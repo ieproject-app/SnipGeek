@@ -15,11 +15,11 @@ export function LanguageSwitcher({ translationsMap }: { translationsMap: Transla
     if (!pathName) return '/'
 
     const isBlogPage = pathName.includes('/blog/');
+    const currentSlugFromParams = params.slug as string;
     
-    if (isBlogPage && translationsMap) {
-      const currentSlug = pathName.split('/').pop();
+    if (isBlogPage && currentSlugFromParams && translationsMap) {
+      const currentSlug = currentSlugFromParams;
       
-      // Find the translation key for the current post
       let translationKey: string | null = null;
       for (const key in translationsMap) {
         const found = translationsMap[key].find(t => t.locale === currentLocale && t.slug === currentSlug);
@@ -43,13 +43,9 @@ export function LanguageSwitcher({ translationsMap }: { translationsMap: Transla
     // Fallback for non-blog pages or if translation is not found
     const segments = pathName.split('/');
     const isLocalized = i18n.locales.includes(segments[1] as any);
-
-    let pathWithoutLocale = pathName;
-    if (isLocalized) {
-        // e.g. /id/about -> /about or /id -> /
-        const newPath = segments.slice(2).join('/');
-        pathWithoutLocale = `/${newPath}`;
-    }
+    
+    let pathWithoutLocale = isLocalized ? `/${segments.slice(2).join('/')}` : pathName;
+    if (pathWithoutLocale === '') pathWithoutLocale = '/';
 
     if (newLocale === i18n.defaultLocale) {
         return pathWithoutLocale;
