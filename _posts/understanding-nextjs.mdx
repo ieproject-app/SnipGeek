@@ -1,0 +1,51 @@
+---
+title: 'Understanding the Power of Next.js App Router'
+date: '2024-07-22'
+description: 'Explore the features of the Next.js App Router, including Server Components, Layouts, and Streaming, and how they enable you to build faster, more dynamic web applications.'
+heroImage: 'understanding-nextjs'
+---
+
+The release of the App Router in Next.js 13 marked a significant paradigm shift in how we build React applications. It introduces powerful new concepts like Server Components, nested layouts, and built-in streaming capabilities that fundamentally improve both developer experience and application performance.
+
+## Server Components: A New Era
+
+The most groundbreaking feature is the introduction of React Server Components. By default, all components within the `app` directory are Server Components.
+
+> Server Components run exclusively on the server, reducing the amount of JavaScript sent to the client and enabling direct access to server-side resources like databases or file systems without needing a separate API layer.
+
+This leads to several key benefits:
+- **Smaller Bundle Sizes**: Less client-side JavaScript means faster initial page loads and better performance, especially on slower networks or devices.
+- **Direct Data Fetching**: You can use `async/await` directly within your components to fetch data.
+- **Improved Security**: Sensitive data and logic, like API keys, remain on theserver and are never exposed to the client.
+
+```tsx
+// app/posts/page.tsx
+
+async function getPosts() {
+  const res = await db.query('SELECT * FROM posts');
+  return res.rows;
+}
+
+export default async function PostsPage() {
+  const posts = await getPosts();
+
+  return (
+    <ul>
+      {posts.map(post => (
+        <li key={post.id}>{post.title}</li>
+      ))}
+    </ul>
+  );
+}
+```
+
+## Nested Layouts and Routes
+
+The App Router uses a file-system-based routing system where folders define routes. A special `layout.tsx` file allows you to create UI that is shared across multiple pages.
+
+- `app/layout.tsx`: Root layout, applies to all routes.
+- `app/dashboard/layout.tsx`: Nested layout, applies only to routes under `/dashboard`.
+
+This structure preserves state, minimizes re-rendering, and allows for complex, interactive UIs to be built with ease.
+
+The App Router is a powerful evolution for Next.js, enabling developers to build faster, more scalable, and more engaging user experiences. Embracing its features will set you up for success in the modern web landscape.

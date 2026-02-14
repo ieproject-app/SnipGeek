@@ -1,3 +1,16 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "understanding-nextjs",
+      "description": "Abstract representation of Next.js architecture",
+      "imageUrl": "https://images.unsplash.com/photo-1565106430482-8f6e74349ca1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxjb2RlJTIwYWJzdHJhY3R8ZW58MHx8fHwxNzcxMDI0ODk1fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "code abstract"
+    },
+    {
+      "id": "mastering-tailwind",
+      "description": "A vibrant and clean design system visualization",
+      "imageUrl": "https://images.unsplash.com/photo-1576595580361-90a855b84b20?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxkZXNpZ24lMjBzeXN0ZW18ZW58MHx8fHwxNzcxMDYwODc4fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "design system"
+    }
+  ]
 }
