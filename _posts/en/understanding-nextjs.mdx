@@ -1,0 +1,52 @@
+---
+title: 'Understanding Next.js Core Concepts'
+date: '2024-05-21'
+description: 'A beginner-friendly guide to the architecture and key features of Next.js for modern web development.'
+heroImage: 'understanding-nextjs'
+translationKey: 'understanding-nextjs'
+featured: true
+category: 'Tutorial'
+tags:
+  - 'Next.js'
+  - 'React'
+  - 'Web Development'
+---
+
+Next.js is a powerful React framework that enables functionalities such as server-side rendering and generating static websites. For React developers, it offers a streamlined experience for building fast and user-friendly web applications. This post will delve into the core concepts that make Next.js a go-to choice for developers worldwide.
+
+## App Router vs. Pages Router
+
+One of the most significant evolutions in Next.js is the introduction of the **App Router**, which works alongside the traditional **Pages Router**. The App Router, built on top of React Server Components, allows for more flexible and powerful routing, nested layouts, and improved data fetching strategies. While the Pages Router remains a solid choice for many applications, the App Router is the future, offering better performance and developer experience.
+
+## Server Components and Client Components
+
+With the App Router, Next.js introduces a new paradigm: React Server Components (RSCs). By default, all components inside the `app` directory are Server Components. This means they run exclusively on the server, fetching data and rendering HTML before it's ever sent to the client. This significantly reduces the amount of JavaScript shipped to the browser, leading to faster initial page loads.
+
+When you need interactivity, like handling a button click or using state with `useState`, you can opt into using a **Client Component** by simply adding the `'use client'` directive at the top of your file. This provides a clear separation of concerns between your server-rendered static content and your interactive client-side logic.
+
+## Data Fetching
+
+Next.js revolutionizes data fetching with `async` and `await` in Server Components. You can fetch data directly within your components, and Next.js will automatically handle caching and revalidation.
+
+```javascript
+async function getData() {
+  const res = await fetch('https://api.example.com/...')
+  // The return value is *not* serialized
+  // You can return Date, Map, Set, etc.
+ 
+  if (!res.ok) {
+    // This will activate the closest `error.js` Error Boundary
+    throw new Error('Failed to fetch data')
+  }
+ 
+  return res.json()
+}
+ 
+export default async function Page() {
+  const data = await getData()
+ 
+  return <main></main>
+}
+```
+
+This approach simplifies code, improves performance by fetching data on the server, and provides a robust caching mechanism out of the box.

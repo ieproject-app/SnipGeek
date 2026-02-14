@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
+import { i18n } from '@/i18n-config';
 
 const postsDirectory = path.join(process.cwd(), '_posts');
 
@@ -9,21 +10,27 @@ export type PostFrontmatter = {
   date: string;
   description: string;
   heroImage: string;
+  translationKey: string;
+  featured?: boolean;
+  tags?: string[];
+  category?: string;
   [key: string]: any;
 };
 
 export type Post<TFrontmatter> = {
   slug: string;
   frontmatter: TFrontmatter;
+  locale: string;
 };
 
 
-export function getSortedPostsData(): Post<PostFrontmatter>[] {
+export function getSortedPostsData(locale: string = i18n.defaultLocale): Post<PostFrontmatter>[] {
+  const localeDirectory = path.join(postsDirectory, locale);
   let fileNames: string[];
+
   try {
-    fileNames = fs.readdirSync(postsDirectory);
+    fileNames = fs.readdirSync(localeDirectory);
   } catch (err) {
-    // If the directory doesn't exist, return an empty array
     return [];
   }
 
@@ -31,13 +38,14 @@ export function getSortedPostsData(): Post<PostFrontmatter>[] {
     .filter((fileName) => fileName.endsWith('.mdx'))
     .map((fileName) => {
       const slug = fileName.replace(/\.mdx$/, '');
-      const fullPath = path.join(postsDirectory, fileName);
+      const fullPath = path.join(localeDirectory, fileName);
       const fileContents = fs.readFileSync(fullPath, 'utf8');
       const { data } = matter(fileContents);
 
       return {
         slug,
         frontmatter: data as PostFrontmatter,
+        locale,
       };
     });
 
@@ -50,8 +58,15 @@ export function getSortedPostsData(): Post<PostFrontmatter>[] {
   });
 }
 
-export async function getPostData(slug: string) {
-  const fullPath = path.join(postsDirectory, `${slug}.mdx`);
+export type PostData = {
+  slug: string;
+  frontmatter: PostFrontmatter;
+  content: string;
+  locale: string;
+};
+
+export async function getPostData(slug: string, locale: string = i18n.defaultLocale): Promise<PostData | null> {
+  const fullPath = path.join(postsDirectory, locale, `${slug}.mdx`);
   
   if (!fs.existsSync(fullPath)) {
     return null;
@@ -64,13 +79,15 @@ export async function getPostData(slug: string) {
     slug,
     frontmatter: data as PostFrontmatter,
     content,
+    locale,
   };
 }
 
-export function getAllPostSlugs() {
+export function getAllPostSlugs(locale: string = i18n.defaultLocale) {
+    const localeDirectory = path.join(postsDirectory, locale);
     let fileNames: string[];
     try {
-      fileNames = fs.readdirSync(postsDirectory);
+      fileNames = fs.readdirSync(localeDirectory);
     } catch (err) {
       return [];
     }
@@ -82,4 +99,20 @@ export function getAllPostSlugs() {
           slug: fileName.replace(/\.mdx$/, ''),
         };
       });
+}
+
+export function getPostTranslation(translationKey: string, targetLocale: string): Post<PostFrontmatter> | null {
+  const allPosts = getSortedPostsData(targetLocale);
+  const translatedPost = allPosts.find(p => p.frontmatter.translationKey === translationKey);
+  return translatedPost || null;
+}
+
+export function getAllLocales() {
+  try {
+    return fs.readdirSync(postsDirectory).filter(item => 
+      fs.statSync(path.join(postsDirectory, item)).isDirectory()
+    );
+  } catch (error) {
+    return [];
+  }
 }

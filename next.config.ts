@@ -1,4 +1,5 @@
 import type {NextConfig} from 'next';
+import { i18n } from './src/i18n-config';
 
 const nextConfig: NextConfig = {
   /* config options here */
@@ -29,6 +30,10 @@ const nextConfig: NextConfig = {
         pathname: '/**',
       },
     ],
+  },
+  i18n: {
+    locales: i18n.locales,
+    defaultLocale: i18n.defaultLocale,
   },
 };
 

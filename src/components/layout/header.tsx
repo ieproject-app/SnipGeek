@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
+import { LanguageSwitcher } from './language-switcher';
 
 export function Header() {
   const [isVisible, setIsVisible] = useState(true);
@@ -11,11 +12,9 @@ export function Header() {
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
-      // Show header if scrolling up or at the top of the page
       if (currentScrollY < lastScrollY.current || currentScrollY < 10) {
         setIsVisible(true);
       } else if (currentScrollY > 100 && currentScrollY > lastScrollY.current) {
-        // Hide header if scrolling down and not near the top
         setIsVisible(false);
       }
       lastScrollY.current = currentScrollY;
@@ -33,10 +32,11 @@ export function Header() {
         "fixed top-4 left-1/2 -translate-x-1/2 z-50 transition-all duration-300 ease-in-out",
         isVisible ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-16"
     )}>
-        <nav className="bg-primary/90 backdrop-blur-sm text-primary-foreground rounded-full px-5 py-2 shadow-lg ring-1 ring-black/5">
+        <nav className="bg-primary/90 backdrop-blur-sm text-primary-foreground rounded-full px-4 py-2 shadow-lg ring-1 ring-black/5 flex items-center gap-4">
             <Link href="/" className="font-headline text-2xl font-bold tracking-tighter">
                 SG
             </Link>
+            <LanguageSwitcher />
         </nav>
     </header>
   );

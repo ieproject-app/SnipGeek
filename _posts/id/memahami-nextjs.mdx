@@ -1,0 +1,52 @@
+---
+title: 'Memahami Konsep Inti Next.js'
+date: '2024-05-21'
+description: 'Panduan ramah pemula tentang arsitektur dan fitur utama Next.js untuk pengembangan web modern.'
+heroImage: 'understanding-nextjs'
+translationKey: 'understanding-nextjs'
+featured: true
+category: 'Tutorial'
+tags:
+  - 'Next.js'
+  - 'React'
+  - 'Pengembangan Web'
+---
+
+Next.js adalah kerangka kerja React yang kuat yang memungkinkan fungsionalitas seperti rendering sisi server dan pembuatan situs web statis. Bagi pengembang React, ini menawarkan pengalaman yang efisien untuk membangun aplikasi web yang cepat dan ramah pengguna. Postingan ini akan membahas konsep-konsep inti yang menjadikan Next.js pilihan utama bagi para pengembang di seluruh dunia.
+
+## App Router vs. Pages Router
+
+Salah satu evolusi paling signifikan di Next.js adalah pengenalan **App Router**, yang bekerja berdampingan dengan **Pages Router** tradisional. App Router, yang dibangun di atas React Server Components, memungkinkan routing yang lebih fleksibel dan kuat, layout bersarang, dan strategi pengambilan data yang lebih baik. Meskipun Pages Router tetap menjadi pilihan yang solid untuk banyak aplikasi, App Router adalah masa depan, menawarkan kinerja dan pengalaman pengembang yang lebih baik.
+
+## Server Components dan Client Components
+
+Dengan App Router, Next.js memperkenalkan paradigma baru: React Server Components (RSC). Secara default, semua komponen di dalam direktori `app` adalah Server Components. Ini berarti mereka berjalan secara eksklusif di server, mengambil data dan me-render HTML sebelum dikirim ke klien. Hal ini secara signifikan mengurangi jumlah JavaScript yang dikirim ke browser, yang mengarah pada pemuatan halaman awal yang lebih cepat.
+
+Ketika Anda membutuhkan interaktivitas, seperti menangani klik tombol atau menggunakan state dengan `useState`, Anda dapat memilih untuk menggunakan **Client Component** dengan hanya menambahkan direktif `'use client'` di bagian atas file Anda. Ini memberikan pemisahan yang jelas antara konten statis yang di-render di server dan logika interaktif sisi klien Anda.
+
+## Pengambilan Data (Data Fetching)
+
+Next.js merevolusi pengambilan data dengan `async` dan `await` di Server Components. Anda dapat mengambil data langsung di dalam komponen Anda, dan Next.js akan secara otomatis menangani caching dan revalidasi.
+
+```javascript
+async function getData() {
+  const res = await fetch('https://api.example.com/...')
+  // Nilai yang dikembalikan *tidak* diserialisasi
+  // Anda bisa mengembalikan Date, Map, Set, dll.
+ 
+  if (!res.ok) {
+    // Ini akan mengaktifkan `error.js` Error Boundary terdekat
+    throw new Error('Gagal mengambil data')
+  }
+ 
+  return res.json()
+}
+ 
+export default async function Page() {
+  const data = await getData()
+ 
+  return <main></main>
+}
+```
+
+Pendekatan ini menyederhanakan kode, meningkatkan kinerja dengan mengambil data di server, dan menyediakan mekanisme caching yang kuat secara bawaan.
