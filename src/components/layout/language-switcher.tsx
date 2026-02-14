@@ -9,7 +9,17 @@ import { type TranslationsMap } from '@/lib/posts'
 export function LanguageSwitcher({ translationsMap }: { translationsMap: TranslationsMap }) {
   const pathName = usePathname()
   const params = useParams()
-  const currentLocale = params.locale as string
+
+  // This is a more robust way to determine the current locale.
+  // It checks the URL path first, which is the most reliable source of truth.
+  const getCurrentLocale = () => {
+    const segments = pathName.split('/');
+    if (i18n.locales.includes(segments[1] as any)) {
+      return segments[1];
+    }
+    return i18n.defaultLocale;
+  }
+  const currentLocale = getCurrentLocale();
 
   const redirectedPathName = (newLocale: string) => {
     if (!pathName) return '/'
@@ -18,11 +28,10 @@ export function LanguageSwitcher({ translationsMap }: { translationsMap: Transla
     const currentSlugFromParams = params.slug as string;
     
     if (isBlogPage && currentSlugFromParams && translationsMap) {
-      const currentSlug = currentSlugFromParams;
-      
       let translationKey: string | null = null;
+      // Find the translation key for the current slug and locale
       for (const key in translationsMap) {
-        const found = translationsMap[key].find(t => t.locale === currentLocale && t.slug === currentSlug);
+        const found = translationsMap[key].find(t => t.locale === currentLocale && t.slug === currentSlugFromParams);
         if (found) {
           translationKey = key;
           break;
@@ -30,6 +39,7 @@ export function LanguageSwitcher({ translationsMap }: { translationsMap: Transla
       }
 
       if (translationKey) {
+        // BUG FIX: Use the found translationKey, not the loop variable 'key'
         const targetTranslation = translationsMap[translationKey].find(t => t.locale === newLocale);
         if (targetTranslation) {
           if (newLocale === i18n.defaultLocale) {
@@ -58,17 +68,18 @@ export function LanguageSwitcher({ translationsMap }: { translationsMap: Transla
     return `/${newLocale}${pathWithoutLocale}`;
   }
 
+  const isActive = (locale: string) => currentLocale === locale;
+
   return (
     <div className="flex gap-1 items-center">
       {i18n.locales.map((locale) => {
-        const isActive = currentLocale === locale;
         return (
           <Button
             key={locale}
-            variant={isActive ? 'secondary' : 'ghost'}
+            variant={isActive(locale) ? 'secondary' : 'ghost'}
             size="sm"
             asChild
-            className={`transition-all ${isActive ? 'ring-2 ring-ring' : ''}`}
+            className={`transition-all ${isActive(locale) ? 'ring-2 ring-ring' : ''}`}
           >
             <Link href={redirectedPathName(locale)}>
               {locale.toUpperCase()}
