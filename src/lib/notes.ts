@@ -52,23 +52,7 @@ export function getSortedNotesData(locale?: string): Note<NoteFrontmatter>[] {
     })
     .filter((note): note is Note<NoteFrontmatter> => note !== null); // Filter out null values
 
-  const notesWithKeys = new Map<string, Note<NoteFrontmatter>>();
-  const notesWithoutKeys: Note<NoteFrontmatter>[] = [];
-
-  for (const note of allNotesData) {
-      const key = note.frontmatter.translationKey;
-      if (key) {
-          if (!notesWithKeys.has(key) || new Date(note.frontmatter.date) > new Date(notesWithKeys.get(key)!.frontmatter.date)) {
-              notesWithKeys.set(key, note);
-          }
-      } else {
-          notesWithoutKeys.push(note);
-      }
-  }
-
-  const uniqueNotes = [...Array.from(notesWithKeys.values()), ...notesWithoutKeys];
-
-  return uniqueNotes.sort((a, b) => {
+  return allNotesData.sort((a, b) => {
     if (new Date(a.frontmatter.date) < new Date(b.frontmatter.date)) {
       return 1;
     } else {
