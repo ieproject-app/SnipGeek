@@ -16,8 +16,10 @@ export function LanguageSwitcher({ translationsMap }: { translationsMap: Transla
   const redirectedPathName = (newLocale: string) => {
     if (!pathName) return '/'
 
-    // 1. Handle blog post pages
+    // 1. Handle detail pages (blog, notes)
     if (currentSlug && translationsMap) {
+      const pageType = pathName.includes('/notes/') ? 'notes' : 'blog';
+      
       let translationKey: string | null = null;
       // Find the translation key for the current slug and locale
       for (const key in translationsMap) {
@@ -29,12 +31,12 @@ export function LanguageSwitcher({ translationsMap }: { translationsMap: Transla
       }
 
       if (translationKey) {
-        const targetTranslation = translationsMap[translationKey].find(t => t.locale === newLocale);
+        const targetTranslation = translationsMap[translationKey]?.find(t => t.locale === newLocale);
         if (targetTranslation) {
           if (newLocale === i18n.defaultLocale) {
-            return `/blog/${targetTranslation.slug}`;
+            return `/${pageType}/${targetTranslation.slug}`;
           }
-          return `/${newLocale}/blog/${targetTranslation.slug}`;
+          return `/${newLocale}/${pageType}/${targetTranslation.slug}`;
         }
       }
     }

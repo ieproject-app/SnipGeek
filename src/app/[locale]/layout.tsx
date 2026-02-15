@@ -1,6 +1,7 @@
 import { Header } from '@/components/layout/header';
 import { i18n } from '@/i18n-config';
-import { getAllTranslationsMap } from '@/lib/posts';
+import { getAllTranslationsMap as getAllPostTranslationsMap } from '@/lib/posts';
+import { getAllNotesTranslationsMap } from '@/lib/notes';
 import '../globals.css';
 import { Toaster } from '@/components/ui/toaster';
 import type { Metadata } from 'next';
@@ -21,7 +22,10 @@ export default function LocaleLayout({
   children: React.ReactNode;
   params: { locale: string };
 }) {
-  const translationsMap = getAllTranslationsMap();
+  const postTranslationsMap = getAllPostTranslationsMap();
+  const noteTranslationsMap = getAllNotesTranslationsMap();
+  const translationsMap = {...postTranslationsMap, ...noteTranslationsMap};
+  
   return (
     <html lang={params.locale} className="scroll-smooth">
       <head>

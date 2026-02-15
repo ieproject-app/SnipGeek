@@ -15,11 +15,8 @@ export default function NotesPage({ params: { locale } }: { params: { locale: st
       <main className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-12 sm:pt-32 sm:pb-16">
         <header className="mb-12 text-center">
             <h1 className="font-headline text-5xl md:text-6xl font-extrabold tracking-tighter text-primary mb-3">
-                Notes
+                {locale === 'id' ? 'Catatan' : 'Notes'}
             </h1>
-            <p className="text-muted-foreground text-lg">
-                A collection of short thoughts, findings, and experiments.
-            </p>
         </header>
 
         <section>

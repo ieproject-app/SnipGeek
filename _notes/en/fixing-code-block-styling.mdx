@@ -1,0 +1,47 @@
+---
+title: 'Fixing The Case of the Stubborn Code Block Styles'
+date: '2024-05-23'
+description: 'A quick note on how we solved a tricky CSS issue with code block styling in our MDX setup.'
+translationKey: 'fixing-code-block'
+---
+
+Today, we ran into an interesting little problem: our code blocks looked plain and had no internal padding, making the code stick to the edges. It wasn't a good look.
+
+We tried applying global styles using `@apply` in `globals.css`:
+
+```css
+pre.shiki {
+  @apply rounded-lg p-6 my-6 overflow-x-auto;
+}
+```
+
+Theoretically, this should have worked. However, it seemed like these styles weren't being applied, likely due to some specificity conflict or build-time optimization that we couldn't immediately pinpoint.
+
+The more robust solution was to handle it directly at the component level. We edited `src/components/mdx-components.tsx` to explicitly define how a `<pre>` tag should be rendered.
+
+We created a custom component for it:
+
+```tsx
+const MdxPre = ({ className, ...props }: React.HTMLAttributes<HTMLPreElement>) => (
+    <pre
+        className={cn(
+            "rounded-lg p-6 my-6 overflow-x-auto",
+            className
+        )}
+        {...props}
+    />
+);
+```
+
+And then registered it:
+
+```tsx
+export const mdxComponents: MDXComponents = {
+    // ... other components
+    pre: MdxPre,
+}
+```
+
+By doing this, we tell MDX, "Hey, every time you see a `<pre>` block, use this exact React component." This bypasses any CSS specificity issues and directly applies the Tailwind classes we want.
+
+Problem solved! The code blocks now have proper padding and rounded corners, just as they should.
