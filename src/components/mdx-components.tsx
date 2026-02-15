@@ -2,16 +2,22 @@ import type { MDXComponents } from 'next-mdx-remote/rsc/types'
 import Image from 'next/image'
 import Link from 'next/link'
 
-const CustomCode = ({ className, ...props }: any) => {
-  const isCodeBlock = className?.includes('language-');
+// This component handles how `<code>` tags are rendered.
+const CustomCode = (props: any) => {
+  const isCodeBlock = props.className?.includes('language-');
+
   if (isCodeBlock) {
-    // The `pre` tag is handled by rehype-pretty-code, so we just need the code tag.
-    return <code className={className} {...props} />;
+    // For code blocks, rehype-pretty-code has already done the syntax highlighting.
+    // It passes the necessary props to `code`. We just render it.
+    // The parent <pre> tag is handled by CustomPre.
+    return <code {...props} />;
   }
-  // This is for inline code
+
+  // For inline code, we apply our own simple styling.
   return <code className="font-code relative rounded bg-muted px-[0.4rem] py-[0.2rem] font-mono text-sm font-semibold" {...props} />;
 }
 
+// This component handles how `<img>` tags are rendered via MDX.
 const CustomImage = (props: any) => (
     <div className="my-8">
         <Image
@@ -23,6 +29,13 @@ const CustomImage = (props: any) => (
     </div>
 );
 
+// This component handles the outer container for code blocks.
+const CustomPre = (props: any) => {
+  // rehype-pretty-code injects its own <pre> with styles.
+  // We pass the props through and only add margin for layout.
+  // This lets the theme from rehype-pretty-code control the background, padding, and font.
+  return <pre className="my-6" {...props} />;
+}
 
 export const mdxComponents: MDXComponents = {
     h1: ({ children }) => <h1 className="font-headline mt-12 mb-6 text-4xl font-bold tracking-tighter text-primary">{children}</h1>,
@@ -40,9 +53,7 @@ export const mdxComponents: MDXComponents = {
     ol: ({ children }) => <ol className="my-6 ml-6 list-decimal [&>li]:mt-2">{children}ol>,
     li: ({ children }) => <li>{children}</li>,
     blockquote: ({ children }) => <blockquote className="mt-6 border-l-2 border-primary/20 pl-6 italic text-muted-foreground">{children}</blockquote>,
-    pre: (props: any) => (
-      <pre className="font-code my-6 rounded-lg overflow-x-auto" {...props} />
-    ),
+    pre: CustomPre,
     code: CustomCode,
     Image: CustomImage,
 }
