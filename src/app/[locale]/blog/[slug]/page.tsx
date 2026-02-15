@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { mdxComponents } from '@/components/mdx-components';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import type { Metadata } from 'next';
+import remarkGfm from 'remark-gfm';
 
 export async function generateStaticParams() {
   const locales = getAllLocales();
@@ -66,7 +67,15 @@ export default async function PostPage({ params }: { params: { slug: string, loc
           </p>
         </header>
         <div className="text-lg text-foreground/80">
-          <MDXRemote source={post.content} components={mdxComponents} />
+          <MDXRemote
+            source={post.content}
+            components={mdxComponents}
+            options={{
+              mdxOptions: {
+                remarkPlugins: [remarkGfm],
+              },
+            }}
+          />
         </div>
       </article>
     </main>
