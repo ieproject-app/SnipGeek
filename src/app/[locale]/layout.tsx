@@ -6,6 +6,8 @@ import { getAllNotesTranslationsMap } from '@/lib/notes';
 import '../globals.css';
 import { Toaster } from '@/components/ui/toaster';
 import type { Metadata } from 'next';
+import { ThemeProvider } from '@/components/theme-provider';
+import { BackToTop } from '@/components/layout/back-to-top';
 
 export const metadata: Metadata = {
   // The user should update this URL to their actual domain.
@@ -37,17 +39,25 @@ export default function LocaleLayout({
   const translationsMap = {...postTranslationsMap, ...noteTranslationsMap};
   
   return (
-    <html lang={params.locale} className="scroll-smooth">
+    <html lang={params.locale} className="scroll-smooth" suppressHydrationWarning>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Space+Grotesk:wght@400;500;700&family=Source+Code+Pro&display=swap" rel="stylesheet" />
       </head>
       <body className="font-body antialiased">
-        <Header translationsMap={translationsMap} />
-        <main>{children}</main>
-        <Footer />
-        <Toaster />
+        <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+        >
+            <Header translationsMap={translationsMap} />
+            <main>{children}</main>
+            <Footer />
+            <Toaster />
+            <BackToTop />
+        </ThemeProvider>
       </body>
     </html>
   );

@@ -4,6 +4,7 @@ import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { i18n } from '@/i18n-config';
 import { cn } from '@/lib/utils';
+import { ThemeSwitcher } from './theme-switcher';
 
 const footerNavItems = [
   { id: 'footer-about', title: 'About', href: '/about' },
@@ -15,7 +16,7 @@ const footerNavItems = [
 export function Footer() {
     const authorName = "SnipGeek";
     const authorBio = "A passionate developer exploring the web and sharing findings along the way.";
-    const authorAvatar = "/images/profile/profile.png"; // Placeholder for local profile picture
+    const authorAvatar = "/images/profile/profile.png";
 
     return (
         <footer className="w-full bg-background pt-20 sm:pt-32">
@@ -70,8 +71,9 @@ export function Footer() {
 
             {/* Section 3: Standard Footer */}
             <div className="mt-16 sm:mt-24 py-8 border-t">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-sm text-muted-foreground">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row justify-between items-center gap-4 text-center text-sm text-muted-foreground">
                     <p>&copy; {new Date().getFullYear()} {authorName}. All Rights Reserved.</p>
+                    <ThemeSwitcher />
                 </div>
             </div>
         </footer>
