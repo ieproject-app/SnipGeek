@@ -30,10 +30,8 @@ export default function Home({ params: { locale } }: { params: { locale: string 
                     key={post.slug}
                     className={cn(
                       "transform transition-all duration-300 ease-in-out hover:scale-105 hover:-translate-y-2",
-                      index === 0 && "lg:-rotate-2",
-                      index === 1 && "lg:rotate-1",
-                      index === 2 && "lg:-rotate-1",
-                      index === 3 && "lg:rotate-2"
+                      (index === 0 || index === 2) && "lg:rotate-2",
+                      (index === 1 || index === 3) && "lg:-rotate-2 lg:z-10"
                     )}
                   >
                     <Link href={`${linkPrefix}/blog/${post.slug}`} className="block group" aria-label={`Read more about ${post.frontmatter.title}`}>
