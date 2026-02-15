@@ -171,7 +171,7 @@ export function Header({ translationsMap, searchableData }: { translationsMap: T
                 isSearchOpen ? "opacity-0 pointer-events-none" : "opacity-100"
             )}>
                 {/* Mobile controls */}
-                <div className="flex md:hidden items-center">
+                <div className={cn("flex md:hidden items-center", isSearchOpen && "opacity-0 pointer-events-none")}>
                     <LanguageSwitcher translationsMap={translationsMap} />
                     <Button 
                         variant="ghost" 
@@ -280,7 +280,7 @@ export function Header({ translationsMap, searchableData }: { translationsMap: T
                 {query.length > 1 ? (
                     results.length > 0 ? (
                         <ScrollArea className="h-full max-h-[400px]">
-                            <div className="p-2 pr-4">
+                            <div className="p-2">
                                 <p className="px-2 py-1.5 text-xs font-semibold text-muted-foreground">{results.length} results found</p>
                                 <ul>
                                     {results.map((item) => (
