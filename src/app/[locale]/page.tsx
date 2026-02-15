@@ -30,21 +30,21 @@ export default function Home({ params: { locale } }: { params: { locale: string 
       {/* Featured Posts Section */}
       {featuredPosts.length > 0 && (
         <section className="mb-20 sm:mb-28">
-          <div className="container max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <h2 className="text-3xl font-bold font-headline tracking-tighter text-primary mb-10 text-center">{locale === 'id' ? 'Unggulan' : 'Featured Posts'}</h2>
-            <div className="space-y-16">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {featuredPosts.map((post, index) => {
                 const heroImage = PlaceHolderImages.find(p => p.id === post.frontmatter.heroImage);
                 return (
                   <div
                     key={post.slug}
                     className={cn(
-                      "transform transition-transform duration-300 ease-in-out hover:scale-105 hover:!rotate-0",
-                      index % 2 === 0 ? '-rotate-1' : 'rotate-1'
+                      "transform transition-all duration-300 ease-in-out hover:scale-105 hover:z-10",
+                      (index === 0 || index === 2) ? "lg:-translate-y-4" : ""
                     )}
                   >
                     <Link href={`${linkPrefix}/blog/${post.slug}`} className="block group" aria-label={`Read more about ${post.frontmatter.title}`}>
-                      <article className="relative w-full h-80 md:h-96 rounded-xl overflow-hidden shadow-2xl">
+                      <article className="relative w-full h-96 rounded-xl overflow-hidden shadow-2xl">
                         {heroImage && (
                           <Image
                             src={heroImage.imageUrl}
@@ -54,15 +54,12 @@ export default function Home({ params: { locale } }: { params: { locale: string 
                             data-ai-hint={heroImage.imageHint}
                           />
                         )}
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
-                        <div className="absolute bottom-0 left-0 p-6 md:p-8 text-white w-full">
-                          <p className="text-sm font-semibold uppercase tracking-wider opacity-80 mb-1">{post.frontmatter.category}</p>
-                          <h3 className="font-headline text-3xl md:text-4xl font-bold">
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
+                        <div className="absolute bottom-0 left-0 p-6 text-white w-full">
+                          <p className="text-xs font-semibold uppercase tracking-wider opacity-80 mb-1">{post.frontmatter.category}</p>
+                          <h3 className="font-headline text-2xl font-bold">
                             {post.frontmatter.title}
                           </h3>
-                          <p className="text-sm opacity-90 mt-2 line-clamp-2">
-                            {post.frontmatter.description}
-                          </p>
                         </div>
                       </article>
                     </Link>
