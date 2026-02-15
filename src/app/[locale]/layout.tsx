@@ -8,8 +8,17 @@ import { Toaster } from '@/components/ui/toaster';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
+  // The user should update this URL to their actual domain.
+  metadataBase: new URL('https://your-site-url.com'),
   title: 'SnipGeek - A Modern Minimalist Tech Blog',
   description: 'A modern minimalist tech blog for geeks, powered by local MDX.',
+  alternates: {
+    canonical: '/',
+    languages: {
+      'en': '/',
+      'id': '/id',
+    },
+  },
 };
 
 export async function generateStaticParams() {

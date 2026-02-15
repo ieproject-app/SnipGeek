@@ -2,7 +2,7 @@
 
 import { usePathname, useParams } from 'next/navigation'
 import Link from 'next/link'
-import { i18n } from '@/i18n-config'
+import { i18n, type Locale } from '@/i18n-config'
 import { type TranslationsMap } from '@/lib/posts'
 import { cn } from '@/lib/utils'
 
@@ -12,6 +12,11 @@ export function LanguageSwitcher({ translationsMap }: { translationsMap: Transla
 
   const currentLocale = (params.locale as string) || i18n.defaultLocale;
   const currentSlug = params.slug as string | undefined;
+
+  const handleLocaleChange = (locale: Locale) => {
+    // Set cookie to remember the user's choice for 1 year
+    document.cookie = `NEXT_LOCALE=${locale}; path=/; max-age=31536000; SameSite=Lax`;
+  };
 
   const redirectedPathName = (newLocale: string) => {
     if (!pathName) return '/'
@@ -70,6 +75,7 @@ export function LanguageSwitcher({ translationsMap }: { translationsMap: Transla
                     currentLocale === locale ? "text-primary-foreground" : "text-primary-foreground/60 hover:text-primary-foreground"
                 )}
                 aria-current={currentLocale === locale ? 'page' : undefined}
+                onClick={() => handleLocaleChange(locale as Locale)}
             >
                 {locale.toUpperCase()}
             </Link>

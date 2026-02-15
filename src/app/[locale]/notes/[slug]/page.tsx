@@ -23,9 +23,30 @@ export async function generateMetadata({ params }: { params: { slug: string, loc
       description: 'The page you are looking for does not exist.',
     };
   }
+
+  const path = `/${params.locale}/notes/${note.slug}`;
+
   return {
     title: note.frontmatter.title,
     description: note.frontmatter.description,
+    alternates: {
+        canonical: path,
+    },
+    openGraph: {
+        title: note.frontmatter.title,
+        description: note.frontmatter.description,
+        url: path,
+        siteName: 'SnipGeek',
+        locale: params.locale,
+        type: 'article',
+        publishedTime: note.frontmatter.date,
+        authors: ['SnipGeek'],
+    },
+    twitter: {
+        card: 'summary_large_image',
+        title: note.frontmatter.title,
+        description: note.frontmatter.description,
+    },
   };
 }
 

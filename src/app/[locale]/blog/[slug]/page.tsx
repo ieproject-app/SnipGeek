@@ -7,6 +7,7 @@ import { PlaceHolderImages } from '@/lib/placeholder-images';
 import type { Metadata } from 'next';
 import remarkGfm from 'remark-gfm';
 import rehypeShiki from '@shikijs/rehype';
+import { i18n } from '@/i18n-config';
 
 export async function generateStaticParams() {
   const locales = getAllLocales();
@@ -25,9 +26,39 @@ export async function generateMetadata({ params }: { params: { slug: string, loc
       description: 'The page you are looking for does not exist.',
     };
   }
+
+  const heroImage = PlaceHolderImages.find(p => p.id === post.frontmatter.heroImage);
+  const path = `/${params.locale}/blog/${post.slug}`;
+
   return {
     title: post.frontmatter.title,
     description: post.frontmatter.description,
+    alternates: {
+        canonical: path,
+    },
+    openGraph: {
+        title: post.frontmatter.title,
+        description: post.frontmatter.description,
+        url: path,
+        siteName: 'SnipGeek',
+        images: heroImage ? [
+            {
+                url: heroImage.imageUrl,
+                width: 1200,
+                height: 630,
+            },
+        ] : [],
+        locale: params.locale,
+        type: 'article',
+        publishedTime: post.frontmatter.date,
+        authors: ['SnipGeek'],
+    },
+    twitter: {
+        card: 'summary_large_image',
+        title: post.frontmatter.title,
+        description: post.frontmatter.description,
+        images: heroImage ? [heroImage.imageUrl] : [],
+    },
   };
 }
 
