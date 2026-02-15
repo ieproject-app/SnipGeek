@@ -29,11 +29,11 @@ export default function Home({ params: { locale } }: { params: { locale: string 
                   <div
                     key={post.slug}
                     className={cn(
-                      "transform transition-all duration-300 ease-in-out hover:scale-105 hover:z-10",
-                      index === 0 && "lg:-translate-y-4 lg:-rotate-2",
-                      index === 1 && "lg:rotate-2",
-                      index === 2 && "lg:-translate-y-4 lg:rotate-2",
-                      index === 3 && "lg:-rotate-2"
+                      "transform transition-all duration-300 ease-in-out hover:scale-105 hover:-translate-y-2",
+                      index === 0 && "lg:-rotate-2",
+                      index === 1 && "lg:rotate-1",
+                      index === 2 && "lg:-rotate-1",
+                      index === 3 && "lg:rotate-2"
                     )}
                   >
                     <Link href={`${linkPrefix}/blog/${post.slug}`} className="block group" aria-label={`Read more about ${post.frontmatter.title}`}>
