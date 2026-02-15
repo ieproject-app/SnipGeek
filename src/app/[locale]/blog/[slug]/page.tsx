@@ -77,7 +77,7 @@ export default async function PostPage({ params }: { params: { slug: string, loc
             })}
           </p>
         </header>
-        <div className="text-lg text-foreground/80 prose dark:prose-invert">
+        <div className="text-lg text-foreground/80">
           <MDXRemote source={post.content} components={mdxComponents} options={options} />
         </div>
       </article>
