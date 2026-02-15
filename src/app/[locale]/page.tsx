@@ -17,7 +17,7 @@ export default function Home({ params: { locale } }: { params: { locale: string 
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-12 sm:pt-32 sm:pb-16">
       <header className="text-center mb-12 sm:mb-16">
         <h1 className="font-headline text-5xl md:text-6xl font-extrabold tracking-tighter text-primary">
-          {locale === 'id' ? 'Blog Teknologi Modern' : 'SnipBlog'}
+          {locale === 'id' ? 'Blog Teknologi Modern' : 'SnipGeek'}
         </h1>
         <p className="mt-4 text-lg text-muted-foreground max-w-xl mx-auto">
           {locale === 'id' ? 'Blog teknologi minimalis modern untuk para geek, didukung oleh MDX lokal.' : 'A modern minimalist tech blog for geeks, powered by local MDX.'}

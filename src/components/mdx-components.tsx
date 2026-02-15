@@ -2,6 +2,7 @@ import type { MDXComponents } from 'next-mdx-remote/rsc/types'
 import Image from 'next/image'
 import Link from 'next/link'
 import React from 'react';
+import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table';
 
 // This component handles how `<img>` tags are rendered via MDX.
 const CustomImage = (props: any) => (
@@ -44,7 +45,6 @@ const MdxLi = ({ children }: { children?: React.ReactNode }) => <li>{children}</
 const MdxBlockquote = ({ children }: { children?: React.ReactNode }) => <blockquote className="mt-6 border-l-2 border-primary/20 pl-6 italic text-muted-foreground">{children}</blockquote>;
 const CustomPre = ({ children }: { children?: React.ReactNode }) => <pre className="font-code bg-muted text-card-foreground p-4 rounded-lg overflow-x-auto my-6">{children}</pre>;
 
-
 export const mdxComponents: MDXComponents = {
     h1: MdxH1,
     h2: MdxH2,
@@ -58,4 +58,10 @@ export const mdxComponents: MDXComponents = {
     blockquote: MdxBlockquote,
     pre: CustomPre,
     img: CustomImage,
+    table: (props) => <div className="my-6"><Table {...props} /></div>,
+    thead: TableHeader,
+    tbody: TableBody,
+    tr: TableRow,
+    th: TableHead,
+    td: TableCell,
 }

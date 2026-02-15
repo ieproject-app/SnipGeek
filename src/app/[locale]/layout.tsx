@@ -6,7 +6,7 @@ import { Toaster } from '@/components/ui/toaster';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'SnipBlog - A Modern Minimalist Tech Blog',
+  title: 'SnipGeek - A Modern Minimalist Tech Blog',
   description: 'A modern minimalist tech blog for geeks, powered by local MDX.',
 };
 
