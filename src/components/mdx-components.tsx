@@ -21,18 +21,9 @@ export const mdxComponents: MDXComponents = {
     pre: (props) => (
       <pre className="font-code my-6 rounded-lg overflow-x-auto" {...props} />
     ),
-    code: (props) => {
-      // Check if this is a code block processed by rehype-pretty-code
-      const isCodeBlock = props.className?.includes('language-');
-      
-      // If it's a code block, let the plugin's styles apply without interference.
-      if (isCodeBlock) {
-        return <code {...props} />;
-      }
-      
-      // Otherwise, it's an inline code snippet, so apply our custom styling.
-      return <code className="font-code relative rounded bg-muted px-[0.4rem] py-[0.2rem] font-mono text-sm font-semibold" {...props} />;
-    },
+    code: (props) => (
+      <code className="font-code relative rounded bg-muted px-[0.4rem] py-[0.2rem] font-mono text-sm font-semibold" {...props} />
+    ),
     Image: (props) => (
         <div className="my-8">
             <Image
