@@ -12,9 +12,7 @@ const footerNavItems = [
   { id: 'footer-archive', title: 'Archive', href: '/archive' },
 ];
 
-export function Footer({ locale }: { locale: string }) {
-    const linkPrefix = locale === i18n.defaultLocale ? '' : `/${locale}`;
-
+export function Footer() {
     const authorName = "SnipGeek";
     const authorBio = "A passionate developer exploring the web and sharing findings along the way.";
     const authorAvatar = "/images/profile/avatar.png"; // Placeholder for local profile picture
@@ -35,7 +33,7 @@ export function Footer({ locale }: { locale: string }) {
                                     (index === 1 || index === 3) && "-rotate-2"
                                 )}
                             >
-                                <Link href={`${linkPrefix}${item.href}`} className="block group">
+                                <Link href={item.href} className="block group">
                                     <article className="relative w-full aspect-[4/3] rounded-xl overflow-hidden shadow-lg">
                                         {image && (
                                             <Image

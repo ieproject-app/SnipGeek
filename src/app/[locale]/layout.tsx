@@ -46,7 +46,7 @@ export default function LocaleLayout({
       <body className="font-body antialiased">
         <Header translationsMap={translationsMap} />
         <main>{children}</main>
-        <Footer locale={params.locale} />
+        <Footer />
         <Toaster />
       </body>
     </html>
