@@ -64,7 +64,7 @@ export default function Home({ params: { locale } }: { params: { locale: string 
 
       {/* Other Posts Section */}
       {otherPosts.length > 0 && (
-        <section className="container max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pb-12 sm:pb-16">
+        <section className="container max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pb-12 sm:pb-16">
           <h2 className="text-3xl font-bold font-headline tracking-tighter text-primary mb-8 text-center">{locale === 'id' ? 'Semua Postingan' : 'All Posts'}</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {otherPosts.slice(0, 4).map((post) => {
