@@ -8,14 +8,9 @@ import { TranslationsMap } from '@/lib/posts';
 import { Search, X, Menu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
+import { usePathname } from 'next/navigation';
 
 const menuItems = [
     { name: 'Blog', href: '/blog' },
@@ -42,11 +37,20 @@ type SearchableItem = {
 export function Header({ translationsMap, searchableData }: { translationsMap: TranslationsMap, searchableData: SearchableItem[] }) {
   const [isVisible, setIsVisible] = useState(true);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<SearchableItem[]>([]);
   const lastScrollY = useRef(0);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const headerRef = useRef<HTMLElement>(null);
+  const pathname = usePathname();
+
+  // Close menu on route change
+  useEffect(() => {
+    setIsMenuOpen(false);
+    setIsSearchOpen(false);
+    setQuery('');
+  }, [pathname]);
 
   // Search logic
   useEffect(() => {
@@ -67,7 +71,7 @@ export function Header({ translationsMap, searchableData }: { translationsMap: T
   // Scroll visibility logic
   useEffect(() => {
     const handleScroll = () => {
-      if (isSearchOpen) return; // Don't hide header if search is open
+      if (isSearchOpen || isMenuOpen) return;
       const currentScrollY = window.scrollY;
       if (currentScrollY < lastScrollY.current || currentScrollY < 10) {
         setIsVisible(true);
@@ -79,7 +83,7 @@ export function Header({ translationsMap, searchableData }: { translationsMap: T
 
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [isSearchOpen]);
+  }, [isSearchOpen, isMenuOpen]);
 
   // Focus input when search opens
   useEffect(() => {
@@ -88,17 +92,19 @@ export function Header({ translationsMap, searchableData }: { translationsMap: T
     }
   }, [isSearchOpen]);
   
-  // Close search on click outside or escape key
+  // Close search/menu on click outside or escape key
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (headerRef.current && !headerRef.current.contains(event.target as Node)) {
         setIsSearchOpen(false);
+        setIsMenuOpen(false);
         setQuery('');
       }
     };
     const handleKeydown = (event: KeyboardEvent) => {
         if (event.key === 'Escape') {
             setIsSearchOpen(false);
+            setIsMenuOpen(false);
             setQuery('');
         }
     }
@@ -115,14 +121,32 @@ export function Header({ translationsMap, searchableData }: { translationsMap: T
     setQuery('');
   };
 
+  const handleMenuToggle = () => {
+    if (isSearchOpen) {
+      setIsSearchOpen(false);
+      setQuery('');
+    }
+    setIsMenuOpen(prev => !prev);
+  }
+
+  const handleSearchToggle = () => {
+    if (isMenuOpen) {
+      setIsMenuOpen(false);
+    }
+    setIsSearchOpen(prev => !prev);
+  }
+
   return (
     <header ref={headerRef} className={cn(
         "fixed top-4 left-4 right-4 md:left-1/2 md:-translate-x-1/2 md:right-auto z-50 transition-all duration-300 ease-in-out",
+        "w-full max-w-sm md:max-w-none",
+        isSearchOpen ? 'md:max-w-md' : 'md:w-auto',
         isVisible ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-16"
     )}>
         <nav className={cn(
-            "mx-auto bg-primary/90 backdrop-blur-sm text-primary-foreground rounded-full shadow-lg ring-1 ring-black/5 flex items-center justify-between h-12 transition-all duration-500 ease-in-out px-2",
-            isSearchOpen ? 'w-full max-w-sm md:max-w-md' : 'w-full md:w-auto'
+            "relative mx-auto bg-primary/90 backdrop-blur-sm text-primary-foreground shadow-lg ring-1 ring-black/5 flex items-center justify-between h-12 transition-all duration-300 ease-in-out px-2",
+            isSearchOpen ? 'w-full rounded-full' : 'md:w-auto',
+            isMenuOpen ? 'rounded-t-2xl rounded-b-none' : 'rounded-full'
         )}>
             {/* Normal view container */}
             <div className={cn(
@@ -138,7 +162,6 @@ export function Header({ translationsMap, searchableData }: { translationsMap: T
                     SG
                 </Link>
                 
-                {/* Spacer for desktop */}
                 <div className="flex-grow hidden md:block" />
 
             </div>
@@ -154,27 +177,15 @@ export function Header({ translationsMap, searchableData }: { translationsMap: T
                         variant="ghost" 
                         size="icon" 
                         className="rounded-full relative z-20 h-9 w-9"
-                        onClick={() => setIsSearchOpen(true)}
+                        onClick={handleSearchToggle}
                         aria-label="Open search"
                     >
                        <Search className="h-5 w-5" />
                     </Button>
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full">
-                                <Menu className="h-5 w-5" />
-                            </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                            {allMenuItems.map((item) => (
-                                <DropdownMenuItem key={item.name} asChild>
-                                    <Link href={item.href}>
-                                        {item.name}
-                                    </Link>
-                                </DropdownMenuItem>
-                            ))}
-                        </DropdownMenuContent>
-                    </DropdownMenu>
+                    <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full" onClick={handleMenuToggle}>
+                        <Menu className="h-5 w-5" />
+                        <span className="sr-only">Open menu</span>
+                    </Button>
                 </div>
 
                 {/* Desktop controls */}
@@ -190,27 +201,20 @@ export function Header({ translationsMap, searchableData }: { translationsMap: T
                             {item.name}
                         </Link>
                     ))}
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-primary-foreground/70 hover:text-primary-foreground">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
-                            </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                            {moreMenuItems.map((item) => (
-                                <DropdownMenuItem key={item.name} asChild>
-                                    <Link href={item.href}>
-                                        {item.name}
-                                    </Link>
-                                </DropdownMenuItem>
-                            ))}
-                        </DropdownMenuContent>
-                    </DropdownMenu>
+                    <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="h-8 w-8 rounded-full text-primary-foreground/70 hover:text-primary-foreground" 
+                        onClick={handleMenuToggle}
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+                        <span className="sr-only">Open more menu items</span>
+                    </Button>
                     <Button 
                         variant="ghost" 
                         size="icon" 
                         className="rounded-full relative z-20 h-9 w-9"
-                        onClick={() => setIsSearchOpen(true)}
+                        onClick={handleSearchToggle}
                         aria-label={"Open search"}
                     >
                        <Search className="h-5 w-5" />
@@ -244,6 +248,31 @@ export function Header({ translationsMap, searchableData }: { translationsMap: T
                 </Button>
             </div>
         </nav>
+
+        {/* Custom Menu */}
+        <div className={cn(
+            "absolute top-full left-0 right-0 z-40 bg-primary/90 backdrop-blur-sm shadow-lg ring-1 ring-black/5 rounded-b-2xl overflow-hidden transition-all duration-300 ease-in-out",
+            "transform-origin-top",
+            isMenuOpen ? "opacity-100 scale-y-100" : "opacity-0 scale-y-95 pointer-events-none"
+        )}>
+            {/* Mobile Menu */}
+            <div className="md:hidden p-2">
+                {allMenuItems.map((item) => (
+                    <Link key={item.name} href={item.href} className="block px-4 py-3 text-base text-primary-foreground rounded-lg hover:bg-primary-foreground/10 transition-colors">
+                        {item.name}
+                    </Link>
+                ))}
+            </div>
+            {/* Desktop Menu */}
+            <div className="hidden md:block p-2">
+                {moreMenuItems.map((item) => (
+                    <Link key={item.name} href={item.href} className="block px-4 py-2 text-sm text-primary-foreground rounded-lg hover:bg-primary-foreground/10 transition-colors">
+                        {item.name}
+                    </Link>
+                ))}
+            </div>
+        </div>
+
         {/* Search Results */}
         {isSearchOpen && (
           <div className="w-full md:w-auto mx-auto mt-2 md:max-w-sm lg:max-w-md">
