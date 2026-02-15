@@ -1,23 +1,21 @@
 ---
-title: 'Memahami Konsep Inti Next.js'
-date: '2024-05-01'
-description: 'Selami lebih dalam konsep-konsep fundamental yang menjadikan Next.js sebuah framework yang kuat untuk membangun aplikasi web modern.'
-heroImage: 'understanding-nextjs'
-translationKey: 'post-1'
+title: "Memahami Next.js: Sebuah Tinjauan Mendalam"
+date: "2024-05-01"
+description: "Melihat secara komprehensif konsep inti Next.js, dari Server Components hingga App Router."
+heroImage: "understanding-nextjs"
+translationKey: "post-1"
 featured: true
 ---
 
-Next.js adalah sebuah framework React yang memberikan Anda pengalaman pengembangan terbaik dengan semua fitur yang Anda butuhkan untuk produksi: rendering hybrid statis & server, dukungan TypeScript, bundling cerdas, pre-fetching rute, dan banyak lagi. Tanpa perlu konfigurasi.
+Next.js telah merevolusi pengembangan React dengan menyediakan kerangka kerja yang kuat dengan fitur-fitur seperti Server-Side Rendering (SSR), Static Site Generation (SSG), dan sekarang, App Router dengan React Server Components (RSC).
 
-## Fondasi Dasar
+## App Router
 
-Pada intinya, Next.js menyediakan cara terstruktur untuk membangun aplikasi React. Ini menangani banyak perkakas dan konfigurasi yang bisa membuat pusing saat memulai proyek baru dari awal.
+App Router, yang diperkenalkan di Next.js 13, adalah sebuah perubahan paradigma. Ini memungkinkan Anda membangun aplikasi menggunakan sistem routing berbasis file di dalam direktori `app`. Setiap folder mewakili segmen rute.
 
-<Note>
-Ini adalah komponen catatan khusus! Anda bisa menggunakannya untuk menyorot informasi penting yang tidak boleh dilewatkan oleh pembaca. Sangat bagus untuk tips, pengingat, atau konteks tambahan.
-</Note>
+> **Catatan:** App Router menggunakan Server Components secara default, yang merupakan keuntungan performa yang besar. Ini berarti lebih sedikit JavaScript yang dikirim ke klien, menghasilkan pemuatan halaman awal yang lebih cepat.
 
-Berikut adalah contoh kode yang lebih panjang untuk mendemonstrasikan bagaimana `rehype-pretty-code` menangani pewarnaan sintaks dan luapan konten. Ini seharusnya sekarang dirender dengan tema `github-dark` dan dapat digulir secara horizontal di layar kecil.
+Berikut adalah contoh kode yang panjang untuk menunjukkan bagaimana seharusnya blok kode terlihat dan berfungsi. Blok ini seharusnya memiliki latar belakang yang konsisten dan dapat digulir secara horizontal di layar yang lebih kecil jika kontennya meluap.
 
 ```tsx
 // src/app/layout.tsx
@@ -30,7 +28,7 @@ const inter = Inter({ subsets: ['latin'] });
  
 export const metadata = {
   title: 'My Awesome App',
-  description: 'Dibuat oleh create next app, dan sekarang memiliki deskripsi yang jauh lebih panjang untuk melihat bagaimana teks terbungkus dan bagaimana seluruh blok kode berperilaku ketika isinya sangat lebar.',
+  description: 'Dibuat oleh create next app, ini adalah contoh baris kode yang sangat panjang yang seharusnya menyebabkan wadah dapat digulir secara horizontal daripada membungkus atau meluap dengan buruk.',
 };
  
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -47,18 +45,23 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 }
 ```
 
-Contoh kode sebaris, seperti `const contoh = "halo"`, seharusnya memiliki latar belakang abu-abu sederhana dan bukan pewarnaan sintaksis penuh.
+## Client vs. Server Components
 
-<Warning>
-Hati-hati! Ini adalah komponen peringatan. Ini dirancang untuk menarik perhatian pada informasi kritis, risiko potensial, atau tindakan yang dapat memiliki konsekuensi yang tidak diinginkan. Gunakan dengan bijak.
-</Warning>
+Dengan App Router, Anda dapat secara eksplisit mendefinisikan komponen sebagai Client atau Server Components.
 
-## Contoh Carousel Gambar
+- **Server Components** berjalan secara eksklusif di server. Mereka dapat langsung mengakses sumber daya backend seperti database dan sistem file.
+- **Client Components** bersifat interaktif dan berjalan di klien. Anda memilih untuk menggunakannya dengan menambahkan direktif `'use client'` di bagian atas file Anda.
 
-Di bawah ini adalah demonstrasi komponen carousel gambar. Anda dapat menggunakannya untuk menampilkan galeri gambar secara ringkas dan interaktif.
+> **Peringatan:** Hati-hati saat mengambil data sensitif. Server Components adalah tempat yang bagus untuk ini, tetapi jangan pernah mengekspos kunci rahasia atau token ke Client Components.
 
-<ImageCarousel images={[
-  "https://picsum.photos/seed/carousel1/1200/675",
-  "https://picsum.photos/seed/carousel2/1200/675",
-  "https://picsum.photos/seed/carousel3/1200/675"
-]} />
+## Galeri Gambar
+
+Berikut adalah beberapa contoh gambar yang ditampilkan satu per satu.
+
+![Representasi abstrak arsitektur Next.js](https://images.unsplash.com/photo-1565106430482-8f6e74349ca1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxjb2RlJTIwYWJzdHJhY3R8ZW58MHx8fHwxNzcxMDI0ODk1fDA&ixlib=rb-4.1.0&q=80&w=1080)
+
+![Visualisasi sistem desain yang cerah dan bersih](https://images.unsplash.com/photo-1576595580361-90a855b84b20?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxkZXNpZ24lMjBzeXN0ZW18ZW58MHx8fHwxNzcxMDYwODc4fDA&ixlib=rb-4.1.0&q=80&w=1080)
+
+![Gambar Placeholder 3](https://picsum.photos/seed/gallery3/800/400)
+
+Ini menunjukkan cara sederhana untuk menampilkan gambar tanpa komponen carousel yang rumit.

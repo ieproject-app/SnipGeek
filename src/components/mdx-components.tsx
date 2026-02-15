@@ -1,9 +1,6 @@
 import type { MDXComponents } from 'next-mdx-remote/rsc/types'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Note } from './mdx/Note'
-import { Warning } from './mdx/Warning'
-import { ImageCarousel } from './mdx/ImageCarousel'
 
 // This component handles how `<img>` tags are rendered via MDX.
 const CustomImage = (props: any) => (
@@ -35,6 +32,7 @@ const MdxUl = ({ children }: { children?: React.ReactNode }) => <ul className="m
 const MdxOl = ({ children }: { children?: React.ReactNode }) => <ol className="my-6 ml-6 list-decimal [&>li]:mt-2">{children}</ol>;
 const MdxLi = ({ children }: { children?: React.ReactNode }) => <li>{children}</li>;
 const MdxBlockquote = ({ children }: { children?: React.ReactNode }) => <blockquote className="mt-6 border-l-2 border-primary/20 pl-6 italic text-muted-foreground">{children}</blockquote>;
+const MdxPre = (props: React.HTMLAttributes<HTMLPreElement>) => <pre className="font-code bg-muted text-card-foreground p-4 rounded-lg overflow-x-auto my-6" {...props} />;
 
 
 export const mdxComponents: MDXComponents = {
@@ -48,8 +46,6 @@ export const mdxComponents: MDXComponents = {
     ol: MdxOl,
     li: MdxLi,
     blockquote: MdxBlockquote,
-    Image: CustomImage,
-    Note,
-    Warning,
-    ImageCarousel,
+    pre: MdxPre,
+    img: CustomImage,
 }

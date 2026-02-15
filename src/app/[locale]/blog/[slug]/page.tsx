@@ -5,7 +5,6 @@ import Image from 'next/image';
 import { mdxComponents } from '@/components/mdx-components';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import type { Metadata } from 'next';
-import rehypePrettyCode from 'rehype-pretty-code';
 
 export async function generateStaticParams() {
   const locales = getAllLocales();
@@ -38,17 +37,6 @@ export default async function PostPage({ params }: { params: { slug: string, loc
 
   const heroImage = PlaceHolderImages.find(p => p.id === post.frontmatter.heroImage);
 
-  const options = {
-    mdxOptions: {
-      rehypePlugins: [
-        [rehypePrettyCode, {
-          theme: 'github-dark',
-          keepBackground: false,
-        }],
-      ],
-    },
-  };
-
   return (
     <main className="w-full">
       <article className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-12 sm:pt-32 sm:pb-16">
@@ -78,7 +66,7 @@ export default async function PostPage({ params }: { params: { slug: string, loc
           </p>
         </header>
         <div className="text-lg text-foreground/80">
-          <MDXRemote source={post.content} components={mdxComponents} options={options} />
+          <MDXRemote source={post.content} components={mdxComponents} />
         </div>
       </article>
     </main>
