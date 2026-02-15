@@ -1,10 +1,9 @@
-patch-package
 --- a/node_modules/next-themes/package.json
 +++ b/node_modules/next-themes/package.json
-@@ -63,8 +63,8 @@
+@@ -53,7 +53,7 @@
+     "react-dom": ">=16.8.0"
    },
    "peerDependencies": {
-     "next": ">=9",
 -    "react": "^16.8 || ^17 || ^18",
 -    "react-dom": "^16.8 || ^17 || ^18"
 +    "react": "^16.8 || ^17 || ^18 || ^19",
