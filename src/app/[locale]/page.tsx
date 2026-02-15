@@ -22,15 +22,18 @@ export default function Home({ params: { locale } }: { params: { locale: string 
       {featuredPosts.length > 0 && (
         <section className="pt-24 sm:pt-32 mb-20 sm:mb-28">
           <div className="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-0">
               {featuredPosts.map((post, index) => {
                 const heroImage = PlaceHolderImages.find(p => p.id === post.frontmatter.heroImage);
                 return (
                   <div
                     key={post.slug}
                     className={cn(
-                      "transform transition-all duration-300 ease-in-out hover:scale-105 hover:z-10",
-                      (index === 0 || index === 2) ? "lg:-translate-y-4" : ""
+                      "transform transition-all duration-300 ease-in-out hover:scale-105 hover:z-10 hover:!rotate-0",
+                      index === 0 && "lg:-translate-y-4 lg:-rotate-2",
+                      index === 1 && "lg:rotate-2",
+                      index === 2 && "lg:-translate-y-4 lg:rotate-2",
+                      index === 3 && "lg:-rotate-2"
                     )}
                   >
                     <Link href={`${linkPrefix}/blog/${post.slug}`} className="block group" aria-label={`Read more about ${post.frontmatter.title}`}>
