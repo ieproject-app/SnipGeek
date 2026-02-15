@@ -1,0 +1,72 @@
+---
+title: "Memahami Server Component di Next.js"
+description: "Membahas secara mendalam cara kerja Server Component di Next.js, manfaatnya, dan cara menggunakannya secara efektif."
+date: "2024-07-28"
+heroImage: "understanding-nextjs"
+translationKey: "understanding-nextjs"
+featured: false
+---
+
+Next.js 13 memperkenalkan paradigma baru: Server Components. Mereka mewakili perubahan signifikan dalam cara kita membangun aplikasi React, menjanjikan kinerja yang lebih baik dan pengalaman pengembang yang lebih efisien. Tapi apa sebenarnya itu, dan bagaimana perbedaannya dari Client Components tradisional yang biasa kita gunakan?
+
+## Apa itu Server Components?
+
+Server Components adalah komponen React yang dirender secara eksklusif di server. Tidak seperti komponen tradisional yang dirender di server pada awalnya (untuk SSR) dan kemudian "hidrasi" untuk menjadi interaktif di klien, kode Server Components **tidak pernah** dikirim ke browser.
+
+Ini menghasilkan bundel JavaScript sisi klien yang lebih kecil, yang mengarah pada pemuatan halaman awal yang lebih cepat dan kinerja keseluruhan yang lebih baik.
+
+```tsx
+// src/app/page.tsx
+import { db } from '@/lib/db';
+ 
+// Ini adalah Server Component
+async function HomePage() {
+  const posts = await db.post.findMany();
+ 
+  return (
+    <main>
+      <h1>Blog Saya</h1>
+      <ul>
+        {posts.map((post) => (
+          <li key={post.id}>
+            <a href={`/posts/${post.slug}`}>{post.title}</a>
+          </li>
+        ))}
+      </ul>
+    </main>
+  );
+}
+ 
+export default HomePage;
+```
+
+> **Poin kunci:** Dengan Server Components, Anda dapat mengambil data langsung di dalam komponen Anda menggunakan `async/await`, yang sangat menyederhanakan logika pengambilan data.
+
+## Server vs. Client Components
+
+Berikut adalah ringkasan singkat perbedaan utamanya:
+
+| Fitur             | Server Component | Client Component |
+| ----------------- | :--------------: | :--------------: |
+| Berjalan di Server|        ✅        |        ❌        |
+| Interaktif (State)|        ❌        |        ✅        |
+| Akses Database    |        ✅        |        ❌        |
+
+---
+
+### Pemformatan Teks
+
+Anda dapat menggunakan Markdown standar untuk pemformatan teks:
+- **Teks Tebal**
+- *Teks Miring*
+- ~~Teks Dicoret~~
+
+## Kapan Menggunakannya?
+
+Memutuskan antara Server dan Client Components sangat penting untuk membangun aplikasi Next.js yang efisien.
+
+1.  **Gunakan Server Components secara default.** Mereka sangat bagus untuk konten statis, mengambil data, dan mengakses sumber daya backend secara langsung.
+2.  **Gunakan Client Components untuk interaktivitas.** Jika komponen Anda perlu menggunakan state (`useState`), efek siklus hidup (`useEffect`), atau menangani API khusus browser (seperti window atau document), Anda harus menandainya sebagai Client Component dengan direktif `'use client'`.
+3.  **Campur dan cocokkan.** Anda dapat dengan mulus menyarangkan Server Components di dalam Client Components dan sebaliknya, memungkinkan Anda membangun UI yang kompleks dengan kinerja optimal.
+
+Dengan memahami kekuatan setiap jenis komponen, Anda dapat membangun aplikasi yang lebih cepat, lebih dapat diskalakan, dan lebih mudah dipelihara dengan Next.js.

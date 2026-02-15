@@ -1,0 +1,72 @@
+---
+title: "Understanding Next.js Server Components"
+description: "A deep dive into how Next.js Server Components work, their benefits, and how to use them effectively."
+date: "2024-07-28"
+heroImage: "understanding-nextjs"
+translationKey: "understanding-nextjs"
+featured: false
+---
+
+Next.js 13 introduced a new paradigm: Server Components. They represent a significant shift in how we build React applications, promising better performance and a more streamlined developer experience. But what exactly are they, and how do they differ from the traditional Client Components we're used to?
+
+## What are Server Components?
+
+Server Components are React components that render exclusively on the server. Unlike traditional components that render on the server initially (for SSR) and then "hydrate" to become interactive on the client, Server Components' code **never** ships to the browser.
+
+This results in a smaller client-side JavaScript bundle, leading to faster initial page loads and better overall performance.
+
+```tsx
+// src/app/page.tsx
+import { db } from '@/lib/db';
+ 
+// This is a Server Component
+async function HomePage() {
+  const posts = await db.post.findMany();
+ 
+  return (
+    <main>
+      <h1>My Blog</h1>
+      <ul>
+        {posts.map((post) => (
+          <li key={post.id}>
+            <a href={`/posts/${post.slug}`}>{post.title}</a>
+          </li>
+        ))}
+      </ul>
+    </main>
+  );
+}
+ 
+export default HomePage;
+```
+
+> **Key takeaway:** With Server Components, you can fetch data directly within your component using `async/await`, simplifying data-fetching logic significantly.
+
+## Server vs. Client Components
+
+Here's a quick breakdown of the key differences:
+
+| Feature           | Server Component | Client Component |
+| ----------------- | :--------------: | :--------------: |
+| Runs on Server    |        ✅        |        ❌        |
+| Interactive (State)|        ❌        |        ✅        |
+| Access Database   |        ✅        |        ❌        |
+
+---
+
+### Text Formatting
+
+You can use standard Markdown for text formatting:
+- **Bold Text**
+- *Italic Text*
+- ~~Strikethrough Text~~
+
+## When to Use Which?
+
+Deciding between Server and Client Components is crucial for building efficient Next.js applications.
+
+1.  **Use Server Components by default.** They are great for static content, fetching data, and accessing backend resources directly.
+2.  **Use Client Components for interactivity.** If your component needs to use state (`useState`), lifecycle effects (`useEffect`), or handle browser-only APIs (like window or document), you must mark it as a Client Component with the `'use client'` directive.
+3.  **Mix and match.** You can seamlessly nest Server Components within Client Components and vice versa, allowing you to build complex UIs with optimal performance.
+
+By understanding the strengths of each component type, you can build faster, more scalable, and more maintainable applications with Next.js.
