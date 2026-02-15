@@ -2,6 +2,28 @@ import type { MDXComponents } from 'next-mdx-remote/rsc/types'
 import Image from 'next/image'
 import Link from 'next/link'
 
+const CustomCode = ({ className, ...props }: any) => {
+  const isCodeBlock = className?.includes('language-');
+  if (isCodeBlock) {
+    // The `pre` tag is handled by rehype-pretty-code, so we just need the code tag.
+    return <code className={className} {...props} />;
+  }
+  // This is for inline code
+  return <code className="font-code relative rounded bg-muted px-[0.4rem] py-[0.2rem] font-mono text-sm font-semibold" {...props} />;
+}
+
+const CustomImage = (props: any) => (
+    <div className="my-8">
+        <Image
+            className="rounded-lg shadow-md"
+            sizes="100vw"
+            style={{ width: '100%', height: 'auto' }}
+            {...props}
+        />
+    </div>
+);
+
+
 export const mdxComponents: MDXComponents = {
     h1: ({ children }) => <h1 className="font-headline mt-12 mb-6 text-4xl font-bold tracking-tighter text-primary">{children}</h1>,
     h2: ({ children }) => <h2 className="font-headline mt-10 mb-5 border-b pb-2 text-3xl font-bold tracking-tighter text-primary">{children}</h2>,
@@ -18,20 +40,9 @@ export const mdxComponents: MDXComponents = {
     ol: ({ children }) => <ol className="my-6 ml-6 list-decimal [&>li]:mt-2">{children}ol>,
     li: ({ children }) => <li>{children}</li>,
     blockquote: ({ children }) => <blockquote className="mt-6 border-l-2 border-primary/20 pl-6 italic text-muted-foreground">{children}</blockquote>,
-    pre: (props) => (
+    pre: (props: any) => (
       <pre className="font-code my-6 rounded-lg overflow-x-auto" {...props} />
     ),
-    code: (props) => (
-      <code className="font-code relative rounded bg-muted px-[0.4rem] py-[0.2rem] font-mono text-sm font-semibold" {...props} />
-    ),
-    Image: (props) => (
-        <div className="my-8">
-            <Image
-                className="rounded-lg shadow-md"
-                sizes="100vw"
-                style={{ width: '100%', height: 'auto' }}
-                {...props}
-            />
-        </div>
-    ),
+    code: CustomCode,
+    Image: CustomImage,
 }
