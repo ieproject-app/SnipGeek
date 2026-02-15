@@ -43,7 +43,7 @@ export default async function PostPage({ params }: { params: { slug: string, loc
       rehypePlugins: [
         [rehypePrettyCode, {
           theme: 'github-dark',
-          keepBackground: true,
+          keepBackground: false,
         }],
       ],
     },

@@ -1,52 +1,54 @@
 ---
-title: 'Memahami Konsep Inti Next.js'
-date: '2024-05-21'
-description: 'Panduan ramah pemula tentang arsitektur dan fitur utama Next.js untuk pengembangan web modern.'
+title: 'Memahami Next.js: Panduan Mendalam untuk Pemula'
+date: '2024-05-10'
+description: 'Next.js adalah kerangka kerja React yang kuat untuk membangun aplikasi web modern dan cepat. Panduan ini akan memandu Anda memahami konsep inti yang Anda perlukan untuk memulai.'
 heroImage: 'understanding-nextjs'
-translationKey: 'understanding-nextjs'
+translationKey: 'nextjs-deep-dive'
 featured: true
-category: 'Tutorial'
-tags:
-  - 'Next.js'
-  - 'React'
-  - 'Pengembangan Web'
 ---
 
-Next.js adalah kerangka kerja React yang kuat yang memungkinkan fungsionalitas seperti rendering sisi server dan pembuatan situs web statis. Bagi pengembang React, ini menawarkan pengalaman yang efisien untuk membangun aplikasi web yang cepat dan ramah pengguna. Postingan ini akan membahas konsep-konsep inti yang menjadikan Next.js pilihan utama bagi para pengembang di seluruh dunia.
+Next.js menyediakan fondasi yang kokoh untuk membangun aplikasi React yang di-render di server, situs web statis, dan banyak lagi. Kerangka kerja ini hadir dengan serangkaian fitur bawaan yang memperlancar proses pengembangan.
 
-## App Router vs. Pages Router
+## Konsep Inti
 
-Salah satu evolusi paling signifikan di Next.js adalah pengenalan **App Router**, yang bekerja berdampingan dengan **Pages Router** tradisional. App Router, yang dibangun di atas React Server Components, memungkinkan routing yang lebih fleksibel dan kuat, layout bersarang, dan strategi pengambilan data yang lebih baik. Meskipun Pages Router tetap menjadi pilihan yang solid untuk banyak aplikasi, App Router adalah masa depan, menawarkan kinerja dan pengalaman pengembang yang lebih baik.
+Memahami konsep-konsep inti ini sangat penting untuk menggunakan Next.js secara efektif.
 
-## Server Components dan Client Components
+### Halaman dan Perutean
 
-Dengan App Router, Next.js memperkenalkan paradigma baru: React Server Components (RSC). Secara default, semua komponen di dalam direktori `app` adalah Server Components. Ini berarti mereka berjalan secara eksklusif di server, mengambil data dan me-render HTML sebelum dikirim ke klien. Hal ini secara signifikan mengurangi jumlah JavaScript yang dikirim ke browser, yang mengarah pada pemuatan halaman awal yang lebih cepat.
+Di Next.js, sebuah halaman adalah Komponen React yang diekspor dari file `.js`, `.jsx`, `.ts`, atau `.tsx` di dalam direktori `app`. Setiap halaman dikaitkan dengan sebuah rute berdasarkan nama filenya.
 
-Ketika Anda membutuhkan interaktivitas, seperti menangani klik tombol atau menggunakan state dengan `useState`, Anda dapat memilih untuk menggunakan **Client Component** dengan hanya menambahkan direktif `'use client'` di bagian atas file Anda. Ini memberikan pemisahan yang jelas antara konten statis yang di-render di server dan logika interaktif sisi klien Anda.
+<Note>
+App Router, yang diperkenalkan di Next.js 13, adalah cara yang direkomendasikan untuk membangun aplikasi baru. Fitur ini menawarkan hal-hal seperti layout, komponen server, dan lainnya.
+</Note>
 
-## Pengambilan Data (Data Fetching)
+Berikut adalah contoh komponen halaman sederhana dalam TypeScript:
 
-Next.js merevolusi pengambilan data dengan `async` dan `await` di Server Components. Anda dapat mengambil data langsung di dalam komponen Anda, dan Next.js akan secara otomatis menangani caching dan revalidasi.
+```tsx
+// src/app/tentang/page.tsx
 
-```javascript
-async function getData() {
-  const res = await fetch('https://api.example.com/...')
-  // Nilai yang dikembalikan *tidak* diserialisasi
-  // Anda bisa mengembalikan Date, Map, Set, dll.
- 
-  if (!res.ok) {
-    // Ini akan mengaktifkan `error.js` Error Boundary terdekat
-    throw new Error('Gagal mengambil data')
-  }
- 
-  return res.json()
-}
- 
-export default async function Page() {
-  const data = await getData()
- 
-  return <main></main>
+export default function HalamanTentang() {
+  return <h1>Tentang Kami</h1>;
 }
 ```
 
-Pendekatan ini menyederhanakan kode, meningkatkan kinerja dengan mengambil data di server, dan menyediakan mekanisme caching yang kuat secara bawaan.
+Kode ini membuat halaman baru yang dapat diakses di URL `/tentang`. Sangat sederhana!
+
+### Pengambilan Data
+
+Next.js menawarkan metode pengambilan data yang berbeda, tergantung pada kasus penggunaan Anda. Anda dapat mengambil data di sisi server dengan Komponen Server, atau di sisi klien.
+
+<Warning>
+Saat mengambil data sensitif, selalu lakukan di sisi server untuk menghindari terpaparnya kunci API atau rahasia lainnya ke browser.
+</Warning>
+
+### Contoh Galeri Gambar
+
+Berikut adalah contoh dari komponen carousel gambar. Anda dapat menggunakannya untuk menampilkan beberapa gambar dengan cara yang ringkas dan interaktif.
+
+<ImageCarousel images={[
+  "https://picsum.photos/seed/carousel1/1200/675",
+  "https://picsum.photos/seed/carousel2/1200/675",
+  "https://picsum.photos/seed/carousel3/1200/675"
+]} />
+
+Next.js adalah kerangka kerja serbaguna yang terus berkembang. Dengan menguasai konsep-konsep dasar ini, Anda akan siap untuk membangun aplikasi web modern berkinerja tinggi.

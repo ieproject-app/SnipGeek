@@ -1,6 +1,9 @@
 import type { MDXComponents } from 'next-mdx-remote/rsc/types'
 import Image from 'next/image'
 import Link from 'next/link'
+import { Note } from './mdx/Note'
+import { Warning } from './mdx/Warning'
+import { ImageCarousel } from './mdx/ImageCarousel'
 
 // This component handles how `<code>` tags are rendered.
 const CustomCode = (props: any) => {
@@ -9,7 +12,7 @@ const CustomCode = (props: any) => {
   if (isCodeBlock) {
     // For code blocks, rehype-pretty-code has already done the syntax highlighting.
     // It passes the necessary props to `code`. We just render it.
-    // The parent <pre> tag is handled by CustomPre.
+    // The parent <pre> tag is handled by rehype-pretty-code's wrapper.
     return <code {...props} />;
   }
 
@@ -29,13 +32,8 @@ const CustomImage = (props: any) => (
     </div>
 );
 
-// This component handles the outer container for code blocks.
-// rehype-pretty-code will generate its own pre tag with styles,
-// so we don't need to override it anymore.
-// We let the library handle it for proper styling and functionality.
-
-
-// Defining components outside the main object to avoid parser issues.
+// We define all the custom components outside of the main object
+// to avoid the weird parser issues from the build tool.
 const MdxH1 = ({ children }: { children?: React.ReactNode }) => <h1 className="font-headline mt-12 mb-6 text-4xl font-bold tracking-tighter text-primary">{children}</h1>;
 const MdxH2 = ({ children }: { children?: React.ReactNode }) => <h2 className="font-headline mt-10 mb-5 border-b pb-2 text-3xl font-bold tracking-tighter text-primary">{children}</h2>;
 const MdxH3 = ({ children }: { children?: React.ReactNode }) => <h3 className="font-headline mt-8 mb-4 text-2xl font-bold tracking-tighter text-primary">{children}</h3>;
@@ -43,6 +41,7 @@ const MdxH4 = ({ children }: { children?: React.ReactNode }) => <h4 className="f
 const MdxP = ({ children }: { children?: React.ReactNode }) => <p className="leading-7 my-6">{children}</p>;
 const MdxA = (props: React.AnchorHTMLAttributes<HTMLAnchorElement>) => {
   if (props.href) {
+    // Handle internal and external links differently if needed
     return <Link href={props.href} className="font-medium text-accent-foreground underline hover:no-underline">{props.children}</Link>;
   }
   return <a {...props} />;
@@ -66,4 +65,7 @@ export const mdxComponents: MDXComponents = {
     blockquote: MdxBlockquote,
     code: CustomCode,
     Image: CustomImage,
+    Note,
+    Warning,
+    ImageCarousel,
 }
