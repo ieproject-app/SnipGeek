@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { LanguageSwitcher } from './language-switcher';
 import { TranslationsMap } from '@/lib/posts';
-import { Search, X, MoreHorizontal, Menu } from 'lucide-react';
+import { Search, X, Menu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -17,11 +17,12 @@ import {
 
 const menuItems = [
     { name: 'Blog', href: '/blog' },
+    { name: 'Notes', href: '/notes' },
     { name: 'Projects', href: '/projects' },
-    { name: 'About', href: '/about' },
 ];
 
 const moreMenuItems = [
+    { name: 'About', href: '/about' },
     { name: 'Archive', href: '/archive' },
     { name: 'Contact', href: '/contact' },
 ];
@@ -85,8 +86,8 @@ export function Header({ translationsMap }: { translationsMap: TranslationsMap }
         isVisible ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-16"
     )}>
         <nav className={cn(
-            "mx-auto bg-primary/90 backdrop-blur-sm text-primary-foreground rounded-full shadow-lg ring-1 ring-black/5 flex items-center justify-end h-12 transition-all duration-500 ease-in-out",
-            isSearchOpen ? 'w-full max-w-sm md:w-80 px-2' : 'w-full md:w-auto px-2'
+            "mx-auto bg-primary/90 backdrop-blur-sm text-primary-foreground rounded-full shadow-lg ring-1 ring-black/5 flex items-center justify-between h-12 transition-all duration-500 ease-in-out px-2",
+            isSearchOpen ? 'w-full max-w-sm md:max-w-md' : 'w-full md:w-auto'
         )}>
             {/* Normal view container */}
             <div className={cn(
@@ -102,12 +103,27 @@ export function Header({ translationsMap }: { translationsMap: TranslationsMap }
                     SG
                 </Link>
                 
-                {/* Spacer for mobile */}
-                <div className="flex-grow block md:hidden" />
+                {/* Spacer for desktop */}
+                <div className="flex-grow hidden md:block" />
 
+            </div>
+            
+            <div className={cn(
+                "flex items-center gap-1 transition-opacity duration-300",
+                isSearchOpen ? "opacity-0" : "opacity-100"
+            )}>
                 {/* Mobile controls */}
                 <div className="flex md:hidden items-center">
                     <LanguageSwitcher translationsMap={translationsMap} />
+                    <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="rounded-full relative z-20 h-9 w-9"
+                        onClick={() => setIsSearchOpen(true)}
+                        aria-label="Open search"
+                    >
+                       <Search className="h-5 w-5" />
+                    </Button>
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full">
@@ -142,7 +158,7 @@ export function Header({ translationsMap }: { translationsMap: TranslationsMap }
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-primary-foreground/70 hover:text-primary-foreground">
-                                <MoreHorizontal className="h-5 w-5" />
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
@@ -155,14 +171,22 @@ export function Header({ translationsMap }: { translationsMap: TranslationsMap }
                             ))}
                         </DropdownMenuContent>
                     </DropdownMenu>
+                    <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="rounded-full relative z-20 h-9 w-9"
+                        onClick={() => setIsSearchOpen(true)}
+                        aria-label={"Open search"}
+                    >
+                       <Search className="h-5 w-5" />
+                    </Button>
                 </div>
-
             </div>
             
-            {/* Search Input */}
+            {/* Search Input and Close Button container */}
             <div className={cn(
-                "absolute left-0 w-full h-full transition-all duration-300 ease-in-out",
-                isSearchOpen ? "opacity-100 z-10" : "opacity-0 -z-10"
+                "absolute left-0 right-0 w-full h-full flex items-center transition-all duration-300 ease-in-out",
+                isSearchOpen ? "opacity-100 z-10 px-2" : "opacity-0 -z-10"
             )}>
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-primary-foreground/70 pointer-events-none"/>
                 <Input 
@@ -172,19 +196,14 @@ export function Header({ translationsMap }: { translationsMap: TranslationsMap }
                     className="w-full h-full bg-transparent border-none rounded-full pl-12 pr-12 focus-visible:ring-0 focus-visible:ring-offset-0 text-primary-foreground placeholder:text-primary-foreground/50"
                     aria-hidden={!isSearchOpen}
                 />
-            </div>
-
-            {/* Search/Close Button */}
-            <div className="pl-1">
                 <Button 
                     variant="ghost" 
                     size="icon" 
-                    className="rounded-full relative z-20 h-9 w-9"
-                    onClick={() => setIsSearchOpen(prev => !prev)}
-                    aria-label={isSearchOpen ? "Close search" : "Open search"}
+                    className="rounded-full absolute right-2 z-20 h-9 w-9"
+                    onClick={() => setIsSearchOpen(false)}
+                    aria-label="Close search"
                 >
-                   <Search className={cn("transition-all duration-300", isSearchOpen ? 'opacity-0 scale-50 rotate-90' : 'opacity-100 scale-100 rotate-0')} />
-                   <X className={cn("absolute transition-all duration-300", isSearchOpen ? 'opacity-100 scale-100 rotate-0' : 'opacity-0 scale-50 -rotate-90')} />
+                   <X className="h-5 w-5" />
                 </Button>
             </div>
         </nav>
