@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { LanguageSwitcher } from './language-switcher';
 import { TranslationsMap } from '@/lib/posts';
-import { Search, X, MoreHorizontal } from 'lucide-react';
+import { Search, X, MoreHorizontal, Menu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -25,6 +25,8 @@ const moreMenuItems = [
     { name: 'Archive', href: '/archive' },
     { name: 'Contact', href: '/contact' },
 ];
+
+const allMenuItems = [...menuItems, ...moreMenuItems];
 
 export function Header({ translationsMap }: { translationsMap: TranslationsMap }) {
   const [isVisible, setIsVisible] = useState(true);
@@ -79,16 +81,16 @@ export function Header({ translationsMap }: { translationsMap: TranslationsMap }
 
   return (
     <header ref={headerRef} className={cn(
-        "fixed top-4 left-1/2 -translate-x-1/2 z-50 transition-all duration-300 ease-in-out",
+        "fixed top-4 left-4 right-4 md:left-1/2 md:-translate-x-1/2 md:right-auto z-50 transition-all duration-300 ease-in-out",
         isVisible ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-16"
     )}>
         <nav className={cn(
-            "bg-primary/90 backdrop-blur-sm text-primary-foreground rounded-full shadow-lg ring-1 ring-black/5 flex items-center justify-end h-12 transition-all duration-500 ease-in-out px-2",
-            isSearchOpen ? 'w-80' : 'w-auto'
+            "mx-auto bg-primary/90 backdrop-blur-sm text-primary-foreground rounded-full shadow-lg ring-1 ring-black/5 flex items-center justify-end h-12 transition-all duration-500 ease-in-out",
+            isSearchOpen ? 'w-full max-w-sm md:w-80 px-2' : 'w-full md:w-auto px-2'
         )}>
             {/* Normal view container */}
             <div className={cn(
-                "flex items-center gap-2 transition-all duration-300 ease-in-out",
+                "flex items-center flex-grow md:flex-grow-0 gap-2 transition-all duration-300 ease-in-out",
                 isSearchOpen ? 'w-0 opacity-0 -translate-x-10' : 'w-auto opacity-100 translate-x-0'
             )}>
                 <Link 
@@ -99,38 +101,61 @@ export function Header({ translationsMap }: { translationsMap: TranslationsMap }
                 >
                     SG
                 </Link>
-                <LanguageSwitcher translationsMap={translationsMap} />
+                
+                {/* Spacer for mobile */}
+                <div className="flex-grow block md:hidden" />
 
-                <div className="h-6 w-px bg-primary-foreground/20" />
+                {/* Mobile controls */}
+                <div className="flex md:hidden items-center">
+                    <LanguageSwitcher translationsMap={translationsMap} />
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full">
+                                <Menu className="h-5 w-5" />
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                            {allMenuItems.map((item) => (
+                                <DropdownMenuItem key={item.name} asChild>
+                                    <Link href={item.href}>
+                                        {item.name}
+                                    </Link>
+                                </DropdownMenuItem>
+                            ))}
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                </div>
 
-                {menuItems.map(item => (
-                    <Link
-                        key={item.name}
-                        href={item.href}
-                        className="px-3 py-1 text-sm font-medium rounded-full hover:bg-primary-foreground/10 transition-colors"
-                        aria-hidden={isSearchOpen}
-                        tabIndex={isSearchOpen ? -1 : 0}
-                    >
-                        {item.name}
-                    </Link>
-                ))}
-
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-primary-foreground/70 hover:text-primary-foreground">
-                            <MoreHorizontal className="h-5 w-5" />
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                        {moreMenuItems.map((item) => (
-                            <DropdownMenuItem key={item.name} asChild>
-                                <Link href={item.href}>
-                                    {item.name}
-                                </Link>
-                            </DropdownMenuItem>
-                        ))}
-                    </DropdownMenuContent>
-                </DropdownMenu>
+                {/* Desktop controls */}
+                <div className="hidden md:flex items-center gap-2">
+                    <LanguageSwitcher translationsMap={translationsMap} />
+                    <div className="h-6 w-px bg-primary-foreground/20" />
+                    {menuItems.map(item => (
+                        <Link
+                            key={item.name}
+                            href={item.href}
+                            className="px-3 py-1 text-sm font-medium rounded-full hover:bg-primary-foreground/10 transition-colors"
+                        >
+                            {item.name}
+                        </Link>
+                    ))}
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-primary-foreground/70 hover:text-primary-foreground">
+                                <MoreHorizontal className="h-5 w-5" />
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                            {moreMenuItems.map((item) => (
+                                <DropdownMenuItem key={item.name} asChild>
+                                    <Link href={item.href}>
+                                        {item.name}
+                                    </Link>
+                                </DropdownMenuItem>
+                            ))}
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                </div>
 
             </div>
             
