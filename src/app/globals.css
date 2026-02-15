@@ -11,8 +11,8 @@
     @apply font-code relative rounded bg-muted px-[0.4rem] py-[0.2rem] font-mono text-sm font-semibold text-foreground/80;
   }
 
-  /* Custom styles for the Shiki <pre> container, specifically inside articles */
-  article pre.shiki {
+  /* Custom styles for the Shiki <pre> container */
+  pre.shiki {
     @apply rounded-lg p-6 my-6 overflow-x-auto;
   }
 
