@@ -38,24 +38,29 @@ export function LanguageSwitcher({ translationsMap }: { translationsMap: Transla
       if (translationKey) {
         const targetTranslation = translationsMap[translationKey]?.find(t => t.locale === newLocale);
         if (targetTranslation) {
+          // Construct the new path for the translated slug
           if (newLocale === i18n.defaultLocale) {
             return `/${pageType}/${targetTranslation.slug}`;
           }
           return `/${newLocale}/${pageType}/${targetTranslation.slug}`;
         }
       }
+      // If no translation found for a slug page, fall back to generic page logic
     }
 
-    // 2. Handle all other pages (homepage, etc.)
-    const pathWithoutLocale = currentLocale === i18n.defaultLocale
-        ? pathName
-        : pathName.replace(`/${currentLocale}`, '') || '/';
-    
+    // 2. Handle all other pages (homepage, /about, /contact etc.)
+    // `pathName` from `usePathname` is always locale-prefixed due to middleware rewrite.
+    // e.g., /en/about, /id/about, /en, /id
+    const pathWithoutLocalePrefix = pathName.replace(`/${currentLocale}`, '');
+    const newPath = pathWithoutLocalePrefix === '' ? '/' : pathWithoutLocalePrefix;
+
     if (newLocale === i18n.defaultLocale) {
-      return pathWithoutLocale;
+        // For default locale, we want the "clean" URL, e.g., /about
+        return newPath;
     }
-
-    return `/${newLocale}${pathWithoutLocale === '/' ? '' : pathWithoutLocale}`;
+    
+    // For other locales, we prefix with the locale, e.g., /id/about
+    return `/${newLocale}${newPath === '/' ? '' : newPath}`;
   }
 
   return (
