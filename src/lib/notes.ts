@@ -122,16 +122,33 @@ export function getAllNotesTranslationsMap(): NotesTranslationsMap {
   const translationsMap: NotesTranslationsMap = {};
 
   for (const locale of allLocales) {
-    const notes = getSortedNotesData(locale);
-    for (const note of notes) {
-      const key = note.frontmatter.translationKey;
+    const localeDirectory = path.join(notesDirectory, locale);
+    let fileNames: string[];
+    try {
+      fileNames = fs.readdirSync(localeDirectory);
+    } catch (err) {
+      continue; 
+    }
+
+    for (const fileName of fileNames) {
+      if (!fileName.endsWith('.mdx')) continue;
+      
+      const slug = fileName.replace(/\.mdx$/, '');
+      const fullPath = path.join(localeDirectory, fileName);
+      const fileContents = fs.readFileSync(fullPath, 'utf8');
+      const { data } = matter(fileContents);
+      const frontmatter = data as NoteFrontmatter;
+
+      const key = frontmatter.translationKey;
       if (!key) continue;
+
       if (!translationsMap[key]) {
         translationsMap[key] = [];
       }
+
       const existing = translationsMap[key].find(t => t.locale === locale);
       if (!existing) {
-        translationsMap[key].push({ locale, slug: note.slug });
+        translationsMap[key].push({ locale, slug });
       }
     }
   }

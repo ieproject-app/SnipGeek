@@ -1,27 +1,17 @@
 ---
-title: 'Memperbaiki Masalah Gaya Blok Kode yang Keras Kepala'
+title: 'Memperbaiki Gaya Blok Kode yang Membandel'
 date: '2024-05-23'
-description: 'Catatan singkat tentang bagaimana kami menyelesaikan masalah CSS yang rumit dengan gaya blok kode pada pengaturan MDX kami.'
-translationKey: 'fixing-code-block'
+description: 'Catatan singkat tentang bagaimana kami memperbaiki masalah gaya blok kode.'
+translationKey: 'code-block-styling-fix'
 ---
 
-Hari ini, kami mengalami masalah kecil yang menarik: blok kode kami terlihat biasa saja dan tidak memiliki padding internal, membuat kode menempel ke tepian. Tampilannya tidak bagus.
+Setelah beberapa kali mencoba, kami akhirnya menemukan solusi untuk masalah gaya pada blok kode yang tidak konsisten.
 
-Kami mencoba menerapkan gaya global menggunakan `@apply` di `globals.css`:
-
-```css
-pre.shiki {
-  @apply rounded-lg p-6 my-6 overflow-x-auto;
-}
-```
-
-Secara teori, ini seharusnya berhasil. Namun, sepertinya gaya ini tidak diterapkan, kemungkinan karena adanya konflik spesifisitas atau optimisasi saat build yang tidak dapat kami pastikan dengan segera.
-
-Solusi yang lebih tangguh adalah menanganinya langsung di tingkat komponen. Kami mengedit `src/components/mdx-components.tsx` untuk secara eksplisit mendefinisikan bagaimana tag `<pre>` harus dirender.
-
-Kami membuat komponen kustom untuk itu:
+Masalahnya adalah selektor CSS yang terlalu spesifik atau konflik dengan gaya lain. Solusinya adalah dengan secara eksplisit mendefinisikan komponen untuk elemen `<pre>` di `mdx-components.tsx` dan menerapkan kelas Tailwind langsung di sana.
 
 ```tsx
+// src/components/mdx-components.tsx
+
 const MdxPre = ({ className, ...props }: React.HTMLAttributes<HTMLPreElement>) => (
     <pre
         className={cn(
@@ -31,17 +21,11 @@ const MdxPre = ({ className, ...props }: React.HTMLAttributes<HTMLPreElement>) =
         {...props}
     />
 );
-```
 
-Dan kemudian mendaftarkannya:
-
-```tsx
 export const mdxComponents: MDXComponents = {
     // ... other components
     pre: MdxPre,
 }
 ```
 
-Dengan melakukan ini, kami memberi tahu MDX, "Hei, setiap kali kamu melihat blok `<pre>`, gunakan komponen React ini." Ini melewati semua masalah spesifisitas CSS dan secara langsung menerapkan kelas Tailwind yang kami inginkan.
-
-Masalah terpecahkan! Blok kode sekarang memiliki padding yang tepat dan sudut yang membulat, sebagaimana mestinya.
+Pendekatan ini memastikan bahwa semua blok kode akan selalu memiliki sudut membulat dan *padding* yang benar, tidak peduli apa pun.

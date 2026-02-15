@@ -140,16 +140,33 @@ export function getAllTranslationsMap(): TranslationsMap {
   const translationsMap: TranslationsMap = {};
 
   for (const locale of allLocales) {
-    const posts = getSortedPostsData(locale);
-    for (const post of posts) {
-      const key = post.frontmatter.translationKey;
+    const localeDirectory = path.join(postsDirectory, locale);
+    let fileNames: string[];
+    try {
+      fileNames = fs.readdirSync(localeDirectory);
+    } catch (err) {
+      continue;
+    }
+
+    for (const fileName of fileNames) {
+      if (!fileName.endsWith('.mdx')) continue;
+      
+      const slug = fileName.replace(/\.mdx$/, '');
+      const fullPath = path.join(localeDirectory, fileName);
+      const fileContents = fs.readFileSync(fullPath, 'utf8');
+      const { data } = matter(fileContents);
+      const frontmatter = data as PostFrontmatter;
+
+      const key = frontmatter.translationKey;
       if (!key) continue;
+
       if (!translationsMap[key]) {
         translationsMap[key] = [];
       }
+
       const existing = translationsMap[key].find(t => t.locale === locale);
       if (!existing) {
-        translationsMap[key].push({ locale, slug: post.slug });
+        translationsMap[key].push({ locale, slug });
       }
     }
   }
