@@ -139,13 +139,12 @@ export function Header({ translationsMap, searchableData }: { translationsMap: T
   return (
     <header ref={headerRef} className={cn(
         "fixed top-4 left-4 right-4 md:left-1/2 md:-translate-x-1/2 md:right-auto z-50 transition-all duration-300 ease-in-out",
-        "w-full max-w-sm md:max-w-none",
         isSearchOpen ? 'md:max-w-md' : 'md:w-auto',
         isVisible ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-16"
     )}>
         <nav className={cn(
             "relative mx-auto bg-primary/90 backdrop-blur-sm text-primary-foreground shadow-lg ring-1 ring-black/5 flex items-center justify-between h-12 transition-all duration-300 ease-in-out px-2",
-            isSearchOpen ? 'w-full rounded-full' : 'md:w-auto',
+            isSearchOpen ? 'w-full rounded-full' : 'w-full md:w-auto',
             isMenuOpen ? 'rounded-t-2xl rounded-b-none' : 'rounded-full'
         )}>
             {/* Normal view container */}
