@@ -18,10 +18,10 @@ export const mdxComponents: MDXComponents = {
     ol: ({ children }) => <ol className="my-6 ml-6 list-decimal [&>li]:mt-2">{children}ol>,
     li: ({ children }) => <li>{children}</li>,
     blockquote: ({ children }) => <blockquote className="mt-6 border-l-2 border-primary/20 pl-6 italic text-muted-foreground">{children}</blockquote>,
-    pre: (props: React.HTMLAttributes<HTMLPreElement>) => (
+    pre: (props) => (
       <pre className="font-code my-6 rounded-lg overflow-x-auto" {...props} />
     ),
-    code: (props: React.HTMLAttributes<HTMLElement>) => {
+    code: (props: any) => {
       // Check if this is a code block processed by rehype-pretty-code
       const isCodeBlock = props.className?.includes('language-');
       
