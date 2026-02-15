@@ -30,12 +30,10 @@ const CustomImage = (props: any) => (
 );
 
 // This component handles the outer container for code blocks.
-const CustomPre = (props: any) => {
-  // rehype-pretty-code injects its own <pre> with styles.
-  // We pass the props through and only add margin for layout.
-  // This lets the theme from rehype-pretty-code control the background, padding, and font.
-  return <pre className="my-6" {...props} />;
-}
+// rehype-pretty-code will generate its own pre tag with styles,
+// so we don't need to override it anymore.
+// We let the library handle it for proper styling and functionality.
+
 
 // Defining components outside the main object to avoid parser issues.
 const MdxH1 = ({ children }: { children?: React.ReactNode }) => <h1 className="font-headline mt-12 mb-6 text-4xl font-bold tracking-tighter text-primary">{children}</h1>;
@@ -66,7 +64,6 @@ export const mdxComponents: MDXComponents = {
     ol: MdxOl,
     li: MdxLi,
     blockquote: MdxBlockquote,
-    pre: CustomPre,
     code: CustomCode,
     Image: CustomImage,
 }
