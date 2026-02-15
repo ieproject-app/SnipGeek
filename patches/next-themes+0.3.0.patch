@@ -1,53 +1,10 @@
-diff --git a/node_modules/next-themes/dist/index.js b/node_modules/next-themes/dist/index.js
-index 5b2a0950a4980d1912f275e532a24c5597793077..c8c312a14b534b4c73f739cb32b21c43f8207133 100644
---- a/node_modules/next-themes/dist/index.js
-+++ b/node_modules/next-themes/dist/index.js
-@@ -1,5 +1,5 @@
- 'use client';
--import React, { createContext, useContext, useEffect, useState, useCallback, useMemo, Fragment } from 'react';
-+import React, { createContext, useContext, useEffect, useState, useCallback, useMemo, Fragment, Children } from 'react';
- 
- const colorSchemes = ['light', 'dark'];
- const MEDIA = '(prefers-color-scheme: dark)';
-@@ -21,7 +21,7 @@ const ThemeContext = createContext(undefined);
- const defaultContext = {
-     setTheme: _ => { },
-     themes: [],
--};
-+}; 
- const useTheme = () => { var _a; return (_a = useContext(ThemeContext)) !== null && _a !== void 0 ? _a : defaultContext; };
- 
- const ThemeProvider = props => {
-diff --git a/node_modules/next-themes/dist/index.mjs b/node_modules/next-themes/dist/index.mjs
-index 724b07d58a05c110b91e9b2518e1081515d48721..6d9620f4c34a17961b7f1bd001a1c93de4580237 100644
---- a/node_modules/next-themes/dist/index.mjs
-+++ b/node_modules/next-themes/dist/index.mjs
-@@ -1,5 +1,5 @@
- 'use client';
--import { createContext, useContext, useEffect, useState, useCallback, useMemo, Fragment } from 'react';
-+import { createContext, useContext, useEffect, useState, useCallback, useMemo, Fragment, Children } from 'react';
- 
- const colorSchemes = ['light', 'dark'];
- const MEDIA = '(prefers-color-scheme: dark)';
-@@ -21,7 +21,7 @@ const ThemeContext = createContext(undefined);
- const defaultContext = {
-     setTheme: _ => { },
-     themes: [],
--};
-+}; 
- const useTheme = () => { var _a; return (_a = useContext(ThemeContext)) !== null && _a !== void 0 ? _a : defaultContext; };
- 
- const ThemeProvider = props => {
-diff --git a/node_modules/next-themes/package.json b/node_modules/next-themes/package.json
-index 54228723c3b038622c4d4453b160b29c1181283c..015b67a5089c177c44917a2a07c44f331908ab1c 100644
 --- a/node_modules/next-themes/package.json
 +++ b/node_modules/next-themes/package.json
-@@ -28,7 +28,7 @@
-     "url": "https://github.com/pacocoursey/next-themes/issues"
-   },
+@@ -38,7 +38,7 @@
    "peerDependencies": {
+     "next": ">=9",
 -    "react": "^16.8 || ^17 || ^18"
 +    "react": "^16.8 || ^17 || ^18 || ^19"
    },
    "peerDependenciesMeta": {
-     "react-dom": {
+     "next": {
