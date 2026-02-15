@@ -15,7 +15,7 @@ const footerNavItems = [
 export function Footer() {
     const authorName = "SnipGeek";
     const authorBio = "A passionate developer exploring the web and sharing findings along the way.";
-    const authorAvatar = "/images/profile/avatar.png"; // Placeholder for local profile picture
+    const authorAvatar = "/images/profile/profile.png"; // Placeholder for local profile picture
 
     return (
         <footer className="w-full bg-background pt-20 sm:pt-32">
