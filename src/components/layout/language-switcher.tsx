@@ -19,14 +19,13 @@ export function LanguageSwitcher({ translationsMap }: { translationsMap: Transla
   };
 
   const redirectedPathName = (newLocale: string) => {
-    if (!pathName) return '/'
+    if (!pathName) return '/';
 
-    // 1. Handle detail pages (blog, notes)
+    // 1. Handle detail pages (blog, notes) with available translations
     if (currentSlug && translationsMap) {
       const pageType = pathName.includes('/notes/') ? 'notes' : 'blog';
       
       let translationKey: string | null = null;
-      // Find the translation key for the current slug and locale
       for (const key in translationsMap) {
         const found = translationsMap[key].find(t => t.locale === currentLocale && t.slug === currentSlug);
         if (found) {
@@ -38,29 +37,40 @@ export function LanguageSwitcher({ translationsMap }: { translationsMap: Transla
       if (translationKey) {
         const targetTranslation = translationsMap[translationKey]?.find(t => t.locale === newLocale);
         if (targetTranslation) {
-          // Construct the new path for the translated slug
+          // Found a specific translation, so construct the new path from scratch
           if (newLocale === i18n.defaultLocale) {
             return `/${pageType}/${targetTranslation.slug}`;
           }
           return `/${newLocale}/${pageType}/${targetTranslation.slug}`;
         }
       }
-      // If no translation found for a slug page, fall back to generic page logic
+      // If no translation is found, fall through to the generic logic below.
     }
 
-    // 2. Handle all other pages (homepage, /about, /contact etc.)
-    // `pathName` from `usePathname` is always locale-prefixed due to middleware rewrite.
-    // e.g., /en/about, /id/about, /en, /id
-    const pathWithoutLocalePrefix = pathName.replace(`/${currentLocale}`, '');
-    const newPath = pathWithoutLocalePrefix === '' ? '/' : pathWithoutLocalePrefix;
-
-    if (newLocale === i18n.defaultLocale) {
-        // For default locale, we want the "clean" URL, e.g., /about
-        return newPath;
+    // 2. Handle all other pages (e.g., /about, /contact) OR slug pages without a direct translation
+    const segments = pathName.split('/');
+    
+    // Check if the first segment after the initial '/' is a locale
+    const isLocaleInPath = i18n.locales.includes(segments[1] as Locale);
+    
+    // If a locale is found in the path, remove it to get the base path
+    if (isLocaleInPath) {
+      segments.splice(1, 1);
     }
     
-    // For other locales, we prefix with the locale, e.g., /id/about
-    return `/${newLocale}${newPath === '/' ? '' : newPath}`;
+    const pathWithoutLocale = segments.join('/') || '/';
+
+    // If the new locale is the default, use the clean path
+    if (newLocale === i18n.defaultLocale) {
+      return pathWithoutLocale;
+    }
+
+    // For other locales, prefix the path with the new locale
+    // Handle the homepage case where pathWithoutLocale is just "/"
+    if (pathWithoutLocale === '/') {
+      return `/${newLocale}`;
+    }
+    return `/${newLocale}${pathWithoutLocale}`;
   }
 
   return (
