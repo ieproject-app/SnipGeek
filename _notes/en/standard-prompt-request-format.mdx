@@ -1,0 +1,53 @@
+---
+title: "Standard Prompt Request Format"
+date: "2026-02-16"
+description: "A standard template for submitting new feature or change requests to ensure a smooth and accurate development process."
+translationKey: "prompt-standard-format"
+published: true
+---
+
+Whenever you want me to build a new feature, fix a bug, or make changes to the app, please use the format below. The goal is to ensure I have all the details I need, so the final result matches your expectations and no steps are missed.
+
+### 1. Main Goal
+*(Required)*
+
+Briefly describe (in one or two sentences) what you ultimately want to achieve.
+
+**Example:**
+> "I want to add a 'Reading List' feature so users can save articles to read later."
+
+### 2. Change Details
+*(Required)*
+
+This is the most important part. Provide as much detail as possible.
+
+- **Feature/Bug Description:** Explain how you want the feature to work or describe the problem/bug you've found.
+- **UI Location:** On which page or in which component should this change appear? (e.g., "in the header," "under the article title," "on all article cards on the homepage").
+- **Look & Feel:** Are there any design preferences? (e.g., "use a `Card` component," "center the button," "the icon should be a `Bookmark`").
+- **User Flow:** Describe the steps a user would take when interacting with this feature.
+
+**Example:**
+> - **Description:** A button to save an article to a reading list. When clicked, the article is saved to `localStorage`, and the button's state changes.
+> - **UI Location:** Appears on the article detail page and also on every article card on the homepage.
+> - **Look & Feel:** Use a `Bookmark` icon. If saved, the icon becomes solid.
+> - **Flow:** User clicks the icon -> icon changes -> a "Article saved" notification appears.
+
+### 3. Image/Asset Placement
+*(Optional)*
+
+If you want me to insert a placeholder for an image you'll add later (like a screenshot), just let me know where.
+
+**Example:**
+> "Under the 'User Flow' section, please insert a placeholder for an image."
+
+{/* You can place your image/screenshot here */}
+
+### 4. Things to Avoid
+*(Optional)*
+
+Are there any constraints or things I should not do?
+
+**Example:**
+> "Do not change the `header`'s background color."
+
+By following this format, we can minimize miscommunication and speed up the development process. Thank you for your cooperation!

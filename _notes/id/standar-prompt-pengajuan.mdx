@@ -1,51 +1,53 @@
 ---
-title: "Standar Format Pengajuan Fitur & Perbaikan"
-date: '2026-02-16'
-description: "Sebuah templat standar untuk mengajukan permintaan fitur atau laporan bug agar kolaborasi kita lebih efisien dan tidak ada detail yang terlewat."
-translationKey: "prompt-standard"
+title: "Standar Format Prompt Pengajuan"
+date: "2026-02-16"
+description: "Sebuah templat standar untuk mengajukan permintaan perubahan atau fitur baru agar proses pengembangan berjalan lancar dan sesuai harapan."
+translationKey: "prompt-standard-format"
 published: true
 ---
 
-Untuk memastikan setiap permintaan pengembangan atau perbaikan bug berjalan lancar dan efisien, mari kita gunakan format standar ini. Ini membantu saya untuk memahami kebutuhan Anda sepenuhnya dan menghindari kesalahan atau kelupaan detail penting.
+Setiap kali Anda ingin saya membangun fitur baru, memperbaiki bug, atau membuat perubahan pada aplikasi, mohon gunakan format di bawah ini. Tujuannya adalah untuk memastikan semua detail yang saya butuhkan tersedia, sehingga hasil akhirnya sesuai dengan harapan Anda dan tidak ada lagi langkah yang terlewat.
 
-### 1. Untuk Permintaan Fitur Baru
+### 1. Tujuan Utama
+*(Wajib)*
 
-Gunakan format ini saat Anda menginginkan penambahan fungsionalitas baru.
+Jelaskan secara singkat (satu atau dua kalimat) apa tujuan akhir yang ingin Anda capai.
 
-{/*
-```
-**Tujuan Fitur:**
-[Jelaskan secara singkat apa tujuan akhir dari fitur ini. Contoh: "Saya ingin pengguna bisa menyimpan artikel untuk dibaca nanti."]
+**Contoh:**
+> "Saya ingin menambahkan fitur 'Reading List' agar pengguna bisa menyimpan artikel untuk dibaca nanti."
 
-**Analisis & Konsep (Alur Pengguna):**
-[Jelaskan bagaimana Anda membayangkan pengguna berinteraksi dengan fitur ini, langkah demi langkah. Contoh: "1. Di halaman artikel, ada tombol 'Simpan'. 2. Setelah diklik, artikel masuk ke daftar. 3. Di header, ada ikon untuk melihat daftar yang tersimpan."]
+### 2. Detail Perubahan
+*(Wajib)*
 
-**Aspek Visual & Penempatan:**
-[Deskripsikan di mana saja komponen UI untuk fitur ini harus muncul. Jika memungkinkan, sebutkan komponen dari ShadCN atau pustaka lain yang sudah ada. Contoh: "Tombol 'Simpan' ada di bawah judul artikel. Untuk daftar, gunakan komponen 'Sheet' dari ShadCN yang muncul dari kanan saat ikon di header diklik."]
+Ini adalah bagian paling penting. Berikan rincian sebanyak mungkin.
 
-**Pertimbangan Teknis (Jika Ada):**
-[Jika Anda punya preferensi teknis, sebutkan di sini. Jika tidak, kosongkan saja. Contoh: "Untuk penyimpanan data, kita gunakan localStorage di browser saja, tidak perlu database."]
-```
-*/}
+- **Deskripsi Fitur/Bug:** Jelaskan cara kerja fitur yang Anda inginkan atau jelaskan masalah/bug yang Anda temukan.
+- **Lokasi UI:** Di halaman mana atau di komponen apa perubahan ini harus muncul? (Contoh: "di header", "di bawah judul artikel", "di semua kartu artikel pada halaman utama").
+- **Tampilan & Desain:** Apakah ada preferensi desain? (Contoh: "gunakan komponen `Card`", "buat tombolnya rata tengah", "ikonnya harus `Bookmark`").
+- **Alur Pengguna:** Jelaskan langkah-langkah yang akan diambil pengguna saat berinteraksi dengan fitur ini.
 
-### 2. Untuk Laporan Bug atau Perbaikan Visual
+**Contoh:**
+> - **Deskripsi:** Tombol untuk menyimpan artikel ke daftar bacaan. Saat diklik, artikel disimpan di `localStorage` dan tombol berubah status.
+> - **Lokasi UI:** Muncul di halaman detail artikel dan juga di setiap kartu artikel di halaman utama.
+> - **Tampilan:** Gunakan ikon `Bookmark`. Jika sudah disimpan, ikonnya menjadi solid.
+> - **Alur:** Pengguna klik ikon -> ikon berubah -> muncul notifikasi "Artikel disimpan".
 
-Gunakan format ini saat Anda menemukan sesuatu yang tidak berfungsi atau terlihat seperti yang seharusnya.
+### 3. Penempatan Gambar/Aset
+*(Opsional)*
 
-{/*
-```
-**Deskripsi Masalah:**
-[Jelaskan masalah yang Anda lihat sejelas mungkin. Contoh: "Judul artikel di hasil pencarian terlalu panjang dan keluar dari kotaknya."]
+Jika Anda ingin saya menyisipkan *placeholder* untuk gambar yang akan Anda tambahkan nanti (seperti tangkapan layar), beri tahu saya di bagian mana.
 
-**Lokasi Masalah:**
-[Sebutkan halaman atau komponen spesifik di mana masalah ini terjadi. Contoh: "Ini terjadi di dalam kotak hasil pencarian yang muncul dari header."]
+**Contoh:**
+> "Di bawah bagian 'Alur Pengguna', tolong sisipkan placeholder untuk gambar."
 
-**Perilaku yang Diharapkan:**
-[Jelaskan bagaimana seharusnya tampilan atau fungsionalitas yang benar. Contoh: "Seharusnya, judul yang panjang bisa turun menjadi dua baris, dan jika masih terlalu panjang, baru dipotong dengan '...'.]
+{/* Di sini Anda bisa meletakkan gambar/screenshot */}
 
-**Lampiran (Sangat Direkomendasikan):**
-[Sertakan tangkapan layar (screenshot) atau video singkat. Ini sangat mempercepat proses identifikasi dan perbaikan masalah.]
-```
-*/}
+### 4. Hal yang Perlu Dihindari
+*(Opsional)*
 
-Dengan mengikuti format ini, kita dapat memastikan semua detail tersampaikan dengan baik dan proses pengembangan berjalan lebih mulus. Terima kasih atas kerja samanya!
+Adakah batasan atau hal-hal yang tidak boleh saya lakukan?
+
+**Contoh:**
+> "Jangan mengubah warna latar belakang `header`."
+
+Dengan mengikuti format ini, kita dapat meminimalisir miskomunikasi dan mempercepat proses pengembangan. Terima kasih atas kerja samanya!

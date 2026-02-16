@@ -5,6 +5,8 @@ import { mdxComponents } from '@/components/mdx-components';
 import type { Metadata } from 'next';
 import remarkGfm from 'remark-gfm';
 import rehypeShiki from '@shikijs/rehype';
+import { AddToReadingListButton } from '@/components/layout/add-to-reading-list-button';
+import { i18n } from '@/i18n-config';
 
 export async function generateStaticParams() {
   const locales = getAllLocales();
@@ -55,6 +57,7 @@ export default async function NotePage({ params }: { params: { slug: string, loc
   if (!note) {
     notFound();
   }
+  const linkPrefix = params.locale === i18n.defaultLocale ? '' : `/${params.locale}`;
 
   return (
     <main className="w-full">
@@ -63,13 +66,24 @@ export default async function NotePage({ params }: { params: { slug: string, loc
           <h1 className="font-headline text-4xl md:text-5xl font-extrabold tracking-tighter text-primary mb-3">
             {note.frontmatter.title}
           </h1>
-          <p className="text-muted-foreground text-lg mb-8">
-            {new Date(note.frontmatter.date).toLocaleDateString(params.locale, {
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric',
-            })}
-          </p>
+          <div className="flex flex-wrap items-center gap-4 mb-8">
+            <p className="text-muted-foreground text-base">
+                {new Date(note.frontmatter.date).toLocaleDateString(params.locale, {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                })}
+            </p>
+            <AddToReadingListButton 
+                item={{
+                    slug: note.slug,
+                    title: note.frontmatter.title,
+                    description: note.frontmatter.description,
+                    href: `${linkPrefix}/notes/${note.slug}`,
+                    type: 'note'
+                }}
+            />
+          </div>
         </header>
         <div className="text-lg text-foreground/80">
           <MDXRemote

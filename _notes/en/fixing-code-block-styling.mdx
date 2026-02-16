@@ -1,51 +1,51 @@
 ---
-title: 'Fixing The Case of the Stubborn Code Block Styles'
-date: '2026-02-15'
-description: 'A quick walkthrough of how we debugged and fixed a tricky CSS issue with code syntax highlighting.'
-translationKey: 'code-block-styling-fix'
+title: "Fixing Code Block Styling in Tailwind & MDX"
+date: "2026-02-15"
+description: "A brief technical note on how we solved a styling issue where code blocks and inline code looked the same, and the solution using CSS layers."
+translationKey: "code-block-styling"
+published: true
 ---
 
-We encountered an interesting CSS issue where our code blocks, which are styled using the wonderful Shiki library, were not getting the correct padding or rounded corners. The text inside was uncomfortably close to the edges, and the sharp corners just didn't fit our sites aesthetic.
+While building this blog, we ran into a rather annoying visual issue: all `<code>` elements looked the same. This meant that short snippets of code within a paragraph (inline code) looked exactly like multi-line code blocks, which were supposed to have their own distinct background and padding.
 
-This is a classic case of CSS specificity wars, or sometimes just a simple oversight in how components are structured and styled in a modern framework like Next.js.
+### The Root Problem
 
-### The Initial Attempt: Global CSS
-
-Our first thought was to apply a global style in `src/app/globals.css`. This is usually the go-to for general styling.
+By default, we applied a base style to the `<code>` tag in `globals.css`:
 
 ```css
-pre.shiki {
-  @apply rounded-lg p-6 my-6 overflow-x-auto;
+code {
+  @apply font-code relative rounded bg-muted px-[0.4rem] py-[0.2rem] font-mono text-sm font-semibold;
 }
 ```
 
-Theoretically, this should have worked. We were targeting all `<pre>` elements with the class `shiki`. However, for some reason, the styles were not being applied.
+The problem is that our syntax highlighting library (Shiki) also generates a `<pre><code>...</code></pre>` HTML structure for code blocks. As a result, the `code` style above was also being applied to large code blocks, overriding the beautiful styling from Shiki.
 
-### The Winning Solution: Direct Component Rendering
+{/* Place a screenshot showing the problem here */}
 
-After the global approach failed, we decided to take more direct control. In a component-based framework, the most reliable way to style something is often to control its rendering directly.
+### The Solution: Using `@layer` and a CSS Reset
 
-We modified `src/components/mdx-components.tsx`. This file tells our application how to render Markdown elements. By defining a custom component for the `<pre>` tag, we could forcefully apply the styles we wanted using Tailwind classes.
+The solution was to differentiate the CSS targeting. We kept the base style for `<code>`, but added a specific override for any `code` element found inside a `<pre>` tag.
 
-```tsx
-// src/components/mdx-components.tsx
+We used Tailwind CSS's `@layer components` to define this custom style and added a reset rule:
 
-// ... other components
+```css
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-const MdxPre = ({ className, ...props }: React.HTMLAttributes<HTMLPreElement>) => (
-    <pre
-        className={cn(
-            "rounded-lg p-6 my-6 overflow-x-auto",
-            className
-        )}
-        {...props}
-    />
-);
+@layer components {
+  /* Default style for inline code */
+  code {
+    @apply font-code relative rounded bg-muted px-[0.4rem] py-[0.2rem] font-mono text-sm font-semibold text-foreground/80;
+  }
 
-export const mdxComponents: MDXComponents = {
-  // ... other components
-  pre: MdxPre,
+  /* Reset styles specifically for Shiki's code blocks */
+  pre code {
+    @apply bg-transparent text-inherit p-0 font-normal rounded-none static;
+  }
 }
 ```
 
-By explicitly mapping the `<pre>` element to our `MdxPre` component, we guarantee that every code block rendered from MDX will have the correct padding, rounded corners, and overflow behavior. Problem solved!
+With the `pre code` rule, we effectively "erase" the custom styles from inline code whenever it's inside a `<pre>` block, allowing Shiki's styles to take full precedence. As a result, inline code and code blocks now have distinct, appropriate appearances.
+
+{/* Place a screenshot showing the final result here */}

@@ -1,51 +1,51 @@
 ---
-title: 'Memperbaiki Gaya Blok Kode yang Bandel'
-date: '2026-02-15'
-description: 'Langkah singkat tentang bagaimana kami men-debug dan memperbaiki masalah CSS yang rumit pada syntax highlighting kode.'
-translationKey: 'code-block-styling-fix'
+title: "Memperbaiki Gaya Blok Kode di Tailwind & MDX"
+date: "2026-02-15"
+description: "Sebuah catatan teknis singkat tentang bagaimana kami mengatasi masalah styling di mana blok kode dan kode inline memiliki tampilan yang sama, dan solusinya menggunakan CSS layers."
+translationKey: "code-block-styling"
+published: true
 ---
 
-Kami menghadapi masalah CSS yang menarik di mana blok kode kami, yang diberi gaya menggunakan pustaka Shiki, tidak mendapatkan `padding` atau sudut membulat yang benar. Teks di dalamnya jadi terlalu mepet ke tepi, dan sudut yang tajam tidak sesuai dengan estetika situs kami.
+Saat membangun blog ini, kami menemukan sebuah masalah visual yang cukup mengganggu: semua elemen `<code>` memiliki tampilan yang sama. Ini berarti potongan kode singkat di dalam paragraf (`inline code`) terlihat persis seperti blok kode multi-baris yang seharusnya memiliki latar belakang dan padding tersendiri.
 
-Ini adalah kasus klasik "perang" spesifisitas CSS, atau terkadang hanya kelalaian sederhana dalam cara komponen disusun dan diberi gaya dalam kerangka kerja modern seperti Next.js.
+### Akar Masalah
 
-### Usaha Awal: CSS Global
-
-Pikiran pertama kami adalah menerapkan gaya global di `src/app/globals.css`. Ini biasanya merupakan pendekatan utama untuk penataan gaya umum.
+Secara default, kami memberikan gaya dasar pada tag `<code>` di file `globals.css`:
 
 ```css
-pre.shiki {
-  @apply rounded-lg p-6 my-6 overflow-x-auto;
+code {
+  @apply font-code relative rounded bg-muted px-[0.4rem] py-[0.2rem] font-mono text-sm font-semibold;
 }
 ```
 
-Secara teori, ini seharusnya berhasil. Kami menargetkan semua elemen `<pre>` dengan kelas `shiki`. Namun, entah mengapa, gaya tersebut tidak diterapkan.
+Masalahnya, pustaka *syntax highlighting* (Shiki) yang kami gunakan juga menghasilkan struktur HTML `<pre><code>...</code></pre>` untuk blok kode. Akibatnya, gaya `code` di atas juga diterapkan pada blok kode besar, menimpa gaya indah dari Shiki.
 
-### Solusi Akhir: Merender Komponen Secara Langsung
+{/* Letakkan screenshot yang menunjukkan masalah di sini */}
 
-Setelah pendekatan global gagal, kami memutuskan untuk mengambil kendali yang lebih langsung. Dalam kerangka kerja berbasis komponen, cara paling andal untuk menata sesuatu sering kali adalah dengan mengontrol proses renderingnya secara langsung.
+### Solusi: Menggunakan `@layer` dan Reset CSS
 
-Kami memodifikasi `src/components/mdx-components.tsx`. File ini memberi tahu aplikasi kami cara merender elemen Markdown. Dengan mendefinisikan komponen khusus untuk tag `<pre>`, kami dapat secara paksa menerapkan gaya yang kami inginkan menggunakan kelas Tailwind.
+Solusinya adalah dengan membedakan penargetan CSS. Kami tetap mempertahankan gaya dasar untuk `code`, tetapi menambahkan sebuah *override* (penimpaan) khusus untuk `code` yang berada di dalam tag `<pre>`.
 
-```tsx
-// src/components/mdx-components.tsx
+Kami menggunakan `@layer components` dari Tailwind CSS untuk mendefinisikan gaya khusus ini, dan menambahkan aturan reset:
 
-// ... komponen lain
+```css
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-const MdxPre = ({ className, ...props }: React.HTMLAttributes<HTMLPreElement>) => (
-    <pre
-        className={cn(
-            "rounded-lg p-6 my-6 overflow-x-auto",
-            className
-        )}
-        {...props}
-    />
-);
+@layer components {
+  /* Gaya default untuk kode inline */
+  code {
+    @apply font-code relative rounded bg-muted px-[0.4rem] py-[0.2rem] font-mono text-sm font-semibold text-foreground/80;
+  }
 
-export const mdxComponents: MDXComponents = {
-  // ... komponen lain
-  pre: MdxPre,
+  /* Reset gaya khusus untuk blok kode dari Shiki */
+  pre code {
+    @apply bg-transparent text-inherit p-0 font-normal rounded-none static;
+  }
 }
 ```
 
-Dengan memetakan elemen `<pre>` secara eksplisit ke komponen `MdxPre` kami, kami menjamin bahwa setiap blok kode yang dirender dari MDX akan memiliki `padding`, sudut membulat, dan perilaku `overflow` yang benar. Masalah terpecahkan!
+Dengan aturan `pre code`, kami secara efektif "menghapus" gaya kustom dari `code` inline setiap kali ia berada di dalam sebuah blok `<pre>`, memungkinkan gaya dari Shiki untuk mengambil alih sepenuhnya. Hasilnya, kode inline dan blok kode kini memiliki tampilan yang berbeda dan sesuai fungsinya.
+
+{/* Letakkan screenshot yang menunjukkan hasil akhir di sini */}
