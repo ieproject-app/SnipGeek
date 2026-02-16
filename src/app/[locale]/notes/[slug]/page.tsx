@@ -101,7 +101,7 @@ export default async function NotePage({ params }: { params: { slug: string, loc
           />
         </div>
 
-        <div className="mt-12 flex flex-col items-center gap-4 text-center">
+        <div className="mt-12 flex flex-col gap-4 text-center">
             <h3 className="text-lg font-semibold tracking-tight text-primary">{dictionary.post.shareArticle}</h3>
             <ShareButtons
                 title={note.frontmatter.title}

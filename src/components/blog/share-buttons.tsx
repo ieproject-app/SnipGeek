@@ -37,42 +37,42 @@ export function ShareButtons({ title, imageUrl }: ShareButtonsProps) {
   };
 
   return (
-    <div className="flex items-center justify-center rounded-lg border bg-card">
+    <div className="flex rounded-lg border bg-card">
       <a 
         href={shareLinks.twitter} 
         target="_blank" 
         rel="noopener noreferrer" 
-        className="p-4 text-muted-foreground transition-colors hover:text-primary"
+        className="flex flex-1 items-center justify-center p-4 text-muted-foreground transition-colors hover:bg-accent hover:text-primary"
         aria-label="Share on X"
       >
         <XLogo className="h-5 w-5" />
       </a>
-      <div className="h-6 w-px bg-border" />
+      <div className="w-px bg-border" />
       <a 
         href={shareLinks.facebook} 
         target="_blank" 
         rel="noopener noreferrer" 
-        className="p-4 text-muted-foreground transition-colors hover:text-primary"
+        className="flex flex-1 items-center justify-center p-4 text-muted-foreground transition-colors hover:bg-accent hover:text-primary"
         aria-label="Share on Facebook"
       >
         <Facebook className="h-5 w-5" />
       </a>
-      <div className="h-6 w-px bg-border" />
+      <div className="w-px bg-border" />
       <a 
         href={shareLinks.linkedin} 
         target="_blank" 
         rel="noopener noreferrer" 
-        className="p-4 text-muted-foreground transition-colors hover:text-primary"
+        className="flex flex-1 items-center justify-center p-4 text-muted-foreground transition-colors hover:bg-accent hover:text-primary"
         aria-label="Share on LinkedIn"
       >
         <Linkedin className="h-5 w-5" />
       </a>
-      <div className="h-6 w-px bg-border" />
+      <div className="w-px bg-border" />
       <a 
           href={shareLinks.telegram} 
           target="_blank" 
           rel="noopener noreferrer" 
-          className="p-4 text-muted-foreground transition-colors hover:text-primary"
+          className="flex flex-1 items-center justify-center p-4 text-muted-foreground transition-colors hover:bg-accent hover:text-primary"
           aria-label="Share on Telegram"
       >
           <Send className="h-5 w-5" />
