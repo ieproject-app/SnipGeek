@@ -11,6 +11,10 @@ export default function NotesPage({ params: { locale } }: { params: { locale: st
   const allNotesData = getSortedNotesData(locale);
   const linkPrefix = locale === i18n.defaultLocale ? '' : `/${locale}`;
 
+  const formatDatePart = (date: Date, options: Intl.DateTimeFormatOptions) => {
+    return new Intl.DateTimeFormat(locale, options).format(date);
+  };
+
   return (
     <div className="w-full">
       <main className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-12 sm:pt-32 sm:pb-16">
@@ -21,38 +25,42 @@ export default function NotesPage({ params: { locale } }: { params: { locale: st
         </header>
 
         <section>
-          <ul className="space-y-8">
-            {allNotesData.map((note) => (
-              <li key={note.slug}>
-                <Link href={`${linkPrefix}/notes/${note.slug}`} className="block group">
-                  <article className="flex justify-between items-start gap-4">
-                    <div className="flex-1">
-                      <h2 className="font-headline text-2xl font-bold tracking-tight text-primary group-hover:text-accent transition-colors">
-                        {note.frontmatter.title}
-                      </h2>
-                      <p className="text-muted-foreground text-sm mt-1">
-                        {new Date(note.frontmatter.date).toLocaleDateString(locale, {
-                          year: 'numeric',
-                          month: 'long',
-                          day: 'numeric',
-                        })}
-                      </p>
-                    </div>
-                     <AddToReadingListButton 
-                        item={{
-                            slug: note.slug,
-                            title: note.frontmatter.title,
-                            description: note.frontmatter.description,
-                            href: `${linkPrefix}/notes/${note.slug}`,
-                            type: 'note'
-                        }}
+          <ul className="space-y-12">
+            {allNotesData.map((note) => {
+              const noteDate = new Date(note.frontmatter.date);
+              const item = {
+                  slug: note.slug,
+                  title: note.frontmatter.title,
+                  description: note.frontmatter.description,
+                  href: `${linkPrefix}/notes/${note.slug}`,
+                  type: 'note' as const
+              };
+              return (
+                <li key={note.slug} className="relative group">
+                    <Link href={`${linkPrefix}/notes/${note.slug}`} className="block">
+                        <article className="flex items-start gap-4 sm:gap-6">
+                        <div className="flex-shrink-0 bg-primary text-primary-foreground rounded-lg w-20 text-center p-2">
+                            <p className="text-3xl font-bold">{formatDatePart(noteDate, { day: 'numeric' })}</p>
+                            <p className="text-sm font-semibold uppercase">{formatDatePart(noteDate, { month: 'short' })}</p>
+                            <p className="text-xs">{formatDatePart(noteDate, { year: 'numeric' })}</p>
+                        </div>
+                        <div className="flex-1">
+                            <h2 className="font-headline text-2xl font-bold tracking-tight text-primary group-hover:text-accent transition-colors">
+                            {note.frontmatter.title}
+                            </h2>
+                            <p className="text-muted-foreground text-sm mt-2">
+                                {note.frontmatter.description}
+                            </p>
+                        </div>
+                        </article>
+                    </Link>
+                    <AddToReadingListButton 
+                        item={item}
                         showText={false}
-                        className="text-muted-foreground hover:text-primary shrink-0"
+                        className="absolute top-0 right-0 text-muted-foreground hover:text-primary shrink-0 opacity-0 group-hover:opacity-100 transition-opacity"
                     />
-                  </article>
-                </Link>
-              </li>
-            ))}
+                </li>
+            )})}
           </ul>
         </section>
       </main>
