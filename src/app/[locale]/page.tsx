@@ -46,12 +46,12 @@ export default function Home({ params: { locale } }: { params: { locale: string 
                     <Link href={`${linkPrefix}/blog/${post.slug}`} className="block group" aria-label={`Read more about ${post.frontmatter.title}`}>
                       <article className="relative w-full aspect-[4/3] rounded-xl overflow-hidden shadow-2xl">
                         <div className="absolute top-3 right-3 z-20 flex items-center gap-2">
-                            <Flame className="h-5 w-5 text-orange-400 fill-orange-400" />
                             <AddToReadingListButton 
                                 item={item}
                                 showText={false}
-                                className="text-white bg-black/30 hover:bg-black/50 hover:text-white"
+                                className="text-white bg-black/30 hover:bg-black/50 hover:text-white opacity-0 group-hover:opacity-100 transition-opacity"
                             />
+                            <Flame className="h-5 w-5 text-orange-400 fill-orange-400" />
                         </div>
                         {heroImage && (
                           <Image
