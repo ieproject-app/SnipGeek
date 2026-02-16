@@ -26,7 +26,7 @@ export default async function Home({ params: { locale } }: { params: { locale: s
     let heroImageHint: string | undefined;
 
     if (heroImageValue) {
-        if (heroImageValue.startsWith('http')) {
+        if (heroImageValue.startsWith('http') || heroImageValue.startsWith('/')) {
             heroImageSrc = heroImageValue;
             heroImageHint = post.frontmatter.imageAlt || post.frontmatter.title;
         } else {

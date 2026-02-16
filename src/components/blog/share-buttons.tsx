@@ -1,10 +1,9 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
-import { Facebook, Linkedin } from 'lucide-react';
+import { Facebook, Linkedin, Send } from 'lucide-react';
 import { XLogo } from '@/components/icons/x-logo';
 import { useState, useEffect } from 'react';
-import { PinterestLogo } from '@/components/icons/pinterest-logo';
 
 interface ShareButtonsProps {
   title: string;
@@ -29,13 +28,12 @@ export function ShareButtons({ title, imageUrl }: ShareButtonsProps) {
 
   const encodedUrl = encodeURIComponent(currentUrl);
   const encodedTitle = encodeURIComponent(title);
-  const encodedImageUrl = imageUrl ? encodeURIComponent(imageUrl) : '';
 
   const shareLinks = {
     twitter: `https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodedTitle}`,
     facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`,
     linkedin: `https://www.linkedin.com/shareArticle?mini=true&url=${encodedUrl}&title=${encodedTitle}`,
-    pinterest: `https://pinterest.com/pin/create/button/?url=${encodedUrl}&media=${encodedImageUrl}&description=${encodedTitle}`,
+    telegram: `https://t.me/share/url?url=${encodedUrl}&text=${encodedTitle}`,
   };
 
   return (
@@ -69,20 +67,16 @@ export function ShareButtons({ title, imageUrl }: ShareButtonsProps) {
       >
         <Linkedin className="h-5 w-5" />
       </a>
-      {imageUrl && (
-        <>
-            <div className="h-6 w-px bg-border" />
-            <a 
-                href={shareLinks.pinterest} 
-                target="_blank" 
-                rel="noopener noreferrer" 
-                className="p-4 text-muted-foreground transition-colors hover:text-primary"
-                aria-label="Share on Pinterest"
-            >
-                <PinterestLogo className="h-5 w-5" />
-            </a>
-        </>
-      )}
+      <div className="h-6 w-px bg-border" />
+      <a 
+          href={shareLinks.telegram} 
+          target="_blank" 
+          rel="noopener noreferrer" 
+          className="p-4 text-muted-foreground transition-colors hover:text-primary"
+          aria-label="Share on Telegram"
+      >
+          <Send className="h-5 w-5" />
+      </a>
     </div>
   );
 }
