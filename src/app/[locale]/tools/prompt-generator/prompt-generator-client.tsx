@@ -9,6 +9,7 @@ import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { Calendar as CalendarIcon, Copy, Check } from 'lucide-react';
@@ -20,6 +21,7 @@ type PromptGeneratorProps = {
 };
 
 export function PromptGeneratorClient({ dictionary }: PromptGeneratorProps) {
+  const [contentType, setContentType] = useState<'blog' | 'note'>('blog');
   const [draft, setDraft] = useState('');
   const [title, setTitle] = useState('');
   const [publishDate, setPublishDate] = useState<Date | undefined>(new Date());
@@ -35,22 +37,36 @@ export function PromptGeneratorClient({ dictionary }: PromptGeneratorProps) {
 
   useEffect(() => {
     const buildPrompt = () => {
-      let prompt = `${dictionary.promptBase}\n\n`;
+      const isBlog = contentType === 'blog';
+      
+      let prompt = isBlog
+        ? `${dictionary.promptBaseBlog}\n\n`
+        : `${dictionary.promptBaseNote}\n\n`;
+
       prompt += `**${dictionary.frontmatterDetails}:**\n`;
+      prompt += `- ${dictionary.contentTypeLabel}: ${isBlog ? dictionary.contentTypeBlog : dictionary.contentTypeNote}\n`;
       prompt += `- ${dictionary.titleLabel}: ${title ? `"${title}"` : dictionary.titlePlaceholder}\n`;
       prompt += `- ${dictionary.dateLabel}: ${publishDate ? publishDate.toISOString() : new Date().toISOString()}\n`;
-      prompt += `- ${dictionary.statusLabel}: published: ${isPublished}, featured: ${isFeatured}\n`;
+      
+      let frontmatterStatus = `published: ${isPublished}`;
+      if (isBlog) {
+        frontmatterStatus += `, featured: ${isFeatured}`;
+      }
+      prompt += `- ${dictionary.statusLabel}: ${frontmatterStatus}\n`;
 
       const imageLines = images.split('\n').filter(line => line.trim() !== '');
-      const heroImageLine = imageLines.length > 0 ? imageLines[0] : '';
-      const [heroImagePath, heroImageAlt] = heroImageLine.split('|').map(s => s.trim());
 
-      if (heroImagePath) {
-        prompt += `- heroImage: "${heroImagePath}"\n`;
-        prompt += `- imageAlt: "${heroImageAlt || 'Please create a descriptive alt text based on the image path.'}"\n`;
-      } else {
-        prompt += `- heroImage: "https://placehold.co/1200x630/e2e8f0/64748b?text=Hero+Image"\n`;
-        prompt += `- imageAlt: "Please create a descriptive alt text."\n`;
+      if (isBlog) {
+        const heroImageLine = imageLines.length > 0 ? imageLines[0] : '';
+        const [heroImagePath, heroImageAlt] = heroImageLine.split('|').map(s => s ? s.trim() : '');
+
+        if (heroImagePath) {
+          prompt += `- heroImage: "${heroImagePath}"\n`;
+          prompt += `- imageAlt: "${heroImageAlt || 'Please create a descriptive alt text based on the image path.'}"\n`;
+        } else {
+          prompt += `- heroImage: "https://placehold.co/1200x630/e2e8f0/64748b?text=Hero+Image"\n`;
+          prompt += `- imageAlt: "Please create a descriptive alt text."\n`;
+        }
       }
       
       if (tags) {
@@ -61,14 +77,26 @@ export function PromptGeneratorClient({ dictionary }: PromptGeneratorProps) {
       }
       prompt += `- ${dictionary.translationLabel}: ${needsTranslation ? dictionary.translationYes : dictionary.translationNo}\n\n`;
 
-      if (imageLines.length > 1) {
+      if (isBlog && imageLines.length > 1) {
           prompt += `**${dictionary.supportingImagesLabel}:**\n`;
           imageLines.slice(1).forEach((line, index) => {
-              const [imgPath, imgAlt] = line.split('|').map(s => s.trim());
+              const [imgPath, imgAlt] = line.split('|').map(s => s ? s.trim() : '');
               prompt += `- Image ${index + 1} Path: "${imgPath}"\n`;
               prompt += `- Image ${index + 1} Alt: "${imgAlt || `Please create alt text for supporting image ${index + 1}`}"\n`;
           });
           prompt += `\n`;
+      }
+
+      if (!isBlog && imageLines.length > 0) {
+        prompt += `**${dictionary.supportingImagesLabelNote}:**\n`;
+        imageLines.forEach((line) => {
+            const [imgPath, imgAlt] = line.split('|').map(s => s ? s.trim() : '');
+            if (imgPath) {
+              prompt += `- Path: "${imgPath}"\n`;
+              prompt += `- Alt: "${imgAlt || `Please create alt text for this image`}"\n`;
+            }
+        });
+        prompt += `\n`;
       }
 
       prompt += `---\n\n`;
@@ -80,7 +108,7 @@ export function PromptGeneratorClient({ dictionary }: PromptGeneratorProps) {
     };
 
     buildPrompt();
-  }, [draft, title, publishDate, isPublished, isFeatured, images, tags, needsTranslation, dictionary]);
+  }, [draft, title, publishDate, isPublished, isFeatured, images, tags, needsTranslation, dictionary, contentType]);
 
   const handleCopy = () => {
     navigator.clipboard.writeText(generatedPrompt);
@@ -94,8 +122,28 @@ export function PromptGeneratorClient({ dictionary }: PromptGeneratorProps) {
     }, 2000);
   };
   
+  const isBlog = contentType === 'blog';
+
   return (
     <div className="space-y-8">
+      <Card>
+          <CardHeader>
+              <CardTitle>{dictionary.contentTypeLabel}</CardTitle>
+          </CardHeader>
+          <CardContent>
+              <RadioGroup value={contentType} onValueChange={(value) => setContentType(value as 'blog' | 'note')} className="flex flex-col sm:flex-row gap-4">
+                  <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="blog" id="r-blog" />
+                      <Label htmlFor="r-blog">{dictionary.contentTypeBlog}</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="note" id="r-note" />
+                      <Label htmlFor="r-note">{dictionary.contentTypeNote}</Label>
+                  </div>
+              </RadioGroup>
+          </CardContent>
+      </Card>
+      
       <Card>
         <CardHeader>
           <CardTitle>{dictionary.draftTitle}</CardTitle>
@@ -112,13 +160,15 @@ export function PromptGeneratorClient({ dictionary }: PromptGeneratorProps) {
 
        <Card>
         <CardHeader>
-          <CardTitle>{dictionary.imagesTitle}</CardTitle>
+          <CardTitle>{isBlog ? dictionary.imagesTitle : dictionary.imagesTitleNote}</CardTitle>
         </CardHeader>
         <CardContent>
-            <Label htmlFor="images" className="text-sm text-muted-foreground">{dictionary.imagesDescription}</Label>
+            <Label htmlFor="images" className="text-sm text-muted-foreground">
+                {isBlog ? dictionary.imagesDescription : dictionary.imagesDescriptionNote}
+            </Label>
             <Textarea
                 id="images"
-                placeholder={dictionary.imagesPlaceholder}
+                placeholder={isBlog ? dictionary.imagesPlaceholder : dictionary.imagesPlaceholderNote}
                 value={images}
                 onChange={(e) => setImages(e.target.value)}
                 className="min-h-[120px] font-mono text-xs mt-2"
@@ -170,10 +220,12 @@ export function PromptGeneratorClient({ dictionary }: PromptGeneratorProps) {
                     <Switch id="published" checked={isPublished} onCheckedChange={setIsPublished} />
                     <Label htmlFor="published">{dictionary.publishSwitchLabel}</Label>
                 </div>
-                <div className="flex items-center space-x-2">
-                    <Switch id="featured" checked={isFeatured} onCheckedChange={setIsFeatured} />
-                    <Label htmlFor="featured">{dictionary.featuredSwitchLabel}</Label>
-                </div>
+                {isBlog && (
+                    <div className="flex items-center space-x-2">
+                        <Switch id="featured" checked={isFeatured} onCheckedChange={setIsFeatured} />
+                        <Label htmlFor="featured">{dictionary.featuredSwitchLabel}</Label>
+                    </div>
+                )}
             </div>
           </div>
           
