@@ -96,4 +96,18 @@
   body {
     @apply bg-background text-foreground;
   }
+
+  /* Fade-in animation for page transitions */
+  .fade-in-on-load {
+    animation: fade-in 0.4s ease-in-out;
+  }
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
 }

@@ -1,7 +1,6 @@
 'use client'
 
 import { usePathname, useParams } from 'next/navigation'
-import Link from 'next/link'
 import { i18n, type Locale } from '@/i18n-config'
 import { type TranslationsMap } from '@/lib/posts'
 import { cn } from '@/lib/utils'
@@ -82,7 +81,7 @@ export function LanguageSwitcher({ translationsMap }: { translationsMap: Transla
             )}
         />
         {i18n.locales.map(locale => (
-            <Link 
+            <a
                 key={locale} 
                 href={redirectedPathName(locale)} 
                 className={cn(
@@ -93,7 +92,7 @@ export function LanguageSwitcher({ translationsMap }: { translationsMap: Transla
                 onClick={() => handleLocaleChange(locale as Locale)}
             >
                 {locale.toUpperCase()}
-            </Link>
+            </a>
         ))}
     </div>
   )
