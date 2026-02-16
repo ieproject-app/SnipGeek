@@ -8,12 +8,16 @@ const postsDirectory = path.join(process.cwd(), '_posts');
 export type PostFrontmatter = {
   title: string;
   date: string;
+  updated?: string;
   description: string;
   heroImage: string;
+  imageAlt?: string;
   translationKey: string;
+  published?: boolean;
   featured?: boolean;
   tags?: string[];
   category?: string;
+  authorId?: string;
   [key: string]: any;
 };
 
@@ -52,7 +56,8 @@ export function getSortedPostsData(locale?: string): Post<PostFrontmatter>[] {
         frontmatter: data as PostFrontmatter,
         locale: targetLocale!,
       };
-    });
+    })
+    .filter(post => post.frontmatter.published === true);
 
   const postsWithKeys = new Map<string, Post<PostFrontmatter>>();
   const postsWithoutKeys: Post<PostFrontmatter>[] = [];
@@ -71,6 +76,46 @@ export function getSortedPostsData(locale?: string): Post<PostFrontmatter>[] {
   const uniquePosts = [...Array.from(postsWithKeys.values()), ...postsWithoutKeys];
 
   return uniquePosts.sort((a, b) => {
+    if (new Date(a.frontmatter.date) < new Date(b.frontmatter.date)) {
+      return 1;
+    } else {
+      return -1;
+    }
+  });
+}
+
+export function getDraftPostsData(locale?: string): Post<PostFrontmatter>[] {
+  const targetLocale = i18n.locales.includes(locale as Locale) ? locale : i18n.defaultLocale;
+  const localeDirectory = path.join(postsDirectory, targetLocale!);
+  
+  let fileNames: string[];
+  try {
+    fileNames = fs.readdirSync(localeDirectory);
+  } catch (err) {
+    return [];
+  }
+
+  const allPostsData = fileNames
+    .filter((fileName) => fileName.endsWith('.mdx'))
+    .map((fileName) => {
+      const slug = fileName.replace(/\.mdx$/, '');
+      const fullPath = path.join(localeDirectory, fileName);
+      const fileContents = fs.readFileSync(fullPath, 'utf8');
+      const { data } = matter(fileContents);
+
+      if (!data.heroImage) {
+        data.heroImage = 'understanding-nextjs';
+      }
+
+      return {
+        slug,
+        frontmatter: data as PostFrontmatter,
+        locale: targetLocale!,
+      };
+    })
+    .filter(post => post.frontmatter.published !== true);
+
+  return allPostsData.sort((a, b) => {
     if (new Date(a.frontmatter.date) < new Date(b.frontmatter.date)) {
       return 1;
     } else {
@@ -122,10 +167,17 @@ export function getAllPostSlugs(locale?: string) {
     return fileNames
       .filter((fileName) => fileName.endsWith('.mdx'))
       .map((fileName) => {
-        return {
-          slug: fileName.replace(/\.mdx$/, ''),
-        };
-      });
+        const fullPath = path.join(localeDirectory, fileName);
+        const fileContents = fs.readFileSync(fullPath, 'utf8');
+        const { data } = matter(fileContents);
+        if (data.published === true) {
+            return {
+                slug: fileName.replace(/\.mdx$/, ''),
+            };
+        }
+        return null;
+      })
+      .filter(slug => slug !== null);
 }
 
 export function getPostTranslation(translationKey: string, targetLocale: string): Post<PostFrontmatter> | null {

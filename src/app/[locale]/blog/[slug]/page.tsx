@@ -10,6 +10,7 @@ import rehypeShiki from '@shikijs/rehype';
 import { AddToReadingListButton } from '@/components/layout/add-to-reading-list-button';
 import { i18n } from '@/i18n-config';
 import { getDictionary } from '@/lib/get-dictionary';
+import { Badge } from '@/components/ui/badge';
 
 export async function generateStaticParams() {
   const locales = getAllLocales();
@@ -31,6 +32,7 @@ export async function generateMetadata({ params }: { params: { slug: string, loc
 
   const heroImage = PlaceHolderImages.find(p => p.id === post.frontmatter.heroImage);
   const path = `/${params.locale}/blog/${post.slug}`;
+  const imageAlt = post.frontmatter.imageAlt || post.frontmatter.title;
 
   return {
     title: post.frontmatter.title,
@@ -48,25 +50,27 @@ export async function generateMetadata({ params }: { params: { slug: string, loc
                 url: heroImage.imageUrl,
                 width: 1200,
                 height: 630,
+                alt: imageAlt,
             },
         ] : [],
         locale: params.locale,
         type: 'article',
         publishedTime: post.frontmatter.date,
+        modifiedTime: post.frontmatter.updated,
         authors: ['SnipGeek'],
     },
     twitter: {
         card: 'summary_large_image',
         title: post.frontmatter.title,
         description: post.frontmatter.description,
-        images: heroImage ? [heroImage.imageUrl] : [],
+        images: heroImage ? [{url: heroImage.imageUrl, alt: imageAlt}] : [],
     },
   };
 }
 
 export default async function PostPage({ params }: { params: { slug: string, locale: string } }) {
   const post = await getPostData(params.slug, params.locale);
-  if (!post) {
+  if (!post || !post.frontmatter.published) {
     notFound();
   }
 
@@ -81,7 +85,7 @@ export default async function PostPage({ params }: { params: { slug: string, loc
           <div className="mb-8 sm:mb-12">
             <Image
               src={heroImage.imageUrl}
-              alt={heroImage.description}
+              alt={post.frontmatter.imageAlt || post.frontmatter.title}
               width={1200}
               height={630}
               className="w-full h-auto rounded-xl shadow-lg object-cover"
@@ -94,14 +98,25 @@ export default async function PostPage({ params }: { params: { slug: string, loc
           <h1 className="font-headline text-4xl md:text-5xl font-extrabold tracking-tighter text-primary mb-3">
             {post.frontmatter.title}
           </h1>
-          <div className="flex flex-wrap items-center gap-4 mb-8">
-            <p className="text-muted-foreground text-base">
-              {new Date(post.frontmatter.date).toLocaleDateString(params.locale, {
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-muted-foreground text-sm mb-4">
+            <p>
+              {`Published on ${new Date(post.frontmatter.date).toLocaleDateString(params.locale, {
                 year: 'numeric',
                 month: 'long',
                 day: 'numeric',
-              })}
+              })}`}
             </p>
+            {post.frontmatter.updated && (
+                <p>
+                    {`(Updated on ${new Date(post.frontmatter.updated).toLocaleDateString(params.locale, {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                    })})`}
+                </p>
+            )}
+          </div>
+          <div className="flex flex-wrap items-center gap-4 mb-8">
             <AddToReadingListButton 
               item={{
                   slug: post.slug,
@@ -112,6 +127,9 @@ export default async function PostPage({ params }: { params: { slug: string, loc
               }}
               dictionary={dictionary.readingList}
             />
+             {post.frontmatter.tags && post.frontmatter.tags.map(tag => (
+                <Badge key={tag} variant="secondary">{tag}</Badge>
+            ))}
           </div>
         </header>
         <div className="text-lg text-foreground/80">

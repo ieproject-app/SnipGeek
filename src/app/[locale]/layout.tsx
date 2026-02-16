@@ -1,8 +1,8 @@
 import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
 import { i18n } from '@/i18n-config';
-import { getAllTranslationsMap as getAllPostTranslationsMap, getSortedPostsData } from '@/lib/posts';
-import { getAllNotesTranslationsMap, getSortedNotesData } from '@/lib/notes';
+import { getAllTranslationsMap as getAllPostTranslationsMap, getSortedPostsData, getDraftPostsData } from '@/lib/posts';
+import { getAllNotesTranslationsMap, getSortedNotesData, getDraftNotesData } from '@/lib/notes';
 import '../globals.css';
 import { Toaster } from '@/components/ui/toaster';
 import type { Metadata } from 'next';
@@ -10,6 +10,7 @@ import { ThemeProvider } from '@/components/theme-provider';
 import { ReadingListProvider } from '@/hooks/use-reading-list';
 import { BackToTop } from '@/components/layout/back-to-top';
 import { getDictionary } from '@/lib/get-dictionary';
+import { DraftList } from '@/components/layout/draft-list';
 
 export const metadata: Metadata = {
   // The user should update this URL to their actual domain.
@@ -62,6 +63,8 @@ export default async function LocaleLayout({
 
   const searchableData = [...searchablePosts, ...searchableNotes];
   const dictionary = await getDictionary(params.locale);
+  const draftPosts = getDraftPostsData(params.locale);
+  const draftNotes = getDraftNotesData(params.locale);
   
   return (
     <html lang={params.locale} className="scroll-smooth" suppressHydrationWarning>
@@ -83,6 +86,7 @@ export default async function LocaleLayout({
             <Footer dictionary={dictionary} />
             <Toaster />
             <BackToTop />
+            <DraftList draftPosts={draftPosts} draftNotes={draftNotes} dictionary={dictionary} />
           </ReadingListProvider>
         </ThemeProvider>
       </body>

@@ -56,5 +56,9 @@
         "items": "items",
         "inYourList": "in your reading list",
         "empty": "Your reading list is empty. Save articles to read them later."
+    },
+    "drafts": {
+        "title": "Drafts",
+        "noDrafts": "No drafts in this category."
     }
 }

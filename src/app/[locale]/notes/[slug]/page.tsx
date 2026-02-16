@@ -8,6 +8,7 @@ import rehypeShiki from '@shikijs/rehype';
 import { AddToReadingListButton } from '@/components/layout/add-to-reading-list-button';
 import { i18n } from '@/i18n-config';
 import { getDictionary } from '@/lib/get-dictionary';
+import { Badge } from '@/components/ui/badge';
 
 export async function generateStaticParams() {
   const locales = getAllLocales();
@@ -43,6 +44,7 @@ export async function generateMetadata({ params }: { params: { slug: string, loc
         locale: params.locale,
         type: 'article',
         publishedTime: note.frontmatter.date,
+        modifiedTime: note.frontmatter.updated,
         authors: ['SnipGeek'],
     },
     twitter: {
@@ -55,7 +57,7 @@ export async function generateMetadata({ params }: { params: { slug: string, loc
 
 export default async function NotePage({ params }: { params: { slug: string, locale: string } }) {
   const note = await getNoteData(params.slug, params.locale);
-  if (!note) {
+  if (!note || !note.frontmatter.published) {
     notFound();
   }
   const linkPrefix = params.locale === i18n.defaultLocale ? '' : `/${params.locale}`;
@@ -68,14 +70,25 @@ export default async function NotePage({ params }: { params: { slug: string, loc
           <h1 className="font-headline text-4xl md:text-5xl font-extrabold tracking-tighter text-primary mb-3">
             {note.frontmatter.title}
           </h1>
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-muted-foreground text-sm mb-4">
+                <p>
+                    {`Published on ${new Date(note.frontmatter.date).toLocaleDateString(params.locale, {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                    })}`}
+                </p>
+                {note.frontmatter.updated && (
+                    <p>
+                        {`(Updated on ${new Date(note.frontmatter.updated).toLocaleDateString(params.locale, {
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric',
+                        })})`}
+                    </p>
+                )}
+          </div>
           <div className="flex flex-wrap items-center gap-4 mb-8">
-            <p className="text-muted-foreground text-base">
-                {new Date(note.frontmatter.date).toLocaleDateString(params.locale, {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-                })}
-            </p>
             <AddToReadingListButton 
                 item={{
                     slug: note.slug,
@@ -86,6 +99,9 @@ export default async function NotePage({ params }: { params: { slug: string, loc
                 }}
                 dictionary={dictionary.readingList}
             />
+            {note.frontmatter.tags && note.frontmatter.tags.map(tag => (
+                <Badge key={tag} variant="secondary">{tag}</Badge>
+            ))}
           </div>
         </header>
         <div className="text-lg text-foreground/80">

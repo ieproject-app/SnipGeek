@@ -56,5 +56,9 @@
         "items": "item",
         "inYourList": "dalam daftar baca Anda",
         "empty": "Daftar baca Anda kosong. Simpan artikel untuk membacanya nanti."
+    },
+    "drafts": {
+        "title": "Draf",
+        "noDrafts": "Tidak ada draf dalam kategori ini."
     }
 }
