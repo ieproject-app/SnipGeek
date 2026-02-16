@@ -20,6 +20,100 @@ export default async function Home({ params: { locale } }: { params: { locale: s
   
   const linkPrefix = locale === i18n.defaultLocale ? '' : `/${locale}`;
 
+  const renderPostCard = (post: (typeof allPostsData)[0], isFeatured: boolean) => {
+    const heroImageValue = post.frontmatter.heroImage;
+    let heroImageSrc: string | undefined;
+    let heroImageHint: string | undefined;
+
+    if (heroImageValue) {
+        if (heroImageValue.startsWith('http')) {
+            heroImageSrc = heroImageValue;
+            heroImageHint = post.frontmatter.imageAlt || post.frontmatter.title;
+        } else {
+            const placeholder = PlaceHolderImages.find(p => p.id === heroImageValue);
+            if (placeholder) {
+                heroImageSrc = placeholder.imageUrl;
+                heroImageHint = placeholder.imageHint;
+            }
+        }
+    }
+
+    const item = {
+        slug: post.slug,
+        title: post.frontmatter.title,
+        description: post.frontmatter.description,
+        href: `${linkPrefix}/blog/${post.slug}`,
+        type: 'blog' as const,
+    };
+
+    if (isFeatured) {
+        return (
+            <Link href={`${linkPrefix}/blog/${post.slug}`} className="block group" aria-label={`Read more about ${post.frontmatter.title}`}>
+                <article className="relative w-full aspect-[4/3] rounded-xl overflow-hidden shadow-2xl">
+                    <div className="absolute top-3 right-3 z-20 flex items-center gap-2">
+                        <AddToReadingListButton 
+                            item={item}
+                            dictionary={dictionary.readingList}
+                            showText={false}
+                            className="text-white bg-black/30 hover:bg-black/50 hover:text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                        />
+                        <Flame className="h-5 w-5 text-orange-400 fill-orange-400" />
+                    </div>
+                    {heroImageSrc && (
+                        <Image
+                            src={heroImageSrc}
+                            alt={post.frontmatter.imageAlt || post.frontmatter.title}
+                            fill
+                            className="object-cover transition-transform duration-500 group-hover:scale-110"
+                            data-ai-hint={heroImageHint}
+                        />
+                    )}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
+                    <div className="absolute bottom-0 left-0 p-6 text-white w-full">
+                        <p className="text-xs font-semibold uppercase tracking-wider opacity-80 mb-1">{post.frontmatter.category}</p>
+                        <h3 className="font-headline text-2xl font-bold">
+                            {post.frontmatter.title}
+                        </h3>
+                    </div>
+                </article>
+            </Link>
+        );
+    }
+
+    return (
+        <div key={post.slug} className="group relative">
+            <Link href={`${linkPrefix}/blog/${post.slug}`} className="block" aria-label={`Read more about ${post.frontmatter.title}`}>
+                <div className="relative w-full aspect-video overflow-hidden rounded-lg mb-4">
+                    {heroImageSrc && (
+                        <Image
+                            src={heroImageSrc}
+                            alt={post.frontmatter.imageAlt || post.frontmatter.title}
+                            fill
+                            className="object-cover transition-transform duration-500 group-hover:scale-105"
+                            data-ai-hint={heroImageHint}
+                        />
+                    )}
+                </div>
+
+                {post.frontmatter.category && <p className="text-sm text-muted-foreground mb-1">{post.frontmatter.category}</p>}
+                <h3 className="font-headline text-xl font-bold tracking-tight text-primary group-hover:text-accent transition-colors">
+                    {post.frontmatter.title}
+                </h3>
+                <p className="leading-relaxed text-muted-foreground mt-2 text-sm line-clamp-3">
+                    {post.frontmatter.description}
+                </p>
+            </Link>
+            <AddToReadingListButton 
+                item={item}
+                showText={false}
+                dictionary={dictionary.readingList}
+                className="absolute top-3 right-3 z-10 text-white bg-black/30 hover:bg-black/50 hover:text-white opacity-0 group-hover:opacity-100 transition-opacity"
+            />
+        </div>
+    );
+  }
+
+
   return (
     <div className="w-full">
       {/* Featured Posts Section */}
@@ -27,16 +121,7 @@ export default async function Home({ params: { locale } }: { params: { locale: s
         <section className="pt-24 sm:pt-32 mb-20 sm:mb-28">
           <div className="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-0">
-              {featuredPosts.map((post, index) => {
-                const heroImage = PlaceHolderImages.find(p => p.id === post.frontmatter.heroImage);
-                const item = {
-                    slug: post.slug,
-                    title: post.frontmatter.title,
-                    description: post.frontmatter.description,
-                    href: `${linkPrefix}/blog/${post.slug}`,
-                    type: 'blog' as const,
-                };
-                return (
+              {featuredPosts.map((post, index) => (
                   <div
                     key={post.slug}
                     className={cn(
@@ -45,38 +130,9 @@ export default async function Home({ params: { locale } }: { params: { locale: s
                       (index === 1 || index === 3) && "-rotate-2 z-10 hover:-translate-y-2"
                     )}
                   >
-                    <Link href={`${linkPrefix}/blog/${post.slug}`} className="block group" aria-label={`Read more about ${post.frontmatter.title}`}>
-                      <article className="relative w-full aspect-[4/3] rounded-xl overflow-hidden shadow-2xl">
-                        <div className="absolute top-3 right-3 z-20 flex items-center gap-2">
-                           <AddToReadingListButton 
-                                item={item}
-                                dictionary={dictionary.readingList}
-                                showText={false}
-                                className="text-white bg-black/30 hover:bg-black/50 hover:text-white opacity-0 group-hover:opacity-100 transition-opacity"
-                            />
-                            <Flame className="h-5 w-5 text-orange-400 fill-orange-400" />
-                        </div>
-                        {heroImage && (
-                          <Image
-                            src={heroImage.imageUrl}
-                            alt={post.frontmatter.imageAlt || post.frontmatter.title}
-                            fill
-                            className="object-cover transition-transform duration-500 group-hover:scale-110"
-                            data-ai-hint={heroImage.imageHint}
-                          />
-                        )}
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
-                        <div className="absolute bottom-0 left-0 p-6 text-white w-full">
-                          <p className="text-xs font-semibold uppercase tracking-wider opacity-80 mb-1">{post.frontmatter.category}</p>
-                          <h3 className="font-headline text-2xl font-bold">
-                            {post.frontmatter.title}
-                          </h3>
-                        </div>
-                      </article>
-                    </Link>
+                    {renderPostCard(post, true)}
                   </div>
-                );
-              })}
+                ))}
             </div>
           </div>
         </section>
@@ -87,47 +143,7 @@ export default async function Home({ params: { locale } }: { params: { locale: s
         <section className="container max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pb-12 sm:pb-16">
           <h2 className="text-3xl font-bold font-headline tracking-tighter text-primary mb-8 text-center">{dictionary.home.allPosts}</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-12">
-            {otherPosts.slice(0, 4).map((post) => {
-                const heroImage = PlaceHolderImages.find(p => p.id === post.frontmatter.heroImage);
-                const item = {
-                    slug: post.slug,
-                    title: post.frontmatter.title,
-                    description: post.frontmatter.description,
-                    href: `${linkPrefix}/blog/${post.slug}`,
-                    type: 'blog' as const,
-                };
-                return (
-                    <div key={post.slug} className="group relative">
-                        <Link href={`${linkPrefix}/blog/${post.slug}`} className="block" aria-label={`Read more about ${post.frontmatter.title}`}>
-                            <div className="relative w-full aspect-video overflow-hidden rounded-lg mb-4">
-                                {heroImage && (
-                                    <Image
-                                        src={heroImage.imageUrl}
-                                        alt={post.frontmatter.imageAlt || post.frontmatter.title}
-                                        fill
-                                        className="object-cover transition-transform duration-500 group-hover:scale-105"
-                                        data-ai-hint={heroImage.imageHint}
-                                    />
-                                )}
-                            </div>
-
-                            {post.frontmatter.category && <p className="text-sm text-muted-foreground mb-1">{post.frontmatter.category}</p>}
-                            <h3 className="font-headline text-xl font-bold tracking-tight text-primary group-hover:text-accent transition-colors">
-                                {post.frontmatter.title}
-                            </h3>
-                            <p className="leading-relaxed text-muted-foreground mt-2 text-sm line-clamp-3">
-                                {post.frontmatter.description}
-                            </p>
-                        </Link>
-                         <AddToReadingListButton 
-                            item={item}
-                            showText={false}
-                            dictionary={dictionary.readingList}
-                            className="absolute top-3 right-3 z-10 text-white bg-black/30 hover:bg-black/50 hover:text-white opacity-0 group-hover:opacity-100 transition-opacity"
-                        />
-                    </div>
-                )
-            })}
+            {otherPosts.slice(0, 4).map((post) => renderPostCard(post, false))}
           </div>
         </section>
       )}

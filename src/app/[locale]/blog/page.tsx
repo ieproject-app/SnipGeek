@@ -26,7 +26,23 @@ export default async function BlogPage({ params: { locale } }: { params: { local
 
         <section className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-12">
             {allPostsData.map((post) => {
-                const heroImage = PlaceHolderImages.find(p => p.id === post.frontmatter.heroImage);
+                const heroImageValue = post.frontmatter.heroImage;
+                let heroImageSrc: string | undefined;
+                let heroImageHint: string | undefined;
+
+                if (heroImageValue) {
+                    if (heroImageValue.startsWith('http')) {
+                        heroImageSrc = heroImageValue;
+                        heroImageHint = post.frontmatter.imageAlt || post.frontmatter.title;
+                    } else {
+                        const placeholder = PlaceHolderImages.find(p => p.id === heroImageValue);
+                        if (placeholder) {
+                            heroImageSrc = placeholder.imageUrl;
+                            heroImageHint = placeholder.imageHint;
+                        }
+                    }
+                }
+                
                 const item = {
                     slug: post.slug,
                     title: post.frontmatter.title,
@@ -38,13 +54,13 @@ export default async function BlogPage({ params: { locale } }: { params: { local
                     <div key={post.slug} className="group relative">
                         <Link href={`${linkPrefix}/blog/${post.slug}`} className="block" aria-label={`Read more about ${post.frontmatter.title}`}>
                             <div className="relative w-full aspect-video overflow-hidden rounded-lg mb-4">
-                                {heroImage && (
+                                {heroImageSrc && (
                                     <Image
-                                        src={heroImage.imageUrl}
+                                        src={heroImageSrc}
                                         alt={post.frontmatter.imageAlt || post.frontmatter.title}
                                         fill
                                         className="object-cover transition-transform duration-500 group-hover:scale-105"
-                                        data-ai-hint={heroImage.imageHint}
+                                        data-ai-hint={heroImageHint}
                                     />
                                 )}
                             </div>

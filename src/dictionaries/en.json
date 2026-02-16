@@ -63,7 +63,7 @@
     },
     "post": {
         "share": "Share",
-        "shareOn": "Share on"
+        "shareArticle": "Share this article"
     },
     "readingList": {
         "add": "Save to List",

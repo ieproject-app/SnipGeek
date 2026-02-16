@@ -1,7 +1,6 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { AddToReadingListButton } from '@/components/layout/add-to-reading-list-button';
-import { ShareButtons } from './share-buttons';
 import type { PostFrontmatter } from '@/lib/posts';
 import type { NoteFrontmatter } from '@/lib/notes';
 import type { Dictionary } from '@/lib/get-dictionary';
@@ -48,10 +47,6 @@ export function PostMeta({ frontmatter, item, locale, dictionary }: PostMetaProp
           <AddToReadingListButton 
             item={item}
             dictionary={dictionary.readingList}
-          />
-          <ShareButtons 
-            title={frontmatter.title}
-            dictionary={dictionary.post}
           />
         </div>
       </div>

@@ -11,6 +11,7 @@ import { i18n } from '@/i18n-config';
 import { getDictionary } from '@/lib/get-dictionary';
 import { PostComments } from '@/components/blog/post-comments';
 import { PostMeta } from '@/components/blog/post-meta';
+import { ShareButtons } from '@/components/blog/share-buttons';
 
 export async function generateStaticParams() {
   const locales = getAllLocales();
@@ -159,6 +160,14 @@ export default async function PostPage({ params }: { params: { slug: string, loc
               },
             }}
           />
+        </div>
+
+        <div className="mt-12 flex flex-col items-center gap-4 text-center">
+            <h3 className="text-lg font-semibold tracking-tight text-primary">{dictionary.post.shareArticle}</h3>
+            <ShareButtons
+                title={post.frontmatter.title}
+                imageUrl={heroSource?.url}
+            />
         </div>
         
         <PostComments article={{ slug: post.slug, title: post.frontmatter.title }} type="blog" locale={params.locale} />
