@@ -1,0 +1,33 @@
+---
+title: "Standard Prompt Format"
+description: "A standardized template for submitting change requests to ensure clarity and completeness."
+date: "2026-02-16"
+translationKey: "standard-prompt-format"
+published: true
+---
+
+To ensure that every request is clear, complete, and nothing gets overlooked (like the `published` status or correct syntax), let's use this standard format for submitting requests.
+
+### **Standard Prompt Template**
+
+**1. Main Goal:**
+(Describe the primary objective in one clear sentence. For example: "I want to add a 'Reading List' feature.")
+
+**2. Detailed Description & User Flow:**
+(Explain the feature in more detail. How should a user interact with it from start to finish? For example: "A user visits an article page, clicks a 'Save' button. Later, they can access this saved list from the header...")
+
+**3. Key Pages/Components Involved:**
+(List the files or parts of the site you think will be affected. For example: "This will affect the article detail page and the main header.")
+
+**4. Specific Requirements & Constraints (If any):**
+(Mention any non-negotiable details. For example: "The data must be stored in the browser's localStorage, not a database," or "The design must use a slide-out panel from the right.")
+
+**5. Acceptance Criteria (How to know it's "Done"):**
+(Provide a simple checklist to verify the feature is complete.)
+- [ ] A "Save to Reading List" button appears on every article page.
+- [ ] Clicking the button saves the article slug to `localStorage`.
+- [ ] A "Reading List" icon is visible in the header.
+- [ ] Clicking the icon shows a list of saved articles.
+- [ ] I can remove an article from the list.
+
+By using this format, we can minimize back-and-forth and ensure all critical details are captured from the start.

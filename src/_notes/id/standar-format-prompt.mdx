@@ -1,0 +1,33 @@
+---
+title: "Standar Format Prompt"
+description: "Templat standar untuk mengajukan permintaan perubahan demi memastikan kejelasan dan kelengkapan."
+date: "2026-02-16"
+translationKey: "standard-prompt-format"
+published: true
+---
+
+Untuk memastikan setiap permintaan jelas, lengkap, dan tidak ada yang terlewat (seperti status `published` atau sintaks yang benar), mari kita gunakan format standar ini untuk mengajukan permintaan.
+
+### **Templat Prompt Standar**
+
+**1. Tujuan Utama:**
+(Jelaskan tujuan utama dalam satu kalimat yang jelas. Contoh: "Saya ingin menambahkan fitur 'Reading List'.")
+
+**2. Deskripsi Detail & Alur Pengguna:**
+(Jelaskan fitur secara lebih rinci. Bagaimana pengguna berinteraksi dengannya dari awal hingga akhir? Contoh: "Pengguna mengunjungi halaman artikel, mengklik tombol 'Simpan'. Nanti, mereka bisa mengakses daftar yang disimpan ini dari header...")
+
+**3. Halaman/Komponen Utama yang Terlibat:**
+(Sebutkan file atau bagian dari situs yang menurut Anda akan terpengaruh. Contoh: "Ini akan memengaruhi halaman detail artikel dan header utama.")
+
+**4. Persyaratan & Batasan Spesifik (Jika ada):**
+(Sebutkan detail yang tidak bisa ditawar. Contoh: "Data harus disimpan di `localStorage` browser, bukan di database," atau "Desainnya harus menggunakan panel geser dari sisi kanan.")
+
+**5. Kriteria Keberhasilan (Bagaimana tahu ini "Selesai"):**
+(Berikan daftar periksa sederhana untuk memverifikasi fitur telah selesai.)
+- [ ] Tombol "Simpan ke Reading List" muncul di setiap halaman artikel.
+- [ ] Mengklik tombol menyimpan `slug` artikel ke `localStorage`.
+- [ ] Ikon "Reading List" terlihat di header.
+- [ ] Mengklik ikon menampilkan daftar artikel yang disimpan.
+- [ ] Saya bisa menghapus artikel dari daftar.
+
+Dengan menggunakan format ini, kita dapat meminimalkan bolak-balik dan memastikan semua detail penting ditangkap sejak awal.
