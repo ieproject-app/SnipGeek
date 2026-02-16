@@ -12,10 +12,11 @@ interface PostCommentsProps {
     slug: string;
     title: string;
   };
+  type: 'blog' | 'note';
   locale: string;
 }
 
-export function PostComments({ article, locale }: PostCommentsProps) {
+export function PostComments({ article, type, locale }: PostCommentsProps) {
   const [shouldLoad, setShouldLoad] = useState(false);
   const commentsRef = useRef<HTMLDivElement>(null);
 
@@ -48,8 +49,8 @@ export function PostComments({ article, locale }: PostCommentsProps) {
     );
   }
 
-  // Construct the canonical URL for the article
-  const canonicalUrl = `https://${productionHostname}/blog/${article.slug}`;
+  // Construct the canonical URL for the article based on its type
+  const canonicalUrl = `https://${productionHostname}/${type}/${article.slug}`;
 
   return (
     <div className="border-t mt-16 pt-12">

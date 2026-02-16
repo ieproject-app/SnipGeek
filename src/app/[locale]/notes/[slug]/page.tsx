@@ -9,6 +9,7 @@ import { AddToReadingListButton } from '@/components/layout/add-to-reading-list-
 import { i18n } from '@/i18n-config';
 import { getDictionary } from '@/lib/get-dictionary';
 import { Badge } from '@/components/ui/badge';
+import { PostComments } from '@/components/blog/post-comments';
 
 export async function generateStaticParams() {
   const locales = getAllLocales();
@@ -116,6 +117,9 @@ export default async function NotePage({ params }: { params: { slug: string, loc
             }}
           />
         </div>
+        
+        <PostComments article={{ slug: note.slug, title: note.frontmatter.title }} type="note" locale={params.locale} />
+
       </article>
     </main>
   );
