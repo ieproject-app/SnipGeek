@@ -147,7 +147,7 @@ export default async function PostPage({ params }: { params: { slug: string, loc
         </div>
         
         {/* Disqus Comments Section */}
-        <PostComments article={{ slug: post.slug, title: post.frontmatter.title }} />
+        <PostComments article={{ slug: post.slug, title: post.frontmatter.title }} locale={params.locale} />
 
       </article>
     </main>

@@ -12,9 +12,10 @@ interface PostCommentsProps {
     slug: string;
     title: string;
   };
+  locale: string;
 }
 
-export function PostComments({ article }: PostCommentsProps) {
+export function PostComments({ article, locale }: PostCommentsProps) {
   const [shouldLoad, setShouldLoad] = useState(false);
   const commentsRef = useRef<HTMLDivElement>(null);
 
@@ -58,6 +59,7 @@ export function PostComments({ article }: PostCommentsProps) {
                 url: canonicalUrl,
                 identifier: article.slug,
                 title: article.title,
+                language: locale,
             }}
         />
     </div>
