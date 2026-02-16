@@ -7,6 +7,7 @@ import { PlaceHolderImages } from '@/lib/placeholder-images';
 import type { Metadata } from 'next';
 import remarkGfm from 'remark-gfm';
 import rehypeShiki from '@shikijs/rehype';
+import { AddToReadingListButton } from '@/components/layout/add-to-reading-list-button';
 import { i18n } from '@/i18n-config';
 
 export async function generateStaticParams() {
@@ -69,6 +70,7 @@ export default async function PostPage({ params }: { params: { slug: string, loc
   }
 
   const heroImage = PlaceHolderImages.find(p => p.id === post.frontmatter.heroImage);
+  const linkPrefix = params.locale === i18n.defaultLocale ? '' : `/${params.locale}`;
 
   return (
     <main className="w-full">
@@ -90,13 +92,22 @@ export default async function PostPage({ params }: { params: { slug: string, loc
           <h1 className="font-headline text-4xl md:text-5xl font-extrabold tracking-tighter text-primary mb-3">
             {post.frontmatter.title}
           </h1>
-          <p className="text-muted-foreground text-lg mb-8">
-            {new Date(post.frontmatter.date).toLocaleDateString(params.locale, {
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric',
-            })}
-          </p>
+          <div className="flex flex-wrap items-center gap-4 mb-8">
+            <p className="text-muted-foreground text-base">
+              {new Date(post.frontmatter.date).toLocaleDateString(params.locale, {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+              })}
+            </p>
+            <AddToReadingListButton item={{
+                slug: post.slug,
+                title: post.frontmatter.title,
+                description: post.frontmatter.description,
+                href: `${linkPrefix}/blog/${post.slug}`,
+                type: 'blog'
+            }} />
+          </div>
         </header>
         <div className="text-lg text-foreground/80">
           <MDXRemote

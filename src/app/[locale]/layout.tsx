@@ -7,6 +7,7 @@ import '../globals.css';
 import { Toaster } from '@/components/ui/toaster';
 import type { Metadata } from 'next';
 import { ThemeProvider } from '@/components/theme-provider';
+import { ReadingListProvider } from '@/hooks/use-reading-list';
 import { BackToTop } from '@/components/layout/back-to-top';
 
 export const metadata: Metadata = {
@@ -74,11 +75,13 @@ export default function LocaleLayout({
             enableSystem
             disableTransitionOnChange
         >
+          <ReadingListProvider>
             <Header translationsMap={translationsMap} searchableData={searchableData} />
             <main>{children}</main>
             <Footer />
             <Toaster />
             <BackToTop />
+          </ReadingListProvider>
         </ThemeProvider>
       </body>
     </html>

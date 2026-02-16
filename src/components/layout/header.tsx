@@ -5,12 +5,13 @@ import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { LanguageSwitcher } from './language-switcher';
 import { TranslationsMap } from '@/lib/posts';
-import { Search, X, Menu } from 'lucide-react';
+import { Search, X, Menu, Bookmark, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { usePathname } from 'next/navigation';
+import { useReadingList } from '@/hooks/use-reading-list';
 
 const menuItems = [
     { name: 'Blog', href: '/blog' },
@@ -34,21 +35,26 @@ type SearchableItem = {
   href: string;
 };
 
+type ActiveView = 'none' | 'search' | 'menu' | 'readingList';
+
 export function Header({ translationsMap, searchableData }: { translationsMap: TranslationsMap, searchableData: SearchableItem[] }) {
   const [isVisible, setIsVisible] = useState(true);
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [activeView, setActiveView] = useState<ActiveView>('none');
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<SearchableItem[]>([]);
+  const { items: readingListItems, removeItem: removeReadingListItem } = useReadingList();
   const lastScrollY = useRef(0);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const headerRef = useRef<HTMLElement>(null);
   const pathname = usePathname();
 
-  // Close menu on route change
+  const isSearchOpen = activeView === 'search';
+  const isMenuOpen = activeView === 'menu';
+  const isReadingListOpen = activeView === 'readingList';
+
+  // Close all views on route change
   useEffect(() => {
-    setIsMenuOpen(false);
-    setIsSearchOpen(false);
+    setActiveView('none');
     setQuery('');
   }, [pathname]);
 
@@ -71,7 +77,7 @@ export function Header({ translationsMap, searchableData }: { translationsMap: T
   // Scroll visibility logic
   useEffect(() => {
     const handleScroll = () => {
-      if (isSearchOpen || isMenuOpen) return;
+      if (activeView !== 'none') return;
       const currentScrollY = window.scrollY;
       if (currentScrollY < lastScrollY.current || currentScrollY < 10) {
         setIsVisible(true);
@@ -83,7 +89,7 @@ export function Header({ translationsMap, searchableData }: { translationsMap: T
 
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [isSearchOpen, isMenuOpen]);
+  }, [activeView]);
 
   // Focus input when search opens
   useEffect(() => {
@@ -92,19 +98,17 @@ export function Header({ translationsMap, searchableData }: { translationsMap: T
     }
   }, [isSearchOpen]);
   
-  // Close search/menu on click outside or escape key
+  // Close all views on click outside or escape key
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (headerRef.current && !headerRef.current.contains(event.target as Node)) {
-        setIsSearchOpen(false);
-        setIsMenuOpen(false);
+        setActiveView('none');
         setQuery('');
       }
     };
     const handleKeydown = (event: KeyboardEvent) => {
         if (event.key === 'Escape') {
-            setIsSearchOpen(false);
-            setIsMenuOpen(false);
+            setActiveView('none');
             setQuery('');
         }
     }
@@ -117,23 +121,15 @@ export function Header({ translationsMap, searchableData }: { translationsMap: T
   }, [headerRef]);
 
   const handleResultClick = () => {
-    setIsSearchOpen(false);
+    setActiveView('none');
     setQuery('');
   };
 
-  const handleMenuToggle = () => {
-    if (isSearchOpen) {
-      setIsSearchOpen(false);
+  const toggleView = (view: ActiveView) => {
+    setActiveView(prev => (prev === view ? 'none' : view));
+    if (view !== 'search') {
       setQuery('');
     }
-    setIsMenuOpen(prev => !prev);
-  }
-
-  const handleSearchToggle = () => {
-    if (isMenuOpen) {
-      setIsMenuOpen(false);
-    }
-    setIsSearchOpen(prev => !prev);
   }
 
   return (
@@ -146,7 +142,7 @@ export function Header({ translationsMap, searchableData }: { translationsMap: T
             "relative mx-auto bg-primary/90 backdrop-blur-sm text-primary-foreground shadow-lg ring-1 ring-black/5 flex items-center justify-between h-12 transition-all duration-300 ease-in-out px-2",
             isSearchOpen && 'md:w-full',
             isSearchOpen ? 'rounded-full' : 'w-full md:w-auto',
-            isMenuOpen ? 'rounded-t-2xl rounded-b-none' : 'rounded-full'
+            (isMenuOpen || isReadingListOpen) ? 'rounded-t-2xl rounded-b-none' : 'rounded-full'
         )}>
             {/* Normal view container */}
             <div className={cn(
@@ -177,12 +173,21 @@ export function Header({ translationsMap, searchableData }: { translationsMap: T
                         variant="ghost" 
                         size="icon" 
                         className="rounded-full relative z-20 h-9 w-9"
-                        onClick={handleSearchToggle}
+                        onClick={() => toggleView('search')}
                         aria-label="Open search"
                     >
                        <Search className="h-5 w-5" />
                     </Button>
-                    <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full" onClick={handleMenuToggle}>
+                    <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="rounded-full relative z-20 h-9 w-9"
+                        onClick={() => toggleView('readingList')}
+                        aria-label="Open reading list"
+                    >
+                       <Bookmark className="h-5 w-5" />
+                    </Button>
+                    <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full" onClick={() => toggleView('menu')}>
                         <Menu className="h-5 w-5" />
                         <span className="sr-only">Open menu</span>
                     </Button>
@@ -205,7 +210,7 @@ export function Header({ translationsMap, searchableData }: { translationsMap: T
                         variant="ghost" 
                         size="icon" 
                         className="h-8 w-8 rounded-full text-primary-foreground/70 hover:text-primary-foreground" 
-                        onClick={handleMenuToggle}
+                        onClick={() => toggleView('menu')}
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
                         <span className="sr-only">Open more menu items</span>
@@ -213,8 +218,17 @@ export function Header({ translationsMap, searchableData }: { translationsMap: T
                     <Button 
                         variant="ghost" 
                         size="icon" 
+                        className="relative z-20 h-9 w-9 rounded-full"
+                        onClick={() => toggleView('readingList')}
+                        aria-label="Open reading list"
+                    >
+                       <Bookmark className="h-5 w-5" />
+                    </Button>
+                    <Button 
+                        variant="ghost" 
+                        size="icon" 
                         className={cn("rounded-full relative z-20 h-9 w-9", isSearchOpen && "opacity-0 pointer-events-none")}
-                        onClick={handleSearchToggle}
+                        onClick={() => toggleView('search')}
                         aria-label={"Open search"}
                     >
                        <Search className="h-5 w-5" />
@@ -241,7 +255,7 @@ export function Header({ translationsMap, searchableData }: { translationsMap: T
                     variant="ghost" 
                     size="icon" 
                     className="rounded-full absolute right-2 z-20 h-9 w-9"
-                    onClick={() => { setIsSearchOpen(false); setQuery(''); }}
+                    onClick={() => { setActiveView('none'); setQuery(''); }}
                     aria-label="Close search"
                 >
                    <X className="h-5 w-5" />
@@ -258,7 +272,7 @@ export function Header({ translationsMap, searchableData }: { translationsMap: T
             {/* Mobile Menu */}
             <div className="md:hidden p-2">
                 {allMenuItems.map((item) => (
-                    <Link key={item.name} href={item.href} className="block px-4 py-3 text-base text-primary-foreground rounded-lg hover:bg-primary-foreground/10 transition-colors">
+                    <Link key={item.name} href={item.href} className="block px-4 py-3 text-base text-primary-foreground rounded-lg hover:bg-primary-foreground/10 transition-colors" onClick={() => setActiveView('none')}>
                         {item.name}
                     </Link>
                 ))}
@@ -266,56 +280,104 @@ export function Header({ translationsMap, searchableData }: { translationsMap: T
             {/* Desktop Menu */}
             <div className="hidden md:block p-2">
                 {moreMenuItems.map((item) => (
-                    <Link key={item.name} href={item.href} className="block px-4 py-2 text-sm text-primary-foreground rounded-lg hover:bg-primary-foreground/10 transition-colors">
+                    <Link key={item.name} href={item.href} className="block px-4 py-2 text-sm text-primary-foreground rounded-lg hover:bg-primary-foreground/10 transition-colors" onClick={() => setActiveView('none')}>
                         {item.name}
                     </Link>
                 ))}
             </div>
         </div>
 
-        {/* Search Results */}
-        {isSearchOpen && (
-          <div className="absolute top-full left-0 right-0 z-30 mt-2">
+        {/* Results Container */}
+        <div className="absolute top-full left-0 right-0 z-30 mt-2">
+          {/* Search Results */}
+          {isSearchOpen && (
             <div className="bg-background rounded-lg border shadow-lg max-h-[400px] overflow-hidden">
-                {query.length > 1 ? (
-                    results.length > 0 ? (
-                        <ScrollArea className="h-full max-h-[400px]">
-                            <div className="p-2">
-                                <p className="px-2 py-1.5 text-xs font-semibold text-muted-foreground">{results.length} results found</p>
-                                <ul>
-                                    {results.map((item) => (
-                                    <li key={`${item.type}-${item.slug}`}>
-                                        <Link 
-                                            href={item.href} 
-                                            onClick={handleResultClick} 
-                                            className="block p-3 rounded-md hover:bg-accent transition-colors"
-                                        >
-                                            <div className="overflow-hidden">
-                                                <div className="flex items-center justify-between gap-2">
-                                                    <span className="font-medium text-sm text-primary line-clamp-2 flex-1 min-w-0">{item.title}</span>
-                                                    <Badge variant="outline" className="capitalize text-xs shrink-0">{item.type}</Badge>
-                                                </div>
-                                                <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{item.description}</p>
-                                            </div>
-                                        </Link>
-                                    </li>
-                                    ))}
-                                </ul>
-                            </div>
-                        </ScrollArea>
+                  {query.length > 1 ? (
+                      results.length > 0 ? (
+                          <ScrollArea className="h-full max-h-[400px]">
+                              <div className="p-2">
+                                  <p className="px-2 py-1.5 text-xs font-semibold text-muted-foreground">{results.length} results found</p>
+                                  <ul>
+                                      {results.map((item) => (
+                                      <li key={`${item.type}-${item.slug}`}>
+                                          <Link 
+                                              href={item.href} 
+                                              onClick={handleResultClick} 
+                                              className="block p-3 rounded-md hover:bg-accent transition-colors"
+                                          >
+                                              <div className="overflow-hidden">
+                                                  <div className="flex items-start justify-between gap-2">
+                                                      <span className="font-medium text-sm text-primary line-clamp-2 flex-1 min-w-0">{item.title}</span>
+                                                      <Badge variant="outline" className="capitalize text-xs shrink-0">{item.type}</Badge>
+                                                  </div>
+                                                  <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{item.description}</p>
+                                              </div>
+                                          </Link>
+                                      </li>
+                                      ))}
+                                  </ul>
+                              </div>
+                          </ScrollArea>
+                      ) : (
+                          <div className="p-6 text-center text-sm text-muted-foreground">
+                              No results found for &quot;{query}&quot;.
+                          </div>
+                      )
+                  ) : (
+                      <div className="p-6 text-center text-sm text-muted-foreground">
+                          Search for articles by title or description.
+                      </div>
+                  )}
+              </div>
+          )}
+
+          {/* Reading List Results */}
+          {isReadingListOpen && (
+            <div className="bg-background rounded-lg border shadow-lg max-h-[400px] overflow-hidden">
+                <ScrollArea className="h-full max-h-[400px]">
+                  <div className="p-2">
+                    <p className="px-2 py-1.5 text-xs font-semibold text-muted-foreground">
+                      {readingListItems.length} {readingListItems.length === 1 ? 'item' : 'items'} in your reading list
+                    </p>
+                    {readingListItems.length > 0 ? (
+                      <ul>
+                        {readingListItems.map((item) => (
+                          <li key={`${item.type}-${item.slug}`} className="group relative">
+                              <Link 
+                                  href={item.href} 
+                                  onClick={() => setActiveView('none')} 
+                                  className="block p-3 rounded-md hover:bg-accent transition-colors"
+                              >
+                                  <div className="overflow-hidden pr-8">
+                                      <div className="flex items-start justify-between gap-2">
+                                          <span className="font-medium text-sm text-primary line-clamp-2 flex-1 min-w-0">{item.title}</span>
+                                          <Badge variant="outline" className="capitalize text-xs shrink-0">{item.type}</Badge>
+                                      </div>
+                                      <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{item.description}</p>
+                                  </div>
+                              </Link>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                                onClick={() => removeReadingListItem(item.slug)}
+                                aria-label={`Remove ${item.title} from reading list`}
+                              >
+                                <Trash2 className="h-4 w-4 text-muted-foreground" />
+                              </Button>
+                          </li>
+                        ))}
+                      </ul>
                     ) : (
-                        <div className="p-6 text-center text-sm text-muted-foreground">
-                            No results found for &quot;{query}&quot;.
-                        </div>
-                    )
-                ) : (
-                    <div className="p-6 text-center text-sm text-muted-foreground">
-                        Search for articles by title or description.
-                    </div>
-                )}
-            </div>
-          </div>
-        )}
+                      <div className="p-6 text-center text-sm text-muted-foreground">
+                        Your reading list is empty. Save articles to read them later.
+                      </div>
+                    )}
+                  </div>
+                </ScrollArea>
+              </div>
+          )}
+        </div>
     </header>
   );
 }
