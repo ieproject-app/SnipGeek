@@ -121,8 +121,14 @@ export default async function PostPage({ params }: { params: { slug: string, loc
   return (
     <main className="w-full">
       <article className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-12 sm:pt-32 sm:pb-16">
+        <header>
+          <h1 className="font-headline text-4xl md:text-5xl font-extrabold tracking-tighter text-primary mb-3">
+            {post.frontmatter.title}
+          </h1>
+        </header>
+
         {heroSource && (
-          <div className="mb-8 sm:mb-12">
+          <div className="my-8 sm:my-12">
             <Image
               src={heroSource.url}
               alt={imageAlt || post.frontmatter.title}
@@ -134,11 +140,6 @@ export default async function PostPage({ params }: { params: { slug: string, loc
             />
           </div>
         )}
-        <header>
-          <h1 className="font-headline text-4xl md:text-5xl font-extrabold tracking-tighter text-primary mb-3">
-            {post.frontmatter.title}
-          </h1>
-        </header>
 
         <PostMeta 
           frontmatter={post.frontmatter}
