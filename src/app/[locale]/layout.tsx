@@ -63,8 +63,8 @@ export default async function LocaleLayout({
 
   const searchableData = [...searchablePosts, ...searchableNotes];
   const dictionary = await getDictionary(params.locale);
-  const draftPosts = getDraftPostsData(params.locale);
-  const draftNotes = getDraftNotesData(params.locale);
+  const draftPosts = getDraftPostsData('id');
+  const draftNotes = getDraftNotesData('id');
   
   return (
     <html lang={params.locale} className="scroll-smooth" suppressHydrationWarning>
@@ -72,6 +72,26 @@ export default async function LocaleLayout({
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Space+Grotesk:wght@400;500;700&family=Source+Code+Pro&display=swap" rel="stylesheet" />
+        {/* View Transitions */}
+        <script dangerouslySetInnerHTML={{ __html: `
+          if (document.startViewTransition) {
+            window.navigation.addEventListener('navigate', (event) => {
+              const toUrl = new URL(event.destination.url);
+              if (location.origin !== toUrl.origin) return;
+              event.intercept({
+                async handler() {
+                  const response = await fetch(toUrl.pathname);
+                  const data = await response.text();
+                  const parser = new DOMParser();
+                  const newDoc = parser.parseFromString(data, 'text/html');
+                  document.startViewTransition(() => {
+                    document.documentElement.replaceWith(newDoc.documentElement);
+                  });
+                }
+              });
+            });
+          }
+        `}} />
       </head>
       <body className="font-body antialiased fade-in-on-load">
         <ThemeProvider
