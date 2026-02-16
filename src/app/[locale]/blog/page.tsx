@@ -66,7 +66,7 @@ export default async function BlogPage({ params: { locale } }: { params: { local
                     </div>
                 )
             })}
-          </div>
+          </section>
       </main>
     </div>
   );
