@@ -10,6 +10,7 @@ export type NoteFrontmatter = {
   date: string;
   description: string;
   translationKey: string;
+  published?: boolean;
   [key: string]: any;
 };
 
@@ -50,7 +51,8 @@ export function getSortedNotesData(locale?: string): Note<NoteFrontmatter>[] {
         locale: targetLocale!,
       };
     })
-    .filter((note): note is Note<NoteFrontmatter> => note !== null); // Filter out null values
+    .filter((note): note is Note<NoteFrontmatter> => note !== null)
+    .filter(note => note.frontmatter.published === true); // Only show published notes
 
   return allNotesData.sort((a, b) => {
     if (new Date(a.frontmatter.date) < new Date(b.frontmatter.date)) {
@@ -100,10 +102,17 @@ export function getAllNoteSlugs(locale?: string) {
     return fileNames
       .filter((fileName) => fileName.endsWith('.mdx'))
       .map((fileName) => {
-        return {
-          slug: fileName.replace(/\.mdx$/, ''),
-        };
-      });
+        const fullPath = path.join(localeDirectory, fileName);
+        const fileContents = fs.readFileSync(fullPath, 'utf8');
+        const { data } = matter(fileContents);
+        if (data.published === true) {
+            return {
+                slug: fileName.replace(/\.mdx$/, ''),
+            };
+        }
+        return null;
+      })
+      .filter(slug => slug !== null);
 }
 
 export function getAllLocales() {
@@ -144,7 +153,7 @@ export function getAllNotesTranslationsMap(): NotesTranslationsMap {
       const fileContents = fs.readFileSync(fullPath, 'utf8');
       const { data } = matter(fileContents);
 
-      if (!data.translationKey) continue;
+      if (!data.translationKey || !data.published) continue;
       const frontmatter = data as NoteFrontmatter;
 
       const key = frontmatter.translationKey;

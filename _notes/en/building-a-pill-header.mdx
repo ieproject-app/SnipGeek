@@ -1,0 +1,70 @@
+---
+title: "Crafting a Feature-Rich Pill Header in Next.js"
+date: "2026-02-16"
+description: "A deep dive into the process of building a compact, animated pill header with integrated search, a custom dropdown, and multilingual support, including the bugs we squashed along the way."
+translationKey: "pill-header-journey"
+published: true
+---
+
+Building a UI component that is both aesthetically pleasing and highly functional is a rewarding challenge. In this note, we'll walk through the journey of creating the animated, pill-shaped header you see on this site. What started as a simple navigation bar evolved into a component with a surprising amount of complexity, including a seamless search experience, a custom animated menu, and a few interesting bugs we had to fix.
+
+### The Initial Concept: A Floating Pill
+
+The goal was to create a compact, floating header that felt modern and unobtrusive. The pill shape was chosen for its friendly and clean aesthetic. The core features planned were:
+- Basic navigation links.
+- A language switcher.
+- A search function.
+- A "more" menu for less frequent links.
+
+---
+
+### Feature 1: The Integrated Search
+
+The first major feature was the search. Instead of navigating to a separate search page, the goal was to have the pill header itself expand to become the search bar.
+
+**How it works:**
+- **State Management:** A React state `isSearchOpen` controls the component's appearance.
+- **Animation:** When the search icon is clicked, the header's container uses CSS transitions to smoothly expand its width.
+- **Component Swapping:** The navigation links fade out, and a search input field fades in.
+
+**Bug Fix #1: The Double 'X' Button**
+A strange bug appeared where two close ('X') buttons would render on mobile when the search was active.
+*   **Cause:** This was a tricky rendering glitch. A conditional rendering class was not being applied forcefully enough, causing the mobile menu (hamburger) icon to sometimes render as an 'X' icon simultaneously with the actual search close button.
+*   **Fix:** We applied more specific CSS classes (`opacity-0`, `pointer-events-none`) directly to the other buttons when the search state was active, ensuring they were completely hidden.
+
+<!-- You can place a screenshot of the search animation here. -->
+![Placeholder for search animation](https://placehold.co/600x400?text=Search+Expanding+Animation)
+
+---
+
+### Feature 2: The "Connected" Dropdown Menu
+
+Initially, we used a standard dropdown menu component. However, it felt disconnected, appearing as a separate floating box. The user wanted an effect where the menu appeared to "grow" directly from the pill header.
+
+**How it works:**
+- **Custom Implementation:** We ditched the standard dropdown component.
+- **Dynamic Styling:** When the menu button is clicked, we change the parent header's CSS `border-radius`. The bottom corners of the pill become square.
+- **Positioning:** The menu itself is an absolutely positioned `div` placed right below the header. Its top corners are square, and its bottom corners are rounded.
+- **Illusion:** When combined, the modified header and the new menu `div` look like a single, expanded capsule. A `transform-origin: top` animation makes it feel like it's growing downwards.
+
+**Bug Fix #2: Mobile Responsiveness Woes**
+After implementing the custom menu, the header's width on mobile was a mess.
+*   **Cause:** Conflicting Tailwind CSS classes (`w-full` vs. `left-4 right-4`) caused the header's calculated width to exceed the screen width.
+*   **Fix:** We refined the responsive classes, ensuring `w-full` was only applied on desktop (`md:`), while mobile relied on the `left` and `right` properties to define its size, automatically creating the correct padding.
+
+<!-- You can place a screenshot of the custom menu here. -->
+![Placeholder for the custom menu](https://placehold.co/600x400?text=Custom+Menu+Effect)
+
+---
+
+### Bug Fix #3: The Unruly Search Results
+
+The search results list also had its share of problems.
+
+*   **Problem:** On mobile, the right side of the result items was cut off by the scrollbar. Also, long titles would push the "blog" or "note" badge out of view instead of wrapping to a new line.
+*   **Cause:** The `ScrollArea` component's default behavior places the scrollbar *over* the content on mobile. For the long titles, the `truncate` class was forcing the text into a single line.
+*   **Fix:**
+    1.  We modified the base `ScrollArea` component in `src/components/ui/scroll-area.tsx` to add permanent right-side padding to its viewport, creating space for the scrollbar.
+    2.  In the header, we replaced the `truncate` class on the title with `line-clamp-2`, allowing the text to wrap to a second line before being cut off.
+
+This journey highlights that sometimes the most elegant UI requires moving beyond standard components and tackling the interesting bugs that come with custom solutions.

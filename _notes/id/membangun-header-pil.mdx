@@ -1,0 +1,70 @@
+---
+title: "Membangun Header Pil Kaya Fitur di Next.js"
+date: "2026-02-16"
+description: "Selami proses pembuatan header pil animasi yang ringkas dengan pencarian terintegrasi, menu dropdown kustom, dan dukungan multibahasa, termasuk bug yang berhasil kami atasi."
+translationKey: "pill-header-journey"
+published: true
+---
+
+Membangun komponen antarmuka (UI) yang indah secara estetika sekaligus sangat fungsional adalah tantangan yang memuaskan. Dalam catatan ini, kita akan menelusuri perjalanan membuat header berbentuk pil animasi yang Anda lihat di situs ini. Apa yang dimulai sebagai bilah navigasi sederhana berkembang menjadi komponen dengan kompleksitas yang mengejutkan, termasuk pengalaman pencarian yang mulus, menu animasi kustom, dan beberapa bug menarik yang harus kami perbaiki.
+
+### Konsep Awal: Pil Mengambang
+
+Tujuannya adalah membuat header mengambang yang ringkas, terasa modern, dan tidak mengganggu. Bentuk pil dipilih karena estetikanya yang ramah dan bersih. Fitur inti yang direncanakan adalah:
+- Tautan navigasi dasar.
+- Pengalih bahasa.
+- Fungsi pencarian.
+- Menu "lainnya" untuk tautan yang lebih jarang diakses.
+
+---
+
+### Fitur 1: Pencarian Terintegrasi
+
+Fitur besar pertama adalah pencarian. Alih-alih menavigasi ke halaman pencarian terpisah, tujuannya adalah agar header pil itu sendiri dapat meluas menjadi bilah pencarian.
+
+**Cara kerjanya:**
+- **Manajemen State:** Sebuah *state* React `isSearchOpen` mengontrol penampilan komponen.
+- **Animasi:** Saat ikon pencarian diklik, kontainer header menggunakan transisi CSS untuk melebarkan ukurannya dengan mulus.
+- **Pergantian Komponen:** Tautan navigasi menghilang (fade out), dan kolom input pencarian muncul (fade in).
+
+**Perbaikan Bug #1: Tombol 'X' Ganda**
+Sebuah bug aneh muncul di mana dua tombol tutup ('X') muncul di perangkat seluler saat pencarian aktif.
+*   **Penyebab:** Ini adalah kesalahan render yang cukup rumit. Kelas render kondisional tidak diterapkan dengan cukup kuat, menyebabkan ikon menu seluler (hamburger) terkadang dirender sebagai ikon 'X' secara bersamaan dengan tombol tutup pencarian yang sebenarnya.
+*   **Perbaikan:** Kami menerapkan kelas CSS yang lebih spesifik (`opacity-0`, `pointer-events-none`) langsung ke tombol-tombol lain saat status pencarian aktif, memastikan mereka benar-benar tersembunyi.
+
+<!-- Anda bisa meletakkan tangkapan layar animasi pencarian di sini. -->
+![Placeholder untuk animasi pencarian](https://placehold.co/600x400?text=Animasi+Pencarian+Meluas)
+
+---
+
+### Fitur 2: Menu Dropdown yang "Menyatu"
+
+Awalnya, kami menggunakan komponen menu dropdown standar. Namun, rasanya terputus, muncul sebagai kotak mengambang yang terpisah. Pengguna menginginkan efek di mana menu tampak "tumbuh" langsung dari header pil.
+
+**Cara kerjanya:**
+- **Implementasi Kustom:** Kami meninggalkan komponen dropdown standar.
+- **Styling Dinamis:** Saat tombol menu diklik, kami mengubah `border-radius` CSS dari header induk. Sudut bawah pil menjadi persegi.
+- **Positioning:** Menu itu sendiri adalah sebuah `div` dengan `position: absolute` yang ditempatkan tepat di bawah header. Sudut atasnya persegi, dan sudut bawahnya membulat.
+- **Ilusi:** Saat digabungkan, header yang dimodifikasi dan `div` menu baru terlihat seperti satu kapsul vertikal yang utuh. Animasi `transform-origin: top` membuatnya terasa seolah-olah tumbuh ke bawah.
+
+**Perbaikan Bug #2: Masalah Responsif di Seluler**
+Setelah menerapkan menu kustom, lebar header di perangkat seluler menjadi berantakan.
+*   **Penyebab:** Kelas Tailwind CSS yang saling bertentangan (`w-full` vs. `left-4 right-4`) menyebabkan lebar header yang dihitung melebihi lebar layar.
+*   **Perbaikan:** Kami menyempurnakan kelas responsif, memastikan `w-full` hanya diterapkan di desktop (`md:`), sementara seluler mengandalkan properti `left` dan `right` untuk menentukan ukurannya, secara otomatis menciptakan padding yang benar.
+
+<!-- Anda bisa meletakkan tangkapan layar menu kustom di sini. -->
+![Placeholder untuk menu kustom](https://placehold.co/600x400?text=Efek+Menu+Kustom)
+
+---
+
+### Perbaikan Bug #3: Hasil Pencarian yang Tidak Teratur
+
+Daftar hasil pencarian juga memiliki serangkaian masalahnya sendiri.
+
+*   **Masalah:** Di perangkat seluler, sisi kanan item hasil terpotong oleh scrollbar. Selain itu, judul yang panjang akan mendorong lencana "blog" atau "catatan" keluar dari pandangan alih-alih turun ke baris baru.
+*   **Penyebab:** Perilaku default komponen `ScrollArea` menempatkan scrollbar *di atas* konten pada perangkat seluler. Untuk judul yang panjang, kelas `truncate` memaksa teks menjadi satu baris.
+*   **Perbaikan:**
+    1.  Kami memodifikasi komponen dasar `ScrollArea` di `src/components/ui/scroll-area.tsx` untuk menambahkan padding kanan permanen ke viewport-nya, menciptakan ruang untuk scrollbar.
+    2.  Di header, kami mengganti kelas `truncate` pada judul dengan `line-clamp-2`, memungkinkan teks untuk turun ke baris kedua sebelum dipotong.
+
+Perjalanan ini menyoroti bahwa terkadang UI yang paling elegan menuntut kita untuk bergerak melampaui komponen standar dan mengatasi bug-bug menarik yang datang bersama solusi kustom.
