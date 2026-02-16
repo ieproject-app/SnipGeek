@@ -1,53 +1,39 @@
 ---
-title: "Standar Format Prompt Pengajuan"
+title: "Format Standar Prompt untuk Penerbitan Artikel"
 date: "2026-02-16"
-description: "Sebuah templat standar untuk mengajukan permintaan perubahan atau fitur baru agar proses pengembangan berjalan lancar dan sesuai harapan."
-translationKey: "prompt-standard-format"
+description: "Panduan standar untuk mengajukan permintaan penerbitan artikel untuk memastikan semua detail tercatat dengan benar."
+translationKey: "standard-prompt-request"
 published: true
 ---
 
-Setiap kali Anda ingin saya membangun fitur baru, memperbaiki bug, atau membuat perubahan pada aplikasi, mohon gunakan format di bawah ini. Tujuannya adalah untuk memastikan semua detail yang saya butuhkan tersedia, sehingga hasil akhirnya sesuai dengan harapan Anda dan tidak ada lagi langkah yang terlewat.
+Untuk memastikan setiap artikel diterbitkan persis seperti yang Anda inginkan, mohon gunakan templat berikut untuk permintaan Anda. Daftar periksa ini membantu kita menyelaraskan semua detail penting di awal, untuk mencegah adanya kekurangan.
 
-### 1. Tujuan Utama
-*(Wajib)*
+### Daftar Periksa Permintaan Penerbitan
 
-Jelaskan secara singkat (satu atau dua kalimat) apa tujuan akhir yang ingin Anda capai.
+Mohon sertakan detail ini dalam prompt Anda:
 
-**Contoh:**
-> "Saya ingin menambahkan fitur 'Reading List' agar pengguna bisa menyimpan artikel untuk dibaca nanti."
+- **Jenis Artikel**: Apakah ini 'postingan blog' atau 'catatan'?
+- **Judul**: Apa judul artikelnya?
+- **Konten**: Sediakan konten lengkap untuk artikel tersebut.
+- **Tanggal Terbit**: Kapan tanggal penerbitan yang diinginkan? (contoh: '16 Februari 2026')
+- **Kunci Terjemahan**: Sediakan kunci unik untuk menghubungkan artikel ini dengan terjemahannya (contoh: 'artikel-keren-saya-v1').
+- **Status**: Konfirmasi dengan 'Atur `published: true`'.
+- **Penanda Gambar**: Sebutkan di mana harus meletakkan `<!-- IMAGE_PLACEHOLDER -->` untuk tangkapan layar.
+- **Bahasa**: Tentukan semua bahasa untuk artikel tersebut (contoh: 'Bahasa Inggris dan Indonesia').
 
-### 2. Detail Perubahan
-*(Wajib)*
+---
 
-Ini adalah bagian paling penting. Berikan rincian sebanyak mungkin.
+### Contoh Prompt
 
-- **Deskripsi Fitur/Bug:** Jelaskan cara kerja fitur yang Anda inginkan atau jelaskan masalah/bug yang Anda temukan.
-- **Lokasi UI:** Di halaman mana atau di komponen apa perubahan ini harus muncul? (Contoh: "di header", "di bawah judul artikel", "di semua kartu artikel pada halaman utama").
-- **Tampilan & Desain:** Apakah ada preferensi desain? (Contoh: "gunakan komponen `Card`", "buat tombolnya rata tengah", "ikonnya harus `Bookmark`").
-- **Alur Pengguna:** Jelaskan langkah-langkah yang akan diambil pengguna saat berinteraksi dengan fitur ini.
+> Tolong terbitkan sebuah **catatan** baru untuk saya.
+>
+> - **Jenis Artikel**: Catatan
+> - **Judul**: Catatan Baru Saya Tentang Kolaborasi
+> - **Konten**: [Isi lengkap artikel Anda di sini...]
+> - **Tanggal Terbit**: 17 Februari 2026
+> - **Kunci Terjemahan**: catatan-baru-saya-2026
+> - **Status**: Mohon atur `published: true`.
+> - **Penanda Gambar**: Letakkan satu setelah paragraf kedua.
+> - **Bahasa**: Bahasa Inggris dan Indonesia.
 
-**Contoh:**
-> - **Deskripsi:** Tombol untuk menyimpan artikel ke daftar bacaan. Saat diklik, artikel disimpan di `localStorage` dan tombol berubah status.
-> - **Lokasi UI:** Muncul di halaman detail artikel dan juga di setiap kartu artikel di halaman utama.
-> - **Tampilan:** Gunakan ikon `Bookmark`. Jika sudah disimpan, ikonnya menjadi solid.
-> - **Alur:** Pengguna klik ikon -> ikon berubah -> muncul notifikasi "Artikel disimpan".
-
-### 3. Penempatan Gambar/Aset
-*(Opsional)*
-
-Jika Anda ingin saya menyisipkan *placeholder* untuk gambar yang akan Anda tambahkan nanti (seperti tangkapan layar), beri tahu saya di bagian mana.
-
-**Contoh:**
-> "Di bawah bagian 'Alur Pengguna', tolong sisipkan placeholder untuk gambar."
-
-{/* Di sini Anda bisa meletakkan gambar/screenshot */}
-
-### 4. Hal yang Perlu Dihindari
-*(Opsional)*
-
-Adakah batasan atau hal-hal yang tidak boleh saya lakukan?
-
-**Contoh:**
-> "Jangan mengubah warna latar belakang `header`."
-
-Dengan mengikuti format ini, kita dapat meminimalisir miskomunikasi dan mempercepat proses pengembangan. Terima kasih atas kerja samanya!
+Dengan memberikan detail ini, Anda membantu saya menjalankan visi Anda dengan sempurna pada percobaan pertama. Terima kasih atas kerja samanya!
