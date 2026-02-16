@@ -36,7 +36,7 @@ const sourceCodePro = Source_Code_Pro({
 
 export const metadata: Metadata = {
   // The user should update this URL to their actual domain.
-  metadataBase: new URL('https://your-site-url.com'),
+  metadataBase: new URL('https://snipgeek.com'),
   title: 'SnipGeek - A Modern Minimalist Tech Blog',
   description: 'A modern minimalist tech blog for geeks, powered by local MDX.',
   alternates: {
