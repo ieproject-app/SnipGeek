@@ -12,11 +12,10 @@ export function Footer({ dictionary }: { dictionary: Dictionary }) {
       { id: 'footer-about', title: dictionary.navigation.about, href: '/about' },
       { id: 'footer-notes', title: dictionary.navigation.notes, href: '/notes' },
       { id: 'footer-tools', title: dictionary.navigation.tools, href: '/tools' },
-      { id: 'footer-archive', title: dictionary.navigation.archive, href: '/archive' },
+      { id: 'footer-contact', title: dictionary.navigation.contact, href: '/contact' },
     ];
 
-    const authorName = "SnipGeek";
-    const authorBio = "A passionate developer exploring the web and sharing findings along the way.";
+    const authorName = "Iwan Efendi";
     const authorAvatar = "/images/profile/profile.png";
 
     return (
@@ -64,10 +63,10 @@ export function Footer({ dictionary }: { dictionary: Dictionary }) {
             <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 mt-16 sm:mt-24 text-center">
                 <Avatar className="w-20 h-20 mx-auto mb-4">
                     <AvatarImage src={authorAvatar} alt={authorName} />
-                    <AvatarFallback>{authorName.charAt(0)}</AvatarFallback>
+                    <AvatarFallback>{authorName.split(' ').map(n => n[0]).join('')}</AvatarFallback>
                 </Avatar>
                 <h4 className="font-headline text-2xl font-bold text-primary">{authorName}</h4>
-                <p className="mt-2 text-muted-foreground max-w-md mx-auto">{authorBio}</p>
+                <p className="mt-2 text-muted-foreground max-w-md mx-auto">{dictionary.footer.authorBio}</p>
             </div>
 
             {/* Section 3: Standard Footer */}

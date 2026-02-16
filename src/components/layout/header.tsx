@@ -121,17 +121,15 @@ export function Header({ translationsMap, searchableData, dictionary }: { transl
 
   const menuItems = [
     { name: dictionary.navigation.blog, href: '/blog' },
-    { name: dictionary.navigation.projects, href: '/projects' },
+    { name: dictionary.navigation.notes, href: '/notes' },
+    { name: dictionary.navigation.tools, href: '/tools' },
   ];
 
   const moreMenuItems = [
     { name: dictionary.navigation.about, href: '/about' },
-    { name: dictionary.navigation.archive, href: '/archive' },
-    { name: dictionary.navigation.contact, href: '/contact' },
-    { name: dictionary.navigation.notes, href: '/notes' },
   ];
-
-  const allMenuItems = [...menuItems, ...moreMenuItems];
+  
+  const allMobileMenuItems = [...menuItems, ...moreMenuItems];
 
   return (
     <header ref={headerRef} className={cn(
@@ -282,7 +280,7 @@ export function Header({ translationsMap, searchableData, dictionary }: { transl
         )}>
             {/* Mobile Menu */}
             <div className="md:hidden p-2">
-                {allMenuItems.map((item) => (
+                {allMobileMenuItems.map((item) => (
                     <Link key={item.name} href={item.href} className="block px-4 py-3 text-base text-primary-foreground rounded-lg hover:bg-primary-foreground/10 transition-colors" onClick={() => setActiveView('none')}>
                         {item.name}
                     </Link>

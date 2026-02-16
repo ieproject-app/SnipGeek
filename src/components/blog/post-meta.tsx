@@ -15,7 +15,7 @@ interface PostMetaProps {
 
 export function PostMeta({ frontmatter, item, locale, dictionary }: PostMetaProps) {
   // Hardcoded author data as per plan
-  const authorName = "SnipGeek";
+  const authorName = "Iwan Efendi";
   const authorAvatar = "/images/profile/profile.png";
   
   const displayDate = frontmatter.updated || frontmatter.date;
@@ -28,7 +28,7 @@ export function PostMeta({ frontmatter, item, locale, dictionary }: PostMetaProp
         <div className="flex items-center gap-4">
           <Avatar className="h-12 w-12">
             <AvatarImage src={authorAvatar} alt={authorName} />
-            <AvatarFallback>{authorName.charAt(0)}</AvatarFallback>
+            <AvatarFallback>{authorName.split(' ').map(n => n[0]).join('')}</AvatarFallback>
           </Avatar>
           <div>
             <p className="font-semibold text-primary">{authorName}</p>

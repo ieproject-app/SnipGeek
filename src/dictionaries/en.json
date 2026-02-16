@@ -9,6 +9,9 @@
         "notes": "Notes",
         "tools": "Tools"
     },
+    "footer": {
+        "authorBio": "A passionate developer exploring the web and sharing findings along the way."
+    },
     "home": {
         "allPosts": "All Posts"
     },
@@ -26,6 +29,7 @@
         "wip": "This page is under construction.",
         "internal": "Internal",
         "open_tool": "Open Tool",
+        "coming_soon": "Coming Soon",
         "tool_list": {
             "number_to_words": {
                 "title": "Number to Words Generator",
@@ -52,7 +56,8 @@
     },
     "contact": {
         "title": "Contact",
-        "description": "Get in touch with me.",
+        "description": "Get in touch with me. The best way to reach me is by email.",
+        "intro": "Feel free to reach out. The best way to get in touch is by email.",
         "wip": "This page is under construction."
     },
     "search": {

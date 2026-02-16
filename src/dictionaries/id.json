@@ -9,6 +9,9 @@
         "notes": "Catatan",
         "tools": "Alat"
     },
+    "footer": {
+        "authorBio": "Seorang developer bersemangat yang menjelajahi web dan berbagi temuan di sepanjang jalan."
+    },
     "home": {
         "allPosts": "Semua Postingan"
     },
@@ -26,6 +29,7 @@
         "wip": "Halaman ini sedang dalam tahap pembuatan.",
         "internal": "Internal",
         "open_tool": "Buka Alat",
+        "coming_soon": "Segera Hadir",
         "tool_list": {
             "number_to_words": {
                 "title": "Generator Terbilang",
@@ -52,7 +56,8 @@
     },
     "contact": {
         "title": "Kontak",
-        "description": "Hubungi saya.",
+        "description": "Hubungi saya. Cara terbaik untuk menghubungi saya adalah melalui email.",
+        "intro": "Jangan ragu untuk menghubungi. Cara terbaik untuk menghubungi saya adalah melalui email.",
         "wip": "Halaman ini sedang dalam tahap pembuatan."
     },
     "search": {
