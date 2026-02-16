@@ -46,7 +46,7 @@ export default async function NotesPage({ params: { locale } }: { params: { loca
                             <p className="text-sm font-semibold uppercase">{formatDatePart(noteDate, { month: 'short' })}</p>
                             <p className="text-xs">{formatDatePart(noteDate, { year: 'numeric' })}</p>
                         </div>
-                        <div className="flex-1">
+                        <div className="flex-1 pr-10">
                             <h2 className="font-headline text-2xl font-bold tracking-tight text-primary group-hover:text-accent transition-colors">
                             {note.frontmatter.title}
                             </h2>
