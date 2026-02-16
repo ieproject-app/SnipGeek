@@ -1,15 +1,28 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import './globals.css';
+import { Inter, Space_Grotesk } from 'next/font/google';
+import { cn } from '@/lib/utils';
+
+const inter = Inter({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-inter',
+  weight: ['400', '500', '700'],
+});
+
+const spaceGrotesk = Space_Grotesk({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-space-grotesk',
+  weight: ['400', '500', '700'],
+});
 
 export default function NotFound() {
   return (
-    <html lang="en">
+    <html lang="en" className={cn(inter.variable, spaceGrotesk.variable)}>
       <head>
         <title>404 - Page Not Found</title>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Space+Grotesk:wght@400;500;700&family=Source+Code+Pro&display=swap" rel="stylesheet" />
       </head>
       <body className="font-body antialiased">
         <div className="w-full h-screen flex items-center justify-center bg-background text-foreground">
