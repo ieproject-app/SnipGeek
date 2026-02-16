@@ -22,7 +22,7 @@ export function PostMeta({ frontmatter, item, locale, dictionary }: PostMetaProp
   const dateLabel = frontmatter.updated ? `Updated on` : `Published on`;
 
   return (
-    <div className="my-8 rounded-2xl border bg-card text-card-foreground p-6 shadow-sm">
+    <div className="my-8 rounded-xl border bg-card text-card-foreground p-6 shadow-sm">
       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-6">
         {/* Author and Date Info */}
         <div className="flex items-center gap-4">
