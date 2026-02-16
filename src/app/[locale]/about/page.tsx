@@ -5,6 +5,7 @@ import { MDXRemote } from 'next-mdx-remote/rsc';
 import { mdxComponents } from '@/components/mdx-components';
 import remarkGfm from 'remark-gfm';
 import rehypeShiki from '@shikijs/rehype';
+import { getDictionary } from '@/lib/get-dictionary';
 
 export async function generateMetadata({ params }: { params: { locale: string } }): Promise<Metadata> {
   const { frontmatter } = await getPageContent('about', params.locale);

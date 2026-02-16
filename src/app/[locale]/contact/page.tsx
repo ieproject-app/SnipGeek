@@ -1,27 +1,22 @@
 import { i18n } from '@/i18n-config';
 import type { Metadata } from 'next';
+import { getDictionary } from '@/lib/get-dictionary';
 
-export const metadata: Metadata = {
-  title: 'Contact',
-  description: 'Get in touch with me.',
-};
+export async function generateMetadata({ params: { locale } }: { params: { locale: string } }): Promise<Metadata> {
+  const dictionary = await getDictionary(locale);
+  return {
+    title: dictionary.contact.title,
+    description: dictionary.contact.description,
+  };
+}
 
 export async function generateStaticParams() {
   return i18n.locales.map((locale) => ({ locale }));
 }
 
-export default function Page({ params: { locale } }: { params: { locale: string } }) {
-  const content: {[key: string]: any} = {
-    en: {
-        title: "Contact",
-        description: "This page is under construction."
-    },
-    id: {
-        title: "Kontak",
-        description: "Halaman ini sedang dalam tahap pembuatan."
-    }
-  }
-  const pageContent = content[locale] || content['en'];
+export default async function Page({ params: { locale } }: { params: { locale: string } }) {
+  const dictionary = await getDictionary(locale);
+  const pageContent = dictionary.contact;
 
   return (
     <div className="w-full">
@@ -31,7 +26,7 @@ export default function Page({ params: { locale } }: { params: { locale: string 
                 {pageContent.title}
             </h1>
         </header>
-        <p className="text-center text-muted-foreground">{pageContent.description}</p>
+        <p className="text-center text-muted-foreground">{pageContent.wip}</p>
       </main>
     </div>
   );

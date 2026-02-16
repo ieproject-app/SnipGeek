@@ -1,0 +1,60 @@
+
+{
+    "navigation": {
+        "blog": "Blog",
+        "projects": "Proyek",
+        "about": "Tentang",
+        "archive": "Arsip",
+        "contact": "Kontak",
+        "notes": "Catatan",
+        "tools": "Alat"
+    },
+    "home": {
+        "allPosts": "Semua Postingan"
+    },
+    "notes": {
+        "title": "Catatan"
+    },
+    "projects": {
+        "title": "Proyek",
+        "description": "Sebuah pameran proyek-proyek saya.",
+        "wip": "Halaman ini sedang dalam tahap pembuatan."
+    },
+    "tools": {
+        "title": "Alat",
+        "description": "Kumpulan alat dan sumber daya.",
+        "wip": "Halaman ini sedang dalam tahap pembuatan."
+    },
+    "archive": {
+        "title": "Arsip",
+        "description": "Telusuri semua postingan dan catatan.",
+        "wip": "Halaman ini sedang dalam tahap pembuatan."
+    },
+    "contact": {
+        "title": "Kontak",
+        "description": "Hubungi saya.",
+        "wip": "Halaman ini sedang dalam tahap pembuatan."
+    },
+    "search": {
+        "placeholder": "Cari postingan dan catatan...",
+        "prompt": "Cari artikel berdasarkan judul atau deskripsi.",
+        "noResults": "Tidak ada hasil yang ditemukan untuk",
+        "resultsFound": "hasil ditemukan"
+    },
+    "readingList": {
+        "add": "Simpan ke Daftar",
+        "remove": "Hapus dari Daftar",
+        "added": {
+            "title": "Disimpan ke Daftar Baca",
+            "description": "telah ditambahkan."
+        },
+        "removed": {
+            "title": "Dihapus dari Daftar Baca",
+            "description": "telah dihapus."
+        },
+        "item": "item",
+        "items": "item",
+        "inYourList": "dalam daftar baca Anda",
+        "empty": "Daftar baca Anda kosong. Simpan artikel untuk membacanya nanti."
+    }
+}

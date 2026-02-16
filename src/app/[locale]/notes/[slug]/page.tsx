@@ -7,6 +7,7 @@ import remarkGfm from 'remark-gfm';
 import rehypeShiki from '@shikijs/rehype';
 import { AddToReadingListButton } from '@/components/layout/add-to-reading-list-button';
 import { i18n } from '@/i18n-config';
+import { getDictionary } from '@/lib/get-dictionary';
 
 export async function generateStaticParams() {
   const locales = getAllLocales();
@@ -58,6 +59,7 @@ export default async function NotePage({ params }: { params: { slug: string, loc
     notFound();
   }
   const linkPrefix = params.locale === i18n.defaultLocale ? '' : `/${params.locale}`;
+  const dictionary = await getDictionary(params.locale);
 
   return (
     <main className="w-full">
@@ -82,6 +84,7 @@ export default async function NotePage({ params }: { params: { slug: string, loc
                     href: `${linkPrefix}/notes/${note.slug}`,
                     type: 'note'
                 }}
+                dictionary={dictionary.readingList}
             />
           </div>
         </header>

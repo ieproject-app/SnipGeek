@@ -9,6 +9,7 @@ import remarkGfm from 'remark-gfm';
 import rehypeShiki from '@shikijs/rehype';
 import { AddToReadingListButton } from '@/components/layout/add-to-reading-list-button';
 import { i18n } from '@/i18n-config';
+import { getDictionary } from '@/lib/get-dictionary';
 
 export async function generateStaticParams() {
   const locales = getAllLocales();
@@ -71,6 +72,7 @@ export default async function PostPage({ params }: { params: { slug: string, loc
 
   const heroImage = PlaceHolderImages.find(p => p.id === post.frontmatter.heroImage);
   const linkPrefix = params.locale === i18n.defaultLocale ? '' : `/${params.locale}`;
+  const dictionary = await getDictionary(params.locale);
 
   return (
     <main className="w-full">
@@ -100,13 +102,16 @@ export default async function PostPage({ params }: { params: { slug: string, loc
                 day: 'numeric',
               })}
             </p>
-            <AddToReadingListButton item={{
-                slug: post.slug,
-                title: post.frontmatter.title,
-                description: post.frontmatter.description,
-                href: `${linkPrefix}/blog/${post.slug}`,
-                type: 'blog'
-            }} />
+            <AddToReadingListButton 
+              item={{
+                  slug: post.slug,
+                  title: post.frontmatter.title,
+                  description: post.frontmatter.description,
+                  href: `${linkPrefix}/blog/${post.slug}`,
+                  type: 'blog'
+              }}
+              dictionary={dictionary.readingList}
+            />
           </div>
         </header>
         <div className="text-lg text-foreground/80">

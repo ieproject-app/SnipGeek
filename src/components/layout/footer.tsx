@@ -5,15 +5,16 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { i18n } from '@/i18n-config';
 import { cn } from '@/lib/utils';
 import { ThemeSwitcher } from './theme-switcher';
+import type { Dictionary } from '@/lib/get-dictionary';
 
-const footerNavItems = [
-  { id: 'footer-about', title: 'About', href: '/about' },
-  { id: 'footer-notes', title: 'Notes', href: '/notes' },
-  { id: 'footer-tools', title: 'Tools', href: '/tools' },
-  { id: 'footer-archive', title: 'Archive', href: '/archive' },
-];
+export function Footer({ dictionary }: { dictionary: Dictionary }) {
+    const footerNavItems = [
+      { id: 'footer-about', title: dictionary.navigation.about, href: '/about' },
+      { id: 'footer-notes', title: dictionary.navigation.notes, href: '/notes' },
+      { id: 'footer-tools', title: dictionary.navigation.tools, href: '/tools' },
+      { id: 'footer-archive', title: dictionary.navigation.archive, href: '/archive' },
+    ];
 
-export function Footer() {
     const authorName = "SnipGeek";
     const authorBio = "A passionate developer exploring the web and sharing findings along the way.";
     const authorAvatar = "/images/profile/profile.png";

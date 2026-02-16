@@ -2,14 +2,16 @@ import { getSortedNotesData } from '@/lib/notes';
 import Link from 'next/link';
 import { i18n } from '@/i18n-config';
 import { AddToReadingListButton } from '@/components/layout/add-to-reading-list-button';
+import { getDictionary } from '@/lib/get-dictionary';
 
 export async function generateStaticParams() {
   return i18n.locales.map((locale) => ({ locale }));
 }
 
-export default function NotesPage({ params: { locale } }: { params: { locale: string } }) {
+export default async function NotesPage({ params: { locale } }: { params: { locale: string } }) {
   const allNotesData = getSortedNotesData(locale);
   const linkPrefix = locale === i18n.defaultLocale ? '' : `/${locale}`;
+  const dictionary = await getDictionary(locale);
 
   const formatDatePart = (date: Date, options: Intl.DateTimeFormatOptions) => {
     return new Intl.DateTimeFormat(locale, options).format(date);
@@ -20,7 +22,7 @@ export default function NotesPage({ params: { locale } }: { params: { locale: st
       <main className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-12 sm:pt-32 sm:pb-16">
         <header className="mb-12 text-center">
             <h1 className="font-headline text-5xl md:text-6xl font-extrabold tracking-tighter text-primary mb-3">
-                {locale === 'id' ? 'Catatan' : 'Notes'}
+                {dictionary.notes.title}
             </h1>
         </header>
 
@@ -57,6 +59,7 @@ export default function NotesPage({ params: { locale } }: { params: { locale: st
                     <AddToReadingListButton 
                         item={item}
                         showText={false}
+                        dictionary={dictionary.readingList}
                         className="absolute top-0 right-0 text-muted-foreground hover:text-primary shrink-0 opacity-0 group-hover:opacity-100 transition-opacity"
                     />
                 </li>

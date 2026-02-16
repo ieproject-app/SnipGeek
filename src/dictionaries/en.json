@@ -1,0 +1,60 @@
+
+{
+    "navigation": {
+        "blog": "Blog",
+        "projects": "Projects",
+        "about": "About",
+        "archive": "Archive",
+        "contact": "Contact",
+        "notes": "Notes",
+        "tools": "Tools"
+    },
+    "home": {
+        "allPosts": "All Posts"
+    },
+    "notes": {
+        "title": "Notes"
+    },
+    "projects": {
+        "title": "Projects",
+        "description": "A showcase of my projects.",
+        "wip": "This page is under construction."
+    },
+    "tools": {
+        "title": "Tools",
+        "description": "A collection of tools and resources.",
+        "wip": "This page is under construction."
+    },
+    "archive": {
+        "title": "Archive",
+        "description": "Browse all posts and notes.",
+        "wip": "This page is under construction."
+    },
+    "contact": {
+        "title": "Contact",
+        "description": "Get in touch with me.",
+        "wip": "This page is under construction."
+    },
+    "search": {
+        "placeholder": "Search posts and notes...",
+        "prompt": "Search for articles by title or description.",
+        "noResults": "No results found for",
+        "resultsFound": "results found"
+    },
+    "readingList": {
+        "add": "Save to List",
+        "remove": "Remove from List",
+        "added": {
+            "title": "Saved to Reading List",
+            "description": "has been added."
+        },
+        "removed": {
+            "title": "Removed from Reading List",
+            "description": "has been removed."
+        },
+        "item": "item",
+        "items": "items",
+        "inYourList": "in your reading list",
+        "empty": "Your reading list is empty. Save articles to read them later."
+    }
+}

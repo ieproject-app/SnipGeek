@@ -12,20 +12,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { usePathname } from 'next/navigation';
 import { useReadingList } from '@/hooks/use-reading-list';
-
-const menuItems = [
-    { name: 'Blog', href: '/blog' },
-    { name: 'Projects', href: '/projects' },
-];
-
-const moreMenuItems = [
-    { name: 'About', href: '/about' },
-    { name: 'Archive', href: '/archive' },
-    { name: 'Contact', href: '/contact' },
-    { name: 'Notes', href: '/notes' },
-];
-
-const allMenuItems = [...menuItems, ...moreMenuItems];
+import type { Dictionary } from '@/lib/get-dictionary';
 
 type SearchableItem = {
   slug: string;
@@ -37,7 +24,7 @@ type SearchableItem = {
 
 type ActiveView = 'none' | 'search' | 'menu' | 'readingList';
 
-export function Header({ translationsMap, searchableData }: { translationsMap: TranslationsMap, searchableData: SearchableItem[] }) {
+export function Header({ translationsMap, searchableData, dictionary }: { translationsMap: TranslationsMap, searchableData: SearchableItem[], dictionary: Dictionary }) {
   const [isVisible, setIsVisible] = useState(true);
   const [activeView, setActiveView] = useState<ActiveView>('none');
   const [query, setQuery] = useState('');
@@ -131,6 +118,20 @@ export function Header({ translationsMap, searchableData }: { translationsMap: T
       setQuery('');
     }
   }
+
+  const menuItems = [
+    { name: dictionary.navigation.blog, href: '/blog' },
+    { name: dictionary.navigation.projects, href: '/projects' },
+  ];
+
+  const moreMenuItems = [
+    { name: dictionary.navigation.about, href: '/about' },
+    { name: dictionary.navigation.archive, href: '/archive' },
+    { name: dictionary.navigation.contact, href: '/contact' },
+    { name: dictionary.navigation.notes, href: '/notes' },
+  ];
+
+  const allMenuItems = [...menuItems, ...moreMenuItems];
 
   return (
     <header ref={headerRef} className={cn(
@@ -255,7 +256,7 @@ export function Header({ translationsMap, searchableData }: { translationsMap: T
                 <Input 
                     ref={searchInputRef}
                     type="search" 
-                    placeholder="Search posts and notes..."
+                    placeholder={dictionary.search.placeholder}
                     className="w-full h-full bg-transparent border-none rounded-full pl-12 pr-12 focus-visible:ring-0 focus-visible:ring-offset-0 text-primary-foreground placeholder:text-primary-foreground/50"
                     aria-hidden={!isSearchOpen}
                     value={query}
@@ -306,7 +307,7 @@ export function Header({ translationsMap, searchableData }: { translationsMap: T
                       results.length > 0 ? (
                           <ScrollArea className="h-full max-h-[400px]">
                               <div className="p-2">
-                                  <p className="px-2 py-1.5 text-xs font-semibold text-muted-foreground">{results.length} results found</p>
+                                  <p className="px-2 py-1.5 text-xs font-semibold text-muted-foreground">{results.length} {dictionary.search.resultsFound}</p>
                                   <ul>
                                       {results.map((item) => (
                                       <li key={`${item.type}-${item.slug}`}>
@@ -330,12 +331,12 @@ export function Header({ translationsMap, searchableData }: { translationsMap: T
                           </ScrollArea>
                       ) : (
                           <div className="p-6 text-center text-sm text-muted-foreground">
-                              No results found for &quot;{query}&quot;.
+                              {dictionary.search.noResults} &quot;{query}&quot;.
                           </div>
                       )
                   ) : (
                       <div className="p-6 text-center text-sm text-muted-foreground">
-                          Search for articles by title or description.
+                          {dictionary.search.prompt}
                       </div>
                   )}
               </div>
@@ -347,7 +348,7 @@ export function Header({ translationsMap, searchableData }: { translationsMap: T
                 <ScrollArea className="h-full max-h-[400px]">
                   <div className="p-2">
                     <p className="px-2 py-1.5 text-xs font-semibold text-muted-foreground">
-                      {readingListItems.length} {readingListItems.length === 1 ? 'item' : 'items'} in your reading list
+                      {readingListItems.length} {readingListItems.length === 1 ? dictionary.readingList.item : dictionary.readingList.items} {dictionary.readingList.inYourList}
                     </p>
                     {readingListItems.length > 0 ? (
                       <ul>
@@ -380,7 +381,7 @@ export function Header({ translationsMap, searchableData }: { translationsMap: T
                       </ul>
                     ) : (
                       <div className="p-6 text-center text-sm text-muted-foreground">
-                        Your reading list is empty. Save articles to read them later.
+                        {dictionary.readingList.empty}
                       </div>
                     )}
                   </div>

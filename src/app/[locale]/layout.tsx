@@ -9,6 +9,7 @@ import type { Metadata } from 'next';
 import { ThemeProvider } from '@/components/theme-provider';
 import { ReadingListProvider } from '@/hooks/use-reading-list';
 import { BackToTop } from '@/components/layout/back-to-top';
+import { getDictionary } from '@/lib/get-dictionary';
 
 export const metadata: Metadata = {
   // The user should update this URL to their actual domain.
@@ -28,7 +29,7 @@ export async function generateStaticParams() {
   return i18n.locales.map((locale) => ({ locale }));
 }
 
-export default function LocaleLayout({
+export default async function LocaleLayout({
   children,
   params,
 }: {
@@ -60,6 +61,7 @@ export default function LocaleLayout({
   }));
 
   const searchableData = [...searchablePosts, ...searchableNotes];
+  const dictionary = await getDictionary(params.locale);
   
   return (
     <html lang={params.locale} className="scroll-smooth" suppressHydrationWarning>
@@ -76,9 +78,9 @@ export default function LocaleLayout({
             disableTransitionOnChange
         >
           <ReadingListProvider>
-            <Header translationsMap={translationsMap} searchableData={searchableData} />
+            <Header translationsMap={translationsMap} searchableData={searchableData} dictionary={dictionary} />
             <main>{children}</main>
-            <Footer />
+            <Footer dictionary={dictionary} />
             <Toaster />
             <BackToTop />
           </ReadingListProvider>
