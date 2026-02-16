@@ -9,7 +9,7 @@ import { cn } from '@/lib/utils';
 const CustomImage = (props: any) => {
     // This check prevents build errors and crashes if the `src` is missing or invalid.
     // An invalid `src` can come from an empty image tag in MDX, like `![]()`.
-    if (!props.src || typeof props.src !== 'string') {
+    if (!props.src || typeof props.src !== 'string' || props.src.trim() === '') {
         return null;
     }
 
