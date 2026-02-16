@@ -6,17 +6,25 @@ import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@
 import { cn } from '@/lib/utils';
 
 // This component handles how `<img>` tags are rendered via MDX.
-const CustomImage = (props: any) => (
-    <div className="relative my-8 aspect-video overflow-hidden rounded-lg shadow-md">
-        <Image
-            fill
-            sizes="(max-width: 768px) 100vw, 768px"
-            className="object-cover"
-            alt={props.alt || 'Blog post image'}
-            {...props}
-        />
-    </div>
-);
+const CustomImage = (props: any) => {
+    // This check prevents build errors and crashes if the `src` is missing or invalid.
+    // An invalid `src` can come from an empty image tag in MDX, like `![]()`.
+    if (!props.src || typeof props.src !== 'string') {
+        return null;
+    }
+
+    return (
+        <div className="relative my-8 aspect-video overflow-hidden rounded-lg shadow-md">
+            <Image
+                fill
+                sizes="(max-width: 768px) 100vw, 768px"
+                className="object-cover"
+                alt={props.alt || 'Blog post image'}
+                {...props}
+            />
+        </div>
+    );
+};
 
 // We define all the custom components outside of the main object
 // to avoid the weird parser issues from the build tool.
