@@ -1,30 +1,6 @@
 {
   "placeholderImages": [
     {
-      "id": "telegram-redesign-hero",
-      "description": "Hero image for the Telegram Redesign article",
-      "imageUrl": "https://images.unsplash.com/photo-1752055340594-4eb0eda11a64?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxhcHAlMjBpbnRlcmZhY2V8ZW58MHx8fHwxNzcxMjE5MzQ5fDA&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "app interface"
-    },
-    {
-      "id": "telegram-redesign-bottom-nav",
-      "description": "Screenshot of Telegram's new bottom navigation",
-      "imageUrl": "https://images.unsplash.com/photo-1625027589035-0844e7f91b1b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxtb2JpbGUlMjBuYXZpZ2F0aW9ufGVufDB8fHx8MTc3MTIxOTM0OXww&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "mobile navigation"
-    },
-    {
-      "id": "telegram-redesign-liquid-glass",
-      "description": "Screenshot of Telegram's liquid glass effect",
-      "imageUrl": "https://images.unsplash.com/photo-1748018499383-a068e31d5e9e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxnbGFzcyUyMGVmZmVjdHxlbnwwfHx8fDE3NzEyMTkzNTJ8MA&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "glass effect"
-    },
-    {
-      "id": "telegram-redesign-search",
-      "description": "Screenshot of Telegram's new search bar",
-      "imageUrl": "https://images.unsplash.com/photo-1625716353480-0ab00dcce2bd?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxzZWFyY2glMjBiYXJ8ZW58MHx8fHwxNzcxMjE5MzQ5fDA&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "search bar"
-    },
-    {
       "id": "footer-about",
       "description": "Portrait of a person in a creative setting",
       "imageUrl": "https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?q=80&w=1160&auto=format&fit=crop",

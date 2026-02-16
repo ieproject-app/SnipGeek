@@ -31,9 +31,22 @@ export async function generateMetadata({ params }: { params: { slug: string, loc
     };
   }
 
-  const heroImage = PlaceHolderImages.find(p => p.id === post.frontmatter.heroImage);
+  const { heroImage: heroImageValue, imageAlt: postImageAlt } = post.frontmatter;
+  let heroImageUrl: string | undefined;
+
+  if (heroImageValue) {
+    if (heroImageValue.startsWith('http') || heroImageValue.startsWith('/')) {
+      heroImageUrl = heroImageValue;
+    } else {
+      const placeholder = PlaceHolderImages.find(p => p.id === heroImageValue);
+      if (placeholder) {
+        heroImageUrl = placeholder.imageUrl;
+      }
+    }
+  }
+
   const path = `/${params.locale}/blog/${post.slug}`;
-  const imageAlt = post.frontmatter.imageAlt || post.frontmatter.title;
+  const imageAlt = postImageAlt || post.frontmatter.title;
 
   return {
     title: post.frontmatter.title,
@@ -46,9 +59,9 @@ export async function generateMetadata({ params }: { params: { slug: string, loc
         description: post.frontmatter.description,
         url: path,
         siteName: 'SnipGeek',
-        images: heroImage ? [
+        images: heroImageUrl ? [
             {
-                url: heroImage.imageUrl,
+                url: heroImageUrl,
                 width: 1200,
                 height: 630,
                 alt: imageAlt,
@@ -64,7 +77,7 @@ export async function generateMetadata({ params }: { params: { slug: string, loc
         card: 'summary_large_image',
         title: post.frontmatter.title,
         description: post.frontmatter.description,
-        images: heroImage ? [{url: heroImage.imageUrl, alt: imageAlt}] : [],
+        images: heroImageUrl ? [{url: heroImageUrl, alt: imageAlt}] : [],
     },
   };
 }
@@ -75,23 +88,42 @@ export default async function PostPage({ params }: { params: { slug: string, loc
     notFound();
   }
 
-  const heroImage = PlaceHolderImages.find(p => p.id === post.frontmatter.heroImage);
+  const { heroImage: heroImageValue, imageAlt } = post.frontmatter;
+  let heroSource: { url: string; hint?: string } | undefined;
+
+  if (heroImageValue) {
+    // Check if heroImage is a full URL or a local path
+    if (heroImageValue.startsWith('http') || heroImageValue.startsWith('/')) {
+      heroSource = { 
+        url: heroImageValue,
+        // Generate a hint from the alt text if available
+        hint: imageAlt?.toLowerCase().split(' ').slice(0, 2).join(' ') 
+      };
+    } else {
+      // Otherwise, treat it as an ID for placeholder images
+      const placeholder = PlaceHolderImages.find(p => p.id === heroImageValue);
+      if (placeholder) {
+        heroSource = { url: placeholder.imageUrl, hint: placeholder.imageHint };
+      }
+    }
+  }
+  
   const linkPrefix = params.locale === i18n.defaultLocale ? '' : `/${params.locale}`;
   const dictionary = await getDictionary(params.locale);
 
   return (
     <main className="w-full">
       <article className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-12 sm:pt-32 sm:pb-16">
-        {heroImage && (
+        {heroSource && (
           <div className="mb-8 sm:mb-12">
             <Image
-              src={heroImage.imageUrl}
-              alt={post.frontmatter.imageAlt || post.frontmatter.title}
+              src={heroSource.url}
+              alt={imageAlt || post.frontmatter.title}
               width={1200}
               height={630}
               className="w-full h-auto rounded-xl shadow-lg object-cover"
               priority
-              data-ai-hint={heroImage.imageHint}
+              data-ai-hint={heroSource.hint}
             />
           </div>
         )}
