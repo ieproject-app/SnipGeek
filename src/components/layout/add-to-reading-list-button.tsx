@@ -9,9 +9,11 @@ import { useParams } from 'next/navigation';
 
 interface AddToReadingListButtonProps {
   item: ReadingListItem;
+  showText?: boolean;
+  className?: string;
 }
 
-export function AddToReadingListButton({ item }: AddToReadingListButtonProps) {
+export function AddToReadingListButton({ item, showText = true, className }: AddToReadingListButtonProps) {
   const { addItem, removeItem, isItemSaved } = useReadingList();
   const { toast } = useToast();
   const params = useParams();
@@ -19,7 +21,10 @@ export function AddToReadingListButton({ item }: AddToReadingListButtonProps) {
 
   const isSaved = isItemSaved(item.slug);
 
-  const handleClick = () => {
+  const handleClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
     if (isSaved) {
       removeItem(item.slug);
       toast({
@@ -40,14 +45,24 @@ export function AddToReadingListButton({ item }: AddToReadingListButtonProps) {
     : (locale === 'id' ? 'Simpan ke Daftar' : 'Save to List');
 
   return (
-    <Button variant="outline" size="sm" onClick={handleClick}>
+    <Button
+      variant={showText ? "outline" : "ghost"}
+      size={showText ? "sm" : "icon"}
+      onClick={handleClick}
+      className={cn(
+        !showText && 'h-8 w-8 rounded-full',
+        className
+      )}
+    >
       <Bookmark
         className={cn(
-          'mr-2 h-4 w-4 transition-colors',
+          'h-4 w-4 transition-colors',
+          showText && 'mr-2',
           isSaved && 'fill-primary text-primary'
         )}
       />
-      {buttonText}
+      {showText && buttonText}
+      {!showText && <span className="sr-only">{buttonText}</span>}
     </Button>
   );
 }

@@ -4,6 +4,7 @@ import { i18n } from '@/i18n-config';
 import Image from 'next/image';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { cn } from '@/lib/utils';
+import { AddToReadingListButton } from '@/components/layout/add-to-reading-list-button';
 
 export async function generateStaticParams() {
   return i18n.locales.map((locale) => ({ locale }));
@@ -25,6 +26,13 @@ export default function Home({ params: { locale } }: { params: { locale: string 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-0">
               {featuredPosts.map((post, index) => {
                 const heroImage = PlaceHolderImages.find(p => p.id === post.frontmatter.heroImage);
+                const item = {
+                    slug: post.slug,
+                    title: post.frontmatter.title,
+                    description: post.frontmatter.description,
+                    href: `${linkPrefix}/blog/${post.slug}`,
+                    type: 'blog' as const,
+                };
                 return (
                   <div
                     key={post.slug}
@@ -36,6 +44,11 @@ export default function Home({ params: { locale } }: { params: { locale: string 
                   >
                     <Link href={`${linkPrefix}/blog/${post.slug}`} className="block group" aria-label={`Read more about ${post.frontmatter.title}`}>
                       <article className="relative w-full aspect-[4/3] rounded-xl overflow-hidden shadow-2xl">
+                        <AddToReadingListButton 
+                            item={item}
+                            showText={false}
+                            className="absolute top-3 right-3 z-20 text-white bg-black/30 hover:bg-black/50 hover:text-white"
+                        />
                         {heroImage && (
                           <Image
                             src={heroImage.imageUrl}
@@ -69,13 +82,27 @@ export default function Home({ params: { locale } }: { params: { locale: string 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {otherPosts.slice(0, 4).map((post) => {
                 const heroImage = PlaceHolderImages.find(p => p.id === post.frontmatter.heroImage);
+                const item = {
+                    slug: post.slug,
+                    title: post.frontmatter.title,
+                    description: post.frontmatter.description,
+                    href: `${linkPrefix}/blog/${post.slug}`,
+                    type: 'blog' as const,
+                };
                 return (
                     <Link key={post.slug} href={`${linkPrefix}/blog/${post.slug}`} className="block group" aria-label={`Read more about ${post.frontmatter.title}`}>
                         <article className="flex flex-col h-full bg-card text-card-foreground rounded-xl border shadow-sm hover:shadow-lg transition-shadow duration-300 overflow-hidden">
                             <div className="p-6 flex-grow">
-                                <h3 className="font-headline text-xl font-bold tracking-tight text-primary group-hover:text-accent transition-colors">
-                                    {post.frontmatter.title}
-                                </h3>
+                                <div className="flex justify-between items-start gap-4">
+                                    <h3 className="font-headline text-xl font-bold tracking-tight text-primary group-hover:text-accent transition-colors flex-1">
+                                        {post.frontmatter.title}
+                                    </h3>
+                                    <AddToReadingListButton 
+                                        item={item}
+                                        showText={false}
+                                        className="text-muted-foreground hover:text-primary shrink-0"
+                                    />
+                                </div>
                                 <p className="leading-relaxed text-muted-foreground mt-2 text-sm">
                                     {post.frontmatter.description}
                                 </p>
