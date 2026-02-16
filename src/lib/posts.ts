@@ -48,7 +48,7 @@ export function getSortedPostsData(locale?: string): Post<PostFrontmatter>[] {
       const { data } = matter(fileContents);
 
       if (!data.heroImage) {
-        data.heroImage = 'understanding-nextjs';
+        data.heroImage = 'footer-about';
       }
 
       return {
@@ -104,7 +104,7 @@ export function getDraftPostsData(locale?: string): Post<PostFrontmatter>[] {
       const { data } = matter(fileContents);
 
       if (!data.heroImage) {
-        data.heroImage = 'understanding-nextjs';
+        data.heroImage = 'footer-about';
       }
 
       return {
@@ -143,7 +143,7 @@ export async function getPostData(slug: string, locale?: string): Promise<PostDa
   const { data, content } = matter(fileContents);
 
   if (!data.heroImage) {
-    data.heroImage = 'understanding-nextjs';
+    data.heroImage = 'footer-about';
   }
 
   return {

@@ -1,54 +1,6 @@
 {
   "placeholderImages": [
     {
-      "id": "understanding-nextjs",
-      "description": "Abstract representation of Next.js architecture",
-      "imageUrl": "https://images.unsplash.com/photo-1565106430482-8f6e74349ca1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxjb2RlJTIwYWJzdHJhY3R8ZW58MHx8fHwxNzcxMDI0ODk1fDA&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "code abstract"
-    },
-    {
-      "id": "mastering-tailwind",
-      "description": "A vibrant and clean design system visualization",
-      "imageUrl": "https://images.unsplash.com/photo-1576595580361-90a855b84b20?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxkZXNpZ24lMjBzeXN0ZW18ZW58MHx8fHwxNzcxMDYwODc4fDA&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "design system"
-    },
-    {
-      "id": "modern-payments-dashboard",
-      "description": "A modern fintech dashboard on a smartphone",
-      "imageUrl": "https://images.unsplash.com/photo-1556742502-ec7c0e9f34b1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwzNDE5ODJ8MHwxfGFsbHx8fHx8fHx8fDE2NzE4OTI0OTY&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "fintech app"
-    },
-    {
-      "id": "lightweight-publishing-for-creators",
-      "description": "A minimalist writer's desk with a laptop and notebook",
-      "imageUrl": "https://images.unsplash.com/photo-1457369804613-52c61a468e7d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwzNDE5ODJ8MHwxfGFsbHx8fHx8fHx8fDE2NzE4OTI1MjE&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "writing creator"
-    },
-    {
-      "id": "booking-flow-redesign",
-      "description": "UI/UX design process for a booking application",
-      "imageUrl": "https://images.unsplash.com/photo-1581291518857-4e27b48ff24e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwzNDE5ODJ8MHwxfGFsbHx8fHx8fHx8fDE2NzE4OTI1NDU&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "ui ux"
-    },
-    {
-      "id": "community-app-for-runners",
-      "description": "A person using a running app on their phone",
-      "imageUrl": "https://images.unsplash.com/photo-1541534401786-2077eed87a74?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwzNDE5ODJ8MHwxfGFsbHx8fHx8fHx8fDE2NzE4OTI1Njk&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "running app"
-    },
-    {
-      "id": "getting-started-with-docker",
-      "description": "Docker whale logo on a computer screen",
-      "imageUrl": "https://images.unsplash.com/photo-1629833443016-1147055a128e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwzNDE5ODJ8MHwxfGFsbHx8fHx8fHx8fDE2NzE4OTI1OTM&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "docker code"
-    },
-    {
-      "id": "css-grid-layouts",
-      "description": "Abstract visualization of a CSS grid",
-      "imageUrl": "https://images.unsplash.com/photo-1521185495037-fac355938198?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwzNDE5ODJ8MHwxfGFsbHx8fHx8fHx8fDE2NzE4OTI2MTc&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "css grid"
-    },
-    {
       "id": "footer-about",
       "description": "Portrait of a person in a creative setting",
       "imageUrl": "https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?q=80&w=1160&auto=format&fit=crop",
