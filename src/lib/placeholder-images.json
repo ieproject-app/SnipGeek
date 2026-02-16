@@ -1,6 +1,12 @@
 {
   "placeholderImages": [
     {
+      "id": "is-16gb-ram-obsolete-hero",
+      "description": "An illustration of DDR5 RAM sticks on a modern motherboard background.",
+      "imageUrl": "/images/articles/windows/ram-16gb-sudah-pas-pasan-kenapa-32gb-jadi-standar-baru/Gemini_Generated_Image_ram-16gb-sudah-pas-pasan-kenapa-32gb-jadi-standar-baru-1.webp",
+      "imageHint": "RAM DDR5"
+    },
+    {
       "id": "footer-about",
       "description": "Portrait of a person in a creative setting",
       "imageUrl": "/images/footer/about.webp",
