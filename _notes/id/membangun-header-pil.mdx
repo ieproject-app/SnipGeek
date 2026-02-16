@@ -1,54 +1,10 @@
 ---
-title: "Membangun Header Pil Kaya Fitur di Next.js"
-date: "2026-02-16"
-description: "Selami proses pembuatan header berbentuk pil yang dinamis dan responsif dengan fitur pencarian, lokalisasi, serta bug yang berhasil kami atasi."
-translationKey: "pill-header-build"
+title: "Membangun Header Berbentuk Pil"
+date: "2024-07-28"
+description: "Tutorial tentang cara membuat komponen header berbentuk pil yang modern."
 published: true
+translationKey: "membangun-header-pil"
+tags: ["React", "UI/UX", "Component"]
 ---
 
-Membangun komponen UI yang indah secara estetika sekaligus sangat fungsional bisa menjadi tantangan yang memuaskan. Dalam catatan ini, kita akan mengulas perjalanan membuat header berbentuk pil untuk situs ini, sebuah komponen yang memuat banyak fungsionalitas dalam ruang yang ringkas.
-
-### Visi Awal
-
-Tujuannya adalah header minimalis namun kuat yang akan "mengambang" di dekat bagian atas halaman, menyediakan akses ke navigasi, pergantian bahasa, dan pencarian canggih tanpa mengganggu. Bentuk "pil" dipilih karena estetikanya yang modern dan ramah.
-
-### Fitur Inti yang Diimplementasikan
-
-1.  **Ukuran & Posisi Dinamis**: Header secara cerdas bertransisi dari pil ringkas di tengah pada desktop menjadi bilah lebar penuh di perangkat mobile, memastikan penggunaan ruang layar yang optimal.
-2.  **Pencarian Terintegrasi**: Satu klik pada ikon pencarian dengan mulus mengubah seluruh header menjadi bilah pencarian. Hasilnya muncul dalam daftar yang rapi dan dapat digulir langsung di bawahnya.
-3.  **Pergantian Bahasa yang Mulus**: Pengalih bahasa diintegrasikan dengan elegan ke dalam pil, memungkinkan pengguna beralih antara `EN` dan `ID` dengan satu klik. Komponen ini secara cerdas mengarahkan pengguna ke versi terjemahan dari halaman saat ini jika ada.
-4.  **Menu yang "Tumbuh"**: Alih-alih dropdown standar, menu untuk item tambahan tampak "tumbuh" langsung dari bagian bawah pil, menciptakan pengalaman pengguna yang lebih terintegrasi dan lancar.
-
-### Perjalanan Memperbaiki Bug
-
-Tidak ada proses pengembangan tanpa rintangan. Berikut adalah beberapa bug menarik yang kami temui dan cara kami memperbaikinya.
-
-#### 1. Masalah Ukuran Responsif
-
-Awalnya, membuat header mengubah ukuran dengan benar antara mobile dan desktop cukup rumit. Kami mengalami masalah dengan kelas Tailwind CSS yang saling bertentangan (`w-full`, `max-w-lg`, `left-4`, `right-4`), yang menyebabkan header meluap di layar ponsel.
-
-**Perbaikan**: Kami menyederhanakan logika, memastikan `w-full` hanya diterapkan pada layar medium ke atas (`md:w-full`), sementara di mobile hanya mengandalkan `left-4` dan `right-4` untuk lebar yang responsif.
-
-{/* Placeholder untuk Screenshot Bug Ukuran Header */}
-
-#### 2. Tombol 'X' Ganda yang Misterius
-
-Di perangkat mobile, sebuah bug aneh menyebabkan dua tombol tutup ('X') muncul saat bilah pencarian terbuka.
-
-**Perbaikan**: Ini adalah kesalahan pada rendering kondisional. Solusinya adalah menambahkan aturan CSS yang lebih eksplisit dan kuat untuk memastikan bahwa saat pencarian aktif (`isSearchOpen`), semua elemen interaktif lainnya seperti tombol menu dipaksa untuk disembunyikan (`opacity-0` dan `pointer-events-none`).
-
-{/* Placeholder untuk Screenshot Bug Tombol X Ganda */}
-
-#### 3. Saga Padding & Pemotongan Teks
-
-Ini adalah bug yang paling persisten. Teks dalam daftar hasil pencarian akan terpotong, mendorong elemen lain, atau menempel di tepi wadah, terutama di perangkat mobile di mana scrollbar akan muncul.
-
-**Perbaikan**: Ini memerlukan solusi multi-langkah:
-*   **Masalah 1 (Scrollbar tumpang tindih):** Kami memodifikasi komponen dasar `ScrollArea` itu sendiri untuk menambahkan padding permanen di sisi kanan viewport internalnya. Ini menjamin selalu ada ruang untuk scrollbar overlay di perangkat mobile.
-*   **Masalah 2 (Pemotongan judul):** Judul artikel yang panjang dipaksa menjadi satu baris dan dipotong dengan `...` (kelas `truncate`). Kami mengganti `truncate` dengan `line-clamp-2`, memungkinkan judul untuk turun ke baris kedua sebelum dipotong, yang secara dramatis meningkatkan keterbacaan.
-
-{/* Placeholder untuk Screenshot Bug Tampilan Hasil Pencarian */}
-
-### Kesimpulan
-
-Header pil ini adalah bukti pengembangan berulang. Melalui siklus implementasi, pengujian, dan perbaikan bug, kami tiba di sebuah komponen yang bersih, kuat, dan menyenangkan untuk digunakan.
+Konten artikel akan ditambahkan di sini.

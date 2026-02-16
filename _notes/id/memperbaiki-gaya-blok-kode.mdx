@@ -1,52 +1,10 @@
 ---
-title: 'Memperbaiki Kasus Gaya Blok Kode yang Keras Kepala'
-date: '2026-02-15'
-description: 'Panduan singkat tentang bagaimana kami men-debug dan memperbaiki masalah CSS yang rumit pada penyorotan sintaks kode.'
-translationKey: 'code-block-styling-fix'
+title: "Memperbaiki Gaya Blok Kode"
+date: "2024-07-28"
+description: "Cara memperbaiki masalah gaya pada blok kode di MDX."
 published: true
+translationKey: "memperbaiki-gaya-blok-kode"
+tags: ["CSS", "Styling", "Code Block"]
 ---
 
-Kami menghadapi masalah CSS yang menarik di mana blok kode kami, yang ditata menggunakan pustaka Shiki yang luar biasa, tidak mendapatkan padding atau sudut membulat yang benar. Teks di dalamnya terlalu dekat ke tepi, dan sudut yang tajam tidak sesuai dengan estetika situs kami.
-
-Ini adalah kasus klasik perang spesifisitas CSS, atau terkadang hanya kelalaian sederhana dalam cara komponen disusun dan ditata dalam kerangka kerja modern seperti Next.js.
-
-### Upaya Awal: CSS Global
-
-Pikiran pertama kami adalah menerapkan gaya global di `src/app/globals.css`. Ini biasanya menjadi pilihan utama untuk penataan umum.
-
-```css
-pre.shiki {
-  @apply rounded-lg p-6 my-6 overflow-x-auto;
-}
-```
-
-Secara teori, ini seharusnya berhasil. Kami menargetkan semua elemen `<pre>` dengan kelas `shiki`. Namun, karena suatu alasan, gaya tersebut tidak diterapkan.
-
-### Solusi yang Berhasil: Render Komponen Langsung
-
-Setelah pendekatan global gagal, kami memutuskan untuk mengambil kendali lebih langsung. Dalam kerangka kerja berbasis komponen, cara paling andal untuk menata sesuatu seringkali adalah dengan mengontrol proses render-nya secara langsung.
-
-Kami memodifikasi `src/components/mdx-components.tsx`. File ini memberi tahu aplikasi kami cara me-render elemen Markdown. Dengan mendefinisikan komponen khusus untuk tag `<pre>`, kami dapat secara paksa menerapkan gaya yang kami inginkan menggunakan kelas Tailwind.
-
-```tsx
-// src/components/mdx-components.tsx
-
-// ... komponen lain
-
-const MdxPre = ({ className, ...props }: React.HTMLAttributes<HTMLPreElement>) => (
-    <pre
-        className={cn(
-            "rounded-lg p-6 my-6 overflow-x-auto",
-            className
-        )}
-        {...props}
-    />
-);
-
-export const mdxComponents: MDXComponents = {
-  // ... komponen lain
-  pre: MdxPre,
-}
-```
-
-Dengan secara eksplisit memetakan elemen `<pre>` ke komponen `MdxPre` kami, kami menjamin bahwa setiap blok kode yang di-render dari MDX akan memiliki padding, sudut membulat, dan perilaku overflow yang benar. Masalah terpecahkan!
+Konten artikel akan ditambahkan di sini.
