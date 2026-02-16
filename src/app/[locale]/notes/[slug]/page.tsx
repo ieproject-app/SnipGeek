@@ -41,12 +41,12 @@ export async function generateMetadata({ params }: { params: { slug: string, loc
         title: note.frontmatter.title,
         description: note.frontmatter.description,
         url: path,
-        siteName: 'SnipGeek',
+        siteName: 'Iwan Efendi',
         locale: params.locale,
         type: 'article',
         publishedTime: note.frontmatter.date,
         modifiedTime: note.frontmatter.updated,
-        authors: ['SnipGeek'],
+        authors: ['Iwan Efendi'],
     },
     twitter: {
         card: 'summary_large_image',
@@ -75,7 +75,7 @@ export default async function NotePage({ params }: { params: { slug: string, loc
   return (
     <main className="w-full">
       <article className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-12 sm:pt-32 sm:pb-16">
-        <header>
+        <header className="text-center">
           <h1 className="font-headline text-4xl md:text-5xl font-extrabold tracking-tighter text-primary mb-3">
             {note.frontmatter.title}
           </h1>

@@ -58,7 +58,7 @@ export async function generateMetadata({ params }: { params: { slug: string, loc
         title: post.frontmatter.title,
         description: post.frontmatter.description,
         url: path,
-        siteName: 'SnipGeek',
+        siteName: 'Iwan Efendi',
         images: heroImageUrl ? [
             {
                 url: heroImageUrl,
@@ -71,7 +71,7 @@ export async function generateMetadata({ params }: { params: { slug: string, loc
         type: 'article',
         publishedTime: post.frontmatter.date,
         modifiedTime: post.frontmatter.updated,
-        authors: ['SnipGeek'],
+        authors: ['Iwan Efendi'],
     },
     twitter: {
         card: 'summary_large_image',
@@ -122,7 +122,7 @@ export default async function PostPage({ params }: { params: { slug: string, loc
   return (
     <main className="w-full">
       <article className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-12 sm:pt-32 sm:pb-16">
-        <header>
+        <header className="text-center">
           <h1 className="font-headline text-4xl md:text-5xl font-extrabold tracking-tighter text-primary mb-3">
             {post.frontmatter.title}
           </h1>
