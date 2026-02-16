@@ -30,7 +30,12 @@
         "internal": "Internal",
         "open_tool": "Buka Alat",
         "coming_soon": "Segera Hadir",
+        "new_badge": "Baru",
         "tool_list": {
+            "ai_prompt_generator": {
+                "title": "Generator Prompt Artikel AI",
+                "description": "Buat prompt terstruktur untuk meminta artikel baru dengan detail yang lengkap."
+            },
             "number_to_words": {
                 "title": "Generator Terbilang",
                 "description": "Mengubah angka menjadi bentuk tulisan dalam Bahasa Indonesia."
@@ -89,5 +94,30 @@
     "drafts": {
         "title": "Draf",
         "noDrafts": "Tidak ada draf dalam kategori ini."
+    },
+    "promptGenerator": {
+        "title": "Generator Prompt Artikel AI",
+        "description": "Gunakan formulir ini untuk menghasilkan prompt terstruktur untuk meminta artikel blog baru. Isi detail di bawah ini, dan prompt akhir akan dibuat untuk Anda salin.",
+        "draftTitle": "Draf Artikel / Poin Utama",
+        "draftPlaceholder": "Tempelkan draf artikel lengkap Anda atau poin-poin utama yang ingin saya kembangkan di sini...",
+        "metadataTitle": "Detail Metadata",
+        "articleTitleLabel": "Judul Artikel (Opsional)",
+        "articleTitleDescription": "Kosongkan jika Anda ingin AI membuatkan judul yang SEO-friendly.",
+        "publishDateLabel": "Tanggal Terbit",
+        "statusLabel": "Status Artikel",
+        "publishSwitchLabel": "Terbitkan Langsung",
+        "featuredSwitchLabel": "Tandai sebagai Unggulan",
+        "heroImageLabel": "Path Gambar Utama",
+        "heroImageDescription": "Gunakan URL dari placehold.co untuk placeholder, atau path lokal seperti '/images/articles/image.webp'.",
+        "imageAltLabel": "Teks Alt Gambar",
+        "imageAltDescription": "Teks deskriptif untuk gambar utama demi aksesibilitas dan SEO.",
+        "tagsLabel": "Tag (pisahkan dengan koma)",
+        "tagsPlaceholder": "Hardware, RAM, Windows",
+        "languageTitle": "Pengaturan Bahasa",
+        "translationSwitchLabel": "Buatkan juga versi terjemahan? (EN/ID)",
+        "generatedPromptTitle": "Prompt yang Dihasilkan (Salin teks di bawah)",
+        "copyButton": "Salin Prompt",
+        "copiedButton": "Tersalin!",
+        "copySuccessDescription": "Prompt sudah siap ditempel di chat."
     }
 }
