@@ -186,6 +186,11 @@ export function Header({ translationsMap, searchableData }: { translationsMap: T
                         aria-label="Open reading list"
                     >
                        <Bookmark className="h-5 w-5" />
+                       {readingListItems.length > 0 && (
+                            <span className="absolute top-1 right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-accent text-accent-foreground text-xs font-bold px-1">
+                                {readingListItems.length}
+                            </span>
+                       )}
                     </Button>
                     <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full" onClick={() => toggleView('menu')}>
                         <Menu className="h-5 w-5" />
@@ -223,6 +228,11 @@ export function Header({ translationsMap, searchableData }: { translationsMap: T
                         aria-label="Open reading list"
                     >
                        <Bookmark className="h-5 w-5" />
+                       {readingListItems.length > 0 && (
+                            <span className="absolute top-1 right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-accent text-accent-foreground text-xs font-bold px-1">
+                                {readingListItems.length}
+                            </span>
+                       )}
                     </Button>
                     <Button 
                         variant="ghost" 

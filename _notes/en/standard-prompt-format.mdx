@@ -1,51 +1,33 @@
 ---
-title: "Standard Format for Feature Requests & Fixes"
+title: 'Standardizing Our Prompt Format'
 date: '2026-02-16'
-description: "A standard template for submitting feature requests or bug reports to make our collaboration more efficient and ensure no details are missed."
-translationKey: "prompt-standard"
+description: 'To improve collaboration and reduce errors, we are establishing a standard format for submitting requests.'
+translationKey: 'standar-prompt'
 published: true
 ---
 
-To ensure every development request or bug fix proceeds smoothly and efficiently, let's use this standard format. This helps me to fully understand your needs and avoid mistakes or overlooking important details.
+To ensure clarity and prevent details from being missed (like publication status or syntax issues), we've agreed on a standard template for submitting requests. Using this format will help streamline our workflow and ensure all necessary information is provided upfront.
 
-### 1. For New Feature Requests
+### Standard Prompt Template
 
-Use this format when you want to add new functionality.
+**1. Clear & Concise Goal:**
+Start with a single sentence that summarizes the main objective.
+*Example: "Add a 'Reading List' feature to the application."*
 
-{/*
-```
-**Feature Goal:**
-[Briefly explain the ultimate goal of this feature. Example: "I want users to be able to save articles to read later."]
+**2. Detailed Breakdown & User Stories:**
+Describe the feature or change in detail. Explain how a user would interact with it.
+*Example: "A user should be able to click a bookmark icon on an article. This saves the article. The user can then view their saved articles from a list in the header."*
 
-**Analysis & Concept (User Flow):**
-[Describe how you envision a user interacting with this feature, step by step. Example: "1. On an article page, there is a 'Save' button. 2. After clicking, the article is added to a list. 3. In the header, there's an icon to view the saved list."]
+**3. Specific Technical & UI Requirements (If any):**
+Mention any specific technologies, components, or UI behaviors you have in mind.
+*Example: "Please use `localStorage` for storage. The list in the header should be integrated with the main header component."*
 
-**Visuals & Placement:**
-[Describe where the UI components for this feature should appear. If possible, mention components from ShadCN or other existing libraries. Example: "The 'Save' button is under the article title. For the list, use the 'Sheet' component from ShadCN that slides in from the right when the header icon is clicked."]
+**4. Acceptance Criteria:**
+List the conditions that must be met for the task to be considered complete.
+*Example: "The bookmark icon changes state when clicked. The count in the header updates. The list displays correctly."*
 
-**Technical Considerations (If Any):**
-[If you have any technical preferences, mention them here. Otherwise, just leave it blank. Example: "For data storage, let's just use localStorage in the browser, no database needed."]
-```
-*/}
+**5. Things to AVOID:**
+If there are any anti-patterns or specific things not to do, list them here.
+*Example: "Do not use a separate page for the reading list; it must be integrated into the header."*
 
-### 2. For Bug Reports or Visual Fixes
-
-Use this format when you find something that isn't working or looking as it should.
-
-{/*
-```
-**Problem Description:**
-[Describe the issue you're seeing as clearly as possible. Example: "The article title in the search results is too long and overflows its box."]
-
-**Problem Location:**
-[Specify the page or specific component where this issue occurs. Example: "This happens inside the search results pop-up from the header."]
-
-**Expected Behavior:**
-[Describe what the correct appearance or functionality should be. Example: "A long title should wrap to a second line, and only if it's still too long should it be truncated with '...'.]
-
-**Attachments (Highly Recommended):**
-[Include screenshots or a short video. This greatly speeds up the process of identifying and fixing the issue.]
-```
-*/}
-
-By following this format, we can ensure all details are communicated well and the development process runs more smoothly. Thank you for your cooperation!
+By adhering to this format, we can minimize back-and-forth and build features more accurately and efficiently.
