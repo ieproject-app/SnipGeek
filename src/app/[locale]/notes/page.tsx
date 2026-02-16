@@ -15,6 +15,7 @@ export default async function NotesPage({ params: { locale } }: { params: { loca
   const linkPrefix = locale === i18n.defaultLocale ? '' : `/${locale}`;
   const dictionary = await getDictionary(locale);
   const authorName = "Iwan Efendi";
+  const authorAvatar = "/images/profile/profile.png";
 
   const formatDatePart = (date: Date, options: Intl.DateTimeFormatOptions) => {
     return new Intl.DateTimeFormat(locale, options).format(date);
@@ -41,8 +42,8 @@ export default async function NotesPage({ params: { locale } }: { params: { loca
                   type: 'note' as const
               };
               return (
-                <li key={note.slug} className="relative group">
-                    <Link href={`${linkPrefix}/notes/${note.slug}`} className="block border bg-card rounded-lg p-6 shadow-sm transition-shadow hover:shadow-lg hover:border-primary">
+                <li key={note.slug} className="relative group border bg-card rounded-lg p-6 shadow-sm transition-shadow hover:shadow-lg hover:border-primary">
+                    <Link href={`${linkPrefix}/notes/${note.slug}`} className="block">
                         <article className="flex items-start gap-4 sm:gap-6">
                             <div className="flex-shrink-0 bg-primary text-primary-foreground rounded-lg w-20 text-center p-2">
                                 <p className="text-3xl font-bold">{formatDatePart(noteDate, { day: 'numeric' })}</p>
@@ -53,12 +54,20 @@ export default async function NotesPage({ params: { locale } }: { params: { loca
                                 <h2 className="font-headline text-2xl font-bold tracking-tight text-primary group-hover:text-accent transition-colors">
                                 {note.frontmatter.title}
                                 </h2>
-                                <div className="text-sm text-muted-foreground mt-2 flex items-center gap-2">
+                                <div className="text-sm text-muted-foreground mt-2 flex items-center gap-2 flex-wrap">
+                                    <Avatar className="h-6 w-6">
+                                        <AvatarImage src={authorAvatar} alt={authorName} />
+                                        <AvatarFallback>{authorName.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+                                    </Avatar>
                                     <span>{authorName}</span>
                                     {note.frontmatter.tags && note.frontmatter.tags.length > 0 && (
                                         <>
-                                            <span>•</span>
-                                            <span className="font-medium">{note.frontmatter.tags[0]}</span>
+                                            <span className="hidden sm:inline">•</span>
+                                            <div className="flex flex-wrap gap-1">
+                                                {note.frontmatter.tags.map(tag => (
+                                                    <Badge key={tag} variant="secondary">{tag}</Badge>
+                                                ))}
+                                            </div>
                                         </>
                                     )}
                                 </div>
@@ -72,7 +81,7 @@ export default async function NotesPage({ params: { locale } }: { params: { loca
                         item={item}
                         showText={false}
                         dictionary={dictionary.readingList}
-                        className="absolute top-3 right-3 text-muted-foreground hover:text-primary shrink-0 opacity-0 group-hover:opacity-100 transition-opacity z-10"
+                        className="absolute top-4 right-4 text-muted-foreground hover:text-primary z-10"
                     />
                 </li>
             )})}
