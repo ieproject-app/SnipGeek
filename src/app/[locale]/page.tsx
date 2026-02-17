@@ -16,17 +16,25 @@ export async function generateStaticParams() {
 
 export default async function Home({ params: { locale } }: { params: { locale: string } }) {
   const allPostsData = getSortedPostsData(locale);
-  const featuredPosts = allPostsData.filter(post => post.frontmatter.featured).slice(0, 4);
-  const latestPosts = allPostsData.filter(post => !post.frontmatter.featured).slice(0, 4);
   
-  // Logic for Special Tag Section (e.g., "Hardware")
-  // We'll filter for posts with the 'Hardware' tag that aren't in featured or latest
-  const specialTag = "Windows"; // You can change this to any tag you want to highlight
+  // 1. Featured Posts (Top 4)
+  const featuredPosts = allPostsData.filter(post => post.frontmatter.featured).slice(0, 4);
+  const featuredSlugs = new Set(featuredPosts.map(p => p.slug));
+
+  // 2. Latest Posts (Excluding Featured, Top 4)
+  const latestPosts = allPostsData
+    .filter(post => !featuredSlugs.has(post.slug))
+    .slice(0, 4);
+  const latestSlugs = new Set(latestPosts.map(p => p.slug));
+  
+  // 3. Special Tag Section (Excluding Featured & Latest, Top 4)
+  // We only pull from blog posts (allPostsData) for relevance on homepage
+  const specialTag = "Windows"; 
   const specialTagPosts = allPostsData
     .filter(post => 
       post.frontmatter.tags?.some(tag => tag.toLowerCase() === specialTag.toLowerCase()) &&
-      !featuredPosts.some(fp => fp.slug === post.slug) &&
-      !latestPosts.some(lp => lp.slug === post.slug)
+      !featuredSlugs.has(post.slug) &&
+      !latestSlugs.has(post.slug)
     )
     .slice(0, 4);
 
