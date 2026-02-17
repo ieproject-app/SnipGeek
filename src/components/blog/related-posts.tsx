@@ -192,7 +192,7 @@ export async function RelatedPosts({ type, locale, currentSlug, currentTags, cur
                     item={item}
                     showText={false}
                     dictionary={dictionary.readingList}
-                    className="text-muted-foreground hover:text-primary z-10 opacity-0 group-hover:opacity-100 transition-opacity shrink-0"
+                    className="text-muted-foreground hover:text-muted/50 z-10 opacity-0 group-hover:opacity-100 transition-opacity shrink-0"
                 />
             </CardFooter>
       </Card>
@@ -200,7 +200,7 @@ export async function RelatedPosts({ type, locale, currentSlug, currentTags, cur
   }
 
   return (
-    <section className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24 border-t mt-16">
+    <section className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24 border-t mt-16">
       <h2 className="text-3xl font-bold font-headline tracking-tighter text-primary mb-8 text-center">
         {dictionary.post.relatedContent}
       </h2>
