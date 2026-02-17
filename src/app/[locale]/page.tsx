@@ -1,3 +1,4 @@
+
 import { getSortedPostsData } from '@/lib/posts';
 import Link from 'next/link';
 import { i18n } from '@/i18n-config';
@@ -7,6 +8,7 @@ import { cn } from '@/lib/utils';
 import { AddToReadingListButton } from '@/components/layout/add-to-reading-list-button';
 import { Flame } from 'lucide-react';
 import { getDictionary } from '@/lib/get-dictionary';
+import { Button } from '@/components/ui/button';
 
 export async function generateStaticParams() {
   return i18n.locales.map((locale) => ({ locale }));
@@ -141,9 +143,16 @@ export default async function Home({ params: { locale } }: { params: { locale: s
       {/* Other Posts Section */}
       {otherPosts.length > 0 && (
         <section className="container max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pb-12 sm:pb-16">
-          <h2 className="text-3xl font-bold font-headline tracking-tighter text-primary mb-8 text-center">{dictionary.home.allPosts}</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-12">
+          <h2 className="text-3xl font-bold font-headline tracking-tighter text-primary mb-8 text-center">{dictionary.home.latestPosts}</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-12 mb-12">
             {otherPosts.slice(0, 4).map((post) => renderPostCard(post, false))}
+          </div>
+          <div className="flex justify-center">
+            <Button asChild variant="outline" size="lg" className="rounded-full">
+                <Link href={`${linkPrefix}/blog`}>
+                    {dictionary.home.viewAllPosts}
+                </Link>
+            </Button>
           </div>
         </section>
       )}

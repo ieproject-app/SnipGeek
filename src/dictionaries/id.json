@@ -13,7 +13,8 @@
         "authorBio": "Seorang developer bersemangat yang menjelajahi web dan berbagi temuan di sepanjang jalan."
     },
     "home": {
-        "allPosts": "Semua Postingan"
+        "latestPosts": "Postingan Terbaru",
+        "viewAllPosts": "Lihat Semua Postingan"
     },
     "notes": {
         "title": "Catatan"
