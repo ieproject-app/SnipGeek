@@ -5,7 +5,6 @@ import Image from 'next/image';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { getDictionary } from '@/lib/get-dictionary';
 import { AddToReadingListButton } from '@/components/layout/add-to-reading-list-button';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { i18n } from '@/i18n-config';
 
@@ -147,8 +146,6 @@ export async function RelatedPosts({ type, locale, currentSlug, currentTags, cur
 
   // Renderer for Notes
   const renderNoteCard = (note: Note<NoteFrontmatter>) => {
-    const authorName = "Iwan Efendi"; // Hardcoded as per project structure
-    const authorAvatar = "/images/profile/profile.png";
     const noteDate = new Date(note.frontmatter.date);
     const formatDatePart = (date: Date, options: Intl.DateTimeFormatOptions) => {
         return new Intl.DateTimeFormat(locale, options).format(date);
@@ -162,48 +159,40 @@ export async function RelatedPosts({ type, locale, currentSlug, currentTags, cur
     };
 
     return (
-        <li key={note.slug} className="relative group border bg-card rounded-lg p-6 shadow-sm transition-shadow hover:shadow-lg hover:border-primary">
-            <Link href={`${linkPrefix}/notes/${note.slug}`} className="block">
-                <article className="flex gap-4 sm:gap-6">
-                    <div className="flex w-20 flex-shrink-0 flex-col items-center justify-center rounded-lg bg-primary p-2 text-center text-primary-foreground">
+        <div key={note.slug}>
+            <Link href={`${linkPrefix}/notes/${note.slug}`} className="block group h-full">
+                <article className="relative flex h-full flex-col rounded-lg border bg-card p-6 shadow-sm transition-shadow hover:shadow-lg hover:border-primary">
+                    <div className="flex w-20 flex-shrink-0 flex-col items-center justify-center rounded-lg bg-primary p-2 text-center text-primary-foreground mb-4">
                         <p className="text-3xl font-bold">{formatDatePart(noteDate, { day: 'numeric' })}</p>
                         <p className="text-sm font-semibold uppercase">{formatDatePart(noteDate, { month: 'short' })}</p>
                         <p className="text-xs">{formatDatePart(noteDate, { year: 'numeric' })}</p>
                     </div>
-                    <div className="flex-1">
-                        <h2 className="font-headline text-2xl font-bold tracking-tight text-primary group-hover:text-accent transition-colors">
+                    
+                    <h2 className="font-headline text-xl font-bold tracking-tight text-primary group-hover:text-accent transition-colors">
                         {note.frontmatter.title}
-                        </h2>
-                        <div className="text-sm text-muted-foreground mt-2 flex items-center gap-2 flex-wrap">
-                            <Avatar className="h-6 w-6">
-                                <AvatarImage src={authorAvatar} alt={authorName} />
-                                <AvatarFallback>{authorName.split(' ').map(n => n[0]).join('')}</AvatarFallback>
-                            </Avatar>
-                            <span>{authorName}</span>
-                            {note.frontmatter.tags && note.frontmatter.tags.length > 0 && (
-                                <>
-                                    <span className="hidden sm:inline">•</span>
-                                    <div className="flex flex-wrap gap-1">
-                                        {note.frontmatter.tags.map(tag => (
-                                            <Badge key={tag} variant="secondary">{tag}</Badge>
-                                        ))}
-                                    </div>
-                                </>
-                            )}
+                    </h2>
+                    
+                    <p className="text-muted-foreground text-sm mt-2 flex-grow line-clamp-3">
+                        {note.frontmatter.description}
+                    </p>
+                    
+                    {note.frontmatter.tags && note.frontmatter.tags.length > 0 && (
+                        <div className="mt-4 flex flex-wrap gap-1">
+                            {note.frontmatter.tags.map(tag => (
+                                <Badge key={tag} variant="secondary">{tag}</Badge>
+                            ))}
                         </div>
-                        <p className="text-muted-foreground text-sm mt-3 line-clamp-2">
-                            {note.frontmatter.description}
-                        </p>
-                    </div>
+                    )}
+
+                    <AddToReadingListButton 
+                        item={item}
+                        showText={false}
+                        dictionary={dictionary.readingList}
+                        className="absolute top-4 right-4 text-muted-foreground hover:text-primary z-10 opacity-0 group-hover:opacity-100 transition-opacity"
+                    />
                 </article>
             </Link>
-            <AddToReadingListButton 
-                item={item}
-                showText={false}
-                dictionary={dictionary.readingList}
-                className="absolute top-4 right-4 text-muted-foreground hover:text-primary z-10"
-            />
-        </li>
+        </div>
     );
   }
 
@@ -217,9 +206,9 @@ export async function RelatedPosts({ type, locale, currentSlug, currentTags, cur
             {relatedContent.map(item => renderBlogPostCard(item as Post<PostFrontmatter>))}
         </div>
       ) : (
-        <ul className="space-y-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {relatedContent.map(item => renderNoteCard(item as Note<NoteFrontmatter>))}
-        </ul>
+        </div>
       )}
     </section>
   );
