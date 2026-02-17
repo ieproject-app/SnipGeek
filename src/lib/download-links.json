@@ -1,3 +1,4 @@
+
 {
   "downloadLinks": [
     {
@@ -8,7 +9,7 @@
     {
       "id": "win11-iso-24h2-en",
       "text": "Windows 11 24H2 English",
-      "url": "https://software.download.prss.microsoft.com/dbazure/Win11_25H2_English_x64.iso?t=bdadfcf5-a000-4b64-9dc0-068425181996&P1=1771326814&P2=601&P3=2&P4=z1BE%2fxc51oPiF9jr6McKw6wjnS3qwnPD4oR4tf8cLtvY9FgKVUZ6htGqpR9%2bCOmzEeUW%2bfz6dN4bEvz%2fqBdF%2f2eqcoantEPYpSB7DtJMZ5lW316INI7DvaTb4jklS3IKOQy960p7%2bu8W81HsMWXn8CjuxNLmR3ytDZBPrJYjRbQZT5dkzXUS4h%2bsXdHeTUFRv%2bT60Yu7KorOavxQJMCtiASqnMrZuqFeDRdd2jOISm6mTwWDz4B7ON4v1cWWy%2fKFw2EoT1%2bjAt0OFa%2fymFBk43UBoC1cuXaBVKJLPIvkBIEIj0renIzzNYvUEu%2btcKAUGf2fTWFGQ6qXKIhuKEBrEg%3d%3d"
+      "url": "https://www.microsoft.com/software-download/windows11"
     }
   ]
 }
