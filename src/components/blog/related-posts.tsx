@@ -159,10 +159,10 @@ export async function RelatedPosts({ type, locale, currentSlug, currentTags, cur
     };
 
     return (
-        <div key={note.slug}>
-            <Link href={`${linkPrefix}/notes/${note.slug}`} className="block group h-full">
-                <article className="relative flex h-full flex-col rounded-lg border bg-card p-6 shadow-sm transition-shadow hover:shadow-lg hover:border-primary">
-                    <div className="flex w-20 flex-shrink-0 flex-col items-center justify-center rounded-lg bg-primary p-2 text-center text-primary-foreground mb-4">
+        <div key={note.slug} className="group relative">
+            <Link href={`${linkPrefix}/notes/${note.slug}`} className="block h-full" aria-label={note.frontmatter.title}>
+                <article className="flex h-full flex-col">
+                    <div className="flex w-20 flex-shrink-0 flex-col items-center justify-center rounded-lg bg-primary p-2 text-center text-primary-foreground mb-4 transition-transform sm:group-hover:scale-105">
                         <p className="text-3xl font-bold">{formatDatePart(noteDate, { day: 'numeric' })}</p>
                         <p className="text-sm font-semibold uppercase">{formatDatePart(noteDate, { month: 'short' })}</p>
                         <p className="text-xs">{formatDatePart(noteDate, { year: 'numeric' })}</p>
@@ -183,15 +183,14 @@ export async function RelatedPosts({ type, locale, currentSlug, currentTags, cur
                             ))}
                         </div>
                     )}
-
-                    <AddToReadingListButton 
-                        item={item}
-                        showText={false}
-                        dictionary={dictionary.readingList}
-                        className="absolute top-4 right-4 text-muted-foreground hover:text-primary z-10 opacity-0 group-hover:opacity-100 transition-opacity"
-                    />
                 </article>
             </Link>
+            <AddToReadingListButton 
+                item={item}
+                showText={false}
+                dictionary={dictionary.readingList}
+                className="absolute top-4 right-0 text-muted-foreground hover:text-primary z-10 opacity-0 group-hover:opacity-100 transition-opacity"
+            />
         </div>
     );
   }
