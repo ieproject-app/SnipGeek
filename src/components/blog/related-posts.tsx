@@ -182,7 +182,12 @@ export async function RelatedPosts({ type, locale, currentSlug, currentTags, cur
                 </div>
             </CardContent>
 
-            <CardFooter className="flex items-center justify-end border-t px-6 py-4">
+            <CardFooter className="flex items-center justify-between gap-4 border-t px-6 py-4">
+                <div className="flex flex-wrap gap-1">
+                    {note.frontmatter.tags && note.frontmatter.tags.map(tag => (
+                        <Badge key={tag} variant="secondary">{tag}</Badge>
+                    ))}
+                </div>
                 <AddToReadingListButton 
                     item={item}
                     showText={false}
@@ -195,7 +200,7 @@ export async function RelatedPosts({ type, locale, currentSlug, currentTags, cur
   }
 
   return (
-    <section className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24 border-t mt-16">
+    <section className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24 border-t mt-16">
       <h2 className="text-3xl font-bold font-headline tracking-tighter text-primary mb-8 text-center">
         {dictionary.post.relatedContent}
       </h2>
