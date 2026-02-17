@@ -40,7 +40,7 @@ export default async function NotesPage({ params: { locale } }: { params: { loca
                 type: 'note' as const
             };
             return (
-              <Card key={note.slug} className="group relative bg-card/50 transition-shadow hover:shadow-lg border border-l-4 border-l-primary">
+              <Card key={note.slug} className="group relative bg-card/50 border border-l-4 border-l-primary">
                 <CardContent className="flex items-stretch gap-6 p-6">
                     <Link href={`${linkPrefix}/notes/${note.slug}`} aria-label={note.frontmatter.title} className="block shrink-0">
                         <div className="flex h-full w-20 flex-col items-center justify-center rounded-lg bg-primary p-2 text-center text-primary-foreground transition-transform group-hover:scale-105">

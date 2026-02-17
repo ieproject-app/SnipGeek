@@ -160,30 +160,29 @@ export async function RelatedPosts({ type, locale, currentSlug, currentTags, cur
     };
 
     return (
-        <Card key={note.slug} className="group relative flex flex-col bg-card/50 transition-shadow hover:shadow-lg border border-l-4 border-l-primary">
-            <CardContent className="flex flex-1 items-stretch gap-4 p-4">
+        <Card key={note.slug} className="group relative bg-card/50 border border-l-4 border-l-primary">
+            <CardContent className="flex items-stretch gap-6 p-6">
                 <Link href={`${linkPrefix}/notes/${note.slug}`} aria-label={note.frontmatter.title} className="block shrink-0">
-                    <div className="flex h-full w-16 flex-col items-center justify-center rounded-lg bg-primary p-1 text-center text-primary-foreground transition-transform group-hover:scale-105">
-                        <p className="text-2xl font-bold">{formatDatePart(noteDate, { day: 'numeric' })}</p>
-                        <p className="text-xs font-semibold uppercase">{formatDatePart(noteDate, { month: 'short' })}</p>
+                    <div className="flex h-full w-20 flex-col items-center justify-center rounded-lg bg-primary p-2 text-center text-primary-foreground transition-transform group-hover:scale-105">
+                        <p className="text-3xl font-bold">{formatDatePart(noteDate, { day: 'numeric' })}</p>
+                        <p className="text-sm font-semibold uppercase">{formatDatePart(noteDate, { month: 'short' })}</p>
+                        <p className="text-xs">{formatDatePart(noteDate, { year: 'numeric' })}</p>
                     </div>
                 </Link>
                 
                 <div className="flex min-w-0 flex-1 flex-col">
-                    <Link href={`${linkPrefix}/notes/${note.slug}`} aria-label={note.frontmatter.title} className="block flex-1">
-                        <h2 className="font-headline text-lg font-bold leading-tight tracking-tight text-primary group-hover:text-accent transition-colors line-clamp-3">
+                    <Link href={`${linkPrefix}/notes/${note.slug}`} aria-label={note.frontmatter.title} className="flex-1">
+                        <h2 className="font-headline text-2xl font-bold tracking-tight text-primary group-hover:text-accent transition-colors">
                             {note.frontmatter.title}
                         </h2>
+                        <p className="text-muted-foreground mt-2 line-clamp-3">
+                            {note.frontmatter.description}
+                        </p>
                     </Link>
                 </div>
             </CardContent>
 
-            <CardFooter className="flex items-center justify-between gap-2 border-t px-4 py-3">
-                <div className="flex flex-wrap gap-1">
-                    {note.frontmatter.tags && note.frontmatter.tags.map(tag => (
-                        <Badge key={tag} variant="secondary" className="text-[10px] px-1.5 py-0.5">{tag}</Badge>
-                    ))}
-                </div>
+            <CardFooter className="flex items-center justify-end border-t px-6 py-4">
                 <AddToReadingListButton 
                     item={item}
                     showText={false}
@@ -191,7 +190,7 @@ export async function RelatedPosts({ type, locale, currentSlug, currentTags, cur
                     className="text-muted-foreground hover:text-primary z-10 opacity-0 group-hover:opacity-100 transition-opacity shrink-0"
                 />
             </CardFooter>
-        </Card>
+      </Card>
     );
   }
 
@@ -205,7 +204,7 @@ export async function RelatedPosts({ type, locale, currentSlug, currentTags, cur
             {relatedContent.map(item => renderBlogPostCard(item as Post<PostFrontmatter>))}
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="space-y-8">
             {relatedContent.map(item => renderNoteCard(item as Note<NoteFrontmatter>))}
         </div>
       )}
