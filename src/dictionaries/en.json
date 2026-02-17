@@ -130,7 +130,7 @@
         "imagesPlaceholderNote": "/images/notes/some-image.webp | Alt text for the image",
         "metadataTitle": "Metadata Details",
         "articleTitleLabel": "Content Title (Optional)",
-        "articleTitleDescription": "Leave blank if you want the AI to create an SEO-friendly title.",
+        "articleTitleDescription": "An English title is recommended. The URL slug will be generated from this title (e.g., 'how-to-do-stuff'). Leave blank for an AI-generated title.",
         "publishDateLabel": "Publish Date",
         "publishDatePlaceholder": "YYYY-MM-DD",
         "publishDateDescription": "Feel free to use a flexible format like 'tomorrow' or 'next Monday'.",
@@ -140,8 +140,11 @@
         "tagsLabel": "Tags (comma-separated)",
         "tagsPlaceholder": "Hardware, RAM, Windows",
         "tagsDescription": "Leave blank if you want the AI to generate relevant tags.",
-        "languageTitle": "Language Settings",
+        "languageTitle": "Language & Linking",
         "translationSwitchLabel": "Also create translated version? (EN/ID)",
+        "translationKeyLabel": "Translation Key",
+        "translationKeyPlaceholder": "catatan-artikel-baru-saya",
+        "translationKeyDescription": "A unique ID in Indonesian to link translated articles. MUST be the same for both versions.",
         "generatedPromptTitle": "Generated Prompt (Copy the text below)",
         "copyButton": "Copy Prompt",
         "copiedButton": "Copied!",
@@ -152,12 +155,9 @@
         "titleLabel": "Title",
         "titlePlaceholder": "Please create an SEO-friendly title based on the content.",
         "dateLabel": "Publish Date",
-        "translationLabel": "Create Translation",
-        "translationYes": "Yes (English & Indonesian), ensure the translationKey is the same.",
-        "translationNo": "No.",
         "supportingImagesLabel": "Supporting Images (in order)",
         "supportingImagesLabelNote": "Images to insert in content",
         "draftContentLabel": "Main Content/Draft",
-        "finalInstruction": "Additional Instruction: After completion, always confirm the `translationKey` you used so I can find the files easily."
+        "finalInstruction": "Additional Instruction: The slug must be in English and kebab-case. After completion, always confirm the `translationKey` you used so I can find the files easily."
     }
 }

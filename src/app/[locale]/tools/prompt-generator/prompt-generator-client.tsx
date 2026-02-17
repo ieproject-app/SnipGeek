@@ -11,6 +11,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Copy, Check } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import type { Dictionary } from '@/lib/get-dictionary';
+import { cn } from '@/lib/utils';
 
 type PromptGeneratorProps = {
   dictionary: Dictionary['promptGenerator'];
@@ -27,6 +28,7 @@ export function PromptGeneratorClient({ dictionary }: PromptGeneratorProps) {
   const [images, setImages] = useState('');
   const [tags, setTags] = useState('');
   const [needsTranslation, setNeedsTranslation] = useState(true);
+  const [translationKey, setTranslationKey] = useState('');
 
   const [generatedPrompt, setGeneratedPrompt] = useState('');
   const [isCopied, setIsCopied] = useState(false);
@@ -51,6 +53,10 @@ export function PromptGeneratorClient({ dictionary }: PromptGeneratorProps) {
       }
       prompt += `- ${dictionary.statusLabel}: ${frontmatterStatus}\n`;
 
+      if (needsTranslation) {
+        prompt += `- translationKey: "${translationKey || 'Tolong buatkan kunci terjemahan unik dalam Bahasa Indonesia'}"\n`;
+      }
+
       const imageLines = images.split('\n').filter(line => line.trim() !== '');
 
       if (isBlog) {
@@ -70,7 +76,8 @@ export function PromptGeneratorClient({ dictionary }: PromptGeneratorProps) {
       } else {
         prompt += `- tags: Please generate relevant tags based on the content.\n`;
       }
-      prompt += `- ${dictionary.translationLabel}: ${needsTranslation ? dictionary.translationYes : dictionary.translationNo}\n\n`;
+      
+      prompt += `\n`;
 
       if (isBlog && imageLines.length > 1) {
           prompt += `**${dictionary.supportingImagesLabel}:**\n`;
@@ -117,7 +124,7 @@ export function PromptGeneratorClient({ dictionary }: PromptGeneratorProps) {
     };
 
     buildPrompt();
-  }, [draft, title, publishDate, isPublished, isFeatured, images, tags, needsTranslation, dictionary, contentType, downloadLinks]);
+  }, [draft, title, publishDate, isPublished, isFeatured, images, tags, needsTranslation, translationKey, dictionary, contentType, downloadLinks]);
 
   const handleCopy = () => {
     navigator.clipboard.writeText(generatedPrompt);
@@ -248,17 +255,32 @@ export function PromptGeneratorClient({ dictionary }: PromptGeneratorProps) {
             <Input id="tags" placeholder={dictionary.tagsPlaceholder} value={tags} onChange={(e) => setTags(e.target.value)} />
             <p className="text-sm text-muted-foreground">{dictionary.tagsDescription}</p>
           </div>
-
-          <div className="grid gap-2">
-            <Label>{dictionary.languageTitle}</Label>
-             <div className="flex items-center space-x-2">
-                <Switch id="translation" checked={needsTranslation} onCheckedChange={setNeedsTranslation} />
-                <Label htmlFor="translation">{dictionary.translationSwitchLabel}</Label>
-            </div>
-          </div>
         </CardContent>
       </Card>
       
+       <Card>
+        <CardHeader>
+          <CardTitle>{dictionary.languageTitle}</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-6">
+            <div className="flex items-center space-x-2">
+                <Switch id="translation" checked={needsTranslation} onCheckedChange={setNeedsTranslation} />
+                <Label htmlFor="translation">{dictionary.translationSwitchLabel}</Label>
+            </div>
+            <div className={cn("grid gap-2", !needsTranslation && "opacity-50")}>
+                <Label htmlFor="translationKey">{dictionary.translationKeyLabel}</Label>
+                <Input 
+                    id="translationKey" 
+                    placeholder={dictionary.translationKeyPlaceholder}
+                    value={translationKey}
+                    onChange={(e) => setTranslationKey(e.target.value)} 
+                    disabled={!needsTranslation}
+                />
+                <p className="text-sm text-muted-foreground">{dictionary.translationKeyDescription}</p>
+            </div>
+        </CardContent>
+      </Card>
+
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>{dictionary.generatedPromptTitle}</CardTitle>

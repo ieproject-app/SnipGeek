@@ -130,7 +130,7 @@
         "imagesPlaceholderNote": "/images/notes/gambar-catatan.webp | Teks alt untuk gambar",
         "metadataTitle": "Detail Metadata",
         "articleTitleLabel": "Judul Konten (Opsional)",
-        "articleTitleDescription": "Kosongkan jika Anda ingin AI membuatkan judul yang SEO-friendly.",
+        "articleTitleDescription": "Judul dalam Bahasa Inggris sangat disarankan. Slug URL akan dibuat dari judul ini (contoh: 'how-to-do-stuff'). Kosongkan jika ingin judul dibuatkan oleh AI.",
         "publishDateLabel": "Tanggal Terbit",
         "publishDatePlaceholder": "DD-MM-YYYY",
         "publishDateDescription": "Anda juga bisa menggunakan format fleksibel seperti 'besok' atau 'Senin depan'.",
@@ -140,8 +140,11 @@
         "tagsLabel": "Tag (pisahkan dengan koma)",
         "tagsPlaceholder": "Hardware, RAM, Windows",
         "tagsDescription": "Kosongkan jika Anda ingin AI membuatkan tag yang relevan.",
-        "languageTitle": "Pengaturan Bahasa",
+        "languageTitle": "Bahasa & Penautan",
         "translationSwitchLabel": "Buatkan juga versi terjemahan? (EN/ID)",
+        "translationKeyLabel": "Kunci Terjemahan",
+        "translationKeyPlaceholder": "catatan-artikel-baru-saya",
+        "translationKeyDescription": "ID unik dalam Bahasa Indonesia untuk menghubungkan artikel terjemahan. HARUS sama untuk kedua versi.",
         "generatedPromptTitle": "Prompt yang Dihasilkan (Salin teks di bawah)",
         "copyButton": "Salin Prompt",
         "copiedButton": "Tersalin!",
@@ -152,12 +155,9 @@
         "titleLabel": "Judul",
         "titlePlaceholder": "Tolong buatkan judul SEO-friendly berdasarkan konten.",
         "dateLabel": "Tanggal Terbit",
-        "translationLabel": "Buatkan Terjemahan",
-        "translationYes": "Ya (Inggris & Indonesia), pastikan translationKey sama.",
-        "translationNo": "Tidak.",
         "supportingImagesLabel": "Gambar Pendukung (sesuai urutan)",
         "supportingImagesLabelNote": "Gambar untuk disisipkan di konten",
         "draftContentLabel": "Konten/Draf Utama",
-        "finalInstruction": "Instruksi Tambahan: Setelah selesai, selalu konfirmasikan `translationKey` yang Anda gunakan agar saya bisa menemukan filenya dengan mudah."
+        "finalInstruction": "Instruksi Tambahan: Slug harus dalam Bahasa Inggris dan format kebab-case. Setelah selesai, selalu konfirmasikan `translationKey` yang Anda gunakan agar saya bisa menemukan filenya dengan mudah."
     }
 }
