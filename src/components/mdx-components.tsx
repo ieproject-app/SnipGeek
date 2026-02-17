@@ -1,3 +1,4 @@
+
 import type { MDXComponents } from 'next-mdx-remote/rsc/types'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -77,7 +78,7 @@ const MdxA = (props: React.AnchorHTMLAttributes<HTMLAnchorElement>) => {
   return <a {...props} />;
 };
 const MdxUl = ({ children }: { children?: React.ReactNode }) => <ul className="my-6 ml-6 list-disc [&>li]:mt-2">{children}</ul>;
-const MdxOl = ({ children }: { children?: React.ReactNode }) => <ol className="my-6 ml-6 list-decimal [&>li]:mt-2">{children}</ul>;
+const MdxOl = ({ children }: { children?: React.ReactNode }) => <ol className="my-6 ml-6 list-decimal [&>li]:mt-2">{children}</ol>;
 const MdxLi = ({ children }: { children?: React.ReactNode }) => <li>{children}</li>;
 const MdxBlockquote = ({ children }: { children?: React.ReactNode }) => <blockquote className="mt-6 border-l-2 border-primary/20 pl-6 italic text-muted-foreground">{children}</blockquote>;
 
