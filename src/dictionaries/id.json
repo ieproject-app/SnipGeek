@@ -130,7 +130,7 @@
         "imagesPlaceholderNote": "/images/notes/gambar-catatan.webp | Teks alt untuk gambar",
         "metadataTitle": "Detail Metadata",
         "articleTitleLabel": "Judul Konten (Opsional)",
-        "articleTitleDescription": "Judul dalam Bahasa Inggris sangat disarankan. Slug URL akan dibuat dari judul ini (contoh: 'how-to-do-stuff'). Kosongkan jika ingin judul dibuatkan oleh AI.",
+        "articleTitleDescription": "Judul dalam Bahasa Inggris sangat disarankan. Untuk SEO terbaik, usahakan 50-60 karakter. Slug URL akan dibuat dari judul ini. Kosongkan jika ingin judul dibuatkan oleh AI.",
         "publishDateLabel": "Tanggal Terbit",
         "publishDatePlaceholder": "DD-MM-YYYY",
         "publishDateDescription": "Anda juga bisa menggunakan format fleksibel seperti 'besok' atau 'Senin depan'.",

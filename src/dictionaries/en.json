@@ -130,7 +130,7 @@
         "imagesPlaceholderNote": "/images/notes/some-image.webp | Alt text for the image",
         "metadataTitle": "Metadata Details",
         "articleTitleLabel": "Content Title (Optional)",
-        "articleTitleDescription": "An English title is recommended. The URL slug will be generated from this title (e.g., 'how-to-do-stuff'). Leave blank for an AI-generated title.",
+        "articleTitleDescription": "An English title is recommended. For best SEO, aim for 50-60 characters. The URL slug will be generated from this. Leave blank for an AI-generated title.",
         "publishDateLabel": "Publish Date",
         "publishDatePlaceholder": "YYYY-MM-DD",
         "publishDateDescription": "Feel free to use a flexible format like 'tomorrow' or 'next Monday'.",
