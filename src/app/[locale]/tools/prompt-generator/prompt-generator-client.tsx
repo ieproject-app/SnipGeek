@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -200,7 +201,7 @@ export function PromptGeneratorClient({ dictionary }: PromptGeneratorProps) {
                     {publishDate ? format(publishDate, "PPP") : <span>Pick a date</span>}
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-auto p-0">
+                <PopoverContent className="p-0">
                   <Calendar
                     mode="single"
                     selected={publishDate}
