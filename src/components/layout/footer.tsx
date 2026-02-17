@@ -73,7 +73,7 @@ export function Footer({ dictionary, translationsMap }: { dictionary: Dictionary
 
             {/* Section 3: Standard Footer */}
             <div className="mt-16 sm:mt-24 py-8 border-t">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row justify-center items-center gap-4 text-sm text-muted-foreground">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col justify-center items-center gap-4 text-sm text-muted-foreground">
                     <p>&copy; {new Date().getFullYear()} {authorName}. All Rights Reserved.</p>
                     <div className="flex items-center gap-4">
                         <LanguageSwitcher translationsMap={translationsMap} />
