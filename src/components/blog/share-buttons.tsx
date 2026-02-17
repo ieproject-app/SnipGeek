@@ -42,7 +42,7 @@ export function ShareButtons({ title, imageUrl }: ShareButtonsProps) {
         href={shareLinks.twitter} 
         target="_blank" 
         rel="noopener noreferrer" 
-        className="flex flex-1 items-center justify-center p-4 text-muted-foreground transition-colors duration-300 ease-in-out hover:bg-muted hover:text-accent-foreground"
+        className="flex flex-1 items-center justify-center p-4 text-muted-foreground transition-colors duration-300 ease-in-out hover:bg-muted hover:text-accent"
         aria-label="Share on X"
       >
         <XLogo className="h-5 w-5" />
@@ -52,7 +52,7 @@ export function ShareButtons({ title, imageUrl }: ShareButtonsProps) {
         href={shareLinks.facebook} 
         target="_blank" 
         rel="noopener noreferrer" 
-        className="flex flex-1 items-center justify-center p-4 text-muted-foreground transition-colors duration-300 ease-in-out hover:bg-muted hover:text-accent-foreground"
+        className="flex flex-1 items-center justify-center p-4 text-muted-foreground transition-colors duration-300 ease-in-out hover:bg-muted hover:text-accent"
         aria-label="Share on Facebook"
       >
         <Facebook className="h-5 w-5" />
@@ -62,7 +62,7 @@ export function ShareButtons({ title, imageUrl }: ShareButtonsProps) {
         href={shareLinks.linkedin} 
         target="_blank" 
         rel="noopener noreferrer" 
-        className="flex flex-1 items-center justify-center p-4 text-muted-foreground transition-colors duration-300 ease-in-out hover:bg-muted hover:text-accent-foreground"
+        className="flex flex-1 items-center justify-center p-4 text-muted-foreground transition-colors duration-300 ease-in-out hover:bg-muted hover:text-accent"
         aria-label="Share on LinkedIn"
       >
         <Linkedin className="h-5 w-5" />
@@ -72,7 +72,7 @@ export function ShareButtons({ title, imageUrl }: ShareButtonsProps) {
           href={shareLinks.telegram} 
           target="_blank" 
           rel="noopener noreferrer" 
-          className="flex flex-1 items-center justify-center p-4 text-muted-foreground transition-colors duration-300 ease-in-out hover:bg-muted hover:text-accent-foreground"
+          className="flex flex-1 items-center justify-center p-4 text-muted-foreground transition-colors duration-300 ease-in-out hover:bg-muted hover:text-accent"
           aria-label="Share on Telegram"
       >
           <Send className="h-5 w-5" />
