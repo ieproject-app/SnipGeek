@@ -167,7 +167,6 @@ export function Header({ translationsMap, searchableData, dictionary }: { transl
             )}>
                 {/* Mobile controls */}
                 <div className={cn("flex md:hidden items-center", isSearchOpen && "opacity-0 pointer-events-none")}>
-                    <LanguageSwitcher translationsMap={translationsMap} />
                     <Button 
                         variant="ghost" 
                         size="icon" 
@@ -199,8 +198,6 @@ export function Header({ translationsMap, searchableData, dictionary }: { transl
 
                 {/* Desktop controls */}
                 <div className="hidden md:flex items-center gap-2">
-                    <LanguageSwitcher translationsMap={translationsMap} />
-                    <div className="h-6 w-px bg-primary-foreground/20" />
                     {menuItems.map(item => (
                         <Link
                             key={item.name}

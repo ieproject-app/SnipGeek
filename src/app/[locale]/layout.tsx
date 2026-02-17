@@ -101,7 +101,7 @@ export default async function LocaleLayout({
           <ReadingListProvider>
             <Header translationsMap={translationsMap} searchableData={searchableData} dictionary={dictionary} />
             <main>{children}</main>
-            <Footer dictionary={dictionary} />
+            <Footer dictionary={dictionary} translationsMap={translationsMap} />
             <Toaster />
             <BackToTop />
             <DraftList draftPosts={draftPosts} draftNotes={draftNotes} dictionary={dictionary} />
