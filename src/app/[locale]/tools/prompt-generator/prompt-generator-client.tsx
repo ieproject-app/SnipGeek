@@ -60,13 +60,11 @@ export function PromptGeneratorClient({ dictionary }: PromptGeneratorProps) {
         const heroImageLine = imageLines.length > 0 ? imageLines[0] : '';
         const [heroImagePath, heroImageAlt] = heroImageLine.split('|').map(s => s ? s.trim() : '');
 
-        if (heroImagePath) {
-          prompt += `- heroImage: "${heroImagePath}"\n`;
-          prompt += `- imageAlt: "${heroImageAlt || 'Please create a descriptive alt text based on the image path.'}"\n`;
-        } else {
-          prompt += `- heroImage: "https://placehold.co/1200x630/e2e8f0/64748b?text=Hero+Image"\n`;
-          prompt += `- imageAlt: "Please create a descriptive alt text."\n`;
-        }
+        const finalHeroImagePath = heroImagePath || "/images/blank/blank.webp";
+        const finalHeroImageAlt = heroImageAlt || 'Please create a descriptive alt text.';
+
+        prompt += `- heroImage: "${finalHeroImagePath}"\n`;
+        prompt += `- imageAlt: "${finalHeroImageAlt}"\n`;
       }
       
       if (tags) {
