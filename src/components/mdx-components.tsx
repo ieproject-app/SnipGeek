@@ -4,8 +4,9 @@ import Link from 'next/link'
 import React from 'react';
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table';
 import { cn } from '@/lib/utils';
-import { DownloadButton } from '@/components/blog/download-button';
-import { AllDownloadLinks } from '@/lib/download-links';
+import { buttonVariants } from '@/components/ui/button';
+import { Download } from 'lucide-react';
+import { downloadLinks } from '@/lib/data-downloads';
 
 // This component handles how `<img>` tags are rendered via MDX.
 const CustomImage = (props: any) => {
@@ -31,11 +32,11 @@ const CustomImage = (props: any) => {
 
 // This component centralizes download links.
 const DownloadLink = ({ id }: { id: string }) => {
-  const linkData = AllDownloadLinks.find(link => link.id === id);
+  const linkData = downloadLinks[id];
 
   if (!linkData) {
     // This warning will show in the server console during build if an ID is not found.
-    console.warn(`[DownloadLink Component]: The ID "${id}" was not found in download-links.json.`);
+    console.warn(`[DownloadLink Component]: The ID "${id}" was not found in data-downloads.ts.`);
     // Render a noticeable error in the article itself during development.
     if (process.env.NODE_ENV === 'development') {
       return <p className="font-bold text-destructive">[DownloadLink Error: Invalid ID &quot;{id}&quot;]</p>;
@@ -43,10 +44,19 @@ const DownloadLink = ({ id }: { id: string }) => {
     return null;
   }
 
+  const linkHref = `/download/${id}`;
+
   return (
-    <DownloadButton href={linkData.url}>
-      {linkData.text}
-    </DownloadButton>
+    <div className="my-6">
+        <Link 
+          href={linkHref} 
+          rel="noopener nofollow"
+          className={cn(buttonVariants({ size: "lg" }))}
+        >
+            <Download className="mr-2 h-5 w-5" />
+            {linkData.fileName}
+        </Link>
+    </div>
   );
 };
 
@@ -100,6 +110,5 @@ export const mdxComponents: MDXComponents = {
     th: TableHead,
     td: TableCell,
     pre: MdxPre,
-    DownloadButton,
     DownloadLink, // Exporting the new component for use in MDX
 }
