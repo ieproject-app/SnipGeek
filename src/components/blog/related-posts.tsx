@@ -7,7 +7,7 @@ import { getDictionary } from '@/lib/get-dictionary';
 import { AddToReadingListButton } from '@/components/layout/add-to-reading-list-button';
 import { Badge } from '@/components/ui/badge';
 import { i18n } from '@/i18n-config';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardFooter } from '@/components/ui/card';
 
 type RelatedPostsProps = {
   type: 'blog' | 'note';
@@ -160,7 +160,7 @@ export async function RelatedPosts({ type, locale, currentSlug, currentTags, cur
     };
 
     return (
-        <Card key={note.slug} className="group relative flex h-full flex-col bg-card/50 transition-shadow hover:shadow-lg border">
+        <Card key={note.slug} className="group relative flex flex-col bg-card/50 transition-shadow hover:shadow-lg border border-l-4 border-l-primary">
             <CardContent className="flex flex-1 items-stretch gap-4 p-4">
                 <Link href={`${linkPrefix}/notes/${note.slug}`} aria-label={note.frontmatter.title} className="block shrink-0">
                     <div className="flex h-full w-16 flex-col items-center justify-center rounded-lg bg-primary p-1 text-center text-primary-foreground transition-transform group-hover:scale-105">
@@ -170,31 +170,27 @@ export async function RelatedPosts({ type, locale, currentSlug, currentTags, cur
                 </Link>
                 
                 <div className="flex min-w-0 flex-1 flex-col">
-                    <div className="flex-1">
-                        <Link href={`${linkPrefix}/notes/${note.slug}`} aria-label={note.frontmatter.title} className="block">
-                            <h2 className="font-headline text-lg font-bold leading-tight tracking-tight text-primary group-hover:text-accent transition-colors line-clamp-3">
-                                {note.frontmatter.title}
-                            </h2>
-                        </Link>
-                    </div>
-                    
-                    {note.frontmatter.tags && note.frontmatter.tags.length > 0 && (
-                        <div className="mt-2 border-t pt-2">
-                            <div className="flex flex-wrap gap-1">
-                                {note.frontmatter.tags.map(tag => (
-                                    <Badge key={tag} variant="secondary" className="text-[10px] px-1.5 py-0.5">{tag}</Badge>
-                                ))}
-                            </div>
-                        </div>
-                    )}
+                    <Link href={`${linkPrefix}/notes/${note.slug}`} aria-label={note.frontmatter.title} className="block flex-1">
+                        <h2 className="font-headline text-lg font-bold leading-tight tracking-tight text-primary group-hover:text-accent transition-colors line-clamp-3">
+                            {note.frontmatter.title}
+                        </h2>
+                    </Link>
                 </div>
             </CardContent>
-            <AddToReadingListButton 
-                item={item}
-                showText={false}
-                dictionary={dictionary.readingList}
-                className="absolute top-4 right-4 text-muted-foreground hover:text-primary z-10 opacity-0 group-hover:opacity-100 transition-opacity"
-            />
+
+            <CardFooter className="flex items-center justify-between gap-2 border-t px-4 py-3">
+                <div className="flex flex-wrap gap-1">
+                    {note.frontmatter.tags && note.frontmatter.tags.map(tag => (
+                        <Badge key={tag} variant="secondary" className="text-[10px] px-1.5 py-0.5">{tag}</Badge>
+                    ))}
+                </div>
+                <AddToReadingListButton 
+                    item={item}
+                    showText={false}
+                    dictionary={dictionary.readingList}
+                    className="text-muted-foreground hover:text-primary z-10 opacity-0 group-hover:opacity-100 transition-opacity shrink-0"
+                />
+            </CardFooter>
         </Card>
     );
   }

@@ -4,7 +4,7 @@ import { i18n } from '@/i18n-config';
 import { AddToReadingListButton } from '@/components/layout/add-to-reading-list-button';
 import { getDictionary } from '@/lib/get-dictionary';
 import { Badge } from '@/components/ui/badge';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 
 export async function generateStaticParams() {
@@ -40,7 +40,7 @@ export default async function NotesPage({ params: { locale } }: { params: { loca
                 type: 'note' as const
             };
             return (
-              <Card key={note.slug} className="group relative bg-card/50 transition-shadow hover:shadow-lg border">
+              <Card key={note.slug} className="group relative bg-card/50 transition-shadow hover:shadow-lg border border-l-4 border-l-primary">
                 <CardContent className="flex items-stretch gap-6 p-6">
                     <Link href={`${linkPrefix}/notes/${note.slug}`} aria-label={note.frontmatter.title} className="block shrink-0">
                         <div className="flex h-full w-20 flex-col items-center justify-center rounded-lg bg-primary p-2 text-center text-primary-foreground transition-transform group-hover:scale-105">
@@ -51,34 +51,30 @@ export default async function NotesPage({ params: { locale } }: { params: { loca
                     </Link>
                     
                     <div className="flex min-w-0 flex-1 flex-col">
-                        <div className="flex-1">
-                            <Link href={`${linkPrefix}/notes/${note.slug}`} aria-label={note.frontmatter.title}>
-                                <h2 className="font-headline text-2xl font-bold tracking-tight text-primary group-hover:text-accent transition-colors">
-                                    {note.frontmatter.title}
-                                </h2>
-                                <p className="text-muted-foreground mt-2 line-clamp-3">
-                                    {note.frontmatter.description}
-                                </p>
-                            </Link>
-                        </div>
-                        
-                        {note.frontmatter.tags && note.frontmatter.tags.length > 0 && (
-                            <div className="mt-4 border-t pt-4">
-                                <div className="flex flex-wrap gap-1">
-                                    {note.frontmatter.tags.map(tag => (
-                                        <Badge key={tag} variant="secondary">{tag}</Badge>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
+                        <Link href={`${linkPrefix}/notes/${note.slug}`} aria-label={note.frontmatter.title} className="flex-1">
+                            <h2 className="font-headline text-2xl font-bold tracking-tight text-primary group-hover:text-accent transition-colors">
+                                {note.frontmatter.title}
+                            </h2>
+                            <p className="text-muted-foreground mt-2 line-clamp-3">
+                                {note.frontmatter.description}
+                            </p>
+                        </Link>
                     </div>
                 </CardContent>
-                <AddToReadingListButton 
-                    item={item}
-                    showText={false}
-                    dictionary={dictionary.readingList}
-                    className="absolute top-6 right-6 text-muted-foreground hover:text-primary z-10 opacity-0 group-hover:opacity-100 transition-opacity"
-                />
+
+                <CardFooter className="flex items-center justify-between gap-4 border-t px-6 py-4">
+                    <div className="flex flex-wrap gap-1">
+                        {note.frontmatter.tags && note.frontmatter.tags.map(tag => (
+                            <Badge key={tag} variant="secondary">{tag}</Badge>
+                        ))}
+                    </div>
+                    <AddToReadingListButton 
+                        item={item}
+                        showText={false}
+                        dictionary={dictionary.readingList}
+                        className="text-muted-foreground hover:text-primary z-10 opacity-0 group-hover:opacity-100 transition-opacity shrink-0"
+                    />
+                </CardFooter>
               </Card>
             )})}
         </section>
