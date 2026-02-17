@@ -98,12 +98,9 @@
     },
     "downloadGate": {
         "title": "Preparing Your Download",
-        "description": "You are being redirected to an external site. {siteName} is not responsible for the content of third-party sites. Download at your own risk.",
-        "fileNameLabel": "File:",
         "fileSizeLabel": "Size:",
         "continueButton": "Continue to Download",
-        "redirecting": "or wait for automatic redirection in {countdown}s...",
-        "disclaimerTitle": "Disclaimer"
+        "redirecting": "or your download will begin automatically..."
     },
     "promptGenerator": {
         "title": "AI Content Prompt Generator",
@@ -143,7 +140,7 @@
         "tagsDescription": "Leave blank if you want the AI to generate relevant tags.",
         "translationKeyLabel": "Translation Key",
         "translationKeyPlaceholder": "unique-linking-key",
-        "translationKeyDescription": "A unique ID to link translated articles. MUST be the same for both versions.",
+        "translationKeyDescription": "A unique ID to link translated articles. MUST be the same for all language versions.",
         "generatedPromptTitle": "Generated Prompt (Copy the text below)",
         "copyButton": "Copy Prompt",
         "copiedButton": "Copied!",

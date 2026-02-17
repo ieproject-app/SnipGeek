@@ -73,7 +73,7 @@ const MdxP = ({ children }: { children?: React.ReactNode }) => <p className="lea
 const MdxA = (props: React.AnchorHTMLAttributes<HTMLAnchorElement>) => {
   if (props.href) {
     // Handle internal and external links differently if needed
-    return <Link href={props.href} className="font-medium text-accent-foreground underline hover:no-underline">{props.children}</Link>;
+    return <Link href={props.href} className="font-medium text-accent underline hover:no-underline">{props.children}</Link>;
   }
   return <a {...props} />;
 };
