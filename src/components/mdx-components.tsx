@@ -33,12 +33,26 @@ const MdxH2 = ({ children }: { children?: React.ReactNode }) => <h2 className="f
 const MdxH3 = ({ children }: { children?: React.ReactNode }) => <h3 className="font-headline mt-8 mb-4 text-2xl font-bold tracking-tighter text-primary">{children}</h3>;
 const MdxH4 = ({ children }: { children?: React.ReactNode }) => <h4 className="font-headline mt-6 mb-3 text-xl font-bold tracking-tighter text-primary">{children}</h4>;
 const MdxP = ({ children }: { children?: React.ReactNode }) => {
-    // When MDX wraps a lone image in a <p> tag, it creates invalid HTML because our
-    // CustomImage component renders a <div>. This check prevents that by not rendering
-    // the <p> wrapper around images.
-    if (React.isValidElement(children) && (children.props as any)?.mdxType === 'img') {
+    // This logic prevents a hydration error where a <div> (from CustomImage)
+    // would be a descendant of a <p>, which is invalid HTML.
+    
+    // Filter out meaningless whitespace/newline text nodes from children
+    const significantChildren = React.Children.toArray(children).filter(child => {
+        return React.isValidElement(child) || (typeof child === 'string' && child.trim() !== '');
+    });
+
+    // Check if the only significant child is a single image component
+    const isSingleImage =
+        significantChildren.length === 1 &&
+        React.isValidElement(significantChildren[0]) &&
+        (significantChildren[0].props as any).mdxType === 'img';
+
+    // If it is, render the children directly without a <p> wrapper to avoid nesting a <div> in a <p>.
+    if (isSingleImage) {
         return <>{children}</>;
     }
+
+    // Otherwise, render a normal paragraph
     return <p className="leading-7 my-6">{children}</p>;
 };
 const MdxA = (props: React.AnchorHTMLAttributes<HTMLAnchorElement>) => {
