@@ -96,6 +96,17 @@
         "title": "Draf",
         "noDrafts": "Tidak ada draf dalam kategori ini."
     },
+    "downloadGate": {
+        "title": "Anda akan meninggalkan situs ini",
+        "description": "Anda sedang diarahkan ke tautan unduhan eksternal.",
+        "redirectingIn": "Mengarahkan dalam {countdown} detik...",
+        "redirectingNow": "Sedang mengarahkan...",
+        "continueButton": "Lanjutkan untuk Mengunduh",
+        "invalidUrl": {
+            "title": "URL Tidak Valid",
+            "description": "Tautan unduhan tidak valid atau telah dirusak."
+        }
+    },
     "promptGenerator": {
         "title": "Generator Prompt Konten AI",
         "description": "Gunakan formulir ini untuk menghasilkan prompt terstruktur untuk meminta konten baru. Isi detail di bawah ini, dan prompt akhir akan dibuat untuk Anda salin.",
@@ -104,6 +115,13 @@
         "contentTypeNote": "Catatan (Note)",
         "draftTitle": "Draf Konten / Poin Utama",
         "draftPlaceholder": "Tempelkan draf konten lengkap Anda atau poin-poin utama yang ingin saya kembangkan di sini...",
+        "downloadLinks": {
+            "title": "Tautan Unduhan (Opsional)",
+            "description": "Sediakan tautan unduhan untuk disertakan dalam artikel, satu per baris. Gunakan format: Teks Tautan | https://url-eksternal.com",
+            "placeholder": "Unduh Driver v1.2.3 | https://example.com/driver.zip\nUnduh Manual | https://example.com/manual.pdf",
+            "promptTitle": "Tautan Unduhan",
+            "promptInstruction": "Tolong sisipkan tombol unduhan untuk tautan berikut di akhir artikel, menggunakan komponen <DownloadButton>:"
+        },
         "imagesTitle": "Detail Gambar",
         "imagesDescription": "Baris pertama adalah **selalu** untuk gambar utama (hero image), dipisahkan oleh `|` untuk teks alt. Setiap baris berikutnya adalah untuk gambar pendukung.",
         "imagesPlaceholder": "/images/blank/blank.webp | Teks alt deskriptif untuk hero image\n/images/articles/pendukung-1.webp | Teks alt untuk gambar pendukung pertama",

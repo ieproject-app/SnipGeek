@@ -4,6 +4,7 @@ import Link from 'next/link'
 import React from 'react';
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table';
 import { cn } from '@/lib/utils';
+import { DownloadButton } from '@/components/blog/download-button';
 
 // This component handles how `<img>` tags are rendered via MDX.
 const CustomImage = (props: any) => {
@@ -77,4 +78,5 @@ export const mdxComponents: MDXComponents = {
     th: TableHead,
     td: TableCell,
     pre: MdxPre,
+    DownloadButton,
 }

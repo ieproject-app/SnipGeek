@@ -19,6 +19,7 @@ type PromptGeneratorProps = {
 export function PromptGeneratorClient({ dictionary }: PromptGeneratorProps) {
   const [contentType, setContentType] = useState<'blog' | 'note'>('blog');
   const [draft, setDraft] = useState('');
+  const [downloadLinks, setDownloadLinks] = useState('');
   const [title, setTitle] = useState('');
   const [publishDate, setPublishDate] = useState<string>('');
   const [isPublished, setIsPublished] = useState(true);
@@ -93,6 +94,20 @@ export function PromptGeneratorClient({ dictionary }: PromptGeneratorProps) {
         prompt += `\n`;
       }
 
+      if (downloadLinks) {
+          prompt += `\n**${dictionary.downloadLinks.promptTitle}:**\n`;
+          prompt += `${dictionary.downloadLinks.promptInstruction}\n`;
+          
+          const links = downloadLinks.split('\n').filter(line => line.trim() !== '');
+          links.forEach(link => {
+              const [text, url] = link.split('|').map(s => s.trim());
+              if (text && url) {
+                  prompt += `- Text: "${text}", URL: "${url}"\n`;
+              }
+          });
+          prompt += `\n`;
+      }
+
       prompt += `---\n\n`;
       prompt += `**${dictionary.draftContentLabel}:**\n\n`;
       prompt += draft;
@@ -102,7 +117,7 @@ export function PromptGeneratorClient({ dictionary }: PromptGeneratorProps) {
     };
 
     buildPrompt();
-  }, [draft, title, publishDate, isPublished, isFeatured, images, tags, needsTranslation, dictionary, contentType]);
+  }, [draft, title, publishDate, isPublished, isFeatured, images, tags, needsTranslation, dictionary, contentType, downloadLinks]);
 
   const handleCopy = () => {
     navigator.clipboard.writeText(generatedPrompt);
@@ -149,6 +164,24 @@ export function PromptGeneratorClient({ dictionary }: PromptGeneratorProps) {
             onChange={(e) => setDraft(e.target.value)}
             className="min-h-[200px]"
           />
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+            <CardTitle>{dictionary.downloadLinks.title}</CardTitle>
+        </CardHeader>
+        <CardContent>
+            <Label htmlFor="download-links" className="text-sm text-muted-foreground">
+                {dictionary.downloadLinks.description}
+            </Label>
+            <Textarea
+                id="download-links"
+                placeholder={dictionary.downloadLinks.placeholder}
+                value={downloadLinks}
+                onChange={(e) => setDownloadLinks(e.target.value)}
+                className="min-h-[120px] font-mono text-xs mt-2"
+            />
         </CardContent>
       </Card>
 

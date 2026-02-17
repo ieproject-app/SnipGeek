@@ -96,6 +96,17 @@
         "title": "Drafts",
         "noDrafts": "No drafts in this category."
     },
+    "downloadGate": {
+        "title": "You are leaving this site",
+        "description": "You are being redirected to an external download link.",
+        "redirectingIn": "Redirecting in {countdown} seconds...",
+        "redirectingNow": "Redirecting now...",
+        "continueButton": "Continue to Download",
+        "invalidUrl": {
+            "title": "Invalid URL",
+            "description": "The download link is invalid or has been tampered with."
+        }
+    },
     "promptGenerator": {
         "title": "AI Content Prompt Generator",
         "description": "Use this form to generate a structured prompt for requesting new content. Fill in the details below, and the final prompt will be generated for you to copy.",
@@ -104,6 +115,13 @@
         "contentTypeNote": "Note",
         "draftTitle": "Content Draft / Main Points",
         "draftPlaceholder": "Paste your full content draft or the main points you want me to expand upon here...",
+        "downloadLinks": {
+            "title": "Download Links (Optional)",
+            "description": "Provide download links to be included in the article, one per line. Use the format: Link Text | https://external-url.com",
+            "placeholder": "Download Driver v1.2.3 | https://example.com/driver.zip\nDownload Manual | https://example.com/manual.pdf",
+            "promptTitle": "Download Links",
+            "promptInstruction": "Please insert download buttons for the following links at the end of the article, using the <DownloadButton> component:"
+        },
         "imagesTitle": "Image Details",
         "imagesDescription": "The first line is ALWAYS for the hero image, separated by a `|` for the alt text. Each subsequent line is for a supporting image.",
         "imagesPlaceholder": "/images/blank/blank.webp | A descriptive alt text for the hero image\n/images/articles/supporting-1.webp | Alt text for the first supporting image",
