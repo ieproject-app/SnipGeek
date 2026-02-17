@@ -1,0 +1,129 @@
+---
+title: 'Panduan Lengkap Membuat Bootable Windows 11 dengan Rufus'
+date: '2026-02-19'
+updated: '2026-02-19'
+description: 'Panduan langkah demi langkah untuk membuat media instalasi USB Windows 11 yang dapat di-boot menggunakan Rufus, termasuk melewati persyaratan TPM 2.0 dan Secure Boot.'
+heroImage: '/images/_posts/rufus/pasang-rufus-terbaru.webp'
+imageAlt: 'Tampilan antarmuka aplikasi Rufus di Windows 11 untuk membuat USB bootable.'
+translationKey: 'pasang-rufus-terbaru'
+published: true
+featured: false
+category: 'Tutorial'
+tags: ['Rufus', 'Windows 11', 'Bootable USB', 'Instalasi Windows', 'Tutorial']
+---
+
+Melakukan instalasi bersih Windows 11 merupakan langkah tepat untuk mendapatkan sistem yang stabil, ringan, dan bebas dari aplikasi bawaan yang tidak diperlukan. Metode paling efektif untuk melakukannya adalah menggunakan media instalasi berbasis USB.
+
+Salah satu utilitas yang paling andal untuk tugas ini adalah **Rufus** — aplikasi ringan, cepat, dan fleksibel, termasuk kemampuan untuk menyesuaikan persyaratan instalasi seperti TPM 2.0 dan Secure Boot.
+
+Panduan ini akan menjelaskan seluruh proses secara sistematis, mulai dari tahap persiapan hingga USB bootable siap digunakan.
+
+---
+
+## 1. Tahap Persiapan (Wajib Disiapkan)
+
+Sebelum memulai proses pembuatan media instalasi, pastikan beberapa komponen berikut telah tersedia:
+
+### 1. USB Flash Drive
+
+Gunakan flash drive dengan kapasitas minimal **8 GB**. Pastikan perangkat dalam kondisi baik.
+
+### 2. File ISO Windows 11
+
+Siapkan file installer Windows 11 dalam format `.iso`. Anda bisa mengunduhnya dari tautan resmi di bagian akhir artikel ini.
+
+### 3. Aplikasi Rufus
+
+Gunakan versi terbaru Rufus. Tautan unduhan juga tersedia di akhir artikel.
+
+### 4. Cadangkan Data Penting
+
+> ⚠️ **Peringatan**
+> Proses ini akan memformat flash drive sepenuhnya. Semua data di dalamnya akan terhapus permanen.
+
+---
+
+## 2. Proses Pembuatan Bootable Windows 11
+
+![USB Flash Drive dicolokkan ke laptop siap untuk proses pembuatan bootable.](/images/_posts/rufus/rufus-banner.webp)
+
+Setelah semua persiapan selesai, lanjutkan dengan langkah berikut.
+
+---
+
+### Langkah 1 — Jalankan Rufus dan Pilih Perangkat
+
+Buka aplikasi Rufus dan hubungkan flash drive ke komputer. Perangkat akan otomatis terdeteksi pada bagian **Device**.
+
+![Tampilan awal Rufus 4.9 dengan perangkat USB terdeteksi.](/images/_posts/rufus/rufus-4.9_1.png)
+
+Pastikan perangkat yang dipilih sudah benar sebelum melanjutkan.
+
+---
+
+### Langkah 2 — Pilih File ISO Windows 11
+
+Pada bagian **Boot selection**, klik **SELECT**, lalu pilih file ISO Windows 11 yang telah diunduh.
+
+![Memilih file ISO Windows 11 pada aplikasi Rufus.](/images/_posts/rufus/rufus-4.9_2.png)
+
+Setelah file dipilih, Rufus akan mengatur beberapa parameter secara otomatis.
+
+---
+
+### Langkah 3 — Verifikasi Skema Partisi
+
+Pastikan konfigurasi berikut digunakan:
+
+*   **Partition scheme:** GPT
+*   **Target system:** UEFI (non-CSM)
+
+Konfigurasi ini sesuai dengan standar instalasi Windows 11 pada sistem modern.
+
+---
+
+### Langkah 4 — Mulai Proses
+
+Klik tombol **START** untuk memulai pembuatan media bootable.
+
+---
+
+### Langkah 5 — Konfigurasi Windows User Experience
+
+Setelah menekan START, jendela konfigurasi tambahan akan muncul.
+
+Centang opsi berikut jika diperlukan:
+
+*   **Remove requirement for 4GB+ RAM, Secure Boot and TPM 2.0**
+
+![Jendela kustomisasi instalasi Windows 11 di Rufus.](/images/_posts/rufus/rufus-4.9_3.png)
+
+Klik **OK** untuk melanjutkan proses.
+
+---
+
+### Langkah 6 — Tunggu Hingga Selesai
+
+Rufus akan mulai menyalin file instalasi ke flash drive. Proses ini membutuhkan beberapa menit.
+
+![Tampilan Rufus setelah proses pembuatan bootable selesai dengan status READY.](/images/_posts/rufus/rufus-4.9_4.png)
+
+Ketika status berubah menjadi **READY**, flash drive Anda telah siap digunakan.
+
+---
+
+## Penutup
+
+Media instalasi Windows 11 kini siap digunakan untuk instalasi bersih pada perangkat berbasis UEFI. Dengan konfigurasi yang tepat, proses instalasi akan berjalan lebih efisien dan minim kendala.
+
+---
+
+## Unduhan
+
+<DownloadButton href="https://rufus.ie/downloads/">
+  Unduh Rufus Versi Terbaru
+</DownloadButton>
+
+<DownloadButton href="https://software.download.prss.microsoft.com/dbazure/Win11_25H2_English_x64.iso?t=bdadfcf5-a000-4b64-9dc0-068425181996&P1=1771326814&P2=601&P3=2&P4=z1BE%2fxc51oPiF9jr6McKw6wjnS3qwnPD4oR4tf8cLtvY9FgKVUZ6htGqpR9%2bCOmzEeUW%2bfz6dN4bEvz%2fqBdF%2f2eqcoantEPYpSB7DtJMZ5lW316INI7DvaTb4jklS3IKOQy960p7%2bu8W81HsMWXn8CjuxNLmR3ytDZBPrJYjRbQZT5dkzXUS4h%2bsXdHeTUFRv%2bT60Yu7KorOavxQJMCtiASqnMrZuqFeDRdd2jOISm6mTwWDz4B7ON4v1cWWy%2fKFw2EoT1%2bjAt0OFa%2fymFBk43UBoC1cuXaBVKJLPIvkBIEIj0renIzzNYvUEu%2btcKAUGf2fTWFGQ6qXKIhuKEBrEg%3d%3d">
+  Unduh ISO Windows 11 (24H2 English)
+</DownloadButton>

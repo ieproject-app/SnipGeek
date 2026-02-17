@@ -1,0 +1,129 @@
+---
+title: 'Complete Guide to Creating a Bootable Windows 11 USB with Rufus'
+date: '2026-02-19'
+updated: '2026-02-19'
+description: 'A step-by-step guide to creating a bootable Windows 11 USB installation media using Rufus, including how to bypass TPM 2.0 and Secure Boot requirements.'
+heroImage: '/images/_posts/rufus/pasang-rufus-terbaru.webp'
+imageAlt: 'The Rufus application interface on Windows 11 for creating a bootable USB.'
+translationKey: 'pasang-rufus-terbaru'
+published: true
+featured: false
+category: 'Tutorial'
+tags: ['Rufus', 'Windows 11', 'Bootable USB', 'Windows Installation', 'Tutorial']
+---
+
+Performing a clean installation of Windows 11 is the right step to get a stable, lightweight system free from unnecessary bloatware. The most effective method for this is using a USB-based installation media.
+
+One of the most reliable utilities for this task is **Rufus** — a lightweight, fast, and flexible application, including the ability to customize installation requirements like TPM 2.0 and Secure Boot.
+
+This guide will explain the entire process systematically, from the preparation stage until the bootable USB is ready to use.
+
+---
+
+## 1. Preparation Stage (Required)
+
+Before starting the process of creating the installation media, ensure the following components are ready:
+
+### 1. USB Flash Drive
+
+Use a flash drive with a minimum capacity of **8 GB**. Make sure the device is in good condition.
+
+### 2. Windows 11 ISO File
+
+Prepare the Windows 11 installer file in `.iso` format. You can download it from the official link at the end of this article.
+
+### 3. Rufus Application
+
+Use the latest version of Rufus. The download link is also available at the end of this article.
+
+### 4. Back Up Important Data
+
+> ⚠️ **Warning**
+> This process will completely format the flash drive. All data on it will be permanently deleted.
+
+---
+
+## 2. Creating the Bootable Windows 11 Drive
+
+![A USB Flash Drive plugged into a laptop, ready for the bootable creation process.](/images/_posts/rufus/rufus-banner.webp)
+
+Once all preparations are complete, proceed with the following steps.
+
+---
+
+### Step 1 — Run Rufus and Select the Device
+
+Open the Rufus application and connect the flash drive to your computer. The device will be automatically detected under the **Device** section.
+
+![The initial screen of Rufus 4.9 with the USB device detected.](/images/_posts/rufus/rufus-4.9_1.png)
+
+Ensure the correct device is selected before proceeding.
+
+---
+
+### Step 2 — Select the Windows 11 ISO File
+
+In the **Boot selection** section, click **SELECT**, then choose the downloaded Windows 11 ISO file.
+
+![Selecting the Windows 11 ISO file in the Rufus application.](/images/_posts/rufus/rufus-4.9_2.png)
+
+Once the file is selected, Rufus will automatically configure several parameters.
+
+---
+
+### Step 3 — Verify the Partition Scheme
+
+Ensure the following configuration is used:
+
+*   **Partition scheme:** GPT
+*   **Target system:** UEFI (non-CSM)
+
+This configuration is standard for installing Windows 11 on modern systems.
+
+---
+
+### Step 4 — Start the Process
+
+Click the **START** button to begin creating the bootable media.
+
+---
+
+### Step 5 — Configure the Windows User Experience
+
+After pressing START, an additional configuration window will appear.
+
+Check the following option if needed:
+
+*   **Remove requirement for 4GB+ RAM, Secure Boot and TPM 2.0**
+
+![The Windows 11 installation customization window in Rufus.](/images/_posts/rufus/rufus-4.9_3.png)
+
+Click **OK** to continue the process.
+
+---
+
+### Step 6 — Wait for Completion
+
+Rufus will start copying the installation files to the flash drive. This process takes a few minutes.
+
+![The Rufus interface after the bootable creation process is complete, showing a READY status.](/images/_posts/rufus/rufus-4.9_4.png)
+
+When the status changes to **READY**, your flash drive is ready to use.
+
+---
+
+## Conclusion
+
+The Windows 11 installation media is now ready for a clean installation on UEFI-based devices. With the right configuration, the installation process will be more efficient and encounter fewer obstacles.
+
+---
+
+## Downloads
+
+<DownloadButton href="https://rufus.ie/downloads/">
+  Download Latest Rufus
+</DownloadButton>
+
+<DownloadButton href="https://software.download.prss.microsoft.com/dbazure/Win11_25H2_English_x64.iso?t=bdadfcf5-a000-4b64-9dc0-068425181996&P1=1771326814&P2=601&P3=2&P4=z1BE%2fxc51oPiF9jr6McKw6wjnS3qwnPD4oR4tf8cLtvY9FgKVUZ6htGqpR9%2bCOmzEeUW%2bfz6dN4bEvz%2fqBdF%2f2eqcoantEPYpSB7DtJMZ5lW316INI7DvaTb4jklS3IKOQy960p7%2bu8W81HsMWXn8CjuxNLmR3ytDZBPrJYjRbQZT5dkzXUS4h%2bsXdHeTUFRv%2bT60Yu7KorOavxQJMCtiASqnMrZuqFeDRdd2jOISm6mTwWDz4B7ON4v1cWWy%2fKFw2EoT1%2bjAt0OFa%2fymFBk43UBoC1cuXaBVKJLPIvkBIEIj0renIzzNYvUEu%2btcKAUGf2fTWFGQ6qXKIhuKEBrEg%3d%3d">
+  Download Windows 11 ISO (24H2 English)
+</DownloadButton>
