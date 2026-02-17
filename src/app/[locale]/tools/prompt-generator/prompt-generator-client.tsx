@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -8,12 +7,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
-import { Calendar } from '@/components/ui/calendar';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { cn } from '@/lib/utils';
-import { format } from 'date-fns';
-import { Calendar as CalendarIcon, Copy, Check } from 'lucide-react';
+import { Copy, Check } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import type { Dictionary } from '@/lib/get-dictionary';
 
@@ -25,7 +20,7 @@ export function PromptGeneratorClient({ dictionary }: PromptGeneratorProps) {
   const [contentType, setContentType] = useState<'blog' | 'note'>('blog');
   const [draft, setDraft] = useState('');
   const [title, setTitle] = useState('');
-  const [publishDate, setPublishDate] = useState<Date | undefined>(new Date());
+  const [publishDate, setPublishDate] = useState<string>(new Date().toISOString().split('T')[0]);
   const [isPublished, setIsPublished] = useState(true);
   const [isFeatured, setIsFeatured] = useState(false);
   const [images, setImages] = useState('');
@@ -47,7 +42,7 @@ export function PromptGeneratorClient({ dictionary }: PromptGeneratorProps) {
       prompt += `**${dictionary.frontmatterDetails}:**\n`;
       prompt += `- ${dictionary.contentTypeLabel}: ${isBlog ? dictionary.contentTypeBlog : dictionary.contentTypeNote}\n`;
       prompt += `- ${dictionary.titleLabel}: ${title ? `"${title}"` : dictionary.titlePlaceholder}\n`;
-      prompt += `- ${dictionary.dateLabel}: ${publishDate ? publishDate.toISOString() : new Date().toISOString()}\n`;
+      prompt += `- ${dictionary.dateLabel}: ${publishDate || new Date().toISOString().split('T')[0]}\n`;
       
       let frontmatterStatus = `published: ${isPublished}`;
       if (isBlog) {
@@ -187,28 +182,16 @@ export function PromptGeneratorClient({ dictionary }: PromptGeneratorProps) {
           </div>
 
           <div className="grid gap-2">
-            <Label>{dictionary.publishDateLabel}</Label>
-             <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant={"outline"}
-                    className={cn(
-                      "w-full sm:w-[280px] justify-start text-left font-normal",
-                      !publishDate && "text-muted-foreground"
-                    )}
-                  >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {publishDate ? format(publishDate, "PPP") : <span>Pick a date</span>}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="p-0">
-                  <Calendar
-                    mode="single"
-                    selected={publishDate}
-                    onSelect={setPublishDate}
-                  />
-                </PopoverContent>
-              </Popover>
+            <Label htmlFor="publishDate">{dictionary.publishDateLabel}</Label>
+            <Input
+                id="publishDate"
+                type="text"
+                value={publishDate}
+                onChange={(e) => setPublishDate(e.target.value)}
+                placeholder="YYYY-MM-DD"
+                className="w-full sm:w-[280px]"
+            />
+            <p className="text-sm text-muted-foreground">Enter date in YYYY-MM-DD format.</p>
           </div>
           
           <div className="grid gap-2">
