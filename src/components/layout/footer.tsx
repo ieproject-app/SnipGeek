@@ -23,7 +23,7 @@ export function Footer({ dictionary, translationsMap }: { dictionary: Dictionary
     return (
         <footer className="w-full bg-background pt-20 sm:pt-32">
             {/* Section 1: Visual Link Gallery */}
-            <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
                     {footerNavItems.map((item, index) => {
                         const image = PlaceHolderImages.find(p => p.id === item.id);
@@ -62,7 +62,7 @@ export function Footer({ dictionary, translationsMap }: { dictionary: Dictionary
             </div>
 
             {/* Section 2: Author Profile */}
-            <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 mt-16 sm:mt-24 text-center">
+            <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 mt-16 sm:mt-24 text-center">
                 <Avatar className="w-20 h-20 mx-auto mb-4">
                     <AvatarImage src={authorAvatar} alt={authorName} />
                     <AvatarFallback>{authorName.split(' ').map(n => n[0]).join('')}</AvatarFallback>
