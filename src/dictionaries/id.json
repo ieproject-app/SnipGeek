@@ -81,7 +81,8 @@
     "post": {
         "share": "Bagikan",
         "shareArticle": "Bagikan artikel ini",
-        "relatedContent": "Anda Mungkin Juga Suka"
+        "relatedContent": "Anda Mungkin Juga Suka",
+        "toc": "Daftar Isi"
     },
     "readingList": {
         "add": "Simpan ke Daftar",

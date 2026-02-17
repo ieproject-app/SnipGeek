@@ -9,17 +9,20 @@ import { buttonVariants } from '@/components/ui/button';
 import { Download } from 'lucide-react';
 import { downloadLinks } from '@/lib/data-downloads';
 
-// This component handles how `<img>` tags are rendered via MDX.
+// Helper to generate IDs for TOC
+const generateId = (children: any) => {
+    if (typeof children !== 'string') return undefined;
+    return children
+      .toLowerCase()
+      .replace(/[^\w\s-]/g, '')
+      .replace(/\s+/g, '-');
+};
+
 const CustomImage = (props: any) => {
-    // This check prevents build errors and crashes if the `src` is missing or invalid.
-    // An invalid `src` can come from an empty image tag in MDX, like `![]()`.
     if (!props.src || typeof props.src !== 'string' || props.src.trim() === '') {
         return null;
     }
 
-    // The content container is max-w-3xl (768px). We'll use this for width calculation
-    // and maintain a 16:9 aspect ratio. The `w-full` and `h-auto` classes will
-    // make the image responsive within its container.
     return (
         <Image
             width={768}
@@ -31,14 +34,11 @@ const CustomImage = (props: any) => {
     );
 };
 
-// This component centralizes download links.
 const DownloadButton = ({ id }: { id: string }) => {
   const linkData = downloadLinks[id];
 
   if (!linkData) {
-    // This warning will show in the server console during build if an ID is not found.
     console.warn(`[DownloadButton Component]: The ID "${id}" was not found in data-downloads.ts.`);
-    // Render a noticeable error in the article itself during development.
     if (process.env.NODE_ENV === 'development') {
       return <p className="font-bold text-destructive">[DownloadButton Error: Invalid ID &quot;{id}&quot;]</p>;
     }
@@ -61,18 +61,13 @@ const DownloadButton = ({ id }: { id: string }) => {
   );
 };
 
-// We define all the custom components outside of the main object
-// to avoid the weird parser issues from the build tool.
-const MdxH1 = ({ children }: { children?: React.ReactNode }) => <h1 className="font-headline mt-12 mb-6 text-4xl font-bold tracking-tighter text-primary">{children}</h1>;
-const MdxH2 = ({ children }: { children?: React.ReactNode }) => <h2 className="font-headline mt-10 mb-5 text-3xl font-bold tracking-tighter text-primary">{children}</h2>;
-const MdxH3 = ({ children }: { children?: React.ReactNode }) => <h3 className="font-headline mt-8 mb-4 text-2xl font-bold tracking-tighter text-primary">{children}</h3>;
-const MdxH4 = ({ children }: { children?: React.ReactNode }) => <h4 className="font-headline mt-6 mb-3 text-xl font-bold tracking-tighter text-primary">{children}</h4>;
-// Because CustomImage now renders a valid `<img>` tag, we no longer need complex logic here.
-// An `<img>` can legally be a child of a `<p>`.
+const MdxH1 = ({ children }: { children?: React.ReactNode }) => <h1 id={generateId(children)} className="font-headline mt-12 mb-6 text-4xl font-bold tracking-tighter text-primary scroll-mt-24">{children}</h1>;
+const MdxH2 = ({ children }: { children?: React.ReactNode }) => <h2 id={generateId(children)} className="font-headline mt-10 mb-5 text-3xl font-bold tracking-tighter text-primary scroll-mt-24">{children}</h2>;
+const MdxH3 = ({ children }: { children?: React.ReactNode }) => <h3 id={generateId(children)} className="font-headline mt-8 mb-4 text-2xl font-bold tracking-tighter text-primary scroll-mt-24">{children}</h3>;
+const MdxH4 = ({ children }: { children?: React.ReactNode }) => <h4 id={generateId(children)} className="font-headline mt-6 mb-3 text-xl font-bold tracking-tighter text-primary scroll-mt-24">{children}</h4>;
 const MdxP = ({ children }: { children?: React.ReactNode }) => <p className="leading-7 my-6">{children}</p>;
 const MdxA = (props: React.AnchorHTMLAttributes<HTMLAnchorElement>) => {
   if (props.href) {
-    // Handle internal and external links differently if needed
     return <Link href={props.href} className="font-medium text-accent underline hover:no-underline">{props.children}</Link>;
   }
   return <a {...props} />;
@@ -111,5 +106,5 @@ export const mdxComponents: MDXComponents = {
     th: TableHead,
     td: TableCell,
     pre: MdxPre,
-    DownloadButton, // Exporting the new component for use in MDX
+    DownloadButton,
 }

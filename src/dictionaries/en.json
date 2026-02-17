@@ -81,7 +81,8 @@
     "post": {
         "share": "Share",
         "shareArticle": "Share this article",
-        "relatedContent": "You Might Also Like"
+        "relatedContent": "You Might Also Like",
+        "toc": "On this page"
     },
     "readingList": {
         "add": "Save to List",

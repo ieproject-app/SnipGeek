@@ -1,3 +1,4 @@
+
 import { getPostData, getAllPostSlugs, getAllLocales } from '@/lib/posts';
 import { notFound } from 'next/navigation';
 import { MDXRemote } from 'next-mdx-remote/rsc';
@@ -13,6 +14,8 @@ import { PostComments } from '@/components/blog/post-comments';
 import { PostMeta } from '@/components/blog/post-meta';
 import { ShareButtons } from '@/components/blog/share-buttons';
 import { RelatedPosts } from '@/components/blog/related-posts';
+import { TableOfContents, MobileTableOfContents } from '@/components/blog/table-of-contents';
+import { extractHeadings } from '@/lib/mdx-utils';
 
 export async function generateStaticParams() {
   const locales = getAllLocales();
@@ -93,15 +96,12 @@ export default async function PostPage({ params }: { params: { slug: string, loc
   let heroSource: { url: string; hint?: string } | undefined;
 
   if (heroImageValue) {
-    // Check if heroImage is a full URL or a local path
     if (heroImageValue.startsWith('http') || heroImageValue.startsWith('/')) {
       heroSource = { 
         url: heroImageValue,
-        // Generate a hint from the alt text if available
         hint: imageAlt?.toLowerCase().split(' ').slice(0, 2).join(' ') 
       };
     } else {
-      // Otherwise, treat it as an ID for placeholder images
       const placeholder = PlaceHolderImages.find(p => p.id === heroImageValue);
       if (placeholder) {
         heroSource = { url: placeholder.imageUrl, hint: placeholder.imageHint };
@@ -111,6 +111,7 @@ export default async function PostPage({ params }: { params: { slug: string, loc
   
   const linkPrefix = params.locale === i18n.defaultLocale ? '' : `/${params.locale}`;
   const dictionary = await getDictionary(params.locale);
+  const headings = extractHeadings(post.content);
 
   const itemForMeta = {
       slug: post.slug,
@@ -122,58 +123,74 @@ export default async function PostPage({ params }: { params: { slug: string, loc
 
   return (
     <div className="w-full">
-      <article className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-12 sm:pt-32 sm:pb-16">
-        <header className="text-center">
-          <h1 className="font-headline text-4xl md:text-5xl font-extrabold tracking-tighter text-primary mb-3">
-            {post.frontmatter.title}
-          </h1>
-        </header>
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-12 sm:pt-32 sm:pb-16">
+        <div className="flex flex-col lg:flex-row gap-12">
+            {/* Main Content Column */}
+            <article className="flex-1 max-w-3xl mx-auto lg:mx-0">
+                <header className="text-center">
+                    <h1 className="font-headline text-4xl md:text-5xl font-extrabold tracking-tighter text-primary mb-3">
+                        {post.frontmatter.title}
+                    </h1>
+                </header>
 
-        {heroSource && (
-          <div className="my-8 sm:my-12">
-            <Image
-              src={heroSource.url}
-              alt={imageAlt || post.frontmatter.title}
-              width={1200}
-              height={630}
-              className="w-full h-auto rounded-xl shadow-lg object-cover"
-              priority
-              data-ai-hint={heroSource.hint}
-            />
-          </div>
-        )}
+                {heroSource && (
+                    <div className="my-8 sm:my-12">
+                        <Image
+                            src={heroSource.url}
+                            alt={imageAlt || post.frontmatter.title}
+                            width={1200}
+                            height={630}
+                            className="w-full h-auto rounded-xl shadow-lg object-cover"
+                            priority
+                            data-ai-hint={heroSource.hint}
+                        />
+                    </div>
+                )}
 
-        <PostMeta 
-          frontmatter={post.frontmatter}
-          item={itemForMeta}
-          locale={params.locale}
-          dictionary={dictionary}
-        />
-        
-        <div className="text-lg text-foreground/80">
-          <MDXRemote
-            source={post.content}
-            components={mdxComponents}
-            options={{
-              mdxOptions: {
-                remarkPlugins: [remarkGfm],
-                rehypePlugins: [[rehypeShiki, { theme: 'github-dark' }]],
-              },
-            }}
-          />
+                <PostMeta 
+                    frontmatter={post.frontmatter}
+                    item={itemForMeta}
+                    locale={params.locale}
+                    dictionary={dictionary}
+                />
+
+                {/* Mobile TOC */}
+                <div className="lg:hidden">
+                    <MobileTableOfContents headings={headings} title={dictionary.post.toc} />
+                </div>
+                
+                <div className="text-lg text-foreground/80">
+                    <MDXRemote
+                        source={post.content}
+                        components={mdxComponents}
+                        options={{
+                            mdxOptions: {
+                                remarkPlugins: [remarkGfm],
+                                rehypePlugins: [[rehypeShiki, { theme: 'github-dark' }]],
+                            },
+                        }}
+                    />
+                </div>
+
+                <div className="mt-12 flex flex-col gap-4 text-center">
+                    <h3 className="text-lg font-semibold tracking-tight text-primary">{dictionary.post.shareArticle}</h3>
+                    <ShareButtons
+                        title={post.frontmatter.title}
+                        imageUrl={heroSource?.url}
+                    />
+                </div>
+                
+                <PostComments article={{ slug: post.slug, title: post.frontmatter.title }} type="blog" locale={params.locale} />
+            </article>
+
+            {/* Desktop Sidebar Column */}
+            <aside className="hidden lg:block w-64 shrink-0">
+                <div className="sticky top-24 space-y-8">
+                    <TableOfContents headings={headings} title={dictionary.post.toc} />
+                </div>
+            </aside>
         </div>
-
-        <div className="mt-12 flex flex-col gap-4 text-center">
-            <h3 className="text-lg font-semibold tracking-tight text-primary">{dictionary.post.shareArticle}</h3>
-            <ShareButtons
-                title={post.frontmatter.title}
-                imageUrl={heroSource?.url}
-            />
-        </div>
-        
-        <PostComments article={{ slug: post.slug, title: post.frontmatter.title }} type="blog" locale={params.locale} />
-
-      </article>
+      </div>
 
       <RelatedPosts 
         type="blog"
