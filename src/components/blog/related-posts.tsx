@@ -160,33 +160,34 @@ export async function RelatedPosts({ type, locale, currentSlug, currentTags, cur
     };
 
     return (
-        <Card key={note.slug} className="group relative flex h-full flex-col border-l-4 border-primary bg-card/50 transition-colors hover:border-accent">
-            <CardContent className="flex flex-1 flex-col p-6">
-                <Link href={`${linkPrefix}/notes/${note.slug}`} className="flex flex-1 flex-col" aria-label={note.frontmatter.title}>
-                    <div className="mb-4">
-                        <div className="inline-flex w-20 flex-col items-center justify-center rounded-lg bg-primary p-2 text-center text-primary-foreground transition-transform sm:group-hover:scale-105">
-                            <p className="text-3xl font-bold">{formatDatePart(noteDate, { day: 'numeric' })}</p>
-                            <p className="text-sm font-semibold uppercase">{formatDatePart(noteDate, { month: 'short' })}</p>
-                            <p className="text-xs">{formatDatePart(noteDate, { year: 'numeric' })}</p>
-                        </div>
+        <Card key={note.slug} className="group relative flex h-full flex-col bg-card/50 transition-shadow hover:shadow-lg border">
+            <CardContent className="flex flex-1 items-stretch gap-4 p-4">
+                <Link href={`${linkPrefix}/notes/${note.slug}`} aria-label={note.frontmatter.title} className="block shrink-0">
+                    <div className="flex h-full w-16 flex-col items-center justify-center rounded-lg bg-primary p-1 text-center text-primary-foreground transition-transform group-hover:scale-105">
+                        <p className="text-2xl font-bold">{formatDatePart(noteDate, { day: 'numeric' })}</p>
+                        <p className="text-xs font-semibold uppercase">{formatDatePart(noteDate, { month: 'short' })}</p>
+                    </div>
+                </Link>
+                
+                <div className="flex min-w-0 flex-1 flex-col">
+                    <div className="flex-1">
+                        <Link href={`${linkPrefix}/notes/${note.slug}`} aria-label={note.frontmatter.title} className="block">
+                            <h2 className="font-headline text-lg font-bold leading-tight tracking-tight text-primary group-hover:text-accent transition-colors line-clamp-3">
+                                {note.frontmatter.title}
+                            </h2>
+                        </Link>
                     </div>
                     
-                    <h2 className="font-headline text-xl font-bold tracking-tight text-primary group-hover:text-accent transition-colors">
-                        {note.frontmatter.title}
-                    </h2>
-                    
-                    <p className="text-muted-foreground text-sm mt-2 flex-grow line-clamp-3">
-                        {note.frontmatter.description}
-                    </p>
-                    
                     {note.frontmatter.tags && note.frontmatter.tags.length > 0 && (
-                        <div className="mt-4 flex flex-wrap gap-1">
-                            {note.frontmatter.tags.map(tag => (
-                                <Badge key={tag} variant="secondary">{tag}</Badge>
-                            ))}
+                        <div className="mt-2 border-t pt-2">
+                            <div className="flex flex-wrap gap-1">
+                                {note.frontmatter.tags.map(tag => (
+                                    <Badge key={tag} variant="secondary" className="text-[10px] px-1.5 py-0.5">{tag}</Badge>
+                                ))}
+                            </div>
                         </div>
                     )}
-                </Link>
+                </div>
             </CardContent>
             <AddToReadingListButton 
                 item={item}

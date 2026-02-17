@@ -40,34 +40,37 @@ export default async function NotesPage({ params: { locale } }: { params: { loca
                 type: 'note' as const
             };
             return (
-              <Card key={note.slug} className="group relative border-l-4 border-primary bg-card/50 transition-colors hover:border-accent">
-                <CardContent className="p-6">
-                    <div className="mb-4">
-                        <Link href={`${linkPrefix}/notes/${note.slug}`} aria-label={note.frontmatter.title} className="inline-block">
-                            <div className="flex w-20 flex-col items-center justify-center rounded-lg bg-primary p-2 text-center text-primary-foreground transition-transform sm:group-hover:scale-105">
-                                <p className="text-3xl font-bold">{formatDatePart(noteDate, { day: 'numeric' })}</p>
-                                <p className="text-sm font-semibold uppercase">{formatDatePart(noteDate, { month: 'short' })}</p>
-                                <p className="text-xs">{formatDatePart(noteDate, { year: 'numeric' })}</p>
+              <Card key={note.slug} className="group relative bg-card/50 transition-shadow hover:shadow-lg border">
+                <CardContent className="flex items-stretch gap-6 p-6">
+                    <Link href={`${linkPrefix}/notes/${note.slug}`} aria-label={note.frontmatter.title} className="block shrink-0">
+                        <div className="flex h-full w-20 flex-col items-center justify-center rounded-lg bg-primary p-2 text-center text-primary-foreground transition-transform group-hover:scale-105">
+                            <p className="text-3xl font-bold">{formatDatePart(noteDate, { day: 'numeric' })}</p>
+                            <p className="text-sm font-semibold uppercase">{formatDatePart(noteDate, { month: 'short' })}</p>
+                            <p className="text-xs">{formatDatePart(noteDate, { year: 'numeric' })}</p>
+                        </div>
+                    </Link>
+                    
+                    <div className="flex min-w-0 flex-1 flex-col">
+                        <div className="flex-1">
+                            <Link href={`${linkPrefix}/notes/${note.slug}`} aria-label={note.frontmatter.title}>
+                                <h2 className="font-headline text-2xl font-bold tracking-tight text-primary group-hover:text-accent transition-colors">
+                                    {note.frontmatter.title}
+                                </h2>
+                                <p className="text-muted-foreground mt-2 line-clamp-3">
+                                    {note.frontmatter.description}
+                                </p>
+                            </Link>
+                        </div>
+                        
+                        {note.frontmatter.tags && note.frontmatter.tags.length > 0 && (
+                            <div className="mt-4 border-t pt-4">
+                                <div className="flex flex-wrap gap-1">
+                                    {note.frontmatter.tags.map(tag => (
+                                        <Badge key={tag} variant="secondary">{tag}</Badge>
+                                    ))}
+                                </div>
                             </div>
-                        </Link>
-                    </div>
-
-                    <div>
-                      <Link href={`${linkPrefix}/notes/${note.slug}`} aria-label={note.frontmatter.title}>
-                        <h2 className="font-headline text-2xl font-bold tracking-tight text-primary group-hover:text-accent transition-colors">
-                            {note.frontmatter.title}
-                        </h2>
-                        <p className="text-muted-foreground mt-2 line-clamp-3">
-                            {note.frontmatter.description}
-                        </p>
-                      </Link>
-                      {note.frontmatter.tags && note.frontmatter.tags.length > 0 && (
-                          <div className="mt-3 flex flex-wrap gap-1">
-                              {note.frontmatter.tags.map(tag => (
-                                  <Badge key={tag} variant="secondary">{tag}</Badge>
-                              ))}
-                          </div>
-                      )}
+                        )}
                     </div>
                 </CardContent>
                 <AddToReadingListButton 
