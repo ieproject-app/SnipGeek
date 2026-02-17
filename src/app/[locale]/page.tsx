@@ -17,9 +17,20 @@ export async function generateStaticParams() {
 export default async function Home({ params: { locale } }: { params: { locale: string } }) {
   const allPostsData = getSortedPostsData(locale);
   const featuredPosts = allPostsData.filter(post => post.frontmatter.featured).slice(0, 4);
-  const otherPosts = allPostsData.filter(post => !post.frontmatter.featured);
-  const dictionary = await getDictionary(locale);
+  const latestPosts = allPostsData.filter(post => !post.frontmatter.featured).slice(0, 4);
   
+  // Logic for Special Tag Section (e.g., "Hardware")
+  // We'll filter for posts with the 'Hardware' tag that aren't in featured or latest
+  const specialTag = "Windows"; // You can change this to any tag you want to highlight
+  const specialTagPosts = allPostsData
+    .filter(post => 
+      post.frontmatter.tags?.some(tag => tag.toLowerCase() === specialTag.toLowerCase()) &&
+      !featuredPosts.some(fp => fp.slug === post.slug) &&
+      !latestPosts.some(lp => lp.slug === post.slug)
+    )
+    .slice(0, 4);
+
+  const dictionary = await getDictionary(locale);
   const linkPrefix = locale === i18n.defaultLocale ? '' : `/${locale}`;
 
   const renderPostCard = (post: (typeof allPostsData)[0], isFeatured: boolean) => {
@@ -140,20 +151,41 @@ export default async function Home({ params: { locale } }: { params: { locale: s
         </section>
       )}
 
-      {/* Other Posts Section */}
-      {otherPosts.length > 0 && (
+      {/* Latest Posts Section */}
+      {latestPosts.length > 0 && (
         <section className="container max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pb-12 sm:pb-16">
           <h2 className="text-3xl font-bold font-headline tracking-tighter text-primary mb-8 text-center">{dictionary.home.latestPosts}</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-12 mb-12">
-            {otherPosts.slice(0, 4).map((post) => renderPostCard(post, false))}
+            {latestPosts.map((post) => renderPostCard(post, false))}
           </div>
-          <div className="flex justify-center">
+          <div className="flex justify-center mb-16">
             <Button asChild variant="outline" size="lg" className="rounded-full">
                 <Link href={`${linkPrefix}/blog`}>
                     {dictionary.home.viewAllPosts}
                 </Link>
             </Button>
           </div>
+        </section>
+      )}
+
+      {/* Special Tag Section */}
+      {specialTagPosts.length > 0 && (
+        <section className="bg-muted/30 py-16 mb-12">
+            <div className="container max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 className="text-3xl font-bold font-headline tracking-tighter text-primary mb-8 text-center">
+                    {dictionary.home.specialTagSectionTitle.replace('{tag}', specialTag)}
+                </h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-12">
+                    {specialTagPosts.map((post) => renderPostCard(post, false))}
+                </div>
+                <div className="flex justify-center mt-12">
+                    <Button asChild variant="ghost" className="rounded-full">
+                        <Link href={`${linkPrefix}/tags/${specialTag.toLowerCase()}`}>
+                            {dictionary.home.viewAllPosts}
+                        </Link>
+                    </Button>
+                </div>
+            </div>
         </section>
       )}
     </div>

@@ -1,3 +1,4 @@
+
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { AddToReadingListButton } from '@/components/layout/add-to-reading-list-button';
@@ -5,6 +6,8 @@ import type { PostFrontmatter } from '@/lib/posts';
 import type { NoteFrontmatter } from '@/lib/notes';
 import type { Dictionary } from '@/lib/get-dictionary';
 import type { ReadingListItem } from '@/hooks/use-reading-list';
+import Link from 'next/link';
+import { i18n } from '@/i18n-config';
 
 interface PostMetaProps {
   frontmatter: PostFrontmatter | NoteFrontmatter;
@@ -20,6 +23,7 @@ export function PostMeta({ frontmatter, item, locale, dictionary }: PostMetaProp
   
   const displayDate = frontmatter.updated || frontmatter.date;
   const dateLabel = frontmatter.updated ? `Updated on` : `Published on`;
+  const linkPrefix = locale === i18n.defaultLocale ? '' : `/${locale}`;
 
   return (
     <div className="my-8 rounded-xl border bg-card/50 text-card-foreground p-6">
@@ -56,7 +60,11 @@ export function PostMeta({ frontmatter, item, locale, dictionary }: PostMetaProp
         <div className="mt-6 border-t pt-6">
           <div className="flex flex-wrap items-center gap-2">
             {frontmatter.tags.map(tag => (
-              <Badge key={tag} variant="secondary">{tag}</Badge>
+              <Link key={tag} href={`${linkPrefix}/tags/${tag.toLowerCase()}`}>
+                <Badge variant="secondary" className="hover:bg-primary hover:text-primary-foreground transition-colors cursor-pointer">
+                  {tag}
+                </Badge>
+              </Link>
             ))}
           </div>
         </div>

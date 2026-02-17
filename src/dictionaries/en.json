@@ -14,7 +14,8 @@
     },
     "home": {
         "latestPosts": "Latest Posts",
-        "viewAllPosts": "View All Posts"
+        "viewAllPosts": "View All Posts",
+        "specialTagSectionTitle": "More from {tag}"
     },
     "notes": {
         "title": "Notes"
@@ -65,6 +66,11 @@
         "description": "Get in touch with me. The best way to reach me is by email.",
         "intro": "Feel free to reach out. The best way to get in touch is by email.",
         "wip": "This page is under construction."
+    },
+    "tags": {
+        "title": "Tag: {tag}",
+        "description": "All articles and notes tagged with {tag}.",
+        "noItems": "No articles found for this tag."
     },
     "search": {
         "placeholder": "Search posts and notes...",

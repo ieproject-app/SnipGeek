@@ -14,7 +14,8 @@
     },
     "home": {
         "latestPosts": "Postingan Terbaru",
-        "viewAllPosts": "Lihat Semua Postingan"
+        "viewAllPosts": "Lihat Semua Postingan",
+        "specialTagSectionTitle": "Lebih banyak tentang {tag}"
     },
     "notes": {
         "title": "Catatan"
@@ -65,6 +66,11 @@
         "description": "Hubungi saya. Cara terbaik untuk menghubungi saya adalah melalui email.",
         "intro": "Jangan ragu untuk menghubungi. Cara terbaik untuk menghubungi saya adalah melalui email.",
         "wip": "Halaman ini sedang dalam tahap pembuatan."
+    },
+    "tags": {
+        "title": "Tag: {tag}",
+        "description": "Semua artikel dan catatan dengan tag {tag}.",
+        "noItems": "Tidak ada artikel yang ditemukan untuk tag ini."
     },
     "search": {
         "placeholder": "Cari postingan dan catatan...",

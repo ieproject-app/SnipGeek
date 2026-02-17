@@ -1,3 +1,4 @@
+
 import { getSortedNotesData } from '@/lib/notes';
 import Link from 'next/link';
 import { i18n } from '@/i18n-config';
@@ -66,7 +67,11 @@ export default async function NotesPage({ params: { locale } }: { params: { loca
                 <CardFooter className="flex items-center justify-between gap-4 border-t px-6 py-4">
                     <div className="flex flex-wrap gap-1">
                         {note.frontmatter.tags && note.frontmatter.tags.map(tag => (
-                            <Badge key={tag} variant="secondary">{tag}</Badge>
+                            <Link key={tag} href={`${linkPrefix}/tags/${tag.toLowerCase()}`}>
+                              <Badge variant="secondary" className="hover:bg-primary hover:text-primary-foreground transition-colors cursor-pointer">
+                                {tag}
+                              </Badge>
+                            </Link>
                         ))}
                     </div>
                     <AddToReadingListButton 

@@ -1,3 +1,4 @@
+
 import { getSortedPostsData, type Post, type PostFrontmatter } from '@/lib/posts';
 import { getSortedNotesData, type Note, type NoteFrontmatter } from '@/lib/notes';
 import Link from 'next/link';
@@ -186,7 +187,11 @@ export async function RelatedPosts({ type, locale, currentSlug, currentTags, cur
         <CardFooter className="flex items-center justify-between gap-4 border-t px-6 py-4">
             <div className="flex flex-wrap gap-1">
                 {note.frontmatter.tags && note.frontmatter.tags.map(tag => (
-                    <Badge key={tag} variant="secondary">{tag}</Badge>
+                    <Link key={tag} href={`${linkPrefix}/tags/${tag.toLowerCase()}`}>
+                      <Badge variant="secondary" className="hover:bg-primary hover:text-primary-foreground transition-colors cursor-pointer">
+                        {tag}
+                      </Badge>
+                    </Link>
                 ))}
             </div>
             <AddToReadingListButton 
