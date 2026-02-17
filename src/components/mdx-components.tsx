@@ -31,15 +31,15 @@ const CustomImage = (props: any) => {
 };
 
 // This component centralizes download links.
-const DownloadLink = ({ id }: { id: string }) => {
+const DownloadButton = ({ id }: { id: string }) => {
   const linkData = downloadLinks[id];
 
   if (!linkData) {
     // This warning will show in the server console during build if an ID is not found.
-    console.warn(`[DownloadLink Component]: The ID "${id}" was not found in data-downloads.ts.`);
+    console.warn(`[DownloadButton Component]: The ID "${id}" was not found in data-downloads.ts.`);
     // Render a noticeable error in the article itself during development.
     if (process.env.NODE_ENV === 'development') {
-      return <p className="font-bold text-destructive">[DownloadLink Error: Invalid ID &quot;{id}&quot;]</p>;
+      return <p className="font-bold text-destructive">[DownloadButton Error: Invalid ID &quot;{id}&quot;]</p>;
     }
     return null;
   }
@@ -77,7 +77,7 @@ const MdxA = (props: React.AnchorHTMLAttributes<HTMLAnchorElement>) => {
   return <a {...props} />;
 };
 const MdxUl = ({ children }: { children?: React.ReactNode }) => <ul className="my-6 ml-6 list-disc [&>li]:mt-2">{children}</ul>;
-const MdxOl = ({ children }: { children?: React.ReactNode }) => <ol className="my-6 ml-6 list-decimal [&>li]:mt-2">{children}</ol>;
+const MdxOl = ({ children }: { children?: React.ReactNode }) => <ol className="my-6 ml-6 list-decimal [&>li]:mt-2">{children}</ul>;
 const MdxLi = ({ children }: { children?: React.ReactNode }) => <li>{children}</li>;
 const MdxBlockquote = ({ children }: { children?: React.ReactNode }) => <blockquote className="mt-6 border-l-2 border-primary/20 pl-6 italic text-muted-foreground">{children}</blockquote>;
 
@@ -110,5 +110,5 @@ export const mdxComponents: MDXComponents = {
     th: TableHead,
     td: TableCell,
     pre: MdxPre,
-    DownloadLink, // Exporting the new component for use in MDX
+    DownloadButton, // Exporting the new component for use in MDX
 }
