@@ -4,6 +4,7 @@ import { i18n } from '@/i18n-config';
 import { AddToReadingListButton } from '@/components/layout/add-to-reading-list-button';
 import { getDictionary } from '@/lib/get-dictionary';
 import { Badge } from '@/components/ui/badge';
+import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 
 export async function generateStaticParams() {
@@ -28,7 +29,7 @@ export default async function NotesPage({ params: { locale } }: { params: { loca
             </h1>
         </header>
 
-        <section className="space-y-12">
+        <section className="space-y-8">
           {allNotesData.map((note) => {
             const noteDate = new Date(note.frontmatter.date);
             const item = {
@@ -39,44 +40,43 @@ export default async function NotesPage({ params: { locale } }: { params: { loca
                 type: 'note' as const
             };
             return (
-              <article key={note.slug} className="relative flex flex-col sm:flex-row items-start gap-x-6 group">
-                {/* Date Box */}
-                <div className="flex-shrink-0 mb-4 sm:mb-0">
-                  <Link href={`${linkPrefix}/notes/${note.slug}`} aria-label={note.frontmatter.title}>
-                    <div className="flex w-20 flex-col items-center justify-center rounded-lg bg-primary p-2 text-center text-primary-foreground transition-transform sm:group-hover:scale-105">
-                      <p className="text-3xl font-bold">{formatDatePart(noteDate, { day: 'numeric' })}</p>
-                      <p className="text-sm font-semibold uppercase">{formatDatePart(noteDate, { month: 'short' })}</p>
-                      <p className="text-xs">{formatDatePart(noteDate, { year: 'numeric' })}</p>
+              <Card key={note.slug} className="group relative border-l-4 border-primary bg-card/50 transition-colors hover:border-accent">
+                <CardContent className="p-6">
+                    <div className="mb-4">
+                        <Link href={`${linkPrefix}/notes/${note.slug}`} aria-label={note.frontmatter.title} className="inline-block">
+                            <div className="flex w-20 flex-col items-center justify-center rounded-lg bg-primary p-2 text-center text-primary-foreground transition-transform sm:group-hover:scale-105">
+                                <p className="text-3xl font-bold">{formatDatePart(noteDate, { day: 'numeric' })}</p>
+                                <p className="text-sm font-semibold uppercase">{formatDatePart(noteDate, { month: 'short' })}</p>
+                                <p className="text-xs">{formatDatePart(noteDate, { year: 'numeric' })}</p>
+                            </div>
+                        </Link>
                     </div>
-                  </Link>
-                </div>
-                
-                {/* Content */}
-                <div className="flex-grow">
-                  <Link href={`${linkPrefix}/notes/${note.slug}`} aria-label={note.frontmatter.title}>
-                    <h2 className="font-headline text-2xl font-bold tracking-tight text-primary group-hover:text-accent transition-colors">
-                        {note.frontmatter.title}
-                    </h2>
-                    <p className="text-muted-foreground mt-2 line-clamp-3">
-                        {note.frontmatter.description}
-                    </p>
-                  </Link>
-                  {note.frontmatter.tags && note.frontmatter.tags.length > 0 && (
-                      <div className="mt-3 flex flex-wrap gap-1">
-                          {note.frontmatter.tags.map(tag => (
-                              <Badge key={tag} variant="secondary">{tag}</Badge>
-                          ))}
-                      </div>
-                  )}
-                </div>
 
+                    <div>
+                      <Link href={`${linkPrefix}/notes/${note.slug}`} aria-label={note.frontmatter.title}>
+                        <h2 className="font-headline text-2xl font-bold tracking-tight text-primary group-hover:text-accent transition-colors">
+                            {note.frontmatter.title}
+                        </h2>
+                        <p className="text-muted-foreground mt-2 line-clamp-3">
+                            {note.frontmatter.description}
+                        </p>
+                      </Link>
+                      {note.frontmatter.tags && note.frontmatter.tags.length > 0 && (
+                          <div className="mt-3 flex flex-wrap gap-1">
+                              {note.frontmatter.tags.map(tag => (
+                                  <Badge key={tag} variant="secondary">{tag}</Badge>
+                              ))}
+                          </div>
+                      )}
+                    </div>
+                </CardContent>
                 <AddToReadingListButton 
                     item={item}
                     showText={false}
                     dictionary={dictionary.readingList}
-                    className="absolute top-0 right-0 text-muted-foreground hover:text-primary z-10 opacity-0 group-hover:opacity-100 transition-opacity"
+                    className="absolute top-6 right-6 text-muted-foreground hover:text-primary z-10 opacity-0 group-hover:opacity-100 transition-opacity"
                 />
-              </article>
+              </Card>
             )})}
         </section>
       </main>

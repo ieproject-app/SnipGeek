@@ -7,6 +7,7 @@ import { getDictionary } from '@/lib/get-dictionary';
 import { AddToReadingListButton } from '@/components/layout/add-to-reading-list-button';
 import { Badge } from '@/components/ui/badge';
 import { i18n } from '@/i18n-config';
+import { Card, CardContent } from '@/components/ui/card';
 
 type RelatedPostsProps = {
   type: 'blog' | 'note';
@@ -159,13 +160,15 @@ export async function RelatedPosts({ type, locale, currentSlug, currentTags, cur
     };
 
     return (
-        <div key={note.slug} className="group relative">
-            <Link href={`${linkPrefix}/notes/${note.slug}`} className="block h-full" aria-label={note.frontmatter.title}>
-                <article className="flex h-full flex-col">
-                    <div className="flex w-20 flex-shrink-0 flex-col items-center justify-center rounded-lg bg-primary p-2 text-center text-primary-foreground mb-4 transition-transform sm:group-hover:scale-105">
-                        <p className="text-3xl font-bold">{formatDatePart(noteDate, { day: 'numeric' })}</p>
-                        <p className="text-sm font-semibold uppercase">{formatDatePart(noteDate, { month: 'short' })}</p>
-                        <p className="text-xs">{formatDatePart(noteDate, { year: 'numeric' })}</p>
+        <Card key={note.slug} className="group relative flex h-full flex-col border-l-4 border-primary bg-card/50 transition-colors hover:border-accent">
+            <CardContent className="flex flex-1 flex-col p-6">
+                <Link href={`${linkPrefix}/notes/${note.slug}`} className="flex flex-1 flex-col" aria-label={note.frontmatter.title}>
+                    <div className="mb-4">
+                        <div className="inline-flex w-20 flex-col items-center justify-center rounded-lg bg-primary p-2 text-center text-primary-foreground transition-transform sm:group-hover:scale-105">
+                            <p className="text-3xl font-bold">{formatDatePart(noteDate, { day: 'numeric' })}</p>
+                            <p className="text-sm font-semibold uppercase">{formatDatePart(noteDate, { month: 'short' })}</p>
+                            <p className="text-xs">{formatDatePart(noteDate, { year: 'numeric' })}</p>
+                        </div>
                     </div>
                     
                     <h2 className="font-headline text-xl font-bold tracking-tight text-primary group-hover:text-accent transition-colors">
@@ -183,15 +186,15 @@ export async function RelatedPosts({ type, locale, currentSlug, currentTags, cur
                             ))}
                         </div>
                     )}
-                </article>
-            </Link>
+                </Link>
+            </CardContent>
             <AddToReadingListButton 
                 item={item}
                 showText={false}
                 dictionary={dictionary.readingList}
-                className="absolute top-4 right-0 text-muted-foreground hover:text-primary z-10 opacity-0 group-hover:opacity-100 transition-opacity"
+                className="absolute top-4 right-4 text-muted-foreground hover:text-primary z-10 opacity-0 group-hover:opacity-100 transition-opacity"
             />
-        </div>
+        </Card>
     );
   }
 
