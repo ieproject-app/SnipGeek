@@ -128,7 +128,7 @@ export async function RelatedPosts({ type, locale, currentSlug, currentTags, cur
                 </div>
 
                 {post.frontmatter.category && <p className="text-sm text-muted-foreground mb-1">{post.frontmatter.category}</p>}
-                <h3 className="font-headline text-xl font-bold tracking-tight text-primary group-hover:text-accent transition-colors">
+                <h3 className="font-headline text-xl font-bold tracking-tight text-primary transition-colors">
                     {post.frontmatter.title}
                 </h3>
                 <p className="leading-relaxed text-muted-foreground mt-2 text-sm line-clamp-3">
@@ -172,7 +172,7 @@ export async function RelatedPosts({ type, locale, currentSlug, currentTags, cur
                 
                 <div className="flex min-w-0 flex-1 flex-col">
                     <Link href={`${linkPrefix}/notes/${note.slug}`} aria-label={note.frontmatter.title} className="flex-1">
-                        <h2 className="font-headline text-2xl font-bold tracking-tight text-primary group-hover:text-accent transition-colors">
+                        <h2 className="font-headline text-2xl font-bold tracking-tight text-primary transition-colors">
                             {note.frontmatter.title}
                         </h2>
                         <p className="text-muted-foreground mt-2 line-clamp-3">

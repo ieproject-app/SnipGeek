@@ -66,7 +66,7 @@ export default async function BlogPage({ params: { locale } }: { params: { local
                             </div>
 
                             {post.frontmatter.category && <p className="text-sm text-muted-foreground mb-1">{post.frontmatter.category}</p>}
-                            <h3 className="font-headline text-xl font-bold tracking-tight text-primary group-hover:text-accent transition-colors">
+                            <h3 className="font-headline text-xl font-bold tracking-tight text-primary transition-colors">
                                 {post.frontmatter.title}
                             </h3>
                             <p className="leading-relaxed text-muted-foreground mt-2 text-sm line-clamp-3">

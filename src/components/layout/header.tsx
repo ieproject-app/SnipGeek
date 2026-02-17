@@ -309,7 +309,7 @@ export function Header({ translationsMap, searchableData, dictionary }: { transl
                                           <Link 
                                               href={item.href} 
                                               onClick={handleResultClick} 
-                                              className="block p-3 rounded-md hover:bg-accent transition-colors"
+                                              className="block p-3 rounded-md hover:bg-muted transition-colors"
                                           >
                                               <div className="overflow-hidden">
                                                   <div className="flex items-start justify-between gap-2">
@@ -352,7 +352,7 @@ export function Header({ translationsMap, searchableData, dictionary }: { transl
                               <Link 
                                   href={item.href} 
                                   onClick={() => setActiveView('none')} 
-                                  className="block p-3 rounded-md hover:bg-accent transition-colors"
+                                  className="block p-3 rounded-md hover:bg-muted transition-colors"
                               >
                                   <div className="overflow-hidden pr-8">
                                       <div className="flex items-start justify-between gap-2">
