@@ -19,7 +19,7 @@
 
 @layer base {
   :root {
-    --background: 246 100% 98%; /* #f5f3ff */
+    --background: 39 88% 97%; /* #fdf8f2 */
     --foreground: 225 14% 17%; /* Darker than primary for text */
     --card: 0 0% 100%;
     --card-foreground: 225 14% 17%;
@@ -54,7 +54,7 @@
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
   .dark {
-    --background: 0 0% 10%; /* #1a1a1a */
+    --background: 27 15% 10%; /* #1c1814 */
     --foreground: 210 40% 98%;
     --card: 222 47% 11%;
     --card-foreground: 210 40% 98%;
@@ -95,12 +95,12 @@
   }
   body {
     @apply bg-background text-foreground;
-    background-image: radial-gradient(ellipse at 15% 30%, rgba(255,220,180,0.6) 0%, transparent 45%), radial-gradient(ellipse at 85% 20%, rgba(200,180,255,0.5) 0%, transparent 45%), radial-gradient(ellipse at 60% 80%, rgba(180,220,255,0.4) 0%, transparent 40%);
+    background-image: radial-gradient(ellipse 70% 55% at 8% 12%, rgba(251,191,120,0.18) 0%, transparent 60%), radial-gradient(ellipse 60% 50% at 92% 10%, rgba(253,186,116,0.14) 0%, transparent 55%), radial-gradient(ellipse 55% 45% at 50% 95%, rgba(252,211,155,0.12) 0%, transparent 50%);
     background-attachment: fixed;
   }
 
   .dark body {
-    background-image: radial-gradient(ellipse at 20% 20%, rgba(120,150,80,0.25) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(60,80,60,0.15) 0%, transparent 50%);
+    background-image: radial-gradient(ellipse 65% 50% at 5% 10%, rgba(180,100,40,0.14) 0%, transparent 60%), radial-gradient(ellipse 55% 45% at 95% 8%, rgba(160,80,30,0.10) 0%, transparent 55%), radial-gradient(ellipse 50% 40% at 50% 98%, rgba(140,70,20,0.08) 0%, transparent 50%);
   }
 
   /* Fade-in animation for page transitions */

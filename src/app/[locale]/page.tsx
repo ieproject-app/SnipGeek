@@ -68,7 +68,7 @@ export default async function Home({ params: { locale } }: { params: { locale: s
                             data-ai-hint={heroImageHint}
                         />
                     )}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
                     <div className="absolute bottom-0 left-0 p-6 text-white w-full">
                         <p className="text-xs font-semibold uppercase tracking-wider opacity-80 mb-1">{post.frontmatter.category}</p>
                         <h3 className="font-headline text-2xl font-bold">

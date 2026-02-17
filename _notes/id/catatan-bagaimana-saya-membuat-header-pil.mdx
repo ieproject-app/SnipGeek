@@ -1,0 +1,100 @@
+---
+title: "Membongkar Header Pil Mengambang: Bedah Fitur dengan Next.js dan Tailwind"
+date: "2026-02-17"
+description: "Penjelasan mendalam tentang arsitektur dan implementasi header pil mengambang yang multifungsi dan responsif di blog ini, dibangun dengan Next.js & Tailwind."
+translationKey: "catatan-bagaimana-saya-membuat-header-pil"
+published: true
+tags: ['Next.js', 'React', 'Tailwind CSS', 'UI/UX', 'Pengembangan Web']
+---
+
+Jika Anda pernah menavigasi situs ini, Anda kemungkinan besar telah berinteraksi dengan header "pil" mengambang di bagian atas halaman. Fitur ini dirancang agar minimalis namun kuat, menampung navigasi, pencarian, dan daftar baca dalam satu komponen yang ringkas dan responsif. Dalam catatan ini, saya akan membedah cara pembuatannya menggunakan Next.js, React Hooks, dan Tailwind CSS.
+
+### Teknologi Inti
+
+- **Next.js App Router:** Untuk struktur komponen dan rendering sisi server.
+- **React Hooks:** Terutama `useState`, `useEffect`, dan `useRef` untuk mengelola state, efek samping, dan referensi langsung ke DOM.
+- **Tailwind CSS:** Untuk semua styling, memungkinkan desain yang cepat dengan pendekatan *utility-first*. Kami juga menggunakan `clsx` untuk menerapkan kelas secara kondisional.
+- **Lucide React:** Untuk ikon-ikon yang digunakan.
+
+### Langkah 1: Struktur Dasar & Posisi Mengambang
+
+Fondasinya adalah elemen `<header>` dengan `position: fixed`.
+
+```jsx
+<header className="fixed top-4 left-4 right-4 md:left-1/2 md:-translate-x-1/2 ... z-50">
+  <nav className="relative ... rounded-full bg-primary/90 backdrop-blur-sm ...">
+    {/* Konten akan diletakkan di sini */}
+  </nav>
+</header>
+```
+- `fixed top-4`: Ini menyematkan header di dekat bagian atas viewport.
+- `left-4 right-4`: Di perangkat mobile, header membentang hampir selebar layar.
+- `md:left-1/2 md:-translate-x-1/2`: Di layar medium ke atas, header memposisikan diri di tengah secara horizontal.
+- `bg-primary/90 backdrop-blur-sm`: Ini menciptakan efek kaca buram semi-transparan.
+- `rounded-full`: Ini memberinya bentuk "pil".
+
+### Langkah 2: Otak Komponen - Manajemen State Tampilan
+
+Bagian paling krusial dari header adalah mengelola apa yang sedang ditampilkan saat ini. Saya menggunakan satu hook `useState` untuk ini:
+
+```tsx
+type ActiveView = 'none' | 'search' | 'menu' | 'readingList';
+const [activeView, setActiveView] = useState<ActiveView>('none');
+```
+
+Setiap elemen interaktif di header hanya memanggil `setActiveView` untuk mengubah apa yang ditampilkan. Misalnya, mengklik ikon pencarian akan mengatur tampilan menjadi `'search'`, yang pada gilirannya memicu rendering kondisional untuk input pencarian dan panel hasil.
+
+Bentuk dan gaya komponen juga bereaksi terhadap state ini. Ketika `isSearchOpen` bernilai `true`, lebar elemen `nav` akan meluas. Ketika `isMenuOpen` bernilai `true`, `border-radius` berubah dari `rounded-full` menjadi `rounded-t-2xl` agar menyatu dengan panel dropdown di bawahnya.
+
+### Langkah 3: Pengalaman Pencarian Dinamis
+
+Fungsionalitas pencarian adalah fitur utama.
+1.  **Transisi State:** Mengklik ikon pencarian akan mengatur `activeView = 'search'`.
+2.  **Animasi Kondisional:** Kelas CSS diaktifkan dan dinonaktifkan menggunakan `clsx`. Tautan navigasi utama akan menghilang (`opacity-0`) sementara kontainer input pencarian muncul (`opacity-100`).
+3.  **Fokus Otomatis:** Sebuah `useEffect` hook akan terpicu ketika tampilan pencarian aktif, secara otomatis memberikan fokus pada elemen `<input>` untuk pengalaman pengguna yang mulus.
+    ```tsx
+    const searchInputRef = useRef<HTMLInputElement>(null);
+
+    useEffect(() => {
+      if (isSearchOpen) {
+        // Timeout singkat memastikan elemen sudah terlihat sebelum difokuskan
+        setTimeout(() => searchInputRef.current?.focus(), 100);
+      }
+    }, [isSearchOpen]);
+    ```
+4.  **Penyaringan Real-time:** Sebuah `useEffect` lainnya memantau perubahan pada state `query` pencarian. Hook ini akan menyaring array postingan dan catatan yang sudah dimuat sebelumnya untuk menampilkan hasil yang relevan secara instan.
+
+### Langkah 4: Visibilitas Cerdas saat Scroll
+
+Pola UX yang umum adalah menyembunyikan navigasi saat menggulir ke bawah dan menampilkannya saat menggulir ke atas. Ini dicapai dengan hook `useEffect` lainnya.
+
+```tsx
+const lastScrollY = useRef(0);
+const [isVisible, setIsVisible] = useState(true);
+
+useEffect(() => {
+  const handleScroll = () => {
+    const currentScrollY = window.scrollY;
+    // Tampilkan jika menggulir ke atas atau berada di dekat puncak halaman
+    if (currentScrollY < lastScrollY.current || currentScrollY < 10) {
+      setIsVisible(true);
+    } else if (currentScrollY > 100 && currentScrollY > lastScrollY.current) {
+      // Sembunyikan jika menggulir ke bawah dan melewati ambang batas tertentu
+      setIsVisible(false);
+    }
+    lastScrollY.current = currentScrollY;
+  };
+
+  window.addEventListener('scroll', handleScroll, { passive: true });
+  return () => window.removeEventListener('scroll', handleScroll);
+}, []);
+```
+State `isVisible` kemudian akan menambah atau menghapus kelas yang mengontrol `opacity` dan `transform` dari header.
+
+### Langkah 5: Detail-Detail Kecil
+
+- **Tombol Escape:** Sebuah *event listener* global dipasang untuk menutup tampilan aktif apa pun (pencarian, menu, dll.) saat tombol 'Escape' ditekan.
+- **Klik di Luar:** Listener serupa juga akan menutup tampilan jika pengguna mengklik di area mana pun di luar komponen header.
+- **Responsif:** Komponen ini bertransisi dengan anggun dari header mobile yang lebar penuh menjadi header desktop yang ringkas dan terpusat menggunakan prefiks responsif dari Tailwind (`md:`).
+
+Dengan menggabungkan teknik-teknik ini, kita mendapatkan sebuah header yang tidak hanya menarik secara visual tetapi juga sangat fungsional dan intuitif untuk digunakan.
