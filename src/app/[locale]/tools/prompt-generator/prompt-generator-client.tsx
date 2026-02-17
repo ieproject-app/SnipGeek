@@ -200,7 +200,7 @@ export function PromptGeneratorClient({ dictionary }: PromptGeneratorProps) {
                     {publishDate ? format(publishDate, "PPP") : <span>Pick a date</span>}
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="p-0">
+                <PopoverContent className="w-auto p-0">
                   <Calendar
                     mode="single"
                     selected={publishDate}
@@ -244,19 +244,19 @@ export function PromptGeneratorClient({ dictionary }: PromptGeneratorProps) {
       </Card>
       
       <Card>
-        <CardHeader>
+        <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>{dictionary.generatedPromptTitle}</CardTitle>
+          <Button onClick={handleCopy} variant="ghost" size="icon" className="h-8 w-8">
+            {isCopied ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
+            <span className="sr-only">{isCopied ? dictionary.copiedButton : dictionary.copyButton}</span>
+          </Button>
         </CardHeader>
-        <CardContent className="relative">
+        <CardContent>
           <Textarea
             readOnly
             value={generatedPrompt}
             className="min-h-[300px] bg-muted/50 font-mono text-xs"
           />
-          <Button onClick={handleCopy} size="icon" className="absolute top-4 right-4 sm:top-8 sm:right-8">
-            {isCopied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-            <span className="sr-only">{isCopied ? dictionary.copiedButton : dictionary.copyButton}</span>
-          </Button>
         </CardContent>
       </Card>
     </div>
