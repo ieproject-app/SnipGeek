@@ -192,7 +192,7 @@ export async function RelatedPosts({ type, locale, currentSlug, currentTags, cur
                     item={item}
                     showText={false}
                     dictionary={dictionary.readingList}
-                    className="text-muted-foreground hover:text-muted/50 z-10 opacity-0 group-hover:opacity-100 transition-opacity shrink-0"
+                    className="text-muted-foreground hover:text-primary z-10 opacity-0 group-hover:opacity-100 transition-opacity shrink-0"
                 />
             </CardFooter>
       </Card>
