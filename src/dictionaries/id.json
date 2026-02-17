@@ -73,7 +73,8 @@
     },
     "post": {
         "share": "Bagikan",
-        "shareArticle": "Bagikan artikel ini"
+        "shareArticle": "Bagikan artikel ini",
+        "relatedContent": "Anda Mungkin Juga Suka"
     },
     "readingList": {
         "add": "Simpan ke Daftar",
@@ -104,10 +105,10 @@
         "draftTitle": "Draf Konten / Poin Utama",
         "draftPlaceholder": "Tempelkan draf konten lengkap Anda atau poin-poin utama yang ingin saya kembangkan di sini...",
         "imagesTitle": "Detail Gambar",
-        "imagesDescription": "Baris pertama **selalu** untuk gambar utama (hero image). Setiap baris berikutnya adalah untuk gambar pendukung, sesuai urutan kemunculannya di artikel.",
-        "imagesPlaceholder": "/images/articles/hero.webp | Teks alt deskriptif untuk hero image\n/images/articles/pendukung-1.webp | Teks alt untuk gambar pendukung pertama",
+        "imagesDescription": "Baris pertama adalah **selalu** untuk gambar utama (hero image), dipisahkan oleh `|` untuk teks alt. Setiap baris berikutnya adalah untuk gambar pendukung.",
+        "imagesPlaceholder": "/images/blank/blank.webp | Teks alt deskriptif untuk hero image\n/images/articles/pendukung-1.webp | Teks alt untuk gambar pendukung pertama",
         "imagesTitleNote": "Gambar Pendukung (Opsional)",
-        "imagesDescriptionNote": "Masukkan path dan teks alt untuk gambar yang akan disisipkan di dalam konten, satu per baris. Catatan tidak memiliki gambar utama.",
+        "imagesDescriptionNote": "Masukkan path dan teks alt untuk gambar yang akan disisipkan di dalam konten, satu per baris, dipisahkan oleh `|`. Catatan tidak memiliki gambar utama.",
         "imagesPlaceholderNote": "/images/notes/gambar-catatan.webp | Teks alt untuk gambar",
         "metadataTitle": "Detail Metadata",
         "articleTitleLabel": "Judul Konten (Opsional)",

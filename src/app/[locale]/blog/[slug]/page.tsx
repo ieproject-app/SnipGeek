@@ -12,6 +12,7 @@ import { getDictionary } from '@/lib/get-dictionary';
 import { PostComments } from '@/components/blog/post-comments';
 import { PostMeta } from '@/components/blog/post-meta';
 import { ShareButtons } from '@/components/blog/share-buttons';
+import { RelatedPosts } from '@/components/blog/related-posts';
 
 export async function generateStaticParams() {
   const locales = getAllLocales();
@@ -120,7 +121,7 @@ export default async function PostPage({ params }: { params: { slug: string, loc
   };
 
   return (
-    <main className="w-full">
+    <div className="w-full">
       <article className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-12 sm:pt-32 sm:pb-16">
         <header className="text-center">
           <h1 className="font-headline text-4xl md:text-5xl font-extrabold tracking-tighter text-primary mb-3">
@@ -173,6 +174,14 @@ export default async function PostPage({ params }: { params: { slug: string, loc
         <PostComments article={{ slug: post.slug, title: post.frontmatter.title }} type="blog" locale={params.locale} />
 
       </article>
-    </main>
+
+      <RelatedPosts 
+        type="blog"
+        locale={params.locale}
+        currentSlug={post.slug}
+        currentTags={post.frontmatter.tags}
+        currentCategory={post.frontmatter.category}
+      />
+    </div>
   );
 }

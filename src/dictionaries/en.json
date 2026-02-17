@@ -73,7 +73,8 @@
     },
     "post": {
         "share": "Share",
-        "shareArticle": "Share this article"
+        "shareArticle": "Share this article",
+        "relatedContent": "You Might Also Like"
     },
     "readingList": {
         "add": "Save to List",
@@ -104,10 +105,10 @@
         "draftTitle": "Content Draft / Main Points",
         "draftPlaceholder": "Paste your full content draft or the main points you want me to expand upon here...",
         "imagesTitle": "Image Details",
-        "imagesDescription": "The first line is ALWAYS for the hero image. Each subsequent line is for a supporting image, in order of appearance in the article.",
-        "imagesPlaceholder": "/images/articles/hero.webp | A descriptive alt text for the hero image\n/images/articles/supporting-1.webp | Alt text for the first supporting image",
+        "imagesDescription": "The first line is ALWAYS for the hero image, separated by a `|` for the alt text. Each subsequent line is for a supporting image.",
+        "imagesPlaceholder": "/images/blank/blank.webp | A descriptive alt text for the hero image\n/images/articles/supporting-1.webp | Alt text for the first supporting image",
         "imagesTitleNote": "Supporting Images (Optional)",
-        "imagesDescriptionNote": "Insert path and alt text for images to be embedded within the note's content, one per line. Notes do not have a hero image.",
+        "imagesDescriptionNote": "Insert path and alt text for images to be embedded within the note's content, one per line, separated by a `|`. Notes do not have a hero image.",
         "imagesPlaceholderNote": "/images/notes/some-image.webp | Alt text for the image",
         "metadataTitle": "Metadata Details",
         "articleTitleLabel": "Content Title (Optional)",
