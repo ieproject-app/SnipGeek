@@ -205,7 +205,6 @@ export function PromptGeneratorClient({ dictionary }: PromptGeneratorProps) {
                     mode="single"
                     selected={publishDate}
                     onSelect={setPublishDate}
-                    initialFocus
                   />
                 </PopoverContent>
               </Popover>
