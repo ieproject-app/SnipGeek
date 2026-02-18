@@ -1,4 +1,3 @@
-
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import './globals.css';
@@ -34,14 +33,24 @@ export default function NotFound() {
                 <h1 className="font-headline text-8xl sm:text-9xl font-extrabold tracking-tighter text-primary mb-3">
                     404
                 </h1>
-                <p className="font-headline text-2xl md:text-3xl font-bold tracking-tight text-primary">
-                    Lost in Space?
-                </p>
+                <div className="space-y-1">
+                    <p className="font-headline text-2xl md:text-3xl font-bold tracking-tight text-primary">
+                        Lost in Space?
+                    </p>
+                    <p className="font-headline text-xl md:text-2xl font-bold tracking-tight text-primary/60">
+                        Tersesat di Luar Angkasa?
+                    </p>
+                </div>
             </header>
             
-            <p className="text-muted-foreground mb-12 text-lg">
-                The page you are looking for might have been moved or deleted. Let's get you back on track.
-            </p>
+            <div className="mb-12 space-y-2">
+                <p className="text-muted-foreground text-lg leading-relaxed">
+                    The page you are looking for might have been moved or deleted.
+                </p>
+                <p className="text-muted-foreground/70 text-base italic">
+                    Halaman yang Anda cari mungkin telah dipindahkan atau dihapus.
+                </p>
+            </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-12">
                 <Button asChild variant="outline" size="lg" className="rounded-xl h-16">
@@ -79,5 +88,3 @@ export default function NotFound() {
     </html>
   );
 }
-
-    

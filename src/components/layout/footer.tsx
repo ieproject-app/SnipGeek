@@ -1,4 +1,3 @@
-
 import Image from 'next/image';
 import Link from 'next/link';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
@@ -9,6 +8,8 @@ import { ThemeSwitcher } from './theme-switcher';
 import type { Dictionary } from '@/lib/get-dictionary';
 import { LanguageSwitcher } from './language-switcher';
 import type { TranslationsMap } from '@/lib/posts';
+import { Facebook, Youtube, Instagram } from 'lucide-react';
+import { TikTokLogo } from '@/components/icons/tiktok-logo';
 
 export function Footer({ dictionary, translationsMap }: { dictionary: Dictionary, translationsMap: TranslationsMap }) {
     const footerNavItems = [
@@ -20,6 +21,13 @@ export function Footer({ dictionary, translationsMap }: { dictionary: Dictionary
 
     const authorName = "Iwan Efendi";
     const authorAvatar = "/images/profile/profile.png";
+
+    const socialLinks = [
+        { icon: <Facebook className="h-5 w-5" />, href: "https://www.facebook.com/iwan.efendi.777", label: "Facebook" },
+        { icon: <Youtube className="h-5 w-5" />, href: "https://www.youtube.com/@iwantools", label: "YouTube" },
+        { icon: <Instagram className="h-5 w-5" />, href: "https://www.instagram.com/iwnefnd/", label: "Instagram" },
+        { icon: <TikTokLogo className="h-5 w-5" />, href: "https://www.tiktok.com/@iwantools", label: "TikTok" },
+    ];
 
     return (
         <footer className="w-full bg-background pt-20 sm:pt-32">
@@ -68,6 +76,21 @@ export function Footer({ dictionary, translationsMap }: { dictionary: Dictionary
                 </Avatar>
                 <h4 className="font-headline text-2xl font-bold text-primary">{authorName}</h4>
                 <p className="mt-2 text-muted-foreground max-w-md mx-auto">{dictionary.footer.authorBio}</p>
+                
+                <div className="flex items-center justify-center gap-4 mt-6">
+                    {socialLinks.map((social) => (
+                        <a 
+                            key={social.label} 
+                            href={social.href} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="p-2 rounded-full border bg-card/50 text-muted-foreground hover:text-primary hover:border-primary transition-all duration-300"
+                            aria-label={social.label}
+                        >
+                            {social.icon}
+                        </a>
+                    ))}
+                </div>
             </div>
 
             <div className="mt-16 sm:mt-24 py-8 border-t">
@@ -82,5 +105,3 @@ export function Footer({ dictionary, translationsMap }: { dictionary: Dictionary
         </footer>
     );
 }
-
-    
