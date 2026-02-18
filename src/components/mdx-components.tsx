@@ -23,7 +23,7 @@ const CustomImage = (props: any) => {
     }
 
     return (
-        <div className="relative my-8 w-full">
+        <span className="block relative my-8 w-full">
             <Image
                 width={1200}
                 height={675}
@@ -32,7 +32,7 @@ const CustomImage = (props: any) => {
                 alt={props.alt || 'SnipGeek article image'}
                 {...props}
             />
-        </div>
+        </span>
     );
 };
 
@@ -42,7 +42,7 @@ const DownloadButton = ({ id }: { id: string }) => {
   if (!linkData) {
     console.warn(`[DownloadButton Component]: The ID "${id}" was not found in data-downloads.ts.`);
     if (process.env.NODE_ENV === 'development') {
-      return <p className="font-bold text-destructive">[DownloadButton Error: Invalid ID &quot;{id}&quot;]</p>;
+      return <span className="block font-bold text-destructive">[DownloadButton Error: Invalid ID &quot;{id}&quot;]</span>;
     }
     return null;
   }
@@ -50,7 +50,7 @@ const DownloadButton = ({ id }: { id: string }) => {
   const linkHref = `/download/${id}`;
 
   return (
-    <div className="my-6">
+    <span className="block my-6">
         <Link 
           href={linkHref} 
           rel="noopener nofollow"
@@ -59,7 +59,7 @@ const DownloadButton = ({ id }: { id: string }) => {
             <Download className="mr-2 h-5 w-5" />
             {linkData.fileName}
         </Link>
-    </div>
+    </span>
   );
 };
 
@@ -101,7 +101,7 @@ export const mdxComponents: MDXComponents = {
     li: MdxAItem,
     blockquote: MdxBlockquote,
     img: CustomImage,
-    table: (props) => <div className="my-6"><Table {...props} /></div>,
+    table: (props) => <span className="block my-6"><Table {...props} /></span>,
     thead: TableHeader,
     tbody: TableBody,
     tr: TableRow,
