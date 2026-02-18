@@ -60,10 +60,10 @@ const DownloadButton = ({ id }: { id: string }) => {
   );
 };
 
-const MdxH1 = ({ children }: { children?: React.ReactNode }) => <h1 id={generateId(children)} className="font-headline mt-12 mb-6 text-4xl font-bold tracking-tighter text-primary scroll-mt-12">{children}</h1>;
-const MdxH2 = ({ children }: { children?: React.ReactNode }) => <h2 id={generateId(children)} className="font-headline mt-10 mb-5 text-3xl font-bold tracking-tighter text-primary scroll-mt-12">{children}</h2>;
-const MdxH3 = ({ children }: { children?: React.ReactNode }) => <h3 id={generateId(children)} className="font-headline mt-8 mb-4 text-2xl font-bold tracking-tighter text-primary scroll-mt-12">{children}</h3>;
-const MdxH4 = ({ children }: { children?: React.ReactNode }) => <h4 id={generateId(children)} className="font-headline mt-6 mb-3 text-xl font-bold tracking-tighter text-primary scroll-mt-12">{children}</h4>;
+const MdxH1 = ({ children }: { children?: React.ReactNode }) => <h1 id={generateId(children)} className="font-headline mt-12 mb-6 text-4xl font-bold tracking-tighter text-primary scroll-mt-6">{children}</h1>;
+const MdxH2 = ({ children }: { children?: React.ReactNode }) => <h2 id={generateId(children)} className="font-headline mt-10 mb-5 text-3xl font-bold tracking-tighter text-primary scroll-mt-6">{children}</h2>;
+const MdxH3 = ({ children }: { children?: React.ReactNode }) => <h3 id={generateId(children)} className="font-headline mt-8 mb-4 text-2xl font-bold tracking-tighter text-primary scroll-mt-6">{children}</h3>;
+const MdxH4 = ({ children }: { children?: React.ReactNode }) => <h4 id={generateId(children)} className="font-headline mt-6 mb-3 text-xl font-bold tracking-tighter text-primary scroll-mt-6">{children}</h4>;
 const MdxP = ({ children }: { children?: React.ReactNode }) => <p className="leading-7 my-6">{children}</p>;
 const MdxA = (props: React.AnchorHTMLAttributes<HTMLAnchorElement>) => {
   if (props.href) {
@@ -73,7 +73,7 @@ const MdxA = (props: React.AnchorHTMLAttributes<HTMLAnchorElement>) => {
 };
 const MdxUl = ({ children }: { children?: React.ReactNode }) => <ul className="my-6 ml-6 list-disc [&>li]:mt-2">{children}</ul>;
 const MdxOl = ({ children }: { children?: React.ReactNode }) => <ol className="my-6 ml-6 list-decimal [&>li]:mt-2">{children}</ol>;
-const MdxLi = ({ children }: { children?: React.ReactNode }) => <li>{children}</li>;
+const MdxAItem = ({ children }: { children?: React.ReactNode }) => <li>{children}</li>;
 const MdxBlockquote = ({ children }: { children?: React.ReactNode }) => <blockquote className="mt-6 border-l-2 border-primary/20 pl-6 italic text-muted-foreground">{children}</blockquote>;
 
 const MdxPre = ({ className, ...props }: React.HTMLAttributes<HTMLPreElement>) => (
@@ -95,7 +95,7 @@ export const mdxComponents: MDXComponents = {
     a: MdxA,
     ul: MdxUl,
     ol: MdxOl,
-    li: MdxLi,
+    li: MdxAItem,
     blockquote: MdxBlockquote,
     img: CustomImage,
     table: (props) => <div className="my-6"><Table {...props} /></div>,
