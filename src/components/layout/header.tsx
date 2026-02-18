@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { LanguageSwitcher } from './language-switcher';
 import { TranslationsMap } from '@/lib/posts';
-import { Search, X, Menu, Bookmark, Trash2 } from 'lucide-react';
+import { Search, X, Menu, Bookmark, Trash2, MoreHorizontal } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -158,11 +158,12 @@ export function Header({ translationsMap, searchableData, dictionary }: { transl
                 "flex items-center gap-1 transition-opacity duration-300",
                 isSearchOpen ? "opacity-0 pointer-events-none" : "opacity-100"
             )}>
+                {/* Mobile Icons */}
                 <div className={cn("flex md:hidden items-center", isSearchOpen && "opacity-0 pointer-events-none")}>
                     <Button variant="ghost" size="icon" className="rounded-full h-9 w-9" onClick={() => toggleView('search')}>
                        <Search className="h-5 w-5" />
                     </Button>
-                    <Button variant="ghost" size="icon" className="rounded-full h-9 w-9" onClick={() => toggleView('readingList')}>
+                    <Button variant="ghost" size="icon" className="relative rounded-full h-9 w-9" onClick={() => toggleView('readingList')}>
                        <Bookmark className="h-5 w-5" />
                        {readingListItems.length > 0 && (
                             <span className="absolute top-1 right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-accent text-accent-foreground text-xs font-bold px-1">
@@ -175,6 +176,7 @@ export function Header({ translationsMap, searchableData, dictionary }: { transl
                     </Button>
                 </div>
 
+                {/* Desktop Icons */}
                 <div className="hidden md:flex items-center gap-2">
                     {menuItems.map(item => (
                         <Link key={item.name} href={item.href} className="px-3 py-1 text-sm font-medium rounded-full hover:bg-primary-foreground/10 transition-colors">
@@ -182,9 +184,9 @@ export function Header({ translationsMap, searchableData, dictionary }: { transl
                         </Link>
                     ))}
                     <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full" onClick={() => toggleView('menu')}>
-                        <Menu className="h-5 w-5" />
+                        <MoreHorizontal className="h-5 w-5" />
                     </Button>
-                    <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full" onClick={() => toggleView('readingList')}>
+                    <Button variant="ghost" size="icon" className="relative h-9 w-9 rounded-full" onClick={() => toggleView('readingList')}>
                        <Bookmark className="h-5 w-5" />
                        {readingListItems.length > 0 && (
                             <span className="absolute top-1 right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-accent text-accent-foreground text-xs font-bold px-1">
@@ -198,6 +200,7 @@ export function Header({ translationsMap, searchableData, dictionary }: { transl
                 </div>
             </div>
             
+            {/* Search Input Overlay */}
             <div className={cn(
                 "absolute left-0 right-0 w-full h-full flex items-center transition-all duration-300 ease-in-out",
                 isSearchOpen ? "opacity-100 z-10 px-2" : "opacity-0 -z-10"
@@ -217,20 +220,32 @@ export function Header({ translationsMap, searchableData, dictionary }: { transl
             </div>
         </nav>
 
+        {/* Dropdown Menu */}
         <div className={cn(
             "absolute top-full left-0 right-0 z-40 bg-primary/90 backdrop-blur-sm shadow-lg ring-1 ring-black/5 rounded-b-2xl overflow-hidden transition-all duration-300 ease-in-out",
             "transform-origin-top",
             isMenuOpen ? "opacity-100 scale-y-100" : "opacity-0 scale-y-95 pointer-events-none"
         )}>
             <div className="p-2">
-                {allMobileMenuItems.map((item) => (
-                    <Link key={item.name} href={item.href} className="block px-4 py-3 text-base text-primary-foreground rounded-lg hover:bg-primary-foreground/10 transition-colors" onClick={() => setActiveView('none')}>
-                        {item.name}
-                    </Link>
-                ))}
+                {/* Mobile shows all, Desktop only shows 'moreMenuItems' */}
+                <div className="md:hidden">
+                    {allMobileMenuItems.map((item) => (
+                        <Link key={item.name} href={item.href} className="block px-4 py-3 text-base text-primary-foreground rounded-lg hover:bg-primary-foreground/10 transition-colors" onClick={() => setActiveView('none')}>
+                            {item.name}
+                        </Link>
+                    ))}
+                </div>
+                <div className="hidden md:block">
+                    {moreMenuItems.map((item) => (
+                        <Link key={item.name} href={item.href} className="block px-4 py-3 text-base text-primary-foreground rounded-lg hover:bg-primary-foreground/10 transition-colors" onClick={() => setActiveView('none')}>
+                            {item.name}
+                        </Link>
+                    ))}
+                </div>
             </div>
         </div>
 
+        {/* Search Results & Reading List Overlay */}
         <div className="absolute top-full left-0 right-0 z-30 mt-2">
           {isSearchOpen && (
             <div className="bg-background rounded-lg border shadow-lg max-h-[400px] overflow-hidden">
@@ -308,5 +323,3 @@ export function Header({ translationsMap, searchableData, dictionary }: { transl
     </header>
   );
 }
-
-    
