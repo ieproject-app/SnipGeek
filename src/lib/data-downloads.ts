@@ -132,7 +132,7 @@ export const downloadLinks: Record<string, DownloadInfo> = {
     externalUrl: 'https://www.dropbox.com/scl/fi/v66ge1e5n0v3gq3q3q3q3/minion-pro.rar?rlkey=example&dl=1'
   },
   'font-koleksi-lengkap': {
-    fileName: 'Complete Font Collection by IR Web',
+    fileName: 'Complete Font Collection by SnipGeek',
     fileSize: '30 MB',
     externalUrl: 'https://www.dropbox.com/scl/fi/v66ge1e5n0v3gq3q3q3q3/koleksi-font-irweb.rar?rlkey=example&dl=1'
   },
