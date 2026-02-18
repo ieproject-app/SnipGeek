@@ -46,7 +46,6 @@ TL WH	01/01/2023	28/02/2025	WILIYAN FERDIANSAH	TL Inventory & Asset Management	1
 TL WH	01/03/2025	31/12/9999	WILIYAN FERDIANSAH	Officer 3 Commercial & Supply Chain Jambi	19950335
 Mgr Finance	01/03/2025	31/01/2026	FADHILA NISYA TANJUNG	Mgr Business Support Regional I	896136
 Mgr Finance	01/02/2026	31/12/9999	AZHARY AGUNG KURNIA	Mgr Business Support Area Sumatera	925598
-TL Finance	01/02/2026	31/12/9999	DONI PRASETIO
-	Officer 3 Finance & Performance Area Sumatera	965028
+TL Finance	01/02/2026	31/12/9999	DONI PRASETIO	Officer 3 Finance & Performance Area Sumatera	965028
 Procurement	01/01/2023	28/02/2025	IWAN EFFENDI	Staff Procurement & Partnership	20950700
 Procurement	01/01/2023	31/12/9999	IWAN EFFENDI	POH Staff Procurement & Partnership	20950700

@@ -132,10 +132,15 @@ export default function EmployeeHistoryClient({
             }
         })
         .sort((a, b) => {
-            const aIsActive = a.tglSelesai.getFullYear() === 9999;
-            const bIsActive = b.tglSelesai.getFullYear() === 9999;
-            if (aIsActive && !bIsActive) return -1;
-            if (!aIsActive && bIsActive) return 1;
+            // Sort by end date descending (newest first)
+            const dateSort = b.tglSelesai.getTime() - a.tglSelesai.getTime();
+            if (dateSort !== 0) return dateSort;
+            
+            // If end dates are same, sort by start date descending
+            const startSort = b.tglMulai.getTime() - a.tglMulai.getTime();
+            if (startSort !== 0) return startSort;
+
+            // Fallback to name
             return a.nama.localeCompare(b.nama);
         });
 
@@ -230,7 +235,7 @@ export default function EmployeeHistoryClient({
                 <Table>
                 <TableHeader className="bg-muted/30">
                     <TableRow className="hover:bg-transparent">
-                        <TableHead className="sticky left-0 z-20 bg-muted font-bold py-4 pl-6 min-w-[200px] border-r">
+                        <TableHead className="sticky left-0 z-20 bg-card font-bold py-4 pl-6 min-w-[200px] border-r">
                             {t.nameHeader}
                         </TableHead>
                         <TableHead className="font-bold px-4">{t.positionHeader}</TableHead>
@@ -247,11 +252,10 @@ export default function EmployeeHistoryClient({
                         <TableRow 
                             key={`${p.nik}-${i}`} 
                             className={cn(
-                                "transition-all duration-200",
                                 isActive ? 'bg-primary/[0.03] hover:bg-primary/[0.08]' : 'hover:bg-muted/50'
                             )}
                         >
-                        <TableCell className="sticky left-0 z-10 bg-background py-4 pl-6 font-semibold border-r min-w-[200px] group-hover:bg-muted/50 transition-colors">
+                        <TableCell className="sticky left-0 z-10 bg-card py-4 pl-6 font-semibold border-r min-w-[200px]">
                             {p.nama}
                         </TableCell>
                         <TableCell className="text-muted-foreground px-4 text-xs md:text-sm">{p.jabatan}</TableCell>
