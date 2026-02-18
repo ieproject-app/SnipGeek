@@ -22,7 +22,7 @@ type SearchableItem = {
 
 type ActiveView = 'none' | 'search' | 'menu' | 'readingList';
 
-export function Header({ searchableData, dictionary }: { translationsMap: any, searchableData: SearchableItem[], dictionary: Dictionary }) {
+export function Header({ searchableData, dictionary }: { searchableData: SearchableItem[], dictionary: Dictionary }) {
   const [isVisible, setIsVisible] = useState(true);
   const [activeView, setActiveView] = useState<ActiveView>('none');
   const [query, setQuery] = useState('');
@@ -176,9 +176,9 @@ export function Header({ searchableData, dictionary }: { translationsMap: any, s
                 </div>
 
                 {/* Desktop Icons */}
-                <div className="hidden md:flex items-center gap-2">
+                <div className="hidden md:flex items-center gap-1">
                     {menuItems.map(item => (
-                        <Link key={item.name} href={item.href} className={cn("px-3 py-1 text-sm font-medium", navItemClass)}>
+                        <Link key={item.name} href={item.href} className={cn("px-2 py-1 text-sm font-medium", navItemClass)}>
                             {item.name}
                         </Link>
                     ))}
