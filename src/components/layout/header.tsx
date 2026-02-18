@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
@@ -39,13 +40,11 @@ export function Header({ translationsMap, searchableData, dictionary }: { transl
   const isMenuOpen = activeView === 'menu';
   const isReadingListOpen = activeView === 'readingList';
 
-  // Close all views on route change
   useEffect(() => {
     setActiveView('none');
     setQuery('');
   }, [pathname]);
 
-  // Search logic
   useEffect(() => {
     if (query.length > 1) {
       const lowerCaseQuery = query.toLowerCase();
@@ -60,8 +59,6 @@ export function Header({ translationsMap, searchableData, dictionary }: { transl
     }
   }, [query, searchableData]);
 
-
-  // Scroll visibility logic
   useEffect(() => {
     const handleScroll = () => {
       if (activeView !== 'none') return;
@@ -78,14 +75,12 @@ export function Header({ translationsMap, searchableData, dictionary }: { transl
     return () => window.removeEventListener('scroll', handleScroll);
   }, [activeView]);
 
-  // Focus input when search opens
   useEffect(() => {
     if (isSearchOpen) {
       setTimeout(() => searchInputRef.current?.focus(), 100);
     }
   }, [isSearchOpen]);
   
-  // Close all views on click outside or escape key
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (headerRef.current && !headerRef.current.contains(event.target as Node)) {
@@ -127,6 +122,7 @@ export function Header({ translationsMap, searchableData, dictionary }: { transl
 
   const moreMenuItems = [
     { name: dictionary.navigation.about, href: '/about' },
+    { name: dictionary.navigation.contact, href: '/contact' },
   ];
   
   const allMobileMenuItems = [...menuItems, ...moreMenuItems];
@@ -143,7 +139,6 @@ export function Header({ translationsMap, searchableData, dictionary }: { transl
             isSearchOpen ? 'rounded-full' : 'w-full md:w-auto',
             (isMenuOpen || isReadingListOpen) ? 'rounded-t-2xl rounded-b-none' : 'rounded-full'
         )}>
-            {/* Normal view container */}
             <div className={cn(
                 "flex items-center flex-grow md:flex-grow-0 gap-2 transition-all duration-300 ease-in-out",
                 isSearchOpen ? 'w-0 opacity-0 -translate-x-10' : 'w-auto opacity-100 translate-x-0'
@@ -156,33 +151,18 @@ export function Header({ translationsMap, searchableData, dictionary }: { transl
                 >
                     SG
                 </Link>
-                
                 <div className="flex-grow hidden md:block" />
-
             </div>
             
             <div className={cn(
                 "flex items-center gap-1 transition-opacity duration-300",
                 isSearchOpen ? "opacity-0 pointer-events-none" : "opacity-100"
             )}>
-                {/* Mobile controls */}
                 <div className={cn("flex md:hidden items-center", isSearchOpen && "opacity-0 pointer-events-none")}>
-                    <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        className="rounded-full relative z-20 h-9 w-9"
-                        onClick={() => toggleView('search')}
-                        aria-label="Open search"
-                    >
+                    <Button variant="ghost" size="icon" className="rounded-full h-9 w-9" onClick={() => toggleView('search')}>
                        <Search className="h-5 w-5" />
                     </Button>
-                    <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        className="rounded-full relative z-20 h-9 w-9"
-                        onClick={() => toggleView('readingList')}
-                        aria-label="Open reading list"
-                    >
+                    <Button variant="ghost" size="icon" className="rounded-full h-9 w-9" onClick={() => toggleView('readingList')}>
                        <Bookmark className="h-5 w-5" />
                        {readingListItems.length > 0 && (
                             <span className="absolute top-1 right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-accent text-accent-foreground text-xs font-bold px-1">
@@ -192,37 +172,19 @@ export function Header({ translationsMap, searchableData, dictionary }: { transl
                     </Button>
                     <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full" onClick={() => toggleView('menu')}>
                         <Menu className="h-5 w-5" />
-                        <span className="sr-only">Open menu</span>
                     </Button>
                 </div>
 
-                {/* Desktop controls */}
                 <div className="hidden md:flex items-center gap-2">
                     {menuItems.map(item => (
-                        <Link
-                            key={item.name}
-                            href={item.href}
-                            className="px-3 py-1 text-sm font-medium rounded-full hover:bg-primary-foreground/10 transition-colors"
-                        >
+                        <Link key={item.name} href={item.href} className="px-3 py-1 text-sm font-medium rounded-full hover:bg-primary-foreground/10 transition-colors">
                             {item.name}
                         </Link>
                     ))}
-                    <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        className="h-8 w-8 rounded-full text-primary-foreground/70 hover:text-primary-foreground" 
-                        onClick={() => toggleView('menu')}
-                    >
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
-                        <span className="sr-only">Open more menu items</span>
+                    <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full" onClick={() => toggleView('menu')}>
+                        <Menu className="h-5 w-5" />
                     </Button>
-                    <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        className="relative z-20 h-9 w-9 rounded-full"
-                        onClick={() => toggleView('readingList')}
-                        aria-label="Open reading list"
-                    >
+                    <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full" onClick={() => toggleView('readingList')}>
                        <Bookmark className="h-5 w-5" />
                        {readingListItems.length > 0 && (
                             <span className="absolute top-1 right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-accent text-accent-foreground text-xs font-bold px-1">
@@ -230,19 +192,12 @@ export function Header({ translationsMap, searchableData, dictionary }: { transl
                             </span>
                        )}
                     </Button>
-                    <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        className={cn("rounded-full relative z-20 h-9 w-9", isSearchOpen && "opacity-0 pointer-events-none")}
-                        onClick={() => toggleView('search')}
-                        aria-label={"Open search"}
-                    >
+                    <Button variant="ghost" size="icon" className="rounded-full h-9 w-9" onClick={() => toggleView('search')}>
                        <Search className="h-5 w-5" />
                     </Button>
                 </div>
             </div>
             
-            {/* Search Input and Close Button container */}
             <div className={cn(
                 "absolute left-0 right-0 w-full h-full flex items-center transition-all duration-300 ease-in-out",
                 isSearchOpen ? "opacity-100 z-10 px-2" : "opacity-0 -z-10"
@@ -253,49 +208,30 @@ export function Header({ translationsMap, searchableData, dictionary }: { transl
                     type="search" 
                     placeholder={dictionary.search.placeholder}
                     className="w-full h-full bg-transparent border-none rounded-full pl-12 pr-12 focus-visible:ring-0 focus-visible:ring-offset-0 text-primary-foreground placeholder:text-primary-foreground/50"
-                    aria-hidden={!isSearchOpen}
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
                 />
-                <Button 
-                    variant="ghost" 
-                    size="icon" 
-                    className="rounded-full absolute right-2 z-20 h-9 w-9"
-                    onClick={() => { setActiveView('none'); setQuery(''); }}
-                    aria-label="Close search"
-                >
+                <Button variant="ghost" size="icon" className="rounded-full absolute right-2 z-20 h-9 w-9" onClick={() => { setActiveView('none'); setQuery(''); }}>
                    <X className="h-5 w-5" />
                 </Button>
             </div>
         </nav>
 
-        {/* Custom Menu */}
         <div className={cn(
             "absolute top-full left-0 right-0 z-40 bg-primary/90 backdrop-blur-sm shadow-lg ring-1 ring-black/5 rounded-b-2xl overflow-hidden transition-all duration-300 ease-in-out",
             "transform-origin-top",
             isMenuOpen ? "opacity-100 scale-y-100" : "opacity-0 scale-y-95 pointer-events-none"
         )}>
-            {/* Mobile Menu */}
-            <div className="md:hidden p-2">
+            <div className="p-2">
                 {allMobileMenuItems.map((item) => (
                     <Link key={item.name} href={item.href} className="block px-4 py-3 text-base text-primary-foreground rounded-lg hover:bg-primary-foreground/10 transition-colors" onClick={() => setActiveView('none')}>
                         {item.name}
                     </Link>
                 ))}
             </div>
-            {/* Desktop Menu */}
-            <div className="hidden md:block p-2">
-                {moreMenuItems.map((item) => (
-                    <Link key={item.name} href={item.href} className="block px-4 py-2 text-sm text-primary-foreground rounded-lg hover:bg-primary-foreground/10 transition-colors" onClick={() => setActiveView('none')}>
-                        {item.name}
-                    </Link>
-                ))}
-            </div>
         </div>
 
-        {/* Results Container */}
         <div className="absolute top-full left-0 right-0 z-30 mt-2">
-          {/* Search Results */}
           {isSearchOpen && (
             <div className="bg-background rounded-lg border shadow-lg max-h-[400px] overflow-hidden">
                   {query.length > 1 ? (
@@ -306,11 +242,7 @@ export function Header({ translationsMap, searchableData, dictionary }: { transl
                                   <ul>
                                       {results.map((item) => (
                                       <li key={`${item.type}-${item.slug}`}>
-                                          <Link 
-                                              href={item.href} 
-                                              onClick={handleResultClick} 
-                                              className="block p-3 rounded-md hover:bg-muted transition-colors"
-                                          >
+                                          <Link href={item.href} onClick={handleResultClick} className="block p-3 rounded-md hover:bg-muted transition-colors">
                                               <div className="overflow-hidden">
                                                   <div className="flex items-start justify-between gap-2">
                                                       <span className="font-medium text-sm text-primary line-clamp-2 flex-1 min-w-0">{item.title}</span>
@@ -337,7 +269,6 @@ export function Header({ translationsMap, searchableData, dictionary }: { transl
               </div>
           )}
 
-          {/* Reading List Results */}
           {isReadingListOpen && (
             <div className="bg-background rounded-lg border shadow-lg max-h-[400px] overflow-hidden">
                 <ScrollArea className="h-full max-h-[400px]">
@@ -349,11 +280,7 @@ export function Header({ translationsMap, searchableData, dictionary }: { transl
                       <ul>
                         {readingListItems.map((item) => (
                           <li key={`${item.type}-${item.slug}`} className="group relative">
-                              <Link 
-                                  href={item.href} 
-                                  onClick={() => setActiveView('none')} 
-                                  className="block p-3 rounded-md hover:bg-muted transition-colors"
-                              >
+                              <Link href={item.href} onClick={() => setActiveView('none')} className="block p-3 rounded-md hover:bg-muted transition-colors">
                                   <div className="overflow-hidden pr-8">
                                       <div className="flex items-start justify-between gap-2">
                                           <span className="font-medium text-sm text-primary line-clamp-2 flex-1 min-w-0">{item.title}</span>
@@ -362,13 +289,7 @@ export function Header({ translationsMap, searchableData, dictionary }: { transl
                                       <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{item.description}</p>
                                   </div>
                               </Link>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-                                onClick={() => removeReadingListItem(item.slug)}
-                                aria-label={`Remove ${item.title} from reading list`}
-                              >
+                              <Button variant="ghost" size="icon" className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => removeReadingListItem(item.slug)}>
                                 <Trash2 className="h-4 w-4 text-muted-foreground" />
                               </Button>
                           </li>
@@ -387,3 +308,5 @@ export function Header({ translationsMap, searchableData, dictionary }: { transl
     </header>
   );
 }
+
+    

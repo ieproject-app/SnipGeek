@@ -12,7 +12,7 @@ import { PostComments } from '@/components/blog/post-comments';
 import { PostMeta } from '@/components/blog/post-meta';
 import { ShareButtons } from '@/components/blog/share-buttons';
 import { RelatedPosts } from '@/components/blog/related-posts';
-import { MobileTableOfContents } from '@/components/blog/table-of-contents';
+import { TableOfContents } from '@/components/blog/table-of-contents';
 import { extractHeadings } from '@/lib/mdx-utils';
 
 export async function generateStaticParams() {
@@ -94,8 +94,7 @@ export default async function NotePage({ params }: { params: { slug: string, loc
                 dictionary={dictionary}
             />
 
-            {/* TOC is now part of the single column flow, collapsed by default */}
-            <MobileTableOfContents headings={headings} title={dictionary.post.toc} />
+            <TableOfContents headings={headings} title={dictionary.post.toc} />
             
             <div className="text-lg text-foreground/80">
                 <MDXRemote
@@ -130,3 +129,5 @@ export default async function NotePage({ params }: { params: { slug: string, loc
     </div>
   );
 }
+
+    

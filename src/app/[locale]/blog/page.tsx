@@ -1,3 +1,4 @@
+
 import { getSortedPostsData } from '@/lib/posts';
 import Link from 'next/link';
 import { i18n } from '@/i18n-config';
@@ -18,10 +19,13 @@ export default async function BlogPage({ params: { locale } }: { params: { local
   return (
     <div className="w-full">
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-12 sm:pt-32 sm:pb-16">
-        <header className="mb-12 text-center">
+        <header className="mb-16 text-center">
             <h1 className="font-headline text-5xl md:text-6xl font-extrabold tracking-tighter text-primary mb-3">
                 {dictionary.navigation.blog}
             </h1>
+            <p className="text-muted-foreground max-w-xl mx-auto text-lg italic">
+                {dictionary.blog.description}
+            </p>
         </header>
 
         <section className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-12">
@@ -87,3 +91,5 @@ export default async function BlogPage({ params: { locale } }: { params: { local
     </div>
   );
 }
+
+    

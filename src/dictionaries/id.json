@@ -17,8 +17,13 @@
         "viewAllPosts": "Lihat Semua Postingan",
         "specialTagSectionTitle": "Lebih banyak tentang {tag}"
     },
+    "blog": {
+        "title": "Blog",
+        "description": "Pembahasan mendalam tentang teknologi, tutorial, dan wawasan pengembangan."
+    },
     "notes": {
-        "title": "Catatan"
+        "title": "Catatan",
+        "description": "Catatan teknis pribadi dan referensi cepat."
     },
     "projects": {
         "title": "Proyek",
@@ -110,6 +115,12 @@
         "continueButton": "Lanjutkan untuk Mengunduh",
         "redirecting": "atau unduhan Anda akan dimulai secara otomatis..."
     },
+    "notFound": {
+        "title": "Halaman Tidak Ditemukan",
+        "description": "Halaman yang Anda cari mungkin telah dipindahkan atau dihapus.",
+        "backHome": "Kembali ke Beranda",
+        "popularLinks": "Coba lihat ini saja:"
+    },
     "promptGenerator": {
         "title": "Generator Prompt Konten AI",
         "description": "Gunakan formulir ini untuk menghasilkan prompt terstruktur untuk meminta konten baru. Isi detail di bawah ini, dan prompt akhir akan dibuat untuk Anda salin.",
@@ -165,3 +176,5 @@
         "finalInstruction": "Instruksi Tambahan: Setelah selesai, selalu konfirmasikan `translationKey` dan `slug` Bahasa Inggris yang Anda gunakan agar saya bisa menemukan filenya dengan mudah."
     }
 }
+
+    

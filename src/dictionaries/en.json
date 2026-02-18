@@ -17,8 +17,13 @@
         "viewAllPosts": "View All Posts",
         "specialTagSectionTitle": "More from {tag}"
     },
+    "blog": {
+        "title": "Blog",
+        "description": "Deep dives into tech, tutorials, and development insights."
+    },
     "notes": {
-        "title": "Notes"
+        "title": "Notes",
+        "description": "Personal technical snippets and quick references."
     },
     "projects": {
         "title": "Projects",
@@ -110,6 +115,12 @@
         "continueButton": "Continue to Download",
         "redirecting": "or your download will begin automatically..."
     },
+    "notFound": {
+        "title": "Page Not Found",
+        "description": "The page you are looking for might have been moved or deleted.",
+        "backHome": "Back to Home",
+        "popularLinks": "Try these instead:"
+    },
     "promptGenerator": {
         "title": "AI Content Prompt Generator",
         "description": "Use this form to generate a structured prompt for requesting new content. Fill in the details below, and the final prompt will be generated for you to copy.",
@@ -165,3 +176,5 @@
         "finalInstruction": "Additional Instruction: After completion, always confirm the `translationKey` and the English `slug` you used so I can find the files easily."
     }
 }
+
+    

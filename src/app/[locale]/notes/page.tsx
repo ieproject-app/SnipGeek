@@ -28,6 +28,9 @@ export default async function NotesPage({ params: { locale } }: { params: { loca
             <h1 className="font-headline text-5xl md:text-6xl font-extrabold tracking-tighter text-primary mb-3">
                 {dictionary.notes.title}
             </h1>
+            <p className="text-muted-foreground max-w-xl mx-auto text-lg italic">
+                {dictionary.notes.description}
+            </p>
         </header>
 
         <section className="space-y-8">
@@ -42,7 +45,6 @@ export default async function NotesPage({ params: { locale } }: { params: { loca
             };
             return (
               <Card key={note.slug} className="group relative flex flex-col overflow-hidden rounded-lg border bg-card/50 shadow-sm transition-all hover:shadow-lg">
-                {/* Date Ribbon */}
                 <div className="flex items-center justify-between bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground">
                   <div>
                     <span className="text-xl font-bold">{formatDatePart(noteDate, { day: 'numeric' })}</span>
@@ -51,7 +53,6 @@ export default async function NotesPage({ params: { locale } }: { params: { loca
                   <span>{formatDatePart(noteDate, { year: 'numeric' })}</span>
                 </div>
 
-                {/* Main Content */}
                 <div className="flex flex-1 flex-col p-6">
                   <Link href={`${linkPrefix}/notes/${note.slug}`} aria-label={note.frontmatter.title} className="flex-1">
                     <h2 className="font-headline text-2xl font-bold tracking-tight text-primary transition-colors group-hover:text-accent">
@@ -63,7 +64,6 @@ export default async function NotesPage({ params: { locale } }: { params: { loca
                   </Link>
                 </div>
                 
-                {/* Footer with Tags and Action */}
                 <CardFooter className="flex items-center justify-between gap-4 border-t px-6 py-4">
                     <div className="flex flex-wrap gap-1">
                         {note.frontmatter.tags && note.frontmatter.tags.map(tag => (
@@ -88,3 +88,5 @@ export default async function NotesPage({ params: { locale } }: { params: { loca
     </div>
   );
 }
+
+    

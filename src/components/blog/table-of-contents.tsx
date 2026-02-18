@@ -1,6 +1,7 @@
+
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import type { Heading } from '@/lib/mdx-utils';
 import { ChevronRight, ListIcon } from 'lucide-react';
@@ -11,64 +12,6 @@ interface TableOfContentsProps {
 }
 
 export function TableOfContents({ headings, title }: TableOfContentsProps) {
-  const [activeId, setActiveId] = useState<string>('');
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setActiveId(entry.target.id);
-          }
-        });
-      },
-      { rootMargin: '0% 0% -80% 0%' }
-    );
-
-    headings.forEach((heading) => {
-      const element = document.getElementById(heading.id);
-      if (element) observer.observe(element);
-    });
-
-    return () => observer.disconnect();
-  }, [headings]);
-
-  if (headings.length === 0) return null;
-
-  return (
-    <nav className="space-y-4">
-      <div className="flex items-center gap-2 text-primary font-headline font-bold uppercase tracking-wider text-sm">
-        <span className="flex items-center gap-2">
-            <ListIcon className="h-4 w-4" />
-            {title}
-        </span>
-      </div>
-      <ul className="space-y-2 text-sm">
-        {headings.map((heading) => (
-          <li
-            key={heading.id}
-            className={cn(
-              "transition-all duration-200 border-l-2 pl-4 py-1",
-              heading.level === 3 ? "ml-4" : "",
-              activeId === heading.id
-                ? "border-accent text-accent font-semibold"
-                : "border-transparent text-muted-foreground hover:text-foreground hover:border-muted"
-            )}
-          >
-            <a
-              href={`#${heading.id}`}
-              className="block"
-            >
-              {heading.text}
-            </a>
-          </li>
-        ))}
-      </ul>
-    </nav>
-  );
-}
-
-export function MobileTableOfContents({ headings, title }: TableOfContentsProps) {
     const [isOpen, setIsOpen] = useState(false);
 
     if (headings.length === 0) return null;
@@ -110,3 +53,5 @@ export function MobileTableOfContents({ headings, title }: TableOfContentsProps)
         </div>
     );
 }
+
+    

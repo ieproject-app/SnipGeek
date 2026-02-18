@@ -1,3 +1,4 @@
+
 import Image from 'next/image';
 import Link from 'next/link';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
@@ -22,7 +23,6 @@ export function Footer({ dictionary, translationsMap }: { dictionary: Dictionary
 
     return (
         <footer className="w-full bg-background pt-20 sm:pt-32">
-            {/* Section 1: Visual Link Gallery */}
             <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
                     {footerNavItems.map((item, index) => {
@@ -61,7 +61,6 @@ export function Footer({ dictionary, translationsMap }: { dictionary: Dictionary
                 </div>
             </div>
 
-            {/* Section 2: Author Profile */}
             <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 mt-16 sm:mt-24 text-center">
                 <Avatar className="w-20 h-20 mx-auto mb-4">
                     <AvatarImage src={authorAvatar} alt={authorName} />
@@ -71,7 +70,6 @@ export function Footer({ dictionary, translationsMap }: { dictionary: Dictionary
                 <p className="mt-2 text-muted-foreground max-w-md mx-auto">{dictionary.footer.authorBio}</p>
             </div>
 
-            {/* Section 3: Standard Footer */}
             <div className="mt-16 sm:mt-24 py-8 border-t">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col justify-center items-center gap-4 text-sm text-muted-foreground">
                     <div className="flex items-center gap-4">
@@ -84,3 +82,5 @@ export function Footer({ dictionary, translationsMap }: { dictionary: Dictionary
         </footer>
     );
 }
+
+    
