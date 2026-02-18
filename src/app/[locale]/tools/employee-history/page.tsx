@@ -3,6 +3,7 @@ import { Locale } from '@/i18n-config'
 import EmployeeHistoryClient from './employee-history-client'
 import fs from 'fs'
 import path from 'path'
+import type { Metadata } from 'next'
 
 // Helper function to read the employee data from the text file.
 const getEmployeeData = () => {
@@ -14,6 +15,24 @@ const getEmployeeData = () => {
     console.error("Error reading employee history file:", error);
     return "";
   }
+}
+
+export async function generateMetadata({
+  params: { locale },
+}: {
+  params: { locale: Locale }
+}): Promise<Metadata> {
+  const dictionary = await getDictionary(locale)
+  const pageContent = dictionary.tools.tool_list.employee_history;
+
+  return {
+    title: pageContent.title,
+    description: pageContent.description,
+    robots: {
+      index: false,
+      follow: false,
+    },
+  };
 }
 
 /**
