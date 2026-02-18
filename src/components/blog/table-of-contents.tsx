@@ -99,7 +99,6 @@ export function MobileTableOfContents({ headings, title }: TableOfContentsProps)
                         >
                             <a 
                                 href={`#${heading.id}`}
-                                onClick={() => setIsOpen(false)}
                                 className="text-muted-foreground hover:text-accent transition-colors"
                             >
                                 {heading.text}
