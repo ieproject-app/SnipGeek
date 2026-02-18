@@ -161,7 +161,7 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                     <Button variant="ghost" size="icon" className={cn("relative rounded-full h-9 w-9 bg-transparent hover:bg-transparent", navItemClass)} onClick={() => toggleView('readingList')}>
                        <Bookmark className="h-5 w-5" />
                        {readingListItems.length > 0 && (
-                            <span className="absolute top-1 right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-accent text-accent-foreground text-xs font-bold px-1">
+                            <span className="absolute -top-1 -right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-accent text-accent-foreground text-xs font-bold px-1">
                                 {readingListItems.length}
                             </span>
                        )}
@@ -185,7 +185,7 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                         <Button variant="ghost" size="icon" className={cn("relative h-9 w-9 rounded-full bg-transparent hover:bg-transparent", navItemClass)} onClick={() => toggleView('readingList')}>
                            <Bookmark className="h-5 w-5" />
                            {readingListItems.length > 0 && (
-                                <span className="absolute top-1 right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-accent text-accent-foreground text-xs font-bold px-1">
+                                <span className="absolute -top-1 -right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-accent text-accent-foreground text-xs font-bold px-1">
                                     {readingListItems.length}
                                 </span>
                            )}
