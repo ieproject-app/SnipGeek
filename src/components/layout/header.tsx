@@ -129,24 +129,21 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
   return (
     <header ref={headerRef} className={cn(
         "fixed top-4 left-4 right-4 md:left-1/2 md:-translate-x-1/2 md:right-auto z-50 transition-all duration-300 ease-in-out",
-        isSearchOpen ? 'md:w-full max-w-lg' : 'md:w-[520px]',
+        isSearchOpen ? 'md:w-[560px]' : 'md:w-[480px]',
         isVisible ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-16"
     )}>
         <nav className={cn(
             "relative mx-auto bg-primary/90 backdrop-blur-sm text-primary-foreground shadow-lg ring-1 ring-black/5 flex items-center justify-between h-12 transition-all duration-300 ease-in-out px-4",
-            isSearchOpen && 'md:w-full',
             isSearchOpen ? 'rounded-full' : 'w-full md:w-auto',
             (isMenuOpen || isReadingListOpen) ? 'rounded-t-2xl rounded-b-none' : 'rounded-full'
         )}>
             <div className={cn(
-                "flex items-center flex-grow md:flex-grow-0 gap-1 transition-all duration-300 ease-in-out",
-                isSearchOpen ? 'w-0 opacity-0 -translate-x-10' : 'w-auto opacity-100 translate-x-0'
+                "flex items-center flex-grow md:flex-grow-0 transition-all duration-300 ease-in-out",
+                isSearchOpen ? 'w-0 opacity-0 -translate-x-10 pointer-events-none' : 'w-auto opacity-100 translate-x-0'
             )}>
                 <Link 
                     href="/" 
                     className="font-headline text-xl font-bold tracking-tighter whitespace-nowrap"
-                    aria-hidden={isSearchOpen}
-                    tabIndex={isSearchOpen ? -1 : 0}
                 >
                     SnipGeek
                 </Link>
@@ -157,7 +154,7 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                 isSearchOpen ? "opacity-0 pointer-events-none" : "opacity-100"
             )}>
                 {/* Mobile Icons */}
-                <div className={cn("flex md:hidden items-center", isSearchOpen && "opacity-0 pointer-events-none")}>
+                <div className="flex md:hidden items-center">
                     <Button variant="ghost" size="icon" className={cn("rounded-full h-9 w-9 bg-transparent hover:bg-transparent", navItemClass)} onClick={() => toggleView('search')}>
                        <Search className="h-5 w-5" />
                     </Button>
@@ -202,8 +199,8 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
             
             {/* Search Input Overlay */}
             <div className={cn(
-                "absolute left-0 right-0 w-full h-full flex items-center transition-all duration-300 ease-in-out",
-                isSearchOpen ? "opacity-100 z-10 px-2" : "opacity-0 -z-10"
+                "absolute inset-0 w-full h-full flex items-center transition-all duration-300 ease-in-out",
+                isSearchOpen ? "opacity-100 z-10 px-2" : "opacity-0 -z-10 pointer-events-none"
             )}>
                 <Search className="absolute left-6 top-1/2 -translate-y-1/2 h-5 w-5 text-primary-foreground/70 pointer-events-none"/>
                 <Input 
