@@ -140,17 +140,18 @@ export function Header({ translationsMap, searchableData, dictionary }: { transl
             (isMenuOpen || isReadingListOpen) ? 'rounded-t-2xl rounded-b-none' : 'rounded-full'
         )}>
             <div className={cn(
-                "flex items-center flex-grow md:flex-grow-0 gap-2 transition-all duration-300 ease-in-out",
+                "flex items-center flex-grow md:flex-grow-0 gap-1 transition-all duration-300 ease-in-out",
                 isSearchOpen ? 'w-0 opacity-0 -translate-x-10' : 'w-auto opacity-100 translate-x-0'
             )}>
                 <Link 
                     href="/" 
-                    className="font-headline text-2xl font-bold tracking-tighter ml-2 whitespace-nowrap"
+                    className="font-headline text-xl font-bold tracking-tighter ml-2 whitespace-nowrap"
                     aria-hidden={isSearchOpen}
                     tabIndex={isSearchOpen ? -1 : 0}
                 >
-                    SG
+                    SnipGeek
                 </Link>
+                <div className="h-6 w-px bg-primary-foreground/20 mx-1 hidden sm:block" />
                 <div className="flex-grow hidden md:block" />
             </div>
             
