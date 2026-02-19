@@ -9,6 +9,7 @@ import { AddToReadingListButton } from '@/components/layout/add-to-reading-list-
 import { Flame } from 'lucide-react';
 import { getDictionary } from '@/lib/get-dictionary';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 
 export async function generateStaticParams() {
   return i18n.locales.map((locale) => ({ locale }));
@@ -28,7 +29,6 @@ export default async function Home({ params: { locale } }: { params: { locale: s
   const latestSlugs = new Set(latestPosts.map(p => p.slug));
   
   // 3. Special Tag Section (Excluding Featured & Latest, Top 4)
-  // We only pull from blog posts (allPostsData) for relevance on homepage
   const specialTag = "Windows"; 
   const specialTagPosts = allPostsData
     .filter(post => 
@@ -89,12 +89,15 @@ export default async function Home({ params: { locale } }: { params: { locale: s
                             data-ai-hint={heroImageHint}
                         />
                     )}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
                     <div className="absolute bottom-0 left-0 p-6 text-white w-full">
                         <p className="text-xs font-semibold uppercase tracking-wider opacity-80 mb-1">{post.frontmatter.category}</p>
-                        <h3 className="font-headline text-2xl font-bold">
+                        <h3 className="font-headline text-xl font-bold line-clamp-2">
                             {post.frontmatter.title}
                         </h3>
+                        <p className="text-xs opacity-70 mt-2 line-clamp-2 font-medium">
+                            {post.frontmatter.description}
+                        </p>
                     </div>
                 </article>
             </Link>
@@ -124,6 +127,19 @@ export default async function Home({ params: { locale } }: { params: { locale: s
                     {post.frontmatter.description}
                 </p>
             </Link>
+            
+            {post.frontmatter.tags && post.frontmatter.tags.length > 0 && (
+                <div className="flex flex-wrap gap-1.5 mt-3">
+                    {post.frontmatter.tags.slice(0, 3).map(tag => (
+                        <Link key={tag} href={`${linkPrefix}/tags/${tag.toLowerCase()}`}>
+                            <Badge variant="secondary" className="text-[10px] py-0 px-2 h-5 hover:bg-primary hover:text-primary-foreground transition-colors cursor-pointer">
+                                {tag}
+                            </Badge>
+                        </Link>
+                    ))}
+                </div>
+            )}
+
             <AddToReadingListButton 
                 item={item}
                 showText={false}
