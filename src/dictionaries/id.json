@@ -136,6 +136,13 @@
             "promptTitle": "Tombol Unduhan",
             "promptInstruction": "Tolong ganti placeholder [DOWNLOAD_X] di dalam draf dengan komponen <DownloadButton> menggunakan ID yang sesuai di bawah ini:"
         },
+        "imageGrid": {
+            "title": "Grid Gambar (Image Grid)",
+            "description": "Grupkan beberapa gambar ke dalam grid yang responsif. Format: [GRID_ID] | jumlah_kolom | path1, path2, path3...",
+            "placeholder": "[GRID_1] | 3 | /img1.webp, /img2.webp, /img3.webp",
+            "promptTitle": "Grid Gambar",
+            "promptInstruction": "Tolong grupkan gambar-gambar berikut menggunakan komponen <ImageGrid> dengan jumlah kolom yang ditentukan:"
+        },
         "imagesTitle": "Detail Gambar",
         "imagesDescription": "Baris pertama adalah **selalu** untuk gambar utama (hero image), dipisahkan oleh `|` untuk teks alt. Setiap baris berikutnya adalah untuk gambar pendukung.",
         "imagesPlaceholder": "/images/blank/blank.webp | Teks alt deskriptif untuk hero image\n/images/articles/pendukung-1.webp | Teks alt untuk gambar pendukung pertama",

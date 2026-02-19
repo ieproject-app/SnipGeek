@@ -1,3 +1,4 @@
+
 import type {MDXComponents} from 'next-mdx-remote/rsc/types'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -63,6 +64,21 @@ const DownloadButton = ({ id }: { id: string }) => {
   );
 };
 
+const ImageGrid = ({ children, columns = 2 }: { children: React.ReactNode, columns?: number }) => {
+    const gridCols = {
+      1: 'grid-cols-1',
+      2: 'grid-cols-1 sm:grid-cols-2',
+      3: 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3',
+      4: 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4',
+    }[columns as 1 | 2 | 3 | 4] || 'grid-cols-1 sm:grid-cols-2';
+  
+    return (
+      <div className={cn("grid gap-4 my-8 [&>p]:m-0", gridCols)}>
+        {children}
+      </div>
+    );
+};
+
 const MdxH1 = ({ children }: { children?: React.ReactNode }) => <h1 id={generateId(children)} className="font-headline mt-12 mb-6 text-4xl font-bold tracking-tighter text-primary scroll-mt-6">{children}</h1>;
 const MdxH2 = ({ children }: { children?: React.ReactNode }) => <h2 id={generateId(children)} className="font-headline mt-10 mb-5 text-3xl font-bold tracking-tighter text-primary scroll-mt-6">{children}</h2>;
 const MdxH3 = ({ children }: { children?: React.ReactNode }) => <h3 id={generateId(children)} className="font-headline mt-8 mb-4 text-2xl font-bold tracking-tighter text-primary scroll-mt-6">{children}</h3>;
@@ -109,4 +125,5 @@ export const mdxComponents: MDXComponents = {
     td: TableCell,
     pre: MdxPre,
     DownloadButton,
+    ImageGrid,
 }

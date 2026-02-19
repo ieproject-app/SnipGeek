@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -20,6 +21,7 @@ export function PromptGeneratorClient({ dictionary }: PromptGeneratorProps) {
   const [contentType, setContentType] = useState<'blog' | 'note'>('blog');
   const [draft, setDraft] = useState('');
   const [downloadMappings, setDownloadMappings] = useState('');
+  const [imageGridMappings, setImageGridMappings] = useState('');
   const [title, setTitle] = useState('');
   const [slug, setSlug] = useState('');
   const [publishDate, setPublishDate] = useState<string>('');
@@ -112,6 +114,22 @@ export function PromptGeneratorClient({ dictionary }: PromptGeneratorProps) {
           prompt += `\n`;
       }
 
+      if (imageGridMappings && dictionary.imageGrid) {
+        prompt += `\n**${dictionary.imageGrid.promptTitle}:**\n`;
+        prompt += `${dictionary.imageGrid.promptInstruction}\n`;
+        
+        const gridMappings = imageGridMappings.split('\n').filter(line => line.trim() !== '');
+        gridMappings.forEach((line) => {
+            const parts = line.split('|').map(s => s.trim());
+            if (parts.length >= 3) {
+                const [placeholder, cols, pathsStr] = parts;
+                const paths = pathsStr.split(',').map(p => p.trim());
+                prompt += `- Placeholder ${placeholder} -> Columns: ${cols}, Paths: ${paths.join(', ')}\n`;
+            }
+        });
+        prompt += `\n`;
+      }
+
       prompt += `---\n\n`;
       prompt += `**${dictionary.draftContentLabel}:**\n\n`;
       prompt += draft;
@@ -121,7 +139,7 @@ export function PromptGeneratorClient({ dictionary }: PromptGeneratorProps) {
     };
 
     buildPrompt();
-  }, [draft, title, slug, publishDate, isPublished, isFeatured, images, tags, translationKey, dictionary, contentType, downloadMappings]);
+  }, [draft, title, slug, publishDate, isPublished, isFeatured, images, tags, translationKey, dictionary, contentType, downloadMappings, imageGridMappings]);
 
   const handleCopy = () => {
     navigator.clipboard.writeText(generatedPrompt);
@@ -188,6 +206,26 @@ export function PromptGeneratorClient({ dictionary }: PromptGeneratorProps) {
             />
         </CardContent>
       </Card>
+
+      {dictionary.imageGrid && (
+        <Card>
+          <CardHeader>
+              <CardTitle>{dictionary.imageGrid.title}</CardTitle>
+          </CardHeader>
+          <CardContent>
+              <Label htmlFor="grid-mappings" className="text-sm text-muted-foreground">
+                  {dictionary.imageGrid.description}
+              </Label>
+              <Textarea
+                  id="grid-mappings"
+                  placeholder={dictionary.imageGrid.placeholder}
+                  value={imageGridMappings}
+                  onChange={(e) => setImageGridMappings(e.target.value)}
+                  className="min-h-[120px] font-mono text-xs mt-2"
+              />
+          </CardContent>
+        </Card>
+      )}
 
        <Card>
         <CardHeader>

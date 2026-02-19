@@ -136,6 +136,13 @@
             "promptTitle": "Download Buttons",
             "promptInstruction": "Please replace the [DOWNLOAD_X] placeholders in the draft with <DownloadButton> components using the corresponding IDs below:"
         },
+        "imageGrid": {
+            "title": "Image Grids",
+            "description": "Group multiple images into a responsive grid. Format: [GRID_ID] | cols | path1, path2, path3...",
+            "placeholder": "[GRID_1] | 3 | /img1.webp, /img2.webp, /img3.webp",
+            "promptTitle": "Image Grids",
+            "promptInstruction": "Please group the following images using the <ImageGrid> component with the specified column count:"
+        },
         "imagesTitle": "Image Details",
         "imagesDescription": "The first line is ALWAYS for the hero image, separated by a `|` for the alt text. Each subsequent line is for a supporting image.",
         "imagesPlaceholder": "/images/blank/blank.webp | A descriptive alt text for the hero image\n/images/articles/supporting-1.webp | Alt text for the first supporting image",
