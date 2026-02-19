@@ -17,7 +17,7 @@ const generateId = (children: any) => {
       .replace(/\s+/g, '-');
 };
 
-const CustomImage = (props: any) => {
+const CustomImage = ({ class: _class, className, ...props }: any) => {
     if (!props.src || typeof props.src !== 'string' || props.src.trim() === '') {
         return null;
     }
@@ -28,7 +28,7 @@ const CustomImage = (props: any) => {
                 width={1200}
                 height={675}
                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 70vw, 800px"
-                className="h-auto w-full rounded-lg shadow-md object-cover"
+                className={cn("h-auto w-full rounded-lg shadow-md object-cover", _class, className)}
                 alt={props.alt || 'SnipGeek article image'}
                 {...props}
             />
@@ -63,7 +63,7 @@ const DownloadButton = ({ id }: { id: string }) => {
   );
 };
 
-const ImageGrid = ({ children, columns = 2 }: { children: React.ReactNode, columns?: number }) => {
+const ImageGrid = ({ children, columns = 2, class: _class, className }: any) => {
     const gridCols = {
       1: 'grid-cols-1',
       2: 'grid-cols-1 sm:grid-cols-2',
@@ -72,32 +72,40 @@ const ImageGrid = ({ children, columns = 2 }: { children: React.ReactNode, colum
     }[columns as 1 | 2 | 3 | 4] || 'grid-cols-1 sm:grid-cols-2';
   
     return (
-      <div className={cn("grid gap-4 my-8 [&>p]:m-0 [&>span]:m-0", gridCols)}>
+      <div className={cn("grid gap-4 my-8 [&>p]:m-0 [&>span]:m-0", gridCols, _class, className)}>
         {children}
       </div>
     );
 };
 
-const MdxH1 = ({ children }: { children?: React.ReactNode }) => <h1 id={generateId(children)} className="font-headline mt-12 mb-6 text-4xl font-bold tracking-tighter text-primary scroll-mt-6">{children}</h1>;
-const MdxH2 = ({ children }: { children?: React.ReactNode }) => <h2 id={generateId(children)} className="font-headline mt-10 mb-5 text-3xl font-bold tracking-tighter text-primary scroll-mt-6">{children}</h2>;
-const MdxH3 = ({ children }: { children?: React.ReactNode }) => <h3 id={generateId(children)} className="font-headline mt-8 mb-4 text-2xl font-bold tracking-tighter text-primary scroll-mt-6">{children}</h3>;
-const MdxH4 = ({ children }: { children?: React.ReactNode }) => <h4 id={generateId(children)} className="font-headline mt-6 mb-3 text-xl font-bold tracking-tighter text-primary scroll-mt-6">{children}</h4>;
-const MdxP = ({ children }: { children?: React.ReactNode }) => <span className="block leading-7 my-6">{children}</span>;
-const MdxA = (props: React.AnchorHTMLAttributes<HTMLAnchorElement>) => {
-  if (props.href) {
-    return <Link href={props.href} className="font-medium text-accent underline hover:no-underline">{props.children}</Link>;
-  }
-  return <a {...props} />;
-};
-const MdxUl = ({ children }: { children?: React.ReactNode }) => <ul className="my-6 ml-6 list-disc [&>li]:mt-2">{children}</ul>;
-const MdxOl = ({ children }: { children?: React.ReactNode }) => <ol className="my-6 ml-6 list-decimal [&>li]:mt-2">{children}</ol>;
-const MdxAItem = ({ children }: { children?: React.ReactNode }) => <li>{children}</li>;
-const MdxBlockquote = ({ children }: { children?: React.ReactNode }) => <blockquote className="mt-6 border-l-2 border-primary/20 pl-6 italic text-muted-foreground">{children}</blockquote>;
+const MdxH1 = ({ children, class: _class, className, ...props }: any) => <h1 id={generateId(children)} className={cn("font-headline mt-12 mb-6 text-4xl font-bold tracking-tighter text-primary scroll-mt-6", _class, className)} {...props}>{children}</h1>;
+const MdxH2 = ({ children, class: _class, className, ...props }: any) => <h2 id={generateId(children)} className={cn("font-headline mt-10 mb-5 text-3xl font-bold tracking-tighter text-primary scroll-mt-6", _class, className)} {...props}>{children}</h2>;
+const MdxH3 = ({ children, class: _class, className, ...props }: any) => <h3 id={generateId(children)} className={cn("font-headline mt-8 mb-4 text-2xl font-bold tracking-tighter text-primary scroll-mt-6", _class, className)} {...props}>{children}</h3>;
+const MdxH4 = ({ children, class: _class, className, ...props }: any) => <h4 id={generateId(children)} className={cn("font-headline mt-6 mb-3 text-xl font-bold tracking-tighter text-primary scroll-mt-6", _class, className)} {...props}>{children}</h4>;
 
-const MdxPre = ({ className, ...props }: React.HTMLAttributes<HTMLPreElement>) => (
+const MdxP = ({ children, class: _class, className, ...props }: any) => (
+  <span className={cn("block leading-7 my-6", _class, className)} {...props}>
+    {children}
+  </span>
+);
+
+const MdxA = ({ class: _class, className, ...props }: React.AnchorHTMLAttributes<HTMLAnchorElement> & { class?: string }) => {
+  if (props.href) {
+    return <Link href={props.href} className={cn("font-medium text-accent underline hover:no-underline", _class, className)}>{props.children}</Link>;
+  }
+  return <a className={cn(_class, className)} {...props} />;
+};
+
+const MdxUl = ({ children, class: _class, className, ...props }: any) => <ul className={cn("my-6 ml-6 list-disc [&>li]:mt-2", _class, className)} {...props}>{children}</ul>;
+const MdxOl = ({ children, class: _class, className, ...props }: any) => <ol className={cn("my-6 ml-6 list-decimal [&>li]:mt-2", _class, className)} {...props}>{children}</ol>;
+const MdxAItem = ({ children, class: _class, className, ...props }: any) => <li className={cn(_class, className)} {...props}>{children}</li>;
+const MdxBlockquote = ({ children, class: _class, className, ...props }: any) => <blockquote className={cn("mt-6 border-l-2 border-primary/20 pl-6 italic text-muted-foreground", _class, className)} {...props}>{children}</blockquote>;
+
+const MdxPre = ({ className, class: _class, ...props }: any) => (
     <pre
         className={cn(
             "rounded-lg p-6 my-6 overflow-x-auto",
+            _class,
             className
         )}
         {...props}
@@ -116,13 +124,23 @@ export const mdxComponents: MDXComponents = {
     li: MdxAItem,
     blockquote: MdxBlockquote,
     img: CustomImage,
-    table: (props) => <span className="block my-6"><Table {...props} /></span>,
+    table: (props: any) => <span className="block my-6"><Table {...props} /></span>,
     thead: TableHeader,
     tbody: TableBody,
     tr: TableRow,
     th: TableHead,
     td: TableCell,
     pre: MdxPre,
+    details: ({ children, class: _class, className, ...props }: any) => (
+      <details className={cn("my-6 p-4 rounded-xl border bg-muted/20", _class, className)} {...props}>
+        {children}
+      </details>
+    ),
+    summary: ({ children, class: _class, className, ...props }: any) => (
+      <summary className={cn("font-bold cursor-pointer hover:text-accent transition-colors", _class, className)} {...props}>
+        {children}
+      </summary>
+    ),
     DownloadButton,
     ImageGrid,
 }
