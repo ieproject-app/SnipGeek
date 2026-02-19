@@ -1,4 +1,3 @@
-
 {
     "navigation": {
         "blog": "Blog",
@@ -181,29 +180,11 @@
         "promptBaseNote": "Please create and publish a new Note for me based on the following details. The English version must use the slug specified, and the Indonesian version must also use the EXACT SAME SLUG.",
         "frontmatterDetails": "Frontmatter Details",
         "titleLabel": "Title",
-        "titlePlaceholder": "Please create an SEO-friendly title based on the content.",
+        "titlePlaceholder": "Please create an SEO-friendly title (50-60 characters) based on the content.",
         "dateLabel": "Publish Date",
         "supportingImagesLabel": "Supporting Images (in order)",
         "supportingImagesLabelNote": "Images to insert in content",
         "draftContentLabel": "Main Content/Draft",
-        "finalInstruction": "Additional Instruction: After completion, always confirm the `translationKey` and the English `slug` you used so I can find the files easily."
-    },
-    "employeeHistory": {
-        "searchTitle": "Search Employee History",
-        "searchDescription": "Filters are applied automatically as you type or make a selection.",
-        "searchPlaceholder": "Search by date, name, or NIK...",
-        "groupPlaceholder": "Select Job Group",
-        "allGroups": "All Groups",
-        "nameHeader": "Name",
-        "positionHeader": "Position",
-        "groupHeader": "Job Group",
-        "nikHeader": "NIK",
-        "startDateHeader": "Start Date",
-        "endDateHeader": "End Date",
-        "generatorTitle": "Document Signer Generator",
-        "generatorDescription": "Select a document type and date to automatically see the required signers.",
-        "docTypePlaceholder": "Select Document Type",
-        "projectValuePlaceholder": "Project Value (if > 500M)",
-        "present": "Present"
+        "finalInstruction": "Additional Instruction: 1. Always confirm the `translationKey` and the English `slug` used. 2. Ensure the title is exactly 50-60 characters long. 3. If manual HTML tags are needed, ALWAYS use 'className' instead of 'class' to prevent hydration errors."
     }
 }

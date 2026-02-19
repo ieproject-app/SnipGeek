@@ -1,4 +1,3 @@
-
 {
     "navigation": {
         "blog": "Blog",
@@ -149,6 +148,13 @@
             "promptTitle": "Grid Gambar",
             "promptInstruction": "Tolong grupkan gambar-gambar berikut menggunakan komponen <ImageGrid> dengan jumlah kolom yang ditentukan:"
         },
+        "imageGrid": {
+            "title": "Grid Gambar (Image Grid)",
+            "description": "Grupkan beberapa gambar ke dalam grid yang responsif. Format: [GRID_ID] | jumlah_kolom | path1, path2, path3...",
+            "placeholder": "[GRID_1] | 3 | /img1.webp, /img2.webp, /img3.webp",
+            "promptTitle": "Grid Gambar",
+            "promptInstruction": "Tolong grupkan gambar-gambar berikut menggunakan komponen <ImageGrid> dengan jumlah kolom yang ditentukan:"
+        },
         "imagesTitle": "Detail Gambar",
         "imagesDescription": "Baris pertama adalah **selalu** untuk gambar utama (hero image), dipisahkan oleh `|` untuk teks alt. Setiap baris berikutnya adalah untuk gambar pendukung.",
         "imagesPlaceholder": "/images/blank/blank.webp | Teks alt deskriptif untuk hero image\n/images/articles/pendukung-1.webp | Teks alt untuk gambar pendukung pertama",
@@ -181,29 +187,11 @@
         "promptBaseNote": "Tolong buat dan terbitkan sebuah Catatan (Note) baru untuk saya berdasarkan detail berikut. Versi Bahasa Inggris harus menggunakan slug yang ditentukan, dan versi Bahasa Indonesia juga harus menggunakan SLUG YANG SAMA PERSIS.",
         "frontmatterDetails": "Detail Frontmatter",
         "titleLabel": "Judul",
-        "titlePlaceholder": "Tolong buatkan judul SEO-friendly berdasarkan konten.",
+        "titlePlaceholder": "Tolong buatkan judul SEO-friendly (50-60 karakter) berdasarkan konten.",
         "dateLabel": "Tanggal Terbit",
         "supportingImagesLabel": "Gambar Pendukung (sesuai urutan)",
         "supportingImagesLabelNote": "Gambar untuk disisipkan di konten",
         "draftContentLabel": "Konten/Draf Utama",
-        "finalInstruction": "Instruksi Tambahan: Setelah selesai, selalu konfirmasikan `translationKey` dan `slug` Bahasa Inggris yang Anda gunakan agar saya bisa menemukan filenya dengan mudah."
-    },
-    "employeeHistory": {
-        "searchTitle": "Cari Riwayat Pejabat",
-        "searchDescription": "Filter akan diterapkan secara otomatis saat Anda mengubah input.",
-        "searchPlaceholder": "Cari berdasarkan tanggal, nama, atau NIK...",
-        "groupPlaceholder": "Pilih Grup Jabatan",
-        "allGroups": "Semua Grup",
-        "nameHeader": "Nama",
-        "positionHeader": "Jabatan",
-        "groupHeader": "Grup Jabatan",
-        "nikHeader": "NIK",
-        "startDateHeader": "Tanggal Mulai",
-        "endDateHeader": "Tanggal Selesai",
-        "generatorTitle": "Generator Penandatangan Dokumen",
-        "generatorDescription": "Pilih jenis dan tanggal dokumen untuk melihat daftar penandatangan secara otomatis.",
-        "docTypePlaceholder": "Pilih Jenis Dokumen",
-        "projectValuePlaceholder": "Nilai Proyek (jika > 500jt)",
-        "present": "Saat ini"
+        "finalInstruction": "Instruksi Tambahan: 1. Selalu konfirmasikan `translationKey` dan `slug` Bahasa Inggris yang digunakan. 2. Pastikan judul tepat berjumlah 50-60 karakter. 3. Jika tag HTML manual dibutuhkan, SELALU gunakan 'className' dan bukan 'class' untuk mencegah error hidrasi."
     }
 }
