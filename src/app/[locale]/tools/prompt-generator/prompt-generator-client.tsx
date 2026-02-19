@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -12,6 +11,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Copy, Check } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import type { Dictionary } from '@/lib/get-dictionary';
+import { cn } from '@/lib/utils';
 
 type PromptGeneratorProps = {
   dictionary: Dictionary['promptGenerator'];
@@ -66,7 +66,6 @@ export function PromptGeneratorClient({ dictionary }: PromptGeneratorProps) {
       const imageLines = images.split('\n').filter(line => line.trim() !== '');
 
       if (isBlog) {
-        // Hero Image is always part of frontmatter for blog
         const heroImageLine = (showImages && imageLines.length > 0) ? imageLines[0] : '';
         const [heroImagePath, heroImageAlt] = heroImageLine.split('|').map(s => s ? s.trim() : '');
 
@@ -86,7 +85,6 @@ export function PromptGeneratorClient({ dictionary }: PromptGeneratorProps) {
       
       prompt += `\n`;
 
-      // Supporting Images (extra lines)
       if (isBlog && showImages && imageLines.length > 1) {
           prompt += `**${dictionary.supportingImagesLabel}:**\n`;
           imageLines.slice(1).forEach((line, index) => {
@@ -97,7 +95,6 @@ export function PromptGeneratorClient({ dictionary }: PromptGeneratorProps) {
           prompt += `\n`;
       }
 
-      // Images for Notes
       if (!isBlog && showImages && imageLines.length > 0) {
         prompt += `**${dictionary.supportingImagesLabelNote}:**\n`;
         imageLines.forEach((line) => {
@@ -110,7 +107,6 @@ export function PromptGeneratorClient({ dictionary }: PromptGeneratorProps) {
         prompt += `\n`;
       }
 
-      // Download Buttons Section
       if (showDownloads && downloadMappings) {
           prompt += `\n**${dictionary.downloadLinks.promptTitle}:**\n`;
           prompt += `${dictionary.downloadLinks.promptInstruction}\n`;
@@ -125,7 +121,6 @@ export function PromptGeneratorClient({ dictionary }: PromptGeneratorProps) {
           prompt += `\n`;
       }
 
-      // Image Grids Section
       if (showGrids && imageGridMappings && dictionary.imageGrid) {
         prompt += `\n**${dictionary.imageGrid.promptTitle}:**\n`;
         prompt += `${dictionary.imageGrid.promptInstruction}\n`;
@@ -153,7 +148,15 @@ export function PromptGeneratorClient({ dictionary }: PromptGeneratorProps) {
     buildPrompt();
   }, [draft, title, slug, publishDate, isPublished, isFeatured, images, tags, translationKey, dictionary, contentType, downloadMappings, imageGridMappings, showDownloads, showGrids, showImages]);
 
-  const handleCopy = () => {
+  const handleCopy = (text: string, label: string) => {
+    navigator.clipboard.writeText(text);
+    toast({
+      title: label,
+      description: dictionary.copySuccessDescription,
+    });
+  };
+
+  const handleCopyMain = () => {
     navigator.clipboard.writeText(generatedPrompt);
     setIsCopied(true);
     toast({
@@ -166,6 +169,18 @@ export function PromptGeneratorClient({ dictionary }: PromptGeneratorProps) {
   };
   
   const isBlog = contentType === 'blog';
+
+  const CopyExampleButton = ({ text, label }: { text: string; label: string }) => (
+    <Button 
+      variant="ghost" 
+      size="sm" 
+      onClick={() => handleCopy(text, label)}
+      className="h-7 px-2 text-[10px] gap-1 opacity-70 hover:opacity-100"
+    >
+      <Copy className="h-3 w-3" />
+      {dictionary.copyButton} Example
+    </Button>
+  );
 
   return (
     <div className="space-y-8">
@@ -187,7 +202,6 @@ export function PromptGeneratorClient({ dictionary }: PromptGeneratorProps) {
           </CardContent>
       </Card>
 
-      {/* Feature Toggles Card */}
       <Card>
           <CardHeader>
               <CardTitle>{dictionary.features.title}</CardTitle>
@@ -224,8 +238,9 @@ export function PromptGeneratorClient({ dictionary }: PromptGeneratorProps) {
 
       {showDownloads && (
         <Card>
-            <CardHeader>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0">
                 <CardTitle>{dictionary.downloadLinks.title}</CardTitle>
+                <CopyExampleButton text={dictionary.downloadLinks.placeholder} label={dictionary.downloadLinks.title} />
             </CardHeader>
             <CardContent>
                 <Label htmlFor="download-mappings" className="text-sm text-muted-foreground">
@@ -244,8 +259,9 @@ export function PromptGeneratorClient({ dictionary }: PromptGeneratorProps) {
 
       {(showGrids && dictionary.imageGrid) && (
         <Card>
-          <CardHeader>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0">
               <CardTitle>{dictionary.imageGrid.title}</CardTitle>
+              <CopyExampleButton text={dictionary.imageGrid.placeholder} label={dictionary.imageGrid.title} />
           </CardHeader>
           <CardContent>
               <Label htmlFor="grid-mappings" className="text-sm text-muted-foreground">
@@ -264,8 +280,12 @@ export function PromptGeneratorClient({ dictionary }: PromptGeneratorProps) {
 
       {showImages && (
        <Card>
-        <CardHeader>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0">
           <CardTitle>{isBlog ? dictionary.imagesTitle : dictionary.imagesTitleNote}</CardTitle>
+          <CopyExampleButton 
+            text={isBlog ? dictionary.imagesPlaceholder : dictionary.imagesPlaceholderNote} 
+            label={isBlog ? dictionary.imagesTitle : dictionary.imagesTitleNote} 
+          />
         </CardHeader>
         <CardContent>
             <Label htmlFor="images" className="text-sm text-muted-foreground">
@@ -350,7 +370,7 @@ export function PromptGeneratorClient({ dictionary }: PromptGeneratorProps) {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>{dictionary.generatedPromptTitle}</CardTitle>
-          <Button onClick={handleCopy} variant="ghost" size="icon" className="h-8 w-8">
+          <Button onClick={handleCopyMain} variant="ghost" size="icon" className="h-8 w-8">
             {isCopied ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
             <span className="sr-only">{isCopied ? dictionary.copiedButton : dictionary.copyButton}</span>
           </Button>
