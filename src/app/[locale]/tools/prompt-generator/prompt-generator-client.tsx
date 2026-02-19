@@ -20,14 +20,21 @@ type PromptGeneratorProps = {
 export function PromptGeneratorClient({ dictionary }: PromptGeneratorProps) {
   const [contentType, setContentType] = useState<'blog' | 'note'>('blog');
   const [draft, setDraft] = useState('');
+  
+  // Feature Toggles
+  const [showDownloads, setShowDownloads] = useState(false);
+  const [showGrids, setShowGrids] = useState(false);
+  const [showImages, setShowImages] = useState(true);
+
   const [downloadMappings, setDownloadMappings] = useState('');
   const [imageGridMappings, setImageGridMappings] = useState('');
+  const [images, setImages] = useState('');
+
   const [title, setTitle] = useState('');
   const [slug, setSlug] = useState('');
   const [publishDate, setPublishDate] = useState<string>('');
   const [isPublished, setIsPublished] = useState(true);
   const [isFeatured, setIsFeatured] = useState(false);
-  const [images, setImages] = useState('');
   const [tags, setTags] = useState('');
   const [translationKey, setTranslationKey] = useState('');
 
@@ -59,7 +66,8 @@ export function PromptGeneratorClient({ dictionary }: PromptGeneratorProps) {
       const imageLines = images.split('\n').filter(line => line.trim() !== '');
 
       if (isBlog) {
-        const heroImageLine = imageLines.length > 0 ? imageLines[0] : '';
+        // Hero Image is always part of frontmatter for blog
+        const heroImageLine = (showImages && imageLines.length > 0) ? imageLines[0] : '';
         const [heroImagePath, heroImageAlt] = heroImageLine.split('|').map(s => s ? s.trim() : '');
 
         const finalHeroImagePath = heroImagePath || "/images/blank/blank.webp";
@@ -78,7 +86,8 @@ export function PromptGeneratorClient({ dictionary }: PromptGeneratorProps) {
       
       prompt += `\n`;
 
-      if (isBlog && imageLines.length > 1) {
+      // Supporting Images (extra lines)
+      if (isBlog && showImages && imageLines.length > 1) {
           prompt += `**${dictionary.supportingImagesLabel}:**\n`;
           imageLines.slice(1).forEach((line, index) => {
               const [imgPath, imgAlt] = line.split('|').map(s => s ? s.trim() : '');
@@ -88,7 +97,8 @@ export function PromptGeneratorClient({ dictionary }: PromptGeneratorProps) {
           prompt += `\n`;
       }
 
-      if (!isBlog && imageLines.length > 0) {
+      // Images for Notes
+      if (!isBlog && showImages && imageLines.length > 0) {
         prompt += `**${dictionary.supportingImagesLabelNote}:**\n`;
         imageLines.forEach((line) => {
             const [imgPath, imgAlt] = line.split('|').map(s => s ? s.trim() : '');
@@ -100,7 +110,8 @@ export function PromptGeneratorClient({ dictionary }: PromptGeneratorProps) {
         prompt += `\n`;
       }
 
-      if (downloadMappings) {
+      // Download Buttons Section
+      if (showDownloads && downloadMappings) {
           prompt += `\n**${dictionary.downloadLinks.promptTitle}:**\n`;
           prompt += `${dictionary.downloadLinks.promptInstruction}\n`;
           
@@ -114,7 +125,8 @@ export function PromptGeneratorClient({ dictionary }: PromptGeneratorProps) {
           prompt += `\n`;
       }
 
-      if (imageGridMappings && dictionary.imageGrid) {
+      // Image Grids Section
+      if (showGrids && imageGridMappings && dictionary.imageGrid) {
         prompt += `\n**${dictionary.imageGrid.promptTitle}:**\n`;
         prompt += `${dictionary.imageGrid.promptInstruction}\n`;
         
@@ -139,7 +151,7 @@ export function PromptGeneratorClient({ dictionary }: PromptGeneratorProps) {
     };
 
     buildPrompt();
-  }, [draft, title, slug, publishDate, isPublished, isFeatured, images, tags, translationKey, dictionary, contentType, downloadMappings, imageGridMappings]);
+  }, [draft, title, slug, publishDate, isPublished, isFeatured, images, tags, translationKey, dictionary, contentType, downloadMappings, imageGridMappings, showDownloads, showGrids, showImages]);
 
   const handleCopy = () => {
     navigator.clipboard.writeText(generatedPrompt);
@@ -174,6 +186,27 @@ export function PromptGeneratorClient({ dictionary }: PromptGeneratorProps) {
               </RadioGroup>
           </CardContent>
       </Card>
+
+      {/* Feature Toggles Card */}
+      <Card>
+          <CardHeader>
+              <CardTitle>{dictionary.features.title}</CardTitle>
+          </CardHeader>
+          <CardContent className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="flex items-center space-x-2">
+                  <Switch id="f-downloads" checked={showDownloads} onCheckedChange={setShowDownloads} />
+                  <Label htmlFor="f-downloads">{dictionary.features.downloads}</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                  <Switch id="f-grids" checked={showGrids} onCheckedChange={setShowGrids} />
+                  <Label htmlFor="f-grids">{dictionary.features.grids}</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                  <Switch id="f-images" checked={showImages} onCheckedChange={setShowImages} />
+                  <Label htmlFor="f-images">{dictionary.features.images}</Label>
+              </div>
+          </CardContent>
+      </Card>
       
       <Card>
         <CardHeader>
@@ -189,25 +222,27 @@ export function PromptGeneratorClient({ dictionary }: PromptGeneratorProps) {
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader>
-            <CardTitle>{dictionary.downloadLinks.title}</CardTitle>
-        </CardHeader>
-        <CardContent>
-            <Label htmlFor="download-mappings" className="text-sm text-muted-foreground">
-                {dictionary.downloadLinks.description}
-            </Label>
-            <Textarea
-                id="download-mappings"
-                placeholder={dictionary.downloadLinks.placeholder}
-                value={downloadMappings}
-                onChange={(e) => setDownloadMappings(e.target.value)}
-                className="min-h-[120px] font-mono text-xs mt-2"
-            />
-        </CardContent>
-      </Card>
+      {showDownloads && (
+        <Card>
+            <CardHeader>
+                <CardTitle>{dictionary.downloadLinks.title}</CardTitle>
+            </CardHeader>
+            <CardContent>
+                <Label htmlFor="download-mappings" className="text-sm text-muted-foreground">
+                    {dictionary.downloadLinks.description}
+                </Label>
+                <Textarea
+                    id="download-mappings"
+                    placeholder={dictionary.downloadLinks.placeholder}
+                    value={downloadMappings}
+                    onChange={(e) => setDownloadMappings(e.target.value)}
+                    className="min-h-[120px] font-mono text-xs mt-2"
+                />
+            </CardContent>
+        </Card>
+      )}
 
-      {dictionary.imageGrid && (
+      {(showGrids && dictionary.imageGrid) && (
         <Card>
           <CardHeader>
               <CardTitle>{dictionary.imageGrid.title}</CardTitle>
@@ -227,6 +262,7 @@ export function PromptGeneratorClient({ dictionary }: PromptGeneratorProps) {
         </Card>
       )}
 
+      {showImages && (
        <Card>
         <CardHeader>
           <CardTitle>{isBlog ? dictionary.imagesTitle : dictionary.imagesTitleNote}</CardTitle>
@@ -244,6 +280,7 @@ export function PromptGeneratorClient({ dictionary }: PromptGeneratorProps) {
             />
         </CardContent>
       </Card>
+      )}
       
       <Card>
         <CardHeader>

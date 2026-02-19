@@ -127,6 +127,12 @@
         "contentTypeLabel": "Content Type",
         "contentTypeBlog": "Blog Article",
         "contentTypeNote": "Note",
+        "features": {
+            "title": "Optional Features",
+            "downloads": "Download Buttons",
+            "grids": "Image Grids",
+            "images": "Supporting Images"
+        },
         "draftTitle": "Content Draft / Main Points",
         "draftPlaceholder": "Paste your full content draft here. To specify a download button location, use a placeholder like [DOWNLOAD_1], [DOWNLOAD_2], etc.",
         "downloadLinks": {

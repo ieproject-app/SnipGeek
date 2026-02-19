@@ -127,6 +127,12 @@
         "contentTypeLabel": "Jenis Konten",
         "contentTypeBlog": "Artikel Blog",
         "contentTypeNote": "Catatan (Note)",
+        "features": {
+            "title": "Fitur Opsional",
+            "downloads": "Tombol Unduhan",
+            "grids": "Grid Gambar",
+            "images": "Gambar Pendukung"
+        },
         "draftTitle": "Draf Konten / Poin Utama",
         "draftPlaceholder": "Tempelkan draf konten lengkap Anda di sini. Untuk menentukan lokasi tombol unduhan, gunakan placeholder seperti [DOWNLOAD_1], [DOWNLOAD_2], dll.",
         "downloadLinks": {
