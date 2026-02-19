@@ -83,7 +83,7 @@ const MdxH1 = ({ children }: { children?: React.ReactNode }) => <h1 id={generate
 const MdxH2 = ({ children }: { children?: React.ReactNode }) => <h2 id={generateId(children)} className="font-headline mt-10 mb-5 text-3xl font-bold tracking-tighter text-primary scroll-mt-6">{children}</h2>;
 const MdxH3 = ({ children }: { children?: React.ReactNode }) => <h3 id={generateId(children)} className="font-headline mt-8 mb-4 text-2xl font-bold tracking-tighter text-primary scroll-mt-6">{children}</h3>;
 const MdxH4 = ({ children }: { children?: React.ReactNode }) => <h4 id={generateId(children)} className="font-headline mt-6 mb-3 text-xl font-bold tracking-tighter text-primary scroll-mt-6">{children}</h4>;
-const MdxP = ({ children }: { children?: React.ReactNode }) => <p className="leading-7 my-6">{children}</p>;
+const MdxP = ({ children }: { children?: React.ReactNode }) => <div className="leading-7 my-6">{children}</div>;
 const MdxA = (props: React.AnchorHTMLAttributes<HTMLAnchorElement>) => {
   if (props.href) {
     return <Link href={props.href} className="font-medium text-accent underline hover:no-underline">{props.children}</Link>;
