@@ -65,34 +65,39 @@ export function LanguageSwitcher({ translationsMap }: { translationsMap: Transla
     return `/${newLocale}${pathWithoutLocale}`;
   }
 
-  if (!mounted) {
-    return (
-      <div className="flex items-center bg-primary/90 backdrop-blur-sm rounded-full p-1 h-8 w-[80px] animate-pulse" />
-    );
-  }
-
+  // To prevent hydration mismatch, we ensure the container is identical 
+  // on server and client initial render.
   return (
-    <div className="relative flex items-center bg-primary/90 backdrop-blur-sm rounded-full p-1 text-xs">
-        <div 
-            className={cn(
-                "absolute h-6 w-9 bg-primary-foreground/20 shadow-sm rounded-full transition-transform duration-300 ease-in-out",
-                currentLocale === 'en' ? 'translate-x-0' : 'translate-x-full'
-            )}
-        />
-        {i18n.locales.map(locale => (
-            <a
-                key={locale} 
-                href={redirectedPathName(locale)} 
+    <div 
+      className="relative flex items-center bg-primary/90 backdrop-blur-sm rounded-full p-1 text-xs min-h-[32px] min-w-[80px]"
+      suppressHydrationWarning
+    >
+        {!mounted ? (
+          <div className="w-full h-full animate-pulse bg-primary-foreground/10 rounded-full" />
+        ) : (
+          <>
+            <div 
                 className={cn(
-                    "relative z-10 w-9 h-6 flex items-center justify-center font-bold transition-colors",
-                    currentLocale === locale ? "text-primary-foreground" : "text-primary-foreground/50 hover:text-primary-foreground"
+                    "absolute h-6 w-9 bg-primary-foreground/20 shadow-sm rounded-full transition-transform duration-300 ease-in-out",
+                    currentLocale === 'en' ? 'translate-x-0' : 'translate-x-full'
                 )}
-                aria-current={currentLocale === locale ? 'page' : undefined}
-                onClick={() => handleLocaleChange(locale as Locale)}
-            >
-                {locale.toUpperCase()}
-            </a>
-        ))}
+            />
+            {i18n.locales.map(locale => (
+                <a
+                    key={locale} 
+                    href={redirectedPathName(locale)} 
+                    className={cn(
+                        "relative z-10 w-9 h-6 flex items-center justify-center font-bold transition-colors",
+                        currentLocale === locale ? "text-primary-foreground" : "text-primary-foreground/50 hover:text-primary-foreground"
+                    )}
+                    aria-current={currentLocale === locale ? 'page' : undefined}
+                    onClick={() => handleLocaleChange(locale as Locale)}
+                >
+                    {locale.toUpperCase()}
+                </a>
+            ))}
+          </>
+        )}
     </div>
   )
 }
