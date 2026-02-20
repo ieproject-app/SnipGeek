@@ -19,12 +19,12 @@ export default async function Home({ params: { locale } }: { params: { locale: s
   const allPostsData = getSortedPostsData(locale);
   
   // 1. Featured Posts (Top 4)
-  const featuredPosts = allPostsData.filter(post => post.frontmatter.featured).slice(0, 4);
+  const featuredPosts = allPostsData.filter(post => post.frontmatter.published && post.frontmatter.featured).slice(0, 4);
   const featuredSlugs = new Set(featuredPosts.map(p => p.slug));
 
   // 2. Latest Posts (Excluding Featured, Top 4)
   const latestPosts = allPostsData
-    .filter(post => !featuredSlugs.has(post.slug))
+    .filter(post => post.frontmatter.published && !featuredSlugs.has(post.slug))
     .slice(0, 4);
   const latestSlugs = new Set(latestPosts.map(p => p.slug));
   
@@ -32,6 +32,7 @@ export default async function Home({ params: { locale } }: { params: { locale: s
   const specialTag = "Windows"; 
   const specialTagPosts = allPostsData
     .filter(post => 
+      post.frontmatter.published &&
       post.frontmatter.tags?.some(tag => tag.toLowerCase() === specialTag.toLowerCase()) &&
       !featuredSlugs.has(post.slug) &&
       !latestSlugs.has(post.slug)
@@ -41,7 +42,7 @@ export default async function Home({ params: { locale } }: { params: { locale: s
   const dictionary = await getDictionary(locale);
   const linkPrefix = locale === i18n.defaultLocale ? '' : `/${locale}`;
 
-  const renderPostCard = (post: (typeof allPostsData)[0], isFeatured: boolean) => {
+  const renderPostCard = (post: (typeof allPostsData)[0], isFeatured: boolean, index: number) => {
     const heroImageValue = post.frontmatter.heroImage;
     let heroImageSrc: string | undefined;
     let heroImageHint: string | undefined;
@@ -86,14 +87,14 @@ export default async function Home({ params: { locale } }: { params: { locale: s
                             alt={post.frontmatter.imageAlt || post.frontmatter.title}
                             fill
                             className="object-cover transition-transform duration-500 group-hover:scale-110"
+                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                            priority={index < 2}
                             data-ai-hint={heroImageHint}
                         />
                     )}
-                    {/* Enhanced Gradient Contrast (Option A) */}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/60 to-transparent" />
                     <div className="absolute bottom-0 left-0 p-6 text-white w-full">
                         <p className="text-xs font-semibold uppercase tracking-wider opacity-80 mb-1">{post.frontmatter.category}</p>
-                        {/* Increased Title Size & Boldness (Option C) - Line clamp removed to show full title */}
                         <h3 className="font-headline text-2xl font-extrabold leading-tight">
                             {post.frontmatter.title}
                         </h3>
@@ -113,6 +114,7 @@ export default async function Home({ params: { locale } }: { params: { locale: s
                             alt={post.frontmatter.imageAlt || post.frontmatter.title}
                             fill
                             className="object-cover transition-transform duration-500 group-hover:scale-105"
+                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 400px"
                             data-ai-hint={heroImageHint}
                         />
                     )}
@@ -149,12 +151,12 @@ export default async function Home({ params: { locale } }: { params: { locale: s
                   <div
                     key={post.slug}
                     className={cn(
-                      "transform transition-all duration-300 ease-in-out hover:scale-105",
+                      "transform transition-all duration-300 ease-in-out hover:scale-105 will-change-transform",
                       (index === 0 || index === 2) && "rotate-2 -translate-y-4 hover:-translate-y-6",
                       (index === 1 || index === 3) && "-rotate-2 z-10 hover:-translate-y-2"
                     )}
                   >
-                    {renderPostCard(post, true)}
+                    {renderPostCard(post, true, index)}
                   </div>
                 ))}
             </div>
@@ -167,7 +169,7 @@ export default async function Home({ params: { locale } }: { params: { locale: s
         <section className="container max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pb-12 sm:pb-16">
           <h2 className="text-3xl font-bold font-headline tracking-tighter text-primary mb-8 text-center">{dictionary.home.latestPosts}</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-12 mb-12">
-            {latestPosts.map((post) => renderPostCard(post, false))}
+            {latestPosts.map((post, index) => renderPostCard(post, false, index))}
           </div>
           <div className="flex justify-center mb-16">
             <Button asChild variant="outline" size="lg" className="rounded-full">
@@ -187,7 +189,7 @@ export default async function Home({ params: { locale } }: { params: { locale: s
                     {dictionary.home.specialTagSectionTitle.replace('{tag}', specialTag)}
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-12">
-                    {specialTagPosts.map((post) => renderPostCard(post, false))}
+                    {specialTagPosts.map((post, index) => renderPostCard(post, false, index))}
                 </div>
                 <div className="flex justify-center mt-12">
                     <Button asChild variant="ghost" className="rounded-full">

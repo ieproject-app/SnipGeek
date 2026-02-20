@@ -1,3 +1,4 @@
+
 import Image from 'next/image';
 import Link from 'next/link';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
@@ -39,7 +40,7 @@ export function Footer({ dictionary, translationsMap }: { dictionary: Dictionary
                             <div
                                 key={item.id}
                                 className={cn(
-                                    "transform transition-all duration-300 ease-in-out hover:scale-105 hover:-translate-y-2",
+                                    "transform transition-all duration-300 ease-in-out hover:scale-105 hover:-translate-y-2 will-change-transform",
                                     (index === 0 || index === 2) && "rotate-2",
                                     (index === 1 || index === 3) && "-rotate-2"
                                 )}
@@ -52,6 +53,7 @@ export function Footer({ dictionary, translationsMap }: { dictionary: Dictionary
                                                 alt={item.title}
                                                 fill
                                                 className="object-cover transition-transform duration-500 group-hover:scale-110"
+                                                sizes="(max-width: 768px) 50vw, 200px"
                                                 data-ai-hint={image.imageHint}
                                             />
                                         )}

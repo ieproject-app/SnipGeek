@@ -64,6 +64,7 @@ export default async function BlogPage({ params: { locale } }: { params: { local
                                         alt={post.frontmatter.imageAlt || post.frontmatter.title}
                                         fill
                                         className="object-cover transition-transform duration-500 group-hover:scale-105"
+                                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 400px"
                                         data-ai-hint={heroImageHint}
                                     />
                                 )}
@@ -91,5 +92,3 @@ export default async function BlogPage({ params: { locale } }: { params: { local
     </div>
   );
 }
-
-    

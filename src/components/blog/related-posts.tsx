@@ -18,7 +18,6 @@ type RelatedPostsProps = {
   currentCategory?: string;
 };
 
-// This function will contain the core logic
 const getRelatedContent = (
   type: 'blog' | 'note',
   locale: string,
@@ -34,12 +33,10 @@ const getRelatedContent = (
     const itemTags = item.frontmatter.tags || [];
     const itemCategory = (item.frontmatter as PostFrontmatter).category;
 
-    // Score based on category (for blogs)
     if (type === 'blog' && currentCategory && itemCategory && currentCategory === itemCategory) {
       score += 5;
     }
 
-    // Score based on tags
     currentTags.forEach(tag => {
       if (itemTags.includes(tag)) {
         score += 1;
@@ -51,7 +48,6 @@ const getRelatedContent = (
   .filter(item => item.score > 0)
   .sort((a, b) => b.score - a.score);
 
-  // Shuffle the top N relevant items
   const topN = scoredContent.slice(0, 10);
   for (let i = topN.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -61,12 +57,11 @@ const getRelatedContent = (
   const relatedCount = 3;
   let related = topN.slice(0, relatedCount);
   
-  // Fill with latest content if not enough related items
   if (related.length < relatedCount) {
     const moreNeeded = relatedCount - related.length;
     const latestContent = otherContent
-      .filter(item => !related.some(r => r.slug === item.slug)) // Exclude already selected
-      .filter(item => !scoredContent.some(s => s.slug === item.slug)) // Exclude already scored
+      .filter(item => !related.some(r => r.slug === item.slug))
+      .filter(item => !scoredContent.some(s => s.slug === item.slug))
       .slice(0, moreNeeded);
     related.push(...latestContent);
   }
@@ -74,8 +69,6 @@ const getRelatedContent = (
   return related;
 };
 
-
-// The main component
 export async function RelatedPosts({ type, locale, currentSlug, currentTags, currentCategory }: RelatedPostsProps) {
   const relatedContent = getRelatedContent(type, locale, currentSlug, currentTags, currentCategory);
 
@@ -86,7 +79,6 @@ export async function RelatedPosts({ type, locale, currentSlug, currentTags, cur
   const dictionary = await getDictionary(locale);
   const linkPrefix = locale === i18n.defaultLocale ? '' : `/${locale}`;
 
-  // Renderer for Blog Posts
   const renderBlogPostCard = (post: Post<PostFrontmatter>) => {
     const heroImageValue = post.frontmatter.heroImage;
     let heroImageSrc: string | undefined;
@@ -123,6 +115,7 @@ export async function RelatedPosts({ type, locale, currentSlug, currentTags, cur
                             alt={post.frontmatter.imageAlt || post.frontmatter.title}
                             fill
                             className="object-cover transition-transform duration-500 group-hover:scale-105"
+                            sizes="(max-width: 768px) 100vw, 33vw"
                             data-ai-hint={heroImageHint}
                         />
                     )}
@@ -146,7 +139,6 @@ export async function RelatedPosts({ type, locale, currentSlug, currentTags, cur
     );
   }
 
-  // Renderer for Notes
   const renderNoteCard = (note: Note<NoteFrontmatter>) => {
     const noteDate = new Date(note.frontmatter.date);
     const formatDatePart = (date: Date, options: Intl.DateTimeFormatOptions) => {
@@ -162,7 +154,6 @@ export async function RelatedPosts({ type, locale, currentSlug, currentTags, cur
 
     return (
       <Card key={note.slug} className="group relative flex flex-col overflow-hidden rounded-lg border bg-card/50 shadow-sm transition-all hover:shadow-lg">
-        {/* Date Ribbon */}
         <div className="flex items-center justify-between bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground">
           <div>
             <span className="text-xl font-bold">{formatDatePart(noteDate, { day: 'numeric' })}</span>
@@ -171,7 +162,6 @@ export async function RelatedPosts({ type, locale, currentSlug, currentTags, cur
           <span>{formatDatePart(noteDate, { year: 'numeric' })}</span>
         </div>
 
-        {/* Main Content */}
         <div className="flex flex-1 flex-col p-6">
           <Link href={`${linkPrefix}/notes/${note.slug}`} aria-label={note.frontmatter.title} className="flex-1">
             <h2 className="font-headline text-2xl font-bold tracking-tight text-primary transition-colors group-hover:text-accent">
@@ -183,7 +173,6 @@ export async function RelatedPosts({ type, locale, currentSlug, currentTags, cur
           </Link>
         </div>
         
-        {/* Footer with Tags and Action */}
         <CardFooter className="flex items-center justify-between gap-4 border-t px-6 py-4">
             <div className="flex flex-wrap gap-1">
                 {note.frontmatter.tags && note.frontmatter.tags.map(tag => (

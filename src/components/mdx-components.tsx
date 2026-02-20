@@ -1,3 +1,4 @@
+
 import type {MDXComponents} from 'next-mdx-remote/rsc/types'
 import Image from 'next/image'
 import Link from 'next/link'

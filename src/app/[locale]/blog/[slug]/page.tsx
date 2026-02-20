@@ -139,6 +139,7 @@ export default async function PostPage({ params }: { params: { slug: string, loc
                         width={1200}
                         height={630}
                         className="w-full h-auto rounded-xl shadow-lg object-cover"
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 90vw, 1200px"
                         priority
                         data-ai-hint={heroSource.hint}
                     />
@@ -189,5 +190,3 @@ export default async function PostPage({ params }: { params: { slug: string, loc
     </div>
   );
 }
-
-    
