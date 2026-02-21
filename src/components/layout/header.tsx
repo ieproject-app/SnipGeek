@@ -129,34 +129,25 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
   return (
     <header ref={headerRef} className={cn(
         "fixed top-4 left-4 right-4 md:left-1/2 md:-translate-x-1/2 md:right-auto z-50 transition-all duration-300 ease-in-out",
-        isSearchOpen ? 'md:w-[560px]' : 'md:w-[480px]',
+        isSearchOpen ? 'md:w-[560px]' : 'md:w-[520px]',
         isVisible ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-16"
     )}>
         <nav className={cn(
-            "relative mx-auto bg-primary/90 backdrop-blur-sm text-primary-foreground shadow-lg ring-1 ring-black/5 flex items-center justify-between h-12 transition-all duration-300 ease-in-out px-4 rounded-full"
+            "relative mx-auto bg-primary/90 backdrop-blur-sm text-primary-foreground shadow-lg ring-1 ring-black/5 flex items-center justify-between h-12 transition-all duration-300 ease-in-out pr-4 rounded-full overflow-hidden"
         )}>
             <div className={cn(
-                "flex items-center flex-grow md:flex-grow-0 transition-all duration-300 ease-in-out",
+                "flex items-center flex-grow md:flex-grow-0 h-full transition-all duration-300 ease-in-out",
                 isSearchOpen ? 'w-0 opacity-0 -translate-x-10 pointer-events-none' : 'w-auto opacity-100 translate-x-0'
             )}>
                 <Link 
                     href="/" 
-                    className="flex items-center gap-2.5 group"
+                    className="flex items-center h-full group"
                 >
-                    {/* Split Pill Icon (Full Rounded) */}
-                    <div className="relative w-8 h-8 rounded-full overflow-hidden border border-accent/20 shadow-md transition-all duration-300 group-hover:-translate-y-0.5 group-hover:shadow-accent/20 group-hover:border-accent flex items-center justify-center font-headline font-black text-[10px] tracking-tighter">
-                        {/* Background Halves */}
-                        <div className="absolute inset-0 flex">
-                            <div className="w-1/2 h-full bg-primary" />
-                            <div className="w-1/2 h-full bg-accent" />
-                        </div>
-                        {/* Inverted Letters */}
-                        <div className="relative flex items-center justify-center w-full h-full">
-                            <span className="text-accent w-1/2 text-center">S</span>
-                            <span className="text-primary w-1/2 text-center">G</span>
-                        </div>
+                    {/* Brand Head - SG Icon as the left end of the pill */}
+                    <div className="h-full w-14 bg-accent flex items-center justify-center text-primary font-headline font-black text-lg tracking-tighter transition-all duration-300 group-hover:w-16 rounded-l-full">
+                        SG
                     </div>
-                    <span className="font-headline text-xl font-bold tracking-tighter whitespace-nowrap text-primary-foreground">
+                    <span className="font-headline text-xl font-bold tracking-tighter whitespace-nowrap text-primary-foreground pl-3 pr-2">
                         SnipGeek
                     </span>
                 </Link>
