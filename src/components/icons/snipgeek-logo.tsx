@@ -1,8 +1,8 @@
 import React from 'react';
 
 /**
- * SnipGeekLogo - A modern, clean negative-space SVG logo.
- * Designed to be used for favicon, icons, and branding assets.
+ * SnipGeekLogo - Komponen logo SVG dengan sudut membulat (soft corners).
+ * Dirancang untuk identitas visual yang modern dan ramah.
  */
 export const SnipGeekLogo = ({ className, ...props }: React.SVGProps<SVGSVGElement>) => (
   <svg
@@ -12,8 +12,7 @@ export const SnipGeekLogo = ({ className, ...props }: React.SVGProps<SVGSVGEleme
     {...props}
   >
     <defs>
-      <mask id="sg-mask">
-        {/* White fills the mask, Black cuts it out */}
+      <mask id="sg-mask-component">
         <rect width="100" height="100" fill="white" />
         <text
           x="50%"
@@ -32,12 +31,14 @@ export const SnipGeekLogo = ({ className, ...props }: React.SVGProps<SVGSVGEleme
       </mask>
     </defs>
     
-    {/* The main logo body using the mask for negative space effect */}
+    {/* Background dengan sudut membulat (rx="22") agar tidak runcing */}
     <rect
       width="100"
       height="100"
+      rx="22"
+      ry="22"
       fill="currentColor"
-      mask="url(#sg-mask)"
+      mask="url(#sg-mask-component)"
     />
   </svg>
 );
