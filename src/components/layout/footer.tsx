@@ -31,8 +31,8 @@ export function Footer({ dictionary, translationsMap }: { dictionary: Dictionary
     ];
 
     return (
-        <footer className="relative w-full bg-background pt-20 sm:pt-32 overflow-hidden border-t">
-            {/* Gooey Liquid Background Effect */}
+        <footer className="relative w-full bg-primary text-primary-foreground pt-24 sm:pt-32 mt-32">
+            {/* Gooey Liquid Background Effect - Sits at the top of the footer block */}
             <GooeyFooterBackground />
 
             <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -75,12 +75,12 @@ export function Footer({ dictionary, translationsMap }: { dictionary: Dictionary
             </div>
 
             <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 mt-16 sm:mt-24 text-center">
-                <Avatar className="w-20 h-20 mx-auto mb-4 border-2 border-background shadow-md">
+                <Avatar className="w-20 h-20 mx-auto mb-4 border-2 border-primary-foreground/20 shadow-md">
                     <AvatarImage src={authorAvatar} alt={authorName} />
-                    <AvatarFallback>{authorName.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+                    <AvatarFallback className="bg-primary-foreground/10">{authorName.split(' ').map(n => n[0]).join('')}</AvatarFallback>
                 </Avatar>
-                <h4 className="font-headline text-2xl font-bold text-primary">{authorName}</h4>
-                <p className="mt-2 text-muted-foreground max-w-md mx-auto">{dictionary.footer.authorBio}</p>
+                <h4 className="font-headline text-2xl font-bold">{authorName}</h4>
+                <p className="mt-2 text-primary-foreground/70 max-w-md mx-auto">{dictionary.footer.authorBio}</p>
                 
                 <div className="flex items-center justify-center gap-4 mt-6">
                     {socialLinks.map((social) => (
@@ -89,7 +89,7 @@ export function Footer({ dictionary, translationsMap }: { dictionary: Dictionary
                             href={social.href} 
                             target="_blank" 
                             rel="noopener noreferrer"
-                            className="p-2 rounded-full border bg-card/50 text-muted-foreground hover:text-primary hover:border-primary transition-all duration-300 backdrop-blur-sm"
+                            className="p-2 rounded-full border border-primary-foreground/20 bg-primary-foreground/5 text-primary-foreground/70 hover:text-primary-foreground hover:border-primary-foreground/50 transition-all duration-300 backdrop-blur-sm"
                             aria-label={social.label}
                         >
                             {social.icon}
@@ -98,8 +98,8 @@ export function Footer({ dictionary, translationsMap }: { dictionary: Dictionary
                 </div>
             </div>
 
-            <div className="relative z-10 mt-16 sm:mt-24 py-8 border-t bg-background/50 backdrop-blur-md">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col justify-center items-center gap-4 text-sm text-muted-foreground">
+            <div className="relative z-10 mt-16 sm:mt-24 py-8 border-t border-primary-foreground/10">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col justify-center items-center gap-4 text-sm text-primary-foreground/50">
                     <div className="flex items-center gap-4">
                         <LanguageSwitcher translationsMap={translationsMap} />
                         <ThemeSwitcher />
