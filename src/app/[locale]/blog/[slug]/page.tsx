@@ -1,4 +1,3 @@
-
 import { getPostData, getAllPostSlugs, getAllLocales, getAllTranslationsMap as getAllPostTranslationsMap } from '@/lib/posts';
 import { notFound } from 'next/navigation';
 import { MDXRemote } from 'next-mdx-remote/rsc';
@@ -26,8 +25,9 @@ export async function generateStaticParams() {
   return allParams;
 }
 
-export async function generateMetadata({ params }: { params: { slug: string, locale: string } }): Promise<Metadata> {
-  const post = await getPostData(params.slug, params.locale);
+export async function generateMetadata({ params }: { params: Promise<{ slug: string, locale: string }> }): Promise<Metadata> {
+  const { slug, locale } = await params;
+  const post = await getPostData(slug, locale);
   if (!post) {
     return {
       title: 'Not Found',
@@ -49,7 +49,6 @@ export async function generateMetadata({ params }: { params: { slug: string, loc
     }
   }
 
-  // Multi-language SEO Logic
   const translationsMap = getAllPostTranslationsMap();
   const translationKey = post.frontmatter.translationKey;
   const languages: Record<string, string> = {};
@@ -62,7 +61,7 @@ export async function generateMetadata({ params }: { params: { slug: string, loc
     }
   });
 
-  const currentPrefix = params.locale === i18n.defaultLocale ? '' : `/${params.locale}`;
+  const currentPrefix = locale === i18n.defaultLocale ? '' : `/${locale}`;
   const canonicalPath = `${currentPrefix}/blog/${post.slug}`;
   const imageAlt = postImageAlt || post.frontmatter.title;
 
@@ -89,7 +88,7 @@ export async function generateMetadata({ params }: { params: { slug: string, loc
                 alt: imageAlt,
             },
         ] : [],
-        locale: params.locale,
+        locale: locale,
         type: 'article',
         publishedTime: post.frontmatter.date,
         modifiedTime: post.frontmatter.updated,
@@ -104,8 +103,9 @@ export async function generateMetadata({ params }: { params: { slug: string, loc
   };
 }
 
-export default async function PostPage({ params }: { params: { slug: string, locale: string } }) {
-  const post = await getPostData(params.slug, params.locale);
+export default async function PostPage({ params }: { params: Promise<{ slug: string, locale: string }> }) {
+  const { slug, locale } = await params;
+  const post = await getPostData(slug, locale);
   if (!post || !post.frontmatter.published) {
     notFound();
   }
@@ -127,11 +127,10 @@ export default async function PostPage({ params }: { params: { slug: string, loc
     }
   }
   
-  const linkPrefix = params.locale === i18n.defaultLocale ? '' : `/${params.locale}`;
-  const dictionary = await getDictionary(params.locale);
+  const linkPrefix = locale === i18n.defaultLocale ? '' : `/${locale}`;
+  const dictionary = await getDictionary(locale as any);
   const headings = extractHeadings(post.content);
 
-  // Reading time calculation (average 200 wpm)
   const wordCount = post.content.trim().split(/\s+/).length;
   const readingTime = Math.ceil(wordCount / 200);
 
@@ -171,7 +170,7 @@ export default async function PostPage({ params }: { params: { slug: string, loc
             <PostMeta 
                 frontmatter={post.frontmatter}
                 item={itemForMeta}
-                locale={params.locale}
+                locale={locale}
                 dictionary={dictionary}
                 readingTime={readingTime}
             />
@@ -199,13 +198,13 @@ export default async function PostPage({ params }: { params: { slug: string, loc
                 />
             </div>
             
-            <PostComments article={{ slug: post.slug, title: post.frontmatter.title }} type="blog" locale={params.locale} />
+            <PostComments article={{ slug: post.slug, title: post.frontmatter.title }} type="blog" locale={locale} />
         </article>
       </main>
 
       <RelatedPosts 
         type="blog"
-        locale={params.locale}
+        locale={locale}
         currentSlug={post.slug}
         currentTags={post.frontmatter.tags}
         currentCategory={post.frontmatter.category}

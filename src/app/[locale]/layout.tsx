@@ -35,7 +35,6 @@ const sourceCodePro = Source_Code_Pro({
 });
 
 export const metadata: Metadata = {
-  // The user should update this URL to their actual domain.
   metadataBase: new URL('https://snipgeek.com'),
   title: 'SnipGeek - A Modern Minimalist Tech Blog',
   description: 'A modern minimalist tech blog for geeks, powered by local MDX.',
@@ -57,15 +56,16 @@ export default async function LocaleLayout({
   params,
 }: {
   children: React.ReactNode;
-  params: { locale: string };
+  params: Promise<{ locale: string }>;
 }) {
+  const { locale } = await params;
   const postTranslationsMap = getAllPostTranslationsMap();
   const noteTranslationsMap = getAllNotesTranslationsMap();
   const translationsMap = {...postTranslationsMap, ...noteTranslationsMap};
 
-  const posts = getSortedPostsData(params.locale);
-  const notes = getSortedNotesData(params.locale);
-  const linkPrefix = params.locale === i18n.defaultLocale ? '' : `/${params.locale}`;
+  const posts = getSortedPostsData(locale);
+  const notes = getSortedNotesData(locale);
+  const linkPrefix = locale === i18n.defaultLocale ? '' : `/${locale}`;
 
   const searchablePosts = posts.map(post => ({
     slug: post.slug,
@@ -84,12 +84,12 @@ export default async function LocaleLayout({
   }));
 
   const searchableData = [...searchablePosts, ...searchableNotes];
-  const dictionary = await getDictionary(params.locale as any);
-  const draftPosts = getDraftPostsData(params.locale);
-  const draftNotes = getDraftNotesData(params.locale);
+  const dictionary = await getDictionary(locale as any);
+  const draftPosts = getDraftPostsData(locale);
+  const draftNotes = getDraftNotesData(locale);
   
   return (
-    <html lang={params.locale} className={cn(inter.variable, spaceGrotesk.variable, sourceCodePro.variable, "scroll-smooth")} suppressHydrationWarning>
+    <html lang={locale} className={cn(inter.variable, spaceGrotesk.variable, sourceCodePro.variable, "scroll-smooth")} suppressHydrationWarning>
       <head />
       <body className="font-body antialiased fade-in-on-load">
         <ThemeProvider
@@ -99,7 +99,7 @@ export default async function LocaleLayout({
             disableTransitionOnChange
         >
           <ReadingListProvider>
-            <Header translationsMap={translationsMap} searchableData={searchableData} dictionary={dictionary} />
+            <Header searchableData={searchableData} dictionary={dictionary} />
             <main>{children}</main>
             <Footer dictionary={dictionary} translationsMap={translationsMap} />
             <Toaster />
