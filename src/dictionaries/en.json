@@ -1,3 +1,4 @@
+
 {
     "navigation": {
         "blog": "Blog",
@@ -28,6 +29,17 @@
         "title": "Projects",
         "description": "A showcase of my projects.",
         "wip": "This page is under construction."
+    },
+    "about": {
+        "title": "About Me",
+        "description": "My journey from field technician to digital optimizer.",
+        "experience": "Professional Experience",
+        "skills": "Technical Expertise",
+        "education": "Education",
+        "certifications": "Licenses & Certs",
+        "downloadResume": "Download My Full Resume",
+        "getInTouch": "Let's Connect",
+        "summary": "Professional Summary"
     },
     "tools": {
         "title": "Tools",
@@ -165,7 +177,7 @@
         },
         "imageGrid": {
             "title": "Image Grids (Sequential)",
-            "description": "Enter grid data one per line (format: cols | path1, path2...). They will map to [GRID_1], [GRID_2], etc.",
+            "description": "Enter grid data one per line (format: cols | path1, path2...). Mereka akan dipetakan ke [GRID_1], [GRID_2], dll.",
             "placeholder": "3 | /img1.webp, /img2.webp, /img3.webp",
             "promptTitle": "Image Grids",
             "promptInstruction": "Please group the following images using the <ImageGrid> component with the specified column count:"

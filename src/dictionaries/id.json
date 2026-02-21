@@ -1,3 +1,4 @@
+
 {
     "navigation": {
         "blog": "Blog",
@@ -28,6 +29,17 @@
         "title": "Proyek",
         "description": "Sebuah pameran proyek-proyek saya.",
         "wip": "Halaman ini sedang dalam tahap pembuatan."
+    },
+    "about": {
+        "title": "Tentang Saya",
+        "description": "Perjalanan saya dari teknisi lapangan hingga pengoptimal digital.",
+        "experience": "Pengalaman Profesional",
+        "skills": "Keahlian Teknis",
+        "education": "Pendidikan",
+        "certifications": "Lisensi & Sertifikasi",
+        "downloadResume": "Unduh Resume Lengkap Saya",
+        "getInTouch": "Ayo Terhubung",
+        "summary": "Ringkasan Profesional"
     },
     "tools": {
         "title": "Alat",

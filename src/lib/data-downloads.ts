@@ -6,6 +6,11 @@ export interface DownloadInfo {
 }
 
 export const downloadLinks: Record<string, DownloadInfo> = {
+  'cv-iwan-efendi': {
+    fileName: 'CV Iwan Efendi (Professional Resume)',
+    fileSize: 'Online Doc',
+    externalUrl: 'https://docs.google.com/document/d/1ZrQ7YlcYiyTHSMzD4AnNt44NT34Z432xDamVliP4DUg/edit?usp=sharing'
+  },
   'windows-11-iso-24h2': {
     fileName: 'Windows 11 24H2 English x64 ISO',
     fileSize: 'Large (Direct link)',
