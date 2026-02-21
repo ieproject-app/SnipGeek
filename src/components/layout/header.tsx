@@ -32,10 +32,15 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
   const searchInputRef = useRef<HTMLInputElement>(null);
   const headerRef = useRef<HTMLElement>(null);
   const pathname = usePathname();
+  const [mounted, setMounted] = useState(false);
 
   const isSearchOpen = activeView === 'search';
   const isMenuOpen = activeView === 'menu';
   const isReadingListOpen = activeView === 'readingList';
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     setActiveView('none');
@@ -147,11 +152,11 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                     <div className="h-full w-14 flex items-center justify-center bg-accent text-primary font-headline font-black text-lg transition-all duration-300 group-hover:w-16 rounded-l-full shrink-0 z-10">
                         SG
                     </div>
-                    <div className="overflow-hidden max-w-0 opacity-0 group-hover:max-w-40 group-hover:opacity-100 transition-all duration-500 ease-in-out">
+                    <span className="overflow-hidden max-w-0 opacity-0 group-hover:max-w-40 group-hover:opacity-100 transition-all duration-500 ease-in-out inline-block">
                         <span className="font-headline text-xl font-bold tracking-tighter whitespace-nowrap text-primary-foreground pl-3 pr-4 block transform -translate-x-4 group-hover:translate-x-0 transition-transform duration-500 ease-in-out">
                             SnipGeek
                         </span>
-                    </div>
+                    </span>
                 </Link>
             </div>
             
@@ -165,7 +170,7 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                     </Button>
                     <Button variant="ghost" size="icon" className={cn("relative rounded-full h-9 w-9 bg-transparent hover:bg-transparent", navItemClass)} onClick={() => toggleView('readingList')}>
                        <Bookmark className="h-5 w-5" />
-                       {readingListItems.length > 0 && (
+                       {mounted && readingListItems.length > 0 && (
                             <span className="absolute -top-1 -right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-accent text-accent-foreground text-xs font-bold px-1">
                                 {readingListItems.length}
                             </span>
@@ -188,7 +193,7 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                         </Button>
                         <Button variant="ghost" size="icon" className={cn("relative h-9 w-9 rounded-full bg-transparent hover:bg-transparent", navItemClass)} onClick={() => toggleView('readingList')}>
                            <Bookmark className="h-5 w-5" />
-                           {readingListItems.length > 0 && (
+                           {mounted && readingListItems.length > 0 && (
                                 <span className="absolute -top-1 -right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-accent text-accent-foreground text-xs font-bold px-1">
                                     {readingListItems.length}
                                 </span>
@@ -288,7 +293,7 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                     <p className="px-2 py-1.5 text-xs font-semibold text-muted-foreground">
                       {readingListItems.length} {readingListItems.length === 1 ? dictionary.readingList.item : dictionary.readingList.items} {dictionary.readingList.inYourList}
                     </p>
-                    {readingListItems.length > 0 ? (
+                    {mounted && readingListItems.length > 0 ? (
                       <ul>
                         {readingListItems.map((item) => (
                           <li key={`${item.type}-${item.slug}`} className="group relative">
