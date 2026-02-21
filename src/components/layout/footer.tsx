@@ -10,7 +10,6 @@ import { LanguageSwitcher } from './language-switcher';
 import type { TranslationsMap } from '@/lib/posts';
 import { Facebook, Youtube, Instagram } from 'lucide-react';
 import { TikTokLogo } from '@/components/icons/tiktok-logo';
-import { GooeyFooterBackground } from './gooey-footer-background';
 
 export function Footer({ dictionary, translationsMap }: { dictionary: Dictionary, translationsMap: TranslationsMap }) {
     const footerNavItems = [
@@ -31,8 +30,8 @@ export function Footer({ dictionary, translationsMap }: { dictionary: Dictionary
     ];
 
     return (
-        <footer className="relative w-full mt-32 overflow-visible">
-            {/* Top Navigation Section - Stays transparent */}
+        <footer className="relative w-full mt-32">
+            {/* Top Navigation Section - Links Cards */}
             <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 mb-24">
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
                     {footerNavItems.map((item, index) => {
@@ -72,15 +71,12 @@ export function Footer({ dictionary, translationsMap }: { dictionary: Dictionary
                 </div>
             </div>
 
-            {/* Sub-Footer Section - The solid liquid base containing Profile */}
+            {/* Sub-Footer Section - Solid Color Base */}
             <div className="relative w-full bg-primary text-primary-foreground pt-12 pb-12">
-                {/* Gooey Liquid Effect sits right on top of this block */}
-                <GooeyFooterBackground />
-
                 <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-                    {/* Profile Section - Positioned to sit on the subfooter */}
-                    <div className="text-center mb-16 -mt-12">
-                        <Avatar className="w-24 h-24 mx-auto mb-6 border-4 border-primary-foreground/10 shadow-2xl">
+                    {/* Profile Section - Overlapping the solid background */}
+                    <div className="text-center mb-16 -mt-24">
+                        <Avatar className="w-24 h-24 mx-auto mb-6 border-4 border-primary shadow-2xl bg-primary">
                             <AvatarImage src={authorAvatar} alt={authorName} />
                             <AvatarFallback className="bg-muted text-primary">{authorName.split(' ').map(n => n[0]).join('')}</AvatarFallback>
                         </Avatar>
