@@ -116,7 +116,7 @@ export async function RelatedPosts({ type, locale, currentSlug, currentTags, cur
                             alt={post.frontmatter.imageAlt || post.frontmatter.title}
                             fill
                             className="object-cover"
-                            sizes="(max-width: 768px) 100vw, 33vw"
+                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 33vw, 400px"
                             data-ai-hint={heroImageHint}
                         />
                     )}
@@ -175,6 +175,9 @@ export async function RelatedPosts({ type, locale, currentSlug, currentTags, cur
             <h3 className="font-headline text-lg font-bold tracking-tight text-primary transition-colors group-hover/link:text-accent mb-2">
                 {note.frontmatter.title}
             </h3>
+            <p className="text-sm text-muted-foreground line-clamp-2">
+                {note.frontmatter.description}
+            </p>
           </Link>
         </CardContent>
         
@@ -201,8 +204,8 @@ export async function RelatedPosts({ type, locale, currentSlug, currentTags, cur
       </h2>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         {type === 'blog' 
-            ? relatedContent.map(item => renderBlogPostCard(item as Post<PostFrontmatter>))
-            : relatedContent.map(item => renderNoteCard(item as Note<NoteFrontmatter>))
+            ? (relatedContent as Post<PostFrontmatter>[]).map(item => renderBlogPostCard(item))
+            : (relatedContent as Note<NoteFrontmatter>[]).map(item => renderNoteCard(item))
         }
       </div>
     </section>
