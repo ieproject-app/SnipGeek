@@ -8,15 +8,15 @@ import { ThemeSwitcher } from './theme-switcher';
 import type { Dictionary } from '@/lib/get-dictionary';
 import { LanguageSwitcher } from './language-switcher';
 import type { TranslationsMap } from '@/lib/posts';
-import { Facebook, Youtube, Instagram } from 'lucide-react';
+import { Facebook, Youtube, Instagram, User2, StickyNote, LayoutGrid, Mail } from 'lucide-react';
 import { TikTokLogo } from '@/components/icons/tiktok-logo';
 
 export function Footer({ dictionary, translationsMap }: { dictionary: Dictionary, translationsMap: TranslationsMap }) {
     const footerNavItems = [
-      { id: 'footer-about', title: dictionary.navigation.about, href: '/about' },
-      { id: 'footer-notes', title: dictionary.navigation.notes, href: '/notes' },
-      { id: 'footer-tools', title: dictionary.navigation.tools, href: '/tools' },
-      { id: 'footer-contact', title: dictionary.navigation.contact, href: '/contact' },
+      { id: 'footer-about', title: dictionary.navigation.about, href: '/about', icon: <User2 className="h-5 w-5" /> },
+      { id: 'footer-notes', title: dictionary.navigation.notes, href: '/notes', icon: <StickyNote className="h-5 w-5" /> },
+      { id: 'footer-tools', title: dictionary.navigation.tools, href: '/tools', icon: <LayoutGrid className="h-5 w-5" /> },
+      { id: 'footer-contact', title: dictionary.navigation.contact, href: '/contact', icon: <Mail className="h-5 w-5" /> },
     ];
 
     const authorName = "Iwan Efendi";
@@ -59,8 +59,9 @@ export function Footer({ dictionary, translationsMap }: { dictionary: Dictionary
                                         )}
                                         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
                                         <div className="absolute bottom-0 left-0 p-4 text-white">
-                                            <h3 className="font-headline text-lg font-bold">
-                                                {item.title}
+                                            <h3 className="font-headline text-lg font-bold flex items-center gap-2">
+                                                {item.icon}
+                                                <span>{item.title}</span>
                                             </h3>
                                         </div>
                                     </article>
