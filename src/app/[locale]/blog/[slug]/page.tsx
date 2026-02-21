@@ -131,6 +131,10 @@ export default async function PostPage({ params }: { params: { slug: string, loc
   const dictionary = await getDictionary(params.locale);
   const headings = extractHeadings(post.content);
 
+  // Reading time calculation (average 200 wpm)
+  const wordCount = post.content.trim().split(/\s+/).length;
+  const readingTime = Math.ceil(wordCount / 200);
+
   const itemForMeta = {
       slug: post.slug,
       title: post.frontmatter.title,
@@ -169,6 +173,7 @@ export default async function PostPage({ params }: { params: { slug: string, loc
                 item={itemForMeta}
                 locale={params.locale}
                 dictionary={dictionary}
+                readingTime={readingTime}
             />
 
             <TableOfContents headings={headings} title={dictionary.post.toc} />

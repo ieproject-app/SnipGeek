@@ -87,6 +87,10 @@ export default async function NotePage({ params }: { params: { slug: string, loc
   const dictionary = await getDictionary(params.locale);
   const headings = extractHeadings(note.content);
 
+  // Reading time calculation (average 200 wpm)
+  const wordCount = note.content.trim().split(/\s+/).length;
+  const readingTime = Math.ceil(wordCount / 200);
+
   const itemForMeta = {
       slug: note.slug,
       title: note.frontmatter.title,
@@ -110,6 +114,7 @@ export default async function NotePage({ params }: { params: { slug: string, loc
                 item={itemForMeta}
                 locale={params.locale}
                 dictionary={dictionary}
+                readingTime={readingTime}
             />
 
             <TableOfContents headings={headings} title={dictionary.post.toc} />

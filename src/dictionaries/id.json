@@ -115,6 +115,8 @@
         "resultsFound": "hasil ditemukan"
     },
     "post": {
+        "by": "Oleh",
+        "readingTime": "{minutes} mnt baca",
         "share": "Bagikan",
         "shareArticle": "Bagikan artikel ini",
         "relatedContent": "Anda Mungkin Juga Suka",

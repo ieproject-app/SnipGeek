@@ -115,6 +115,8 @@
         "resultsFound": "results found"
     },
     "post": {
+        "by": "By",
+        "readingTime": "{minutes} min read",
         "share": "Share",
         "shareArticle": "Share this article",
         "relatedContent": "You Might Also Like",
