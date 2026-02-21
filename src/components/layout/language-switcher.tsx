@@ -65,20 +65,19 @@ export function LanguageSwitcher({ translationsMap }: { translationsMap: Transla
     return `/${newLocale}${pathWithoutLocale}`;
   }
 
-  // To prevent hydration mismatch, we ensure the container is identical 
-  // on server and client initial render.
+  // Use primary-foreground with low opacity for the background to contrast with bg-primary footer
   return (
     <div 
-      className="relative flex items-center bg-primary/90 backdrop-blur-sm rounded-full p-1 text-xs min-h-[32px] min-w-[80px]"
+      className="relative flex items-center bg-primary-foreground/10 backdrop-blur-md rounded-full p-1 text-xs min-h-[32px] min-w-[80px] shadow-inner"
       suppressHydrationWarning
     >
         {!mounted ? (
-          <div className="w-full h-full animate-pulse bg-primary-foreground/10 rounded-full" />
+          <div className="w-full h-full animate-pulse bg-primary-foreground/5 rounded-full" />
         ) : (
           <>
             <div 
                 className={cn(
-                    "absolute h-6 w-9 bg-primary-foreground/20 shadow-sm rounded-full transition-transform duration-300 ease-in-out",
+                    "absolute h-6 w-9 bg-primary-foreground/20 shadow-md rounded-full transition-transform duration-300 ease-in-out",
                     currentLocale === 'en' ? 'translate-x-0' : 'translate-x-full'
                 )}
             />
@@ -88,7 +87,7 @@ export function LanguageSwitcher({ translationsMap }: { translationsMap: Transla
                     href={redirectedPathName(locale)} 
                     className={cn(
                         "relative z-10 w-9 h-6 flex items-center justify-center font-bold transition-colors",
-                        currentLocale === locale ? "text-primary-foreground" : "text-primary-foreground/50 hover:text-primary-foreground"
+                        currentLocale === locale ? "text-primary-foreground" : "text-primary-foreground/70 hover:text-primary-foreground"
                     )}
                     aria-current={currentLocale === locale ? 'page' : undefined}
                     onClick={() => handleLocaleChange(locale as Locale)}
