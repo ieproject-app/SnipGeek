@@ -1,0 +1,25 @@
+<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <mask id="sg-mask">
+      <rect width="100" height="100" fill="white" />
+      <text
+        x="50%"
+        y="54%"
+        dominant-baseline="middle"
+        text-anchor="middle"
+        fill="black"
+        style="font-family: sans-serif; font-weight: 900; font-size: 52px;"
+      >
+        SG
+      </text>
+    </mask>
+  </defs>
+  
+  <!-- Latar belakang warna aksen dengan teks SG sebagai lubang (negative space) -->
+  <rect
+    width="100"
+    height="100"
+    fill="#7DD3FC"
+    mask="url(#sg-mask)"
+  />
+</svg>
