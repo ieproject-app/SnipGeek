@@ -143,9 +143,14 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
             )}>
                 <Link 
                     href="/" 
-                    className="font-headline text-xl font-bold tracking-tighter whitespace-nowrap"
+                    className="flex items-center gap-2.5 group"
                 >
-                    SnipGeek
+                    <div className="flex items-center justify-center w-8 h-8 rounded-full bg-accent text-primary font-headline font-extrabold text-xs tracking-tighter shadow-sm transition-all duration-300 group-hover:rotate-12 group-hover:scale-110">
+                        SG
+                    </div>
+                    <span className="font-headline text-xl font-bold tracking-tighter whitespace-nowrap text-primary-foreground">
+                        SnipGeek
+                    </span>
                 </Link>
             </div>
             
