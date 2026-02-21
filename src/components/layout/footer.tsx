@@ -32,8 +32,8 @@ export function Footer({ dictionary, translationsMap }: { dictionary: Dictionary
 
     return (
         <footer className="relative w-full mt-32 overflow-visible">
-            {/* Main Footer Section - Merges with background */}
-            <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            {/* Top Navigation Section - Stays transparent */}
+            <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 mb-24">
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
                     {footerNavItems.map((item, index) => {
                         const image = PlaceHolderImages.find(p => p.id === item.id);
@@ -70,43 +70,49 @@ export function Footer({ dictionary, translationsMap }: { dictionary: Dictionary
                         );
                     })}
                 </div>
-
-                <div className="mt-16 sm:mt-24 text-center pb-16">
-                    <Avatar className="w-20 h-20 mx-auto mb-4 border-2 border-border shadow-md">
-                        <AvatarImage src={authorAvatar} alt={authorName} />
-                        <AvatarFallback className="bg-muted">{authorName.split(' ').map(n => n[0]).join('')}</AvatarFallback>
-                    </Avatar>
-                    <h4 className="font-headline text-2xl font-bold text-primary">{authorName}</h4>
-                    <p className="mt-2 text-muted-foreground max-w-md mx-auto">{dictionary.footer.authorBio}</p>
-                    
-                    <div className="flex items-center justify-center gap-4 mt-6">
-                        {socialLinks.map((social) => (
-                            <a 
-                                key={social.label} 
-                                href={social.href} 
-                                target="_blank" 
-                                rel="noopener noreferrer"
-                                className="p-2 rounded-full border border-border bg-card text-muted-foreground hover:text-primary hover:border-primary transition-all duration-300 shadow-sm"
-                                aria-label={social.label}
-                            >
-                                {social.icon}
-                            </a>
-                        ))}
-                    </div>
-                </div>
             </div>
 
-            {/* Sub-Footer Section - The solid liquid base */}
-            <div className="relative w-full bg-primary text-primary-foreground pt-12 pb-8">
+            {/* Sub-Footer Section - The solid liquid base containing Profile */}
+            <div className="relative w-full bg-primary text-primary-foreground pt-24 pb-12">
                 {/* Gooey Liquid Effect sits right on top of this block */}
                 <GooeyFooterBackground />
 
-                <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col justify-center items-center gap-4 text-sm text-primary-foreground/50">
-                    <div className="flex items-center gap-4">
-                        <LanguageSwitcher translationsMap={translationsMap} />
-                        <ThemeSwitcher />
+                <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                    {/* Profile Section - Now integrated here */}
+                    <div className="text-center mb-16">
+                        <Avatar className="w-24 h-24 mx-auto mb-6 border-4 border-primary-foreground/10 shadow-2xl">
+                            <AvatarImage src={authorAvatar} alt={authorName} />
+                            <AvatarFallback className="bg-muted text-primary">{authorName.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+                        </Avatar>
+                        <h4 className="font-headline text-3xl font-bold text-primary-foreground tracking-tight">{authorName}</h4>
+                        <p className="mt-4 text-primary-foreground/70 max-w-md mx-auto text-lg leading-relaxed font-medium">
+                            {dictionary.footer.authorBio}
+                        </p>
+                        
+                        <div className="flex items-center justify-center gap-4 mt-8">
+                            {socialLinks.map((social) => (
+                                <a 
+                                    key={social.label} 
+                                    href={social.href} 
+                                    target="_blank" 
+                                    rel="noopener noreferrer"
+                                    className="p-3 rounded-full border border-primary-foreground/20 bg-primary-foreground/5 text-primary-foreground/60 hover:text-primary-foreground hover:bg-primary-foreground/10 hover:scale-110 transition-all duration-300 shadow-sm"
+                                    aria-label={social.label}
+                                >
+                                    {social.icon}
+                                </a>
+                            ))}
+                        </div>
                     </div>
-                    <p>&copy; {new Date().getFullYear()} SnipGeek. All Rights Reserved.</p>
+
+                    {/* Footer Bottom: Switchers and Copyright */}
+                    <div className="flex flex-col justify-center items-center gap-6 text-sm text-primary-foreground/40 border-t border-primary-foreground/10 pt-12">
+                        <div className="flex items-center gap-4">
+                            <LanguageSwitcher translationsMap={translationsMap} />
+                            <ThemeSwitcher />
+                        </div>
+                        <p className="font-medium tracking-wide">&copy; {new Date().getFullYear()} SnipGeek. All Rights Reserved.</p>
+                    </div>
                 </div>
             </div>
         </footer>
