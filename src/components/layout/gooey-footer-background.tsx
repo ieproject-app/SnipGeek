@@ -4,23 +4,22 @@ import React, { useEffect, useState } from 'react';
 
 /**
  * GooeyFooterBackground Component
- * Creates a subtle "boiling" liquid transition at the top edge of the footer.
- * Optimized to prevent layout jitter and provide a more integrated look.
+ * Dioptimalkan untuk alur yang lebih natural dan integrasi tanpa celah dengan basis footer solid.
  */
 export function GooeyFooterBackground() {
   const [particles, setParticles] = useState<any[]>([]);
 
   useEffect(() => {
-    // Generate fewer particles for a more subtle, premium feel
-    const particleCount = 25; 
+    // Jumlah partikel dikurangi untuk kesan yang lebih bersih dan premium
+    const particleCount = 20; 
     const p = [];
     for (let i = 0; i < particleCount; i++) {
       p.push({
         id: i,
-        size: 1.5 + Math.random() * 3.5, // 1.5rem to 5rem
-        uplift: 4 + Math.random() * 6, // Reduced uplift for subtler effect
+        size: 2 + Math.random() * 4, // 2rem hingga 6rem
+        uplift: 3 + Math.random() * 5, // Jarak terbang yang lebih pendek dan halus
         posX: Math.random() * 100,
-        dur: 4 + Math.random() * 5, // Slower movement for "thicker" liquid feel
+        dur: 6 + Math.random() * 6, // Gerakan lebih lambat agar terlihat "kental"
         delay: -(Math.random() * 10),
       });
     }
@@ -28,32 +27,32 @@ export function GooeyFooterBackground() {
   }, []);
 
   return (
-    <div className="absolute top-0 left-0 w-full h-16 -translate-y-[95%] pointer-events-none overflow-visible z-0" style={{ contain: 'paint' }}>
+    <div className="absolute top-0 left-0 w-full h-20 -translate-y-full pointer-events-none z-0" style={{ contain: 'paint' }}>
       <style>{`
         @keyframes gooey-float-up {
           0% {
+            transform: translate(-50%, 0) scale(1);
             top: 100%;
-            transform: translate(-50%, -50%) scale(1);
           }
-          70% {
-            opacity: 1;
+          50% {
+            transform: translate(-50%, -10%) scale(1.05);
           }
           100% {
-            top: calc(var(--uplift) * -1);
-            transform: translate(-50%, -50%) scale(0);
-            opacity: 0;
+            transform: translate(-50%, -100%) scale(0);
+            top: calc(100% - var(--uplift));
           }
         }
-        .gooey-liquid-container {
-          filter: url('#footer-liquid-effect-v2');
-          transform: translateZ(0); /* Trigger GPU acceleration */
+        .gooey-liquid-wrapper {
+          filter: url('#footer-gooey-filter-v3');
+          height: 100%;
+          width: 100%;
+          position: relative;
         }
       `}</style>
 
-      {/* The gooey container needs a small "base" ledge to pull particles from */}
-      <div className="gooey-liquid-container relative w-full h-full">
-        {/* A small invisible ledge at the bottom to help the gooey filter "join" with the footer edge */}
-        <div className="absolute bottom-0 left-0 w-full h-4 bg-primary" />
+      <div className="gooey-liquid-wrapper">
+        {/* Kolam Cairan Sumber - Dibuat overlap dengan footer agar tidak ada garis pembatas tajam */}
+        <div className="absolute bottom-[-8px] left-0 w-full h-12 bg-primary" />
         
         {particles.map((p) => (
           <span
@@ -71,18 +70,17 @@ export function GooeyFooterBackground() {
         ))}
       </div>
 
-      {/* SVG Filter Definition */}
+      {/* SVG Filter Definition - Refined for "Natural Melt" */}
       <svg className="absolute w-0 h-0 invisible" aria-hidden="true">
         <defs>
-          <filter id="footer-liquid-effect-v2">
-            <feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur" />
+          <filter id="footer-gooey-filter-v3">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="12" result="blur" />
             <feColorMatrix 
               in="blur" 
               mode="matrix" 
-              values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -8" 
+              values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 20 -10" 
               result="gooey" 
             />
-            <feComposite in="SourceGraphic" in2="gooey" operator="atop"/>
           </filter>
         </defs>
       </svg>
