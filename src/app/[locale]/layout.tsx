@@ -37,6 +37,11 @@ export const metadata: Metadata = {
   metadataBase: new URL('https://snipgeek.com'),
   title: 'SnipGeek - A Modern Minimalist Tech Blog',
   description: 'A modern minimalist tech blog for geeks, powered by local MDX.',
+  icons: {
+    icon: '/images/logo/favicon.ico',
+    shortcut: '/images/logo/favicon.ico',
+    apple: '/images/logo/apple-touch-icon.png',
+  },
   alternates: {
     canonical: '/',
     languages: {
