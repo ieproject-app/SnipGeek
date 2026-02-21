@@ -1,3 +1,4 @@
+
 import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
 import { i18n } from '@/i18n-config';
@@ -18,14 +19,12 @@ const inter = Inter({
   subsets: ['latin'],
   display: 'swap',
   variable: '--font-inter',
-  weight: ['400', '500', '700'],
 });
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ['latin'],
   display: 'swap',
   variable: '--font-space-grotesk',
-  weight: ['400', '500', '700'],
 });
 
 const sourceCodePro = Source_Code_Pro({
