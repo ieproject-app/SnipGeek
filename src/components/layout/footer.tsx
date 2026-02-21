@@ -30,9 +30,9 @@ export function Footer({ dictionary, translationsMap }: { dictionary: Dictionary
     ];
 
     return (
-        <footer className="relative w-full mt-32">
+        <footer className="relative w-full mt-32 border-t bg-muted/30">
             {/* Top Navigation Section - Links Cards */}
-            <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 mb-24">
+            <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
                     {footerNavItems.map((item, index) => {
                         const image = PlaceHolderImages.find(p => p.id === item.id);
@@ -71,17 +71,17 @@ export function Footer({ dictionary, translationsMap }: { dictionary: Dictionary
                 </div>
             </div>
 
-            {/* Sub-Footer Section - Solid Color Base */}
-            <div className="relative w-full bg-primary text-primary-foreground pt-12 pb-12">
+            {/* Sub-Footer Section - Adaptive Color Base */}
+            <div className="relative w-full pt-12 pb-12">
                 <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
                     {/* Profile Section - Overlapping with margin top negative */}
                     <div className="text-center mb-16 -mt-24">
-                        <Avatar className="w-24 h-24 mx-auto mb-6 border-4 border-primary shadow-2xl bg-primary">
+                        <Avatar className="w-24 h-24 mx-auto mb-6 border-4 border-background shadow-2xl bg-background">
                             <AvatarImage src={authorAvatar} alt={authorName} />
                             <AvatarFallback className="bg-muted text-primary">{authorName.split(' ').map(n => n[0]).join('')}</AvatarFallback>
                         </Avatar>
-                        <h4 className="font-headline text-3xl font-bold text-primary-foreground tracking-tight">{authorName}</h4>
-                        <p className="mt-4 text-primary-foreground/80 max-w-md mx-auto text-lg leading-relaxed font-medium">
+                        <h4 className="font-headline text-3xl font-bold text-foreground tracking-tight">{authorName}</h4>
+                        <p className="mt-4 text-muted-foreground max-w-md mx-auto text-lg leading-relaxed font-medium">
                             {dictionary.footer.authorBio}
                         </p>
                         
@@ -92,7 +92,7 @@ export function Footer({ dictionary, translationsMap }: { dictionary: Dictionary
                                     href={social.href} 
                                     target="_blank" 
                                     rel="noopener noreferrer"
-                                    className="p-3 rounded-full border border-primary-foreground/20 bg-primary-foreground/10 text-primary-foreground/80 hover:text-primary-foreground hover:bg-primary-foreground/20 hover:scale-110 transition-all duration-300 shadow-sm"
+                                    className="p-3 rounded-full border border-border bg-background text-muted-foreground hover:text-primary hover:border-primary hover:scale-110 transition-all duration-300 shadow-sm"
                                     aria-label={social.label}
                                 >
                                     {social.icon}
@@ -102,10 +102,13 @@ export function Footer({ dictionary, translationsMap }: { dictionary: Dictionary
                     </div>
 
                     {/* Footer Bottom: Switchers and Copyright */}
-                    <div className="flex flex-col justify-center items-center gap-6 text-sm text-primary-foreground/40 border-t border-primary-foreground/10 pt-12">
+                    <div className="flex flex-col justify-center items-center gap-6 text-sm text-muted-foreground/60 border-t pt-12">
                         <div className="flex items-center gap-4">
-                            <LanguageSwitcher translationsMap={translationsMap} />
-                            <ThemeSwitcher />
+                            {/* Switchers with primary context for visibility */}
+                            <div className="bg-primary/10 rounded-full p-1 flex items-center gap-2">
+                                <LanguageSwitcher translationsMap={translationsMap} />
+                                <ThemeSwitcher />
+                            </div>
                         </div>
                         <p className="font-medium tracking-wide">&copy; {new Date().getFullYear()} SnipGeek. All Rights Reserved.</p>
                     </div>

@@ -65,19 +65,19 @@ export function LanguageSwitcher({ translationsMap }: { translationsMap: Transla
     return `/${newLocale}${pathWithoutLocale}`;
   }
 
-  // Use primary-foreground with low opacity for the background to contrast with bg-primary footer
+  // Use a context-aware color scheme that works in both modes
   return (
     <div 
-      className="relative flex items-center bg-primary-foreground/10 backdrop-blur-md rounded-full p-1 text-xs min-h-[32px] min-w-[80px] shadow-inner"
+      className="relative flex items-center bg-muted rounded-full p-1 text-[10px] min-h-[28px] min-w-[70px] shadow-inner"
       suppressHydrationWarning
     >
         {!mounted ? (
-          <div className="w-full h-full animate-pulse bg-primary-foreground/5 rounded-full" />
+          <div className="w-full h-full animate-pulse bg-muted-foreground/10 rounded-full" />
         ) : (
           <>
             <div 
                 className={cn(
-                    "absolute h-6 w-9 bg-primary-foreground/20 shadow-md rounded-full transition-transform duration-300 ease-in-out",
+                    "absolute h-5 w-8 bg-background shadow-sm rounded-full transition-transform duration-300 ease-in-out",
                     currentLocale === 'en' ? 'translate-x-0' : 'translate-x-full'
                 )}
             />
@@ -86,8 +86,8 @@ export function LanguageSwitcher({ translationsMap }: { translationsMap: Transla
                     key={locale} 
                     href={redirectedPathName(locale)} 
                     className={cn(
-                        "relative z-10 w-9 h-6 flex items-center justify-center font-bold transition-colors",
-                        currentLocale === locale ? "text-primary-foreground" : "text-primary-foreground/70 hover:text-primary-foreground"
+                        "relative z-10 w-8 h-5 flex items-center justify-center font-bold transition-colors",
+                        currentLocale === locale ? "text-primary" : "text-muted-foreground hover:text-foreground"
                     )}
                     aria-current={currentLocale === locale ? 'page' : undefined}
                     onClick={() => handleLocaleChange(locale as Locale)}

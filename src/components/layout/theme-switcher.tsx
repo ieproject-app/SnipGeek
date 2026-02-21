@@ -24,16 +24,16 @@ export function ThemeSwitcher() {
 
   return (
     <div 
-      className="relative flex items-center bg-primary-foreground/10 backdrop-blur-md rounded-full p-1 text-sm min-h-[32px] min-w-[108px] shadow-inner"
+      className="relative flex items-center bg-muted rounded-full p-1 text-sm min-h-[28px] min-w-[90px] shadow-inner"
       suppressHydrationWarning
     >
       {!mounted ? (
-        <div className="w-full h-full animate-pulse bg-primary-foreground/5 rounded-full" />
+        <div className="w-full h-full animate-pulse bg-muted-foreground/10 rounded-full" />
       ) : (
         <>
           <div
             className={cn(
-              'absolute h-6 w-9 bg-primary-foreground/20 shadow-md rounded-full transition-transform duration-300 ease-in-out'
+              'absolute h-5 w-7 bg-background shadow-sm rounded-full transition-transform duration-300 ease-in-out'
             )}
             style={{ transform: `translateX(${activeIndex * 100}%)` }}
           />
@@ -42,14 +42,14 @@ export function ThemeSwitcher() {
               key={option.theme}
               onClick={() => setTheme(option.theme)}
               className={cn(
-                'relative z-10 w-9 h-6 flex items-center justify-center rounded-full transition-colors',
+                'relative z-10 w-7 h-5 flex items-center justify-center rounded-full transition-colors',
                 theme === option.theme
-                  ? 'text-primary-foreground'
-                  : 'text-primary-foreground/70 hover:text-primary-foreground'
+                  ? 'text-primary'
+                  : 'text-muted-foreground hover:text-foreground'
               )}
               aria-label={`Switch to ${option.theme} mode`}
             >
-              <option.icon className="h-3.5 w-3.5" />
+              <option.icon className="h-3 w-3" />
             </button>
           ))}
         </>
