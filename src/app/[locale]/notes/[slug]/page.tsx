@@ -1,4 +1,3 @@
-
 import { getNoteData, getAllNoteSlugs, getAllLocales, getAllNotesTranslationsMap } from '@/lib/notes';
 import { notFound } from 'next/navigation';
 import { MDXRemote } from 'next-mdx-remote/rsc';
@@ -24,8 +23,9 @@ export async function generateStaticParams() {
   return allParams;
 }
 
-export async function generateMetadata({ params }: { params: { slug: string, locale: string } }): Promise<Metadata> {
-  const note = await getNoteData(params.slug, params.locale);
+export async function generateMetadata({ params }: { params: Promise<{ slug: string, locale: string }> }): Promise<Metadata> {
+  const { slug, locale } = await params;
+  const note = await getNoteData(slug, locale);
   if (!note) {
     return {
       title: 'Not Found',
@@ -46,7 +46,7 @@ export async function generateMetadata({ params }: { params: { slug: string, loc
     }
   });
 
-  const currentPrefix = params.locale === i18n.defaultLocale ? '' : `/${params.locale}`;
+  const currentPrefix = locale === i18n.defaultLocale ? '' : `/${locale}`;
   const canonicalPath = `${currentPrefix}/notes/${note.slug}`;
 
   return {
@@ -64,7 +64,7 @@ export async function generateMetadata({ params }: { params: { slug: string, loc
         description: note.frontmatter.description,
         url: canonicalPath,
         siteName: 'SnipGeek',
-        locale: params.locale,
+        locale: locale,
         type: 'article',
         publishedTime: note.frontmatter.date,
         modifiedTime: note.frontmatter.updated,
@@ -78,13 +78,14 @@ export async function generateMetadata({ params }: { params: { slug: string, loc
   };
 }
 
-export default async function NotePage({ params }: { params: { slug: string, locale: string } }) {
-  const note = await getNoteData(params.slug, params.locale);
+export default async function NotePage({ params }: { params: Promise<{ slug: string, locale: string }> }) {
+  const { slug, locale } = await params;
+  const note = await getNoteData(slug, locale);
   if (!note || !note.frontmatter.published) {
     notFound();
   }
-  const linkPrefix = params.locale === i18n.defaultLocale ? '' : `/${params.locale}`;
-  const dictionary = await getDictionary(params.locale);
+  const linkPrefix = locale === i18n.defaultLocale ? '' : `/${locale}`;
+  const dictionary = await getDictionary(locale as any);
   const headings = extractHeadings(note.content);
 
   // Reading time calculation (average 200 wpm)
@@ -103,7 +104,7 @@ export default async function NotePage({ params }: { params: { slug: string, loc
     <div className="w-full">
       <main className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-12 sm:pt-32 sm:pb-16">
         <article>
-            <header className="text-center">
+            <header className="text-center mb-8">
                 <h1 className="font-headline text-4xl md:text-5xl font-extrabold tracking-tighter text-primary mb-3">
                     {note.frontmatter.title}
                 </h1>
@@ -112,9 +113,10 @@ export default async function NotePage({ params }: { params: { slug: string, loc
             <PostMeta
                 frontmatter={note.frontmatter}
                 item={itemForMeta}
-                locale={params.locale}
+                locale={locale}
                 dictionary={dictionary}
                 readingTime={readingTime}
+                isOverlay={false}
             />
 
             <TableOfContents headings={headings} title={dictionary.post.toc} />
@@ -132,20 +134,20 @@ export default async function NotePage({ params }: { params: { slug: string, loc
                 />
             </div>
 
-            <div className="mt-12 flex flex-col gap-4 text-center">
+            <div className="mt-16 flex flex-col gap-4 text-center border-t pt-12">
                 <h3 className="text-lg font-semibold tracking-tight text-primary">{dictionary.post.shareArticle}</h3>
                 <ShareButtons
                     title={note.frontmatter.title}
                 />
             </div>
             
-            <PostComments article={{ slug: note.slug, title: note.frontmatter.title }} type="note" locale={params.locale} />
+            <PostComments article={{ slug: note.slug, title: note.frontmatter.title }} type="note" locale={locale} />
         </article>
       </main>
 
       <RelatedPosts 
         type="note"
-        locale={params.locale}
+        locale={locale}
         currentSlug={note.slug}
         currentTags={note.frontmatter.tags}
       />
