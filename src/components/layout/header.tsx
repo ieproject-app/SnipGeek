@@ -145,7 +145,8 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                     href="/" 
                     className="flex items-center gap-2.5 group"
                 >
-                    <div className="flex items-center justify-center w-8 h-8 rounded-full bg-accent text-primary font-headline font-extrabold text-xs tracking-tighter shadow-sm transition-all duration-300 group-hover:rotate-12 group-hover:scale-110">
+                    {/* Squircle Tech Icon (Rencana 2) */}
+                    <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary border border-accent/30 text-accent font-code font-bold text-sm shadow-md transition-all duration-300 group-hover:-translate-y-0.5 group-hover:shadow-accent/20 group-hover:border-accent">
                         SG
                     </div>
                     <span className="font-headline text-xl font-bold tracking-tighter whitespace-nowrap text-primary-foreground">
