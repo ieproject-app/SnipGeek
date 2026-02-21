@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import type { Post } from '@/lib/posts';
 import type { Note } from '@/lib/notes';
 import type { Dictionary } from '@/lib/get-dictionary';
-import { useToast } from '@/hooks/use-toast';
+import { useNotification } from '@/hooks/use-notification';
 
 type DraftListProps = {
   draftPosts: Post<any>[];
@@ -18,7 +18,7 @@ type DraftListProps = {
 
 export function DraftList({ draftPosts, draftNotes, dictionary }: DraftListProps) {
   const [copiedSlug, setCopiedSlug] = useState<string | null>(null);
-  const { toast } = useToast();
+  const { notify } = useNotification();
 
   if (process.env.NODE_ENV === 'production') {
     return null;
@@ -28,10 +28,7 @@ export function DraftList({ draftPosts, draftNotes, dictionary }: DraftListProps
     const textToCopy = `${slug}.mdx`;
     navigator.clipboard.writeText(textToCopy);
     setCopiedSlug(`${type}-${slug}`);
-    toast({
-      title: 'Copied to clipboard!',
-      description: `"${textToCopy}" has been copied.`,
-    });
+    notify('File Copied');
     setTimeout(() => {
       setCopiedSlug(null);
     }, 2000);

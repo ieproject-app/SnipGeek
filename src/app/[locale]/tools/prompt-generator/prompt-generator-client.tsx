@@ -11,8 +11,8 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Copy, Check, Plus, Trash2, Link as LinkIcon, Hash } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
 import { downloadLinks } from '@/lib/data-downloads';
+import { useNotification } from '@/hooks/use-notification';
 
 type DownloadItem = {
   id: string;
@@ -41,7 +41,7 @@ export function PromptGeneratorClient({ dictionary }: { dictionary: any }) {
 
   const [generatedPrompt, setGeneratedPrompt] = useState('');
   const [isCopied, setIsCopied] = useState(false);
-  const { toast } = useToast();
+  const { notify } = useNotification();
 
   const downloadIds = Object.keys(downloadLinks).sort();
 
@@ -172,10 +172,7 @@ export function PromptGeneratorClient({ dictionary }: { dictionary: any }) {
   const handleCopyMain = () => {
     navigator.clipboard.writeText(generatedPrompt);
     setIsCopied(true);
-    toast({
-      title: dictionary.copiedButton,
-      description: dictionary.copySuccessDescription,
-    });
+    notify(dictionary.copiedButton);
     setTimeout(() => {
       setIsCopied(false);
     }, 2000);

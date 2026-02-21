@@ -10,6 +10,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { usePathname } from 'next/navigation';
 import { useReadingList } from '@/hooks/use-reading-list';
+import { useNotification } from '@/hooks/use-notification';
 import type { Dictionary } from '@/lib/get-dictionary';
 
 type SearchableItem = {
@@ -28,6 +29,7 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<SearchableItem[]>([]);
   const { items: readingListItems, removeItem: removeReadingListItem } = useReadingList();
+  const { message } = useNotification();
   const lastScrollY = useRef(0);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const headerRef = useRef<HTMLElement>(null);
@@ -44,7 +46,13 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
     setMounted(true);
   }, []);
 
-  // Notification logic: if items increase, show header and pulse
+  // Show header and trigger pulse when message or reading list changes
+  useEffect(() => {
+    if (message) {
+      setIsVisible(true);
+    }
+  }, [message]);
+
   useEffect(() => {
     if (mounted && readingListItems.length > prevCount.current) {
       setIsVisible(true);
@@ -76,7 +84,7 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
 
   useEffect(() => {
     const handleScroll = () => {
-      if (activeView !== 'none') return;
+      if (activeView !== 'none' || message) return;
       const currentScrollY = window.scrollY;
       if (currentScrollY < lastScrollY.current || currentScrollY < 10) {
         setIsVisible(true);
@@ -88,7 +96,7 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
 
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [activeView]);
+  }, [activeView, message]);
 
   useEffect(() => {
     if (isSearchOpen) {
@@ -153,16 +161,27 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
         <nav className={cn(
             "relative mx-auto bg-primary/90 backdrop-blur-sm text-primary-foreground shadow-lg ring-1 ring-black/5 flex items-center justify-between h-12 transition-all duration-300 ease-in-out pr-4 rounded-full overflow-hidden"
         )}>
+            {/* Status Notification Pill */}
+            <div className={cn(
+                "absolute inset-0 flex items-center justify-center pointer-events-none transition-all duration-500 z-50",
+                message ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-12"
+            )}>
+                <div className="bg-accent text-primary px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-tighter shadow-xl flex items-center gap-2">
+                    <div className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
+                    {message}
+                </div>
+            </div>
+
             <div className={cn(
                 "flex items-center flex-grow md:flex-grow-0 h-full transition-all duration-300 ease-in-out",
-                isSearchOpen ? 'w-0 opacity-0 -translate-x-10 pointer-events-none' : 'w-auto opacity-100 translate-x-0'
+                (isSearchOpen || message) ? 'w-0 opacity-0 -translate-x-10 pointer-events-none' : 'w-auto opacity-100 translate-x-0'
             )}>
                 <Link href="/" className="flex items-center h-full group"><span className="h-full w-14 flex items-center justify-center bg-accent text-primary font-headline font-black text-lg transition-all duration-300 group-hover:w-16 rounded-l-full shrink-0 z-10">SG</span><span className="overflow-hidden max-w-0 opacity-0 group-hover:max-w-40 group-hover:opacity-100 transition-all duration-500 ease-in-out inline-block"><span className="font-headline text-xl font-bold tracking-tighter whitespace-nowrap text-primary-foreground pl-3 pr-4 block transform -translate-x-4 group-hover:translate-x-0 transition-transform duration-500 ease-in-out">SnipGeek</span></span></Link>
             </div>
             
             <div className={cn(
                 "flex items-center gap-1 transition-opacity duration-300",
-                isSearchOpen ? "opacity-0 pointer-events-none" : "opacity-100"
+                (isSearchOpen || message) ? "opacity-0 pointer-events-none" : "opacity-100"
             )}>
                 <div className="flex md:hidden items-center gap-0">
                     <Button variant="ghost" size="icon" className={cn("h-9 w-9 rounded-full bg-transparent hover:bg-transparent", navItemClass)} onClick={() => toggleView('menu')}>

@@ -1,6 +1,7 @@
 'use client';
 
 import { useReadingList, type ReadingListItem } from '@/hooks/use-reading-list';
+import { useNotification } from '@/hooks/use-notification';
 import { Button } from '@/components/ui/button';
 import { Bookmark } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -15,6 +16,7 @@ interface AddToReadingListButtonProps {
 
 export function AddToReadingListButton({ item, dictionary, showText = true, className }: AddToReadingListButtonProps) {
   const { addItem, removeItem, isItemSaved } = useReadingList();
+  const { notify } = useNotification();
   
   const isSaved = isItemSaved(item.slug);
 
@@ -24,8 +26,10 @@ export function AddToReadingListButton({ item, dictionary, showText = true, clas
     
     if (isSaved) {
       removeItem(item.slug);
+      notify(dictionary.remove);
     } else {
       addItem(item);
+      notify(dictionary.add);
     }
   };
 

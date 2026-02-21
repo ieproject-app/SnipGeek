@@ -4,10 +4,10 @@ import { i18n } from '@/i18n-config';
 import { getAllTranslationsMap as getAllPostTranslationsMap, getSortedPostsData, getDraftPostsData } from '@/lib/posts';
 import { getAllNotesTranslationsMap, getSortedNotesData, getDraftNotesData } from '@/lib/notes';
 import '../globals.css';
-import { Toaster } from '@/components/ui/toaster';
 import type { Metadata } from 'next';
 import { ThemeProvider } from '@/components/theme-provider';
 import { ReadingListProvider } from '@/hooks/use-reading-list';
+import { NotificationProvider } from '@/hooks/use-notification';
 import { BackToTop } from '@/components/layout/back-to-top';
 import { getDictionary } from '@/lib/get-dictionary';
 import { DraftList } from '@/components/layout/draft-list';
@@ -98,14 +98,15 @@ export default async function LocaleLayout({
             enableSystem
             disableTransitionOnChange
         >
-          <ReadingListProvider>
-            <Header searchableData={searchableData} dictionary={dictionary} />
-            <main>{children}</main>
-            <Footer dictionary={dictionary} translationsMap={translationsMap} />
-            <Toaster />
-            <BackToTop />
-            <DraftList draftPosts={draftPosts} draftNotes={draftNotes} dictionary={dictionary} />
-          </ReadingListProvider>
+          <NotificationProvider>
+            <ReadingListProvider>
+              <Header searchableData={searchableData} dictionary={dictionary} />
+              <main>{children}</main>
+              <Footer dictionary={dictionary} translationsMap={translationsMap} />
+              <BackToTop />
+              <DraftList draftPosts={draftPosts} draftNotes={draftNotes} dictionary={dictionary} />
+            </ReadingListProvider>
+          </NotificationProvider>
         </ThemeProvider>
       </body>
     </html>
