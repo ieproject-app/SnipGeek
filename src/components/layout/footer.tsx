@@ -31,7 +31,7 @@ export function Footer({ dictionary, translationsMap }: { dictionary: Dictionary
     ];
 
     return (
-        <footer className="relative w-full bg-background pt-20 sm:pt-32 overflow-hidden">
+        <footer className="relative w-full bg-background pt-20 sm:pt-32 overflow-hidden border-t">
             {/* Gooey Liquid Background Effect */}
             <GooeyFooterBackground />
 

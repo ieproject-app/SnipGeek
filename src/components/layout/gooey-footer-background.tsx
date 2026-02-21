@@ -9,10 +9,10 @@ import React from 'react';
  */
 export function GooeyFooterBackground() {
   return (
-    <div className="absolute inset-0 -z-10 overflow-hidden pointer-events-none opacity-30 dark:opacity-10 select-none">
+    <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none opacity-50 dark:opacity-20 select-none">
       <svg width="100%" height="100%" className="w-full h-full">
         <defs>
-          <filter id="gooey-filter">
+          <filter id="footer-gooey-filter">
             {/* Step 1: Blur the graphics */}
             <feGaussianBlur in="SourceGraphic" stdDeviation="15" result="blur" />
             {/* Step 2: Increase contrast of the alpha channel to create the gooey bond */}
@@ -26,7 +26,7 @@ export function GooeyFooterBackground() {
             <feComposite in="SourceGraphic" in2="goo" operator="atop"/>
           </filter>
         </defs>
-        <g filter="url(#gooey-filter)">
+        <g filter="url(#footer-gooey-filter)">
           {/* Liquid Blob 1 - Moving horizontally and vertically */}
           <circle cx="20%" cy="40%" r="60" fill="currentColor" className="text-primary">
             <animate attributeName="cx" values="20%;35%;15%;20%" dur="25s" repeatCount="indefinite" />
