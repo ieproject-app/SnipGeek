@@ -1,3 +1,4 @@
+
 import { getDictionary } from '@/lib/get-dictionary'
 import { Locale } from '@/i18n-config'
 import EmployeeHistoryClient from './employee-history-client'
@@ -18,10 +19,11 @@ const getEmployeeData = () => {
 }
 
 export async function generateMetadata({
-  params: { locale },
+  params,
 }: {
-  params: { locale: Locale }
+  params: Promise<{ locale: Locale }>
 }): Promise<Metadata> {
+  const { locale } = await params;
   const dictionary = await getDictionary(locale)
   const pageContent = dictionary.tools.tool_list.employee_history;
 
@@ -39,10 +41,11 @@ export async function generateMetadata({
  * The main server component for the Employee History page.
  */
 export default async function EmployeeHistoryPage({
-  params: { locale },
+  params,
 }: {
-  params: { locale: Locale }
+  params: Promise<{ locale: Locale }>
 }) {
+  const { locale } = await params;
   const dictionary = await getDictionary(locale)
   const employeeData = getEmployeeData()
   const pageContent = dictionary.tools.tool_list.employee_history;

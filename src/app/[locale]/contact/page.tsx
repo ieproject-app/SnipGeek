@@ -5,7 +5,8 @@ import { getDictionary } from '@/lib/get-dictionary';
 import { Button } from '@/components/ui/button';
 import { Mail } from 'lucide-react';
 
-export async function generateMetadata({ params: { locale } }: { params: { locale: string } }): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale } = await params;
   const dictionary = await getDictionary(locale);
   const currentPrefix = locale === i18n.defaultLocale ? '' : `/${locale}`;
   const canonicalPath = `${currentPrefix}/contact`;
@@ -33,7 +34,8 @@ export async function generateStaticParams() {
   return i18n.locales.map((locale) => ({ locale }));
 }
 
-export default async function Page({ params: { locale } }: { params: { locale: string } }) {
+export default async function Page({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
   const dictionary = await getDictionary(locale);
   const pageContent = dictionary.contact;
   const email = "iwan.efndi@gmail.com";

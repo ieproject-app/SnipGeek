@@ -15,9 +15,10 @@ import { Briefcase, GraduationCap, Award, Mail, ChevronRight, FileText } from 'l
 import { DownloadButton } from '@/components/mdx-components';
 import Link from 'next/link';
 
-export async function generateMetadata({ params }: { params: { locale: string } }): Promise<Metadata> {
-  const dictionary = await getDictionary(params.locale as any);
-  const currentPrefix = params.locale === i18n.defaultLocale ? '' : `/${params.locale}`;
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale } = await params;
+  const dictionary = await getDictionary(locale as any);
+  const currentPrefix = locale === i18n.defaultLocale ? '' : `/${locale}`;
   const canonicalPath = `${currentPrefix}/about`;
 
   const languages: Record<string, string> = {};
@@ -46,7 +47,8 @@ export async function generateStaticParams() {
   return i18n.locales.map((locale) => ({ locale }));
 }
 
-export default async function AboutPage({ params: { locale } }: { params: { locale: string } }) {
+export default async function AboutPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
   const { content } = await getPageContent('about', locale);
   const dictionary = await getDictionary(locale as any);
   const data = cvData[locale] || cvData.en;

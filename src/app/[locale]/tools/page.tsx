@@ -8,7 +8,8 @@ import { Calculator, Shuffle, Briefcase, Hash, ClipboardPenLine } from 'lucide-r
 import React from 'react';
 import Link from 'next/link';
 
-export async function generateMetadata({ params: { locale } }: { params: { locale: string } }): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale } = await params;
   const dictionary = await getDictionary(locale);
   return {
     title: dictionary.tools.title,
@@ -20,7 +21,8 @@ export async function generateStaticParams() {
   return i18n.locales.map((locale) => ({ locale }));
 }
 
-export default async function ToolsPage({ params: { locale } }: { params: { locale: string } }) {
+export default async function ToolsPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
   const dictionary = await getDictionary(locale);
   const pageContent = dictionary.tools;
   const linkPrefix = locale === i18n.defaultLocale ? '' : `/${locale}`;

@@ -12,7 +12,8 @@ export async function generateStaticParams() {
   return i18n.locales.map((locale) => ({ locale }));
 }
 
-export async function generateMetadata({ params: { locale } }: { params: { locale: string } }): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale } = await params;
   const dictionary = await getDictionary(locale);
   const currentPrefix = locale === i18n.defaultLocale ? '' : `/${locale}`;
   const canonicalPath = `${currentPrefix}/blog`;
@@ -36,7 +37,8 @@ export async function generateMetadata({ params: { locale } }: { params: { local
   };
 }
 
-export default async function BlogPage({ params: { locale } }: { params: { locale: string } }) {
+export default async function BlogPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
   const allPostsData = getSortedPostsData(locale);
   const linkPrefix = locale === i18n.defaultLocale ? '' : `/${locale}`;
   const dictionary = await getDictionary(locale);

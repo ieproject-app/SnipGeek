@@ -11,7 +11,8 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardFooter } from '@/components/ui/card';
 import { Metadata } from 'next';
 
-export async function generateMetadata({ params: { tag, locale } }: { params: { tag: string, locale: string } }): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<{ tag: string, locale: string }> }): Promise<Metadata> {
+  const { tag, locale } = await params;
   const dictionary = await getDictionary(locale);
   const decodedTag = decodeURIComponent(tag);
   return {
@@ -39,7 +40,8 @@ export async function generateStaticParams() {
   return allParams;
 }
 
-export default async function TagPage({ params: { tag, locale } }: { params: { tag: string, locale: string } }) {
+export default async function TagPage({ params }: { params: Promise<{ tag: string, locale: string }> }) {
+  const { tag, locale } = await params;
   const decodedTag = decodeURIComponent(tag).toLowerCase();
   const dictionary = await getDictionary(locale);
   const linkPrefix = locale === i18n.defaultLocale ? '' : `/${locale}`;

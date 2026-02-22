@@ -4,7 +4,8 @@ import { i18n } from '@/i18n-config';
 import type { Metadata } from 'next';
 import { PromptGeneratorClient } from './prompt-generator-client';
 
-export async function generateMetadata({ params: { locale } }: { params: { locale: string } }): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale } = await params;
   const dictionary = await getDictionary(locale as any);
   const title = dictionary.promptGenerator.title;
   const description = dictionary.promptGenerator.description;
@@ -23,8 +24,8 @@ export async function generateStaticParams() {
   return i18n.locales.map((locale) => ({ locale }));
 }
 
-export default async function PromptGeneratorPage({ params: { locale } }: { params: { locale: string } }) {
-  const { locale: lang } = await Promise.resolve(params);
+export default async function PromptGeneratorPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale: lang } = await params;
   const dictionary = await getDictionary(lang as any);
   const pageContent = dictionary.promptGenerator;
   

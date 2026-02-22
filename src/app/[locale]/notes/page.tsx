@@ -12,7 +12,8 @@ export async function generateStaticParams() {
   return i18n.locales.map((locale) => ({ locale }));
 }
 
-export default async function NotesPage({ params: { locale } }: { params: { locale: string } }) {
+export default async function NotesPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
   const allNotesData = getSortedNotesData(locale);
   const linkPrefix = locale === i18n.defaultLocale ? '' : `/${locale}`;
   const dictionary = await getDictionary(locale);
