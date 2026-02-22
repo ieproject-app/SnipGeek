@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -24,7 +25,7 @@ import {
   Calendar, 
   CheckCircle2,
   Image as LucideImage,
-  Layers,
+  Languages,
   Zap
 } from 'lucide-react';
 import { downloadLinks } from '@/lib/data-downloads';
@@ -59,6 +60,7 @@ export function PromptGeneratorClient({ dictionary }: { dictionary: any }) {
   const [publishDate, setPublishDate] = useState<string>('');
   const [isPublished, setIsPublished] = useState(true);
   const [isFeatured, setIsFeatured] = useState(false);
+  const [isIdOnly, setIsIdOnly] = useState(false);
 
   const [generatedPrompt, setGeneratedPrompt] = useState('');
   const [isCopied, setIsCopied] = useState(false);
@@ -92,9 +94,14 @@ export function PromptGeneratorClient({ dictionary }: { dictionary: any }) {
     const buildPrompt = () => {
       const isBlog = contentType === 'blog';
       
-      let prompt = isBlog
-        ? `${dictionary.promptBaseBlog}\n\n`
-        : `${dictionary.promptBaseNote}\n\n`;
+      let promptBase = "";
+      if (isBlog) {
+        promptBase = isIdOnly ? dictionary.promptBaseBlogIdOnly : dictionary.promptBaseBlog;
+      } else {
+        promptBase = isIdOnly ? dictionary.promptBaseNoteIdOnly : dictionary.promptBaseNote;
+      }
+
+      let prompt = `${promptBase}\n\n`;
 
       prompt += `**${dictionary.frontmatterDetails}:**\n`;
       prompt += `- ${dictionary.contentTypeLabel}: ${isBlog ? dictionary.contentTypeBlog : dictionary.contentTypeNote}\n`;
@@ -164,7 +171,7 @@ export function PromptGeneratorClient({ dictionary }: { dictionary: any }) {
     };
 
     buildPrompt();
-  }, [draft, publishDate, isPublished, isFeatured, images, dictionary, contentType, downloadItems, imageGridMappings, showDownloads, showGrids, showImages]);
+  }, [draft, publishDate, isPublished, isFeatured, isIdOnly, images, dictionary, contentType, downloadItems, imageGridMappings, showDownloads, showGrids, showImages]);
 
   const handleCopyMain = () => {
     navigator.clipboard.writeText(generatedPrompt);
@@ -188,7 +195,7 @@ export function PromptGeneratorClient({ dictionary }: { dictionary: any }) {
   return (
     <div className="space-y-8 max-w-6xl mx-auto">
       
-      {/* 1. Header Toolbar - Improved Contrast & Clarity */}
+      {/* 1. Header Toolbar */}
       <Card className="bg-card/50 border-primary/10 shadow-sm overflow-hidden">
         <div className="p-4 md:p-5 flex flex-wrap items-center justify-between gap-6">
           
@@ -297,7 +304,7 @@ export function PromptGeneratorClient({ dictionary }: { dictionary: any }) {
               />
             </div>
             
-            <div className="flex items-center gap-5">
+            <div className="flex flex-wrap items-center gap-5">
               <div className="flex items-center gap-2 group cursor-pointer">
                 <CheckCircle2 className="h-4 w-4 text-muted-foreground shrink-0 group-hover:text-primary transition-colors" />
                 <Label htmlFor="published" className="text-[10px] font-bold uppercase cursor-pointer whitespace-nowrap text-muted-foreground group-hover:text-primary transition-colors">{dictionary.publishSwitchLabel}</Label>
@@ -311,6 +318,12 @@ export function PromptGeneratorClient({ dictionary }: { dictionary: any }) {
                   <Switch id="featured" checked={isFeatured} onCheckedChange={setIsFeatured} className="scale-75" />
                 </div>
               )}
+
+              <div className="flex items-center gap-2 group cursor-pointer">
+                <Languages className="h-4 w-4 text-muted-foreground shrink-0 group-hover:text-primary transition-colors" />
+                <Label htmlFor="idOnly" className="text-[10px] font-bold uppercase cursor-pointer whitespace-nowrap text-muted-foreground group-hover:text-primary transition-colors">{dictionary.idOnlySwitchLabel}</Label>
+                <Switch id="idOnly" checked={isIdOnly} onCheckedChange={setIsIdOnly} className="scale-75" />
+              </div>
             </div>
           </div>
         </div>
