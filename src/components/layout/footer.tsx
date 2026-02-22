@@ -1,3 +1,4 @@
+
 import Image from 'next/image';
 import Link from 'next/link';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
@@ -107,9 +108,9 @@ export function Footer({ dictionary, translationsMap }: { dictionary: Dictionary
                         <div className="flex items-center gap-4">
                             {/* Switchers inside Header-styled Pill */}
                             <div className="bg-primary/90 backdrop-blur-sm rounded-full p-1.5 flex items-center gap-2 shadow-xl border border-white/5">
-                                <LanguageSwitcher translationsMap={translationsMap} />
+                                <LanguageSwitcher translationsMap={translationsMap} dictionary={dictionary} />
                                 <div className="w-px h-4 bg-primary-foreground/20" />
-                                <ThemeSwitcher />
+                                <ThemeSwitcher dictionary={dictionary} />
                             </div>
                         </div>
                         <p className="font-medium tracking-wide">&copy; {new Date().getFullYear()} SnipGeek. All Rights Reserved.</p>

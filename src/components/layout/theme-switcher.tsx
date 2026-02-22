@@ -1,9 +1,12 @@
+
 'use client';
 
 import { useTheme } from 'next-themes';
 import { Sun, Moon, Laptop } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useEffect, useState } from 'react';
+import { useNotification } from '@/hooks/use-notification';
+import type { Dictionary } from '@/lib/get-dictionary';
 
 const themeOptions = [
   { theme: 'light', icon: Sun },
@@ -11,9 +14,10 @@ const themeOptions = [
   { theme: 'dark', icon: Moon },
 ];
 
-export function ThemeSwitcher() {
+export function ThemeSwitcher({ dictionary }: { dictionary: Dictionary }) {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const { notify } = useNotification();
   
   useEffect(() => {
     setMounted(true);
@@ -21,6 +25,13 @@ export function ThemeSwitcher() {
   
   const currentThemeIndex = themeOptions.findIndex((t) => t.theme === theme);
   const activeIndex = currentThemeIndex === -1 ? 1 : currentThemeIndex; // Default to system
+
+  const handleThemeChange = (newTheme: string) => {
+    setTheme(newTheme);
+    const key = `theme${newTheme.charAt(0).toUpperCase() + newTheme.slice(1)}`;
+    const msg = (dictionary.notifications as any)?.[key];
+    if (msg) notify(msg);
+  };
 
   return (
     <div 
@@ -40,7 +51,7 @@ export function ThemeSwitcher() {
           {themeOptions.map((option) => (
             <button
               key={option.theme}
-              onClick={() => setTheme(option.theme)}
+              onClick={() => handleThemeChange(option.theme)}
               className={cn(
                 'relative z-10 w-7 h-5 flex items-center justify-center rounded-full transition-colors',
                 theme === option.theme

@@ -1,3 +1,4 @@
+
 'use client'
 
 import { usePathname, useParams } from 'next/navigation'
@@ -5,8 +6,9 @@ import { i18n, type Locale } from '@/i18n-config'
 import { type TranslationsMap } from '@/lib/posts'
 import { cn } from '@/lib/utils'
 import { useEffect, useState } from 'react'
+import type { Dictionary } from '@/lib/get-dictionary'
 
-export function LanguageSwitcher({ translationsMap }: { translationsMap: TranslationsMap }) {
+export function LanguageSwitcher({ translationsMap, dictionary }: { translationsMap: TranslationsMap, dictionary: Dictionary }) {
   const pathName = usePathname()
   const params = useParams()
   const [mounted, setMounted] = useState(false)
@@ -19,6 +21,8 @@ export function LanguageSwitcher({ translationsMap }: { translationsMap: Transla
 
   const handleLocaleChange = (locale: Locale) => {
     document.cookie = `NEXT_LOCALE=${locale}; path=/; max-age=31536000; SameSite=Lax`;
+    // Store a flag to trigger notification on the new page load
+    localStorage.setItem('snipgeek-pending-notify', locale === 'en' ? 'langEn' : 'langId');
   };
 
   const redirectedPathName = (newLocale: string) => {

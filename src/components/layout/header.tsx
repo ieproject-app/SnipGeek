@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
@@ -29,7 +30,7 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<SearchableItem[]>([]);
   const { items: readingListItems, removeItem: removeReadingListItem } = useReadingList();
-  const { message } = useNotification();
+  const { message, notify } = useNotification();
   const lastScrollY = useRef(0);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const headerRef = useRef<HTMLElement>(null);
@@ -52,6 +53,18 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
       setIsVisible(true);
     }
   }, [message]);
+
+  // Handle pending notifications (e.g. from language switch)
+  useEffect(() => {
+    if (mounted) {
+      const pending = localStorage.getItem('snipgeek-pending-notify');
+      if (pending) {
+        const msg = (dictionary.notifications as any)?.[pending];
+        if (msg) notify(msg);
+        localStorage.removeItem('snipgeek-pending-notify');
+      }
+    }
+  }, [mounted, notify, dictionary]);
 
   useEffect(() => {
     if (mounted && readingListItems.length > prevCount.current) {
