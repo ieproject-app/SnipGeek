@@ -153,7 +153,7 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
   const navItemClass = "transition-all duration-300 text-primary-foreground/70 hover:text-primary-foreground";
 
   return (
-    <header ref={headerRef} className={cn(
+    <header headerRef={headerRef} className={cn(
         "fixed top-4 left-4 right-4 md:left-1/2 md:-translate-x-1/2 md:right-auto z-50 transition-all duration-300 ease-in-out",
         isSearchOpen ? 'md:w-[560px]' : 'md:w-[520px]',
         isVisible ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-16"
@@ -176,7 +176,16 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                 "flex items-center flex-grow md:flex-grow-0 h-full transition-all duration-300 ease-in-out",
                 (isSearchOpen || message) ? 'w-0 opacity-0 -translate-x-10 pointer-events-none' : 'w-auto opacity-100 translate-x-0'
             )}>
-                <Link href="/" className="flex items-center h-full group"><span className="h-full w-14 flex items-center justify-center bg-accent text-primary font-headline font-black text-lg transition-all duration-300 group-hover:w-16 rounded-l-full shrink-0 z-10">SG</span><span className="overflow-hidden max-w-0 opacity-0 group-hover:max-w-40 group-hover:opacity-100 transition-all duration-500 ease-in-out inline-block"><span className="font-headline text-xl font-bold tracking-tighter whitespace-nowrap text-primary-foreground pl-3 pr-4 block transform -translate-x-4 group-hover:translate-x-0 transition-transform duration-500 ease-in-out">SnipGeek</span></span></Link>
+                <Link href="/" className="flex items-center h-full group">
+                    <span className="h-full w-14 flex items-center justify-center bg-accent text-primary font-headline font-black text-lg leading-none transition-all duration-300 group-hover:w-16 shrink-0 z-10">
+                        SG
+                    </span>
+                    <span className="overflow-hidden max-w-0 opacity-0 group-hover:max-w-40 group-hover:opacity-100 transition-all duration-500 ease-in-out inline-block">
+                        <span className="font-headline text-xl font-bold tracking-tighter whitespace-nowrap text-primary-foreground pl-3 pr-4 block transform -translate-x-4 group-hover:translate-x-0 transition-transform duration-500 ease-in-out">
+                            SnipGeek
+                        </span>
+                    </span>
+                </Link>
             </div>
             
             <div className={cn(
