@@ -188,21 +188,24 @@ export function PromptGeneratorClient({ dictionary }: { dictionary: any }) {
   return (
     <div className="space-y-8 max-w-6xl mx-auto">
       
-      {/* 1. Header Toolbar - Improved Color & Contrast */}
+      {/* 1. Header Toolbar - Improved Contrast & Clarity */}
       <Card className="bg-card/50 border-primary/10 shadow-sm overflow-hidden">
         <div className="p-4 md:p-5 flex flex-wrap items-center justify-between gap-6">
           
           <div className="flex flex-wrap items-center gap-6">
-            {/* Group A: Content Type */}
+            {/* Group A: Content Type Selection */}
             <div className="flex items-center gap-2">
               <div className="p-2 bg-primary/5 rounded-lg border border-primary/10 hidden sm:block">
                 <Zap className="h-4 w-4 text-primary" />
               </div>
-              <div className="flex bg-muted/30 p-1 rounded-xl border">
+              <div className="flex bg-muted/30 p-1 rounded-xl border border-primary/5">
                 <Button 
                   variant={contentType === 'blog' ? 'default' : 'ghost'} 
                   onClick={() => setContentType('blog')}
-                  className="h-9 px-3 rounded-lg transition-all gap-2 text-[10px] font-bold uppercase"
+                  className={cn(
+                    "h-9 px-3 rounded-lg transition-all gap-2 text-[10px] font-bold uppercase",
+                    contentType !== 'blog' && "text-muted-foreground hover:bg-background hover:text-primary"
+                  )}
                 >
                   <FileText className="h-3.5 w-3.5" />
                   <span className="hidden sm:inline">{dictionary.contentTypeBlog}</span>
@@ -210,7 +213,10 @@ export function PromptGeneratorClient({ dictionary }: { dictionary: any }) {
                 <Button 
                   variant={contentType === 'note' ? 'default' : 'ghost'} 
                   onClick={() => setContentType('note')}
-                  className="h-9 px-3 rounded-lg transition-all gap-2 text-[10px] font-bold uppercase"
+                  className={cn(
+                    "h-9 px-3 rounded-lg transition-all gap-2 text-[10px] font-bold uppercase",
+                    contentType !== 'note' && "text-muted-foreground hover:bg-background hover:text-primary"
+                  )}
                 >
                   <StickyNote className="h-3.5 w-3.5" />
                   <span className="hidden sm:inline">{dictionary.contentTypeNote}</span>
@@ -218,7 +224,7 @@ export function PromptGeneratorClient({ dictionary }: { dictionary: any }) {
               </div>
             </div>
 
-            {/* Group B: Feature Toggles - Optimized for readability */}
+            {/* Group B: Feature Toggles */}
             <div className="flex items-center gap-2">
               <TooltipProvider>
                 <Tooltip>
@@ -228,7 +234,7 @@ export function PromptGeneratorClient({ dictionary }: { dictionary: any }) {
                       onClick={() => setShowDownloads(!showDownloads)}
                       className={cn(
                         "h-10 w-10 sm:w-auto sm:px-3 rounded-xl border-dashed transition-all",
-                        !showDownloads && "text-muted-foreground hover:text-primary hover:border-primary/40"
+                        !showDownloads && "bg-background/40 text-muted-foreground border-muted-foreground/20 hover:border-primary/40 hover:text-primary hover:bg-background"
                       )}
                     >
                       <Download className="h-4 w-4" />
@@ -247,7 +253,7 @@ export function PromptGeneratorClient({ dictionary }: { dictionary: any }) {
                       onClick={() => setShowGrids(!showGrids)}
                       className={cn(
                         "h-10 w-10 sm:w-auto sm:px-3 rounded-xl border-dashed transition-all",
-                        !showGrids && "text-muted-foreground hover:text-primary hover:border-primary/40"
+                        !showGrids && "bg-background/40 text-muted-foreground border-muted-foreground/20 hover:border-primary/40 hover:text-primary hover:bg-background"
                       )}
                     >
                       <Grid3X3 className="h-4 w-4" />
@@ -266,7 +272,7 @@ export function PromptGeneratorClient({ dictionary }: { dictionary: any }) {
                       onClick={() => setShowImages(!showImages)}
                       className={cn(
                         "h-10 w-10 sm:w-auto sm:px-3 rounded-xl border-dashed transition-all",
-                        !showImages && "text-muted-foreground hover:text-primary hover:border-primary/40"
+                        !showImages && "bg-background/40 text-muted-foreground border-muted-foreground/20 hover:border-primary/40 hover:text-primary hover:bg-background"
                       )}
                     >
                       <LucideImage className="h-4 w-4" />
@@ -279,29 +285,29 @@ export function PromptGeneratorClient({ dictionary }: { dictionary: any }) {
             </div>
           </div>
 
-          {/* Group C: Metadata Mini-Form */}
-          <div className="flex flex-wrap items-center gap-6 w-full md:w-auto border-t pt-4 md:border-t-0 md:pt-0 border-primary/10">
+          {/* Group C: Metadata Form */}
+          <div className="flex flex-wrap items-center gap-6 w-full md:w-auto">
             <div className="flex items-center gap-2">
               <Calendar className="h-4 w-4 text-muted-foreground shrink-0" />
               <Input
                   value={publishDate}
                   onChange={(e) => setPublishDate(e.target.value)}
                   placeholder="YYYY-MM-DD"
-                  className="bg-background/50 h-9 w-28 rounded-lg text-[10px] font-mono"
+                  className="bg-background/50 h-9 w-28 rounded-lg text-[10px] font-mono border-muted-foreground/20 focus:border-primary/40 transition-colors"
               />
             </div>
             
             <div className="flex items-center gap-5">
-              <div className="flex items-center gap-2">
-                <CheckCircle2 className="h-4 w-4 text-muted-foreground shrink-0" />
-                <Label htmlFor="published" className="text-[10px] font-bold uppercase cursor-pointer whitespace-nowrap">{dictionary.publishSwitchLabel}</Label>
+              <div className="flex items-center gap-2 group cursor-pointer">
+                <CheckCircle2 className="h-4 w-4 text-muted-foreground shrink-0 group-hover:text-primary transition-colors" />
+                <Label htmlFor="published" className="text-[10px] font-bold uppercase cursor-pointer whitespace-nowrap text-muted-foreground group-hover:text-primary transition-colors">{dictionary.publishSwitchLabel}</Label>
                 <Switch id="published" checked={isPublished} onCheckedChange={setIsPublished} className="scale-75" />
               </div>
               
               {contentType === 'blog' && (
-                <div className="flex items-center gap-2">
-                  <Plus className="h-4 w-4 text-muted-foreground shrink-0" />
-                  <Label htmlFor="featured" className="text-[10px] font-bold uppercase cursor-pointer whitespace-nowrap">{dictionary.featuredSwitchLabel}</Label>
+                <div className="flex items-center gap-2 group cursor-pointer">
+                  <Plus className="h-4 w-4 text-muted-foreground shrink-0 group-hover:text-primary transition-colors" />
+                  <Label htmlFor="featured" className="text-[10px] font-bold uppercase cursor-pointer whitespace-nowrap text-muted-foreground group-hover:text-primary transition-colors">{dictionary.featuredSwitchLabel}</Label>
                   <Switch id="featured" checked={isFeatured} onCheckedChange={setIsFeatured} className="scale-75" />
                 </div>
               )}
@@ -317,7 +323,7 @@ export function PromptGeneratorClient({ dictionary }: { dictionary: any }) {
             <div className="p-2 bg-primary/10 rounded-lg"><FileText className="h-5 w-5 text-primary" /></div>
             {dictionary.draftTitle}
           </CardTitle>
-          <Button variant="ghost" size="sm" onClick={() => setIsDraftExpanded(!isDraftExpanded)} className="h-8 w-8 rounded-full">
+          <Button variant="ghost" size="sm" onClick={() => setIsDraftExpanded(!isDraftExpanded)} className="h-8 w-8 rounded-full hover:bg-primary/10 hover:text-primary">
             {isDraftExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
           </Button>
         </CardHeader>
@@ -348,7 +354,7 @@ export function PromptGeneratorClient({ dictionary }: { dictionary: any }) {
                     placeholder={contentType === 'blog' ? dictionary.imagesPlaceholder : dictionary.imagesPlaceholderNote}
                     value={images}
                     onChange={(e) => setImages(e.target.value)}
-                    className="font-mono text-[13px] bg-background/50 rounded-xl p-4 min-h-[120px] leading-relaxed"
+                    className="font-mono text-[13px] bg-background/50 rounded-xl p-4 min-h-[120px] leading-relaxed border-muted-foreground/20 focus:border-primary/40"
                 />
                 <p className="mt-3 text-[10px] text-muted-foreground uppercase font-bold tracking-widest pl-1 leading-tight">
                     {contentType === 'blog' ? dictionary.imagesDescription : dictionary.imagesDescriptionNote}
@@ -371,7 +377,7 @@ export function PromptGeneratorClient({ dictionary }: { dictionary: any }) {
                           <Badge variant="secondary" className="text-[10px] font-bold px-2 py-0.5 rounded-md shrink-0">[D_{index + 1}]</Badge>
                           
                           <Select value={item.type} onValueChange={(val) => updateDownloadItem(item.id, { type: val as 'id' | 'url', value: '' })}>
-                              <SelectTrigger className="w-[80px] h-8 text-[10px] rounded-lg">
+                              <SelectTrigger className="w-[80px] h-8 text-[10px] rounded-lg border-muted-foreground/20">
                                 <SelectValue />
                               </SelectTrigger>
                               <SelectContent>
@@ -382,7 +388,7 @@ export function PromptGeneratorClient({ dictionary }: { dictionary: any }) {
 
                           {item.type === 'id' ? (
                               <Select value={item.value} onValueChange={(val) => updateDownloadItem(item.id, { value: val })}>
-                              <SelectTrigger className="flex-1 h-8 text-[10px] rounded-lg">
+                              <SelectTrigger className="flex-1 h-8 text-[10px] rounded-lg border-muted-foreground/20">
                                   <SelectValue placeholder="..." />
                               </SelectTrigger>
                               <SelectContent>
@@ -394,7 +400,7 @@ export function PromptGeneratorClient({ dictionary }: { dictionary: any }) {
                                 placeholder="URL..." 
                                 value={item.value} 
                                 onChange={(e) => updateDownloadItem(item.id, { value: e.target.value })}
-                                className="flex-1 h-8 text-[10px] bg-background/50 rounded-lg"
+                                className="flex-1 h-8 text-[10px] bg-background/50 rounded-lg border-muted-foreground/20 focus:border-primary/40"
                               />
                           )}
 
@@ -404,7 +410,7 @@ export function PromptGeneratorClient({ dictionary }: { dictionary: any }) {
                       </div>
                       ))}
                   </div>
-                  <Button onClick={addDownloadItem} variant="outline" size="sm" className="w-full h-10 border-dashed rounded-xl bg-background/20 hover:bg-primary/5">
+                  <Button onClick={addDownloadItem} variant="outline" size="sm" className="w-full h-10 border-dashed rounded-xl bg-background/20 hover:bg-primary/5 hover:text-primary hover:border-primary/40 transition-all">
                     <Plus className="h-4 w-4 mr-2" /> {dictionary.downloadLinks.addDownload || "Add Download"}
                   </Button>
               </CardContent>
@@ -423,7 +429,7 @@ export function PromptGeneratorClient({ dictionary }: { dictionary: any }) {
                     placeholder={dictionary.imageGrid.placeholder}
                     value={imageGridMappings}
                     onChange={(e) => setImageGridMappings(e.target.value)}
-                    className="min-h-[120px] font-mono text-sm bg-background/50 rounded-xl p-4 leading-relaxed"
+                    className="min-h-[120px] font-mono text-sm bg-background/50 rounded-xl p-4 leading-relaxed border-muted-foreground/20 focus:border-primary/40"
                 />
                 <p className="mt-3 text-[10px] text-muted-foreground uppercase font-bold tracking-widest pl-1 leading-tight">
                   {dictionary.imageGrid.description}
