@@ -18,7 +18,7 @@ export const SnipGeekLogo = ({
       {...props}
     >
       {/* Background kotak hanya muncul jika showBackground true */}
-      {showBackground && (
+      {showBackground ? (
         <rect
           width="100"
           height="100"
@@ -26,7 +26,7 @@ export const SnipGeekLogo = ({
           ry="22"
           fill="currentColor"
         />
-      )}
+      ) : null}
       
       {/* Teks SG - Menggunakan fill="white" jika ada background, atau "currentColor" jika integrated */}
       <text

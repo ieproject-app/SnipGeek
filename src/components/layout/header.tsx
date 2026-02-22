@@ -174,15 +174,15 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
         <nav className={cn(
             "relative mx-auto bg-primary/90 backdrop-blur-sm text-primary-foreground shadow-lg ring-1 ring-black/5 flex items-center justify-between h-12 transition-all duration-300 ease-in-out pr-4 rounded-full overflow-hidden"
         )}>
-            {/* Status Notification Pill - Client Side Only to prevent mismatch */}
-            {mounted && message && (
-              <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-50">
-                  <div className="bg-accent text-accent-foreground px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-tighter shadow-xl flex items-center gap-2 animate-in fade-in slide-in-from-top-4 duration-300">
-                      <div className="h-1.5 w-1.5 rounded-full bg-accent-foreground animate-pulse" />
-                      {message}
-                  </div>
-              </div>
-            )}
+            {/* Status Notification Pill - Stable container to prevent hydration index mismatch */}
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-50">
+              {mounted && message && (
+                <div className="bg-accent text-accent-foreground px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-tighter shadow-xl flex items-center gap-2 animate-in fade-in slide-in-from-top-4 duration-300">
+                    <div className="h-1.5 w-1.5 rounded-full bg-accent-foreground animate-pulse" />
+                    {message}
+                </div>
+              )}
+            </div>
 
             <div className={cn(
                 "flex items-center flex-grow md:flex-grow-0 h-full transition-all duration-300 ease-in-out",
