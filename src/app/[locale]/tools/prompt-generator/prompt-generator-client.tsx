@@ -31,11 +31,11 @@ export function PromptGeneratorClient({ dictionary }: { dictionary: any }) {
   const [showGrids, setShowGrids] = useState(false);
   const [showImages, setShowImages] = useState(true);
 
-  // UI State for "Lihat Selengkapnya"
+  // UI State for Expansion
   const [isDraftExpanded, setIsDraftExpanded] = useState(false);
   const [isImagesExpanded, setIsImagesExpanded] = useState(false);
 
-  // Download Items & Grid Logic
+  // Data Inputs
   const [downloadItems, setDownloadItems] = useState<DownloadItem[]>([]);
   const [imageGridMappings, setImageGridMappings] = useState('');
   const [images, setImages] = useState('');
@@ -51,12 +51,12 @@ export function PromptGeneratorClient({ dictionary }: { dictionary: any }) {
 
   const downloadIds = Object.keys(downloadLinks).sort();
 
-  // Load persisted features
+  // Persistence for feature toggles
   useEffect(() => {
-    const savedFeatures = localStorage.getItem('snipgeek-prompt-features');
-    if (savedFeatures) {
+    const saved = localStorage.getItem('snipgeek-prompt-features');
+    if (saved) {
       try {
-        const parsed = JSON.parse(savedFeatures);
+        const parsed = JSON.parse(saved);
         setShowDownloads(!!parsed.showDownloads);
         setShowGrids(!!parsed.showGrids);
         setShowImages(parsed.showImages !== undefined ? !!parsed.showImages : true);
@@ -64,7 +64,6 @@ export function PromptGeneratorClient({ dictionary }: { dictionary: any }) {
     }
   }, []);
 
-  // Save features on change
   useEffect(() => {
     localStorage.setItem('snipgeek-prompt-features', JSON.stringify({
       showDownloads,
@@ -73,6 +72,7 @@ export function PromptGeneratorClient({ dictionary }: { dictionary: any }) {
     }));
   }, [showDownloads, showGrids, showImages]);
 
+  // Prompt Builder Logic
   useEffect(() => {
     const buildPrompt = () => {
       const isBlog = contentType === 'blog';
@@ -171,73 +171,73 @@ export function PromptGeneratorClient({ dictionary }: { dictionary: any }) {
   };
 
   return (
-    <div className="space-y-8">
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        {/* Left Column: Toggles & Metadata (4/12) */}
-        <div className="lg:col-span-5 space-y-8">
+    <div className="space-y-12">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        {/* Left Column: Toggles & Metadata (4/12) - Sticky on Desktop */}
+        <div className="lg:col-span-4 space-y-8 lg:sticky lg:top-24">
           <Card className="bg-card/50 border-primary/5">
-              <CardHeader>
-                  <CardTitle className="text-lg">{dictionary.contentTypeLabel}</CardTitle>
+              <CardHeader className="pb-4">
+                  <CardTitle className="text-lg font-headline">{dictionary.contentTypeLabel}</CardTitle>
               </CardHeader>
               <CardContent>
-                  <RadioGroup value={contentType} onValueChange={(value) => setContentType(value as 'blog' | 'note')} className="flex flex-col sm:flex-row gap-4">
-                      <div className="flex items-center space-x-2">
+                  <RadioGroup value={contentType} onValueChange={(value) => setContentType(value as 'blog' | 'note')} className="flex flex-col gap-3">
+                      <div className="flex items-center space-x-2 p-3 rounded-xl border bg-background/30 cursor-pointer transition-colors hover:bg-background/50">
                           <RadioGroupItem value="blog" id="r-blog" />
-                          <Label htmlFor="r-blog" className="cursor-pointer font-medium">{dictionary.contentTypeBlog}</Label>
+                          <Label htmlFor="r-blog" className="flex-1 cursor-pointer font-medium">{dictionary.contentTypeBlog}</Label>
                       </div>
-                      <div className="flex items-center space-x-2">
+                      <div className="flex items-center space-x-2 p-3 rounded-xl border bg-background/30 cursor-pointer transition-colors hover:bg-background/50">
                           <RadioGroupItem value="note" id="r-note" />
-                          <Label htmlFor="r-note" className="cursor-pointer font-medium">{dictionary.contentTypeNote}</Label>
+                          <Label htmlFor="r-note" className="flex-1 cursor-pointer font-medium">{dictionary.contentTypeNote}</Label>
                       </div>
                   </RadioGroup>
               </CardContent>
           </Card>
 
           <Card className="bg-card/50 border-primary/5">
-              <CardHeader>
-                  <CardTitle className="text-lg">{dictionary.features.title}</CardTitle>
+              <CardHeader className="pb-4">
+                  <CardTitle className="text-lg font-headline">{dictionary.features.title}</CardTitle>
               </CardHeader>
-              <CardContent className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="flex items-center justify-between p-3 rounded-lg border bg-background/30">
-                      <Label htmlFor="f-downloads" className="cursor-pointer text-sm">{dictionary.features.downloads}</Label>
+              <CardContent className="grid grid-cols-1 gap-3">
+                  <div className="flex items-center justify-between p-3 rounded-xl border bg-background/30">
+                      <Label htmlFor="f-downloads" className="cursor-pointer text-sm font-medium">{dictionary.features.downloads}</Label>
                       <Switch id="f-downloads" checked={showDownloads} onCheckedChange={setShowDownloads} />
                   </div>
-                  <div className="flex items-center justify-between p-3 rounded-lg border bg-background/30">
-                      <Label htmlFor="f-grids" className="cursor-pointer text-sm">{dictionary.features.grids}</Label>
+                  <div className="flex items-center justify-between p-3 rounded-xl border bg-background/30">
+                      <Label htmlFor="f-grids" className="cursor-pointer text-sm font-medium">{dictionary.features.grids}</Label>
                       <Switch id="f-grids" checked={showGrids} onCheckedChange={setShowGrids} />
                   </div>
-                  <div className="flex items-center justify-between p-3 rounded-lg border bg-background/30 sm:col-span-2">
-                      <Label htmlFor="f-images" className="cursor-pointer text-sm">{dictionary.features.images}</Label>
+                  <div className="flex items-center justify-between p-3 rounded-xl border bg-background/30">
+                      <Label htmlFor="f-images" className="cursor-pointer text-sm font-medium">{dictionary.features.images}</Label>
                       <Switch id="f-images" checked={showImages} onCheckedChange={setShowImages} />
                   </div>
               </CardContent>
           </Card>
 
           <Card className="bg-card/50 border-primary/5">
-            <CardHeader>
-              <CardTitle className="text-lg">{dictionary.metadataTitle}</CardTitle>
+            <CardHeader className="pb-4">
+              <CardTitle className="text-lg font-headline">{dictionary.metadataTitle}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="grid gap-2">
-                <Label htmlFor="publishDate" className="text-sm">{dictionary.publishDateLabel}</Label>
+                <Label htmlFor="publishDate" className="text-sm font-medium">{dictionary.publishDateLabel}</Label>
                 <Input
                     id="publishDate"
                     value={publishDate}
                     onChange={(e) => setPublishDate(e.target.value)}
                     placeholder={dictionary.publishDatePlaceholder || 'YYYY-MM-DD'}
-                    className="bg-background/50"
+                    className="bg-background/50 h-11 rounded-xl"
                 />
               </div>
               
               <div className="grid gap-3">
-                <Label className="text-sm">{dictionary.statusLabel}</Label>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div className="flex items-center justify-between p-3 rounded-lg border bg-background/30">
+                <Label className="text-sm font-medium">{dictionary.statusLabel}</Label>
+                <div className="grid grid-cols-1 gap-3">
+                    <div className="flex items-center justify-between p-3 rounded-xl border bg-background/30">
                         <Label htmlFor="published" className="text-xs font-normal cursor-pointer">{dictionary.publishSwitchLabel}</Label>
                         <Switch id="published" checked={isPublished} onCheckedChange={setIsPublished} />
                     </div>
                     {contentType === 'blog' && (
-                        <div className="flex items-center justify-between p-3 rounded-lg border bg-background/30">
+                        <div className="flex items-center justify-between p-3 rounded-xl border bg-background/30">
                             <Label htmlFor="featured" className="text-xs font-normal cursor-pointer">{dictionary.featuredSwitchLabel}</Label>
                             <Switch id="featured" checked={isFeatured} onCheckedChange={setIsFeatured} />
                         </div>
@@ -248,47 +248,48 @@ export function PromptGeneratorClient({ dictionary }: { dictionary: any }) {
           </Card>
         </div>
 
-        {/* Right Column: Main Inputs (7/12) */}
-        <div className="lg:col-span-7 space-y-8">
-          <Card className="bg-card/50 border-primary/5 h-full flex flex-col">
-            <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle className="text-lg">{dictionary.draftTitle}</CardTitle>
-              <Button variant="ghost" size="sm" onClick={() => setIsDraftExpanded(!isDraftExpanded)}>
+        {/* Right Column: Main Draft Input (8/12) */}
+        <div className="lg:col-span-8 space-y-8">
+          <Card className="bg-card/50 border-primary/5 min-h-[500px] flex flex-col overflow-hidden">
+            <CardHeader className="flex flex-row items-center justify-between border-b bg-muted/10 px-6 py-4">
+              <CardTitle className="text-lg font-headline">{dictionary.draftTitle}</CardTitle>
+              <Button variant="ghost" size="sm" onClick={() => setIsDraftExpanded(!isDraftExpanded)} className="h-8 w-8 rounded-full">
                 {isDraftExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
               </Button>
             </CardHeader>
-            <CardContent className="flex-1">
+            <CardContent className="flex-1 p-0">
               <Textarea
                 placeholder={dictionary.draftPlaceholder}
                 value={draft}
                 onChange={(e) => setDraft(e.target.value)}
                 className={cn(
-                    "w-full bg-background/50 font-mono text-sm transition-all duration-300",
-                    isDraftExpanded ? "min-h-[600px]" : "min-h-[300px]"
+                    "w-full h-full border-none rounded-none bg-transparent font-mono text-sm p-6 resize-none focus-visible:ring-0 leading-relaxed transition-all duration-300",
+                    isDraftExpanded ? "min-h-[800px]" : "min-h-[400px]"
                 )}
               />
             </CardContent>
           </Card>
 
+          {/* Conditional Feature Sections - Below Draft for better vertical flow */}
           {showDownloads && (
             <Card className="bg-card/50 border-primary/5">
-                <CardHeader>
-                    <CardTitle className="text-lg">{dictionary.downloadLinks.title}</CardTitle>
+                <CardHeader className="border-b bg-muted/10 px-6 py-4">
+                    <CardTitle className="text-lg font-headline">{dictionary.downloadLinks.title}</CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-4">
+                <CardContent className="p-6 space-y-4">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         {downloadItems.map((item, index) => (
-                        <div key={item.id} className="flex flex-col gap-2 p-3 border rounded-lg bg-background/30 relative group">
+                        <div key={item.id} className="flex flex-col gap-2 p-4 border rounded-xl bg-background/30 relative group transition-all hover:bg-background/50">
                             <div className="flex items-center justify-between">
-                            <Badge variant="outline" className="text-[10px] font-bold">[DOWNLOAD_{index + 1}]</Badge>
-                            <Button variant="ghost" size="icon" onClick={() => removeDownloadItem(item.id)} className="h-6 w-6 text-muted-foreground hover:text-destructive opacity-0 group-hover:opacity-100 transition-opacity">
-                                <Trash2 className="h-3 w-3" />
+                            <Badge variant="secondary" className="text-[10px] font-bold px-2 py-0.5 rounded-md">[DOWNLOAD_{index + 1}]</Badge>
+                            <Button variant="ghost" size="icon" onClick={() => removeDownloadItem(item.id)} className="h-7 w-7 text-muted-foreground hover:text-destructive opacity-0 group-hover:opacity-100 transition-opacity">
+                                <Trash2 className="h-4 w-4" />
                             </Button>
                             </div>
                             
                             <div className="flex gap-2">
                             <Select value={item.type} onValueChange={(val) => updateDownloadItem(item.id, { type: val as 'id' | 'url', value: '' })}>
-                                <SelectTrigger className="w-[80px] h-8 text-xs">
+                                <SelectTrigger className="w-[90px] h-9 text-xs rounded-lg">
                                 <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -299,7 +300,7 @@ export function PromptGeneratorClient({ dictionary }: { dictionary: any }) {
 
                             {item.type === 'id' ? (
                                 <Select value={item.value} onValueChange={(val) => updateDownloadItem(item.id, { value: val })}>
-                                <SelectTrigger className="flex-1 h-8 text-xs">
+                                <SelectTrigger className="flex-1 h-9 text-xs rounded-lg">
                                     <SelectValue placeholder="..." />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -311,14 +312,14 @@ export function PromptGeneratorClient({ dictionary }: { dictionary: any }) {
                                 placeholder="URL..." 
                                 value={item.value} 
                                 onChange={(e) => updateDownloadItem(item.id, { value: e.target.value })}
-                                className="flex-1 h-8 text-xs bg-background/50"
+                                className="flex-1 h-9 text-xs bg-background/50 rounded-lg"
                                 />
                             )}
                             </div>
                         </div>
                         ))}
                     </div>
-                    <Button onClick={addDownloadItem} variant="outline" size="sm" className="w-full border-dashed">
+                    <Button onClick={addDownloadItem} variant="outline" size="sm" className="w-full h-11 border-dashed rounded-xl bg-background/20 hover:bg-primary/5">
                       <Plus className="h-4 w-4 mr-2" /> {dictionary.downloadLinks.addDownload || "Add Download Item"}
                     </Button>
                 </CardContent>
@@ -327,18 +328,18 @@ export function PromptGeneratorClient({ dictionary }: { dictionary: any }) {
 
           {showGrids && (
             <Card className="bg-card/50 border-primary/5">
-              <CardHeader>
-                  <CardTitle className="text-lg">{dictionary.imageGrid.title}</CardTitle>
+              <CardHeader className="border-b bg-muted/10 px-6 py-4">
+                  <CardTitle className="text-lg font-headline">{dictionary.imageGrid.title}</CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="p-6">
                   <Textarea
                       placeholder={dictionary.imageGrid.placeholder}
                       value={imageGridMappings}
                       onChange={(e) => setImageGridMappings(e.target.value)}
-                      className="min-h-[80px] font-mono text-xs bg-background/50"
+                      className="min-h-[100px] font-mono text-xs bg-background/50 rounded-xl p-4"
                   />
-                  <p className="mt-2 text-[10px] text-muted-foreground uppercase font-bold tracking-wider">
-                    {dictionary.imageGrid.description || "Just paste paths separated by comma per line. AI will calculate columns."}
+                  <p className="mt-3 text-[10px] text-muted-foreground uppercase font-bold tracking-widest pl-1">
+                    {dictionary.imageGrid.description || "Paste image paths per line. Columns will be calculated automatically."}
                   </p>
               </CardContent>
             </Card>
@@ -346,23 +347,23 @@ export function PromptGeneratorClient({ dictionary }: { dictionary: any }) {
 
           {showImages && (
           <Card className="bg-card/50 border-primary/5">
-            <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle className="text-lg">{contentType === 'blog' ? dictionary.imagesTitle : dictionary.imagesTitleNote}</CardTitle>
-              <Button variant="ghost" size="sm" onClick={() => setIsImagesExpanded(!isImagesExpanded)}>
+            <CardHeader className="flex flex-row items-center justify-between border-b bg-muted/10 px-6 py-4">
+              <CardTitle className="text-lg font-headline">{contentType === 'blog' ? dictionary.imagesTitle : dictionary.imagesTitleNote}</CardTitle>
+              <Button variant="ghost" size="sm" onClick={() => setIsImagesExpanded(!isImagesExpanded)} className="h-8 w-8 rounded-full">
                 {isImagesExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
               </Button>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-6">
                 <Textarea
                     placeholder={contentType === 'blog' ? dictionary.imagesPlaceholder : dictionary.imagesPlaceholderNote}
                     value={images}
                     onChange={(e) => setImages(e.target.value)}
                     className={cn(
-                        "font-mono text-xs bg-background/50 transition-all duration-300",
-                        isImagesExpanded ? "min-h-[300px]" : "min-h-[100px]"
+                        "font-mono text-xs bg-background/50 rounded-xl p-4 transition-all duration-300",
+                        isImagesExpanded ? "min-h-[400px]" : "min-h-[120px]"
                     )}
                 />
-                <p className="mt-2 text-[10px] text-muted-foreground uppercase font-bold tracking-wider">
+                <p className="mt-3 text-[10px] text-muted-foreground uppercase font-bold tracking-widest pl-1">
                     {contentType === 'blog' ? dictionary.imagesDescription : dictionary.imagesDescriptionNote}
                 </p>
             </CardContent>
@@ -371,14 +372,17 @@ export function PromptGeneratorClient({ dictionary }: { dictionary: any }) {
         </div>
       </div>
 
-      <Card className="border-primary/20 shadow-xl overflow-hidden mt-12">
-        <CardHeader className="flex flex-row items-center justify-between border-b bg-muted/30 py-4 px-6">
-          <CardTitle className="text-lg flex items-center gap-2">
-            <Check className="h-5 w-5 text-green-500" />
+      {/* Generated Result Section - Wide Card below inputs */}
+      <Card className="border-primary/20 shadow-2xl overflow-hidden mt-8 ring-4 ring-primary/5">
+        <CardHeader className="flex flex-col sm:flex-row items-center justify-between border-b bg-muted/30 py-5 px-8 gap-4">
+          <CardTitle className="text-xl font-headline flex items-center gap-3">
+            <div className="p-1.5 bg-green-500/10 rounded-full">
+                <Check className="h-5 w-5 text-green-600" />
+            </div>
             {dictionary.generatedPromptTitle}
           </CardTitle>
-          <Button onClick={handleCopyMain} variant="default" size="sm" className="gap-2 px-6 rounded-full shadow-lg">
-            {isCopied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+          <Button onClick={handleCopyMain} variant="default" size="lg" className="gap-2 px-8 rounded-full shadow-lg h-12 transition-transform active:scale-95">
+            {isCopied ? <Check className="h-5 w-5" /> : <Copy className="h-5 w-5" />}
             {isCopied ? dictionary.copiedButton : dictionary.copyButton}
           </Button>
         </CardHeader>
@@ -386,7 +390,7 @@ export function PromptGeneratorClient({ dictionary }: { dictionary: any }) {
           <Textarea
             readOnly
             value={generatedPrompt}
-            className="min-h-[400px] border-none rounded-none bg-muted/5 font-mono text-xs p-6 resize-none focus-visible:ring-0 leading-relaxed"
+            className="min-h-[500px] border-none rounded-none bg-muted/5 font-mono text-sm p-8 resize-none focus-visible:ring-0 leading-loose"
           />
         </CardContent>
       </Card>
