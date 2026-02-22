@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -189,7 +188,7 @@ export function PromptGeneratorClient({ dictionary }: { dictionary: any }) {
   return (
     <div className="space-y-8 max-w-6xl mx-auto">
       
-      {/* 1. Header Toolbar - Improved Flex Layout to prevent overlapping */}
+      {/* 1. Header Toolbar - Compact Horizontal Layout */}
       <Card className="bg-card/50 border-primary/10 shadow-sm overflow-hidden">
         <div className="p-4 md:p-5 flex flex-wrap items-center justify-between gap-6">
           
@@ -271,8 +270,8 @@ export function PromptGeneratorClient({ dictionary }: { dictionary: any }) {
             </div>
           </div>
 
-          {/* Group C: Metadata Mini-Form - Improved spacing and alignment */}
-          <div className="flex flex-wrap items-center gap-6 border-t pt-4 w-full md:w-auto md:border-t-0 md:border-l md:pt-0 md:pl-6 border-primary/10">
+          {/* Group C: Metadata Mini-Form - Removed left border for cleaner look */}
+          <div className="flex flex-wrap items-center gap-6 border-t pt-4 w-full md:w-auto md:border-t-0 md:pt-0 border-primary/10">
             <div className="flex items-center gap-2">
               <Calendar className="h-4 w-4 text-muted-foreground shrink-0" />
               <Input
@@ -302,7 +301,7 @@ export function PromptGeneratorClient({ dictionary }: { dictionary: any }) {
         </div>
       </Card>
 
-      {/* 2. Main Draft Area - Improved container synchronization */}
+      {/* 2. Main Draft Area */}
       <Card className="bg-card/50 border-primary/10 flex flex-col overflow-hidden shadow-md">
         <CardHeader className="flex flex-row items-center justify-between border-b bg-muted/10 px-6 py-4 shrink-0">
           <CardTitle className="text-lg font-headline flex items-center gap-3">
