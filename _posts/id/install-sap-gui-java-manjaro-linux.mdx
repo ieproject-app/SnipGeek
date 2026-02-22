@@ -1,0 +1,85 @@
+---
+title: "Cara Instalasi SAP GUI for Java 7.80 di Manjaro Linux"
+date: "2026-02-24"
+description: "Panduan lengkap instalasi SAP GUI for Java 7.80 di Linux tanpa akun S-user, mulai dari dependensi hingga siap digunakan."
+heroImage: "/images/_posts/linux/sap-install/sap-banner.png"
+imageAlt: "Tampilan antarmuka SAP GUI for Java yang berjalan lancar di desktop Manjaro Linux."
+translationKey: "install-sap-gui-java-linux"
+published: true
+featured: true
+tags: ["SAP", "Linux", "Manjaro", "Java", "Tutorial"]
+category: "Linux"
+---
+
+Bagi para profesional yang bekerja dengan sistem SAP, bisa mengakses SAP GUI dari berbagai sistem operasi adalah kebutuhan nyata — bukan sekadar kenyamanan. Kabar baiknya, SAP sebenarnya menyediakan **SAP GUI for Java** yang secara resmi mendukung Linux. Masalahnya, untuk mengunduhnya secara resmi kamu membutuhkan **akun S-user** yang terdaftar di SAP Service Marketplace. Dan inilah yang sering jadi hambatan.
+
+Banyak dari kita sebagai pengguna SAP tidak punya akses langsung ke portal tersebut — itu biasanya hanya dimiliki oleh tim IT atau administrator perusahaan. Jadi meski Linux kita sudah siap, file installernya tidak bisa didapat begitu saja. Saya sendiri sempat mandek di sini cukup lama, sampai akhirnya mendapat kiriman file installer dari seorang blogger sesama pengguna SAP. Berkat berbagi itulah panduan ini bisa ditulis — dan sekarang kamu tidak perlu melewati frustrasi yang sama.
+
+Panduan ini akan menunjukkan cara termudah menginstal SAP GUI for Java 7.80 di Manjaro Linux (dan distro lain pada umumnya), mulai dari dependensi sampai siap konfigurasi.
+
+---
+
+## #1 Prasyarat: Install Java Runtime
+
+SAP GUI for Java 7.80 membutuhkan **Java Development Kit (JDK) atau Java Runtime Environment (JRE) versi 17**. Pastikan ini sudah terpasang sebelum melanjutkan.
+
+Di Manjaro, instalasinya cukup satu baris perintah di terminal:
+
+```bash
+sudo pacman -Syu jre-17-openjdk
+```
+
+Perintah ini akan menginstal OpenJDK versi 17 — dependensi utama yang kita butuhkan agar installer SAP GUI bisa berjalan.
+
+---
+
+## #2 Download Installer SAP GUI for Java 7.80
+
+Karena ukurannya yang cukup besar, file installer dalam format `.jar` ini dibagi menjadi **3 bagian**. Kamu harus mengunduh ketiganya dan meletakkannya dalam **satu folder yang sama** sebelum diekstrak.
+
+| Nama File | Link Download |
+| :--- | :--- |
+| **SAP GUI Java 7.80 - Part 1** | <DownloadButton id="sap-gui-java-780-part1" /> |
+| **SAP GUI Java 7.80 - Part 2** | <DownloadButton id="sap-gui-java-780-part2" /> |
+| **SAP GUI Java 7.80 - Part 3** | <DownloadButton id="sap-gui-java-780-part3" /> |
+
+> 📦 **Penting: Ekstrak dulu sebelum install**
+> Setelah ketiga file terunduh, ekstrak file pertama (`.part1.rar`). Proses ekstraksi akan otomatis menggabungkan semua bagian dan menghasilkan satu file installer utama: **`PlatinGUI780_0-80006509.JAR`**.
+
+---
+
+## #3 Jalankan Proses Instalasi
+
+Setelah file `.JAR` berhasil diekstrak, proses instalasinya sangat mudah — selama Java Runtime dari langkah #1 sudah terpasang dengan benar.
+
+1. Temukan file `PlatinGUI780_0-80006509.JAR` di folder kamu.
+2. **Klik kanan** pada file tersebut, pilih **"Open With Other Application"**, lalu pilih **"OpenJDK Java 17 Runtime"**.
+3. Wizard instalasi grafis akan muncul. Ikuti saja instruksi di layar, klik "Next" sampai proses selesai.
+
+![Proses wizard instalasi SAP GUI for Java di sistem operasi Manjaro Linux.](/images/_posts/linux/sap-install/sap-linux-1.webp)
+*Wizard instalasi akan memandu kamu di setiap langkah — cukup ikuti sampai selesai.*
+
+Setelah instalasi selesai, "SAP GUI" akan muncul di menu aplikasi kamu.
+
+---
+
+## #4 Konfigurasi Koneksi Awal
+
+Tugas utama kita — instalasi — sudah beres. Langkah berikutnya adalah mengonfigurasi koneksi ke sistem SAP perusahaan kamu. Proses ini spesifik untuk masing-masing perusahaan, tapi secara umum langkahnya seperti ini:
+
+1. Buka aplikasi SAP GUI.
+2. Klik **New** untuk membuat koneksi baru.
+3. Pindah ke tab **Advanced**.
+4. Centang kotak **"Expert Mode"**.
+5. Salin dan tempel **Connection String** yang diberikan oleh tim IT perusahaan kamu ke kolom yang tersedia.
+
+![Langkah konfigurasi Connection String menggunakan Expert Mode di SAP GUI.](/images/_posts/linux/sap-install/sap-linux-2.webp)
+*Expert mode memungkinkan kamu memasukkan 'Connection String' secara langsung.*
+
+Untuk selebihnya, lanjutkan konfigurasi sesuai panduan internal dari tim IT perusahaanmu. Selamat — sekarang kamu sudah bisa mengakses sistem SAP langsung dari desktop Manjaro!
+
+---
+
+### Referensi
+1. [SAP GUI for Java 7.80 Documentation (PDF)](https://help.sap.com/doc/f540a730ff3c46a29c34be1fd3cd3275/780.00/en-US/sap_gui_for_java.pdf)
+2. [SAP Community - SAP GUI for Java 7.80](https://community.sap.com/t5/technology-blog-posts-by-sap/sap-gui-for-java-7-80/ba-p/13534973)
