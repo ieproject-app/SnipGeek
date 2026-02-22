@@ -189,124 +189,111 @@ export function PromptGeneratorClient({ dictionary }: { dictionary: any }) {
   return (
     <div className="space-y-8 max-w-6xl mx-auto">
       
-      {/* 1. Header Control Bar - Horizontal Desktop, Stacked Mobile */}
+      {/* 1. Header Toolbar - Improved Flex Layout to prevent overlapping */}
       <Card className="bg-card/50 border-primary/10 shadow-sm overflow-hidden">
-        <div className="p-4 md:p-6 flex flex-col md:flex-row items-center justify-between gap-6">
+        <div className="p-4 md:p-5 flex flex-wrap items-center justify-between gap-6">
           
-          {/* Group A: Content Type */}
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-primary/5 rounded-lg border border-primary/10 hidden sm:block">
-              <Zap className="h-4 w-4 text-primary" />
-            </div>
-            <div className="flex bg-muted/30 p-1 rounded-xl border">
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button 
-                      variant={contentType === 'blog' ? 'default' : 'ghost'} 
-                      onClick={() => setContentType('blog')}
-                      className="h-10 px-4 rounded-lg transition-all gap-2"
-                    >
-                      <FileText className="h-4 w-4" />
-                      <span className="text-xs font-bold uppercase tracking-tight hidden sm:inline">{dictionary.contentTypeBlog}</span>
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent><p>{dictionary.contentTypeBlog}</p></TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button 
-                      variant={contentType === 'note' ? 'default' : 'ghost'} 
-                      onClick={() => setContentType('note')}
-                      className="h-10 px-4 rounded-lg transition-all gap-2"
-                    >
-                      <StickyNote className="h-4 w-4" />
-                      <span className="text-xs font-bold uppercase tracking-tight hidden sm:inline">{dictionary.contentTypeNote}</span>
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent><p>{dictionary.contentTypeNote}</p></TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            </div>
-          </div>
-
-          {/* Group B: Feature Toggles */}
-          <div className="flex items-center gap-2">
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button 
-                    variant={showDownloads ? 'secondary' : 'outline'} 
-                    onClick={() => setShowDownloads(!showDownloads)}
-                    className={cn("h-11 w-11 sm:w-auto sm:px-4 rounded-xl border-dashed transition-all", showDownloads && "bg-primary/10 text-primary border-primary/40")}
-                  >
-                    <Download className="h-5 w-5" />
-                    <span className="ml-2 text-[10px] font-bold uppercase hidden lg:inline">{dictionary.features.downloads}</span>
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent><p>{dictionary.features.downloads}</p></TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button 
-                    variant={showGrids ? 'secondary' : 'outline'} 
-                    onClick={() => setShowGrids(!showGrids)}
-                    className={cn("h-11 w-11 sm:w-auto sm:px-4 rounded-xl border-dashed transition-all", showGrids && "bg-primary/10 text-primary border-primary/40")}
-                  >
-                    <Grid3X3 className="h-5 w-5" />
-                    <span className="ml-2 text-[10px] font-bold uppercase hidden lg:inline">{dictionary.features.grids}</span>
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent><p>{dictionary.features.grids}</p></TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button 
-                    variant={showImages ? 'secondary' : 'outline'} 
-                    onClick={() => setShowImages(!showImages)}
-                    className={cn("h-11 w-11 sm:w-auto sm:px-4 rounded-xl border-dashed transition-all", showImages && "bg-primary/10 text-primary border-primary/40")}
-                  >
-                    <LucideImage className="h-5 w-5" />
-                    <span className="ml-2 text-[10px] font-bold uppercase hidden lg:inline">{dictionary.features.images}</span>
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent><p>{dictionary.features.images}</p></TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          </div>
-
-          {/* Group C: Metadata Mini-Form */}
-          <div className="flex flex-wrap items-center justify-center gap-4 border-t md:border-t-0 md:border-l border-primary/10 pt-4 md:pt-0 md:pl-6">
+          <div className="flex flex-wrap items-center gap-6">
+            {/* Group A: Content Type */}
             <div className="flex items-center gap-2">
-              <Calendar className="h-4 w-4 text-muted-foreground" />
+              <div className="p-2 bg-primary/5 rounded-lg border border-primary/10 hidden sm:block">
+                <Zap className="h-4 w-4 text-primary" />
+              </div>
+              <div className="flex bg-muted/30 p-1 rounded-xl border">
+                <Button 
+                  variant={contentType === 'blog' ? 'default' : 'ghost'} 
+                  onClick={() => setContentType('blog')}
+                  className="h-9 px-3 rounded-lg transition-all gap-2 text-[10px] font-bold uppercase"
+                >
+                  <FileText className="h-3.5 w-3.5" />
+                  <span className="hidden sm:inline">{dictionary.contentTypeBlog}</span>
+                </Button>
+                <Button 
+                  variant={contentType === 'note' ? 'default' : 'ghost'} 
+                  onClick={() => setContentType('note')}
+                  className="h-9 px-3 rounded-lg transition-all gap-2 text-[10px] font-bold uppercase"
+                >
+                  <StickyNote className="h-3.5 w-3.5" />
+                  <span className="hidden sm:inline">{dictionary.contentTypeNote}</span>
+                </Button>
+              </div>
+            </div>
+
+            {/* Group B: Feature Toggles */}
+            <div className="flex items-center gap-2">
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button 
+                      variant={showDownloads ? 'secondary' : 'outline'} 
+                      onClick={() => setShowDownloads(!showDownloads)}
+                      className={cn("h-10 w-10 sm:w-auto sm:px-3 rounded-xl border-dashed transition-all", showDownloads && "bg-primary/10 text-primary border-primary/40")}
+                    >
+                      <Download className="h-4 w-4" />
+                      <span className="ml-2 text-[9px] font-bold uppercase hidden lg:inline">{dictionary.features.downloads}</span>
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent><p>{dictionary.features.downloads}</p></TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button 
+                      variant={showGrids ? 'secondary' : 'outline'} 
+                      onClick={() => setShowGrids(!showGrids)}
+                      className={cn("h-10 w-10 sm:w-auto sm:px-3 rounded-xl border-dashed transition-all", showGrids && "bg-primary/10 text-primary border-primary/40")}
+                    >
+                      <Grid3X3 className="h-4 w-4" />
+                      <span className="ml-2 text-[9px] font-bold uppercase hidden lg:inline">{dictionary.features.grids}</span>
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent><p>{dictionary.features.grids}</p></TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button 
+                      variant={showImages ? 'secondary' : 'outline'} 
+                      onClick={() => setShowImages(!showImages)}
+                      className={cn("h-10 w-10 sm:w-auto sm:px-3 rounded-xl border-dashed transition-all", showImages && "bg-primary/10 text-primary border-primary/40")}
+                    >
+                      <LucideImage className="h-4 w-4" />
+                      <span className="ml-2 text-[9px] font-bold uppercase hidden lg:inline">{dictionary.features.images}</span>
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent><p>{dictionary.features.images}</p></TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
+          </div>
+
+          {/* Group C: Metadata Mini-Form - Improved spacing and alignment */}
+          <div className="flex flex-wrap items-center gap-6 border-t pt-4 w-full md:w-auto md:border-t-0 md:border-l md:pt-0 md:pl-6 border-primary/10">
+            <div className="flex items-center gap-2">
+              <Calendar className="h-4 w-4 text-muted-foreground shrink-0" />
               <Input
                   value={publishDate}
                   onChange={(e) => setPublishDate(e.target.value)}
                   placeholder="YYYY-MM-DD"
-                  className="bg-background/50 h-9 w-32 rounded-lg text-xs"
+                  className="bg-background/50 h-9 w-28 rounded-lg text-[10px] font-mono"
               />
             </div>
             
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-5">
               <div className="flex items-center gap-2">
-                <CheckCircle2 className="h-4 w-4 text-muted-foreground" />
-                <Label htmlFor="published" className="text-[10px] font-bold uppercase cursor-pointer hidden sm:inline">{dictionary.publishSwitchLabel}</Label>
+                <CheckCircle2 className="h-4 w-4 text-muted-foreground shrink-0" />
+                <Label htmlFor="published" className="text-[9px] font-bold uppercase cursor-pointer whitespace-nowrap">{dictionary.publishSwitchLabel}</Label>
                 <Switch id="published" checked={isPublished} onCheckedChange={setIsPublished} className="scale-75" />
               </div>
               
               {contentType === 'blog' && (
                 <div className="flex items-center gap-2">
-                  <Plus className="h-4 w-4 text-muted-foreground" />
-                  <Label htmlFor="featured" className="text-[10px] font-bold uppercase cursor-pointer hidden sm:inline">{dictionary.featuredSwitchLabel}</Label>
+                  <Plus className="h-4 w-4 text-muted-foreground shrink-0" />
+                  <Label htmlFor="featured" className="text-[9px] font-bold uppercase cursor-pointer whitespace-nowrap">{dictionary.featuredSwitchLabel}</Label>
                   <Switch id="featured" checked={isFeatured} onCheckedChange={setIsFeatured} className="scale-75" />
                 </div>
               )}
@@ -315,9 +302,9 @@ export function PromptGeneratorClient({ dictionary }: { dictionary: any }) {
         </div>
       </Card>
 
-      {/* 2. Main Draft Area - Full Width Focus */}
+      {/* 2. Main Draft Area - Improved container synchronization */}
       <Card className="bg-card/50 border-primary/10 flex flex-col overflow-hidden shadow-md">
-        <CardHeader className="flex flex-row items-center justify-between border-b bg-muted/10 px-6 py-4">
+        <CardHeader className="flex flex-row items-center justify-between border-b bg-muted/10 px-6 py-4 shrink-0">
           <CardTitle className="text-lg font-headline flex items-center gap-3">
             <div className="p-2 bg-primary/10 rounded-lg"><FileText className="h-5 w-5 text-primary" /></div>
             {dictionary.draftTitle}
@@ -326,7 +313,7 @@ export function PromptGeneratorClient({ dictionary }: { dictionary: any }) {
             {isDraftExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
           </Button>
         </CardHeader>
-        <CardContent className="p-0">
+        <div className="flex-1 min-h-0 bg-transparent">
           <Textarea
             placeholder={dictionary.draftPlaceholder}
             value={draft}
@@ -336,10 +323,10 @@ export function PromptGeneratorClient({ dictionary }: { dictionary: any }) {
                 isDraftExpanded ? "min-h-[800px]" : "min-h-[400px]"
             )}
           />
-        </CardContent>
+        </div>
       </Card>
 
-      {/* 3. Dynamic Technical Sections - Grid 1 or 2 col */}
+      {/* 3. Dynamic Technical Sections */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {showImages && (
           <Card className="bg-card/50 border-primary/10 overflow-hidden shadow-sm animate-in fade-in slide-in-from-top-4 duration-300 md:col-span-2">
