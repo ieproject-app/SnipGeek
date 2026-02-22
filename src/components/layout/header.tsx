@@ -179,8 +179,8 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                 "absolute inset-0 flex items-center justify-center pointer-events-none transition-all duration-500 z-50",
                 message ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-12"
             )}>
-                <div className="bg-accent text-primary px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-tighter shadow-xl flex items-center gap-2">
-                    <div className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
+                <div className="bg-accent text-accent-foreground px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-tighter shadow-xl flex items-center gap-2">
+                    <div className="h-1.5 w-1.5 rounded-full bg-accent-foreground animate-pulse" />
                     {message}
                 </div>
             </div>
@@ -190,7 +190,7 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                 (isSearchOpen || message) ? 'w-0 opacity-0 -translate-x-10 pointer-events-none' : 'w-auto opacity-100 translate-x-0'
             )}>
                 <Link href="/" className="flex items-center h-full group">
-                    <span className="h-full w-14 flex items-center justify-center text-accent transition-all duration-300 group-hover:w-16 shrink-0 z-10 -ml-[1px] border-r border-primary-foreground/10 p-2">
+                    <span className="h-full w-14 flex items-center justify-center text-primary-foreground transition-all duration-300 group-hover:w-16 shrink-0 z-10 -ml-[1px] border-r border-primary-foreground/10 p-2">
                         <SnipGeekLogo showBackground={false} className="h-full w-full" />
                     </span>
                     <span className="overflow-hidden max-w-0 opacity-0 group-hover:max-w-40 group-hover:opacity-100 transition-all duration-500 ease-in-out inline-block">
