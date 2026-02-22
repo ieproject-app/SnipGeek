@@ -145,8 +145,9 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
     <div className="w-full">
       {/* Featured Posts Section */}
       {featuredPosts.length > 0 && (
-        <section className="pt-32 sm:pt-44 mb-20 sm:mb-28">
+        <section className="pt-24 sm:pt-32 mb-20 sm:mb-28">
           <div className="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 className="text-3xl font-bold font-headline tracking-tighter text-primary mb-12 text-center">{dictionary.home.featuredPosts}</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-0">
               {featuredPosts.map((post, index) => (
                   <div

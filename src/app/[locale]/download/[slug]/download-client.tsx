@@ -49,7 +49,7 @@ export function DownloadClient({ downloadInfo, dictionary }: DownloadClientProps
 
   return (
     <div className="w-full">
-      <main className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pt-32 pb-12 sm:pt-44 sm:pb-16 text-center">
+      <main className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-12 sm:pt-32 sm:pb-16 text-center">
         <div className="text-primary mx-auto mb-6">
             {getPlatformIcon(downloadInfo.platform, "h-20 w-20 mx-auto")}
         </div>

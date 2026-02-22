@@ -13,6 +13,7 @@
         "authorBio": "A passionate developer exploring the web and sharing findings along the way."
     },
     "home": {
+        "featuredPosts": "Featured Posts",
         "latestPosts": "Latest Posts",
         "viewAllPosts": "View All Posts",
         "specialTagSectionTitle": "More from {tag}"

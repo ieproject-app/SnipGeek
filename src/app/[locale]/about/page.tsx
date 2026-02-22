@@ -57,7 +57,7 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
   
   return (
     <div className="w-full">
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-32 pb-12 sm:pt-44 sm:pb-16">
+      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-12 sm:pt-32 sm:pb-16">
         
         {/* Hero Section */}
         <section className="mb-16 text-center">

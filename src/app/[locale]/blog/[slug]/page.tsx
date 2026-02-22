@@ -145,7 +145,7 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
 
   return (
     <div className="w-full">
-      <main className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pt-32 pb-12 sm:pt-44 sm:pb-16">
+      <main className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-12 sm:pt-32 sm:pb-16">
         <article>
             <header className="text-center mb-8">
                 <h1 className="font-headline text-4xl md:text-5xl font-extrabold tracking-tighter text-primary mb-3">

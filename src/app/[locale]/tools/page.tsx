@@ -84,7 +84,7 @@ export default async function ToolsPage({ params }: { params: Promise<{ locale: 
 
   return (
     <div className="w-full">
-      <main className="mx-auto max-w-5xl px-4 pt-32 pb-12 sm:px-6 sm:pt-44 sm:pb-16 lg:px-8">
+      <main className="mx-auto max-w-5xl px-4 pt-24 pb-12 sm:px-6 sm:pt-32 sm:pb-16 lg:px-8">
         <header className="mb-12 text-center">
             <h1 className="font-headline text-5xl font-extrabold tracking-tighter text-primary md:text-6xl mb-3">
                 {pageContent.title}

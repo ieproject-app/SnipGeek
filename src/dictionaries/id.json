@@ -13,6 +13,7 @@
         "authorBio": "Seorang developer bersemangat yang menjelajahi web dan berbagi temuan di sepanjang jalan."
     },
     "home": {
+        "featuredPosts": "Postingan Unggulan",
         "latestPosts": "Postingan Terbaru",
         "viewAllPosts": "Lihat Semua Postingan",
         "specialTagSectionTitle": "Lebih banyak tentang {tag}"
