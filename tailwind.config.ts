@@ -12,9 +12,9 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        body: ['var(--font-ubuntu)', 'system-ui', '-apple-system', 'sans-serif'],
-        headline: ['var(--font-ubuntu-condensed)', 'system-ui', 'sans-serif'],
-        code: ['var(--font-ubuntu-mono)', 'ui-monospace', 'monospace'],
+        body: ['var(--font-jakarta)', 'system-ui', '-apple-system', 'sans-serif'],
+        headline: ['var(--font-jakarta)', 'system-ui', 'sans-serif'],
+        code: ['var(--font-geist-mono)', 'ui-monospace', 'monospace'],
       },
       colors: {
         background: 'hsl(var(--background))',

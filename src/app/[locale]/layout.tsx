@@ -12,28 +12,14 @@ import { NotificationProvider } from '@/hooks/use-notification';
 import { BackToTop } from '@/components/layout/back-to-top';
 import { getDictionary } from '@/lib/get-dictionary';
 import { DraftList } from '@/components/layout/draft-list';
-import { Ubuntu, Ubuntu_Condensed, Ubuntu_Mono } from 'next/font/google';
+import { Plus_Jakarta_Sans } from 'next/font/google';
+import { GeistMono } from 'geist/font/mono';
 import { cn } from '@/lib/utils';
 
-const ubuntu = Ubuntu({
+const jakarta = Plus_Jakarta_Sans({
   subsets: ['latin'],
   display: 'swap',
-  variable: '--font-ubuntu',
-  weight: ['300', '400', '500', '700'],
-});
-
-const ubuntuCondensed = Ubuntu_Condensed({
-  subsets: ['latin'],
-  display: 'swap',
-  variable: '--font-ubuntu-condensed',
-  weight: ['400'],
-});
-
-const ubuntuMono = Ubuntu_Mono({
-  subsets: ['latin'],
-  display: 'swap',
-  variable: '--font-ubuntu-mono',
-  weight: ['400', '700'],
+  variable: '--font-jakarta',
 });
 
 export const metadata: Metadata = {
@@ -96,7 +82,7 @@ export default async function LocaleLayout({
   const draftNotes = getDraftNotesData(locale);
   
   return (
-    <html lang={locale} className={cn(ubuntu.variable, ubuntuCondensed.variable, ubuntuMono.variable, "scroll-smooth")} suppressHydrationWarning>
+    <html lang={locale} className={cn(jakarta.variable, GeistMono.variable, "scroll-smooth")} suppressHydrationWarning>
       <head />
       <body className="font-body antialiased fade-in-on-load">
         <ThemeProvider

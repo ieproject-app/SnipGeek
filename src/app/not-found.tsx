@@ -2,27 +2,20 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import './globals.css';
-import { Ubuntu, Ubuntu_Condensed } from 'next/font/google';
+import { Plus_Jakarta_Sans } from 'next/font/google';
+import { GeistMono } from 'geist/font/mono';
 import { cn } from '@/lib/utils';
 import { Search, Home, BookOpen, PenTool } from 'lucide-react';
 
-const ubuntuCondensed = Ubuntu_Condensed({
+const jakarta = Plus_Jakarta_Sans({
   subsets: ['latin'],
   display: 'swap',
-  variable: '--font-ubuntu-condensed',
-  weight: ['400'],
-});
-
-const ubuntu = Ubuntu({
-  subsets: ['latin'],
-  display: 'swap',
-  variable: '--font-ubuntu',
-  weight: ['400', '700'],
+  variable: '--font-jakarta',
 });
 
 export default function NotFound() {
   return (
-    <html lang="en" className={cn(ubuntuCondensed.variable, ubuntu.variable)}>
+    <html lang="en" className={cn(jakarta.variable, GeistMono.variable)}>
       <head>
         <title>404 - Page Not Found | SnipGeek</title>
         <meta name="description" content="Sorry, the page you're looking for doesn't exist. Find tutorials, notes, and tech tools at SnipGeek." />
