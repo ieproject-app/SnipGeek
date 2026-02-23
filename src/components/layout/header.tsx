@@ -225,7 +225,7 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                         onClick={() => toggleView('menu')}
                         aria-label="Toggle Navigation Menu"
                     >
-                        <div className="relative h-5 w-5 shrink-0">
+                        <div className="relative w-5 h-5 flex items-center justify-center shrink-0">
                             <Menu className={cn(
                                 "absolute inset-0 transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)]",
                                 isMenuOpen ? "opacity-0 rotate-90 scale-50" : "opacity-100 rotate-0 scale-100"
@@ -248,13 +248,12 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                         size="icon" 
                         className={cn(
                             "relative rounded-full h-10 w-10 bg-transparent hover:bg-white/10 transition-all", 
-                            isPulsing && "scale-110 bg-accent/20", 
                             navItemClass
                         )} 
                         onClick={() => toggleView('readingList')}
                         aria-label="Reading List"
                     >
-                       <Bookmark className={cn("h-5 w-5", isPulsing && "animate-heartbeat text-accent fill-accent")} />
+                       <Bookmark className="h-5 w-5" />
                        {mounted && readingListItems.length > 0 && (
                             <span className={cn(
                                 "absolute top-1.5 right-1.5 flex h-3.5 min-w-[14px] items-center justify-center rounded-full bg-accent text-accent-foreground text-[9px] font-bold px-1 transition-all duration-300",
@@ -298,7 +297,7 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
 
         {/* Dropdowns (Menu, Search Results, Reading List) */}
         <div className={cn(
-            "absolute top-full left-0 right-0 z-40 mt-4 bg-primary/95 backdrop-blur-md shadow-2xl ring-1 ring-black/5 rounded-xl overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)]",
+            "absolute top-full left-0 z-40 mt-4 w-48 bg-primary/95 backdrop-blur-md shadow-2xl ring-1 ring-black/5 rounded-xl overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)]",
             "transform-origin-top",
             isMenuOpen ? "opacity-100 scale-100 translate-y-0" : "opacity-0 scale-95 -translate-y-2 pointer-events-none"
         )}>
@@ -342,7 +341,7 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                       </p>
                   </div>
                   <ScrollArea className="h-full max-h-[400px]">
-                      <div className="py-2">
+                      <div>
                           {query.length > 1 ? (
                               results.length > 0 ? (
                                   <ul className="grid grid-cols-1">
@@ -391,7 +390,7 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                     </p>
                 </div>
                 <ScrollArea className="h-full max-h-[400px]">
-                  <div className="py-2">
+                  <div>
                     {mounted && readingListItems.length > 0 ? (
                       <ul className="grid grid-cols-1">
                         {readingListItems.map((item, idx) => (
@@ -414,7 +413,7 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                                   <Button 
                                     variant="ghost" 
                                     size="icon" 
-                                    className="absolute top-4 right-4 h-8 w-8 rounded-full text-muted-foreground/40 hover:text-destructive hover:bg-destructive/10 transition-all duration-300" 
+                                    className="absolute top-1/2 -translate-y-1/2 right-4 h-8 w-8 rounded-full text-muted-foreground/40 hover:text-destructive hover:bg-destructive/10 transition-all duration-300" 
                                     onClick={(e) => {
                                         e.preventDefault();
                                         e.stopPropagation();
