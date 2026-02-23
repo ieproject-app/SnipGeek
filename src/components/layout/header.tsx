@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
@@ -285,12 +286,12 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
             isMenuOpen ? "opacity-100 scale-y-100" : "opacity-0 scale-y-95 pointer-events-none"
         )}>
             <div className="grid grid-cols-1">
-                {menuItems.map((item) => (
+                {mounted && menuItems.map((item) => (
                     <Link 
                         key={item.name} 
                         href={item.href} 
                         className={cn(
-                            "block px-6 py-3.5 text-[10px] font-black uppercase tracking-tighter hover:bg-white/10 transition-colors", 
+                            "block px-6 py-3.5 text-[12px] font-black uppercase tracking-tighter hover:bg-white/10 transition-colors", 
                             navItemClass
                         )} 
                         onClick={() => setActiveView('none')}
