@@ -1,9 +1,20 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
-import { Search, X, AlignLeft, Bookmark, Trash2 } from 'lucide-react';
+import { 
+  Search, 
+  X, 
+  Bookmark, 
+  Trash2, 
+  Menu, 
+  BookOpen, 
+  StickyNote, 
+  LayoutGrid, 
+  User, 
+  Mail 
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -151,11 +162,11 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
   }
 
   const menuItems = [
-    { name: dictionary.navigation.blog, href: '/blog' },
-    { name: dictionary.navigation.notes, href: '/notes' },
-    { name: dictionary.navigation.tools, href: '/tools' },
-    { name: dictionary.navigation.about, href: '/about' },
-    { name: dictionary.navigation.contact, href: '/contact' },
+    { name: dictionary.navigation.blog, href: '/blog', icon: BookOpen, type: 'primary' },
+    { name: dictionary.navigation.notes, href: '/notes', icon: StickyNote, type: 'primary' },
+    { name: dictionary.navigation.tools, href: '/tools', icon: LayoutGrid, type: 'primary' },
+    { name: dictionary.navigation.about, href: '/about', icon: User, type: 'secondary' },
+    { name: dictionary.navigation.contact, href: '/contact', icon: Mail, type: 'secondary' },
   ];
 
   const navItemClass = "transition-all duration-300 text-primary-foreground/70 hover:text-primary-foreground";
@@ -204,19 +215,20 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                 "grid grid-cols-3 items-center h-full px-2 transition-all duration-300 ease-in-out",
                 isSearchOpen ? "opacity-0 pointer-events-none" : "opacity-100"
             )}>
-                {/* LEFT SIDE: Minimalist Menu Toggle with Label */}
+                {/* LEFT SIDE: Minimalist Menu Toggle with Intentional Label */}
                 <div className="flex items-center pl-1">
                     <Button 
                         variant="ghost" 
                         className={cn(
-                            "h-10 px-3 gap-1.5 rounded-full bg-transparent hover:bg-white/10 transition-all", 
+                            "h-10 px-3 gap-2.5 rounded-full bg-transparent hover:bg-white/10 transition-all", 
                             navItemClass
                         )} 
                         onClick={() => toggleView('menu')}
                         aria-label="Toggle Navigation Menu"
                     >
-                        <AlignLeft className="h-5 w-5 shrink-0" />
-                        <span className="text-[12px] font-black uppercase tracking-tighter hidden sm:inline leading-none">MENU</span>
+                        <Menu className="h-5 w-5 shrink-0" />
+                        <div className="w-px h-3 bg-white/20 hidden sm:block" />
+                        <span className="text-[11px] font-black uppercase tracking-widest hidden sm:inline leading-none">MENU</span>
                     </Button>
                 </div>
 
@@ -280,24 +292,33 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
 
         {/* Dropdowns (Menu, Search Results, Reading List) */}
         <div className={cn(
-            "absolute top-full left-0 right-0 z-40 mt-4 bg-primary/95 backdrop-blur-md shadow-2xl ring-1 ring-black/5 rounded-xl overflow-hidden transition-all duration-300 ease-in-out",
+            "absolute top-full left-0 right-0 z-40 mt-4 bg-primary/95 backdrop-blur-md shadow-2xl ring-1 ring-black/5 rounded-xl overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)]",
             "transform-origin-top",
-            isMenuOpen ? "opacity-100 scale-y-100" : "opacity-0 scale-y-95 pointer-events-none"
+            isMenuOpen ? "opacity-100 scale-y-100 translate-y-0" : "opacity-0 scale-y-95 -translate-y-4 pointer-events-none"
         )}>
             <div className="grid grid-cols-1">
-                {mounted && menuItems.map((item) => (
-                    <Link 
-                        key={item.name} 
-                        href={item.href} 
-                        className={cn(
-                            "block px-6 py-3.5 text-[12px] font-black uppercase tracking-tighter hover:bg-white/10 transition-colors", 
-                            navItemClass
-                        )} 
-                        onClick={() => setActiveView('none')}
-                    >
-                        {item.name}
-                    </Link>
-                ))}
+                {mounted && menuItems.map((item, index) => {
+                    const isFirstSecondary = item.type === 'secondary' && menuItems[index - 1]?.type === 'primary';
+                    return (
+                        <React.Fragment key={item.name}>
+                            {isFirstSecondary && <div className="h-px bg-white/10 mx-4 my-1" />}
+                            <Link 
+                                href={item.href} 
+                                className={cn(
+                                    "group relative flex items-center gap-4 px-6 py-3.5 text-[12px] font-black uppercase tracking-tighter hover:bg-white/5 transition-all duration-300", 
+                                    navItemClass
+                                )} 
+                                onClick={() => setActiveView('none')}
+                            >
+                                {/* Left Accent Border on Hover */}
+                                <div className="absolute left-0 top-0 bottom-0 w-1 bg-accent scale-y-0 group-hover:scale-y-100 transition-transform duration-300 origin-center" />
+                                
+                                <item.icon className="h-4 w-4 shrink-0 transition-all duration-300 group-hover:scale-110 group-hover:text-accent" />
+                                <span className="transition-transform duration-300 group-hover:translate-x-1">{item.name}</span>
+                            </Link>
+                        </React.Fragment>
+                    );
+                })}
             </div>
         </div>
 
