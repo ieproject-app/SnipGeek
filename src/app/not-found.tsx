@@ -2,27 +2,27 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import './globals.css';
-import { Fira_Sans, Fira_Sans_Condensed } from 'next/font/google';
+import { Ubuntu, Ubuntu_Condensed } from 'next/font/google';
 import { cn } from '@/lib/utils';
 import { Search, Home, BookOpen, PenTool } from 'lucide-react';
 
-const firaSansCondensed = Fira_Sans_Condensed({
+const ubuntuCondensed = Ubuntu_Condensed({
   subsets: ['latin'],
   display: 'swap',
-  variable: '--font-fira-sans-condensed',
-  weight: ['700'],
+  variable: '--font-ubuntu-condensed',
+  weight: ['400'],
 });
 
-const firaSans = Fira_Sans({
+const ubuntu = Ubuntu({
   subsets: ['latin'],
   display: 'swap',
-  variable: '--font-fira-sans',
-  weight: ['400'],
+  variable: '--font-ubuntu',
+  weight: ['400', '700'],
 });
 
 export default function NotFound() {
   return (
-    <html lang="en" className={cn(firaSansCondensed.variable, firaSans.variable)}>
+    <html lang="en" className={cn(ubuntuCondensed.variable, ubuntu.variable)}>
       <head>
         <title>404 - Page Not Found | SnipGeek</title>
         <meta name="description" content="Sorry, the page you're looking for doesn't exist. Find tutorials, notes, and tech tools at SnipGeek." />
