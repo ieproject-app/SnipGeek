@@ -169,17 +169,17 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
         <nav className={cn(
             "relative mx-auto bg-primary/90 backdrop-blur-sm text-primary-foreground shadow-lg ring-1 ring-black/5 h-12 transition-all duration-300 ease-in-out rounded-full"
         )}>
-            {/* Centered Floating Logo - Larger than container */}
+            {/* Centered Logo - Reverted to stay within bounds */}
             <div className={cn(
                 "absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50 transition-all duration-500 ease-in-out",
                 (isSearchOpen || (mounted && message)) ? "opacity-0 scale-75 pointer-events-none" : "opacity-100 scale-100"
             )}>
                 <Link 
                     href="/" 
-                    className="flex items-center justify-center h-16 w-16 transition-all duration-300 hover:scale-110 active:scale-95 drop-shadow-[0_10px_25px_rgba(0,0,0,0.4)]" 
+                    className="flex items-center justify-center h-10 w-10 transition-all duration-300 hover:scale-110 active:scale-95" 
                     aria-label="SnipGeek Home"
                 >
-                    <SnipGeekLogo showBackground={true} className="h-full w-full" />
+                    <SnipGeekLogo showBackground={false} className="h-full w-full" />
                 </Link>
             </div>
 
@@ -213,7 +213,7 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                         onClick={() => toggleView('menu')}
                         aria-label="Toggle Navigation Menu"
                     >
-                        <Menu className="h-6 w-6" />
+                        <Menu className="h-5 w-5" />
                     </Button>
                 </div>
 
@@ -288,7 +288,7 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                             key={item.name} 
                             href={item.href} 
                             className={cn(
-                                "block px-6 py-4 text-base font-bold uppercase tracking-widest rounded-2xl hover:bg-white/10 transition-colors", 
+                                "block px-6 py-3.5 text-sm font-bold uppercase tracking-widest rounded-2xl hover:bg-white/10 transition-colors", 
                                 navItemClass
                             )} 
                             onClick={() => setActiveView('none')}
