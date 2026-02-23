@@ -216,7 +216,7 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                         aria-label="Toggle Navigation Menu"
                     >
                         <AlignLeft className="h-5 w-5 shrink-0" />
-                        <span className="text-[10px] font-black uppercase tracking-tighter hidden sm:inline leading-none mb-[0.5px]">MENU</span>
+                        <span className="text-[12px] font-black uppercase tracking-tighter hidden sm:inline leading-none">MENU</span>
                     </Button>
                 </div>
 
