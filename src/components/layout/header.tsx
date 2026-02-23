@@ -204,16 +204,19 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                 "grid grid-cols-3 items-center h-full px-2 transition-all duration-300 ease-in-out",
                 isSearchOpen ? "opacity-0 pointer-events-none" : "opacity-100"
             )}>
-                {/* LEFT SIDE: Minimalist Menu Toggle */}
+                {/* LEFT SIDE: Minimalist Menu Toggle with Label */}
                 <div className="flex items-center pl-1">
                     <Button 
                         variant="ghost" 
-                        size="icon" 
-                        className={cn("h-10 w-10 rounded-full bg-transparent hover:bg-white/10", navItemClass)} 
+                        className={cn(
+                            "h-10 px-3 gap-2 rounded-full bg-transparent hover:bg-white/10 transition-all", 
+                            navItemClass
+                        )} 
                         onClick={() => toggleView('menu')}
                         aria-label="Toggle Navigation Menu"
                     >
-                        <AlignLeft className="h-5 w-5" />
+                        <AlignLeft className="h-5 w-5 shrink-0" />
+                        <span className="text-[10px] font-black uppercase tracking-tighter hidden sm:inline">MENU</span>
                     </Button>
                 </div>
 
@@ -332,7 +335,7 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                       )
                   ) : (
                       <div className="p-10 text-center text-sm text-muted-foreground font-medium">
-                          {dictionary.search.prompt}
+                          {dictionary.search.placeholder}
                       </div>
                   )}
               </div>
