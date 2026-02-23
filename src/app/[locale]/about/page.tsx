@@ -1,4 +1,3 @@
-
 import { i18n } from '@/i18n-config';
 import type { Metadata } from 'next';
 import { getPageContent } from '@/lib/pages';
@@ -13,7 +12,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Briefcase, GraduationCap, Award, Mail, ChevronRight, FileText } from 'lucide-react';
 import { DownloadButton } from '@/components/mdx-components';
-import Link from 'next/link';
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
@@ -60,12 +58,12 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-12 sm:pt-32 sm:pb-16">
         
         {/* Hero Section */}
-        <section className="mb-16 text-center">
+        <section className="mb-16 text-center animate-in fade-in slide-in-from-bottom-4 duration-700">
             <Avatar className="w-32 h-32 mx-auto mb-6 shadow-xl ring-4 ring-primary/10">
                 <AvatarImage src={authorAvatar} alt={data.name} />
                 <AvatarFallback>IE</AvatarFallback>
             </Avatar>
-            <h1 className="font-headline text-5xl md:text-6xl font-extrabold tracking-tighter text-primary mb-3">
+            <h1 className="font-headline text-5xl md:text-6xl font-extrabold tracking-tighter text-primary mb-3 uppercase">
                 {data.name}
             </h1>
             <p className="text-xl md:text-2xl font-headline font-bold text-muted-foreground mb-6">
@@ -86,7 +84,7 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
         {/* Summary Section */}
         <section className="mb-20">
             <div className="flex items-center gap-4 mb-8">
-                <h2 className="text-2xl font-bold font-headline text-primary shrink-0">{dictionary.about.summary}</h2>
+                <h2 className="text-2xl font-bold font-headline text-primary shrink-0 uppercase tracking-tight">{dictionary.about.summary}</h2>
                 <div className="h-px bg-border flex-1" />
             </div>
             <p className="text-lg leading-relaxed text-foreground/80 italic text-center max-w-3xl mx-auto">
@@ -97,7 +95,7 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
         {/* Personal Story Section (from MDX) */}
         <section className="mb-20 prose prose-lg dark:prose-invert max-w-none">
              <div className="flex items-center gap-4 mb-8">
-                <h2 className="text-2xl font-bold font-headline text-primary shrink-0">{dictionary.about.title}</h2>
+                <h2 className="text-2xl font-bold font-headline text-primary shrink-0 uppercase tracking-tight">{dictionary.about.title}</h2>
                 <div className="h-px bg-border flex-1" />
             </div>
             <div className="text-foreground/80">
@@ -117,7 +115,7 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
         {/* Experience Section */}
         <section className="mb-20">
             <div className="flex items-center gap-4 mb-10">
-                <h2 className="text-2xl font-bold font-headline text-primary shrink-0">{dictionary.about.experience}</h2>
+                <h2 className="text-2xl font-bold font-headline text-primary shrink-0 uppercase tracking-tight">{dictionary.about.experience}</h2>
                 <div className="h-px bg-border flex-1" />
             </div>
             
@@ -154,7 +152,7 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
         {/* Skills Section */}
         <section className="mb-20">
             <div className="flex items-center gap-4 mb-10">
-                <h2 className="text-2xl font-bold font-headline text-primary shrink-0">{dictionary.about.skills}</h2>
+                <h2 className="text-2xl font-bold font-headline text-primary shrink-0 uppercase tracking-tight">{dictionary.about.skills}</h2>
                 <div className="h-px bg-border flex-1" />
             </div>
             
@@ -162,11 +160,11 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
                 {data.skills.map((cat, index) => (
                     <Card key={index} className="bg-card/50 border-primary/10 h-full flex flex-col">
                         <CardHeader>
-                            <CardTitle className="text-lg font-headline text-primary">{cat.name}</CardTitle>
+                            <CardTitle className="text-lg font-headline text-primary uppercase tracking-wide">{cat.name}</CardTitle>
                         </CardHeader>
                         <CardContent className="flex flex-wrap gap-2">
                             {cat.skills.map(skill => (
-                                <Badge key={skill} variant="secondary" className="px-3 py-1">{skill}</Badge>
+                                <Badge key={skill} variant="secondary" className="px-3 py-1 font-medium">{skill}</Badge>
                             ))}
                         </CardContent>
                     </Card>
@@ -178,7 +176,7 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-20">
             <section>
                 <div className="flex items-center gap-4 mb-8">
-                    <h2 className="text-2xl font-bold font-headline text-primary shrink-0">{dictionary.about.education}</h2>
+                    <h2 className="text-2xl font-bold font-headline text-primary shrink-0 uppercase tracking-tight">{dictionary.about.education}</h2>
                     <div className="h-px bg-border flex-1" />
                 </div>
                 {data.education.map((edu, index) => (
@@ -188,7 +186,7 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
                                 <GraduationCap className="w-5 h-5 text-primary" />
                                 <time className="text-xs font-bold uppercase tracking-widest text-muted-foreground">{edu.year}</time>
                             </div>
-                            <CardTitle className="text-lg font-headline">{edu.school}</CardTitle>
+                            <CardTitle className="text-lg font-headline uppercase">{edu.school}</CardTitle>
                             <p className="text-sm text-muted-foreground">{edu.degree}</p>
                         </CardHeader>
                     </Card>
@@ -196,7 +194,7 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
             </section>
             <section>
                 <div className="flex items-center gap-4 mb-8">
-                    <h2 className="text-2xl font-bold font-headline text-primary shrink-0">{dictionary.about.certifications}</h2>
+                    <h2 className="text-2xl font-bold font-headline text-primary shrink-0 uppercase tracking-tight">{dictionary.about.certifications}</h2>
                     <div className="h-px bg-border flex-1" />
                 </div>
                 {data.certifications.map((cert, index) => (
@@ -206,7 +204,7 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
                                 <Award className="w-5 h-5 text-primary" />
                                 <Badge variant="outline" className="text-[10px] uppercase tracking-widest">{cert.period}</Badge>
                             </div>
-                            <CardTitle className="text-lg font-headline">{cert.name}</CardTitle>
+                            <CardTitle className="text-lg font-headline uppercase">{cert.name}</CardTitle>
                             <p className="text-sm text-muted-foreground font-semibold mb-2">{cert.issuer}</p>
                             <p className="text-xs text-foreground/70 leading-relaxed">{cert.description}</p>
                         </CardHeader>
@@ -218,7 +216,7 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
         {/* Download Section */}
         <section className="text-center bg-primary/5 border border-primary/10 rounded-2xl p-8 md:p-12">
             <FileText className="w-12 h-12 text-primary mx-auto mb-6" />
-            <h2 className="text-2xl font-bold font-headline text-primary mb-4">{dictionary.about.downloadResume}</h2>
+            <h2 className="text-2xl font-bold font-headline text-primary mb-4 uppercase tracking-tight">{dictionary.about.downloadResume}</h2>
             <div className="flex justify-center">
                 <DownloadButton id="cv-iwan-efendi" />
             </div>
