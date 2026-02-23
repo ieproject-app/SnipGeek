@@ -12,15 +12,15 @@ import { NotificationProvider } from '@/hooks/use-notification';
 import { BackToTop } from '@/components/layout/back-to-top';
 import { getDictionary } from '@/lib/get-dictionary';
 import { DraftList } from '@/components/layout/draft-list';
-import { Oswald, Roboto } from 'next/font/google';
+import { Roboto, Roboto_Condensed } from 'next/font/google';
 import { GeistMono } from 'geist/font/mono';
 import { cn } from '@/lib/utils';
 
-const oswald = Oswald({
+const robotoCondensed = Roboto_Condensed({
   subsets: ['latin'],
   display: 'swap',
-  variable: '--font-oswald',
-  weight: ['400', '500', '600', '700'],
+  variable: '--font-roboto-condensed',
+  weight: ['400', '700'],
 });
 
 const roboto = Roboto({
@@ -90,7 +90,7 @@ export default async function LocaleLayout({
   const draftNotes = getDraftNotesData(locale);
   
   return (
-    <html lang={locale} className={cn(oswald.variable, roboto.variable, GeistMono.variable, "scroll-smooth")} suppressHydrationWarning>
+    <html lang={locale} className={cn(robotoCondensed.variable, roboto.variable, GeistMono.variable, "scroll-smooth")} suppressHydrationWarning>
       <head />
       <body className="font-body antialiased fade-in-on-load">
         <ThemeProvider

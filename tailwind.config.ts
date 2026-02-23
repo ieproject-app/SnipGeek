@@ -13,7 +13,7 @@ export default {
     extend: {
       fontFamily: {
         body: ['var(--font-roboto)', 'system-ui', '-apple-system', 'sans-serif'],
-        headline: ['var(--font-oswald)', 'system-ui', 'sans-serif'],
+        headline: ['var(--font-roboto-condensed)', 'system-ui', 'sans-serif'],
         code: ['var(--font-geist-mono)', 'ui-monospace', 'monospace'],
       },
       colors: {

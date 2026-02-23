@@ -2,14 +2,14 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import './globals.css';
-import { Oswald, Roboto } from 'next/font/google';
+import { Roboto, Roboto_Condensed } from 'next/font/google';
 import { cn } from '@/lib/utils';
 import { Search, Home, BookOpen, PenTool } from 'lucide-react';
 
-const oswald = Oswald({
+const robotoCondensed = Roboto_Condensed({
   subsets: ['latin'],
   display: 'swap',
-  variable: '--font-oswald',
+  variable: '--font-roboto-condensed',
   weight: ['700'],
 });
 
@@ -22,7 +22,7 @@ const roboto = Roboto({
 
 export default function NotFound() {
   return (
-    <html lang="en" className={cn(oswald.variable, roboto.variable)}>
+    <html lang="en" className={cn(robotoCondensed.variable, roboto.variable)}>
       <head>
         <title>404 - Page Not Found | SnipGeek</title>
         <meta name="description" content="Sorry, the page you're looking for doesn't exist. Find tutorials, notes, and tech tools at SnipGeek." />
