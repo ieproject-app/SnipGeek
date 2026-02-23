@@ -14,7 +14,14 @@ import { getDictionary } from '@/lib/get-dictionary';
 import { DraftList } from '@/components/layout/draft-list';
 import { GeistSans } from 'geist/font/sans';
 import { GeistMono } from 'geist/font/mono';
+import { Open_Sans } from 'next/font/google';
 import { cn } from '@/lib/utils';
+
+const openSans = Open_Sans({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-open-sans',
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://snipgeek.com'),
@@ -76,7 +83,7 @@ export default async function LocaleLayout({
   const draftNotes = getDraftNotesData(locale);
   
   return (
-    <html lang={locale} className={cn(GeistSans.variable, GeistMono.variable, "scroll-smooth")} suppressHydrationWarning>
+    <html lang={locale} className={cn(GeistSans.variable, GeistMono.variable, openSans.variable, "scroll-smooth")} suppressHydrationWarning>
       <head />
       <body className="font-body antialiased fade-in-on-load">
         <ThemeProvider
