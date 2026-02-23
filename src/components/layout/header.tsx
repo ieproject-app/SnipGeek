@@ -4,7 +4,7 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
-import { Search, X, Menu, Bookmark, Trash2 } from 'lucide-react';
+import { Search, X, AlignLeft, Bookmark, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -205,7 +205,7 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                 "grid grid-cols-3 items-center h-full px-2 transition-all duration-300 ease-in-out",
                 isSearchOpen ? "opacity-0 pointer-events-none" : "opacity-100"
             )}>
-                {/* LEFT SIDE: Minimalist Burger Menu */}
+                {/* LEFT SIDE: Minimalist Menu Toggle */}
                 <div className="flex items-center pl-1">
                     <Button 
                         variant="ghost" 
@@ -214,7 +214,7 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                         onClick={() => toggleView('menu')}
                         aria-label="Toggle Navigation Menu"
                     >
-                        <Menu className="h-5 w-5" />
+                        <AlignLeft className="h-5 w-5" />
                     </Button>
                 </div>
 
