@@ -215,12 +215,13 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                 "grid grid-cols-3 items-center h-full px-2 transition-all duration-300 ease-in-out",
                 isSearchOpen ? "opacity-0 pointer-events-none" : "opacity-100"
             )}>
-                {/* LEFT SIDE: Minimalist Menu Toggle with Intentional Label */}
+                {/* LEFT SIDE: Minimalist Menu Toggle */}
                 <div className="flex items-center pl-1">
                     <Button 
                         variant="ghost" 
+                        size="icon"
                         className={cn(
-                            "h-10 px-3 gap-2.5 rounded-full bg-transparent hover:bg-white/10 transition-all", 
+                            "h-10 w-10 rounded-full bg-transparent hover:bg-white/10 transition-all", 
                             navItemClass
                         )} 
                         onClick={() => toggleView('menu')}
@@ -236,8 +237,6 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                                 isMenuOpen ? "opacity-100 rotate-0 scale-100" : "opacity-0 -rotate-90 scale-50"
                             )} />
                         </div>
-                        <div className="w-px h-3 bg-white/20 hidden sm:block" />
-                        <span className="text-[11px] font-black uppercase tracking-widest hidden sm:inline leading-none">MENU</span>
                     </Button>
                 </div>
 
