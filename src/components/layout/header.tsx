@@ -176,7 +176,7 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
             )}>
                 <Link 
                     href="/" 
-                    className="flex items-center justify-center h-9 w-9 transition-all duration-300 hover:scale-110 active:scale-95" 
+                    className="flex items-center justify-center h-7 w-7 transition-all duration-300 hover:scale-110 active:scale-95" 
                     aria-label="SnipGeek Home"
                 >
                     <SnipGeekLogo className="h-full w-full" />
@@ -288,7 +288,7 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                             key={item.name} 
                             href={item.href} 
                             className={cn(
-                                "block px-5 py-2.5 text-xs font-black uppercase tracking-tighter rounded-xl hover:bg-white/10 transition-colors", 
+                                "block px-5 py-2.5 text-[10px] font-black uppercase tracking-tighter rounded-xl hover:bg-white/10 transition-colors", 
                                 navItemClass
                             )} 
                             onClick={() => setActiveView('none')}
