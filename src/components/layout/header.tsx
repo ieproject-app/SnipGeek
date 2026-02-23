@@ -210,7 +210,7 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
 
             {/* Main Header Content */}
             <div className={cn(
-                "grid grid-cols-3 items-center h-full px-1.5 transition-all duration-300 ease-in-out",
+                "grid grid-cols-3 items-center h-full px-1 transition-all duration-300 ease-in-out",
                 isSearchOpen ? "opacity-0 pointer-events-none" : "opacity-100"
             )}>
                 {/* LEFT SIDE: Menu Toggle */}
@@ -242,7 +242,7 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                 <div className="flex justify-center" />
 
                 {/* RIGHT SIDE: Bookmark & Search */}
-                <div className="flex justify-end items-center gap-1">
+                <div className="flex justify-end items-center">
                     <Button 
                         variant="ghost" 
                         size="icon" 
@@ -257,8 +257,8 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                        <Bookmark className={cn("h-5 w-5", isPulsing && "animate-heartbeat text-accent fill-accent")} />
                        {mounted && readingListItems.length > 0 && (
                             <span className={cn(
-                                "absolute top-1 right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-accent text-accent-foreground text-[10px] font-bold px-1 transition-all duration-300",
-                                isPulsing ? "animate-badge-pop ring-4 ring-accent/30" : "scale-100"
+                                "absolute top-1.5 right-1.5 flex h-3.5 min-w-[14px] items-center justify-center rounded-full bg-accent text-accent-foreground text-[9px] font-bold px-1 transition-all duration-300",
+                                isPulsing ? "animate-badge-pop ring-2 ring-accent/30" : "scale-100"
                             )}>
                                 {readingListItems.length}
                             </span>
@@ -284,7 +284,7 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                 <Search className="absolute left-6 top-1/2 -translate-y-1/2 h-5 w-5 text-primary-foreground/70 pointer-events-none"/>
                 <Input 
                     ref={searchInputRef}
-                    type="search" 
+                    type="text" 
                     placeholder={dictionary.search.placeholder}
                     className="w-full h-full bg-transparent border-none rounded-full pl-14 pr-12 focus-visible:ring-0 focus-visible:ring-offset-0 text-primary-foreground placeholder:text-primary-foreground/50"
                     value={query}
@@ -336,32 +336,30 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                 "bg-background rounded-xl border shadow-2xl max-h-[450px] overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)]",
                 isSearchOpen ? "opacity-100 scale-100 translate-y-0" : "opacity-0 scale-95 -translate-y-2"
             )}>
-                  <div className="px-4 py-3 border-b bg-muted/20 flex items-center justify-between">
+                  <div className="px-6 py-3 border-b bg-muted/20 flex items-center justify-between">
                       <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground opacity-60">
                         {query.length > 1 ? `${results.length} ${dictionary.search.resultsFound}` : dictionary.search.prompt}
                       </p>
                   </div>
                   <ScrollArea className="h-full max-h-[400px]">
-                      <div className="p-2">
+                      <div className="py-2">
                           {query.length > 1 ? (
                               results.length > 0 ? (
-                                  <ul className="space-y-2">
+                                  <ul className="grid grid-cols-1">
                                       {results.map((item, idx) => (
                                       <li key={`${item.type}-${item.slug}`} style={{ transitionDelay: `${idx * 30}ms` }} className="animate-in fade-in slide-in-from-left-2 duration-300">
-                                          <Link href={item.href} onClick={handleResultClick} className="block group">
-                                              <div className="relative rounded-xl border border-transparent hover:border-primary/10 hover:bg-muted/50 transition-all duration-300 p-4">
-                                                  <h4 className="font-bold text-sm text-primary line-clamp-2 leading-snug mb-2 transition-colors group-hover:text-accent">
-                                                      {item.title}
-                                                  </h4>
-                                                  <div className="flex items-center gap-2">
-                                                      <Badge variant="secondary" className="text-[9px] h-4 uppercase font-black tracking-wider px-1.5 rounded-sm shrink-0">
-                                                          {item.type}
-                                                      </Badge>
-                                                      <span className="text-[10px] text-muted-foreground font-medium opacity-30">•</span>
-                                                      <p className="text-[11px] text-muted-foreground line-clamp-1 italic opacity-70">
-                                                          {item.description}
-                                                      </p>
-                                                  </div>
+                                          <Link href={item.href} onClick={handleResultClick} className="block group px-6 py-4 hover:bg-muted/50 transition-all duration-300">
+                                              <h4 className="font-bold text-sm text-primary line-clamp-2 leading-snug mb-2 transition-colors group-hover:text-accent">
+                                                  {item.title}
+                                              </h4>
+                                              <div className="flex items-center gap-2">
+                                                  <Badge variant="secondary" className="text-[9px] h-4 uppercase font-black tracking-wider px-1.5 rounded-sm shrink-0">
+                                                      {item.type}
+                                                  </Badge>
+                                                  <span className="text-[10px] text-muted-foreground font-medium opacity-30">•</span>
+                                                  <p className="text-[11px] text-muted-foreground line-clamp-1 italic opacity-70">
+                                                      {item.description}
+                                                  </p>
                                               </div>
                                           </Link>
                                       </li>
@@ -387,19 +385,19 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                 "bg-background rounded-xl border shadow-2xl max-h-[450px] overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)]",
                 isReadingListOpen ? "opacity-100 scale-100 translate-y-0" : "opacity-0 scale-95 -translate-y-2"
             )}>
-                <div className="px-4 py-3 border-b bg-muted/20 flex items-center justify-between">
+                <div className="px-6 py-3 border-b bg-muted/20 flex items-center justify-between">
                     <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground opacity-60">
                       {mounted ? readingListItems.length : 0} {mounted && readingListItems.length === 1 ? dictionary.readingList.item : dictionary.readingList.items} {dictionary.readingList.inYourList}
                     </p>
                 </div>
                 <ScrollArea className="h-full max-h-[400px]">
-                  <div className="p-2">
+                  <div className="py-2">
                     {mounted && readingListItems.length > 0 ? (
-                      <ul className="space-y-2">
+                      <ul className="grid grid-cols-1">
                         {readingListItems.map((item, idx) => (
                           <li key={`${item.type}-${item.slug}`} style={{ transitionDelay: `${idx * 30}ms` }} className="group relative animate-in fade-in slide-in-from-left-2 duration-300">
-                              <div className="relative rounded-xl border border-transparent hover:border-primary/10 hover:bg-muted/50 transition-all duration-300 overflow-hidden">
-                                  <Link href={item.href} onClick={() => setActiveView('none')} className="block p-4 pr-12">
+                              <div className="relative hover:bg-muted/50 transition-all duration-300 overflow-hidden">
+                                  <Link href={item.href} onClick={() => setActiveView('none')} className="block px-6 py-4 pr-14">
                                       <h4 className="font-bold text-sm text-primary line-clamp-2 leading-snug mb-2 transition-colors group-hover:text-accent">
                                           {item.title}
                                       </h4>
@@ -416,7 +414,7 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                                   <Button 
                                     variant="ghost" 
                                     size="icon" 
-                                    className="absolute top-3 right-2 h-8 w-8 rounded-full text-muted-foreground/40 hover:text-destructive hover:bg-destructive/10 transition-all duration-300" 
+                                    className="absolute top-4 right-4 h-8 w-8 rounded-full text-muted-foreground/40 hover:text-destructive hover:bg-destructive/10 transition-all duration-300" 
                                     onClick={(e) => {
                                         e.preventDefault();
                                         e.stopPropagation();
