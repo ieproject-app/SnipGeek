@@ -58,14 +58,12 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
     setMounted(true);
   }, []);
 
-  // Show header when message appears
   useEffect(() => {
     if (message) {
       setIsVisible(true);
     }
   }, [message]);
 
-  // Handle pending notifications (e.g. from language switch)
   useEffect(() => {
     if (mounted) {
       const pending = localStorage.getItem('snipgeek-pending-notify');
@@ -194,7 +192,7 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                 </Link>
             </div>
 
-            {/* Status Notification Pill (Centered) */}
+            {/* Status Notification Pill */}
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-[60]">
               <div className={cn(
                 "px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-tighter flex items-center gap-2 transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] backdrop-blur-md",
@@ -212,11 +210,11 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
 
             {/* Main Header Content */}
             <div className={cn(
-                "grid grid-cols-3 items-center h-full px-2 transition-all duration-300 ease-in-out",
+                "grid grid-cols-3 items-center h-full px-1.5 transition-all duration-300 ease-in-out",
                 isSearchOpen ? "opacity-0 pointer-events-none" : "opacity-100"
             )}>
-                {/* LEFT SIDE: Minimalist Menu Toggle */}
-                <div className="flex items-center pl-1">
+                {/* LEFT SIDE: Menu Toggle */}
+                <div className="flex justify-start">
                     <Button 
                         variant="ghost" 
                         size="icon"
@@ -227,7 +225,7 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                         onClick={() => toggleView('menu')}
                         aria-label="Toggle Navigation Menu"
                     >
-                        <div className="relative h-5 w-5 shrink-0 overflow-hidden">
+                        <div className="relative h-5 w-5 shrink-0">
                             <Menu className={cn(
                                 "absolute inset-0 transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)]",
                                 isMenuOpen ? "opacity-0 rotate-90 scale-50" : "opacity-100 rotate-0 scale-100"
@@ -240,11 +238,11 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                     </Button>
                 </div>
 
-                {/* CENTER: Placeholder for Logo absolute placement */}
+                {/* CENTER: Placeholder */}
                 <div className="flex justify-center" />
 
                 {/* RIGHT SIDE: Bookmark & Search */}
-                <div className="flex items-center justify-end gap-1 pr-1">
+                <div className="flex justify-end items-center gap-1">
                     <Button 
                         variant="ghost" 
                         size="icon" 
@@ -322,9 +320,7 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                                 )} 
                                 onClick={() => setActiveView('none')}
                             >
-                                {/* Left Accent Border on Hover */}
                                 <div className="absolute left-0 top-0 bottom-0 w-1 bg-accent scale-y-0 group-hover:scale-y-100 transition-transform duration-300 origin-center" />
-                                
                                 <item.icon className="h-4 w-4 shrink-0 transition-all duration-300 group-hover:scale-110 group-hover:text-accent" />
                                 <span className="transition-transform duration-300 group-hover:translate-x-1">{item.name}</span>
                             </Link>
