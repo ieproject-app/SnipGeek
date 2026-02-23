@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
@@ -180,7 +179,7 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                     className="flex items-center justify-center h-10 w-10 transition-all duration-300 hover:scale-110 active:scale-95" 
                     aria-label="SnipGeek Home"
                 >
-                    <SnipGeekLogo showBackground={false} className="h-full w-full" />
+                    <SnipGeekLogo className="h-full w-full" />
                 </Link>
             </div>
 

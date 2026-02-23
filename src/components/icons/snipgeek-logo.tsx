@@ -1,13 +1,20 @@
 import React, { useId } from 'react';
 
+interface SnipGeekLogoProps extends React.SVGProps<SVGSVGElement> {
+  showBackground?: boolean;
+  showBadge?: boolean;
+}
+
 /**
  * SnipGeekLogo - Latest minimalist 4-square animated design.
  * Features a clean pulsing animation for tech-focused identity.
  */
 export const SnipGeekLogo = ({ 
   className, 
+  showBackground,
+  showBadge,
   ...props 
-}: React.SVGProps<SVGSVGElement>) => {
+}: SnipGeekLogoProps) => {
   const id = useId().replace(/:/g, "");
 
   return (
