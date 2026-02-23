@@ -3,7 +3,7 @@ import React, { useId } from 'react';
 /**
  * SnipGeekLogo - New animated tech icon logo.
  * Design: Pulsing squares, scan lines, and coding elements with advanced CSS animations.
- * @param showBackground - If true, renders the dark background rect.
+ * Shape: Updated to a perfect circle.
  */
 export const SnipGeekLogo = ({ 
   className, 
@@ -139,7 +139,7 @@ export const SnipGeekLogo = ({
         `}</style>
 
         <clipPath id={clipId}>
-          <rect width="240" height="240" rx="40"/>
+          <rect width="240" height="240" rx="120"/>
         </clipPath>
 
         <radialGradient id={glowId} cx="50%" cy="50%" r="50%">
@@ -154,9 +154,9 @@ export const SnipGeekLogo = ({
         </linearGradient>
       </defs>
 
-      {/* Background */}
-      <rect width="240" height="240" rx="40" fill="#111827"/>
-      <rect width="240" height="240" rx="40" fill={`url(#${glowId})`}/>
+      {/* Background (Perfect Circle) */}
+      <rect width="240" height="240" rx="120" fill="#111827"/>
+      <rect width="240" height="240" rx="120" fill={`url(#${glowId})`}/>
 
       {/* Ring pulse (behind squares) */}
       <rect className={`ring-${id}`} x="72" y="72" width="96" height="96" rx="6"/>
