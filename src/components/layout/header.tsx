@@ -9,7 +9,7 @@ import {
   X, 
   Bookmark, 
   Trash2, 
-  Menu, 
+  MoreHorizontal, 
   BookOpen, 
   StickyNote, 
   LayoutGrid, 
@@ -161,12 +161,15 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
     }
   }
 
-  const menuItems = [
-    { name: dictionary.navigation.blog, href: '/blog', icon: BookOpen, type: 'primary' },
-    { name: dictionary.navigation.notes, href: '/notes', icon: StickyNote, type: 'primary' },
-    { name: dictionary.navigation.tools, href: '/tools', icon: LayoutGrid, type: 'primary' },
-    { name: dictionary.navigation.about, href: '/about', icon: User, type: 'secondary' },
-    { name: dictionary.navigation.contact, href: '/contact', icon: Mail, type: 'secondary' },
+  const directLinks = [
+    { name: dictionary.navigation.blog, href: '/blog', icon: BookOpen },
+    { name: dictionary.navigation.notes, href: '/notes', icon: StickyNote },
+    { name: dictionary.navigation.tools, href: '/tools', icon: LayoutGrid },
+  ];
+
+  const moreItems = [
+    { name: dictionary.navigation.about, href: '/about', icon: User },
+    { name: dictionary.navigation.contact, href: '/contact', icon: Mail },
   ];
 
   const navItemClass = "transition-all duration-300 text-primary-foreground/70 hover:text-primary-foreground";
@@ -174,26 +177,12 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
   return (
     <header ref={headerRef} className={cn(
         "fixed top-4 left-4 right-4 md:left-1/2 md:-translate-x-1/2 md:right-auto z-50 transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]",
-        isSearchOpen ? 'md:w-[560px]' : 'md:w-[480px]',
+        isSearchOpen ? 'md:w-[600px]' : 'md:w-[560px]',
         isVisible ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-16"
     )}>
         <nav className={cn(
-            "relative mx-auto bg-primary/90 backdrop-blur-sm text-primary-foreground shadow-lg ring-1 ring-black/5 h-12 transition-all duration-300 ease-in-out rounded-full"
+            "relative mx-auto bg-primary/90 backdrop-blur-sm text-primary-foreground shadow-lg ring-1 ring-black/5 h-12 transition-all duration-300 ease-in-out rounded-full flex items-center justify-between px-2"
         )}>
-            {/* Centered Logo */}
-            <div className={cn(
-                "absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50 transition-all duration-500 ease-in-out",
-                (isSearchOpen || (mounted && message)) ? "opacity-0 scale-75 pointer-events-none" : "opacity-100 scale-100"
-            )}>
-                <Link 
-                    href="/" 
-                    className="flex items-center justify-center h-7 w-7 transition-all duration-300 hover:scale-110 active:scale-95" 
-                    aria-label="SnipGeek Home"
-                >
-                    <SnipGeekLogo className="h-full w-full" />
-                </Link>
-            </div>
-
             {/* Status Notification Pill */}
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-[60]">
               <div className={cn(
@@ -210,81 +199,103 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
               </div>
             </div>
 
-            {/* Main Header Content */}
+            {/* Left Section: Logo */}
             <div className={cn(
-                "grid grid-cols-3 items-center h-full px-1 transition-all duration-300 ease-in-out",
+                "flex items-center pl-2 transition-all duration-500",
+                isSearchOpen ? "opacity-0 pointer-events-none w-0" : "opacity-100"
+            )}>
+                <Link 
+                    href="/" 
+                    className="flex items-center justify-center h-7 w-7 transition-all duration-300 hover:scale-110 active:scale-95" 
+                    aria-label="SnipGeek Home"
+                >
+                    <SnipGeekLogo className="h-full w-full" />
+                </Link>
+            </div>
+
+            {/* Middle Section: Direct Nav Links */}
+            <div className={cn(
+                "flex-1 flex items-center justify-center gap-1 transition-all duration-500",
                 isSearchOpen ? "opacity-0 pointer-events-none" : "opacity-100"
             )}>
-                {/* LEFT SIDE: Menu Toggle */}
-                <div className="flex justify-start items-center gap-0.5">
-                    <Button 
-                        variant="ghost" 
-                        size="icon"
+                {directLinks.map((item) => (
+                    <Link 
+                        key={item.href}
+                        href={item.href}
                         className={cn(
-                            "h-10 w-10 rounded-full bg-transparent hover:bg-white/10 transition-all", 
-                            navItemClass
-                        )} 
-                        onClick={() => toggleView('menu')}
-                        aria-label="Toggle Navigation Menu"
+                            "px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider hover:bg-white/10 transition-all hidden sm:flex items-center gap-2",
+                            pathname.includes(item.href) ? "text-accent" : "text-primary-foreground/70"
+                        )}
                     >
-                        <div className="relative flex items-center justify-center shrink-0">
-                            {mounted && (
-                              <>
-                                <Menu className={cn(
-                                    "h-5 w-5 transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)]",
-                                    isMenuOpen ? "opacity-0 rotate-90 scale-50" : "opacity-100 rotate-0 scale-100"
-                                )} />
-                                <X className={cn(
-                                    "absolute h-5 w-5 transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)]",
-                                    isMenuOpen ? "opacity-100 rotate-0 scale-100" : "opacity-0 -rotate-90 scale-50"
-                                )} />
-                              </>
-                            )}
-                        </div>
-                    </Button>
-                </div>
+                        <item.icon className="h-3.5 w-3.5" />
+                        <span>{item.name}</span>
+                    </Link>
+                ))}
+            </div>
 
-                {/* CENTER: Placeholder */}
-                <div className="flex justify-center" />
+            {/* Right Section: Utilities & More */}
+            <div className={cn(
+                "flex items-center gap-0.5 transition-all duration-500",
+                isSearchOpen ? "opacity-0 pointer-events-none" : "opacity-100"
+            )}>
+                <ThemeSwitcher dictionary={dictionary} />
+                
+                <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className={cn(
+                        "relative rounded-full h-10 w-10 bg-transparent hover:bg-white/10 transition-all", 
+                        navItemClass
+                    )} 
+                    onClick={() => toggleView('readingList')}
+                    aria-label="Reading List"
+                >
+                    <Bookmark className="h-5 w-5" />
+                    {mounted && readingListItems.length > 0 && (
+                        <span className={cn(
+                            "absolute top-1.5 right-1.5 flex h-3.5 min-w-[14px] items-center justify-center rounded-full bg-accent text-accent-foreground text-[9px] font-bold px-1 transition-all duration-300",
+                            isPulsing ? "animate-badge-pop ring-2 ring-accent/30" : "scale-100"
+                        )}>
+                            {readingListItems.length}
+                        </span>
+                    )}
+                </Button>
 
-                {/* RIGHT SIDE: Switch, Bookmark & Search */}
-                <div className="flex justify-end items-center gap-0.5">
-                    {/* Theme Switcher - First in Group */}
-                    <ThemeSwitcher dictionary={dictionary} />
-                    
-                    {/* Bookmark / Reading List - Middle */}
-                    <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        className={cn(
-                            "relative rounded-full h-10 w-10 bg-transparent hover:bg-white/10 transition-all", 
-                            navItemClass
-                        )} 
-                        onClick={() => toggleView('readingList')}
-                        aria-label="Reading List"
-                    >
-                       <Bookmark className="h-5 w-5" />
-                       {mounted && readingListItems.length > 0 && (
-                            <span className={cn(
-                                "absolute top-1.5 right-1.5 flex h-3.5 min-w-[14px] items-center justify-center rounded-full bg-accent text-accent-foreground text-[9px] font-bold px-1 transition-all duration-300",
-                                isPulsing ? "animate-badge-pop ring-2 ring-accent/30" : "scale-100"
-                            )}>
-                                {readingListItems.length}
-                            </span>
-                       )}
-                    </Button>
+                <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className={cn("h-10 w-10 rounded-full bg-transparent hover:bg-white/10", navItemClass)} 
+                    onClick={() => toggleView('search')}
+                    aria-label="Search"
+                >
+                    <Search className="h-5 w-5" />
+                </Button>
 
-                    {/* Search - End */}
-                    <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        className={cn("h-10 w-10 rounded-full bg-transparent hover:bg-white/10", navItemClass)} 
-                        onClick={() => toggleView('search')}
-                        aria-label="Search"
-                    >
-                       <Search className="h-5 w-5" />
-                    </Button>
-                </div>
+                <Button 
+                    variant="ghost" 
+                    size="icon"
+                    className={cn(
+                        "h-10 w-10 rounded-full bg-transparent hover:bg-white/10 transition-all", 
+                        navItemClass
+                    )} 
+                    onClick={() => toggleView('menu')}
+                    aria-label="Toggle More Menu"
+                >
+                    <div className="relative flex items-center justify-center shrink-0">
+                        {mounted && (
+                            <>
+                            <MoreHorizontal className={cn(
+                                "h-5 w-5 transition-all duration-500",
+                                isMenuOpen ? "opacity-0 rotate-90 scale-50" : "opacity-100 rotate-0 scale-100"
+                            )} />
+                            <X className={cn(
+                                "absolute h-5 w-5 transition-all duration-500",
+                                isMenuOpen ? "opacity-100 rotate-0 scale-100" : "opacity-0 -rotate-90 scale-50"
+                            )} />
+                            </>
+                        )}
+                    </div>
+                </Button>
             </div>
             
             {/* Search Input Overlay */}
@@ -313,26 +324,39 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
             </div>
         </nav>
 
-        {/* Dropdowns (Menu, Search Results, Reading List) */}
+        {/* More Menu Dropdown */}
         <div className={cn(
-            "absolute top-full left-0 z-40 mt-4 w-48 bg-primary/95 backdrop-blur-md shadow-2xl ring-1 ring-black/5 rounded-xl overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)]",
-            "transform-origin-top",
+            "absolute top-full right-0 z-40 mt-4 w-48 bg-primary/95 backdrop-blur-md shadow-2xl ring-1 ring-black/5 rounded-xl overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)]",
+            "transform-origin-top-right",
             isMenuOpen ? "opacity-100 scale-100 translate-y-0" : "opacity-0 scale-95 -translate-y-2 pointer-events-none"
         )}>
             <div className="grid grid-cols-1">
-                {mounted && menuItems.map((item, index) => {
-                    const isFirstSecondary = item.type === 'secondary' && menuItems[index - 1]?.type === 'primary';
-                    return (
-                        <React.Fragment key={item.name}>
-                            {isFirstSecondary && <div className="h-px bg-white/10 mx-4 my-1" />}
+                {mounted && (
+                    <>
+                        {/* Mobile-only visible items */}
+                        <div className="sm:hidden border-b border-white/10">
+                            {directLinks.map((item, index) => (
+                                <Link 
+                                    key={item.href}
+                                    href={item.href} 
+                                    className={cn(
+                                        "group relative flex items-center gap-4 px-6 py-3.5 text-[12px] font-black uppercase tracking-tighter hover:bg-white/5 transition-all", 
+                                        navItemClass
+                                    )} 
+                                    onClick={() => setActiveView('none')}
+                                >
+                                    <item.icon className="h-4 w-4 shrink-0 text-accent" />
+                                    <span>{item.name}</span>
+                                </Link>
+                            ))}
+                        </div>
+                        {/* Always visible secondary items */}
+                        {moreItems.map((item, index) => (
                             <Link 
+                                key={item.href}
                                 href={item.href} 
-                                style={{ 
-                                    transitionDelay: isMenuOpen ? `${index * 40}ms` : '0ms' 
-                                }}
                                 className={cn(
-                                    "group relative flex items-center gap-4 px-6 py-3.5 text-[12px] font-black uppercase tracking-tighter hover:bg-white/5 transition-all duration-500", 
-                                    isMenuOpen ? "translate-x-0 opacity-100" : "-translate-x-4 opacity-0",
+                                    "group relative flex items-center gap-4 px-6 py-3.5 text-[12px] font-black uppercase tracking-tighter hover:bg-white/5 transition-all", 
                                     navItemClass
                                 )} 
                                 onClick={() => setActiveView('none')}
@@ -341,12 +365,13 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                                 <item.icon className="h-4 w-4 shrink-0 transition-all duration-300 group-hover:scale-110 group-hover:text-accent" />
                                 <span className="transition-transform duration-300 group-hover:translate-x-1">{item.name}</span>
                             </Link>
-                        </React.Fragment>
-                    );
-                })}
+                        ))}
+                    </>
+                )}
             </div>
         </div>
 
+        {/* Search Results & Reading List Dropdowns */}
         <div className="absolute top-full left-0 right-0 z-30 mt-4">
           {isSearchOpen && (
             <div className={cn(
