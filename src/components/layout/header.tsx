@@ -215,8 +215,8 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                 "grid grid-cols-3 items-center h-full px-1 transition-all duration-300 ease-in-out",
                 isSearchOpen ? "opacity-0 pointer-events-none" : "opacity-100"
             )}>
-                {/* LEFT SIDE: Menu Toggle */}
-                <div className="flex justify-start">
+                {/* LEFT SIDE: Menu Toggle & Theme Switcher */}
+                <div className="flex justify-start items-center gap-0.5">
                     <Button 
                         variant="ghost" 
                         size="icon"
@@ -242,14 +242,14 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                             )}
                         </div>
                     </Button>
+                    <ThemeSwitcher dictionary={dictionary} />
                 </div>
 
                 {/* CENTER: Placeholder */}
                 <div className="flex justify-center" />
 
-                {/* RIGHT SIDE: Theme, Bookmark & Search */}
+                {/* RIGHT SIDE: Bookmark & Search */}
                 <div className="flex justify-end items-center gap-0.5">
-                    <ThemeSwitcher dictionary={dictionary} />
                     <Button 
                         variant="ghost" 
                         size="icon" 
