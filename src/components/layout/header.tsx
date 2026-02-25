@@ -181,32 +181,34 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
         isVisible ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-16"
     )}>
         <nav className={cn(
-            "relative mx-auto bg-primary/90 backdrop-blur-sm text-primary-foreground shadow-lg ring-1 ring-black/5 h-12 transition-all duration-300 ease-in-out rounded-full flex items-center justify-between px-2"
+            "relative mx-auto bg-primary/90 backdrop-blur-sm text-primary-foreground shadow-lg ring-1 ring-black/5 h-12 transition-all duration-300 ease-in-out rounded-full flex items-center justify-between px-2 overflow-hidden"
         )}>
-            {/* Status Notification Pill */}
-            <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-[60]">
-              <div className={cn(
-                "px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-tighter flex items-center gap-2 transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] backdrop-blur-md",
-                (mounted && message) 
-                  ? "opacity-100 translate-y-0 scale-100 bg-white dark:bg-slate-100 text-slate-900 ring-1 ring-black/10 shadow-[0_20px_50px_rgba(0,0,0,0.3)]" 
-                  : "opacity-0 -translate-y-4 scale-90 bg-white/40 text-transparent"
-              )}>
-                  <div className={cn(
-                    "h-1.5 w-1.5 rounded-full animate-pulse transition-colors duration-500",
-                    message ? "bg-accent" : "bg-transparent"
-                  )} />
-                  {message || "Status"}
-              </div>
+            {/* Notification Bar - Slides out from behind logo */}
+            <div className={cn(
+                "absolute inset-y-0 left-0 z-40 bg-primary/95 backdrop-blur-md transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] rounded-full flex items-center",
+                (mounted && message) ? "w-full opacity-100" : "w-12 opacity-0 pointer-events-none"
+            )}>
+                <div className="flex-1 flex items-center justify-center pl-14 pr-6">
+                    <p className={cn(
+                        "text-[10px] font-black uppercase tracking-widest text-primary-foreground transition-all duration-500 delay-100",
+                        message ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-4"
+                    )}>
+                        {message}
+                    </p>
+                </div>
             </div>
 
-            {/* Left Section: Logo */}
+            {/* Left Section: Logo (Always on top) */}
             <div className={cn(
-                "flex items-center pl-2 transition-all duration-500",
+                "flex items-center pl-2 z-50 transition-all duration-500",
                 isSearchOpen ? "opacity-0 pointer-events-none w-0" : "opacity-100"
             )}>
                 <Link 
                     href="/" 
-                    className="flex items-center justify-center h-7 w-7 transition-all duration-300 hover:scale-110 active:scale-95" 
+                    className={cn(
+                        "flex items-center justify-center h-7 w-7 transition-all duration-300 hover:scale-110 active:scale-95",
+                        message && "animate-pulse"
+                    )} 
                     aria-label="SnipGeek Home"
                 >
                     <SnipGeekLogo className="h-full w-full" />
@@ -216,7 +218,7 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
             {/* Middle Section: Direct Nav Links */}
             <div className={cn(
                 "flex-1 flex items-center justify-center gap-1 transition-all duration-500",
-                isSearchOpen ? "opacity-0 pointer-events-none" : "opacity-100"
+                (isSearchOpen || message) ? "opacity-0 pointer-events-none" : "opacity-100"
             )}>
                 {directLinks.map((item) => (
                     <Link 
@@ -236,7 +238,7 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
             {/* Right Section: Utilities & More */}
             <div className={cn(
                 "flex items-center gap-0.5 transition-all duration-500",
-                isSearchOpen ? "opacity-0 pointer-events-none" : "opacity-100"
+                (isSearchOpen || message) ? "opacity-0 pointer-events-none" : "opacity-100"
             )}>
                 <ThemeSwitcher dictionary={dictionary} />
                 
@@ -301,7 +303,7 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
             {/* Search Input Overlay */}
             <div className={cn(
                 "absolute inset-0 w-full h-full flex items-center transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]",
-                isSearchOpen ? "opacity-100 z-10 px-2" : "opacity-0 -z-10 pointer-events-none"
+                isSearchOpen ? "opacity-100 z-50 px-2" : "opacity-0 -z-10 pointer-events-none"
             )}>
                 <Search className="absolute left-6 top-1/2 -translate-y-1/2 h-5 w-5 text-primary-foreground/70 pointer-events-none"/>
                 <Input 
@@ -317,7 +319,7 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                   size="icon" 
                   className={cn("rounded-full absolute right-2 z-20 h-9 w-9 bg-transparent hover:bg-transparent", navItemClass)} 
                   onClick={() => { setActiveView('none'); setQuery(''); }}
-                  aria-label="Close search"
+                  aria-label={dictionary.search.close || "Close Search"}
                 >
                    <X className="h-5 w-5" />
                 </Button>
