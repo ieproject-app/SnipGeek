@@ -40,7 +40,7 @@ export function BackToTop() {
       onClick={scrollToTop}
       aria-label="Back to top"
     >
-      <ArrowUp className="h-5 w-5" strokeWidth={3} />
+      <ArrowUp className="h-5 w-5" />
     </Button>
   );
 }

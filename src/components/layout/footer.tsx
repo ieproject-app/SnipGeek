@@ -12,19 +12,19 @@ import { TikTokLogo } from '@/components/icons/tiktok-logo';
 
 export function Footer({ dictionary, translationsMap }: { dictionary: Dictionary, translationsMap: TranslationsMap }) {
     const footerNavItems = [
-      { id: 'footer-about', title: dictionary.navigation.about, href: '/about', icon: <User2 className="h-5 w-5" strokeWidth={2.5} /> },
-      { id: 'footer-notes', title: dictionary.navigation.notes, href: '/notes', icon: <StickyNote className="h-5 w-5" strokeWidth={2.5} /> },
-      { id: 'footer-tools', title: dictionary.navigation.tools, href: '/tools', icon: <LayoutGrid className="h-5 w-5" strokeWidth={2.5} /> },
-      { id: 'footer-contact', title: dictionary.navigation.contact, href: '/contact', icon: <Mail className="h-5 w-5" strokeWidth={2.5} /> },
+      { id: 'footer-about', title: dictionary.navigation.about, href: '/about', icon: <User2 className="h-5 w-5" /> },
+      { id: 'footer-notes', title: dictionary.navigation.notes, href: '/notes', icon: <StickyNote className="h-5 w-5" /> },
+      { id: 'footer-tools', title: dictionary.navigation.tools, href: '/tools', icon: <LayoutGrid className="h-5 w-5" /> },
+      { id: 'footer-contact', title: dictionary.navigation.contact, href: '/contact', icon: <Mail className="h-5 w-5" /> },
     ];
 
     const authorName = "Iwan Efendi";
     const authorAvatar = "/images/profile/profile.png";
 
     const socialLinks = [
-        { icon: <Facebook className="h-5 w-5" strokeWidth={2.5} />, href: "https://www.facebook.com/iwan.efendi.777", label: "Facebook" },
-        { icon: <Youtube className="h-5 w-5" strokeWidth={2.5} />, href: "https://www.youtube.com/@iwantools", label: "YouTube" },
-        { icon: <Instagram className="h-5 w-5" strokeWidth={2.5} />, href: "https://www.instagram.com/iwnefnd/", label: "Instagram" },
+        { icon: <Facebook className="h-5 w-5" />, href: "https://www.facebook.com/iwan.efendi.777", label: "Facebook" },
+        { icon: <Youtube className="h-5 w-5" />, href: "https://www.youtube.com/@iwantools", label: "YouTube" },
+        { icon: <Instagram className="h-5 w-5" />, href: "https://www.instagram.com/iwnefnd/", label: "Instagram" },
         { icon: <TikTokLogo className="h-5 w-5" />, href: "https://www.tiktok.com/@iwantools", label: "TikTok" },
     ];
 
@@ -49,7 +49,7 @@ export function Footer({ dictionary, translationsMap }: { dictionary: Dictionary
                                         {image && (
                                             <Image
                                                 src={image.imageUrl}
-                                                alt={item.title}
+                                                alt={image.description}
                                                 fill
                                                 className="object-cover"
                                                 sizes="(max-width: 768px) 50vw, 200px"
@@ -71,10 +71,9 @@ export function Footer({ dictionary, translationsMap }: { dictionary: Dictionary
                 </div>
             </div>
 
-            {/* Sub-Footer Section - Adaptive Color Base */}
+            {/* Sub-Footer Section */}
             <div className="relative w-full pt-12 pb-12 bg-muted/30 border-t border-primary/5">
                 <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-                    {/* Profile Section - Overlapping with margin top negative */}
                     <div className="text-center mb-16 -mt-24">
                         <Avatar className="w-24 h-24 mx-auto mb-6 border-4 border-background shadow-2xl bg-background">
                             <AvatarImage src={authorAvatar} alt={authorName} />
@@ -101,10 +100,8 @@ export function Footer({ dictionary, translationsMap }: { dictionary: Dictionary
                         </div>
                     </div>
 
-                    {/* Footer Bottom: Switchers and Copyright */}
                     <div className="flex flex-col justify-center items-center gap-6 text-sm text-muted-foreground/60 border-t pt-12">
                         <div className="flex items-center gap-4">
-                            {/* Switchers inside Header-styled Pill */}
                             <div className="bg-primary/90 backdrop-blur-sm rounded-full p-1.5 flex items-center gap-2 shadow-xl border border-white/5">
                                 <LanguageSwitcher translationsMap={translationsMap} dictionary={dictionary} />
                             </div>

@@ -22,7 +22,6 @@ export function ThemeSwitcher({ dictionary }: { dictionary: Dictionary }) {
   }
 
   const cycleTheme = () => {
-    // Cycle: system -> light -> dark -> system
     const nextTheme = theme === 'system' ? 'light' : theme === 'light' ? 'dark' : 'system';
     setTheme(nextTheme);
     
@@ -33,9 +32,9 @@ export function ThemeSwitcher({ dictionary }: { dictionary: Dictionary }) {
 
   const getIcon = () => {
     switch (theme) {
-      case 'light': return <Sun className="h-5 w-5 text-amber-400 fill-amber-400/20" strokeWidth={2.5} />;
-      case 'dark': return <Moon className="h-5 w-5 text-amber-400 fill-amber-400/10" strokeWidth={2.5} />;
-      default: return <Laptop className="h-5 w-5 text-primary-foreground/70" strokeWidth={2.5} />;
+      case 'light': return <Sun className="h-5 w-5 text-amber-400 fill-amber-400/20" />;
+      case 'dark': return <Moon className="h-5 w-5 text-amber-400 fill-amber-400/10" />;
+      default: return <Laptop className="h-5 w-5 text-primary-foreground/70" />;
     }
   };
 
