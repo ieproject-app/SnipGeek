@@ -46,7 +46,7 @@ export function ThemeSwitcher({ dictionary }: { dictionary: Dictionary }) {
       className="h-10 w-10 rounded-full bg-transparent hover:bg-white/10 transition-all duration-300 group active:scale-90"
       aria-label="Toggle theme mode"
     >
-      <div className="transition-transform duration-500 ease-in-out group-hover:rotate-12">
+      <div className="transition-transform duration-500 ease-in-out group-hover:rotate-45">
         {getIcon()}
       </div>
     </Button>

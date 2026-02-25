@@ -209,7 +209,7 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                     variant="ghost" 
                     size="icon"
                     className={cn(
-                        "h-10 w-10 rounded-full bg-transparent hover:bg-white/10 transition-all shrink-0", 
+                        "h-10 w-10 rounded-full bg-transparent hover:bg-white/10 transition-all shrink-0 group", 
                         navItemClass
                     )} 
                     onClick={() => toggleView('menu')}
@@ -219,7 +219,7 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                         {mounted && (
                             <>
                             <MoreHorizontal className={cn(
-                                "h-5 w-5 transition-all duration-500",
+                                "h-5 w-5 transition-all duration-500 group-hover:rotate-90",
                                 isMenuOpen ? "opacity-0 rotate-90 scale-50" : "opacity-100 rotate-0 scale-100"
                             )} />
                             <X className={cn(
@@ -234,7 +234,7 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                 <Link 
                     href="/" 
                     className={cn(
-                        "flex items-center justify-center h-7 w-7 transition-all duration-300 hover:scale-110 active:scale-95 ml-1",
+                        "flex items-center justify-center h-7 w-7 transition-all duration-300 hover:scale-110 active:scale-95 ml-1 group/logo",
                         message && "animate-pulse"
                     )} 
                     aria-label="SnipGeek Home"
@@ -253,7 +253,8 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                         key={item.href}
                         href={item.href}
                         className={cn(
-                            "px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider hover:bg-white/10 transition-all hidden sm:flex items-center gap-2",
+                            "px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider transition-all hidden sm:flex items-center gap-2",
+                            "hover:bg-white/10 hover:-translate-y-0.5",
                             pathname.includes(item.href) ? "text-primary-foreground bg-white/10" : "text-primary-foreground/60"
                         )}
                     >
@@ -274,13 +275,13 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                     variant="ghost" 
                     size="icon" 
                     className={cn(
-                        "relative rounded-full h-10 w-10 bg-transparent hover:bg-white/10 transition-all", 
+                        "relative rounded-full h-10 w-10 bg-transparent hover:bg-white/10 transition-all group", 
                         navItemClass
                     )} 
                     onClick={() => toggleView('readingList')}
                     aria-label="Reading List"
                 >
-                    <Bookmark className="h-5 w-5" />
+                    <Bookmark className="h-5 w-5 transition-transform duration-300 group-hover:-translate-y-1" />
                     {mounted && readingListItems.length > 0 && (
                         <span className={cn(
                             "absolute top-1.5 right-1.5 flex h-3.5 min-w-[14px] items-center justify-center rounded-full bg-accent text-accent-foreground text-[9px] font-bold px-1 transition-all duration-300",
@@ -294,11 +295,11 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                 <Button 
                     variant="ghost" 
                     size="icon" 
-                    className={cn("h-10 w-10 rounded-full bg-transparent hover:bg-white/10", navItemClass)} 
+                    className={cn("h-10 w-10 rounded-full bg-transparent hover:bg-white/10 group", navItemClass)} 
                     onClick={() => toggleView('search')}
                     aria-label="Search"
                 >
-                    <Search className="h-5 w-5" />
+                    <Search className="h-5 w-5 transition-all duration-300 group-hover:scale-110 group-hover:rotate-12" />
                 </Button>
             </div>
             

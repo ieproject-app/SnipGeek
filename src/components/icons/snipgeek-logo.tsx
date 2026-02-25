@@ -27,20 +27,24 @@ export const SnipGeekLogo = ({
       <defs>
         <style>{`
           .sq-tl-${id} { 
-            animation: pulseAccent-${id} 2.4s ease-in-out infinite; 
+            animation: pulseAccent-${id} var(--logo-speed, 2.4s) ease-in-out infinite; 
             transform-origin: 26px 26px; 
           }
           .sq-br-${id} { 
-            animation: pulseAccent-${id} 2.4s ease-in-out 1.2s infinite; 
+            animation: pulseAccent-${id} var(--logo-speed, 2.4s) ease-in-out calc(var(--logo-speed, 2.4s) / 2) infinite; 
             transform-origin: 74px 74px; 
           }
           .sq-tr-${id} { 
-            animation: pulseCurrent-${id} 2.4s ease-in-out 0.6s infinite; 
+            animation: pulseCurrent-${id} var(--logo-speed, 2.4s) ease-in-out calc(var(--logo-speed, 2.4s) / 4) infinite; 
             transform-origin: 74px 26px; 
           }
           .sq-bl-${id} { 
-            animation: pulseCurrent-${id} 2.4s ease-in-out 1.8s infinite; 
+            animation: pulseCurrent-${id} var(--logo-speed, 2.4s) ease-in-out calc(var(--logo-speed, 2.4s) * 0.75) infinite; 
             transform-origin: 26px 74px; 
+          }
+
+          .group-hover\\/logo {
+            --logo-speed: 0.8s;
           }
 
           @keyframes pulseAccent-${id} {
