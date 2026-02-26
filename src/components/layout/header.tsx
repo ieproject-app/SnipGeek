@@ -184,11 +184,6 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
     };
   }, [headerRef]);
 
-  const handleResultClick = () => {
-    setActiveView('none');
-    setQuery('');
-  };
-
   const toggleView = (view: ActiveView) => {
     setActiveView(prev => (prev === view ? 'none' : view));
     if (view !== 'search') {
@@ -382,9 +377,9 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
 
         {/* More Menu Dropdown */}
         <div className={cn(
-            "absolute top-full left-0 z-40 mt-4 w-48 bg-primary/95 backdrop-blur-md shadow-2xl ring-1 ring-black/5 rounded-xl overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)]",
+            "absolute top-full left-0 z-[60] mt-4 w-48 bg-primary/95 backdrop-blur-md shadow-2xl ring-1 ring-black/5 rounded-xl overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)]",
             "transform-origin-top-left",
-            isMenuOpen ? "opacity-100 scale-100 translate-y-0" : "opacity-0 scale-95 -translate-y-2 pointer-events-none"
+            isMenuOpen ? "opacity-100 scale-100 translate-y-0" : "opacity-0 scale-95 -translate-y-2 pointer-events-none invisible"
         )}>
             <div className="grid grid-cols-1">
                 {mounted && (
@@ -398,7 +393,6 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                                         "group relative flex items-center gap-4 px-6 py-3.5 text-[12px] font-black uppercase tracking-tighter hover:bg-white/5 transition-all", 
                                         navItemClass
                                     )} 
-                                    onClick={() => setActiveView('none')}
                                 >
                                     <item.icon className="h-4 w-4 shrink-0 text-accent" />
                                     <span>{item.name}</span>
@@ -413,7 +407,6 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                                     "group relative flex items-center gap-4 px-6 py-3.5 text-[12px] font-black uppercase tracking-tighter hover:bg-white/5 transition-all", 
                                     navItemClass
                                 )} 
-                                onClick={() => setActiveView('none')}
                             >
                                 <div className="absolute left-0 top-0 bottom-0 w-1 bg-accent scale-y-0 group-hover:scale-y-100 transition-transform duration-300 origin-center" />
                                 <item.icon className="h-4 w-4 shrink-0 transition-all duration-300 group-hover:scale-110 group-hover:text-accent" />
@@ -426,10 +419,10 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
         </div>
 
         {/* Search Results Dropdown */}
-        <div className="absolute top-full left-0 right-0 z-30 mt-4">
+        <div className="absolute top-full left-0 right-0 z-[60] mt-4">
             <div className={cn(
                 "bg-primary/95 backdrop-blur-xl rounded-2xl border border-primary-foreground/[0.08] shadow-[0_24px_60px_-12px_rgba(0,0,0,0.6)] max-h-[450px] overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)]",
-                isSearchOpen ? "opacity-100 scale-100 translate-y-0" : "opacity-0 scale-[0.97] -translate-y-4 pointer-events-none"
+                isSearchOpen ? "opacity-100 scale-100 translate-y-0" : "opacity-0 scale-[0.97] -translate-y-4 invisible"
             )}>
                   <div className="px-5 py-3 bg-primary-foreground/[0.02] border-b border-primary-foreground/[0.06] flex items-center justify-between">
                       <div className="flex items-center gap-3">
@@ -447,7 +440,7 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                           </div>
                       )}
                   </div>
-                  <ScrollArea className="h-full max-h-[400px]">
+                  <ScrollArea className="max-h-[400px]">
                       <div className="p-2">
                           {query.length > 1 ? (
                               results.length > 0 ? (
@@ -456,7 +449,7 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                                         const config = typeConfig[item.type];
                                         return (
                                           <li key={`${item.type}-${item.slug}`} style={{ animationDelay: `${idx * 45}ms` }} className="animate-in fade-in slide-in-from-bottom-2 duration-300 fill-mode-both">
-                                              <Link href={item.href} onClick={handleResultClick} className="block group px-3 py-2.5 rounded-xl hover:bg-primary-foreground/[0.05] transition-all duration-300 relative overflow-hidden">
+                                              <Link href={item.href} className="block group px-3 py-2.5 rounded-xl hover:bg-primary-foreground/[0.05] transition-all duration-300 relative overflow-hidden">
                                                   {/* Left Accent Bar */}
                                                   <div className={cn("absolute left-0 top-2 bottom-2 w-0.5 rounded-full transition-transform duration-300 origin-center scale-y-0 group-hover:scale-y-100", config.accent)} />
                                                   
@@ -515,10 +508,10 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
         </div>
 
         {/* Reading List Dropdown */}
-        <div className="absolute top-full left-0 right-0 z-30 mt-4">
+        <div className="absolute top-full left-0 right-0 z-[60] mt-4">
             <div className={cn(
                 "bg-primary/95 backdrop-blur-xl rounded-2xl border border-primary-foreground/[0.08] shadow-[0_24px_60px_-12px_rgba(0,0,0,0.6)] max-h-[450px] overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)]",
-                isReadingListOpen ? "opacity-100 scale-100 translate-y-0" : "opacity-0 scale-[0.97] -translate-y-4 pointer-events-none"
+                isReadingListOpen ? "opacity-100 scale-100 translate-y-0" : "opacity-0 scale-[0.97] -translate-y-4 invisible"
             )}>
                 <div className="px-5 py-3 bg-primary-foreground/[0.02] border-b border-primary-foreground/[0.06] flex items-center justify-between">
                     <p className="text-[10px] font-black uppercase tracking-widest text-primary-foreground/40">
@@ -538,7 +531,7 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                         ))}
                     </div>
                 </div>
-                <ScrollArea className="h-full max-h-[400px]">
+                <ScrollArea className="max-h-[400px]">
                   <div className="p-2">
                     {mounted && readingListItems.length > 0 ? (
                       <ul className="grid grid-cols-1 gap-1">
@@ -571,7 +564,7 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                                             </div>
                                         </div>
 
-                                        <Link href={item.href} onClick={() => setActiveView('none')} className="block flex-1 min-w-0">
+                                        <Link href={item.href} className="block flex-1 min-w-0">
                                             <h4 className="text-[13px] font-semibold text-primary-foreground/85 line-clamp-1 leading-snug transition-colors group-hover:text-accent">
                                                 {item.title}
                                             </h4>
