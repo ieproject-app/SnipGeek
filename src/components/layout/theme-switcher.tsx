@@ -43,22 +43,22 @@ export function ThemeSwitcher({ dictionary }: { dictionary: Dictionary }) {
     const key = `theme${nextTheme.charAt(0).toUpperCase() + nextTheme.slice(1)}`;
     const msg = (dictionary?.notifications as any)?.[key];
     
-    const getIcon = (t: string) => {
+    const getNotifyIcon = (t: string) => {
         switch (t) {
-            case 'light': return <Sun className="h-4 w-4 text-accent" />;
-            case 'dark': return <Moon className="h-4 w-4 text-accent" />;
-            default: return <Sun className="h-4 w-4 text-accent" />;
+            case 'light': return <Sun className="h-4 w-4" />;
+            case 'dark': return <Moon className="h-4 w-4" />;
+            default: return <Sun className="h-4 w-4" />;
         }
     };
 
-    if (msg) notify(msg, getIcon(nextTheme));
+    if (msg) notify(msg, getNotifyIcon(nextTheme));
   };
 
   const getIcon = () => {
     if (resolvedTheme === 'dark') {
-        return <Moon className="h-5 w-5 text-accent fill-accent/10" />;
+        return <Moon className="h-5 w-5" />;
     }
-    return <Sun className="h-5 w-5 text-accent fill-accent/20" />;
+    return <Sun className="h-5 w-5" />;
   };
 
   return (
