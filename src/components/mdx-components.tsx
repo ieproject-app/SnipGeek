@@ -9,7 +9,7 @@ import { buttonVariants } from '@/components/ui/button';
 import { Download, Cloud, Github, Type, Cpu, Settings, FileText, Maximize2 } from 'lucide-react';
 import { WindowsStoreLogo } from '@/components/icons/windows-store-logo';
 import { downloadLinks } from '@/lib/data-downloads';
-import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogTrigger, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 
 // Helper to generate IDs for TOC
 const generateId = (children: any) => {
@@ -56,6 +56,8 @@ const ZoomableImage = ({ src, alt, width, height, className, priority, ...props 
                 </div>
             </DialogTrigger>
             <DialogContent className="max-w-[95vw] max-h-[95vh] p-0 border-none bg-transparent overflow-hidden flex items-center justify-center">
+                <DialogTitle className="sr-only">Pratinjau Gambar</DialogTitle>
+                <DialogDescription className="sr-only">Tampilan gambar diperbesar untuk {alt || 'gambar artikel'}</DialogDescription>
                 <div className="relative w-full h-full flex items-center justify-center">
                     <img 
                         src={src} 
