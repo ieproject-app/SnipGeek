@@ -1,3 +1,4 @@
+
 'use client';
 
 import { DiscussionEmbed } from 'disqus-react';
@@ -19,14 +20,17 @@ interface PostCommentsProps {
 
 export function PostComments({ article, type, locale }: PostCommentsProps) {
   const [shouldLoad, setShouldLoad] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const commentsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    setMounted(true);
+    
     // This logic ensures that Disqus is only loaded on the production domain
     // and when the comments section is scrolled into view (lazy-loading).
     const observer = new IntersectionObserver(([entry]) => {
       if (entry.isIntersecting) {
-        if (window.location.hostname === productionHostname) {
+        if (typeof window !== 'undefined' && window.location.hostname === productionHostname) {
           setShouldLoad(true);
         }
         // Disconnect the observer once it has done its job
@@ -64,7 +68,11 @@ export function PostComments({ article, type, locale }: PostCommentsProps) {
             ))}
         </div>
         <p className="text-center text-[10px] text-muted-foreground uppercase font-bold tracking-widest opacity-30 pt-4">
-            {window.location.hostname === productionHostname ? 'Loading Conversation...' : `Comments available on ${productionHostname}`}
+            {!mounted 
+              ? 'Loading Conversation...' 
+              : window.location.hostname === productionHostname 
+                ? 'Loading Conversation...' 
+                : `Comments available on ${productionHostname}`}
         </p>
       </div>
     );
