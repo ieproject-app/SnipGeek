@@ -214,12 +214,12 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
 
   return (
     <header ref={headerRef} className={cn(
-        "fixed top-4 left-4 right-4 md:left-1/2 md:-translate-x-1/2 md:right-auto z-[100] transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]",
+        "fixed top-4 left-4 right-4 md:left-1/2 md:-translate-x-1/2 md:right-auto z-50 transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]",
         isSearchOpen ? 'md:w-[600px]' : 'md:w-[580px]',
         isVisible ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-16"
     )}>
         <nav className={cn(
-            "relative mx-auto bg-primary/90 backdrop-blur-sm text-primary-foreground shadow-lg ring-1 ring-black/5 h-12 transition-all duration-300 ease-in-out rounded-full flex items-center justify-between px-2 overflow-hidden"
+            "relative mx-auto bg-primary/90 backdrop-blur-sm text-primary-foreground shadow-lg ring-1 ring-black/5 h-12 transition-all duration-300 ease-in-out rounded-full flex items-center justify-between px-2"
         )}>
             {/* Notification Bar */}
             <div className={cn(
@@ -249,7 +249,7 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
 
             {/* Left Section: Menu + Logo */}
             <div className={cn(
-                "flex items-center z-50 transition-all duration-500",
+                "flex items-center z-20 transition-all duration-500",
                 isSearchOpen ? "opacity-0 pointer-events-none w-0" : "opacity-100"
             )}>
                 <Button 
@@ -377,7 +377,7 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
 
         {/* More Menu Dropdown */}
         <div className={cn(
-            "absolute top-full left-0 z-[70] mt-4 w-48 bg-primary/95 backdrop-blur-md shadow-2xl ring-1 ring-black/5 rounded-xl overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)]",
+            "absolute top-full left-0 z-40 mt-4 w-48 bg-primary/95 backdrop-blur-md shadow-2xl ring-1 ring-black/5 rounded-xl overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)]",
             "transform-origin-top-left",
             isMenuOpen ? "opacity-100 scale-100 translate-y-0" : "opacity-0 scale-95 -translate-y-2 pointer-events-none invisible"
         )}>
@@ -420,7 +420,7 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
 
         {/* Search Results Dropdown */}
         <div className={cn(
-            "absolute top-full left-0 right-0 z-[70] mt-4 transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)]",
+            "absolute top-full left-0 right-0 z-30 mt-4 transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)]",
             isSearchOpen ? "opacity-100 scale-100 translate-y-0" : "opacity-0 scale-[0.97] -translate-y-4 pointer-events-none invisible"
         )}>
             <div className="bg-primary/95 backdrop-blur-xl rounded-2xl border border-primary-foreground/[0.08] shadow-[0_24px_60px_-12px_rgba(0,0,0,0.6)] max-h-[450px] overflow-hidden">
@@ -440,76 +440,78 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                           </div>
                       )}
                   </div>
-                  <ScrollArea className="max-h-[400px]">
-                      <div className="p-2">
-                          {query.length > 1 ? (
-                              results.length > 0 ? (
-                                  <ul className="grid grid-cols-1 gap-1">
-                                      {results.map((item, idx) => {
-                                        const config = typeConfig[item.type];
-                                        return (
-                                          <li key={`${item.type}-${item.slug}`} style={{ animationDelay: `${idx * 45}ms` }} className="animate-in fade-in slide-in-from-bottom-2 duration-300 fill-mode-both">
-                                              <Link href={item.href} className="block group px-3 py-2.5 rounded-xl hover:bg-primary-foreground/[0.05] transition-all duration-300 relative overflow-hidden">
-                                                  {/* Left Accent Bar */}
-                                                  <div className={cn("absolute left-0 top-2 bottom-2 w-0.5 rounded-full transition-transform duration-300 origin-center scale-y-0 group-hover:scale-y-100", config.accent)} />
-                                                  
-                                                  <div className="flex items-center gap-3">
-                                                      <div className={cn("w-[34px] h-[34px] rounded-[10px] flex items-center justify-center shrink-0", config.bg, config.color)}>
-                                                          <config.icon className="w-4 h-4" />
-                                                      </div>
-                                                      <div className="flex-1 min-w-0">
-                                                          <h4 className="text-[13px] font-semibold text-primary-foreground/85 line-clamp-1 leading-snug transition-colors group-hover:text-accent">
-                                                              <HighlightMatch text={item.title} query={query} />
-                                                          </h4>
-                                                          <p className="text-[11px] text-primary-foreground/35 line-clamp-1 mt-0.5">
-                                                              <HighlightMatch text={item.description} query={query} />
-                                                          </p>
-                                                      </div>
-                                                      <div className="flex flex-col items-end gap-1">
-                                                          <ArrowUpRight className="h-3.5 w-3.5 text-primary-foreground/20 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" />
-                                                          <span className={cn("text-[8px] font-black uppercase tracking-tighter", config.color)}>{item.type}</span>
-                                                      </div>
-                                                  </div>
-                                              </Link>
-                                          </li>
-                                        );
-                                      })}
-                                  </ul>
-                              ) : (
-                                  <div className="p-16 text-center text-sm text-primary-foreground/20 italic flex flex-col items-center gap-4">
-                                      <div className="relative">
-                                          <Search className="h-10 w-10 opacity-5" />
-                                          <X className="h-5 w-5 absolute -top-1 -right-1 opacity-10 text-destructive" />
-                                      </div>
-                                      <p>{dictionary.search.noResults} &quot;{query}&quot;.</p>
-                                  </div>
-                              )
-                          ) : (
-                              <div className="p-12">
-                                  <p className="text-center text-[10px] text-primary-foreground/20 font-black uppercase tracking-widest mb-6">{dictionary.search.placeholder}</p>
-                                  <div className="flex flex-wrap justify-center gap-2">
-                                      {['Hardware', 'Windows', 'Tutorial', 'Automation'].map((cat, i) => (
-                                          <Badge 
-                                            key={cat} 
-                                            variant="outline" 
-                                            className="px-4 py-1.5 rounded-full border-primary-foreground/5 bg-primary-foreground/[0.02] text-primary-foreground/40 cursor-pointer hover:bg-primary-foreground/10 hover:text-primary-foreground transition-all duration-300 animate-in fade-in zoom-in-95 fill-mode-both"
-                                            style={{ animationDelay: `${i * 100}ms` }}
-                                            onClick={() => setQuery(cat)}
-                                          >
-                                              {cat}
-                                          </Badge>
-                                      ))}
-                                  </div>
-                              </div>
-                          )}
-                      </div>
-                  </ScrollArea>
+                  {mounted && (
+                    <ScrollArea className="h-full max-h-[400px]">
+                        <div className="p-2">
+                            {query.length > 1 ? (
+                                results.length > 0 ? (
+                                    <ul className="grid grid-cols-1 gap-1">
+                                        {results.map((item, idx) => {
+                                          const config = typeConfig[item.type];
+                                          return (
+                                            <li key={`${item.type}-${item.slug}`} style={{ animationDelay: `${idx * 45}ms` }} className="animate-in fade-in slide-in-from-bottom-2 duration-300 fill-mode-both">
+                                                <Link href={item.href} className="block group px-3 py-2.5 rounded-xl hover:bg-primary-foreground/[0.05] transition-all duration-300 relative overflow-hidden">
+                                                    {/* Left Accent Bar */}
+                                                    <div className={cn("absolute left-0 top-2 bottom-2 w-0.5 rounded-full transition-transform duration-300 origin-center scale-y-0 group-hover:scale-y-100", config.accent)} />
+                                                    
+                                                    <div className="flex items-center gap-3">
+                                                        <div className={cn("w-[34px] h-[34px] rounded-[10px] flex items-center justify-center shrink-0", config.bg, config.color)}>
+                                                            <config.icon className="w-4 h-4" />
+                                                        </div>
+                                                        <div className="flex-1 min-w-0">
+                                                            <h4 className="text-[13px] font-semibold text-primary-foreground/85 line-clamp-1 leading-snug transition-colors group-hover:text-accent">
+                                                                <HighlightMatch text={item.title} query={query} />
+                                                            </h4>
+                                                            <p className="text-[11px] text-primary-foreground/35 line-clamp-1 mt-0.5">
+                                                                <HighlightMatch text={item.description} query={query} />
+                                                            </p>
+                                                        </div>
+                                                        <div className="flex flex-col items-end gap-1">
+                                                            <ArrowUpRight className="h-3.5 w-3.5 text-primary-foreground/20 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" />
+                                                            <span className={cn("text-[8px] font-black uppercase tracking-tighter", config.color)}>{item.type}</span>
+                                                        </div>
+                                                    </div>
+                                                </Link>
+                                            </li>
+                                          );
+                                        })}
+                                    </ul>
+                                ) : (
+                                    <div className="p-16 text-center text-sm text-primary-foreground/20 italic flex flex-col items-center gap-4">
+                                        <div className="relative">
+                                            <Search className="h-10 w-10 opacity-5" />
+                                            <X className="h-5 w-5 absolute -top-1 -right-1 opacity-10 text-destructive" />
+                                        </div>
+                                        <p>{dictionary.search.noResults} &quot;{query}&quot;.</p>
+                                    </div>
+                                )
+                            ) : (
+                                <div className="p-12">
+                                    <p className="text-center text-[10px] text-primary-foreground/20 font-black uppercase tracking-widest mb-6">{dictionary.search.placeholder}</p>
+                                    <div className="flex flex-wrap justify-center gap-2">
+                                        {['Hardware', 'Windows', 'Tutorial', 'Automation'].map((cat, i) => (
+                                            <Badge 
+                                              key={cat} 
+                                              variant="outline" 
+                                              className="px-4 py-1.5 rounded-full border-primary-foreground/5 bg-primary-foreground/[0.02] text-primary-foreground/40 cursor-pointer hover:bg-primary-foreground/10 hover:text-primary-foreground transition-all duration-300 animate-in fade-in zoom-in-95 fill-mode-both"
+                                              style={{ animationDelay: `${i * 100}ms` }}
+                                              onClick={() => setQuery(cat)}
+                                            >
+                                                {cat}
+                                            </Badge>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </ScrollArea>
+                  )}
               </div>
         </div>
 
         {/* Reading List Dropdown */}
         <div className={cn(
-            "absolute top-full left-0 right-0 z-[70] mt-4 transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)]",
+            "absolute top-full left-0 right-0 z-30 mt-4 transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)]",
             isReadingListOpen ? "opacity-100 scale-100 translate-y-0" : "opacity-0 scale-[0.97] -translate-y-4 pointer-events-none invisible"
         )}>
             <div className="bg-primary/95 backdrop-blur-xl rounded-2xl border border-primary-foreground/[0.08] shadow-[0_24px_60px_-12px_rgba(0,0,0,0.6)] max-h-[450px] overflow-hidden">
@@ -519,7 +521,7 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                     </p>
                     {/* Progress Dots */}
                     <div className="flex gap-1.5">
-                        {readingListItems.slice(0, 5).map((item, i) => (
+                        {mounted && readingListItems.slice(0, 5).map((item, i) => (
                             <div 
                                 key={i} 
                                 className={cn(
@@ -531,80 +533,82 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                         ))}
                     </div>
                 </div>
-                <ScrollArea className="max-h-[400px]">
-                  <div className="p-2">
-                    {mounted && readingListItems.length > 0 ? (
-                      <ul className="grid grid-cols-1 gap-1">
-                        {readingListItems.map((item, idx) => {
-                          const config = typeConfig[item.type];
-                          const ItemIcon = config.icon;
-                          return (
-                            <li 
-                                key={`${item.type}-${item.slug}`} 
-                                style={{ transitionDelay: `${idx * 30}ms` }} 
-                                className={cn(
-                                    "group relative animate-in fade-in slide-in-from-left-2 duration-300",
-                                    removingSlug === item.slug && "animate-out fade-out slide-out-to-right-4 duration-300 fill-mode-forwards"
-                                )}
-                            >
-                                <div className="relative hover:bg-primary-foreground/[0.05] rounded-xl transition-all duration-300 overflow-hidden group">
-                                    {/* Left Accent Bar */}
-                                    <div className={cn("absolute left-0 top-2 bottom-2 w-0.5 rounded-full transition-transform duration-300 origin-center scale-y-0 group-hover:scale-y-100", config.accent)} />
-                                    
-                                    <div className="flex items-center gap-3 px-3 py-2.5 pr-12">
-                                        {/* Morphing Number/Icon */}
-                                        <div className="relative w-[34px] h-[34px] flex items-center justify-center shrink-0">
-                                            <span className="text-[11px] font-black text-primary-foreground/20 group-hover:opacity-0 transition-opacity duration-200">
-                                                {idx + 1}
-                                            </span>
-                                            <div className="absolute inset-0 flex items-center justify-center opacity-0 scale-0 group-hover:opacity-100 group-hover:scale-100 transition-all duration-200">
-                                                <div className={cn("w-full h-full rounded-[10px] flex items-center justify-center", config.bg, config.color)}>
-                                                    <ItemIcon className="w-4 h-4" />
-                                                </div>
-                                            </div>
-                                        </div>
+                {mounted && (
+                  <ScrollArea className="h-full max-h-[400px]">
+                    <div className="p-2">
+                      {readingListItems.length > 0 ? (
+                        <ul className="grid grid-cols-1 gap-1">
+                          {readingListItems.map((item, idx) => {
+                            const config = typeConfig[item.type];
+                            const ItemIcon = config.icon;
+                            return (
+                              <li 
+                                  key={`${item.type}-${item.slug}`} 
+                                  style={{ transitionDelay: `${idx * 30}ms` }} 
+                                  className={cn(
+                                      "group relative animate-in fade-in slide-in-from-left-2 duration-300",
+                                      removingSlug === item.slug && "animate-out fade-out slide-out-to-right-4 duration-300 fill-mode-forwards"
+                                  )}
+                              >
+                                  <div className="relative hover:bg-primary-foreground/[0.05] rounded-xl transition-all duration-300 overflow-hidden group">
+                                      {/* Left Accent Bar */}
+                                      <div className={cn("absolute left-0 top-2 bottom-2 w-0.5 rounded-full transition-transform duration-300 origin-center scale-y-0 group-hover:scale-y-100", config.accent)} />
+                                      
+                                      <div className="flex items-center gap-3 px-3 py-2.5 pr-12">
+                                          {/* Morphing Number/Icon */}
+                                          <div className="relative w-[34px] h-[34px] flex items-center justify-center shrink-0">
+                                              <span className="text-[11px] font-black text-primary-foreground/20 group-hover:opacity-0 transition-opacity duration-200">
+                                                  {idx + 1}
+                                              </span>
+                                              <div className="absolute inset-0 flex items-center justify-center opacity-0 scale-0 group-hover:opacity-100 group-hover:scale-100 transition-all duration-200">
+                                                  <div className={cn("w-full h-full rounded-[10px] flex items-center justify-center", config.bg, config.color)}>
+                                                      <ItemIcon className="w-4 h-4" />
+                                                  </div>
+                                              </div>
+                                          </div>
 
-                                        <Link href={item.href} className="block flex-1 min-w-0">
-                                            <h4 className="text-[13px] font-semibold text-primary-foreground/85 line-clamp-1 leading-snug transition-colors group-hover:text-accent">
-                                                {item.title}
-                                            </h4>
-                                            <p className="text-[11px] text-primary-foreground/35 line-clamp-1 mt-0.5 italic">
-                                                {item.description}
-                                            </p>
-                                        </Link>
-                                    </div>
+                                          <Link href={item.href} className="block flex-1 min-w-0">
+                                              <h4 className="text-[13px] font-semibold text-primary-foreground/85 line-clamp-1 leading-snug transition-colors group-hover:text-accent">
+                                                  {item.title}
+                                              </h4>
+                                              <p className="text-[11px] text-primary-foreground/35 line-clamp-1 mt-0.5 italic">
+                                                  {item.description}
+                                              </p>
+                                          </Link>
+                                      </div>
 
-                                    <Button 
-                                        variant="ghost" 
-                                        size="icon" 
-                                        className="absolute top-1/2 -translate-y-1/2 right-3 h-7 w-7 rounded-full bg-red-500/10 text-red-400/70 hover:text-red-400 hover:bg-red-500/20 transition-all duration-300 opacity-0 translate-x-2 group-hover:opacity-100 group-hover:translate-x-0" 
-                                        onClick={(e) => {
-                                            e.preventDefault();
-                                            e.stopPropagation();
-                                            handleRemoveReadingListItem(item.slug);
-                                        }}
-                                        aria-label="Remove from Reading List"
-                                    >
-                                        <Trash2 className="h-3.5 w-3.5" />
-                                    </Button>
-                                </div>
-                            </li>
-                          );
-                        })}
-                      </ul>
-                    ) : (
-                      <div className="p-20 text-center text-sm text-primary-foreground/20 italic flex flex-col items-center gap-6">
-                        <div className="relative">
-                            <div className="absolute inset-0 bg-primary-foreground/[0.04] rounded-full animate-ping scale-150" />
-                            <div className="w-14 h-14 rounded-full bg-primary-foreground/[0.04] border border-primary-foreground/[0.08] flex items-center justify-center relative z-10">
-                                <Bookmark className="h-6 w-6 text-primary-foreground/30" />
-                            </div>
+                                      <Button 
+                                          variant="ghost" 
+                                          size="icon" 
+                                          className="absolute top-1/2 -translate-y-1/2 right-3 h-7 w-7 rounded-full bg-red-500/10 text-red-400/70 hover:text-red-400 hover:bg-red-500/20 transition-all duration-300 opacity-0 translate-x-2 group-hover:opacity-100 group-hover:translate-x-0" 
+                                          onClick={(e) => {
+                                              e.preventDefault();
+                                              e.stopPropagation();
+                                              handleRemoveReadingListItem(item.slug);
+                                          }}
+                                          aria-label="Remove from Reading List"
+                                      >
+                                          <Trash2 className="h-3.5 w-3.5" />
+                                      </Button>
+                                  </div>
+                              </li>
+                            );
+                          })}
+                        </ul>
+                      ) : (
+                        <div className="p-20 text-center text-sm text-primary-foreground/20 italic flex flex-col items-center gap-6">
+                          <div className="relative">
+                              <div className="absolute inset-0 bg-primary-foreground/[0.04] rounded-full animate-ping scale-150" />
+                              <div className="w-14 h-14 rounded-full bg-primary-foreground/[0.04] border border-primary-foreground/[0.08] flex items-center justify-center relative z-10">
+                                  <Bookmark className="h-6 w-6 text-primary-foreground/30" />
+                              </div>
+                          </div>
+                          <p className="max-w-[200px] leading-relaxed font-medium text-[12px] opacity-50">{dictionary.readingList.empty}</p>
                         </div>
-                        <p className="max-w-[200px] leading-relaxed font-medium text-[12px] opacity-50">{dictionary.readingList.empty}</p>
-                      </div>
-                    )}
-                  </div>
-                </ScrollArea>
+                      )}
+                    </div>
+                  </ScrollArea>
+                )}
               </div>
         </div>
     </header>
