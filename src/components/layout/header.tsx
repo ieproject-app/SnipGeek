@@ -213,7 +213,7 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
   const navItemClass = "transition-all duration-300 text-primary-foreground/70 hover:text-primary-foreground";
 
   return (
-    <header ref={headerRef} className={cn(
+    <header header ref={headerRef} className={cn(
         "fixed top-4 left-4 right-4 md:left-1/2 md:-translate-x-1/2 md:right-auto z-50 transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]",
         isSearchOpen ? 'md:w-[600px]' : 'md:w-[580px]',
         isVisible ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-16"
@@ -301,7 +301,7 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                         className={cn(
                             "px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider transition-all hidden sm:flex items-center gap-2",
                             "hover:bg-white/10 hover:-translate-y-0.5",
-                            pathname.includes(item.href) ? "text-primary-foreground bg-white/10" : "text-primary-foreground/60"
+                            pathname.includes(item.href) ? "text-primary-foreground bg-white/10" : "text-primary-foreground/90"
                         )}
                     >
                         <item.icon className="h-3.5 w-3.5" />
