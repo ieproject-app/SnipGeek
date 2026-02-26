@@ -170,7 +170,7 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
         <Link 
             key={post.slug}
             href={`${linkPrefix}/blog/${post.slug}`} 
-            className="flex items-start gap-4 py-4 border-b border-primary/5 transition-all duration-300 hover:bg-primary/5 group"
+            className="flex items-start gap-4 py-3 border-b border-primary/5 transition-all duration-300 group"
         >
             <div className="relative w-[100px] h-[100px] shrink-0 overflow-hidden rounded-lg shadow-sm border border-primary/5">
                 <Image
@@ -276,21 +276,21 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
                     <Undo2 className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
                     {dictionary.home.breadcrumbHome}
                 </Link>
-                <div className="flex items-center gap-2">
-                    <Button asChild variant="outline" size="sm" className="rounded-full bg-accent text-accent-foreground border-none px-4 font-bold">
+                <div className="flex items-center gap-1">
+                    <Button asChild variant="outline" size="sm" className="h-8 min-w-[32px] rounded-md bg-accent text-accent-foreground border-none px-2 font-bold text-xs">
                         <Link href={`${linkPrefix}/tags/${specialTag.toLowerCase()}`}>
                             1
                         </Link>
                     </Button>
                     {[2, 3, 4, 5, 6].map(num => (
-                        <Button key={num} asChild variant="ghost" size="icon" className="h-8 w-8 rounded-full text-muted-foreground hover:bg-primary/5 hover:text-primary transition-all">
+                        <Button key={num} asChild variant="ghost" size="icon" className="h-8 w-8 rounded-md text-muted-foreground hover:bg-primary/5 hover:text-primary transition-all text-xs font-bold">
                             <Link href={`${linkPrefix}/tags/${specialTag.toLowerCase()}`}>
                                 {num}
                             </Link>
                         </Button>
                     ))}
-                    <div className="w-8 h-8 flex items-center justify-center text-muted-foreground opacity-30">...</div>
-                    <Button asChild variant="ghost" size="icon" className="h-8 w-8 rounded-full text-muted-foreground hover:bg-primary/5">
+                    <div className="w-8 h-8 flex items-center justify-center text-muted-foreground opacity-30 text-xs font-bold">...</div>
+                    <Button asChild variant="ghost" size="icon" className="h-8 w-8 rounded-md text-muted-foreground hover:bg-primary/5 text-xs font-bold">
                         <Link href={`${linkPrefix}/tags/${specialTag.toLowerCase()}`}>
                             16
                         </Link>
