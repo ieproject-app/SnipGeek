@@ -6,10 +6,9 @@ import Image from 'next/image';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { cn } from '@/lib/utils';
 import { AddToReadingListButton } from '@/components/layout/add-to-reading-list-button';
-import { Flame } from 'lucide-react';
+import { Flame, ChevronRight, Undo2 } from 'lucide-react';
 import { getDictionary } from '@/lib/get-dictionary';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { SliderAndShadow } from '@/components/home/slider-and-shadow';
 
 export async function generateStaticParams() {
@@ -37,9 +36,8 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
       post.frontmatter.published && 
       post.frontmatter.category?.toLowerCase() === sliderCategory.toLowerCase()
     )
-    .slice(0, 6); // Exactly 6 items total
+    .slice(0, 6); 
   
-  // Fallback if not enough Tutorial posts
   if (sliderPosts.length < 6) {
       sliderPosts.push(...allPostsData
         .filter(p => p.frontmatter.published && !sliderPosts.some(sp => sp.slug === p.slug))
@@ -47,16 +45,14 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
       );
   }
 
-  // 4. Special Tag Section (Excluding Featured & Latest, Top 4)
+  // 4. Windows Style Section (Filtered by tag 'Windows', 8 items)
   const specialTag = "Windows"; 
   const specialTagPosts = allPostsData
     .filter(post => 
       post.frontmatter.published &&
-      post.frontmatter.tags?.some(tag => tag.toLowerCase() === specialTag.toLowerCase()) &&
-      !featuredSlugs.has(post.slug) &&
-      !latestSlugs.has(post.slug)
+      post.frontmatter.tags?.some(tag => tag.toLowerCase() === specialTag.toLowerCase())
     )
-    .slice(0, 4);
+    .slice(0, 8);
 
   const dictionary = await getDictionary(locale);
   const linkPrefix = locale === i18n.defaultLocale ? '' : `/${locale}`;
@@ -158,6 +154,48 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
     );
   }
 
+  const renderHorizontalCard = (post: (typeof allPostsData)[0]) => {
+    const heroImageValue = post.frontmatter.heroImage;
+    let heroImageSrc = "/images/blank/blank.webp";
+    if (heroImageValue) {
+        if (heroImageValue.startsWith('http') || heroImageValue.startsWith('/')) {
+            heroImageSrc = heroImageValue;
+        } else {
+            const placeholder = PlaceHolderImages.find(p => p.id === heroImageValue);
+            if (placeholder) heroImageSrc = placeholder.imageUrl;
+        }
+    }
+
+    return (
+        <Link 
+            key={post.slug}
+            href={`${linkPrefix}/blog/${post.slug}`} 
+            className="flex items-start gap-4 p-4 border-b border-primary/5 transition-all duration-300 hover:bg-primary/5 group"
+        >
+            <div className="relative w-[100px] h-[100px] shrink-0 overflow-hidden rounded-lg shadow-sm border border-primary/5">
+                <Image
+                    src={heroImageSrc}
+                    alt={post.frontmatter.title}
+                    fill
+                    className="object-cover transition-transform duration-500 group-hover:scale-110"
+                    sizes="100px"
+                />
+            </div>
+            <div className="flex-1 min-w-0 py-1">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-accent mb-1 block">
+                    {post.frontmatter.category || specialTag}
+                </span>
+                <h3 className="font-headline text-sm md:text-base font-bold text-primary leading-snug line-clamp-2 transition-colors group-hover:text-accent">
+                    {post.frontmatter.title}
+                </h3>
+                <time className="text-[10px] text-muted-foreground mt-2 block font-medium">
+                    {new Date(post.frontmatter.date).toLocaleDateString(locale, { day: '2-digit', month: 'long', year: 'numeric' })}
+                </time>
+            </div>
+        </Link>
+    );
+  };
+
 
   return (
     <div className="w-full">
@@ -211,24 +249,54 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
         />
       )}
 
-      {/* Special Tag Section */}
+      {/* Windows 11 Style Section */}
       {specialTagPosts.length > 0 && (
-        <section className="bg-muted/30 py-16 mb-12">
-            <div className="container max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-                <h2 className="text-3xl font-bold font-headline tracking-tighter text-primary mb-8 text-center">
-                    {dictionary.home.specialTagSectionTitle.replace('{tag}', specialTag)}
+        <section className="container max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+            <header className="mb-10 text-left">
+                <h2 className="text-3xl font-extrabold font-headline tracking-tight text-primary mb-2">
+                    {dictionary.home.specialTagSectionTitle}
                 </h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-12">
-                    {specialTagPosts.map((post, index) => renderPostCard(post, false, index))}
+                <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-widest text-accent mb-4">
+                    <span>{dictionary.home.breadcrumbHome}</span>
+                    <span className="opacity-30">›</span>
+                    <span>{dictionary.home.specialTagSectionTitle}</span>
                 </div>
-                <div className="flex justify-center mt-12">
-                    <Button asChild variant="ghost" className="rounded-full">
+                <div className="w-12 h-1 bg-accent rounded-full" />
+            </header>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12">
+                {specialTagPosts.map((post) => renderHorizontalCard(post))}
+            </div>
+
+            <footer className="mt-12 flex items-center justify-between">
+                <Link 
+                    href="/" 
+                    className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-muted-foreground hover:text-primary transition-colors group"
+                >
+                    <Undo2 className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
+                    {dictionary.home.breadcrumbHome}
+                </Link>
+                <div className="flex items-center gap-2">
+                    <Button asChild variant="outline" size="sm" className="rounded-full bg-accent text-accent-foreground border-none px-4 font-bold">
                         <Link href={`${linkPrefix}/tags/${specialTag.toLowerCase()}`}>
-                            {dictionary.home.viewAllPosts}
+                            1
+                        </Link>
+                    </Button>
+                    {[2, 3, 4, 5, 6].map(num => (
+                        <Button key={num} asChild variant="ghost" size="icon" className="h-8 w-8 rounded-full text-muted-foreground hover:bg-primary/5 hover:text-primary transition-all">
+                            <Link href={`${linkPrefix}/tags/${specialTag.toLowerCase()}`}>
+                                {num}
+                            </Link>
+                        </Button>
+                    ))}
+                    <div className="w-8 h-8 flex items-center justify-center text-muted-foreground opacity-30">...</div>
+                    <Button asChild variant="ghost" size="icon" className="h-8 w-8 rounded-full text-muted-foreground hover:bg-primary/5">
+                        <Link href={`${linkPrefix}/tags/${specialTag.toLowerCase()}`}>
+                            16
                         </Link>
                     </Button>
                 </div>
-            </div>
+            </footer>
         </section>
       )}
     </div>

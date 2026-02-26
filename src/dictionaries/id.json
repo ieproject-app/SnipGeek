@@ -16,7 +16,8 @@
         "featuredPosts": "Postingan Unggulan",
         "latestPosts": "Postingan Terbaru",
         "viewAllPosts": "Lihat Semua Postingan",
-        "specialTagSectionTitle": "Lebih banyak tentang {tag}",
+        "specialTagSectionTitle": "Postingan",
+        "breadcrumbHome": "Beranda",
         "sliderAndShadow": {
             "title": "Cari Tutorial Apa?",
             "viewMore": "Selengkapnya"
@@ -229,7 +230,7 @@
         "supportingImagesLabel": "Gambar Pendukung (sesuai urutan)",
         "supportingImagesLabelNote": "Gambar untuk disisipkan di konten",
         "draftContentLabel": "Konten/Draf Utama",
-        "finalInstruction": "Instruksi Tambahan: 1. Konfirmasi translationKey dan slug Inggris. 2. Panjang judul HARUS 50-60 karakter (OPTIMASI SEO KETAT). 3. KEPATUHAN MDX KETAT: Gunakan hanya komponen yang didukung (<DownloadButton />, <ImageGrid />, tabel Markdown standar). Jika draf berisi HTML atau gaya yang tidak kompatibel, SESUAIKAN OTOMATIS agar mengacu pada komponen tersebut. 4. Kepatuhan React: JANGAN PERNAH gunakan 'class', SELALU gunakan 'className' untuk tag HTML kustom seperti <details> atau <summary>. 5. Teks Alt Gambar: Jika teks alt yang diberikan kosong atau berisi placeholder (misal: 'TOLONG BUAT...'), ANDA WAJIB membuat teks alt yang berkualitas tinggi, deskriptif, dan SEO-friendly berdasarkan konteks gambar di dalam artikel."
+        "finalInstruction": "Instruksi Tambahan: 1. Konfirmasi translationKey dan slug Inggris. 2. Panjang judul HARUS 50-60 karakter (OPTIMASI SEO KETAT). 3. KEPATUHAN MDX KETAT: Gunakan hanya komponen yang didukung (<DownloadButton />, <ImageGrid />, tabel Markdown standar). Jika draf berisi HTML atau gaya yang tidak kompatibel, SESUAIKAN OTOMATIS agar mengacu pada komponen tersebut. 4. Kepatuhan React: JANGAN PERNAH gunakan 'class', SELALU gunakan 'className' untuk tag HTML kustom seperti <details> or <summary>. 5. Teks Alt Gambar: Jika teks alt yang diberikan kosong atau berisi placeholder (misal: 'TOLONG BUAT...'), ANDA WAJIB membuat teks alt yang berkualitas tinggi, deskriptif, dan SEO-friendly berdasarkan konteks gambar di dalam artikel."
     },
     "notifications": {
         "themeLight": "Tema: Terang",
