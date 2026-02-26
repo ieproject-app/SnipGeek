@@ -213,7 +213,7 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
   const navItemClass = "transition-all duration-300 text-primary-foreground/70 hover:text-primary-foreground";
 
   return (
-    <header header ref={headerRef} className={cn(
+    <header ref={headerRef} className={cn(
         "fixed top-4 left-4 right-4 md:left-1/2 md:-translate-x-1/2 md:right-auto z-50 transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]",
         isSearchOpen ? 'md:w-[600px]' : 'md:w-[580px]',
         isVisible ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-16"
