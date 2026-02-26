@@ -16,7 +16,11 @@
         "featuredPosts": "Postingan Unggulan",
         "latestPosts": "Postingan Terbaru",
         "viewAllPosts": "Lihat Semua Postingan",
-        "specialTagSectionTitle": "Lebih banyak tentang {tag}"
+        "specialTagSectionTitle": "Lebih banyak tentang {tag}",
+        "sliderAndShadow": {
+            "title": "Slider and Shadow",
+            "viewMore": "Selengkapnya"
+        }
     },
     "blog": {
         "title": "Blog",

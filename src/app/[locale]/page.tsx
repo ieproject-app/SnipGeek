@@ -10,6 +10,7 @@ import { Flame } from 'lucide-react';
 import { getDictionary } from '@/lib/get-dictionary';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { SliderAndShadow } from '@/components/home/slider-and-shadow';
 
 export async function generateStaticParams() {
   return i18n.locales.map((locale) => ({ locale }));
@@ -29,7 +30,24 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
     .slice(0, 4);
   const latestSlugs = new Set(latestPosts.map(p => p.slug));
   
-  // 3. Special Tag Section (Excluding Featured & Latest, Top 4)
+  // 3. Slider and Shadow Content (Filtered by category, e.g., 'Tutorial')
+  const sliderCategory = "Tutorial";
+  const sliderPosts = allPostsData
+    .filter(post => 
+      post.frontmatter.published && 
+      post.frontmatter.category?.toLowerCase() === sliderCategory.toLowerCase()
+    )
+    .slice(0, 6);
+  
+  // Fallback if not enough Tutorial posts
+  if (sliderPosts.length < 5) {
+      sliderPosts.push(...allPostsData
+        .filter(p => p.frontmatter.published && !sliderPosts.some(sp => sp.slug === p.slug))
+        .slice(0, 6 - sliderPosts.length)
+      );
+  }
+
+  // 4. Special Tag Section (Excluding Featured & Latest, Top 4)
   const specialTag = "Windows"; 
   const specialTagPosts = allPostsData
     .filter(post => 
@@ -181,6 +199,16 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
             </Button>
           </div>
         </section>
+      )}
+
+      {/* Slider and Shadow Widget Section */}
+      {sliderPosts.length > 0 && (
+        <SliderAndShadow 
+          posts={sliderPosts as any} 
+          title={dictionary.home.sliderAndShadow.title}
+          viewMoreText={dictionary.home.sliderAndShadow.viewMore}
+          locale={locale}
+        />
       )}
 
       {/* Special Tag Section */}

@@ -16,7 +16,11 @@
         "featuredPosts": "Featured Posts",
         "latestPosts": "Latest Posts",
         "viewAllPosts": "View All Posts",
-        "specialTagSectionTitle": "More from {tag}"
+        "specialTagSectionTitle": "More from {tag}",
+        "sliderAndShadow": {
+            "title": "Slider and Shadow",
+            "viewMore": "See More"
+        }
     },
     "blog": {
         "title": "Blog",
