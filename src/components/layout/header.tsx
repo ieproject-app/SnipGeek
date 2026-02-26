@@ -247,7 +247,7 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                 </div>
             </div>
 
-            {/* Left Section: Menu + Logo */}
+            {/* Left Section: Menu + Logo + Nav Links (Grouped) */}
             <div className={cn(
                 "flex items-center z-20 transition-all duration-500",
                 isSearchOpen ? "opacity-0 pointer-events-none w-0" : "opacity-100"
@@ -281,34 +281,37 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                 <Link 
                     href="/" 
                     className={cn(
-                        "flex items-center justify-center h-7 w-7 transition-all duration-300 hover:scale-110 active:scale-95 ml-1 group/logo"
+                        "flex items-center justify-center h-7 w-7 transition-all duration-300 hover:scale-110 active:scale-95 ml-1 group/logo shrink-0"
                     )} 
                     aria-label="SnipGeek Home"
                 >
                     <SnipGeekLogo className="h-full w-full" />
                 </Link>
+
+                {/* Direct Nav Links - Grouped with Logo */}
+                <div className={cn(
+                    "flex items-center gap-1 ml-4 transition-all duration-500",
+                    (isSearchOpen || message) ? "opacity-0 pointer-events-none" : "opacity-100"
+                )}>
+                    {directLinks.map((item) => (
+                        <Link 
+                            key={item.href}
+                            href={item.href}
+                            className={cn(
+                                "px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider transition-all hidden sm:flex items-center gap-2",
+                                "hover:bg-white/10 hover:-translate-y-0.5",
+                                pathname.includes(item.href) ? "text-primary-foreground bg-white/10" : "text-primary-foreground/90"
+                            )}
+                        >
+                            <item.icon className="h-3.5 w-3.5" />
+                            <span>{item.name}</span>
+                        </Link>
+                    ))}
+                </div>
             </div>
 
-            {/* Middle Section: Direct Nav Links */}
-            <div className={cn(
-                "flex-1 flex items-center justify-center gap-1 transition-all duration-500",
-                (isSearchOpen || message) ? "opacity-0 pointer-events-none" : "opacity-100"
-            )}>
-                {directLinks.map((item) => (
-                    <Link 
-                        key={item.href}
-                        href={item.href}
-                        className={cn(
-                            "px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider transition-all hidden sm:flex items-center gap-2",
-                            "hover:bg-white/10 hover:-translate-y-0.5",
-                            pathname.includes(item.href) ? "text-primary-foreground bg-white/10" : "text-primary-foreground/90"
-                        )}
-                    >
-                        <item.icon className="h-3.5 w-3.5" />
-                        <span>{item.name}</span>
-                    </Link>
-                ))}
-            </div>
+            {/* Middle Section: Spacer */}
+            <div className="flex-1" />
 
             {/* Right Section: Utilities */}
             <div className={cn(
