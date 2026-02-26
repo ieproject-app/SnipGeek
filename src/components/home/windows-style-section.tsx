@@ -1,9 +1,9 @@
+
 'use client';
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { Undo2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Undo2, ArrowRight } from 'lucide-react';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 
 interface WindowsStylePost {
@@ -21,6 +21,7 @@ interface WindowsStyleSectionProps {
   posts: WindowsStylePost[];
   title: string;
   breadcrumbHome: string;
+  viewAllText: string;
   locale: string;
   linkPrefix: string;
   tag: string;
@@ -30,6 +31,7 @@ export function WindowsStyleSection({
   posts, 
   title, 
   breadcrumbHome, 
+  viewAllText,
   locale, 
   linkPrefix,
   tag
@@ -65,7 +67,7 @@ export function WindowsStyleSection({
                 <span className="text-[10px] font-bold uppercase tracking-wider text-accent mb-1 block">
                     {post.frontmatter.category || tag}
                 </span>
-                <h3 className="font-headline text-sm md:text-base font-bold text-primary leading-snug line-clamp-2 transition-colors group-hover:text-accent">
+                <h3 className="font-headline text-[13px] md:text-sm font-medium text-primary leading-snug line-clamp-2 transition-colors group-hover:text-accent">
                     {post.frontmatter.title}
                 </h3>
                 <time className="text-[10px] text-muted-foreground mt-2 block font-medium">
@@ -102,26 +104,14 @@ export function WindowsStyleSection({
                 <Undo2 className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
                 {breadcrumbHome}
             </Link>
-            <div className="flex items-center gap-1">
-                <Button asChild variant="outline" size="sm" className="h-8 min-w-[32px] rounded-md bg-accent text-accent-foreground border-none px-2 font-bold text-xs shadow-sm">
-                    <Link href={`${linkPrefix}/tags/${tag.toLowerCase()}`}>
-                        1
-                    </Link>
-                </Button>
-                {[2, 3, 4, 5, 6].map(num => (
-                    <Button key={num} asChild variant="ghost" size="icon" className="h-8 w-8 rounded-md text-muted-foreground hover:bg-primary/5 hover:text-primary transition-all text-xs font-bold">
-                        <Link href={`${linkPrefix}/tags/${tag.toLowerCase()}`}>
-                            {num}
-                        </Link>
-                    </Button>
-                ))}
-                <div className="w-8 h-8 flex items-center justify-center text-muted-foreground opacity-30 text-xs font-bold">...</div>
-                <Button asChild variant="ghost" size="icon" className="h-8 w-8 rounded-md text-muted-foreground hover:bg-primary/5 text-xs font-bold">
-                    <Link href={`${linkPrefix}/tags/${tag.toLowerCase()}`}>
-                        16
-                    </Link>
-                </Button>
-            </div>
+            
+            <Link 
+                href={`${linkPrefix}/tags/${tag.toLowerCase()}`}
+                className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-accent hover:text-primary transition-all group"
+            >
+                <span>{viewAllText}</span>
+                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+            </Link>
         </footer>
     </section>
   );

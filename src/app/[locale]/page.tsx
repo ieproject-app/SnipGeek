@@ -213,6 +213,7 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
           posts={specialTagPosts as any}
           title={dictionary.home.specialTagSectionTitle}
           breadcrumbHome={dictionary.home.breadcrumbHome}
+          viewAllText={dictionary.home.viewAllPosts}
           locale={locale}
           linkPrefix={linkPrefix}
           tag={specialTag}
