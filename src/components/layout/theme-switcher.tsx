@@ -25,10 +25,19 @@ export function ThemeSwitcher({ dictionary }: { dictionary: Dictionary }) {
     const nextTheme = theme === 'system' ? 'light' : theme === 'light' ? 'dark' : 'system';
     setTheme(nextTheme);
     
-    // Trigger notification bar in Header
+    // Trigger notification bar in Header with context icon
     const key = `theme${nextTheme.charAt(0).toUpperCase() + nextTheme.slice(1)}`;
     const msg = (dictionary?.notifications as any)?.[key];
-    if (msg) notify(msg);
+    
+    const getIcon = (t: string) => {
+        switch (t) {
+            case 'light': return <Sun className="h-4 w-4 text-accent" />;
+            case 'dark': return <Moon className="h-4 w-4 text-accent" />;
+            default: return <Laptop className="h-4 w-4 text-accent" />;
+        }
+    };
+
+    if (msg) notify(msg, getIcon(nextTheme));
   };
 
   const getIcon = () => {

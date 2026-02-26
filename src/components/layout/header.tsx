@@ -13,7 +13,8 @@ import {
   StickyNote, 
   LayoutGrid, 
   User, 
-  Mail 
+  Mail,
+  Languages
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -42,13 +43,13 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<SearchableItem[]>([]);
   const { items: readingListItems, removeItem: removeReadingListItem } = useReadingList();
-  const { message, notify } = useNotification();
+  const { message, icon, notify } = useNotification();
   const lastScrollY = useRef(0);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const headerRef = useRef<HTMLElement>(null);
   const pathname = usePathname();
   const [mounted, setMounted] = useState(false);
-  const [isPulsing, setIsPulsing] = useState(false);
+  const [isGlowing, setIsGlowing] = useState(false);
   const prevCount = useRef(readingListItems.length);
 
   const isSearchOpen = activeView === 'search';
@@ -62,8 +63,8 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
   useEffect(() => {
     if (message) {
       setIsVisible(true);
-      setIsPulsing(true);
-      const timer = setTimeout(() => setIsPulsing(false), 2000);
+      setIsGlowing(true);
+      const timer = setTimeout(() => setIsGlowing(false), 500);
       return () => clearTimeout(timer);
     }
   }, [message]);
@@ -73,7 +74,7 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
       const pending = localStorage.getItem('snipgeek-pending-notify');
       if (pending) {
         const msg = (dictionary?.notifications as any)?.[pending];
-        if (msg) notify(msg);
+        if (msg) notify(msg, <Languages className="h-4 w-4" />);
         localStorage.removeItem('snipgeek-pending-notify');
       }
     }
@@ -82,9 +83,6 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
   useEffect(() => {
     if (mounted && readingListItems.length > prevCount.current) {
       setIsVisible(true);
-      setIsPulsing(true);
-      const timer = setTimeout(() => setIsPulsing(false), 2000);
-      return () => clearTimeout(timer);
     }
     prevCount.current = readingListItems.length;
   }, [readingListItems.length, mounted]);
@@ -185,12 +183,23 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
         <nav className={cn(
             "relative mx-auto bg-primary/90 backdrop-blur-sm text-primary-foreground shadow-lg ring-1 ring-black/5 h-12 transition-all duration-300 ease-in-out rounded-full flex items-center justify-between px-2 overflow-hidden"
         )}>
-            {/* Notification Bar - Slide-out reveal */}
+            {/* Notification Bar - Slide-down reveal with ikon */}
             <div className={cn(
-                "absolute inset-y-0 left-0 z-40 bg-primary/95 backdrop-blur-md transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] rounded-full flex items-center",
-                (mounted && message) ? "w-full opacity-100" : "w-12 opacity-0 pointer-events-none"
+                "absolute inset-0 z-40 bg-primary/95 backdrop-blur-md transition-all flex items-center justify-center px-6 rounded-full overflow-hidden",
+                isGlowing && "ring-2 ring-accent/40 shadow-[0_0_15px_rgba(125,211,252,0.2)]",
+                (mounted && message) 
+                    ? "translate-y-0 opacity-100 ease-[cubic-bezier(0.34,1.56,0.64,1)] duration-500" 
+                    : "translate-y-[-100%] opacity-0 ease-in duration-300 pointer-events-none"
             )}>
-                <div className="flex-1 flex items-center justify-center pl-24 pr-6">
+                <div className="flex items-center gap-3">
+                    {icon && (
+                        <div className={cn(
+                            "text-accent transition-all duration-300 ease-out",
+                            message ? "scale-100 opacity-100 delay-150" : "scale-0 opacity-0"
+                        )}>
+                            {React.cloneElement(icon as React.ReactElement, { className: "h-4 w-4" })}
+                        </div>
+                    )}
                     <p className={cn(
                         "text-[10px] font-black uppercase tracking-widest text-primary-foreground transition-all duration-500 delay-100",
                         message ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-4"
@@ -234,12 +243,11 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                 <Link 
                     href="/" 
                     className={cn(
-                        "flex items-center justify-center h-7 w-7 transition-all duration-300 hover:scale-110 active:scale-95 ml-1 group/logo",
-                        message && "animate-pulse"
+                        "flex items-center justify-center h-7 w-7 transition-all duration-300 hover:scale-110 active:scale-95 ml-1 group/logo"
                     )} 
                     aria-label="SnipGeek Home"
                 >
-                    <SnipGeekLogo className={cn("h-full w-full", isPulsing && "animate-pulse")} />
+                    <SnipGeekLogo className="h-full w-full" />
                 </Link>
             </div>
 
@@ -285,7 +293,7 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                     {mounted && readingListItems.length > 0 && (
                         <span className={cn(
                             "absolute top-1.5 right-1.5 flex h-3.5 min-w-[14px] items-center justify-center rounded-full bg-accent text-accent-foreground text-[9px] font-bold px-1 transition-all duration-300",
-                            isPulsing ? "animate-badge-pop ring-2 ring-accent/30" : "scale-100"
+                            readingListItems.length > prevCount.current ? "animate-badge-pop ring-2 ring-accent/30" : "scale-100"
                         )}>
                             {readingListItems.length}
                         </span>

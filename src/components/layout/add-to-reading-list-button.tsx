@@ -26,12 +26,12 @@ export function AddToReadingListButton({ item, dictionary, showText = true, clas
     
     if (isSaved) {
       removeItem(item.slug);
-      // Trigger notification bar in Header
-      notify(dictionary.remove);
+      // Trigger notification bar in Header with context icon
+      notify(dictionary.remove, <Bookmark className="h-4 w-4 text-accent" />);
     } else {
       addItem(item);
-      // Trigger notification bar in Header
-      notify(dictionary.add);
+      // Trigger notification bar in Header with context icon
+      notify(dictionary.add, <Bookmark className="h-4 w-4 text-accent" />);
     }
   };
 
