@@ -92,7 +92,7 @@ export function ShareButtons({ title, imageUrl }: ShareButtonsProps) {
   ];
 
   return (
-    <div className="group/container relative flex items-center justify-center p-1.5 rounded-lg border border-primary/10 bg-card/30 backdrop-blur-md shadow-sm max-w-sm mx-auto">
+    <div className="group/container relative flex items-center justify-center p-1.5 rounded-full border border-primary/10 bg-card/30 backdrop-blur-md shadow-sm max-w-sm mx-auto">
       {shareButtons.map((btn, index) => (
         <div key={btn.id} className="flex items-center flex-1">
           {btn.href ? (
@@ -101,7 +101,7 @@ export function ShareButtons({ title, imageUrl }: ShareButtonsProps) {
               target="_blank" 
               rel="noopener noreferrer" 
               className={cn(
-                "group relative flex flex-1 flex-col items-center justify-center py-4 px-2 rounded-lg transition-all duration-300",
+                "group relative flex flex-1 flex-col items-center justify-center py-4 px-2 rounded-full transition-all duration-300",
                 "text-muted-foreground hover:-translate-y-1.5 hover:scale-110 hover:rotate-3",
                 btn.hoverClass,
                 btn.shadowClass
@@ -125,7 +125,7 @@ export function ShareButtons({ title, imageUrl }: ShareButtonsProps) {
             <button 
               onClick={btn.onClick}
               className={cn(
-                "group relative flex flex-1 flex-col items-center justify-center py-4 px-2 rounded-lg transition-all duration-300",
+                "group relative flex flex-1 flex-col items-center justify-center py-4 px-2 rounded-full transition-all duration-300",
                 "text-muted-foreground hover:-translate-y-1.5 hover:scale-110 hover:rotate-3",
                 btn.hoverClass,
                 btn.shadowClass,
