@@ -80,17 +80,17 @@ export function Footer({ dictionary, translationsMap }: { dictionary: Dictionary
                 </div>
 
                 <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="text-center mb-16">
-                        {/* Normalized Avatar - Balanced position exactly on the border */}
-                        <div className="relative inline-block mb-8 -mt-32">
-                            <div className="relative rounded-full ring-2 ring-primary/20 ring-offset-4 ring-offset-background shadow-2xl transition-all duration-300 ease-in-out group hover:ring-primary/40">
-                                <Avatar className="w-24 h-24 mx-auto border-4 border-background bg-background transition-transform duration-500 group-hover:scale-105">
-                                    <AvatarImage src={authorAvatar} alt={authorName} />
-                                    <AvatarFallback className="bg-muted text-primary">{authorName.split(' ').map(n => n[0]).join('')}</AvatarFallback>
-                                </Avatar>
-                            </div>
+                    {/* Bisected Avatar - Perfectly centered on the border line */}
+                    <div className="absolute left-1/2 -translate-x-1/2 top-0 -translate-y-1/2 z-20">
+                        <div className="relative rounded-full ring-2 ring-primary/20 ring-offset-4 ring-offset-background shadow-2xl transition-all duration-300 ease-in-out group hover:ring-primary/40">
+                            <Avatar className="w-24 h-24 mx-auto border-4 border-background bg-background transition-transform duration-500 group-hover:scale-105">
+                                <AvatarImage src={authorAvatar} alt={authorName} />
+                                <AvatarFallback className="bg-muted text-primary">{authorName.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+                            </Avatar>
                         </div>
+                    </div>
 
+                    <div className="text-center mb-16">
                         <h4 className="font-headline text-3xl font-bold text-foreground tracking-tight">{authorName}</h4>
                         <p className="mt-4 text-muted-foreground max-w-md mx-auto text-lg leading-relaxed font-medium animate-in fade-in duration-700">
                             {dictionary.footer.authorBio}
