@@ -14,7 +14,8 @@ import {
   LayoutGrid, 
   User, 
   Mail,
-  Languages
+  Languages,
+  ArrowUpRight
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -37,11 +38,35 @@ type SearchableItem = {
 
 type ActiveView = 'none' | 'search' | 'menu' | 'readingList';
 
+const typeConfig = {
+  blog: { icon: BookOpen, color: 'text-sky-500', bg: 'bg-sky-500/10', accent: 'bg-sky-500' },
+  note: { icon: StickyNote, color: 'text-amber-400', bg: 'bg-amber-400/10', accent: 'bg-amber-400' },
+};
+
+const HighlightMatch = ({ text, query }: { text: string; query: string }) => {
+  if (!query.trim()) return <>{text}</>;
+  const parts = text.split(new RegExp(`(${query})`, 'gi'));
+  return (
+    <>
+      {parts.map((part, i) =>
+        part.toLowerCase() === query.toLowerCase() ? (
+          <mark key={i} className="bg-accent/30 text-accent-foreground rounded-[2px] px-0.5 font-semibold">
+            {part}
+          </mark>
+        ) : (
+          part
+        )
+      )}
+    </>
+  );
+};
+
 export function Header({ searchableData, dictionary }: { searchableData: SearchableItem[], dictionary: Dictionary }) {
   const [isVisible, setIsVisible] = useState(true);
   const [activeView, setActiveView] = useState<ActiveView>('none');
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<SearchableItem[]>([]);
+  const [removingSlug, setRemovingSlug] = useState<string | null>(null);
   const { items: readingListItems, removeItem: removeReadingListItem } = useReadingList();
   const { message, icon, notify } = useNotification();
   const lastScrollY = useRef(0);
@@ -161,6 +186,14 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
     }
   }
 
+  const handleRemoveReadingListItem = (slug: string) => {
+    setRemovingSlug(slug);
+    setTimeout(() => {
+      removeReadingListItem(slug);
+      setRemovingSlug(null);
+    }, 320);
+  };
+
   const directLinks = [
     { name: dictionary.navigation.blog, href: '/blog', icon: BookOpen },
     { name: dictionary.navigation.notes, href: '/notes', icon: StickyNote },
@@ -183,7 +216,7 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
         <nav className={cn(
             "relative mx-auto bg-primary/90 backdrop-blur-sm text-primary-foreground shadow-lg ring-1 ring-black/5 h-12 transition-all duration-300 ease-in-out rounded-full flex items-center justify-between px-2 overflow-hidden"
         )}>
-            {/* Notification Bar - Slide-down reveal with ikon */}
+            {/* Notification Bar */}
             <div className={cn(
                 "absolute inset-0 z-40 bg-primary/95 backdrop-blur-md transition-all flex items-center justify-center px-6 rounded-full overflow-hidden",
                 isGlowing && "ring-2 ring-accent/40 shadow-[0_0_15px_rgba(125,211,252,0.2)]",
@@ -382,12 +415,11 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
             </div>
         </div>
 
-        {/* Search Results & Reading List Dropdowns */}
+        {/* Search Results Dropdown */}
         <div className="absolute top-full left-0 right-0 z-30 mt-4">
-          {isSearchOpen && (
             <div className={cn(
-                "bg-background rounded-xl border shadow-2xl max-h-[450px] overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)]",
-                isSearchOpen ? "opacity-100 scale-100 translate-y-0" : "opacity-0 scale-95 -translate-y-2"
+                "bg-background rounded-xl border shadow-2xl max-h-[450px] overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)]",
+                isSearchOpen ? "opacity-100 scale-100 translate-y-0" : "opacity-0 scale-[0.97] -translate-y-4 pointer-events-none"
             )}>
                   <div className="px-6 py-3 border-b bg-muted/20 flex items-center justify-between">
                       <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground opacity-60">
@@ -399,98 +431,162 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                           {query.length > 1 ? (
                               results.length > 0 ? (
                                   <ul className="grid grid-cols-1">
-                                      {results.map((item, idx) => (
-                                      <li key={`${item.type}-${item.slug}`} style={{ transitionDelay: `${idx * 30}ms` }} className="animate-in fade-in slide-in-from-left-2 duration-300">
-                                          <Link href={item.href} onClick={handleResultClick} className="block group px-6 py-4 hover:bg-muted/50 transition-all duration-300">
-                                              <h4 className="font-bold text-sm text-primary line-clamp-2 leading-snug mb-2 transition-colors group-hover:text-accent">
-                                                  {item.title}
-                                              </h4>
-                                              <div className="flex items-center gap-2">
-                                                  <Badge variant="secondary" className="text-[9px] h-4 uppercase font-black tracking-wider px-1.5 rounded-sm shrink-0">
-                                                      {item.type}
-                                                  </Badge>
-                                                  <span className="text-[10px] text-muted-foreground font-medium opacity-30">•</span>
-                                                  <p className="text-[11px] text-muted-foreground line-clamp-1 italic opacity-70">
-                                                      {item.description}
-                                                  </p>
-                                              </div>
-                                          </Link>
-                                      </li>
-                                      ))}
+                                      {results.map((item, idx) => {
+                                        const config = typeConfig[item.type];
+                                        return (
+                                          <li key={`${item.type}-${item.slug}`} style={{ animationDelay: `${idx * 45}ms` }} className="animate-in fade-in slide-in-from-bottom-2 duration-300 fill-mode-both">
+                                              <Link href={item.href} onClick={handleResultClick} className="block group px-6 py-4 hover:bg-muted/50 transition-all duration-300 relative overflow-hidden">
+                                                  {/* Left Accent Bar */}
+                                                  <div className={cn("absolute left-0 top-2 bottom-2 w-0.5 rounded-full transition-transform duration-300 origin-center scale-y-0 group-hover:scale-y-100", config.accent)} />
+                                                  
+                                                  <div className="flex items-start justify-between gap-4">
+                                                      <div className="flex-1 min-w-0">
+                                                          <h4 className="font-bold text-sm text-primary line-clamp-2 leading-snug mb-2 transition-colors group-hover:text-accent">
+                                                              <HighlightMatch text={item.title} query={query} />
+                                                          </h4>
+                                                          <div className="flex items-center gap-2">
+                                                              <Badge variant="secondary" className={cn("text-[9px] h-4 uppercase font-black tracking-wider px-1.5 rounded-sm shrink-0 flex items-center gap-1 border-none", config.bg, config.color)}>
+                                                                  <config.icon className="h-2 w-2" />
+                                                                  {item.type}
+                                                              </Badge>
+                                                              <span className="text-[10px] text-muted-foreground font-medium opacity-30">•</span>
+                                                              <p className="text-[11px] text-muted-foreground line-clamp-1 italic opacity-70">
+                                                                  <HighlightMatch text={item.description} query={query} />
+                                                              </p>
+                                                          </div>
+                                                      </div>
+                                                      <ArrowUpRight className="h-4 w-4 text-muted-foreground opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 shrink-0" />
+                                                  </div>
+                                              </Link>
+                                          </li>
+                                        );
+                                      })}
                                   </ul>
                               ) : (
-                                  <div className="p-12 text-center text-sm text-muted-foreground italic">
-                                      {dictionary.search.noResults} &quot;{query}&quot;.
+                                  <div className="p-16 text-center text-sm text-muted-foreground italic flex flex-col items-center gap-4">
+                                      <div className="relative">
+                                          <Search className="h-10 w-10 opacity-10" />
+                                          <X className="h-5 w-5 absolute -top-1 -right-1 opacity-20 text-destructive" />
+                                      </div>
+                                      <p>{dictionary.search.noResults} &quot;{query}&quot;.</p>
                                   </div>
                               )
                           ) : (
-                              <div className="p-12 text-center text-sm text-muted-foreground font-medium">
-                                  {dictionary.search.placeholder}
+                              <div className="p-12">
+                                  <p className="text-center text-xs text-muted-foreground font-bold uppercase tracking-widest mb-6 opacity-40">{dictionary.search.placeholder}</p>
+                                  <div className="flex flex-wrap justify-center gap-3">
+                                      {['Hardware', 'Windows', 'Tutorial', 'Automation'].map((cat, i) => (
+                                          <Badge 
+                                            key={cat} 
+                                            variant="outline" 
+                                            className="px-4 py-1.5 rounded-full cursor-pointer hover:bg-primary hover:text-primary-foreground transition-all duration-300 animate-in fade-in zoom-in-95 fill-mode-both"
+                                            style={{ animationDelay: `${i * 100}ms` }}
+                                            onClick={() => setQuery(cat)}
+                                          >
+                                              {cat}
+                                          </Badge>
+                                      ))}
+                                  </div>
                               </div>
                           )}
                       </div>
                   </ScrollArea>
               </div>
-          )}
+        </div>
 
-          {isReadingListOpen && (
+        {/* Reading List Dropdown */}
+        <div className="absolute top-full left-0 right-0 z-30 mt-4">
             <div className={cn(
-                "bg-background rounded-xl border shadow-2xl max-h-[450px] overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)]",
-                isReadingListOpen ? "opacity-100 scale-100 translate-y-0" : "opacity-0 scale-95 -translate-y-2"
+                "bg-background rounded-xl border shadow-2xl max-h-[450px] overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)]",
+                isReadingListOpen ? "opacity-100 scale-100 translate-y-0" : "opacity-0 scale-[0.97] -translate-y-4 pointer-events-none"
             )}>
                 <div className="px-6 py-3 border-b bg-muted/20 flex items-center justify-between">
                     <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground opacity-60">
                       {mounted ? readingListItems.length : 0} {mounted && readingListItems.length === 1 ? dictionary.readingList.item : dictionary.readingList.items} {dictionary.readingList.inYourList}
                     </p>
+                    {/* Progress Dots */}
+                    <div className="flex gap-1">
+                        {readingListItems.slice(0, 5).map((_, i) => (
+                            <div 
+                                key={i} 
+                                className="h-1 w-1 rounded-full bg-accent/40 animate-in fade-in zoom-in-50 duration-500 fill-mode-both" 
+                                style={{ animationDelay: `${i * 150}ms` }}
+                            />
+                        ))}
+                    </div>
                 </div>
                 <ScrollArea className="h-full max-h-[400px]">
                   <div className="py-0">
                     {mounted && readingListItems.length > 0 ? (
                       <ul className="grid grid-cols-1">
-                        {readingListItems.map((item, idx) => (
-                          <li key={`${item.type}-${item.slug}`} style={{ transitionDelay: `${idx * 30}ms` }} className="group relative animate-in fade-in slide-in-from-left-2 duration-300">
-                              <div className="relative hover:bg-muted/50 transition-all duration-300 overflow-hidden">
-                                  <Link href={item.href} onClick={() => setActiveView('none')} className="block px-6 py-4 pr-14">
-                                      <h4 className="font-bold text-sm text-primary line-clamp-2 leading-snug mb-2 transition-colors group-hover:text-accent">
-                                          {item.title}
-                                      </h4>
-                                      <div className="flex items-center gap-2">
-                                          <Badge variant="secondary" className="text-[9px] h-4 uppercase font-black tracking-wider px-1.5 rounded-sm shrink-0">
-                                              {item.type}
-                                          </Badge>
-                                          <span className="text-[10px] text-muted-foreground font-medium opacity-30">•</span>
-                                          <p className="text-[11px] text-muted-foreground line-clamp-1 italic opacity-70">
-                                              {item.description}
-                                          </p>
-                                      </div>
-                                  </Link>
-                                  <Button 
-                                    variant="ghost" 
-                                    size="icon" 
-                                    className="absolute top-1/2 -translate-y-1/2 right-4 h-8 w-8 rounded-full text-muted-foreground/40 hover:text-destructive hover:bg-destructive/10 transition-all duration-300" 
-                                    onClick={(e) => {
-                                        e.preventDefault();
-                                        e.stopPropagation();
-                                        removeReadingListItem(item.slug);
-                                    }}
-                                    aria-label="Remove from Reading List"
-                                  >
-                                    <Trash2 className="h-4 w-4" />
-                                  </Button>
-                              </div>
-                          </li>
-                        ))}
+                        {readingListItems.map((item, idx) => {
+                          const config = typeConfig[item.type];
+                          return (
+                            <li 
+                                key={`${item.type}-${item.slug}`} 
+                                style={{ transitionDelay: `${idx * 30}ms` }} 
+                                className={cn(
+                                    "group relative animate-in fade-in slide-in-from-left-2 duration-300",
+                                    removingSlug === item.slug && "animate-out fade-out slide-out-to-right-4 duration-300 fill-mode-forwards"
+                                )}
+                            >
+                                <div className="relative hover:bg-muted/50 transition-all duration-300 overflow-hidden group">
+                                    {/* Left Accent Bar */}
+                                    <div className={cn("absolute left-0 top-2 bottom-2 w-0.5 rounded-full transition-transform duration-300 origin-center scale-y-0 group-hover:scale-y-100", config.accent)} />
+                                    
+                                    <div className="flex items-center gap-4 px-6 py-4 pr-14">
+                                        {/* Number/Icon Toggle */}
+                                        <div className="relative h-8 w-8 flex items-center justify-center shrink-0 border rounded-full bg-muted/20 group-hover:border-accent/30 transition-colors">
+                                            <span className="text-[10px] font-black text-muted-foreground group-hover:opacity-0 transition-opacity">{idx + 1}</span>
+                                            <config.icon className={cn("absolute h-4 w-4 opacity-0 scale-50 group-hover:opacity-100 group-hover:scale-100 transition-all duration-300", config.color)} />
+                                        </div>
+
+                                        <Link href={item.href} onClick={() => setActiveView('none')} className="block flex-1 min-w-0">
+                                            <h4 className="font-bold text-sm text-primary line-clamp-2 leading-snug mb-1.5 transition-colors group-hover:text-accent">
+                                                {item.title}
+                                            </h4>
+                                            <div className="flex items-center gap-2">
+                                                <Badge variant="secondary" className={cn("text-[9px] h-4 uppercase font-black tracking-wider px-1.5 rounded-sm shrink-0 border-none", config.bg, config.color)}>
+                                                    {item.type}
+                                                </Badge>
+                                                <span className="text-[10px] text-muted-foreground font-medium opacity-30">•</span>
+                                                <p className="text-[11px] text-muted-foreground line-clamp-1 italic opacity-70">
+                                                    {item.description}
+                                                </p>
+                                            </div>
+                                        </Link>
+                                    </div>
+
+                                    <Button 
+                                        variant="ghost" 
+                                        size="icon" 
+                                        className="absolute top-1/2 -translate-y-1/2 right-4 h-8 w-8 rounded-full text-muted-foreground/40 hover:text-destructive hover:bg-destructive/10 transition-all duration-300 opacity-0 translate-x-2 group-hover:opacity-100 group-hover:translate-x-0" 
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            e.stopPropagation();
+                                            handleRemoveReadingListItem(item.slug);
+                                        }}
+                                        aria-label="Remove from Reading List"
+                                    >
+                                        <Trash2 className="h-4 w-4" />
+                                    </Button>
+                                </div>
+                            </li>
+                          );
+                        })}
                       </ul>
                     ) : (
-                      <div className="p-12 text-center text-sm text-muted-foreground italic flex flex-col items-center gap-3">
-                        <Bookmark className="h-8 w-8 opacity-10" />
-                        {dictionary.readingList.empty}
+                      <div className="p-20 text-center text-sm text-muted-foreground italic flex flex-col items-center gap-4">
+                        <div className="relative">
+                            <div className="absolute inset-0 bg-accent/20 rounded-full animate-ping" />
+                            <Bookmark className="h-10 w-10 text-accent relative z-10" />
+                        </div>
+                        <p className="max-w-[200px] leading-relaxed font-medium">{dictionary.readingList.empty}</p>
                       </div>
                     )}
                   </div>
                 </ScrollArea>
               </div>
-          )}
         </div>
     </header>
   );
