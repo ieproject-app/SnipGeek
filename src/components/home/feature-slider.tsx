@@ -32,9 +32,10 @@ interface FeatureSliderProps {
   title: string;
   viewMoreText: string;
   locale: string;
+  tag?: string;
 }
 
-export function FeatureSlider({ posts, title, viewMoreText, locale }: FeatureSliderProps) {
+export function FeatureSlider({ posts, title, viewMoreText, locale, tag }: FeatureSliderProps) {
   const [api, setApi] = React.useState<CarouselApi>();
   const [current, setCurrent] = React.useState(0);
   const [count, setCount] = React.useState(0);
@@ -51,6 +52,7 @@ export function FeatureSlider({ posts, title, viewMoreText, locale }: FeatureSli
   }, [api]);
 
   const linkPrefix = locale === 'en' ? '' : `/${locale}`;
+  const viewMoreHref = tag ? `${linkPrefix}/tags/${tag.toLowerCase()}` : `${linkPrefix}/blog`;
 
   return (
     <section className="pb-12 sm:pb-16 overflow-hidden">
@@ -164,7 +166,7 @@ export function FeatureSlider({ posts, title, viewMoreText, locale }: FeatureSli
               <div className="h-3 w-px bg-primary/10 hidden sm:block" />
 
               <Link 
-                href={`${linkPrefix}/blog`} 
+                href={viewMoreHref} 
                 className="text-[10px] font-bold uppercase tracking-widest text-primary hover:text-accent transition-all flex items-center gap-1 group/more"
               >
                 {viewMoreText}

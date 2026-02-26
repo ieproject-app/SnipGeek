@@ -22,6 +22,15 @@ interface BreadcrumbsProps {
 export function Breadcrumbs({ segments, className }: BreadcrumbsProps) {
   const pathname = usePathname();
 
+  // Helper to normalize path by removing trailing slash (except for root '/')
+  const normalizePath = (path: string) => {
+    if (!path) return '';
+    const normalized = path.replace(/\/$/, '');
+    return normalized === '' ? '/' : normalized;
+  };
+
+  const normalizedPathname = normalizePath(pathname);
+
   return (
     <nav 
       aria-label="Breadcrumb"
@@ -32,8 +41,14 @@ export function Breadcrumbs({ segments, className }: BreadcrumbsProps) {
     >
       {segments.map((segment, index) => {
         const isLast = index === segments.length - 1;
-        // Non-interactive if it's the last segment OR if it points to the current path
-        const isInteractive = segment.href && !isLast && segment.href !== pathname && segment.href !== pathname + '/';
+        
+        const normalizedHref = segment.href ? normalizePath(segment.href) : null;
+        
+        // Non-interactive if:
+        // 1. No href provided
+        // 2. It's the last segment (current page)
+        // 3. The href matches the current normalized pathname (prevents links to current page)
+        const isInteractive = normalizedHref && !isLast && normalizedHref !== normalizedPathname;
         
         return (
           <div key={index} className="flex items-center gap-2">
