@@ -1,0 +1,28 @@
+<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      /* Animasi logo SnipGeek */
+      .sq-tl { animation: pulse 2.4s ease-in-out infinite; transform-origin: 26px 26px; }
+      .sq-br { animation: pulse 2.4s ease-in-out 1.2s infinite; transform-origin: 74px 74px; }
+      .sq-tr { animation: pulse-dim 2.4s ease-in-out 0.6s infinite; transform-origin: 74px 26px; }
+      .sq-bl { animation: pulse-dim 2.4s ease-in-out 1.8s infinite; transform-origin: 26px 74px; }
+
+      @keyframes pulse {
+        0%, 100% { transform: scale(1); opacity: 1; }
+        35% { transform: scale(1.06); opacity: 0.9; }
+        60% { transform: scale(0.97); opacity: 1; }
+      }
+      @keyframes pulse-dim {
+        0%, 100% { transform: scale(1); opacity: 0.7; }
+        35% { transform: scale(0.94); opacity: 0.5; }
+        60% { transform: scale(1.03); opacity: 0.7; }
+      }
+    </style>
+  </defs>
+  <!-- Kotak Aksen (Biru Muda) -->
+  <rect class="sq-tl" x="4" y="4" width="44" height="44" rx="1" fill="#7dd3fc"/>
+  <rect class="sq-br" x="52" y="52" width="44" height="44" rx="1" fill="#7dd3fc"/>
+  <!-- Kotak Netral (Abu Gelap) -->
+  <rect class="sq-tr" x="52" y="4" width="44" height="44" rx="1" fill="#374151"/>
+  <rect class="sq-bl" x="4" y="52" width="44" height="44" rx="1" fill="#374151"/>
+</svg>
