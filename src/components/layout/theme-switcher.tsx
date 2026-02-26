@@ -56,9 +56,9 @@ export function ThemeSwitcher({ dictionary }: { dictionary: Dictionary }) {
 
   const getIcon = () => {
     if (resolvedTheme === 'dark') {
-        return <Moon className="h-5 w-5 text-amber-400 fill-amber-400/10" />;
+        return <Moon className="h-5 w-5 text-accent fill-accent/10" />;
     }
-    return <Sun className="h-5 w-5 text-amber-400 fill-amber-400/20" />;
+    return <Sun className="h-5 w-5 text-accent fill-accent/20" />;
   };
 
   return (
