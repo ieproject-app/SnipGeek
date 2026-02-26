@@ -1,6 +1,8 @@
+
 'use client';
 
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 
 export type BreadcrumbSegment = {
@@ -18,6 +20,8 @@ interface BreadcrumbsProps {
  * Shows hierarchy up to category/tag level.
  */
 export function Breadcrumbs({ segments, className }: BreadcrumbsProps) {
+  const pathname = usePathname();
+
   return (
     <nav 
       aria-label="Breadcrumb"
@@ -28,18 +32,20 @@ export function Breadcrumbs({ segments, className }: BreadcrumbsProps) {
     >
       {segments.map((segment, index) => {
         const isLast = index === segments.length - 1;
+        // Non-interactive if it's the last segment OR if it points to the current path
+        const isInteractive = segment.href && !isLast && segment.href !== pathname && segment.href !== pathname + '/';
         
         return (
           <div key={index} className="flex items-center gap-2">
-            {segment.href && !isLast ? (
+            {isInteractive ? (
               <Link 
-                href={segment.href} 
+                href={segment.href!} 
                 className="hover:text-primary transition-all duration-300"
               >
                 {segment.label}
               </Link>
             ) : (
-              <span className={cn(isLast ? "opacity-60" : "")}>
+              <span className={cn(isLast ? "opacity-60" : "opacity-80")}>
                 {segment.label}
               </span>
             )}

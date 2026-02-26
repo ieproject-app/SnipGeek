@@ -9,8 +9,8 @@ import { AddToReadingListButton } from '@/components/layout/add-to-reading-list-
 import { Flame } from 'lucide-react';
 import { getDictionary } from '@/lib/get-dictionary';
 import { Button } from '@/components/ui/button';
-import { SliderAndShadow } from '@/components/home/slider-and-shadow';
-import { WindowsStyleSection } from '@/components/home/windows-style-section';
+import { FeatureSlider } from '@/components/home/feature-slider';
+import { TopicSection } from '@/components/home/topic-section';
 
 export async function generateStaticParams() {
   return i18n.locales.map((locale) => ({ locale }));
@@ -197,9 +197,9 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
         </section>
       )}
 
-      {/* Slider and Shadow Widget Section */}
+      {/* FeatureSlider Section */}
       {sliderPosts.length > 0 && (
-        <SliderAndShadow 
+        <FeatureSlider 
           posts={sliderPosts as any} 
           title={dictionary.home.sliderAndShadow.title}
           viewMoreText={dictionary.home.sliderAndShadow.viewMore}
@@ -207,9 +207,9 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
         />
       )}
 
-      {/* Windows 11 Style Section */}
+      {/* TopicSection */}
       {specialTagPosts.length > 0 && (
-        <WindowsStyleSection 
+        <TopicSection 
           posts={specialTagPosts as any}
           title={dictionary.home.specialTagSectionTitle}
           breadcrumbHome={dictionary.home.breadcrumbHome}
