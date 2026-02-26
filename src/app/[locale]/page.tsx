@@ -96,7 +96,7 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
     if (isFeatured) {
         return (
             <Link href={`${linkPrefix}/blog/${post.slug}`} className="block group" aria-label={`Read more about ${post.frontmatter.title}`}>
-                <article className="relative w-full aspect-[4/3] rounded-xl overflow-hidden shadow-2xl transition-all duration-300 group-hover:shadow-[0_20px_50px_rgba(0,0,0,0.3)]">
+                <article className="relative w-full aspect-[4/3] rounded-lg overflow-hidden shadow-2xl transition-all duration-300 group-hover:shadow-[0_20px_50px_rgba(0,0,0,0.3)]">
                     <div className="absolute top-3 right-3 z-20 flex items-center gap-2">
                         <AddToReadingListButton 
                             item={item}
