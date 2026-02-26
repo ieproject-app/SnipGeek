@@ -1,4 +1,3 @@
-
 import { getSortedPostsData } from '@/lib/posts';
 import Link from 'next/link';
 import { i18n } from '@/i18n-config';
@@ -11,6 +10,7 @@ import { getDictionary } from '@/lib/get-dictionary';
 import { Button } from '@/components/ui/button';
 import { FeatureSlider } from '@/components/home/feature-slider';
 import { TopicSection } from '@/components/home/topic-section';
+import { HorizontalSlider } from '@/components/home/horizontal-slider';
 
 export async function generateStaticParams() {
   return i18n.locales.map((locale) => ({ locale }));
@@ -28,9 +28,8 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
   const latestPosts = allPostsData
     .filter(post => post.frontmatter.published && !featuredSlugs.has(post.slug))
     .slice(0, 4);
-  const latestSlugs = new Set(latestPosts.map(p => p.slug));
   
-  // 3. Slider and Shadow Content (Filtered by category, e.g., 'Tutorial')
+  // 3. Slider (Filtered by category 'Tutorial')
   const sliderCategory = "Tutorial";
   const sliderPosts = allPostsData
     .filter(post => 
@@ -46,14 +45,23 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
       );
   }
 
-  // 4. Windows Style Section (Filtered by tag 'Windows', 8 items)
-  const specialTag = "Windows"; 
-  const specialTagPosts = allPostsData
+  // 4. Topic Section (Filtered by tag 'Windows', 8 items)
+  const topicTag = "Windows"; 
+  const topicPosts = allPostsData
     .filter(post => 
       post.frontmatter.published &&
-      post.frontmatter.tags?.some(tag => tag.toLowerCase() === specialTag.toLowerCase())
+      post.frontmatter.tags?.some(tag => tag.toLowerCase() === topicTag.toLowerCase())
     )
     .slice(0, 8);
+
+  // 5. Software Updates Slider (Filtered by tag 'Update', 6 items)
+  const updateTag = "Update";
+  const updatePosts = allPostsData
+    .filter(post => 
+      post.frontmatter.published &&
+      post.frontmatter.tags?.some(tag => tag.toLowerCase() === updateTag.toLowerCase())
+    )
+    .slice(0, 6);
 
   const dictionary = await getDictionary(locale);
   const linkPrefix = locale === i18n.defaultLocale ? '' : `/${locale}`;
@@ -197,7 +205,7 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
         </section>
       )}
 
-      {/* FeatureSlider Section */}
+      {/* FeatureSlider Section (Tutorials) */}
       {sliderPosts.length > 0 && (
         <FeatureSlider 
           posts={sliderPosts as any} 
@@ -207,16 +215,26 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
         />
       )}
 
-      {/* TopicSection */}
-      {specialTagPosts.length > 0 && (
+      {/* TopicSection (Windows Style) */}
+      {topicPosts.length > 0 && (
         <TopicSection 
-          posts={specialTagPosts as any}
+          posts={topicPosts as any}
           title={dictionary.home.specialTagSectionTitle}
           breadcrumbHome={dictionary.home.breadcrumbHome}
           viewAllText={dictionary.home.viewAllPosts}
           locale={locale}
           linkPrefix={linkPrefix}
-          tag={specialTag}
+          tag={topicTag}
+        />
+      )}
+
+      {/* HorizontalSlider Section (Software Updates) */}
+      {updatePosts.length > 0 && (
+        <HorizontalSlider 
+          posts={updatePosts as any}
+          title={dictionary.home.softwareUpdateSlider.title}
+          viewMoreText={dictionary.home.softwareUpdateSlider.viewMore}
+          locale={locale}
         />
       )}
     </div>

@@ -1,4 +1,3 @@
-
 {
     "navigation": {
         "blog": "Blog",
@@ -19,8 +18,12 @@
         "specialTagSectionTitle": "Postingan",
         "breadcrumbHome": "Home",
         "sliderAndShadow": {
-            "title": "Looking for Tutorials?",
-            "viewMore": "See More"
+            "title": "looking for tutorials?",
+            "viewMore": "see more"
+        },
+        "softwareUpdateSlider": {
+            "title": "new software updates?",
+            "viewMore": "check updates"
         }
     },
     "blog": {

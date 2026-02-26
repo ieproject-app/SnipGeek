@@ -1,4 +1,3 @@
-
 {
     "navigation": {
         "blog": "Blog",
@@ -19,8 +18,12 @@
         "specialTagSectionTitle": "Postingan",
         "breadcrumbHome": "Beranda",
         "sliderAndShadow": {
-            "title": "Cari Tutorial Apa?",
-            "viewMore": "Selengkapnya"
+            "title": "cari tutorial apa?",
+            "viewMore": "selengkapnya"
+        },
+        "softwareUpdateSlider": {
+            "title": "ada pembaruan software?",
+            "viewMore": "cek pembaruan"
         }
     },
     "blog": {
