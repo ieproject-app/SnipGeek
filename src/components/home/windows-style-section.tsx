@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Undo2, ArrowRight } from 'lucide-react';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
+import { Breadcrumbs } from '@/components/layout/breadcrumbs';
 
 interface WindowsStylePost {
   slug: string;
@@ -78,17 +79,18 @@ export function WindowsStyleSection({
     );
   };
 
+  const breadcrumbSegments = [
+    { label: breadcrumbHome, href: linkPrefix || '/' },
+    { label: tag }
+  ];
+
   return (
     <section className="container max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <header className="mb-10 text-left">
             <h2 className="text-3xl font-extrabold font-headline tracking-tight text-primary mb-2">
                 {title}
             </h2>
-            <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-widest text-accent mb-4">
-                <span>{breadcrumbHome}</span>
-                <span className="opacity-30">›</span>
-                <span>{title}</span>
-            </div>
+            <Breadcrumbs segments={breadcrumbSegments} className="mb-4" />
             <div className="w-12 h-1 bg-accent rounded-full" />
         </header>
 

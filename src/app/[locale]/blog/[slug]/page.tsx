@@ -16,6 +16,7 @@ import { ShareButtons } from '@/components/blog/share-buttons';
 import { RelatedPosts } from '@/components/blog/related-posts';
 import { TableOfContents } from '@/components/blog/table-of-contents';
 import { extractHeadings } from '@/lib/mdx-utils';
+import { Breadcrumbs } from '@/components/layout/breadcrumbs';
 
 export async function generateStaticParams() {
   const locales = getAllLocales();
@@ -143,11 +144,18 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
       type: 'blog' as const,
   };
 
+  const breadcrumbSegments = [
+    { label: dictionary.home.breadcrumbHome, href: linkPrefix || '/' },
+    { label: dictionary.navigation.blog, href: `${linkPrefix}/blog` },
+    { label: post.frontmatter.category || 'Blog' }
+  ];
+
   return (
     <div className="w-full">
       <main className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-12 sm:pt-32 sm:pb-16">
         <article>
             <header className="text-center mb-8">
+                <Breadcrumbs segments={breadcrumbSegments} className="justify-center mb-4" />
                 <h1 className="font-headline text-4xl md:text-5xl font-extrabold tracking-tighter text-primary mb-3">
                     {post.frontmatter.title}
                 </h1>
