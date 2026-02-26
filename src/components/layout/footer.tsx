@@ -79,31 +79,58 @@ export function Footer({ dictionary, translationsMap }: { dictionary: Dictionary
             </div>
 
             {/* Sub-Footer Section */}
-            <div className="relative w-full pt-0 pb-12 bg-muted/30">
+            <div className="relative w-full pt-0 pb-12 bg-gradient-to-br from-muted/40 via-background to-muted/20 overflow-hidden transition-all duration-300 ease-in-out">
+                {/* Decorative Ambient Light Circles */}
+                <div className="absolute top-0 left-0 w-96 h-96 rounded-full blur-3xl opacity-10 bg-primary -translate-x-1/2 -translate-y-1/2 pointer-events-none" />
+                <div className="absolute bottom-0 right-0 w-96 h-96 rounded-full blur-3xl opacity-10 bg-primary translate-x-1/2 translate-y-1/2 pointer-events-none" />
+
                 <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center mb-16 -mt-24">
-                        <Avatar className="w-24 h-24 mx-auto mb-6 border-4 border-background shadow-2xl bg-background">
-                            <AvatarImage src={authorAvatar} alt={authorName} />
-                            <AvatarFallback className="bg-muted text-primary">{authorName.split(' ').map(n => n[0]).join('')}</AvatarFallback>
-                        </Avatar>
+                        {/* Premium Avatar with Halo Effect */}
+                        <div className="relative inline-block rounded-full ring-2 ring-primary/20 ring-offset-4 ring-offset-background shadow-2xl mb-6 transition-all duration-300 ease-in-out group hover:ring-primary/40">
+                            <Avatar className="w-24 h-24 mx-auto border-4 border-background bg-background transition-transform duration-500 group-hover:scale-105">
+                                <AvatarImage src={authorAvatar} alt={authorName} />
+                                <AvatarFallback className="bg-muted text-primary">{authorName.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+                            </Avatar>
+                        </div>
+                        
                         <h4 className="font-headline text-3xl font-bold text-foreground tracking-tight">{authorName}</h4>
-                        <p className="mt-4 text-muted-foreground max-w-md mx-auto text-lg leading-relaxed font-medium">
+                        <p className="mt-4 text-muted-foreground max-w-md mx-auto text-lg leading-relaxed font-medium opacity-0 animate-in fade-in duration-700 fill-mode-forwards">
                             {dictionary.footer.authorBio}
                         </p>
                         
+                        {/* Social Links with Tooltips and Brand-Specific Glow */}
                         <div className="flex items-center justify-center gap-4 mt-8">
-                            {socialLinks.map((social) => (
-                                <a 
-                                    key={social.label} 
-                                    href={social.href} 
-                                    target="_blank" 
-                                    rel="noopener noreferrer"
-                                    className="p-3 rounded-full bg-primary/90 text-primary-foreground hover:bg-accent hover:text-primary hover:scale-110 transition-all duration-300 shadow-md"
-                                    aria-label={social.label}
-                                >
-                                    {social.icon}
-                                </a>
-                            ))}
+                            {socialLinks.map((social) => {
+                                const brandStyles: Record<string, string> = {
+                                    "Facebook": "hover:shadow-[0_0_20px_rgba(59,89,152,0.5)] hover:bg-[#3b5998]",
+                                    "YouTube": "hover:shadow-[0_0_20px_rgba(255,0,0,0.5)] hover:bg-[#ff0000]",
+                                    "Instagram": "hover:shadow-[0_0_20px_rgba(225,48,108,0.5)] hover:bg-[#e1306c]",
+                                    "TikTok": "hover:shadow-[0_0_20px_rgba(0,242,234,0.5)] hover:bg-[#00f2ea] hover:text-black",
+                                };
+                                const brandStyle = brandStyles[social.label] || "hover:bg-accent hover:text-primary";
+
+                                return (
+                                    <a 
+                                        key={social.label} 
+                                        href={social.href} 
+                                        target="_blank" 
+                                        rel="noopener noreferrer"
+                                        className={cn(
+                                            "group relative p-3 rounded-full bg-primary/90 text-primary-foreground shadow-md transition-all duration-300 ease-in-out",
+                                            "hover:-translate-y-1 hover:scale-115",
+                                            brandStyle
+                                        )}
+                                        aria-label={social.label}
+                                    >
+                                        {/* Tooltip Label */}
+                                        <span className="absolute -top-8 left-1/2 -translate-x-1/2 px-2 py-1 rounded bg-primary text-primary-foreground text-[10px] font-bold uppercase tracking-widest opacity-0 group-hover:opacity-100 -translate-y-1 group-hover:-translate-y-3 transition-all duration-300 pointer-events-none whitespace-nowrap z-20">
+                                            {social.label}
+                                        </span>
+                                        {social.icon}
+                                    </a>
+                                );
+                            })}
                         </div>
                     </div>
 
