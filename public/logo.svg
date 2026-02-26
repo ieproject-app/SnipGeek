@@ -1,49 +1,17 @@
-<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <linearGradient id="sc-blue" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#67e8f9"/>
+    <linearGradient id="bb5" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#bae6fd"/>
       <stop offset="100%" stop-color="#0ea5e9"/>
     </linearGradient>
-    <filter id="sc-glow" x="-30%" y="-30%" width="160%" height="160%">
-      <feGaussianBlur stdDeviation="3" result="b"/>
-      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
-    </filter>
-    <style>
-      .w3-tl { animation: pulse-a 3s ease-in-out infinite;       transform-origin: 26px 26px; }
-      .w3-br { animation: pulse-a 3s ease-in-out 1.5s infinite;  transform-origin: 74px 74px; }
-      .w3-tr { animation: pulse-b 3s ease-in-out 0.75s infinite; transform-origin: 74px 26px; }
-      .w3-bl { animation: pulse-b 3s ease-in-out 2.25s infinite; transform-origin: 26px 74px; }
-      .w3-dot { animation: pulse-a 3s ease-in-out 0.2s infinite; transform-origin: 50px 50px; }
-
-      @keyframes pulse-a {
-        0%, 100% { transform: scale(1);    filter: drop-shadow(0 0 0px #38bdf8); opacity: 1; }
-        40%       { transform: scale(1.05); filter: drop-shadow(0 0 10px #38bdf888); opacity: 0.9; }
-        70%       { transform: scale(0.97); }
-      }
-      @keyframes pulse-b {
-        0%, 100% { transform: scale(1);    opacity: 0.4; }
-        40%       { transform: scale(0.93); opacity: 0.22; }
-        70%       { transform: scale(1.02); opacity: 0.4; }
-      }
-    </style>
+    <linearGradient id="bd5" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1d4ed8"/>
+      <stop offset="100%" stop-color="#0c2461"/>
+    </linearGradient>
   </defs>
-
-  <!-- TL: active — snipped bottom-right corner -->
-  <polygon class="w3-tl" filter="url(#sc-glow)"
-    points="5,5 47,5 47,38 38,47 5,47"
-    fill="url(#sc-blue)"/>
-
-  <!-- BR: active — snipped top-left corner -->
-  <polygon class="w3-br" filter="url(#sc-glow)"
-    points="62,53 95,53 95,95 53,95 53,62"
-    fill="url(#sc-blue)"/>
-
-  <!-- TR: dim -->
-  <rect class="w3-tr" x="53" y="5" width="42" height="42" rx="4" fill="#1e293b"/>
-
-  <!-- BL: dim -->
-  <rect class="w3-bl" x="5" y="53" width="42" height="42" rx="4" fill="#1e293b"/>
-
-  <!-- Center pivot dot -->
-  <circle class="w3-dot" cx="50" cy="50" r="2.5" fill="#38bdf8" opacity="0.8"/>
+  <polygon points="5,5 49,5 49,40 40,49 5,49" fill="url(#bb5)"/>
+  <polygon points="60,51 95,51 95,95 51,95 51,60" fill="url(#bb5)"/>
+  <rect x="51" y="5" width="44" height="44" rx="4" fill="url(#bd5)"/>
+  <rect x="5" y="51" width="44" height="44" rx="4" fill="url(#bd5)"/>
+  <circle cx="50" cy="50" r="2" fill="#bae6fd" opacity="0.9"/>
 </svg>
