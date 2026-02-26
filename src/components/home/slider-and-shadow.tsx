@@ -53,13 +53,13 @@ export function SliderAndShadow({ posts, title, viewMoreText, locale }: SliderAn
   const linkPrefix = locale === 'en' ? '' : `/${locale}`;
 
   return (
-    <section className="bg-white py-16 sm:py-24 overflow-hidden border-y border-primary/5">
+    <section className="py-12 sm:py-16 overflow-hidden">
       <div className="container max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Section Header - Compact and aligned */}
-        <div className="mb-10 text-left">
-          <h2 className="text-2xl font-bold font-headline tracking-tighter text-primary inline-block relative">
+        {/* Section Header - Centered to match other sections */}
+        <div className="mb-10 text-center">
+          <h2 className="text-3xl font-bold font-headline tracking-tighter text-primary inline-block relative">
             {title}
-            <div className="absolute -bottom-1.5 left-0 w-10 h-1 bg-accent rounded-full" />
+            <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-12 h-1 bg-accent rounded-full" />
           </h2>
         </div>
 
@@ -68,11 +68,11 @@ export function SliderAndShadow({ posts, title, viewMoreText, locale }: SliderAn
           setApi={setApi}
           opts={{
             align: 'start',
-            loop: true,
+            loop: false, // Disabled loop as requested
           }}
           className="w-full"
         >
-          <CarouselContent className="-ml-6 sm:-ml-8">
+          <CarouselContent className="-ml-4 sm:-ml-6">
             {posts.map((post) => {
               const heroImageValue = post.frontmatter.heroImage;
               let heroImageSrc = "/images/blank/blank.webp";
@@ -91,31 +91,26 @@ export function SliderAndShadow({ posts, title, viewMoreText, locale }: SliderAn
               }
 
               return (
-                <CarouselItem key={post.slug} className="pl-6 sm:pl-8 md:basis-1/2 lg:basis-1/3">
+                <CarouselItem key={post.slug} className="pl-4 sm:pl-6 md:basis-1/2 lg:basis-1/3">
                   <Link href={`${linkPrefix}/blog/${post.slug}`} className="block group h-full">
-                    <article className="bg-white rounded-2xl overflow-hidden shadow-[0_15px_35px_-12px_rgba(0,0,0,0.08)] transition-all duration-500 group-hover:shadow-[0_25px_50px_-12px_rgba(0,0,0,0.15)] group-hover:-translate-y-1.5 h-full flex flex-col border border-primary/5">
+                    <article className="bg-card rounded-lg overflow-hidden border shadow-sm transition-all duration-300 hover:shadow-md hover:-translate-y-1 h-full flex flex-col">
                       <div className="relative aspect-video overflow-hidden">
                         <Image
                           src={heroImageSrc}
                           alt={post.frontmatter.imageAlt || post.frontmatter.title}
                           fill
-                          className="object-cover transition-transform duration-700 group-hover:scale-110"
+                          className="object-cover transition-transform duration-500 group-hover:scale-105"
                           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 33vw, 300px"
                           data-ai-hint={heroImageHint}
                         />
                       </div>
-                      <div className="p-6 flex-1 flex flex-col">
-                        <span className="text-[10px] font-black uppercase tracking-widest text-accent mb-2 block">
+                      <div className="p-5 flex-1 flex flex-col">
+                        <span className="text-[10px] font-bold uppercase tracking-widest text-accent mb-2 block">
                           {post.frontmatter.category || 'Featured'}
                         </span>
-                        <h3 className="font-headline text-lg font-bold text-primary leading-tight line-clamp-2 mb-5 group-hover:text-accent transition-colors">
+                        <h3 className="font-headline text-base font-semibold text-primary leading-snug line-clamp-2 group-hover:text-accent transition-colors">
                           {post.frontmatter.title}
                         </h3>
-                        <div className="mt-auto pt-4 border-t border-primary/5">
-                          <p className="text-[10px] font-bold text-muted-foreground/50 tracking-wider">
-                            By: <span className="text-primary/70">snipgeek.com</span>
-                          </p>
-                        </div>
                       </div>
                     </article>
                   </Link>
@@ -124,39 +119,41 @@ export function SliderAndShadow({ posts, title, viewMoreText, locale }: SliderAn
             })}
           </CarouselContent>
 
-          {/* Controls Container - Responsive and integrated */}
-          <div className="mt-14 flex flex-col sm:flex-row items-center justify-center gap-10">
+          {/* Controls Container */}
+          <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-8">
             {/* Navigation Arrows */}
-            <div className="flex items-center gap-3.5 order-2 sm:order-1">
+            <div className="flex items-center gap-2 order-2 sm:order-1">
               <Button
                 variant="outline"
                 size="icon"
-                className="rounded-full h-11 w-11 border-primary/10 bg-white text-primary hover:bg-primary hover:text-white transition-all shadow-sm"
+                className="rounded-full h-9 w-9 border-primary/10 bg-background text-primary hover:bg-primary hover:text-white transition-all"
                 onClick={() => api?.scrollPrev()}
+                disabled={!api?.canScrollPrev()}
                 aria-label="Previous slide"
               >
-                <ChevronLeft className="h-5 w-5" />
+                <ChevronLeft className="h-4 w-4" />
               </Button>
               <Button
                 variant="outline"
                 size="icon"
-                className="rounded-full h-11 w-11 border-primary/10 bg-white text-primary hover:bg-primary hover:text-white transition-all shadow-sm"
+                className="rounded-full h-9 w-9 border-primary/10 bg-background text-primary hover:bg-primary hover:text-white transition-all"
                 onClick={() => api?.scrollNext()}
+                disabled={!api?.canScrollNext()}
                 aria-label="Next slide"
               >
-                <ChevronRight className="h-5 w-5" />
+                <ChevronRight className="h-4 w-4" />
               </Button>
             </div>
 
             {/* Pagination Dots & More Link */}
-            <div className="flex items-center gap-8 order-1 sm:order-2 bg-muted/20 px-6 py-2.5 rounded-full border border-primary/5">
-              <div className="flex items-center gap-2">
+            <div className="flex items-center gap-6 order-1 sm:order-2 bg-muted/30 px-5 py-2 rounded-full border border-primary/5">
+              <div className="flex items-center gap-1.5">
                 {Array.from({ length: count }).map((_, i) => (
                   <button
                     key={i}
                     className={cn(
-                      "h-1.5 transition-all duration-500 rounded-full",
-                      current === i ? "w-8 bg-accent" : "w-1.5 bg-primary/10"
+                      "h-1 transition-all duration-300 rounded-full",
+                      current === i ? "w-6 bg-accent" : "w-1 bg-primary/20"
                     )}
                     onClick={() => api?.scrollTo(i)}
                     aria-label={`Go to slide ${i + 1}`}
@@ -164,14 +161,14 @@ export function SliderAndShadow({ posts, title, viewMoreText, locale }: SliderAn
                 ))}
               </div>
               
-              <div className="h-4 w-px bg-primary/10 hidden sm:block" />
+              <div className="h-3 w-px bg-primary/10 hidden sm:block" />
 
               <Link 
                 href={`${linkPrefix}/blog`} 
-                className="text-[10px] font-black uppercase tracking-widest text-primary hover:text-accent transition-all flex items-center gap-1.5 group/more"
+                className="text-[10px] font-bold uppercase tracking-widest text-primary hover:text-accent transition-all flex items-center gap-1 group/more"
               >
                 {viewMoreText}
-                <ChevronRight className="h-3 w-3 transition-transform group-hover/more:translate-x-1" />
+                <ChevronRight className="h-3 w-3 transition-transform group-hover/more:translate-x-0.5" />
               </Link>
             </div>
           </div>

@@ -37,10 +37,10 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
       post.frontmatter.published && 
       post.frontmatter.category?.toLowerCase() === sliderCategory.toLowerCase()
     )
-    .slice(0, 6);
+    .slice(0, 6); // Exactly 6 items total
   
   // Fallback if not enough Tutorial posts
-  if (sliderPosts.length < 5) {
+  if (sliderPosts.length < 6) {
       sliderPosts.push(...allPostsData
         .filter(p => p.frontmatter.published && !sliderPosts.some(sp => sp.slug === p.slug))
         .slice(0, 6 - sliderPosts.length)
