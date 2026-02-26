@@ -191,7 +191,7 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-12 mb-12">
             {latestPosts.map((post, index) => renderPostCard(post, false, index))}
           </div>
-          <div className="flex justify-center mb-16">
+          <div className="flex justify-center">
             <Button asChild variant="outline" size="lg" className="rounded-full">
                 <Link href={`${linkPrefix}/blog`}>
                     {dictionary.home.viewAllPosts}

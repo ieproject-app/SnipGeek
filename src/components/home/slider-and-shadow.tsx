@@ -53,7 +53,7 @@ export function SliderAndShadow({ posts, title, viewMoreText, locale }: SliderAn
   const linkPrefix = locale === 'en' ? '' : `/${locale}`;
 
   return (
-    <section className="py-12 sm:py-16 overflow-hidden">
+    <section className="pb-12 sm:pb-16 overflow-hidden">
       <div className="container max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header - Centered to match other sections */}
         <div className="mb-10 text-center">
