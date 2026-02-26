@@ -68,7 +68,7 @@ export function SliderAndShadow({ posts, title, viewMoreText, locale }: SliderAn
           setApi={setApi}
           opts={{
             align: 'start',
-            loop: false, // Disabled loop as requested
+            loop: false, 
           }}
           className="w-full"
         >
@@ -108,7 +108,7 @@ export function SliderAndShadow({ posts, title, viewMoreText, locale }: SliderAn
                         <span className="text-[10px] font-bold uppercase tracking-widest text-accent mb-2 block">
                           {post.frontmatter.category || 'Featured'}
                         </span>
-                        <h3 className="font-headline text-base font-semibold text-primary leading-snug line-clamp-2 group-hover:text-accent transition-colors">
+                        <h3 className="font-headline text-base font-semibold text-primary leading-snug group-hover:text-accent transition-colors">
                           {post.frontmatter.title}
                         </h3>
                       </div>
