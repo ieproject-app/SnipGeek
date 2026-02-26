@@ -55,11 +55,11 @@ export function SliderAndShadow({ posts, title, viewMoreText, locale }: SliderAn
   return (
     <section className="pb-12 sm:pb-16 overflow-hidden">
       <div className="container max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Section Header - Centered to match other sections */}
-        <div className="mb-10 text-center">
-          <h2 className="text-3xl font-bold font-headline tracking-tighter text-primary inline-block relative">
+        {/* Section Header - Left Aligned and Minimalist */}
+        <div className="mb-8 text-left">
+          <h2 className="text-lg font-bold font-headline tracking-tight text-primary inline-block relative uppercase">
             {title}
-            <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-12 h-1 bg-accent rounded-full" />
+            <div className="absolute -bottom-1 left-0 w-8 h-0.5 bg-accent rounded-full" />
           </h2>
         </div>
 

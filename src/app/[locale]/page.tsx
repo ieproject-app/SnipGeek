@@ -114,7 +114,7 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
                     <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/60 to-transparent" />
                     <div className="absolute bottom-0 left-0 p-6 text-white w-full">
                         <p className="text-xs font-semibold uppercase tracking-wider opacity-80 mb-1">{post.frontmatter.category}</p>
-                        <h3 className="font-headline text-2xl font-extrabold leading-tight">
+                        <h3 className="font-headline text-xl font-extrabold leading-tight">
                             {post.frontmatter.title}
                         </h3>
                     </div>
