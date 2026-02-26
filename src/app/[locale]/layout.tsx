@@ -1,4 +1,3 @@
-
 import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
 import { i18n } from '@/i18n-config';
@@ -10,6 +9,7 @@ import { ThemeProvider } from '@/components/theme-provider';
 import { ReadingListProvider } from '@/hooks/use-reading-list';
 import { NotificationProvider } from '@/hooks/use-notification';
 import { BackToTop } from '@/components/layout/back-to-top';
+import { ThemeSwitcher } from '@/components/layout/theme-switcher';
 import { getDictionary } from '@/lib/get-dictionary';
 import { DraftList } from '@/components/layout/draft-list';
 import { Plus_Jakarta_Sans } from 'next/font/google';
@@ -140,6 +140,7 @@ export default async function LocaleLayout({
               <main>{children}</main>
               <Footer dictionary={dictionary} translationsMap={translationsMap} />
               <BackToTop />
+              <ThemeSwitcher dictionary={dictionary} />
               <DraftList draftPosts={draftPosts} draftNotes={draftNotes} dictionary={dictionary} />
             </ReadingListProvider>
           </NotificationProvider>

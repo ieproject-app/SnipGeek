@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
@@ -27,7 +26,6 @@ import { useReadingList } from '@/hooks/use-reading-list';
 import { useNotification } from '@/hooks/use-notification';
 import type { Dictionary } from '@/lib/get-dictionary';
 import { SnipGeekLogo } from '@/components/icons/snipgeek-logo';
-import { ThemeSwitcher } from './theme-switcher';
 
 type SearchableItem = {
   slug: string;
@@ -316,8 +314,6 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                 "flex items-center gap-0.5 transition-all duration-500",
                 (isSearchOpen || message) ? "opacity-0 pointer-events-none" : "opacity-100"
             )}>
-                <ThemeSwitcher dictionary={dictionary} />
-                
                 <Button 
                     variant="ghost" 
                     size="icon" 

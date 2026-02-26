@@ -2,7 +2,6 @@
 
 import { useTheme } from 'next-themes';
 import { Sun, Moon, Laptop } from 'lucide-react';
-import { cn } from '@/lib/utils';
 import { useEffect, useState } from 'react';
 import { useNotification } from '@/hooks/use-notification';
 import type { Dictionary } from '@/lib/get-dictionary';
@@ -18,7 +17,7 @@ export function ThemeSwitcher({ dictionary }: { dictionary: Dictionary }) {
   }, []);
   
   if (!mounted) {
-    return <div className="h-10 w-10" />;
+    return null;
   }
 
   const cycleTheme = () => {
@@ -49,16 +48,18 @@ export function ThemeSwitcher({ dictionary }: { dictionary: Dictionary }) {
   };
 
   return (
-    <Button
-      variant="ghost"
-      size="icon"
-      onClick={cycleTheme}
-      className="h-10 w-10 rounded-full bg-transparent hover:bg-white/10 transition-all duration-300 group active:scale-90"
-      aria-label="Toggle theme mode"
-    >
-      <div className="transition-transform duration-500 ease-in-out group-hover:rotate-[12deg]">
-        {getIcon()}
-      </div>
-    </Button>
+    <div className="fixed bottom-20 right-6 z-50">
+      <Button
+        variant="default"
+        size="icon"
+        onClick={cycleTheme}
+        className="h-10 w-10 rounded-full shadow-2xl transition-all duration-300 hover:scale-110 active:scale-95 bg-primary/90 text-primary-foreground border-none"
+        aria-label="Toggle theme mode"
+      >
+        <div className="transition-transform duration-500 ease-in-out group-hover:rotate-[12deg]">
+          {getIcon()}
+        </div>
+      </Button>
+    </div>
   );
 }
