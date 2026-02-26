@@ -10,7 +10,7 @@ export default function Loading() {
                 <Skeleton className="h-12 w-3/4 mx-auto mb-4" />
             </header>
 
-            <div className="relative my-8 sm:my-12 rounded-2xl overflow-hidden shadow-2xl">
+            <div className="relative my-8 sm:my-12 rounded-lg overflow-hidden shadow-2xl">
                 <Skeleton className="w-full aspect-video" />
             </div>
 

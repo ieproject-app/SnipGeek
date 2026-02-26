@@ -45,7 +45,7 @@ export function Footer({ dictionary, translationsMap }: { dictionary: Dictionary
                                 )}
                             >
                                 <Link href={item.href} className="block group">
-                                    <article className="relative w-full aspect-[4/3] rounded-xl overflow-hidden shadow-lg transition-shadow group-hover:shadow-2xl">
+                                    <article className="relative w-full aspect-[4/3] rounded-lg overflow-hidden shadow-lg transition-shadow group-hover:shadow-2xl">
                                         {image && (
                                             <Image
                                                 src={image.imageUrl}

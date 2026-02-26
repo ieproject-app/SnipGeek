@@ -240,7 +240,7 @@ export function PromptGeneratorClient({ dictionary }: { dictionary: any }) {
                       variant={showDownloads ? 'default' : 'outline'} 
                       onClick={() => setShowDownloads(!showDownloads)}
                       className={cn(
-                        "h-10 w-10 sm:w-auto sm:px-3 rounded-xl border-dashed transition-all",
+                        "h-10 w-10 sm:w-auto sm:px-3 rounded-lg border-dashed transition-all",
                         !showDownloads && "bg-background/40 text-muted-foreground border-muted-foreground/20 hover:border-primary/40 hover:text-primary hover:bg-background"
                       )}
                     >
@@ -259,7 +259,7 @@ export function PromptGeneratorClient({ dictionary }: { dictionary: any }) {
                       variant={showGrids ? 'default' : 'outline'} 
                       onClick={() => setShowGrids(!showGrids)}
                       className={cn(
-                        "h-10 w-10 sm:w-auto sm:px-3 rounded-xl border-dashed transition-all",
+                        "h-10 w-10 sm:w-auto sm:px-3 rounded-lg border-dashed transition-all",
                         !showGrids && "bg-background/40 text-muted-foreground border-muted-foreground/20 hover:border-primary/40 hover:text-primary hover:bg-background"
                       )}
                     >
@@ -278,7 +278,7 @@ export function PromptGeneratorClient({ dictionary }: { dictionary: any }) {
                       variant={showImages ? 'default' : 'outline'} 
                       onClick={() => setShowImages(!showImages)}
                       className={cn(
-                        "h-10 w-10 sm:w-auto sm:px-3 rounded-xl border-dashed transition-all",
+                        "h-10 w-10 sm:w-auto sm:px-3 rounded-lg border-dashed transition-all",
                         !showImages && "bg-background/40 text-muted-foreground border-muted-foreground/20 hover:border-primary/40 hover:text-primary hover:bg-background"
                       )}
                     >
@@ -367,7 +367,7 @@ export function PromptGeneratorClient({ dictionary }: { dictionary: any }) {
                     placeholder={contentType === 'blog' ? dictionary.imagesPlaceholder : dictionary.imagesPlaceholderNote}
                     value={images}
                     onChange={(e) => setImages(e.target.value)}
-                    className="font-mono text-[13px] bg-background/50 rounded-xl p-4 min-h-[120px] leading-relaxed border-muted-foreground/20 focus:border-primary/40"
+                    className="font-mono text-[13px] bg-background/50 rounded-lg p-4 min-h-[120px] leading-relaxed border-muted-foreground/20 focus:border-primary/40"
                 />
                 <p className="mt-3 text-[10px] text-muted-foreground uppercase font-bold tracking-widest pl-1 leading-tight">
                     {contentType === 'blog' ? dictionary.imagesDescription : dictionary.imagesDescriptionNote}
@@ -386,7 +386,7 @@ export function PromptGeneratorClient({ dictionary }: { dictionary: any }) {
               <CardContent className="p-6 space-y-4 flex-1">
                   <div className="space-y-3">
                       {downloadItems.map((item, index) => (
-                      <div key={item.id} className="flex items-center gap-2 p-3 border rounded-xl bg-background/30 relative group transition-all hover:bg-background/50">
+                      <div key={item.id} className="flex items-center gap-2 p-3 border rounded-lg bg-background/30 relative group transition-all hover:bg-background/50">
                           <Badge variant="secondary" className="text-[10px] font-bold px-2 py-0.5 rounded-md shrink-0">[D_{index + 1}]</Badge>
                           
                           <Select value={item.type} onValueChange={(val) => updateDownloadItem(item.id, { type: val as 'id' | 'url', value: '' })}>
@@ -423,7 +423,7 @@ export function PromptGeneratorClient({ dictionary }: { dictionary: any }) {
                       </div>
                       ))}
                   </div>
-                  <Button onClick={addDownloadItem} variant="outline" size="sm" className="w-full h-10 border-dashed rounded-xl bg-background/20 hover:bg-primary/5 hover:text-primary hover:border-primary/40 transition-all">
+                  <Button onClick={addDownloadItem} variant="outline" size="sm" className="w-full h-10 border-dashed rounded-lg bg-background/20 hover:bg-primary/5 hover:text-primary hover:border-primary/40 transition-all">
                     <Plus className="h-4 w-4 mr-2" /> {dictionary.downloadLinks.addDownload || "Add Download"}
                   </Button>
               </CardContent>
@@ -442,7 +442,7 @@ export function PromptGeneratorClient({ dictionary }: { dictionary: any }) {
                     placeholder={dictionary.imageGrid.placeholder}
                     value={imageGridMappings}
                     onChange={(e) => setImageGridMappings(e.target.value)}
-                    className="min-h-[120px] font-mono text-sm bg-background/50 rounded-xl p-4 leading-relaxed border-muted-foreground/20 focus:border-primary/40"
+                    className="min-h-[120px] font-mono text-sm bg-background/50 rounded-lg p-4 leading-relaxed border-muted-foreground/20 focus:border-primary/40"
                 />
                 <p className="mt-3 text-[10px] text-muted-foreground uppercase font-bold tracking-widest pl-1 leading-tight">
                   {dictionary.imageGrid.description}
