@@ -1,8 +1,7 @@
-
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import './globals.css';
-import { Archivo, Archivo_Narrow } from 'next/font/google';
+import { Archivo, Bebas_Neue } from 'next/font/google';
 import { GeistMono } from 'geist/font/mono';
 import { cn } from '@/lib/utils';
 import { Search, Home, BookOpen, PenTool } from 'lucide-react';
@@ -13,15 +12,16 @@ const archivo = Archivo({
   variable: '--font-archivo',
 });
 
-const archivoNarrow = Archivo_Narrow({
+const bebasNeue = Bebas_Neue({
+  weight: '400',
   subsets: ['latin'],
   display: 'swap',
-  variable: '--font-archivo-narrow',
+  variable: '--font-bebas-neue',
 });
 
 export default function NotFound() {
   return (
-    <html lang="en" className={cn(archivo.variable, archivoNarrow.variable, GeistMono.variable)}>
+    <html lang="en" className={cn(archivo.variable, bebasNeue.variable, GeistMono.variable)}>
       <head>
         <title>404 - Page Not Found | SnipGeek</title>
         <meta name="description" content="Sorry, the page you're looking for doesn't exist. Find tutorials, notes, and tech tools at SnipGeek." />
