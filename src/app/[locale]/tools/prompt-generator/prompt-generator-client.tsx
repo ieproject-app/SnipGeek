@@ -1,7 +1,6 @@
-
 'use client';
 
-import { useState, useEffect, useMemo, useRef } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -23,8 +22,6 @@ import {
   Grid3X3, 
   ImageIcon, 
   Calendar, 
-  CheckCircle2,
-  Image as LucideImage,
   Zap,
   RefreshCw,
   Sparkles,
@@ -283,7 +280,7 @@ export function PromptGeneratorClient({ dictionary, existingArticles }: PromptGe
   return (
     <div className="max-w-[1600px] mx-auto">
       
-      {/* 1. Main Toolbar (Static) */}
+      {/* 1. Main Toolbar (Static - Per request) */}
       <div className="mb-8 px-4">
         <Card className="bg-background/80 backdrop-blur-xl border-primary/10 shadow-xl overflow-hidden rounded-2xl ring-1 ring-black/[0.03]">
           <div className="p-3 flex flex-wrap items-center justify-between gap-6">
@@ -360,7 +357,7 @@ export function PromptGeneratorClient({ dictionary, existingArticles }: PromptGe
                     onClick={() => setShowImages(!showImages)} 
                     className={cn("h-10 w-10 p-0 rounded-xl transition-all duration-300", showImages && "ring-2 ring-primary/20 shadow-[0_0_15px_rgba(var(--primary),0.2)]")}
                 >
-                    <LucideImage className="h-4 w-4" />
+                    <ImageIcon className="h-4 w-4" />
                 </Button>
               </div>
             </div>
@@ -560,7 +557,7 @@ export function PromptGeneratorClient({ dictionary, existingArticles }: PromptGe
                             <Card className="bg-card/50 border-primary/10 overflow-hidden shadow-sm border-l-4 border-l-emerald-400">
                                 <CardHeader className="bg-muted/5 py-3 border-b px-6">
                                     <CardTitle className="text-[10px] font-black flex items-center gap-2 uppercase tracking-widest">
-                                        <LucideImage className="h-4 w-4 text-emerald-500" /> {contentType === 'blog' ? dictionary.imagesTitle : dictionary.imagesTitleNote}
+                                        <ImageIcon className="h-4 w-4 text-emerald-500" /> {contentType === 'blog' ? dictionary.imagesTitle : dictionary.imagesTitleNote}
                                     </CardTitle>
                                 </CardHeader>
                                 <CardContent className="p-6">
@@ -683,17 +680,7 @@ export function PromptGeneratorClient({ dictionary, existingArticles }: PromptGe
                             </div>
                         </ScrollArea>
                     </CardContent>
-                    
-                    {/* Bottom Status Bar for Preview */}
-                    <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-white/[0.05] bg-black/40 backdrop-blur-md flex items-center justify-end pointer-events-none">
-                        <div className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                    </div>
                 </Card>
-                
-                {/* Visual Hint for Draft status */}
-                <p className="text-center text-[9px] font-black uppercase tracking-[0.4em] text-muted-foreground/40 animate-pulse">
-                    Live Preview Updated • {mounted ? new Date().toLocaleTimeString() : '--:--:--'}
-                </p>
             </div>
         </div>
       </div>
