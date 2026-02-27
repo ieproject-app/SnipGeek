@@ -154,43 +154,43 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
     <div className="w-full">
       <main className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-12 sm:pt-16 sm:pb-16">
         <article>
-            <header className="text-center mb-8">
-                <Breadcrumbs segments={breadcrumbSegments} className="justify-center mb-4" />
-                <h1 className="font-headline text-4xl md:text-5xl font-extrabold tracking-tighter text-primary mb-3">
+            <header className="mb-12">
+                <Breadcrumbs segments={breadcrumbSegments} className="mb-6" />
+                
+                {/* Hero Image - Clean (No Meta Overlay) */}
+                <div className="relative my-8 rounded-lg overflow-hidden shadow-2xl bg-muted group">
+                    {heroSource ? (
+                        <Image
+                            src={heroSource.url}
+                            alt={imageAlt || post.frontmatter.title}
+                            width={1200}
+                            height={630}
+                            className="w-full h-auto aspect-video object-cover transition-transform duration-700 group-hover:scale-105"
+                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 90vw, 1200px"
+                            priority
+                            data-ai-hint={heroSource.hint}
+                        />
+                    ) : (
+                        <div className="w-full aspect-video flex items-center justify-center bg-primary/5">
+                            <span className="text-primary/20 font-headline text-6xl font-black">SnipGeek</span>
+                        </div>
+                    )}
+                </div>
+
+                <h1 className="font-headline text-4xl md:text-5xl font-extrabold tracking-tighter text-primary mb-6 text-left">
                     {post.frontmatter.title}
                 </h1>
-            </header>
 
-            <div className="relative my-8 sm:my-12 rounded-lg overflow-hidden shadow-2xl bg-muted group">
-                {heroSource ? (
-                    <Image
-                        src={heroSource.url}
-                        alt={imageAlt || post.frontmatter.title}
-                        width={1200}
-                        height={630}
-                        className="w-full h-auto aspect-video object-cover transition-transform duration-700 group-hover:scale-105"
-                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 90vw, 1200px"
-                        priority
-                        data-ai-hint={heroSource.hint}
-                    />
-                ) : (
-                    <div className="w-full aspect-video flex items-center justify-center bg-primary/5">
-                        <span className="text-primary/20 font-headline text-6xl font-black">SnipGeek</span>
-                    </div>
-                )}
-                
-                {/* Minimalist Overlay Metadata */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent flex flex-col justify-between p-6 sm:p-8">
-                    <PostMeta 
-                        frontmatter={post.frontmatter}
-                        item={itemForMeta}
-                        locale={locale}
-                        dictionary={dictionary}
-                        readingTime={readingTime}
-                        isOverlay={true}
-                    />
-                </div>
-            </div>
+                {/* Meta Post - Moved below Title */}
+                <PostMeta 
+                    frontmatter={post.frontmatter}
+                    item={itemForMeta}
+                    locale={locale}
+                    dictionary={dictionary}
+                    readingTime={readingTime}
+                    isOverlay={false}
+                />
+            </header>
 
             <TableOfContents headings={headings} title={dictionary.post.toc} />
             

@@ -111,22 +111,22 @@ export default async function NotePage({ params }: { params: Promise<{ slug: str
     <div className="w-full">
       <main className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-12 sm:pt-16 sm:pb-16">
         <article>
-            <header className="text-center mb-8">
-                <Breadcrumbs segments={breadcrumbSegments} className="justify-center mb-4" />
-                <h1 className="font-headline text-4xl md:text-5xl font-extrabold tracking-tighter text-primary mb-3">
+            <header className="mb-8">
+                <Breadcrumbs segments={breadcrumbSegments} className="mb-6" />
+                <h1 className="font-headline text-4xl md:text-5xl font-extrabold tracking-tighter text-primary mb-6 text-left">
                     {note.frontmatter.title}
                 </h1>
-            </header>
 
-            <PostMeta
-                frontmatter={note.frontmatter}
-                item={itemForMeta}
-                locale={locale}
-                dictionary={dictionary}
-                readingTime={readingTime}
-                isOverlay={false}
-                isCentered={true}
-            />
+                <PostMeta
+                    frontmatter={note.frontmatter}
+                    item={itemForMeta}
+                    locale={locale}
+                    dictionary={dictionary}
+                    readingTime={readingTime}
+                    isOverlay={false}
+                    isCentered={false}
+                />
+            </header>
 
             <TableOfContents headings={headings} title={dictionary.post.toc} />
             
