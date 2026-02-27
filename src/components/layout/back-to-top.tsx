@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -41,7 +42,7 @@ export function BackToTop({ dictionary }: { dictionary: Dictionary }) {
           "transition-all duration-300 opacity-0 scale-50 translate-x-4",
           "group-hover:opacity-100 group-hover:scale-100 group-hover:translate-x-0"
       )}>
-          {dictionary.promptGenerator.tooltips.backToTop}
+          {dictionary?.promptGenerator?.tooltips?.backToTop || 'Back to Top'}
           {/* Tooltip Arrow (Points Right) */}
           <span className="absolute top-1/2 -translate-y-1/2 -right-1 w-2 h-2 bg-primary rotate-45" />
       </span>
