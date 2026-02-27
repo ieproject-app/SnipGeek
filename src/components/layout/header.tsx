@@ -219,7 +219,7 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
     )}>
         <div className="max-w-4xl mx-auto h-full px-4 flex items-center justify-between relative">
             
-            {/* Notification Overlay (Replaces Header Content) */}
+            {/* Notification Overlay */}
             <div className={cn(
                 "absolute inset-0 z-40 bg-background/95 backdrop-blur-md transition-all flex items-center justify-center px-6",
                 isGlowing && "ring-b-2 ring-accent/20",
@@ -271,16 +271,18 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                     ))}
                 </nav>
 
-                {/* Utility Buttons */}
+                {/* Utility Buttons - Reordered: Menu -> Bookmark -> Search */}
                 <div className="flex items-center gap-1">
                     <Button 
                         variant="ghost" 
-                        size="icon" 
+                        size="icon"
                         className={cn("h-10 w-10 rounded-full group", navItemClass)} 
-                        onClick={() => toggleView('search')}
-                        aria-label="Search"
+                        onClick={() => toggleView('menu')}
+                        aria-label="More Menu"
                     >
-                        <Search className="h-5 w-5 transition-transform group-hover:scale-110 group-hover:rotate-12" />
+                        <div className="relative flex items-center justify-center">
+                            {isMenuOpen ? <X className="h-5 w-5" /> : <MoreHorizontal className="h-5 w-5" />}
+                        </div>
                     </Button>
 
                     <Button 
@@ -300,19 +302,17 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
 
                     <Button 
                         variant="ghost" 
-                        size="icon"
+                        size="icon" 
                         className={cn("h-10 w-10 rounded-full group", navItemClass)} 
-                        onClick={() => toggleView('menu')}
-                        aria-label="More Menu"
+                        onClick={() => toggleView('search')}
+                        aria-label="Search"
                     >
-                        <div className="relative flex items-center justify-center">
-                            {isMenuOpen ? <X className="h-5 w-5" /> : <MoreHorizontal className="h-5 w-5" />}
-                        </div>
+                        <Search className="h-5 w-5 transition-transform group-hover:scale-110 group-hover:rotate-12" />
                     </Button>
                 </div>
             </div>
 
-            {/* Search Input Overlay (Full Height) */}
+            {/* Search Input Overlay */}
             <div className={cn(
                 "absolute inset-0 w-full h-full flex items-center transition-all duration-500 z-10 px-4",
                 isSearchOpen ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-full pointer-events-none"
@@ -336,7 +336,7 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
             </div>
         </div>
 
-        {/* Dropdowns (Menu, Search Results, Reading List) */}
+        {/* Dropdowns */}
         <div className="max-w-4xl mx-auto relative px-4">
             {/* More Menu */}
             <div className={cn(
