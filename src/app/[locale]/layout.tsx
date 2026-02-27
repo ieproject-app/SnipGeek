@@ -1,3 +1,4 @@
+
 import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
 import { i18n } from '@/i18n-config';
@@ -12,9 +13,20 @@ import { BackToTop } from '@/components/layout/back-to-top';
 import { ThemeSwitcher } from '@/components/layout/theme-switcher';
 import { getDictionary } from '@/lib/get-dictionary';
 import { DraftList } from '@/components/layout/draft-list';
-import { GeistSans } from 'geist/font/sans';
-import { GeistMono } from 'geist/font/mono';
+import { Arimo, Roboto } from 'next/font/google';
 import { cn } from '@/lib/utils';
+
+const fontBody = Arimo({
+  subsets: ['latin'],
+  variable: '--font-arimo',
+  weight: ['400', '500', '600', '700'],
+});
+
+const fontHeadline = Roboto({
+  subsets: ['latin'],
+  variable: '--font-roboto',
+  weight: ['400', '500', '700', '900'],
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://snipgeek.com'),
@@ -117,7 +129,7 @@ export default async function LocaleLayout({
   const draftNotes = getDraftNotesData(locale);
   
   return (
-    <html lang={locale} className={cn(GeistSans.variable, GeistMono.variable, "scroll-smooth")} suppressHydrationWarning>
+    <html lang={locale} className={cn(fontBody.variable, fontHeadline.variable, "scroll-smooth")} suppressHydrationWarning>
       <head />
       <body className="font-body antialiased fade-in-on-load">
         <ThemeProvider

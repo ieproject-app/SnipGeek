@@ -1,14 +1,26 @@
+
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import './globals.css';
-import { GeistSans } from 'geist/font/sans';
-import { GeistMono } from 'geist/font/mono';
+import { Arimo, Roboto } from 'next/font/google';
 import { cn } from '@/lib/utils';
 import { Search, Home, BookOpen, PenTool } from 'lucide-react';
 
+const fontBody = Arimo({
+  subsets: ['latin'],
+  variable: '--font-arimo',
+  weight: ['400', '700'],
+});
+
+const fontHeadline = Roboto({
+  subsets: ['latin'],
+  variable: '--font-roboto',
+  weight: ['700', '900'],
+});
+
 export default function NotFound() {
   return (
-    <html lang="en" className={cn(GeistSans.variable, GeistMono.variable)}>
+    <html lang="en" className={cn(fontBody.variable, fontHeadline.variable)}>
       <head>
         <title>404 - Page Not Found | SnipGeek</title>
         <meta name="description" content="Sorry, the page you're looking for doesn't exist. Find tutorials, notes, and tech tools at SnipGeek." />
