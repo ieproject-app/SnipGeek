@@ -10,7 +10,7 @@ import {
   type CarouselApi 
 } from '@/components/ui/carousel';
 import { ChevronRight } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn, formatRelativeTime } from '@/lib/utils';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 
 interface SliderPost {
@@ -108,14 +108,14 @@ export function HorizontalSlider({ posts, title, viewMoreText, locale, tag }: Ho
                       
                       {/* Content Area */}
                       <div className="flex-1 min-w-0 py-1">
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-accent mb-1 block">
+                        <span className="text-[10px] font-bold tracking-wider text-accent mb-1 block">
                           {post.frontmatter.category || 'Update'}
                         </span>
                         <h3 className="font-headline text-[13px] md:text-sm font-medium text-primary leading-snug line-clamp-2 transition-colors group-hover:text-accent">
                           {post.frontmatter.title}
                         </h3>
                         <time className="text-[10px] text-muted-foreground mt-2 block font-medium opacity-60">
-                          {new Date(post.frontmatter.date).toLocaleDateString(locale, { day: '2-digit', month: 'long', year: 'numeric' })}
+                          {formatRelativeTime(new Date(post.frontmatter.date), locale)}
                         </time>
                       </div>
                     </article>
@@ -136,7 +136,7 @@ export function HorizontalSlider({ posts, title, viewMoreText, locale, tag }: Ho
 
               <Link 
                 href={viewMoreHref} 
-                className="text-[10px] font-black uppercase tracking-widest text-primary/80 hover:text-primary transition-all flex items-center gap-2 group/more"
+                className="text-sm font-bold text-primary/80 hover:text-primary transition-all flex items-center gap-2 group/more"
               >
                 {viewMoreText}
                 <ChevronRight className="h-3.5 w-3.5 transition-transform group-hover/more:translate-x-1" />

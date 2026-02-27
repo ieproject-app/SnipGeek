@@ -9,7 +9,7 @@ import {
   CarouselItem, 
   type CarouselApi 
 } from '@/components/ui/carousel';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 
@@ -95,7 +95,6 @@ export function FeatureSlider({ posts, title, viewMoreText, locale, tag }: Featu
                   <Link href={`${linkPrefix}/blog/${post.slug}`} className="block group h-full">
                     <article className={cn(
                         "relative bg-card rounded-lg overflow-hidden border transition-all duration-300 hover:-translate-y-2 h-full flex flex-col",
-                        // "Before" Shadow Implementation
                         "before:content-[''] before:absolute before:bottom-0 before:inset-x-6 before:h-10 before:z-[-1]",
                         "before:shadow-[0_15px_30px_rgba(0,0,0,0.4)] before:opacity-0 group-hover:before:opacity-100 before:transition-opacity before:duration-500"
                     )}>
@@ -110,7 +109,7 @@ export function FeatureSlider({ posts, title, viewMoreText, locale, tag }: Featu
                         />
                       </div>
                       <div className="p-5 flex-1 flex flex-col">
-                        <span className="text-[10px] font-bold uppercase tracking-widest text-accent mb-2 block">
+                        <span className="text-[10px] font-bold tracking-widest text-accent mb-2 block">
                           {post.frontmatter.category || 'Featured'}
                         </span>
                         <h3 className="font-headline text-base font-semibold text-primary leading-snug group-hover:text-accent transition-colors">
@@ -127,17 +126,15 @@ export function FeatureSlider({ posts, title, viewMoreText, locale, tag }: Featu
           {/* Controls & Custom "View More" Style */}
           <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-8">
             <div className="flex items-center gap-6 bg-muted/30 px-5 py-2.5 rounded-full border border-primary/5">
-              {/* Left Side: Pagination Style Indicators */}
               <div className="flex items-center gap-2 pr-4 border-r border-primary/10">
                 <div className="h-1.5 w-8 bg-accent rounded-full" />
                 <div className="h-1.5 w-1.5 bg-primary/20 rounded-full" />
                 <div className="h-1.5 w-1.5 bg-primary/20 rounded-full" />
               </div>
 
-              {/* Right Side: Text & Navigation */}
               <Link 
                 href={viewMoreHref} 
-                className="text-[10px] font-black uppercase tracking-widest text-primary/80 hover:text-primary transition-all flex items-center gap-2 group/more"
+                className="text-sm font-bold text-primary/80 hover:text-primary transition-all flex items-center gap-2 group/more"
               >
                 {viewMoreText}
                 <ChevronRight className="h-3.5 w-3.5 transition-transform group-hover/more:translate-x-1" />

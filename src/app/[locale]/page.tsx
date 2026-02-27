@@ -116,7 +116,7 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
                 )}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/60 to-transparent" />
                 <div className="absolute bottom-0 left-0 p-6 text-white w-full">
-                    <p className="text-xs font-semibold uppercase tracking-wider opacity-80 mb-1">{post.frontmatter.category}</p>
+                    <p className="text-xs font-semibold mb-1 opacity-80">{post.frontmatter.category}</p>
                     <h3 className="font-headline text-xl font-extrabold leading-tight">
                         {post.frontmatter.title}
                     </h3>
@@ -161,7 +161,7 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
                 </div>
 
                 {post.frontmatter.category && (
-                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-accent mb-1.5">
+                    <p className="text-[10px] font-black tracking-wider text-accent mb-1.5">
                         {post.frontmatter.category}
                     </p>
                 )}
@@ -200,7 +200,7 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
         </section>
       )}
 
-      {/* Latest Posts Section - Updated to 3 columns and 6 items */}
+      {/* Latest Posts Section */}
       {latestPosts.length > 0 && (
         <section className="container max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pb-12 sm:pb-16">
           <h2 className="text-3xl font-bold font-headline tracking-tighter text-primary mb-12 text-center">{dictionary.home.latestPosts}</h2>
@@ -214,15 +214,13 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
                 href={`${linkPrefix}/blog`}
                 className="flex items-center gap-6 bg-muted/30 px-6 py-3 rounded-full border border-primary/5 hover:bg-muted/50 transition-all group"
             >
-                {/* Left Side: Pagination Style Indicators */}
                 <div className="flex items-center gap-2 pr-4 border-r border-primary/10">
                     <div className="h-1.5 w-8 bg-accent rounded-full" />
                     <div className="h-1.5 w-1.5 bg-primary/20 rounded-full" />
                     <div className="h-1.5 w-1.5 bg-primary/20 rounded-full" />
                 </div>
 
-                {/* Right Side: Text & Navigation */}
-                <span className="text-xs font-black uppercase tracking-widest text-primary/80 group-hover:text-primary transition-all flex items-center gap-2">
+                <span className="text-sm font-bold text-primary/80 group-hover:text-primary transition-all flex items-center gap-2">
                     {dictionary.home.viewAllPosts}
                     <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                 </span>

@@ -1,4 +1,3 @@
-
 'use client';
 
 import Link from 'next/link';
@@ -6,6 +5,7 @@ import Image from 'next/image';
 import { Undo2, ArrowRight } from 'lucide-react';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { Breadcrumbs } from '@/components/layout/breadcrumbs';
+import { formatRelativeTime } from '@/lib/utils';
 
 interface TopicPost {
   slug: string;
@@ -65,14 +65,14 @@ export function TopicSection({
                 />
             </div>
             <div className="flex-1 min-w-0 py-1">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-accent mb-1 block">
+                <span className="text-[10px] font-bold tracking-wider text-accent mb-1 block">
                     {post.frontmatter.category || tag}
                 </span>
                 <h3 className="font-headline text-[13px] md:text-sm font-medium text-primary leading-snug line-clamp-2 transition-colors group-hover:text-accent">
                     {post.frontmatter.title}
                 </h3>
-                <time className="text-[10px] text-muted-foreground mt-2 block font-medium">
-                    {new Date(post.frontmatter.date).toLocaleDateString(locale, { day: '2-digit', month: 'long', year: 'numeric' })}
+                <time className="text-[10px] text-muted-foreground mt-2 block font-medium opacity-60">
+                    {formatRelativeTime(new Date(post.frontmatter.date), locale)}
                 </time>
             </div>
         </Link>
@@ -106,7 +106,7 @@ export function TopicSection({
             
             <Link 
                 href={`${linkPrefix}/tags/${tag.toLowerCase()}`}
-                className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-accent hover:text-primary transition-all group"
+                className="flex items-center gap-2 text-sm font-bold text-accent hover:text-primary transition-all group"
             >
                 <span>{viewAllText}</span>
                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
