@@ -229,7 +229,7 @@
         "featuredSwitchLabel": "Tandai sebagai Unggulan",
         "idOnlySwitchLabel": "ID Only",
         "tagsLabel": "Tag",
-        "generatedPromptTitle": "Prompt yang Dihasilkan (Salin teks di bawah)",
+        "generatedPromptTitle": "Hasil Prompt",
         "copyButton": "Salin Prompt",
         "copiedButton": "Tersalin!",
         "promptBaseBlog": "Tolong buat dan terbitkan artikel blog baru untuk saya berdasarkan detail berikut. Versi Bahasa Inggris harus menggunakan slug yang ditentukan, dan versi Bahasa Indonesia juga harus menggunakan SLUG YANG SAMA PERSIS.",

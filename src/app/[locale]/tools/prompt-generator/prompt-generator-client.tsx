@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
@@ -280,7 +281,7 @@ export function PromptGeneratorClient({ dictionary, existingArticles }: PromptGe
   return (
     <div className="max-w-[1600px] mx-auto">
       
-      {/* 1. Main Toolbar */}
+      {/* 1. Main Toolbar (Non-sticky as requested) */}
       <div className="mb-8 px-4">
         <Card className="bg-background/80 backdrop-blur-xl border-primary/10 shadow-xl overflow-hidden rounded-2xl ring-1 ring-black/[0.03]">
           <div className="p-3 flex flex-wrap items-center justify-between gap-6">
@@ -639,28 +640,25 @@ export function PromptGeneratorClient({ dictionary, existingArticles }: PromptGe
         <div className="lg:col-span-5 h-full">
             <div className="sticky top-32 space-y-6">
                 <Card className="border-primary/20 shadow-2xl overflow-hidden ring-4 ring-primary/5 rounded-2xl bg-[#0a0a0a] group/preview">
-                    <CardHeader className="flex flex-row items-center justify-between border-b border-white/[0.05] bg-white/[0.02] py-4 px-8">
-                        <div className="flex items-center gap-3">
-                            <div className="p-1.5 bg-emerald-500/10 rounded-full"><Check className="h-4 w-4 text-emerald-500" /></div>
-                            <CardTitle className="text-[11px] font-black uppercase tracking-widest text-white/80">
-                                {dictionary.generatedPromptTitle}
-                            </CardTitle>
-                        </div>
+                    <CardHeader className="flex flex-row items-center justify-between border-b border-white/[0.05] bg-white/[0.02] py-3 px-6">
+                        <CardTitle className="text-[10px] font-black uppercase tracking-widest text-white/60">
+                            {dictionary.generatedPromptTitle}
+                        </CardTitle>
                         <Button 
                             onClick={handleCopyMain} 
                             variant="default" 
                             size="sm" 
                             className={cn(
-                                "gap-2 px-6 rounded-full shadow-lg h-9 transition-all duration-300",
+                                "gap-2 px-5 rounded-full shadow-lg h-8 transition-all duration-300",
                                 isCopied ? "bg-emerald-500 hover:bg-emerald-600 scale-105" : "bg-primary hover:bg-primary/90"
                             )}
                         >
-                            {isCopied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-                            <span className="text-[10px] font-black uppercase tracking-widest">{isCopied ? dictionary.copiedButton : dictionary.copyButton}</span>
+                            {isCopied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+                            <span className="text-[9px] font-black uppercase tracking-widest">{isCopied ? dictionary.copiedButton : dictionary.copyButton}</span>
                         </Button>
                     </CardHeader>
                     <CardContent className="p-0">
-                        <ScrollArea className="h-[calc(100vh-280px)]">
+                        <ScrollArea className="h-[calc(100vh-220px)]">
                             <div className="relative">
                                 {/* Editor-like line indicators */}
                                 <div className="absolute left-0 top-0 bottom-0 w-12 border-r border-white/[0.03] bg-white/[0.01] pointer-events-none flex flex-col items-center pt-8 gap-[1.125rem]">
@@ -672,7 +670,7 @@ export function PromptGeneratorClient({ dictionary, existingArticles }: PromptGe
                                     readOnly
                                     value={generatedPrompt}
                                     className={cn(
-                                        "min-h-[calc(100vh-280px)] border-none rounded-none bg-transparent font-mono text-[12px] pl-16 pr-8 pt-8 pb-32 resize-none focus-visible:ring-0 leading-relaxed text-slate-300 selection:bg-primary/30",
+                                        "min-h-[calc(100vh-220px)] border-none rounded-none bg-transparent font-mono text-[12px] pl-16 pr-8 pt-8 pb-32 resize-none focus-visible:ring-0 leading-relaxed text-slate-300 selection:bg-primary/30",
                                         "scrollbar-hide"
                                     )}
                                 />

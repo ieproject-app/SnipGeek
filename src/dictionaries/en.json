@@ -229,7 +229,7 @@
         "featuredSwitchLabel": "Mark as Featured",
         "idOnlySwitchLabel": "ID Only",
         "tagsLabel": "Tags",
-        "generatedPromptTitle": "Generated Prompt (Copy the text below)",
+        "generatedPromptTitle": "Generated Prompt",
         "copyButton": "Copy Prompt",
         "copiedButton": "Copied!",
         "promptBaseBlog": "Please create and publish a new blog article for me based on the following details. The English version must use the slug specified, and the Indonesian version must also use the EXACT SAME SLUG.",
