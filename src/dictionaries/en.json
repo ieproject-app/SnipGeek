@@ -233,7 +233,11 @@
         "supportingImagesLabel": "Supporting Images (in order)",
         "supportingImagesLabelNote": "Images to insert in content",
         "draftContentLabel": "Main Content/Draft",
-        "finalInstruction": "Additional Instruction: 1. Confirm translationKey and English slug. 2. Title length MUST BE 50-60 characters (STRICT SEO OPTIMIZATION). 3. STRICT MDX ADHERENCE: Use only supported components (<DownloadButton />, <ImageGrid />, standard Markdown tables). If the draft contains incompatible HTML or styles, AUTOMATICALLY adjust them to fit these components. 4. React Compliance: NEVER use 'class', ALWAYS use 'className' for any custom HTML tags like <details> or <summary>. 5. Image Alt Text: If the provided alt text is missing or a placeholder (e.g., 'PLEASE GENERATE...'), YOU MUST generate a high-quality, descriptive, and SEO-friendly alt text based on the image context in the article."
+        "finalInstruction": "Additional Instruction: 1. Confirm translationKey and English slug. 2. Title length MUST BE 50-60 characters (STRICT SEO OPTIMIZATION). 3. STRICT MDX ADHERENCE: Use only supported components (<DownloadButton />, <ImageGrid />, standard Markdown tables). If the draft contains incompatible HTML or styles, AUTOMATICALLY adjust them to fit these components. 4. React Compliance: NEVER use 'class', ALWAYS use 'className' for any custom HTML tags like <details> or <summary>. 5. Image Alt Text: If the provided alt text is missing or a placeholder (e.g., 'PLEASE GENERATE...'), YOU MUST generate a high-quality, descriptive, and SEO-friendly alt text based on the image context in the article.",
+        "tooltips": {
+            "backToTop": "Back to Top",
+            "theme": "Switch Theme"
+        }
     },
     "notifications": {
         "themeLight": "Theme: Light",

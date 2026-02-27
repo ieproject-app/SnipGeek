@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useTheme } from 'next-themes';
@@ -35,11 +34,9 @@ export function ThemeSwitcher({ dictionary }: { dictionary: Dictionary }) {
   }
 
   const toggleTheme = () => {
-    // Only toggle between light and dark, ignoring system preference
     const nextTheme = resolvedTheme === 'dark' ? 'light' : 'dark';
     setTheme(nextTheme);
     
-    // Trigger notification bar in Header with context icon
     const key = `theme${nextTheme.charAt(0).toUpperCase() + nextTheme.slice(1)}`;
     const msg = (dictionary?.notifications as any)?.[key];
     
@@ -63,14 +60,25 @@ export function ThemeSwitcher({ dictionary }: { dictionary: Dictionary }) {
 
   return (
     <div className={cn(
-        "fixed bottom-20 right-6 z-50 transition-all duration-300",
+        "fixed bottom-20 right-6 z-50 transition-all duration-300 group",
         isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'
     )}>
+      {/* Floating Pill Tooltip (Left Position) */}
+      <span className={cn(
+          "absolute top-1/2 -translate-y-1/2 right-full mr-3 px-3 py-1.5 rounded-full bg-primary text-primary-foreground text-[10px] font-black uppercase tracking-widest shadow-2xl whitespace-nowrap",
+          "opacity-0 scale-50 translate-x-4 transition-all duration-300 pointer-events-none z-20",
+          "group-hover:opacity-100 group-hover:scale-100 group-hover:translate-x-0"
+      )}>
+          {dictionary.promptGenerator.tooltips.theme}
+          {/* Tooltip Arrow (Points Right) */}
+          <span className="absolute top-1/2 -translate-y-1/2 -right-1 w-2 h-2 bg-primary rotate-45" />
+      </span>
+
       <Button
         variant="default"
         size="icon"
         onClick={toggleTheme}
-        className="h-10 w-10 rounded-full shadow-2xl transition-all duration-300 hover:scale-110 active:scale-95 bg-primary/90 text-primary-foreground border-none group"
+        className="h-10 w-10 rounded-full shadow-2xl transition-all duration-300 hover:scale-110 active:scale-95 bg-primary/90 text-primary-foreground border-none"
         aria-label="Toggle theme mode"
       >
         <div className="transition-transform duration-500 ease-in-out group-hover:rotate-[12deg]">
