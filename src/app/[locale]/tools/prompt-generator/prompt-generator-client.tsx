@@ -29,7 +29,8 @@ import {
   Zap,
   RefreshCw,
   Sparkles,
-  Type
+  Type,
+  ListFilter
 } from 'lucide-react';
 import { downloadLinks } from '@/lib/data-downloads';
 import { useNotification } from '@/hooks/use-notification';
@@ -43,9 +44,21 @@ type DownloadItem = {
   value: string;
 };
 
-export function PromptGeneratorClient({ dictionary }: { dictionary: any }) {
+type ArticleSummary = {
+  slug: string;
+  title: string;
+  type: 'blog' | 'note';
+};
+
+interface PromptGeneratorClientProps {
+  dictionary: any;
+  existingArticles: ArticleSummary[];
+}
+
+export function PromptGeneratorClient({ dictionary, existingArticles }: PromptGeneratorClientProps) {
   const [mode, setMode] = useState<'create' | 'modify'>('create');
   const [contentType, setContentType] = useState<'blog' | 'note'>('blog');
+  const [selectedSlug, setSelectedSlug] = useState<string>('');
   const [draft, setDraft] = useState('');
   const [originalContent, setOriginalContent] = useState('');
   const [modInstructions, setModInstructions] = useState('');
@@ -106,6 +119,9 @@ export function PromptGeneratorClient({ dictionary }: { dictionary: any }) {
       
       if (isModify) {
         prompt = `${dictionary.modifyPromptBase}\n\n`;
+        if (selectedSlug) {
+          prompt += `**TARGET ARTICLE SLUG:** \`${selectedSlug}\`\n\n`;
+        }
       } else {
         let promptBase = "";
         if (isBlog) {
@@ -203,7 +219,7 @@ export function PromptGeneratorClient({ dictionary }: { dictionary: any }) {
     };
 
     buildPrompt();
-  }, [mode, draft, originalContent, modInstructions, publishDate, isPublished, isFeatured, isIdOnly, images, dictionary, contentType, downloadItems, imageGridMappings, showDownloads, showGrids, showImages]);
+  }, [mode, draft, originalContent, modInstructions, publishDate, isPublished, isFeatured, isIdOnly, images, dictionary, contentType, downloadItems, imageGridMappings, showDownloads, showGrids, showImages, selectedSlug]);
 
   const handleCopyMain = () => {
     navigator.clipboard.writeText(generatedPrompt);
@@ -314,6 +330,36 @@ export function PromptGeneratorClient({ dictionary }: { dictionary: any }) {
           </div>
         </div>
       </Card>
+
+      {/* Article Selection (Only in Modify Mode) */}
+      {mode === 'modify' && (
+        <Card className="bg-card/50 border-primary/10 shadow-sm">
+          <CardHeader className="py-3 px-6 border-b bg-muted/5">
+            <CardTitle className="text-[10px] font-bold uppercase tracking-widest flex items-center gap-2">
+              <ListFilter className="h-3.5 w-3.5 text-primary" />
+              {dictionary.selectArticleLabel}
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-4">
+            <Select value={selectedSlug} onValueChange={setSelectedSlug}>
+              <SelectTrigger className="w-full bg-background/50 border-muted">
+                <SelectValue placeholder={dictionary.selectArticlePlaceholder} />
+              </SelectTrigger>
+              <SelectContent>
+                {existingArticles.map((article) => (
+                  <SelectItem key={article.slug} value={article.slug}>
+                    <div className="flex items-center gap-2">
+                      <Badge variant="outline" className="text-[8px] h-4 px-1 uppercase">{article.type}</Badge>
+                      <span className="font-semibold">{article.title}</span>
+                      <span className="text-muted-foreground text-[10px] italic">({article.slug})</span>
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </CardContent>
+        </Card>
+      )}
 
       {/* 2. Main Content Area */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">

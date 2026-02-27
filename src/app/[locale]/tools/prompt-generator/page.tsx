@@ -1,8 +1,10 @@
 
 import { getDictionary } from '@/lib/get-dictionary';
-import { i18n } from '@/i18n-config';
+import { i18n, Locale } from '@/i18n-config';
 import type { Metadata } from 'next';
 import { PromptGeneratorClient } from './prompt-generator-client';
+import { getSortedPostsData } from '@/lib/posts';
+import { getSortedNotesData } from '@/lib/notes';
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
@@ -28,6 +30,15 @@ export default async function PromptGeneratorPage({ params }: { params: Promise<
   const { locale: lang } = await params;
   const dictionary = await getDictionary(lang as any);
   const pageContent = dictionary.promptGenerator;
+
+  // Fetch existing articles to populate the selection list
+  const posts = getSortedPostsData(lang);
+  const notes = getSortedNotesData(lang);
+  
+  const existingArticles = [
+    ...posts.map(p => ({ slug: p.slug, title: p.frontmatter.title, type: 'blog' as const })),
+    ...notes.map(n => ({ slug: n.slug, title: n.frontmatter.title, type: 'note' as const }))
+  ].sort((a, b) => a.title.localeCompare(b.title));
   
   return (
     <div className="w-full">
@@ -41,7 +52,7 @@ export default async function PromptGeneratorPage({ params }: { params: Promise<
             </p>
         </header>
         
-        <PromptGeneratorClient dictionary={pageContent} />
+        <PromptGeneratorClient dictionary={pageContent} existingArticles={existingArticles} />
       </main>
     </div>
   );

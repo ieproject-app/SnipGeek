@@ -174,6 +174,8 @@
         "contentTypeLabel": "Jenis Konten",
         "contentTypeBlog": "Artikel Blog",
         "contentTypeNote": "Catatan (Note)",
+        "selectArticleLabel": "Target Artikel untuk Dimodifikasi",
+        "selectArticlePlaceholder": "Pilih artikel yang sudah ada...",
         "features": {
             "title": "Fitur Opsional",
             "downloads": "Tombol Unduhan",
