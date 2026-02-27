@@ -280,7 +280,7 @@ export function PromptGeneratorClient({ dictionary, existingArticles }: PromptGe
   return (
     <div className="max-w-[1600px] mx-auto">
       
-      {/* 1. Main Toolbar (Static - Per request) */}
+      {/* 1. Main Toolbar */}
       <div className="mb-8 px-4">
         <Card className="bg-background/80 backdrop-blur-xl border-primary/10 shadow-xl overflow-hidden rounded-2xl ring-1 ring-black/[0.03]">
           <div className="p-3 flex flex-wrap items-center justify-between gap-6">
@@ -336,7 +336,7 @@ export function PromptGeneratorClient({ dictionary, existingArticles }: PromptGe
                   </Button>
               </div>
 
-              {/* Feature Toggles with Glow Effect */}
+              {/* Feature Toggles */}
               <div className="flex items-center gap-2">
                 <Button 
                     variant={showDownloads ? 'default' : 'outline'} 
@@ -391,15 +391,15 @@ export function PromptGeneratorClient({ dictionary, existingArticles }: PromptGe
         </Card>
       </div>
 
-      {/* 2. Main Persistent Two-Column Layout */}
+      {/* 2. MainPersistent Two-Column Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 px-4">
         
-        {/* Left Column: Input Areas (Scrollable) */}
+        {/* Left Column: Input Areas */}
         <div className="lg:col-span-7 space-y-8 pb-32">
             
-            {/* Modify Mode specific: Article Selection */}
+            {/* Article Selection */}
             {mode === 'modify' && (
-                <Card className="bg-card/50 border-primary/10 shadow-sm overflow-hidden border-l-4 border-l-amber-400 animate-in fade-in slide-in-from-top-4 duration-500">
+                <Card className="bg-card/50 border-primary/10 shadow-sm overflow-hidden border-l-4 border-l-amber-400 animate-in fade-in slide-in-from-top-4 duration-500 rounded-2xl">
                     <CardHeader className="py-4 px-6 border-b bg-muted/5 flex flex-row items-center justify-between">
                         <div className="flex items-center gap-3">
                             <div className="p-2 bg-amber-400/10 rounded-lg"><ListFilter className="h-4 w-4 text-amber-500" /></div>
@@ -465,7 +465,7 @@ export function PromptGeneratorClient({ dictionary, existingArticles }: PromptGe
 
             {/* Main Draft Area */}
             <Card className={cn(
-                "bg-card/50 border-primary/10 flex flex-col overflow-hidden shadow-lg border-l-4 transition-all duration-500",
+                "bg-card/50 border-primary/10 flex flex-col overflow-hidden shadow-lg border-l-4 transition-all duration-500 rounded-2xl",
                 mode === 'modify' ? "border-l-sky-400" : "border-l-primary"
             )}>
                 <CardHeader className="flex flex-row items-center justify-between border-b bg-muted/5 px-6 py-4">
@@ -493,14 +493,13 @@ export function PromptGeneratorClient({ dictionary, existingArticles }: PromptGe
                             "placeholder:text-muted-foreground/30"
                         )}
                     />
-                    {/* Shadow Indicator for scrolling */}
                     <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-background/50 to-transparent pointer-events-none" />
                 </div>
             </Card>
 
-            {/* Modification Instructions (Modify Mode only) */}
+            {/* Modification Instructions */}
             {mode === 'modify' && (
-                <Card className="bg-card/50 border-primary/10 shadow-md border-l-4 border-l-accent animate-in fade-in slide-in-from-bottom-4 duration-500">
+                <Card className="bg-card/50 border-primary/10 shadow-md border-l-4 border-l-accent animate-in fade-in slide-in-from-bottom-4 duration-500 rounded-2xl">
                     <CardHeader className="border-b bg-muted/5 px-6 py-4">
                         <div className="flex items-center gap-3">
                             <div className="p-2 bg-accent/10 rounded-lg"><Zap className="h-4 w-4 text-accent" /></div>
@@ -538,7 +537,7 @@ export function PromptGeneratorClient({ dictionary, existingArticles }: PromptGe
                 </Card>
             )}
 
-            {/* Technical Sections: Collapsible & Animated */}
+            {/* Technical Sections */}
             <div className="space-y-4">
                 <button 
                     onClick={() => setIsTechnicalExpanded(!isTechnicalExpanded)}
@@ -554,7 +553,7 @@ export function PromptGeneratorClient({ dictionary, existingArticles }: PromptGe
                 {isTechnicalExpanded && (
                     <div className="space-y-6 animate-in fade-in slide-in-from-top-4 duration-500">
                         {showImages && (
-                            <Card className="bg-card/50 border-primary/10 overflow-hidden shadow-sm border-l-4 border-l-emerald-400">
+                            <Card className="bg-card/50 border-primary/10 overflow-hidden shadow-sm border-l-4 border-l-emerald-400 rounded-2xl">
                                 <CardHeader className="bg-muted/5 py-3 border-b px-6">
                                     <CardTitle className="text-[10px] font-black flex items-center gap-2 uppercase tracking-widest">
                                         <ImageIcon className="h-4 w-4 text-emerald-500" /> {contentType === 'blog' ? dictionary.imagesTitle : dictionary.imagesTitleNote}
@@ -576,7 +575,7 @@ export function PromptGeneratorClient({ dictionary, existingArticles }: PromptGe
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             {showDownloads && (
-                                <Card className="bg-card/50 border-primary/10 shadow-sm border-l-4 border-l-blue-400 flex flex-col animate-in fade-in zoom-in-95 duration-500">
+                                <Card className="bg-card/50 border-primary/10 shadow-sm border-l-4 border-l-blue-400 flex flex-col animate-in fade-in zoom-in-95 duration-500 rounded-2xl">
                                     <CardHeader className="border-b bg-muted/5 py-3 px-6">
                                         <CardTitle className="text-[10px] font-black flex items-center gap-2 uppercase tracking-widest">
                                             <Download className="h-4 w-4 text-blue-500" /> {dictionary.downloadLinks.title}
@@ -611,7 +610,7 @@ export function PromptGeneratorClient({ dictionary, existingArticles }: PromptGe
                             )}
 
                             {showGrids && (
-                                <Card className="bg-card/50 border-primary/10 shadow-sm border-l-4 border-l-violet-400 flex flex-col animate-in fade-in zoom-in-95 duration-500">
+                                <Card className="bg-card/50 border-primary/10 shadow-sm border-l-4 border-l-violet-400 flex flex-col animate-in fade-in zoom-in-95 duration-500 rounded-2xl">
                                     <CardHeader className="border-b bg-muted/5 py-3 px-6">
                                         <CardTitle className="text-[10px] font-black flex items-center gap-2 uppercase tracking-widest">
                                             <Grid3X3 className="h-4 w-4 text-violet-500" /> {dictionary.imageGrid.title}
@@ -636,10 +635,10 @@ export function PromptGeneratorClient({ dictionary, existingArticles }: PromptGe
             </div>
         </div>
 
-        {/* Right Column: Generated Prompt Preview (Sticky) */}
+        {/* Right Column: Generated Prompt Preview */}
         <div className="lg:col-span-5 h-full">
             <div className="sticky top-32 space-y-6">
-                <Card className="border-primary/20 shadow-2xl overflow-hidden ring-4 ring-primary/5 rounded-3xl bg-[#0a0a0a] group/preview">
+                <Card className="border-primary/20 shadow-2xl overflow-hidden ring-4 ring-primary/5 rounded-2xl bg-[#0a0a0a] group/preview">
                     <CardHeader className="flex flex-row items-center justify-between border-b border-white/[0.05] bg-white/[0.02] py-4 px-8">
                         <div className="flex items-center gap-3">
                             <div className="p-1.5 bg-emerald-500/10 rounded-full"><Check className="h-4 w-4 text-emerald-500" /></div>
