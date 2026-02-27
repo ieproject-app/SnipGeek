@@ -299,7 +299,7 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                         key={item.href}
                         href={item.href}
                         className={cn(
-                            "px-4 py-1 text-[10px] font-black uppercase tracking-widest transition-all hidden sm:flex items-center",
+                            "px-2.5 py-1 text-[10px] font-black uppercase tracking-widest transition-all hidden sm:flex items-center",
                             "hover:-translate-y-0.5 active:scale-95",
                             pathname.includes(item.href) ? "text-accent" : "text-primary-foreground/70 hover:text-primary-foreground"
                         )}
