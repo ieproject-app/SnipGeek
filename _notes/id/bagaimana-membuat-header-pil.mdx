@@ -1,0 +1,38 @@
+---
+title: "Bagaimana Saya Membuat Header Pil yang Melayang"
+date: "2024-05-20"
+description: "Catatan teknis tentang pembuatan navigasi berbentuk pil yang melayang dan transparan."
+translationKey: "catatan-bagaimana-saya-membuat-header-pil"
+published: true
+tags: ["UI/UX", "Tailwind", "Design"]
+---
+
+Header adalah elemen pertama yang dilihat pengunjung, dan untuk SnipGeek, saya ingin sesuatu yang terasa "ringan" tapi tetap fungsional. Akhirnya, saya memutuskan untuk menggunakan desain **Floating Pill Header**.
+
+## Filosofi Desain
+
+Meskipun saat ini kita sudah menerapkan standar *Precision Tech* dengan sudut **4px** pada seluruh kartu dan gambar di SnipGeek, header tetap saya biarkan berbentuk bulat sempurna (*full rounded*). Mengapa? Karena header berfungsi sebagai navigasi global yang harus terlihat kontras dan menonjol dari konten di bawahnya yang lebih kaku dan teknis.
+
+## Detail Implementasi
+
+Saya menggunakan kombinasi beberapa teknik CSS modern di Tailwind:
+1. **Backdrop Blur**: Memberikan efek kaca transparan sehingga konten di bawahnya tetap terlihat samar.
+2. **Sticky Positioning**: Memastikan navigasi selalu tersedia saat pengguna melakukan scroll.
+3. **Z-Index Management**: Menempatkan header di lapisan paling atas agar tidak tertutup oleh elemen slider.
+
+```tsx
+// Cuplikan struktur utama header
+<header className="fixed top-4 left-1/2 -translate-x-1/2 z-50">
+  <nav className="bg-primary/90 backdrop-blur-sm rounded-full shadow-lg h-12">
+    {/* Navigasi di sini */}
+  </nav>
+</header>
+```
+
+## Arsip Visual Desain Saat Ini
+
+Seperti yang saya khawatirkan, desain web terus berevolusi. Agar kita tidak kehilangan jejak bagaimana tampilan header ini di masa "kejayaannya", saya mengabadikannya dalam gambar di bawah ini:
+
+![Tampilan Desain Header Pil SnipGeek](https://picsum.photos/seed/header-pil-id/1200/600)
+
+Gambar di atas adalah bukti sejarah bahwa SnipGeek pernah memiliki navigasi yang sangat bulat di tengah gempuran desain kotak yang presisi. Jika suatu hari nanti saya memutuskan untuk menggantinya menjadi desain yang lebih tajam, catatan ini akan tetap menjadi pengingat.

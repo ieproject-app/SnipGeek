@@ -1,0 +1,38 @@
+---
+title: "How I Built the Floating Pill Header"
+date: "2024-05-20"
+description: "Technical notes on creating a floating, transparent pill-shaped navigation header."
+translationKey: "catatan-bagaimana-saya-membuat-header-pil"
+published: true
+tags: ["UI/UX", "Tailwind", "Design"]
+---
+
+The header is the first element visitors see, and for SnipGeek, I wanted something that felt "light" yet functional. Ultimately, I settled on the **Floating Pill Header** design.
+
+## Design Philosophy
+
+Even though we have now implemented the *Precision Tech* standard with **4px** corners for all cards and images on SnipGeek, I kept the header perfectly round (*full rounded*). Why? Because the header serves as a global navigation that needs to look contrasty and stand out from the more rigid and technical content below it.
+
+## Implementation Details
+
+I used a combination of several modern CSS techniques in Tailwind:
+1. **Backdrop Blur**: Provides a transparent glass effect so underlying content remains faintly visible.
+2. **Sticky Positioning**: Ensures navigation is always available while the user scrolls.
+3. **Z-Index Management**: Places the header on the topmost layer so it isn't covered by slider elements.
+
+```tsx
+// Main header structure snippet
+<header className="fixed top-4 left-1/2 -translate-x-1/2 z-50">
+  <nav className="bg-primary/90 backdrop-blur-sm rounded-full shadow-lg h-12">
+    {/* Navigation items here */}
+  </nav>
+</header>
+```
+
+## Visual Archive of Current Design
+
+As I often worry, web design is constantly evolving. To ensure we don't lose track of how this header looked during its "heyday," I have captured it in the image below:
+
+![SnipGeek Pill Header Design Preview](https://picsum.photos/seed/header-pil-en/1200/600)
+
+The image above is historical proof that SnipGeek once had very rounded navigation amidst a sea of sharp, precision-based designs. If I ever decide to change it to a sharper look in the future, this record will remain as a reminder.
