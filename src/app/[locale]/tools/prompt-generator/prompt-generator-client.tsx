@@ -283,8 +283,8 @@ export function PromptGeneratorClient({ dictionary, existingArticles }: PromptGe
   return (
     <div className="max-w-[1600px] mx-auto">
       
-      {/* 1. Main Sticky Toolbar */}
-      <div className="sticky top-20 z-40 mb-8 px-4">
+      {/* 1. Main Toolbar (Static) */}
+      <div className="mb-8 px-4">
         <Card className="bg-background/80 backdrop-blur-xl border-primary/10 shadow-xl overflow-hidden rounded-2xl ring-1 ring-black/[0.03]">
           <div className="p-3 flex flex-wrap items-center justify-between gap-6">
             
@@ -685,12 +685,7 @@ export function PromptGeneratorClient({ dictionary, existingArticles }: PromptGe
                     </CardContent>
                     
                     {/* Bottom Status Bar for Preview */}
-                    <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-white/[0.05] bg-black/40 backdrop-blur-md flex items-center justify-between pointer-events-none">
-                        <div className="flex items-center gap-4 text-[9px] font-black uppercase tracking-widest text-white/30">
-                            <span className="flex items-center gap-1.5"><Terminal className="h-3 w-3" /> Ready to process</span>
-                            <Separator orientation="vertical" className="h-3 bg-white/10" />
-                            <span className="flex items-center gap-1.5"><Sparkles className="h-3 w-3" /> AI Optimized</span>
-                        </div>
+                    <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-white/[0.05] bg-black/40 backdrop-blur-md flex items-center justify-end pointer-events-none">
                         <div className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
                     </div>
                 </Card>
