@@ -1,0 +1,132 @@
+/**
+ * SnipBlog Security Rules
+ * 
+ * Core Philosophy:
+ * This ruleset implements a robust Role-Based Access Control (RBAC) model using Database-Based 
+ * Access Control (DBAC). It distinguishes between public readers and administrative contributors.
+ * Access is primarily governed by the user's presence in a dedicated administrative roles collection.
+ * 
+ * Data Structure:
+ * - /roles_admin/{userId}: Defines administrative privileges.
+ * - /blogPosts_published/{postId}: Publicly accessible content.
+ * - /blogPosts_drafts/{postId}: Private administrative workspace for content creation.
+ * - /authors/{authorId}: Public profiles of contributors.
+ * - /tags/{tagId}: Public taxonomy for content categorization.
+ * 
+ * Key Security Decisions:
+ * - Structural Segregation: Published content and drafts are stored in separate top-level 
+ *   collections to ensure that public "list" operations never accidentally leak draft content.
+ * - DBAC over Custom Claims: Administrative status is determined by looking up the user's 
+ *   UID in the `/roles_admin` collection, allowing for real-time permission updates.
+ * - Authorization Independence: Blog posts denormalize author information to avoid 
+ *   multi-document lookups during standard read operations.
+ * - Relational Integrity: On creation, documents are verified to ensure internal IDs 
+ *   match their path identifiers.
+ */
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // --- GLOBAL HELPER FUNCTIONS ---
+
+    /** 
+     * @description Checks if the request is from a signed-in user.
+     */
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    /** 
+     * @description Checks if the user's UID exists in the admin roles collection.
+     */
+    function isAdmin() {
+      return isSignedIn() && exists(/databases/$(database)/documents/roles_admin/$(request.auth.uid));
+    }
+
+    /** 
+     * @description Verifies ownership of a specific user-bound resource.
+     */
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    /** 
+     * @description Combines admin check with existence check for updates and deletes.
+     */
+    function isExistingAdmin() {
+      return isAdmin() && resource != null;
+    }
+
+    // --- COLLECTION RULES ---
+
+    /**
+     * @description Secure lookup for administrative privileges.
+     * @path /roles_admin/{userId}
+     * @allow (get) If the user is checking their own admin status.
+     * @deny (list/write) Public listing or self-promotion to admin.
+     * @principle DBAC (Database-Based Access Control) source of truth.
+     */
+    match /roles_admin/{userId} {
+      allow get: if isOwner(userId);
+      allow list: if false;
+      allow create, update, delete: if false;
+    }
+
+    /**
+     * @description Publicly readable blog posts with admin-only write access.
+     * @path /blogPosts_published/{blogPostId}
+     * @allow (get, list) For all users, including anonymous.
+     * @deny (create, update, delete) For any non-admin user.
+     * @principle Structural segregation for secure public listing.
+     */
+    match /blogPosts_published/{blogPostId} {
+      allow get, list: if true;
+      allow create: if isAdmin() && request.resource.data.id == blogPostId;
+      allow update: if isExistingAdmin() && request.resource.data.authorId == resource.data.authorId;
+      allow delete: if isExistingAdmin();
+    }
+
+    /**
+     * @description Private drafts accessible only to administrators.
+     * @path /blogPosts_drafts/{blogPostId}
+     * @allow (all) Only for authenticated administrators.
+     * @deny (all) For public or non-admin users.
+     * @principle Access restricted to a specific global role.
+     */
+    match /blogPosts_drafts/{blogPostId} {
+      allow get, list: if isAdmin();
+      allow create: if isAdmin() && request.resource.data.id == blogPostId;
+      allow update: if isExistingAdmin() && request.resource.data.authorId == resource.data.authorId;
+      allow delete: if isExistingAdmin();
+    }
+
+    /**
+     * @description Author profiles for public display.
+     * @path /authors/{authorId}
+     * @allow (get, list) For all users.
+     * @deny (create, update, delete) For non-admin users.
+     * @principle Public read access with administrative content control.
+     */
+    match /authors/{authorId} {
+      allow get, list: if true;
+      allow create: if isAdmin() && request.resource.data.id == authorId;
+      allow update: if isExistingAdmin();
+      allow delete: if isExistingAdmin();
+    }
+
+    /**
+     * @description Blog taxonomy (tags) for organization and search.
+     * @path /tags/{tagId}
+     * @allow (get, list) For all users.
+     * @deny (create, update, delete) For non-admin users.
+     * @principle Shared public taxonomy managed by administrators.
+     */
+    match /tags/{tagId} {
+      allow get, list: if true;
+      allow create: if isAdmin() && request.resource.data.id == tagId;
+      allow update: if isExistingAdmin();
+      allow delete: if isExistingAdmin();
+    }
+  }
+}
