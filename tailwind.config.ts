@@ -90,10 +90,20 @@ export default {
             height: '0',
           },
         },
+        wiggle: {
+          '0%, 100%': { transform: 'rotate(0deg) scale(1)' },
+          '15%': { transform: 'rotate(-18deg) scale(1.1)' },
+          '30%': { transform: 'rotate(16deg) scale(1.1)' },
+          '45%': { transform: 'rotate(-12deg) scale(1.05)' },
+          '60%': { transform: 'rotate(10deg) scale(1.05)' },
+          '75%': { transform: 'rotate(-6deg) scale(1.02)' },
+          '90%': { transform: 'rotate(4deg) scale(1.02)' },
+        }
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
+        wiggle: 'wiggle 0.7s ease-in-out',
       },
     },
   },

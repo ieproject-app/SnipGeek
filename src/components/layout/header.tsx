@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
@@ -253,8 +254,8 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                 "flex items-center transition-all duration-500",
                 isSearchOpen ? "opacity-0 pointer-events-none" : "opacity-100"
             )}>
-                <NextLink href="/" className="flex items-center gap-3 group [perspective:600px]" aria-label="SnipGeek Home">
-                    <SnipGeekLogo className="h-9 w-9 transition-transform duration-[600ms] ease-in-out group-hover:[transform:rotateY(360deg)]" />
+                <NextLink href="/" className="flex items-center gap-3 group" aria-label="SnipGeek Home">
+                    <SnipGeekLogo className="h-9 w-9 group-hover:animate-wiggle" />
                     <div className="font-headline text-2xl font-black tracking-tighter hidden sm:flex items-baseline">
                         <span className="text-foreground">Snip</span>
                         <span className="text-accent dark:text-foreground ml-px">Geek</span>
