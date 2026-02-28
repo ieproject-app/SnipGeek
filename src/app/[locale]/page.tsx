@@ -4,13 +4,14 @@ import Link from 'next/link';
 import { i18n } from '@/i18n-config';
 import Image from 'next/image';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
-import { cn, formatRelativeTime } from '@/lib/utils';
+import { formatRelativeTime } from '@/lib/utils';
 import { AddToReadingListButton } from '@/components/layout/add-to-reading-list-button';
-import { Flame, ChevronRight } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import { getDictionary } from '@/lib/get-dictionary';
 import { FeatureSlider } from '@/components/home/feature-slider';
 import { TopicSection } from '@/components/home/topic-section';
 import { HorizontalSlider } from '@/components/home/horizontal-slider';
+import { FeaturedPosts } from '@/components/home/featured-posts';
 
 export async function generateStaticParams() {
   return i18n.locales.map((locale) => ({ locale }));
@@ -65,67 +66,6 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
 
   const dictionary = await getDictionary(locale);
   const linkPrefix = locale === i18n.defaultLocale ? '' : `/${locale}`;
-
-  const renderFeaturedCard = (post: (typeof allPostsData)[0], index: number) => {
-    const heroImageValue = post.frontmatter.heroImage;
-    let heroImageSrc: string | undefined;
-    let heroImageHint: string | undefined;
-
-    if (heroImageValue) {
-        if (heroImageValue.startsWith('http') || heroImageValue.startsWith('/')) {
-            heroImageSrc = heroImageValue;
-            heroImageHint = post.frontmatter.imageAlt || post.frontmatter.title;
-        } else {
-            const placeholder = PlaceHolderImages.find(p => p.id === heroImageValue);
-            if (placeholder) {
-                heroImageSrc = placeholder.imageUrl;
-                heroImageHint = placeholder.imageHint;
-            }
-        }
-    }
-
-    const item = {
-        slug: post.slug,
-        title: post.frontmatter.title,
-        description: post.frontmatter.description,
-        href: `${linkPrefix}/blog/${post.slug}`,
-        type: 'blog' as const,
-    };
-
-    return (
-        <Link href={`${linkPrefix}/blog/${post.slug}`} className="block group" aria-label={`Read more about ${post.frontmatter.title}`}>
-            <article className="relative w-full aspect-[4/3] rounded-lg overflow-hidden shadow-xl transition-all duration-500 border-primary/5">
-                <div className="absolute top-3 right-3 z-20 flex items-center gap-2">
-                    <AddToReadingListButton 
-                        item={item}
-                        dictionary={dictionary.readingList}
-                        showText={false}
-                        className="text-white bg-black/30 hover:bg-black/50 hover:text-white opacity-0 group-hover:opacity-100 transition-opacity"
-                    />
-                    <Flame className="h-5 w-5 text-orange-400 fill-orange-400" />
-                </div>
-                {heroImageSrc && (
-                    <Image
-                        src={heroImageSrc}
-                        alt={post.frontmatter.imageAlt || post.frontmatter.title}
-                        fill
-                        className="object-cover transition-transform duration-700 group-hover:scale-110"
-                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                        priority={index < 2}
-                        data-ai-hint={heroImageHint}
-                    />
-                )}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/60 to-transparent" />
-                <div className="absolute bottom-0 left-0 p-6 text-white w-full">
-                    <p className="text-[10px] font-semibold mb-1 opacity-80">{post.frontmatter.category}</p>
-                    <h3 className="font-headline text-xl font-extrabold leading-tight">
-                        {post.frontmatter.title}
-                    </h3>
-                </div>
-            </article>
-        </Link>
-    );
-  }
 
   const renderLatestCard = (post: (typeof allPostsData)[0]) => {
     const heroImageValue = post.frontmatter.heroImage;
@@ -193,27 +133,13 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
 
   return (
     <div className="w-full">
-      {/* Featured Posts Section */}
-      {featuredPosts.length > 0 && (
-        <section className="py-16 sm:py-24 bg-primary/[0.03] dark:bg-muted/30 border-y border-primary/5">
-          <div className="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-0">
-              {featuredPosts.map((post, index) => (
-                  <div
-                    key={post.slug}
-                    className={cn(
-                      "transform transition-all duration-500 ease-in-out will-change-transform",
-                      (index === 0 || index === 2) && "rotate-2 -translate-y-4 hover:-translate-y-8",
-                      (index === 1 || index === 3) && "-rotate-2 z-10 hover:-translate-y-4"
-                    )}
-                  >
-                    {renderFeaturedCard(post, index)}
-                  </div>
-                ))}
-            </div>
-          </div>
-        </section>
-      )}
+      {/* Featured Posts Section - Extracted to dedicated component */}
+      <FeaturedPosts 
+        posts={featuredPosts} 
+        dictionary={dictionary} 
+        locale={locale} 
+        linkPrefix={linkPrefix} 
+      />
 
       {/* Latest Posts Section */}
       {latestPosts.length > 0 && (
