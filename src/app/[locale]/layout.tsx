@@ -15,6 +15,7 @@ import { getDictionary } from '@/lib/get-dictionary';
 import { DraftList } from '@/components/layout/draft-list';
 import { Arimo, Roboto } from 'next/font/google';
 import { cn } from '@/lib/utils';
+import Script from 'next/script';
 
 const fontBody = Arimo({
   subsets: ['latin'],
@@ -130,7 +131,14 @@ export default async function LocaleLayout({
   
   return (
     <html lang={locale} className={cn(fontBody.variable, fontHeadline.variable, "scroll-smooth")} suppressHydrationWarning>
-      <head />
+      <head>
+        <Script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6235611333449307"
+          crossOrigin="anonymous"
+          strategy="afterInteractive"
+        />
+      </head>
       <body className="font-body antialiased fade-in-on-load">
         <ThemeProvider
             attribute="class"
@@ -141,7 +149,7 @@ export default async function LocaleLayout({
           <NotificationProvider>
             <ReadingListProvider>
               <Header searchableData={searchableData} dictionary={dictionary} />
-              <main className="pt-20">{children}</main>
+              <main className="pt-10">{children}</main>
               <Footer dictionary={dictionary} translationsMap={translationsMap} />
               <BackToTop dictionary={dictionary} />
               <ThemeSwitcher dictionary={dictionary} />
