@@ -1,0 +1,230 @@
+{
+  "entities": {
+    "BlogPost": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "BlogPost",
+      "type": "object",
+      "description": "Represents a single blog post on the SnipBlog website, designed for management via an admin dashboard and eventual rendering via MDX.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the BlogPost entity."
+        },
+        "title": {
+          "type": "string",
+          "description": "The main title of the blog post."
+        },
+        "slug": {
+          "type": "string",
+          "description": "A URL-friendly, unique identifier for the blog post, derived from the title, used for permalinks."
+        },
+        "contentMdx": {
+          "type": "string",
+          "description": "The full content of the blog post, written in MDX format."
+        },
+        "excerpt": {
+          "type": "string",
+          "description": "A brief summary or snippet of the blog post content, often displayed in listings."
+        },
+        "heroImageUrl": {
+          "type": "string",
+          "description": "The URL of the hero image displayed prominently at the top of the blog post.",
+          "format": "uri"
+        },
+        "heroImageAltText": {
+          "type": "string",
+          "description": "Alternative text for the hero image, crucial for accessibility and SEO."
+        },
+        "publishDate": {
+          "type": "string",
+          "description": "The date and time when the blog post was first published.",
+          "format": "date-time"
+        },
+        "updatedDate": {
+          "type": "string",
+          "description": "The date and time when the blog post was last updated.",
+          "format": "date-time"
+        },
+        "isPublished": {
+          "type": "boolean",
+          "description": "Indicates whether the blog post is publicly visible (true) or a draft (false)."
+        },
+        "authorId": {
+          "type": "string",
+          "description": "Reference to the Author who wrote this blog post. (Relationship: Author 1:N BlogPost)"
+        },
+        "tagIds": {
+          "type": "array",
+          "description": "References to tags associated with this blog post for categorization. (Relationship: Tag N:N BlogPost)",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "slug",
+        "contentMdx",
+        "excerpt",
+        "heroImageUrl",
+        "heroImageAltText",
+        "publishDate",
+        "isPublished",
+        "authorId"
+      ]
+    },
+    "Author": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Author",
+      "type": "object",
+      "description": "Represents an author who can publish blog posts on SnipBlog.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Author entity."
+        },
+        "name": {
+          "type": "string",
+          "description": "The full name of the author."
+        },
+        "bio": {
+          "type": "string",
+          "description": "A short biographical description of the author."
+        },
+        "email": {
+          "type": "string",
+          "description": "The email address of the author (not used for authentication).",
+          "format": "email"
+        },
+        "profileImageUrl": {
+          "type": "string",
+          "description": "The URL to the author's profile picture.",
+          "format": "uri"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "email"
+      ]
+    },
+    "Tag": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Tag",
+      "type": "object",
+      "description": "Represents a categorization tag that can be applied to blog posts for better organization and searchability.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Tag entity."
+        },
+        "name": {
+          "type": "string",
+          "description": "The human-readable name of the tag (e.g., 'Next.js', 'Web Development')."
+        },
+        "slug": {
+          "type": "string",
+          "description": "A URL-friendly, unique identifier for the tag, derived from its name.",
+          "format": "uri"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "slug"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/roles_admin/{userId}",
+        "definition": {
+          "entityName": "admin_role",
+          "schema": {
+            "$ref": "#/backend/entities/UserRole"
+          },
+          "description": "Collection to define users with administrative privileges. The document ID (`userId`) corresponds to the Firebase Authentication UID of the administrator. Existence of a document here grants admin access. This follows the DBAC principle and supports global roles.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The Firebase Authentication UID of the administrative user."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/blogPosts_published/{blogPostId}",
+        "definition": {
+          "entityName": "BlogPost",
+          "schema": {
+            "$ref": "#/backend/entities/BlogPost"
+          },
+          "description": "Stores blog posts that are publicly visible. Documents in this collection are guaranteed to have `isPublished: true`. Public users have read access. Only users with the 'admin' role can create, update, or delete documents here. Includes denormalized 'authorName', 'authorProfileImageUrl', and 'authorBio' for authorization independence and efficient public display.",
+          "params": [
+            {
+              "name": "blogPostId",
+              "description": "The unique identifier for the published blog post."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/blogPosts_drafts/{blogPostId}",
+        "definition": {
+          "entityName": "BlogPost",
+          "schema": {
+            "$ref": "#/backend/entities/BlogPost"
+          },
+          "description": "Stores blog posts that are currently in draft status and not publicly visible. Documents in this collection are guaranteed to have `isPublished: false`. Only users with the 'admin' role have read, create, update, and delete access. Includes denormalized 'authorName', 'authorProfileImageUrl', and 'authorBio' to avoid cross-collection reads for admin panel views.",
+          "params": [
+            {
+              "name": "blogPostId",
+              "description": "The unique identifier for the draft blog post."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/authors/{authorId}",
+        "definition": {
+          "entityName": "Author",
+          "schema": {
+            "$ref": "#/backend/entities/Author"
+          },
+          "description": "Stores information about authors. This collection is publicly readable for displaying author profiles on blog posts. Only users with the 'admin' role can create, update, or delete author records. `authorId` is the unique identifier for the author.",
+          "params": [
+            {
+              "name": "authorId",
+              "description": "The unique identifier for the author."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/tags/{tagId}",
+        "definition": {
+          "entityName": "Tag",
+          "schema": {
+            "$ref": "#/backend/entities/Tag"
+          },
+          "description": "Stores categorization tags for blog posts. This collection is publicly readable for display in tag listings or post details. Only users with the 'admin' role can create, update, or delete tag records. `tagId` is the unique identifier for the tag.",
+          "params": [
+            {
+              "name": "tagId",
+              "description": "The unique identifier for the tag."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "The Firestore structure is designed to provide a secure, scalable, and debuggable backend for the SnipBlog website, explicitly supporting an admin dashboard for content management while maintaining public readability for published articles. \n\n**Authorization Independence (CRITICAL):** This is achieved primarily through **Structural Segregation** and **Denormalization**. Published blog posts reside in `/blogPosts_published`, which are globally readable, eliminating the need for `get()` calls in rules to check permissions. Drafts and administrative actions are confined to `/blogPosts_drafts`, where access is governed by the presence of a user's UID in the `/roles_admin` collection. The authorization logic for blog posts (read access for public posts, admin access for drafts) is self-contained within the document's path or collection, or the requesting user's role, thus avoiding hierarchical dependencies. Furthermore, `BlogPost` documents denormalize key `Author` details (`authorName`, `authorProfileImageUrl`, `authorBio`) to prevent `get()` calls to the `/authors` collection when displaying posts.\n\n**Clarity of Intent (Debuggability):** The separation into `_published` and `_drafts` collections makes the security posture explicit. A document's location clearly indicates its accessibility. The `/roles_admin` collection provides a transparent and single source of truth for administrative privileges.\n\n**DBAC (No Custom Claims):** User roles are managed directly within Firestore via the `/roles_admin/{userId}` collection. Authorization rules will check `request.auth.uid` against the existence of a document in this collection for admin access.\n\n**QAPs (Rules are not Filters):** This design strongly supports secure `list` operations:\n*   For public users, querying `/blogPosts_published` is inherently secure as all documents in this collection are intended for public read access. The security rules will permit `list` on this collection without needing to filter on `isPublished` because only published posts are ever placed here.\n*   For administrators, querying `/blogPosts_drafts` is secure because only authenticated users with the `admin` role can perform `list` operations on this collection. Similarly, only admins can `list` `/authors` and `/tags`.\n\n**Invariants:** The use of explicit `publishDate`, `updatedDate`, `isPublished` fields and unique slugs within their respective collections helps maintain data integrity. The `authorId` linking to the `/authors` collection ensures clear ownership, and denormalized fields maintain consistency for display purposes."
+  }
+}
