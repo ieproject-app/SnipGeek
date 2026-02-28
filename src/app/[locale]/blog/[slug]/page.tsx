@@ -152,7 +152,7 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
 
   return (
     <div className="w-full">
-      <main className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-12 sm:pt-12 sm:pb-16">
+      <main className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 sm:pt-8 pb-12 sm:pt-12 sm:pb-16">
         <article>
             <header className="mb-12">
                 <Breadcrumbs segments={breadcrumbSegments} className="mb-6" />

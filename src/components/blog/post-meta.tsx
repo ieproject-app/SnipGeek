@@ -6,7 +6,7 @@ import type { Dictionary } from '@/lib/get-dictionary';
 import type { ReadingListItem } from '@/hooks/use-reading-list';
 import Link from 'next/link';
 import { i18n } from '@/i18n-config';
-import { cn } from '@/lib/utils';
+import { cn, formatRelativeTime } from '@/lib/utils';
 
 interface PostMetaProps {
   frontmatter: PostFrontmatter | NoteFrontmatter;
@@ -21,13 +21,11 @@ interface PostMetaProps {
 export function PostMeta({ frontmatter, item, locale, dictionary, readingTime, isOverlay = false, isCentered = false }: PostMetaProps) {
   const authorName = "Iwan Efendi";
   const displayDate = frontmatter.updated || frontmatter.date;
+  const isUpdated = !!frontmatter.updated;
   const linkPrefix = locale === i18n.defaultLocale ? '' : `/${locale}`;
 
-  const dateStr = new Date(displayDate).toLocaleDateString(locale, {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
+  const relativeTimeStr = formatRelativeTime(new Date(displayDate), locale);
+  const timeLabel = isUpdated ? (locale === 'id' ? 'Diperbarui ' : 'Updated ') : '';
 
   if (isOverlay) {
     return (
@@ -56,7 +54,7 @@ export function PostMeta({ frontmatter, item, locale, dictionary, readingTime, i
           <div className="flex flex-wrap items-center gap-3 text-sm font-medium text-white/90">
             <span className="font-bold text-white">{authorName}</span>
             <span className="opacity-40">•</span>
-            <time>{dateStr}</time>
+            <time>{timeLabel}{relativeTimeStr}</time>
             {readingTime && (
               <>
                 <span className="opacity-40">•</span>
@@ -80,7 +78,7 @@ export function PostMeta({ frontmatter, item, locale, dictionary, readingTime, i
       <div className="flex items-center gap-3 text-sm font-medium text-muted-foreground">
         <span className="text-primary font-bold">{authorName}</span>
         <span className="opacity-30">•</span>
-        <time>{dateStr}</time>
+        <time>{timeLabel}{relativeTimeStr}</time>
         {readingTime && (
           <>
             <span className="opacity-30">•</span>

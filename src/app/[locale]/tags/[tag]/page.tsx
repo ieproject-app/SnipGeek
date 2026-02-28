@@ -55,7 +55,7 @@ export default async function TagPage({ params }: { params: Promise<{ tag: strin
 
   return (
     <div className="w-full">
-      <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-12 sm:pt-12 sm:pb-16">
+      <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 sm:pt-8 pb-12 sm:pt-12 sm:pb-16">
         <header className="mb-16 text-center">
             <h1 className="font-headline text-5xl md:text-6xl font-extrabold tracking-tighter text-primary mb-3">
                 {dictionary.tags.title.replace('{tag}', decodedTag.toUpperCase())}
