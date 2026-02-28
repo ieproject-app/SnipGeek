@@ -153,18 +153,18 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
   return (
     <div className="w-full">
       {/* 
-        Symmetry Math: 
-        pt-14 (56px) padding-top on main.
-        mb-6 (24px) on Breadcrumbs + mt-8 (32px) from Image my-8 = 56px.
-        Result: Breadcrumbs is perfectly centered between Header and Hero Image.
+        Precision Symmetry (40px / 40px):
+        pt-10 (40px) on main.
+        mb-10 (40px) on Breadcrumbs segments.
+        Hero Image mt is set to 0 to avoid margin collapsing with breadcrumbs.
       */}
-      <main className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pt-14 pb-16 sm:pb-24">
+      <main className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-16 sm:pb-24">
         <article>
             <header className="mb-12">
-                <Breadcrumbs segments={breadcrumbSegments} className="mb-6" />
+                <Breadcrumbs segments={breadcrumbSegments} className="mb-10" />
                 
-                {/* Hero Image */}
-                <div className="relative my-8 rounded-lg overflow-hidden shadow-xl bg-muted group">
+                {/* Hero Image - mt-0 ensures 40px gap from Breadcrumbs mb-10 */}
+                <div className="relative mt-0 mb-8 rounded-lg overflow-hidden shadow-xl bg-muted group">
                     {heroSource ? (
                         <Image
                             src={heroSource.url}

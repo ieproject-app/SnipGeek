@@ -107,10 +107,10 @@ export default async function NotePage({ params }: { params: Promise<{ slug: str
 
   return (
     <div className="w-full">
-      <main className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pt-14 pb-16 sm:pb-24">
+      <main className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-16 sm:pb-24">
         <article>
             <header className="mb-8">
-                <Breadcrumbs segments={breadcrumbSegments} className="mb-6" />
+                <Breadcrumbs segments={breadcrumbSegments} className="mb-10" />
                 <h1 className="font-headline text-4xl md:text-5xl font-extrabold tracking-tighter text-primary mb-6 text-left">
                     {note.frontmatter.title}
                 </h1>
