@@ -94,7 +94,7 @@ export function HorizontalSlider({ posts, title, viewMoreText, locale, tag }: Ho
                 <CarouselItem key={post.slug} className="pl-4 sm:pl-6 md:basis-1/2">
                   <Link href={`${linkPrefix}/blog/${post.slug}`} className="block group h-full">
                     <article className={cn(
-                        "bg-card/50 rounded-xl overflow-hidden border border-primary/5 p-3 transition-all duration-500 h-full flex gap-4",
+                        "bg-card/50 rounded-lg overflow-hidden border border-primary/5 p-3 transition-all duration-500 h-full flex gap-4",
                         "shadow-sm hover:shadow-[0_15px_30px_rgba(0,0,0,0.1)] dark:hover:shadow-[0_15px_30px_rgba(0,0,0,0.3)]",
                         "hover:-translate-y-1.5 hover:bg-card hover:border-primary/10"
                     )}>

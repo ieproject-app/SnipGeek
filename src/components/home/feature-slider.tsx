@@ -1,4 +1,3 @@
-
 'use client';
 
 import * as React from 'react';
@@ -95,12 +94,12 @@ export function FeatureSlider({ posts, title, viewMoreText, locale, tag }: Featu
                 <CarouselItem key={post.slug} className="pl-4 sm:pl-6 md:basis-1/2 lg:basis-1/3 py-8">
                   <Link href={`${linkPrefix}/blog/${post.slug}`} className="block group h-full">
                     <article className={cn(
-                        "relative bg-card rounded-xl border border-primary/5 transition-all duration-500 h-full flex flex-col group/card overflow-hidden",
+                        "relative bg-card rounded-lg border border-primary/5 transition-all duration-500 h-full flex flex-col group/card overflow-hidden",
                         "hover:-translate-y-2 hover:border-primary/10",
                         "shadow-lg hover:shadow-2xl dark:shadow-black/40"
                     )}>
                       {/* Image container */}
-                      <div className="relative aspect-video overflow-hidden z-10">
+                      <div className="relative aspect-video overflow-hidden z-10 rounded-t-lg">
                         <Image
                           src={heroImageSrc}
                           alt={post.frontmatter.imageAlt || post.frontmatter.title}

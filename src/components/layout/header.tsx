@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
@@ -354,7 +353,7 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
         <div className="max-w-4xl mx-auto relative px-4">
             {/* More Menu */}
             <div className={cn(
-                "absolute top-0 right-4 z-40 w-56 bg-background border border-border shadow-2xl rounded-xl overflow-hidden transition-all duration-300",
+                "absolute top-0 right-4 z-40 w-56 bg-background border border-border shadow-2xl rounded-lg overflow-hidden transition-all duration-300",
                 isMenuOpen ? "opacity-100 scale-100 translate-y-4" : "opacity-0 scale-95 pointer-events-none"
             )}>
                 <div className="py-2">
@@ -377,7 +376,7 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
 
             {/* Search Results */}
             <div className={cn(
-                "absolute top-0 left-4 right-4 z-30 bg-background border border-border shadow-2xl rounded-xl overflow-hidden transition-all duration-300",
+                "absolute top-0 left-4 right-4 z-30 bg-background border border-border shadow-2xl rounded-lg overflow-hidden transition-all duration-300",
                 isSearchOpen ? "opacity-100 scale-100 translate-y-4" : "opacity-0 scale-95 pointer-events-none"
             )}>
                 <div className="p-4 border-b border-border bg-muted/20 flex items-center justify-between">
@@ -430,7 +429,7 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
 
             {/* Reading List */}
             <div className={cn(
-                "absolute top-0 left-4 right-4 z-30 bg-background border border-border shadow-2xl rounded-xl overflow-hidden transition-all duration-300",
+                "absolute top-0 left-4 right-4 z-30 bg-background border border-border shadow-2xl rounded-lg overflow-hidden transition-all duration-300",
                 isReadingListOpen ? "opacity-100 scale-100 translate-y-4" : "opacity-0 scale-95 pointer-events-none"
             )}>
                 <div className="p-4 border-b border-border bg-muted/20">

@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
@@ -283,12 +282,12 @@ export function PromptGeneratorClient({ dictionary, existingArticles }: PromptGe
       
       {/* 1. Main Toolbar (Non-sticky as requested) */}
       <div className="mb-8 px-4">
-        <Card className="bg-background/80 backdrop-blur-xl border-primary/10 shadow-xl overflow-hidden rounded-2xl ring-1 ring-black/[0.03]">
+        <Card className="bg-background/80 backdrop-blur-xl border-primary/10 shadow-xl overflow-hidden rounded-lg ring-1 ring-black/[0.03]">
           <div className="p-3 flex flex-wrap items-center justify-between gap-6">
             
             <div className="flex flex-wrap items-center gap-4">
               {/* Mode Switcher with Sliding Pill Logic */}
-              <div className="relative flex bg-muted/40 p-1 rounded-xl border border-primary/5 min-w-[240px]">
+              <div className="relative flex bg-muted/40 p-1 rounded-lg border border-primary/5 min-w-[240px]">
                   <div className={cn(
                       "absolute top-1 bottom-1 w-[calc(50%-4px)] bg-background rounded-lg shadow-sm transition-all duration-300 ease-in-out z-0",
                       mode === 'modify' ? "translate-x-full" : "translate-x-0"
@@ -318,7 +317,7 @@ export function PromptGeneratorClient({ dictionary, existingArticles }: PromptGe
               <Separator orientation="vertical" className="h-8 hidden lg:block" />
 
               {/* Content Type Selection */}
-              <div className="flex bg-muted/20 p-1 rounded-xl">
+              <div className="flex bg-muted/20 p-1 rounded-lg">
                   <Button 
                     variant={contentType === 'blog' ? 'secondary' : 'ghost'} 
                     onClick={() => setContentType('blog')}
@@ -342,21 +341,21 @@ export function PromptGeneratorClient({ dictionary, existingArticles }: PromptGe
                 <Button 
                     variant={showDownloads ? 'default' : 'outline'} 
                     onClick={() => setShowDownloads(!showDownloads)} 
-                    className={cn("h-10 w-10 p-0 rounded-xl transition-all duration-300", showDownloads && "ring-2 ring-primary/20 shadow-[0_0_15px_rgba(var(--primary),0.2)]")}
+                    className={cn("h-10 w-10 p-0 rounded-lg transition-all duration-300", showDownloads && "ring-2 ring-primary/20 shadow-[0_0_15px_rgba(var(--primary),0.2)]")}
                 >
                     <Download className="h-4 w-4" />
                 </Button>
                 <Button 
                     variant={showGrids ? 'default' : 'outline'} 
                     onClick={() => setShowGrids(!showGrids)} 
-                    className={cn("h-10 w-10 p-0 rounded-xl transition-all duration-300", showGrids && "ring-2 ring-primary/20 shadow-[0_0_15px_rgba(var(--primary),0.2)]")}
+                    className={cn("h-10 w-10 p-0 rounded-lg transition-all duration-300", showGrids && "ring-2 ring-primary/20 shadow-[0_0_15px_rgba(var(--primary),0.2)]")}
                 >
                     <Grid3X3 className="h-4 w-4" />
                 </Button>
                 <Button 
                     variant={showImages ? 'default' : 'outline'} 
                     onClick={() => setShowImages(!showImages)} 
-                    className={cn("h-10 w-10 p-0 rounded-xl transition-all duration-300", showImages && "ring-2 ring-primary/20 shadow-[0_0_15px_rgba(var(--primary),0.2)]")}
+                    className={cn("h-10 w-10 p-0 rounded-lg transition-all duration-300", showImages && "ring-2 ring-primary/20 shadow-[0_0_15px_rgba(var(--primary),0.2)]")}
                 >
                     <ImageIcon className="h-4 w-4" />
                 </Button>
@@ -365,7 +364,7 @@ export function PromptGeneratorClient({ dictionary, existingArticles }: PromptGe
 
             {/* Metadata Controls */}
             <div className="flex flex-wrap items-center gap-6">
-              <div className="flex items-center gap-3 bg-muted/20 p-1.5 rounded-xl border border-primary/5">
+              <div className="flex items-center gap-3 bg-muted/20 p-1.5 rounded-lg border border-primary/5">
                 <Calendar className="h-4 w-4 text-muted-foreground ml-2" />
                 <Input 
                     value={publishDate} 
@@ -400,7 +399,7 @@ export function PromptGeneratorClient({ dictionary, existingArticles }: PromptGe
             
             {/* Article Selection */}
             {mode === 'modify' && (
-                <Card className="bg-card/50 border-primary/10 shadow-sm overflow-hidden border-l-4 border-l-amber-400 animate-in fade-in slide-in-from-top-4 duration-500 rounded-2xl">
+                <Card className="bg-card/50 border-primary/10 shadow-sm overflow-hidden border-l-4 border-l-amber-400 animate-in fade-in slide-in-from-top-4 duration-500 rounded-lg">
                     <CardHeader className="py-4 px-6 border-b bg-muted/5 flex flex-row items-center justify-between">
                         <div className="flex items-center gap-3">
                             <div className="p-2 bg-amber-400/10 rounded-lg"><ListFilter className="h-4 w-4 text-amber-500" /></div>
@@ -415,11 +414,11 @@ export function PromptGeneratorClient({ dictionary, existingArticles }: PromptGe
                                 placeholder={dictionary.searchArticlePlaceholder} 
                                 value={articleSearch} 
                                 onChange={(e) => setArticleSearch(e.target.value)}
-                                className={cn("pl-10 h-11 bg-background/50 rounded-xl", focusInputClass)}
+                                className={cn("pl-10 h-11 bg-background/50 rounded-lg", focusInputClass)}
                             />
                         </div>
                         
-                        <ScrollArea className="h-[220px] rounded-xl border border-primary/5 bg-background/20 p-2">
+                        <ScrollArea className="h-[220px] rounded-lg border border-primary/5 bg-background/20 p-2">
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                                 {filteredArticles.length > 0 ? (
                                     filteredArticles.map((article) => (
@@ -427,7 +426,7 @@ export function PromptGeneratorClient({ dictionary, existingArticles }: PromptGe
                                             key={article.slug}
                                             onClick={() => setSelectedSlug(article.slug)}
                                             className={cn(
-                                                "text-left p-3 rounded-xl transition-all flex flex-col gap-1 group/item border border-transparent",
+                                                "text-left p-3 rounded-lg transition-all flex flex-col gap-1 group/item border border-transparent",
                                                 selectedSlug === article.slug 
                                                     ? "bg-amber-500 text-white shadow-lg shadow-amber-500/20 border-amber-400" 
                                                     : "hover:bg-background hover:border-primary/10 hover:-translate-y-0.5 hover:shadow-md text-muted-foreground hover:text-primary"
@@ -454,7 +453,7 @@ export function PromptGeneratorClient({ dictionary, existingArticles }: PromptGe
                                         </button>
                                     ))
                                 ) : (
-                                    <div className="col-span-2 p-12 text-center text-xs text-muted-foreground italic bg-muted/5 rounded-xl border border-dashed border-primary/10">
+                                    <div className="col-span-2 p-12 text-center text-xs text-muted-foreground italic bg-muted/5 rounded-lg border border-dashed border-primary/10">
                                         No articles found matching your query.
                                     </div>
                                 )}
@@ -466,7 +465,7 @@ export function PromptGeneratorClient({ dictionary, existingArticles }: PromptGe
 
             {/* Main Draft Area */}
             <Card className={cn(
-                "bg-card/50 border-primary/10 flex flex-col overflow-hidden shadow-lg border-l-4 transition-all duration-500 rounded-2xl",
+                "bg-card/50 border-primary/10 flex flex-col overflow-hidden shadow-lg border-l-4 transition-all duration-500 rounded-lg",
                 mode === 'modify' ? "border-l-sky-400" : "border-l-primary"
             )}>
                 <CardHeader className="flex flex-row items-center justify-between border-b bg-muted/5 px-6 py-4">
@@ -500,7 +499,7 @@ export function PromptGeneratorClient({ dictionary, existingArticles }: PromptGe
 
             {/* Modification Instructions */}
             {mode === 'modify' && (
-                <Card className="bg-card/50 border-primary/10 shadow-md border-l-4 border-l-accent animate-in fade-in slide-in-from-bottom-4 duration-500 rounded-2xl">
+                <Card className="bg-card/50 border-primary/10 shadow-md border-l-4 border-l-accent animate-in fade-in slide-in-from-bottom-4 duration-500 rounded-lg">
                     <CardHeader className="border-b bg-muted/5 px-6 py-4">
                         <div className="flex items-center gap-3">
                             <div className="p-2 bg-accent/10 rounded-lg"><Zap className="h-4 w-4 text-accent" /></div>
@@ -521,7 +520,7 @@ export function PromptGeneratorClient({ dictionary, existingArticles }: PromptGe
                                         variant="outline" 
                                         size="sm" 
                                         onClick={() => applyQuickAction(action.id)} 
-                                        className="text-[10px] font-bold rounded-xl px-4 h-8 border-accent/20 hover:bg-accent/5 hover:text-accent hover:border-accent transition-all active:scale-95"
+                                        className="text-[10px] font-bold rounded-lg px-4 h-8 border-accent/20 hover:bg-accent/5 hover:text-accent hover:border-accent transition-all active:scale-95"
                                     >
                                         {action.label}
                                     </Button>
@@ -532,7 +531,7 @@ export function PromptGeneratorClient({ dictionary, existingArticles }: PromptGe
                             placeholder={dictionary.modInstructionsPlaceholder}
                             value={modInstructions}
                             onChange={(e) => setModInstructions(e.target.value)}
-                            className={cn("min-h-[120px] bg-background/30 rounded-xl font-mono text-xs p-4", focusInputClass)}
+                            className={cn("min-h-[120px] bg-background/30 rounded-lg font-mono text-xs p-4", focusInputClass)}
                         />
                     </CardContent>
                 </Card>
@@ -554,7 +553,7 @@ export function PromptGeneratorClient({ dictionary, existingArticles }: PromptGe
                 {isTechnicalExpanded && (
                     <div className="space-y-6 animate-in fade-in slide-in-from-top-4 duration-500">
                         {showImages && (
-                            <Card className="bg-card/50 border-primary/10 overflow-hidden shadow-sm border-l-4 border-l-emerald-400 rounded-2xl">
+                            <Card className="bg-card/50 border-primary/10 overflow-hidden shadow-sm border-l-4 border-l-emerald-400 rounded-lg">
                                 <CardHeader className="bg-muted/5 py-3 border-b px-6">
                                     <CardTitle className="text-[10px] font-black flex items-center gap-2 uppercase tracking-widest">
                                         <ImageIcon className="h-4 w-4 text-emerald-500" /> {contentType === 'blog' ? dictionary.imagesTitle : dictionary.imagesTitleNote}
@@ -565,7 +564,7 @@ export function PromptGeneratorClient({ dictionary, existingArticles }: PromptGe
                                         placeholder={contentType === 'blog' ? dictionary.imagesPlaceholder : dictionary.imagesPlaceholderNote}
                                         value={images}
                                         onChange={(e) => setImages(e.target.value)}
-                                        className={cn("font-mono text-[11px] bg-background/50 rounded-xl p-4 min-h-[100px]", focusInputClass)}
+                                        className={cn("font-mono text-[11px] bg-background/50 rounded-lg p-4 min-h-[100px]", focusInputClass)}
                                     />
                                     <p className="mt-3 text-[9px] text-muted-foreground/60 uppercase font-black tracking-widest">
                                         {contentType === 'blog' ? dictionary.imagesDescription : dictionary.imagesDescriptionNote}
@@ -576,7 +575,7 @@ export function PromptGeneratorClient({ dictionary, existingArticles }: PromptGe
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             {showDownloads && (
-                                <Card className="bg-card/50 border-primary/10 shadow-sm border-l-4 border-l-blue-400 flex flex-col animate-in fade-in zoom-in-95 duration-500 rounded-2xl">
+                                <Card className="bg-card/50 border-primary/10 shadow-sm border-l-4 border-l-blue-400 flex flex-col animate-in fade-in zoom-in-95 duration-500 rounded-lg">
                                     <CardHeader className="border-b bg-muted/5 py-3 px-6">
                                         <CardTitle className="text-[10px] font-black flex items-center gap-2 uppercase tracking-widest">
                                             <Download className="h-4 w-4 text-blue-500" /> {dictionary.downloadLinks.title}
@@ -585,16 +584,16 @@ export function PromptGeneratorClient({ dictionary, existingArticles }: PromptGe
                                     <CardContent className="p-6 space-y-4">
                                         <div className="space-y-3">
                                             {downloadItems.map((item, index) => (
-                                            <div key={item.id} className="flex items-center gap-2 p-2.5 border border-primary/5 rounded-xl bg-background/30 group animate-in slide-in-from-left-2 duration-300">
+                                            <div key={item.id} className="flex items-center gap-2 p-2.5 border border-primary/5 rounded-lg bg-background/30 group animate-in slide-in-from-left-2 duration-300">
                                                 <Badge variant="secondary" className="text-[9px] font-black h-6 min-w-[32px] justify-center">D{index + 1}</Badge>
                                                 <Select value={item.type} onValueChange={(val) => updateDownloadItem(item.id, { type: val as 'id' | 'url', value: '' })}>
                                                     <SelectTrigger className="w-[70px] h-8 text-[10px] rounded-lg border-none bg-muted/50"><SelectValue /></SelectTrigger>
-                                                    <SelectContent className="rounded-xl"><SelectItem value="id">ID</SelectItem><SelectItem value="url">URL</SelectItem></SelectContent>
+                                                    <SelectContent className="rounded-lg"><SelectItem value="id">ID</SelectItem><SelectItem value="url">URL</SelectItem></SelectContent>
                                                 </Select>
                                                 {item.type === 'id' ? (
                                                     <Select value={item.value} onValueChange={(val) => updateDownloadItem(item.id, { value: val })}>
                                                         <SelectTrigger className="flex-1 h-8 text-[10px] rounded-lg border-none bg-muted/50"><SelectValue placeholder="..." /></SelectTrigger>
-                                                        <SelectContent className="rounded-xl max-h-[300px]">{downloadIds.map(id => <SelectItem key={id} value={id} className="text-[10px]">{id}</SelectItem>)}</SelectContent>
+                                                        <SelectContent className="rounded-lg max-h-[300px]">{downloadIds.map(id => <SelectItem key={id} value={id} className="text-[10px]">{id}</SelectItem>)}</SelectContent>
                                                     </Select>
                                                 ) : (
                                                     <Input placeholder="URL..." value={item.value} onChange={(e) => updateDownloadItem(item.id, { value: e.target.value })} className="flex-1 h-8 text-[10px] border-none bg-muted/50" />
@@ -603,7 +602,7 @@ export function PromptGeneratorClient({ dictionary, existingArticles }: PromptGe
                                             </div>
                                             ))}
                                         </div>
-                                        <Button onClick={addDownloadItem} variant="outline" size="sm" className="w-full border-dashed rounded-xl h-10 border-primary/20 hover:bg-primary/5 hover:border-primary/40 transition-all">
+                                        <Button onClick={addDownloadItem} variant="outline" size="sm" className="w-full border-dashed rounded-lg h-10 border-primary/20 hover:bg-primary/5 hover:border-primary/40 transition-all">
                                             <Plus className="h-4 w-4 mr-2" /> {dictionary.downloadLinks.addDownload}
                                         </Button>
                                     </CardContent>
@@ -611,7 +610,7 @@ export function PromptGeneratorClient({ dictionary, existingArticles }: PromptGe
                             )}
 
                             {showGrids && (
-                                <Card className="bg-card/50 border-primary/10 shadow-sm border-l-4 border-l-violet-400 flex flex-col animate-in fade-in zoom-in-95 duration-500 rounded-2xl">
+                                <Card className="bg-card/50 border-primary/10 shadow-sm border-l-4 border-l-violet-400 flex flex-col animate-in fade-in zoom-in-95 duration-500 rounded-lg">
                                     <CardHeader className="border-b bg-muted/5 py-3 px-6">
                                         <CardTitle className="text-[10px] font-black flex items-center gap-2 uppercase tracking-widest">
                                             <Grid3X3 className="h-4 w-4 text-violet-500" /> {dictionary.imageGrid.title}
@@ -622,7 +621,7 @@ export function PromptGeneratorClient({ dictionary, existingArticles }: PromptGe
                                             placeholder={dictionary.imageGrid.placeholder}
                                             value={imageGridMappings}
                                             onChange={(e) => setImageGridMappings(e.target.value)}
-                                            className={cn("min-h-[100px] font-mono text-[11px] bg-background/50 rounded-xl p-4", focusInputClass)}
+                                            className={cn("min-h-[100px] font-mono text-[11px] bg-background/50 rounded-lg p-4", focusInputClass)}
                                         />
                                         <p className="text-[9px] text-muted-foreground/60 uppercase font-black tracking-widest">
                                             {dictionary.imageGrid.description}
@@ -639,7 +638,7 @@ export function PromptGeneratorClient({ dictionary, existingArticles }: PromptGe
         {/* Right Column: Generated Prompt Preview */}
         <div className="lg:col-span-5 h-full">
             <div className="sticky top-32 space-y-6">
-                <Card className="border-primary/20 shadow-2xl overflow-hidden ring-4 ring-primary/5 rounded-2xl bg-[#0a0a0a] group/preview">
+                <Card className="border-primary/20 shadow-2xl overflow-hidden ring-4 ring-primary/5 rounded-lg bg-[#0a0a0a] group/preview">
                     <CardHeader className="flex flex-row items-center justify-between border-b border-white/[0.05] bg-white/[0.02] py-3 px-6">
                         <CardTitle className="text-[10px] font-black uppercase tracking-widest text-white/60">
                             {dictionary.generatedPromptTitle}

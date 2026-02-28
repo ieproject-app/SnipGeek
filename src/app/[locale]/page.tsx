@@ -116,7 +116,7 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
                 )}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/60 to-transparent" />
                 <div className="absolute bottom-0 left-0 p-6 text-white w-full">
-                    <p className="text-xs font-semibold mb-1 opacity-80">{post.frontmatter.category}</p>
+                    <p className="text-[10px] font-semibold mb-1 opacity-80">{post.frontmatter.category}</p>
                     <h3 className="font-headline text-xl font-extrabold leading-tight">
                         {post.frontmatter.title}
                     </h3>
@@ -147,7 +147,7 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
     return (
         <div key={post.slug} className="group relative transition-all duration-500 hover:-translate-y-2">
             <Link href={`${linkPrefix}/blog/${post.slug}`} className="block" aria-label={`Read more about ${post.frontmatter.title}`}>
-                <div className="relative w-full aspect-video overflow-hidden rounded-xl mb-4 shadow-sm group-hover:shadow-[0_15px_30px_rgba(0,0,0,0.1)] dark:group-hover:shadow-[0_15px_30px_rgba(0,0,0,0.3)] transition-all duration-500 border border-primary/5">
+                <div className="relative w-full aspect-video overflow-hidden rounded-lg mb-4 shadow-sm group-hover:shadow-[0_15px_30px_rgba(0,0,0,0.1)] dark:group-hover:shadow-[0_15px_30px_rgba(0,0,0,0.3)] transition-all duration-500 border border-primary/5">
                     {heroImageSrc && (
                         <Image
                             src={heroImageSrc}
@@ -180,7 +180,7 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
     <div className="w-full">
       {/* Featured Posts Section */}
       {featuredPosts.length > 0 && (
-        <section className="py-12 sm:py-16 bg-primary/[0.03] dark:bg-muted/30 border-y border-primary/5">
+        <section className="py-16 sm:py-24 bg-primary/[0.03] dark:bg-muted/30 border-y border-primary/5">
           <div className="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-0">
               {featuredPosts.map((post, index) => (
@@ -202,7 +202,7 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
 
       {/* Latest Posts Section */}
       {latestPosts.length > 0 && (
-        <section className="container max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
+        <section className="container max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-12 sm:pb-16">
           <h2 className="text-3xl font-bold font-headline tracking-tighter text-primary mb-12 text-center">{dictionary.home.latestPosts}</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12 mb-16">
             {latestPosts.map((post) => renderLatestCard(post))}
