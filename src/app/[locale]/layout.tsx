@@ -86,6 +86,9 @@ export const metadata: Metadata = {
       'max-snippet': -1,
     },
   },
+  other: {
+    'google-adsense-account': 'ca-pub-6235611333449307',
+  },
 };
 
 export async function generateStaticParams() {
