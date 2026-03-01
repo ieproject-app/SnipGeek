@@ -5,7 +5,6 @@ import {
     collection, 
     doc, 
     writeBatch, 
-    getFirestore, 
     getDocs, 
     query, 
     limit as firestoreLimit 
@@ -16,6 +15,7 @@ const ADMIN_EMAIL = 'iwan.efndi@gmail.com';
 const REGION_CODE = 'TA-760103';
 
 const tasks = [
+  // Data target 2025 & 2026 dari skrip lama Mas
   { category: 'HK.800', year: 2026, month: 2, start: 100, end: 199 },
   { category: 'HK.800', year: 2026, month: 1, start: 2322, end: 2421 },
   { category: 'HK.820', year: 2026, month: 1, start: 12782, end: 12881 },
@@ -38,31 +38,21 @@ const tasks = [
 
 /**
  * Client-side action to populate Firestore numbers using batches.
- * Note: Since we are using client SDK, we check email inside the function
- * and rely on Security Rules for true protection.
+ * Sesuai dengan format di screenshot Mas.
  */
 export async function populateDatabaseAction(userEmail: string | null) {
     if (userEmail !== ADMIN_EMAIL) {
-        throw new Error("Unauthorized: Only admin can perform this action.");
+        throw new Error("Unauthorized: Hanya Iwan Efendi yang bisa mempopulasi database.");
     }
 
     const { firestore } = initializeFirebase();
     const colRef = collection(firestore, 'availableNumbers');
     
-    // Check if already populated (safety check)
-    const checkQuery = query(colRef, firestoreLimit(1));
-    const checkSnap = await getDocs(checkQuery);
-    if (!checkSnap.empty) {
-        // We can still proceed if user wants to add more, but let's be careful
-        console.warn("Database is not empty. Adding new numbers...");
-    }
-
     let totalCreated = 0;
 
     for (const task of tasks) {
         const { category, year, month, start, end } = task;
         
-        // Firestore batch limit is 500 operations
         let batch = writeBatch(firestore);
         let batchCount = 0;
 
@@ -70,26 +60,28 @@ export async function populateDatabaseAction(userEmail: string | null) {
             const sequence = String(i).padStart(5, '0');
             const dateString = `${String(month).padStart(2, '0')}-${year}`;
             
-            // Note: {DOCTYPE} is replaced in the client app during generation
-            const fullNumber = `${sequence}/${category}/${REGION_CODE}/${dateString}`;
+            // Format fullNumber sesuai screenshot (dengan placeholder {DOCTYPE})
+            const fullNumber = `{DOCTYPE} ${sequence}/${category}/${REGION_CODE}/${dateString}`;
             
+            // Buat ID dokumen yang konsisten agar tidak ada duplikat jika tombol ditekan 2x
             const docId = `${category}-${year}-${month}-below_500m-${sequence}`;
             const docRef = doc(firestore, 'availableNumbers', docId);
 
             batch.set(docRef, {
                 fullNumber,
                 category,
-                year,
-                month,
+                year, // Number type
+                month, // Number type
                 valueCategory: 'below_500m',
                 isUsed: false,
-                assignedTo: null,
-                assignedDate: null
+                assignedTo: "",
+                assignedDate: ""
             });
 
             batchCount++;
             totalCreated++;
 
+            // Commit batch setiap 450 dokumen (Limit Firestore 500)
             if (batchCount === 450) {
                 await batch.commit();
                 batch = writeBatch(firestore);
