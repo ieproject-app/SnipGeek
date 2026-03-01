@@ -14,29 +14,11 @@
         "excerpt": { "type": "string" },
         "heroImageUrl": { "type": "string" },
         "heroImageAltText": { "type": "string" },
-        "images": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "url": { "type": "string" },
-              "alt": { "type": "string" },
-              "path": { "type": "string" },
-              "mediaId": { "type": "string" }
-            }
-          }
-        },
         "publishDate": { "type": "string", "format": "date-time" },
-        "updatedDate": { "type": "string", "format": "date-time" },
         "isPublished": { "type": "boolean" },
-        "featured": { "type": "boolean" },
-        "authorId": { "type": "string" },
-        "tagIds": { "type": "array", "items": { "type": "string" } },
-        "locale": { "type": "string" },
-        "category": { "type": "string" },
-        "translationKey": { "type": "string" }
+        "category": { "type": "string" }
       },
-      "required": ["id", "title", "slug", "contentMdx", "publishDate", "isPublished", "authorId"]
+      "required": ["id", "title", "slug", "contentMdx", "publishDate", "isPublished"]
     },
     "QuickNote": {
       "$schema": "http://json-schema.org/draft-07/schema#",
@@ -49,54 +31,18 @@
         "description": { "type": "string" },
         "contentMdx": { "type": "string" },
         "date": { "type": "string", "format": "date-time" },
-        "locale": { "type": "string" },
-        "tags": { "type": "array", "items": { "type": "string" } },
-        "translationKey": { "type": "string" },
         "published": { "type": "boolean" }
       },
-      "required": ["id", "title", "contentMdx", "date", "locale"]
-    },
-    "MediaItem": {
-      "type": "object",
-      "properties": {
-        "id": { "type": "string" },
-        "url": { "type": "string" },
-        "path": { "type": "string" },
-        "name": { "type": "string" },
-        "uploadedAt": { "type": "string", "format": "date-time" },
-        "size": { "type": "number" },
-        "type": { "type": "string" }
-      }
-    },
-    "Author": {
-      "type": "object",
-      "properties": {
-        "id": { "type": "string" },
-        "name": { "type": "string" },
-        "email": { "type": "string" }
-      }
+      "required": ["id", "title", "contentMdx", "date"]
     }
   },
   "auth": {
-    "providers": ["password", "google", "anonymous"]
+    "providers": ["google"]
   },
   "firestore": {
     "structure": [
       {
-        "path": "/roles_admin/{userId}",
-        "definition": {
-          "entityName": "admin_role",
-          "description": "Admin users."
-        }
-      },
-      {
         "path": "/blogPosts_published/{blogPostId}",
-        "definition": {
-          "entityName": "BlogPost"
-        }
-      },
-      {
-        "path": "/blogPosts_drafts/{blogPostId}",
         "definition": {
           "entityName": "BlogPost"
         }
@@ -105,19 +51,6 @@
         "path": "/notes_published/{noteId}",
         "definition": {
           "entityName": "QuickNote"
-        }
-      },
-      {
-        "path": "/notes_drafts/{noteId}",
-        "definition": {
-          "entityName": "QuickNote"
-        }
-      },
-      {
-        "path": "/media_library/{mediaId}",
-        "definition": {
-          "entityName": "MediaItem",
-          "description": "Global gallery of uploaded images."
         }
       }
     ]

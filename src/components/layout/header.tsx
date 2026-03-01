@@ -15,9 +15,7 @@ import {
   User, 
   Mail,
   Languages,
-  ArrowUpRight,
-  Lock,
-  LayoutDashboard
+  ArrowUpRight
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -29,7 +27,6 @@ import { useNotification } from '@/hooks/use-notification';
 import type { Dictionary } from '@/lib/get-dictionary';
 import { SnipGeekLogo } from '@/components/icons/snipgeek-logo';
 import NextLink from 'next/link';
-import { useUser } from '@/firebase';
 
 type SearchableItem = {
   slug: string;
@@ -82,7 +79,6 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
   const [removingSlug, setRemovingSlug] = useState<string | null>(null);
   const { items: readingListItems, removeItem: removeReadingListItem } = useReadingList();
   const { message, icon, notify } = useNotification();
-  const { user } = useUser();
   const lastScrollY = useRef(0);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const headerRef = useRef<HTMLElement>(null);
@@ -151,15 +147,11 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
       const currentScrollY = window.scrollY;
       const delta = currentScrollY - lastScrollY.current;
 
-      // Logika threshold untuk menghindari flickering
       if (currentScrollY < 10) {
-        // Tampilkan selalu jika di paling atas
         setIsVisible(true);
       } else if (delta > 8 && currentScrollY > 80) {
-        // Sembunyikan jika scroll ke bawah dengan kecepatan tertentu
         setIsVisible(false);
       } else if (delta < -8) {
-        // Munculkan jika scroll ke atas dengan kecepatan tertentu
         setIsVisible(true);
       }
       
@@ -272,7 +264,6 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                 "flex items-center gap-2 sm:gap-6 transition-all duration-500",
                 isSearchOpen ? "opacity-0 pointer-events-none" : "opacity-100"
             )}>
-                {/* Desktop Menu */}
                 <nav className="hidden md:flex items-center gap-1">
                     {directLinks.map((item) => (
                         <NextLink 
@@ -289,25 +280,7 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                     ))}
                 </nav>
 
-                {/* Utility Buttons - Reordered: Menu -> Bookmark -> Search */}
                 <div className="flex items-center gap-1">
-                    {/* Admin Access Button */}
-                    <Button 
-                        asChild
-                        variant="ghost" 
-                        size="icon"
-                        className={cn("h-10 w-10 rounded-full group", navItemClass)} 
-                        aria-label={user ? "Admin Dashboard" : "Admin Login"}
-                    >
-                        <NextLink href={user ? "/admin/dashboard" : "/admin/login"}>
-                            {user ? (
-                                <LayoutDashboard className="h-5 w-5 transition-transform group-hover:scale-110" />
-                            ) : (
-                                <Lock className="h-5 w-5 transition-transform group-hover:scale-110" />
-                            )}
-                        </NextLink>
-                    </Button>
-
                     <Button 
                         variant="ghost" 
                         size="icon"
@@ -371,7 +344,6 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
             </div>
         </div>
 
-        {/* Dropdowns */}
         <div className="max-w-4xl mx-auto relative px-4">
             {/* More Menu */}
             <div className={cn(
