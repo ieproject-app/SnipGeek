@@ -1,4 +1,3 @@
-
 'use client';
 
 import * as React from 'react';
@@ -15,6 +14,7 @@ import { cn, formatRelativeTime } from '@/lib/utils';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { AddToReadingListButton } from '@/components/layout/add-to-reading-list-button';
 import type { Dictionary } from '@/lib/get-dictionary';
+import { CategoryBadge } from '@/components/layout/category-badge';
 
 interface SliderPost {
   slug: string;
@@ -128,9 +128,9 @@ export function FeatureSlider({ posts, title, viewMoreText, readingListDictionar
                         />
                       </div>
                       <div className="p-5 flex-1 flex flex-col z-10">
-                        <span className="text-[10px] font-bold tracking-widest text-accent mb-2 block">
-                          {post.frontmatter.category || 'Featured'}
-                        </span>
+                        <div className="mb-2">
+                            <CategoryBadge category={post.frontmatter.category || 'Featured'} />
+                        </div>
                         <h3 className="font-headline text-base font-semibold text-primary leading-snug group-hover:text-accent transition-colors">
                           {post.frontmatter.title}
                         </h3>

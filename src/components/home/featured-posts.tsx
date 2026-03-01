@@ -1,4 +1,3 @@
-
 'use client';
 
 import Link from 'next/link';
@@ -9,6 +8,7 @@ import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { cn, formatRelativeTime } from '@/lib/utils';
 import { AddToReadingListButton } from '@/components/layout/add-to-reading-list-button';
 import { ArrowRight } from 'lucide-react';
+import { CategoryBadge, getBadgeStyle } from '@/components/layout/category-badge';
 
 interface FeaturedPostsProps {
   posts: Post<PostFrontmatter>[];
@@ -18,24 +18,7 @@ interface FeaturedPostsProps {
 }
 
 /**
- * Generates a deterministic HSL color palette based on a string (category).
- */
-const getCategoryColors = (category: string) => {
-  let hash = 0;
-  for (let i = 0; i < category.length; i++) {
-    hash = category.charCodeAt(i) + ((hash << 5) - hash);
-  }
-  const hue = Math.abs(hash % 360);
-  return {
-    dot: `hsl(${hue}, 25%, 40%)`,
-    badgeBg: `hsla(${hue}, 20%, 94%, 0.92)`,
-    text: `hsl(${hue}, 25%, 30%)`,
-    accent: `hsl(${hue}, 25%, 40%)`,
-  };
-};
-
-/**
- * FeaturedPosts - A sophisticated 4-column staggered gallery grid.
+ * FeaturedPosts - A sophisticated 4-column staggered gallery grid using the colorful badge system.
  */
 export function FeaturedPosts({ posts, dictionary, locale, linkPrefix }: FeaturedPostsProps) {
   if (posts.length === 0) return null;
@@ -62,11 +45,8 @@ export function FeaturedPosts({ posts, dictionary, locale, linkPrefix }: Feature
                 }
             }
 
-            const rawCategory = post.frontmatter.category || 'Tutorial';
-            // Take only first word and format as Sentence case
-            const firstWord = rawCategory.split(' ')[0];
-            const category = firstWord.charAt(0).toUpperCase() + firstWord.slice(1).toLowerCase();
-            const colors = getCategoryColors(category);
+            const category = post.frontmatter.category || 'Tutorial';
+            const badgeStyle = getBadgeStyle(category);
             const isStaggered = index % 2 !== 0;
             
             const item = {
@@ -89,29 +69,18 @@ export function FeaturedPosts({ posts, dictionary, locale, linkPrefix }: Feature
                     <article className="space-y-5">
                         {/* Image Block - 4px rounded */}
                         <div className="relative aspect-[4/3] rounded-lg overflow-hidden bg-muted shadow-md group-hover:shadow-xl group-hover:-translate-y-2 transition-all duration-500">
-                            {/* Category Badge - Frosted Glass, Sentence Case */}
+                            {/* Category Badge - Colorful glass style */}
                             <div className="absolute top-4 left-4 z-20">
-                                <div 
-                                    className="flex items-center gap-2 px-3 py-1.5 rounded-full backdrop-blur-md border border-white/20 shadow-sm"
-                                    style={{ backgroundColor: colors.badgeBg }}
-                                >
-                                    <span 
-                                        className="w-1.5 h-1.5 rounded-full" 
-                                        style={{ backgroundColor: colors.dot }} 
-                                    />
-                                    <span 
-                                        className="text-[10px] font-bold tracking-widest"
-                                        style={{ color: colors.text }}
-                                    >
-                                        {category}
-                                    </span>
-                                </div>
+                                <CategoryBadge 
+                                    category={category} 
+                                    size="sm" 
+                                    className="backdrop-blur-md border-white/20 shadow-sm"
+                                />
                             </div>
 
                             {/* Accent Bar - Bottom of Image */}
                             <div 
-                                className="absolute bottom-0 left-0 right-0 h-[3px] z-30 transition-opacity duration-500 opacity-0 group-hover:opacity-100"
-                                style={{ backgroundColor: colors.accent }}
+                                className={cn("absolute bottom-0 left-0 right-0 h-[3px] z-30 transition-opacity duration-500 opacity-0 group-hover:opacity-100", badgeStyle.dot)}
                             />
 
                             {/* Hero Image */}
@@ -147,8 +116,7 @@ export function FeaturedPosts({ posts, dictionary, locale, linkPrefix }: Feature
                                         className="h-8 w-8 rounded-full border-none bg-primary/[0.03] text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all"
                                     />
                                     <div 
-                                        className="flex items-center gap-1 text-[10px] font-black uppercase tracking-widest transition-transform duration-300 group-hover:translate-x-1"
-                                        style={{ color: colors.accent }}
+                                        className={cn("flex items-center gap-1 text-[10px] font-black uppercase tracking-widest transition-transform duration-300 group-hover:translate-x-1", badgeStyle.text)}
                                     >
                                         READ <ArrowRight className="h-3.5 w-3.5" />
                                     </div>

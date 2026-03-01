@@ -1,4 +1,3 @@
-
 'use client';
 
 import * as React from 'react';
@@ -15,6 +14,7 @@ import { cn, formatRelativeTime } from '@/lib/utils';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { AddToReadingListButton } from '@/components/layout/add-to-reading-list-button';
 import type { Dictionary } from '@/lib/get-dictionary';
+import { CategoryBadge } from '@/components/layout/category-badge';
 
 interface SliderPost {
   slug: string;
@@ -129,9 +129,9 @@ export function HorizontalSlider({ posts, title, viewMoreText, readingListDictio
                       
                       {/* Content Area */}
                       <div className="flex-1 min-w-0 py-1">
-                        <span className="text-[10px] font-bold tracking-wider text-accent mb-1 block">
-                          {post.frontmatter.category || 'Update'}
-                        </span>
+                        <div className="mb-1">
+                            <CategoryBadge category={post.frontmatter.category || 'Update'} />
+                        </div>
                         <h3 className="font-headline text-[13px] md:text-sm font-medium text-primary leading-snug line-clamp-2 transition-colors group-hover:text-accent">
                           {post.frontmatter.title}
                         </h3>
