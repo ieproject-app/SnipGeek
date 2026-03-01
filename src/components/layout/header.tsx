@@ -15,7 +15,9 @@ import {
   User, 
   Mail,
   Languages,
-  ArrowUpRight
+  ArrowUpRight,
+  Lock,
+  LayoutDashboard
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -27,6 +29,7 @@ import { useNotification } from '@/hooks/use-notification';
 import type { Dictionary } from '@/lib/get-dictionary';
 import { SnipGeekLogo } from '@/components/icons/snipgeek-logo';
 import NextLink from 'next/link';
+import { useUser } from '@/firebase';
 
 type SearchableItem = {
   slug: string;
@@ -79,6 +82,7 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
   const [removingSlug, setRemovingSlug] = useState<string | null>(null);
   const { items: readingListItems, removeItem: removeReadingListItem } = useReadingList();
   const { message, icon, notify } = useNotification();
+  const { user } = useUser();
   const lastScrollY = useRef(0);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const headerRef = useRef<HTMLElement>(null);
@@ -287,6 +291,23 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
 
                 {/* Utility Buttons - Reordered: Menu -> Bookmark -> Search */}
                 <div className="flex items-center gap-1">
+                    {/* Admin Access Button */}
+                    <Button 
+                        asChild
+                        variant="ghost" 
+                        size="icon"
+                        className={cn("h-10 w-10 rounded-full group", navItemClass)} 
+                        aria-label={user ? "Admin Dashboard" : "Admin Login"}
+                    >
+                        <NextLink href={user ? "/admin/dashboard" : "/admin/login"}>
+                            {user ? (
+                                <LayoutDashboard className="h-5 w-5 transition-transform group-hover:scale-110" />
+                            ) : (
+                                <Lock className="h-5 w-5 transition-transform group-hover:scale-110" />
+                            )}
+                        </NextLink>
+                    </Button>
+
                     <Button 
                         variant="ghost" 
                         size="icon"
