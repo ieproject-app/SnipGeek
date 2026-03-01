@@ -15,7 +15,9 @@ import {
   Mail,
   Languages,
   ChevronRight,
-  ArrowRight
+  ArrowRight,
+  Sparkles,
+  RefreshCw
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -42,21 +44,68 @@ type SearchableItem = {
 
 type ActiveView = 'none' | 'search' | 'menu' | 'readingList';
 
-const typeConfig = {
-  blog: { 
-    icon: BookOpen, 
-    color: 'text-sky-400', 
-    bg: 'bg-sky-500/10', 
-    accent: 'bg-sky-500',
-    label: 'Article'
-  },
-  note: { 
-    icon: StickyNote, 
-    color: 'text-amber-400', 
-    bg: 'bg-amber-400/10', 
-    accent: 'bg-amber-400',
-    label: 'Note'
-  },
+type BadgeStyle = {
+  bg: string;
+  text: string;
+  border: string;
+  dot: string;
+};
+
+const categoryColorMap: Record<string, BadgeStyle> = {
+  'Windows':  { bg: 'bg-sky-500/12',    text: 'text-sky-400',    border: 'border-sky-500/25',    dot: 'bg-sky-400' },
+  'Android':  { bg: 'bg-green-500/12',  text: 'text-green-400',  border: 'border-green-500/25',  dot: 'bg-green-400' },
+  'Linux':    { bg: 'bg-orange-500/12', text: 'text-orange-400', border: 'border-orange-500/25', dot: 'bg-orange-400' },
+  'macOS':    { bg: 'bg-zinc-500/15',   text: 'text-zinc-300',   border: 'border-zinc-500/25',   dot: 'bg-zinc-300' },
+  'iOS':      { bg: 'bg-blue-500/12',   text: 'text-blue-400',   border: 'border-blue-500/25',   dot: 'bg-blue-400' },
+  'Hardware': { bg: 'bg-violet-500/12', text: 'text-violet-400', border: 'border-violet-500/25', dot: 'bg-violet-400' },
+  'Gadget':   { bg: 'bg-pink-500/12',   text: 'text-pink-400',   border: 'border-pink-500/25',   dot: 'bg-pink-400' },
+  'PC':       { bg: 'bg-indigo-500/12', text: 'text-indigo-400', border: 'border-indigo-500/25', dot: 'bg-indigo-400' },
+  'Software': { bg: 'bg-cyan-500/12',   text: 'text-cyan-400',   border: 'border-cyan-500/25',   dot: 'bg-cyan-400' },
+  'Dev':      { bg: 'bg-teal-500/12',   text: 'text-teal-400',   border: 'border-teal-500/25',   dot: 'bg-teal-400' },
+  'Tips':     { bg: 'bg-yellow-500/12', text: 'text-yellow-400', border: 'border-yellow-500/25', dot: 'bg-yellow-400' },
+  'Tutorial': { bg: 'bg-amber-500/12',  text: 'text-amber-400',  border: 'border-amber-500/25',  dot: 'bg-amber-400' },
+  'Review':   { bg: 'bg-rose-500/12',   text: 'text-rose-400',   border: 'border-rose-500/25',   dot: 'bg-rose-400' },
+  'Article':  { bg: 'bg-sky-500/12',    text: 'text-sky-400',    border: 'border-sky-500/25',    dot: 'bg-sky-400' },
+  'Note':     { bg: 'bg-amber-400/12',  text: 'text-amber-400',  border: 'border-amber-400/25',  dot: 'bg-amber-400' },
+};
+
+const defaultBadgeStyle: BadgeStyle = {
+  bg: 'bg-muted/60', text: 'text-muted-foreground',
+  border: 'border-border', dot: 'bg-muted-foreground',
+};
+
+function getBadgeStyle(category?: string, type?: 'blog' | 'note'): BadgeStyle {
+  if (category && categoryColorMap[category]) return categoryColorMap[category];
+  if (type === 'blog') return categoryColorMap['Article'];
+  if (type === 'note') return categoryColorMap['Note'];
+  return defaultBadgeStyle;
+}
+
+function CategoryBadge({
+  label, style, size = 'xs', showDot = true
+}: { label: string; style: BadgeStyle; size?: 'xs' | 'sm'; showDot?: boolean }) {
+  return (
+    <span className={cn(
+      "inline-flex items-center gap-1 rounded-full border font-black uppercase tracking-wider font-sans",
+      style.bg, style.text, style.border,
+      size === 'xs' ? "text-[8px] px-1.5 py-0.5" : "text-[10px] px-2 py-1"
+    )}>
+      {showDot && (
+        <span className={cn("rounded-full shrink-0", style.dot,
+          size === 'xs' ? "w-1 h-1" : "w-1.5 h-1.5"
+        )} />
+      )}
+      {label}
+    </span>
+  );
+}
+
+const getTimeLabel = () => {
+  const hour = new Date().getHours();
+  if (hour >= 5 && hour < 12) return "🌤 Good Morning Reads";
+  if (hour >= 12 && hour < 17) return "☀️ Afternoon Picks";
+  if (hour >= 17 && hour < 21) return "🌆 Evening Picks";
+  return "🌙 Night Owl Picks";
 };
 
 const HighlightMatch = ({ text, query }: { text: string; query: string }) => {
@@ -79,12 +128,16 @@ const HighlightMatch = ({ text, query }: { text: string; query: string }) => {
 
 export function Header({ searchableData, dictionary }: { searchableData: SearchableItem[], dictionary: Dictionary }) {
   const [isVisible, setIsVisible] = useState(true);
+  const [isScrolled, setIsScrolled] = useState(false);
   const [activeView, setActiveView] = useState<ActiveView>('none');
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<SearchableItem[]>([]);
   const [removingSlug, setRemovingSlug] = useState<string | null>(null);
-  const { items: readingListItems, removeItem: removeReadingListItem } = useReadingList();
+  const [timeLabel] = useState(() => getTimeLabel());
+  
+  const { items: readingListItems, removeItem: removeReadingListItem, addItem: addReadingListItem } = useReadingList();
   const { message, icon, notify } = useNotification();
+  
   const lastScrollY = useRef(0);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const headerRef = useRef<HTMLElement>(null);
@@ -153,8 +206,10 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
 
   useEffect(() => {
     const handleScroll = () => {
-      if (activeView !== 'none' || message) return;
       const currentScrollY = window.scrollY;
+      setIsScrolled(currentScrollY > 10);
+
+      if (activeView !== 'none' || message) return;
       const delta = currentScrollY - lastScrollY.current;
 
       if (currentScrollY < 10) {
@@ -238,32 +293,30 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
     { name: dictionary.navigation.contact, href: '/contact', icon: Mail },
   ];
 
-  const navItemClass = "h-9 w-9 rounded-xl transition-all duration-300 text-foreground/70 hover:text-foreground hover:bg-muted/60 flex items-center justify-center";
+  const navItemClass = "h-9 w-9 rounded-xl transition-all duration-300 text-foreground/70 hover:text-foreground hover:bg-muted/60 flex items-center justify-center relative";
 
   return (
     <header 
       ref={headerRef} 
-      style={{ willChange: 'transform' }}
+      data-scrolled={isScrolled}
       className={cn(
-        "fixed top-0 left-0 right-0 z-50 w-full bg-background/80 backdrop-blur-md border-b border-border/50 transition-transform [transition-timing-function:cubic-bezier(0.4,0,0.2,1)] will-change-transform",
-        isVisible 
-          ? "translate-y-0 duration-500" 
-          : "-translate-y-full duration-300"
+        "fixed top-0 left-0 right-0 z-50 w-full bg-background/80 backdrop-blur-md border-b border-border/50 transition-all [transition-timing-function:cubic-bezier(0.4,0,0.2,1)] will-change-transform",
+        isVisible ? "translate-y-0 duration-500" : "-translate-y-full duration-300",
+        isScrolled && "shadow-sm border-border/80"
     )}>
-        {/* Main Bar: High Impact 64px */}
-        <div className="max-w-4xl mx-auto h-16 min-h-[64px] px-4 flex items-center justify-between relative">
+        <div className="max-w-4xl mx-auto h-16 min-h-[64px] px-4 md:px-6 flex items-center justify-between relative">
             
             {/* Notification Overlay */}
             <div className={cn(
-                "absolute inset-0 z-40 bg-background/95 backdrop-blur-md transition-all flex items-center justify-center px-6",
+                "absolute inset-0 z-40 bg-background/95 backdrop-blur-md transition-all flex items-center justify-center px-6 h-16",
                 isGlowing && "border-b-2 border-accent/20",
                 (mounted && message) 
-                    ? "translate-y-0 opacity-100 ease-out duration-500 h-16" 
-                    : "translate-y-[-100%] opacity-0 ease-in duration-300 pointer-events-none h-16"
+                    ? "translate-y-0 opacity-100 ease-out duration-500" 
+                    : "translate-y-[-100%] opacity-0 ease-in duration-300 pointer-events-none"
             )}>
                 <div className="flex items-center gap-3">
                     {icon && <div className="text-accent">{React.cloneElement(icon as React.ReactElement, { className: "h-5 w-5" })}</div>}
-                    <p className="text-[10px] font-black uppercase tracking-widest text-foreground">
+                    <p className="text-[10px] font-black uppercase tracking-widest text-foreground font-sans">
                         {message}
                     </p>
                 </div>
@@ -276,37 +329,45 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
             )}>
                 <NextLink href="/" className="flex items-center gap-3 group" aria-label="SnipGeek Home">
                     <SnipGeekLogo className="h-8 w-8 group-hover:animate-wiggle" />
-                    <div className="font-headline text-xl font-black tracking-tighter hidden sm:flex items-baseline">
+                    <div className="font-display text-xl font-black tracking-[-0.03em] hidden sm:flex items-baseline">
                         <span className="text-foreground">Snip</span>
                         <span className="text-accent dark:text-foreground ml-px">Geek</span>
                     </div>
                 </NextLink>
             </div>
 
-            {/* Right: Nav + Utilities */}
-            <div className={cn(
-                "flex items-center gap-4 transition-all duration-500",
+            {/* Center: Navigation (md+) */}
+            <nav className={cn(
+                "hidden md:flex items-center gap-0 absolute left-1/2 -translate-x-1/2 transition-all duration-500",
                 (isSearchOpen || isReadingListOpen) ? "opacity-0 pointer-events-none" : "opacity-100"
             )}>
-                <nav className="hidden md:flex items-center gap-0">
-                    {directLinks.map((item) => (
+                {directLinks.map((item) => {
+                    const isActive = pathname.includes(item.href);
+                    return (
                         <NextLink 
                             key={item.href}
                             href={`${linkPrefix}${item.href}`}
                             className={cn(
-                                "px-3 py-2 text-[10px] font-black uppercase tracking-widest transition-all",
-                                "hover:-translate-y-0.5 active:scale-95",
-                                pathname.includes(item.href) ? "text-accent" : "text-foreground/60 hover:text-foreground"
+                                "px-3 py-2 text-[10px] font-black uppercase tracking-[0.12em] transition-all relative font-sans",
+                                isActive ? "text-accent" : "text-foreground/60 hover:text-foreground"
                             )}
                         >
                             {item.name}
+                            <div className={cn(
+                                "absolute bottom-0 left-1/2 -translate-x-1/2 h-[2px] bg-accent transition-all duration-300",
+                                isActive ? "w-4" : "w-0"
+                            )} />
                         </NextLink>
-                    ))}
-                </nav>
+                    );
+                })}
+            </nav>
 
-                <div className="w-px h-4 bg-border hidden md:block" />
-
-                <div className="relative flex items-center gap-1">
+            {/* Right: Utilities */}
+            <div className={cn(
+                "flex items-center gap-1 transition-all duration-500",
+                (isSearchOpen || isReadingListOpen) ? "opacity-0 pointer-events-none" : "opacity-100"
+            )}>
+                <div className="relative group/more-btn">
                     <Button 
                         variant="ghost" 
                         size="icon"
@@ -314,69 +375,96 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                         onClick={() => toggleView('menu')}
                         aria-label="More Menu"
                     >
-                        {isMenuOpen ? <X className="h-5 w-5" /> : <MoreHorizontal className="h-5 w-5" />}
+                        <MoreHorizontal className={cn(
+                            "h-5 w-5 transition-all duration-300",
+                            isMenuOpen ? "rotate-90 opacity-0 scale-0 absolute" : "opacity-100 scale-100"
+                        )} />
+                        <X className={cn(
+                            "h-5 w-5 transition-all duration-300",
+                            isMenuOpen ? "opacity-100 scale-100" : "-rotate-90 opacity-0 scale-0 absolute"
+                        )} />
                     </Button>
 
-                    <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        className={cn("relative", navItemClass)} 
-                        onClick={() => toggleView('readingList')}
-                        aria-label="Reading List"
-                    >
-                        <Bookmark className="h-5 w-5 transition-transform group-hover:-translate-y-1" />
-                        {mounted && readingListItems.length > 0 && (
-                            <span className="absolute top-1.5 right-1.5 flex h-3.5 min-w-[14px] items-center justify-center rounded-full bg-accent text-accent-foreground text-[8px] font-black px-1 animate-badge-pop shadow-sm">
-                                {readingListItems.length}
-                            </span>
-                        )}
-                    </Button>
-
-                    <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        className={navItemClass} 
-                        onClick={() => toggleView('search')}
-                        aria-label="Search"
-                    >
-                        <Search className="h-5 w-5 transition-transform group-hover:scale-110 group-hover:rotate-12" />
-                    </Button>
-
-                    {/* More Menu Dropdown - Anchored to icon group */}
+                    {/* More Menu Dropdown */}
                     <div className={cn(
-                        "absolute top-full left-0 mt-2 z-40 w-48 bg-background/95 backdrop-blur-md border border-border shadow-xl shadow-black/5 rounded-xl overflow-hidden transition-all duration-300",
-                        isMenuOpen ? "opacity-100 scale-100 translate-y-0" : "opacity-0 scale-95 -translate-y-2 pointer-events-none"
+                        "absolute top-full right-0 mt-2 z-40 min-w-[220px] bg-background/95 backdrop-blur-md border border-border shadow-xl shadow-black/5 rounded-2xl overflow-hidden transition-all duration-300 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)]",
+                        isMenuOpen ? "opacity-100 scale-100 translate-y-0" : "opacity-0 scale-[0.97] -translate-y-1 pointer-events-none"
                     )}>
-                        <div className="py-2">
-                            <div className="md:hidden border-b border-border pb-1 mb-1">
+                        <div className="py-3">
+                            <div className="px-4 py-2 mb-1">
+                                <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">SnipGeek · Navigate</p>
+                            </div>
+                            
+                            <div className="md:hidden border-t border-border mt-1 pt-1">
+                                <div className="px-4 py-2">
+                                    <p className="text-[8px] font-black uppercase tracking-[0.15em] text-accent">Explore</p>
+                                </div>
                                 {directLinks.map((item) => (
-                                    <NextLink key={item.href} href={`${linkPrefix}${item.href}`} className="flex items-center gap-3 px-4 py-2.5 text-[11px] font-bold uppercase tracking-wider hover:bg-muted transition-colors rounded-lg mx-1">
+                                    <NextLink key={item.href} href={`${linkPrefix}${item.href}`} className="group/item flex items-center gap-3 px-4 py-2.5 text-[11px] font-bold uppercase tracking-wider hover:bg-muted transition-colors relative">
+                                        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-4 bg-accent opacity-0 group-hover/item:opacity-60 transition-opacity" />
                                         <item.icon className="h-4 w-4 text-accent" />
                                         {item.name}
                                     </NextLink>
                                 ))}
                             </div>
-                            {moreItems.map((item) => (
-                                <NextLink key={item.href} href={`${linkPrefix}${item.href}`} className="flex items-center gap-3 px-4 py-2.5 text-[11px] font-bold uppercase tracking-wider hover:bg-muted transition-colors rounded-lg mx-1">
-                                    <item.icon className="h-4 w-4 text-accent" />
-                                    {item.name}
-                                </NextLink>
-                            ))}
+
+                            <div className="border-t border-border mt-1 pt-1">
+                                <div className="px-4 py-2">
+                                    <p className="text-[8px] font-black uppercase tracking-[0.15em] text-accent">Connect</p>
+                                </div>
+                                {moreItems.map((item) => (
+                                    <NextLink key={item.href} href={`${linkPrefix}${item.href}`} className="group/item flex items-center gap-3 px-4 py-2.5 text-[11px] font-bold uppercase tracking-wider hover:bg-muted transition-colors relative">
+                                        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-4 bg-accent opacity-0 group-hover/item:opacity-60 transition-opacity" />
+                                        <item.icon className="h-4 w-4 text-accent" />
+                                        {item.name}
+                                    </NextLink>
+                                ))}
+                            </div>
                         </div>
                     </div>
                 </div>
+
+                <div className="w-px h-4 bg-border/70 mx-0.5 hidden sm:block" />
+
+                <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className={navItemClass} 
+                    onClick={() => toggleView('readingList')}
+                    aria-label="Reading List"
+                >
+                    <Bookmark className={cn(
+                        "h-5 w-5 transition-all duration-300",
+                        readingListItems.length > 0 ? "fill-accent text-accent" : ""
+                    )} />
+                    {mounted && readingListItems.length > 0 && (
+                        <span className="absolute top-1.5 right-1.5 flex h-3.5 min-w-[14px] items-center justify-center rounded-full bg-accent text-accent-foreground text-[8px] font-black px-1 animate-badge-pop shadow-sm">
+                            {readingListItems.length}
+                        </span>
+                    )}
+                </Button>
+
+                <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className={navItemClass} 
+                    onClick={() => toggleView('search')}
+                    aria-label="Search"
+                >
+                    <Search className="h-5 w-5 transition-transform group-hover:scale-110 group-hover:rotate-12" />
+                </Button>
             </div>
 
-            {/* Search Input Overlay */}
+            {/* Overlays (Search/Reading List Bars) */}
             <div className={cn(
-                "absolute inset-0 w-full h-16 flex items-center transition-all duration-500 z-10 px-6 bg-background",
+                "absolute inset-0 w-full h-16 flex items-center transition-all duration-[280ms] [transition-timing-function:cubic-bezier(0.34,1.56,0.64,1)] z-10 px-6 bg-background",
                 isSearchOpen ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-full pointer-events-none"
             )}>
                 <Search className="h-6 w-6 text-foreground/40 mr-4" />
                 <Input 
                     ref={searchInputRef}
                     placeholder={dictionary.search.placeholder}
-                    className="flex-1 bg-transparent border-none text-xl font-headline focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-foreground/20"
+                    className="flex-1 bg-transparent border-none text-xl font-display focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-foreground/20 placeholder:font-sans"
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
                 />
@@ -390,14 +478,13 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                 </Button>
             </div>
 
-            {/* Reading List Bar Overlay */}
             <div className={cn(
-                "absolute inset-0 w-full h-16 flex items-center justify-between transition-all duration-500 z-10 px-6 bg-background",
+                "absolute inset-0 w-full h-16 flex items-center justify-between transition-all duration-[280ms] [transition-timing-function:cubic-bezier(0.34,1.56,0.64,1)] z-10 px-6 bg-background",
                 isReadingListOpen ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-full pointer-events-none"
             )}>
                 <div className="flex items-center gap-3">
                     <Bookmark className="h-6 w-6 text-accent fill-current" />
-                    <span className="font-headline text-xl font-black uppercase tracking-tight">Reading List</span>
+                    <span className="font-display text-xl font-black uppercase tracking-tight">Reading List</span>
                     {mounted && (
                         <Badge variant="secondary" className="rounded-full bg-accent/10 text-accent border-none font-black h-6 px-3">
                             {readingListItems.length}
@@ -415,25 +502,31 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
             </div>
         </div>
 
-        <div className="max-w-4xl mx-auto relative px-4">
-            {/* Reading List Overlay (Compact Queue Style) */}
+        <div className="max-w-4xl mx-auto relative px-4 md:px-6">
+            {/* Reading List Results Panel */}
             <div className={cn(
-                "absolute top-0 left-4 right-4 z-30 bg-background border border-border shadow-2xl rounded-xl overflow-hidden transition-all duration-300",
-                isReadingListOpen ? "opacity-100 scale-100 translate-y-2" : "opacity-0 scale-95 pointer-events-none"
+                "absolute top-0 left-4 right-4 md:left-6 md:right-6 z-30 bg-background border border-border shadow-2xl rounded-2xl overflow-hidden transition-all duration-300 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)]",
+                isReadingListOpen ? "opacity-100 scale-100 translate-y-2" : "opacity-0 scale-[0.97] -translate-y-1 pointer-events-none"
             )}>
-                <div className="text-[10px] font-black uppercase tracking-widest text-muted-foreground px-4 pt-3 pb-2 border-b border-border">
-                    {dictionary.readingList.inYourList}
+                <div className="flex items-center justify-between px-4 pt-3 pb-2 border-b border-border bg-muted/5">
+                    <p className="text-[9px] font-black uppercase tracking-[0.15em] text-muted-foreground/60">Queue · {readingListItems.length} items</p>
+                    {readingListItems.length > 0 && (
+                        <button className="text-[9px] font-black uppercase tracking-wider text-destructive hover:opacity-70 transition-opacity">Clear all</button>
+                    )}
                 </div>
-                <ScrollArea className="max-h-[300px]">
+                <ScrollArea className="max-h-[320px]">
                     <div className="p-2 space-y-1">
                         {readingListItems.length > 0 ? (
                             readingListItems.map((item) => {
                                 const dataItem = searchableData.find(d => d.slug === item.slug);
                                 const imgUrl = dataItem ? getResolvedImage(dataItem) : '/images/blank/blank.webp';
-                                const config = typeConfig[item.type];
+                                const badgeStyle = getBadgeStyle(dataItem?.category, item.type);
                                 
                                 return (
-                                    <div key={`${item.type}-${item.slug}`} className={cn("group flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all hover:bg-muted/50", removingSlug === item.slug && "opacity-0 scale-95")}>
+                                    <div key={`${item.type}-${item.slug}`} className={cn(
+                                        "group flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-[320ms] hover:bg-muted/50", 
+                                        removingSlug === item.slug && "opacity-0 -translate-x-2 scale-[0.96] ease-in"
+                                    )}>
                                         <NextLink href={item.href} className="flex items-center gap-3 flex-1 min-w-0">
                                             <div className="w-[52px] h-[39px] relative rounded-md overflow-hidden bg-muted shrink-0 border border-border/50">
                                                 <Image src={imgUrl} alt="" fill className="object-cover" sizes="52px" />
@@ -442,14 +535,14 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                                                 <h4 className="text-sm font-bold font-serif text-foreground line-clamp-1 group-hover:text-accent transition-colors">
                                                     {item.title}
                                                 </h4>
-                                                <span className="text-[9px] font-black uppercase text-muted-foreground/60 tracking-wider">
-                                                    {dataItem?.category || config.label}
-                                                </span>
+                                                <div className="mt-0.5">
+                                                    <CategoryBadge label={dataItem?.category || (item.type === 'blog' ? 'Article' : 'Note')} style={badgeStyle} />
+                                                </div>
                                             </div>
                                         </NextLink>
                                         <Button 
                                             variant="ghost" size="icon" 
-                                            className="h-8 w-8 rounded-full text-destructive opacity-0 group-hover:opacity-100 transition-opacity"
+                                            className="h-8 w-8 rounded-full text-destructive opacity-0 group-hover:opacity-100 transition-all translate-x-2 group-hover:translate-x-0"
                                             onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleRemoveReadingListItem(item.slug); }}
                                         >
                                             <Trash2 className="h-3.5 w-3.5" />
@@ -458,18 +551,25 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                                 );
                             })
                         ) : (
-                            <div className="py-16 text-center text-muted-foreground flex flex-col items-center gap-3">
-                                <Bookmark className="h-8 w-8 opacity-20" />
-                                <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">{dictionary.readingList.empty}</p>
+                            <div className="py-16 text-center text-muted-foreground flex flex-col items-center gap-4">
+                                <div className="p-4 bg-muted/30 rounded-2xl">
+                                    <Bookmark className="h-8 w-8 opacity-20" />
+                                </div>
+                                <div className="space-y-1">
+                                    <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">{dictionary.readingList.empty}</p>
+                                    <NextLink href={`${linkPrefix}/blog`} onClick={() => setActiveView('none')} className="text-xs font-bold text-accent hover:underline flex items-center justify-center gap-1">
+                                        Start Reading <ArrowRight className="h-3 w-3" />
+                                    </NextLink>
+                                </div>
                             </div>
                         )}
                     </div>
                 </ScrollArea>
                 {readingListItems.length > 0 && (
-                    <div className="border-t border-border mt-1 pt-2 px-4 pb-3">
+                    <div className="border-t border-border mt-1 p-1">
                         <NextLink 
                             href={`${linkPrefix}/blog`} 
-                            className="text-[10px] font-black uppercase tracking-wider text-muted-foreground hover:text-accent transition-colors flex items-center gap-1"
+                            className="w-full py-2.5 flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-wider text-muted-foreground hover:bg-muted hover:text-accent transition-all rounded-lg"
                             onClick={() => setActiveView('none')}
                         >
                             Browse all posts <ArrowRight className="h-3 w-3" />
@@ -478,42 +578,36 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                 )}
             </div>
 
-            {/* Search Results Overlay */}
+            {/* Search Results Panel */}
             <div className={cn(
-                "absolute top-0 left-4 right-4 z-30 bg-background border border-border shadow-2xl rounded-xl overflow-hidden transition-all duration-300",
-                isSearchOpen ? "opacity-100 scale-100 translate-y-2" : "opacity-0 scale-95 pointer-events-none"
+                "absolute top-0 left-4 right-4 md:left-6 md:right-6 z-30 bg-background border border-border shadow-2xl rounded-2xl overflow-hidden transition-all duration-300 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)]",
+                isSearchOpen ? "opacity-100 scale-100 translate-y-2" : "opacity-0 scale-[0.97] -translate-y-1 pointer-events-none"
             )}>
                 <ScrollArea className="max-h-[450px]">
                     <div className="p-2">
                         {query.length > 1 ? (
                             <>
-                                <div className="text-[10px] font-black uppercase tracking-widest text-muted-foreground px-4 py-2 border-b border-border">
-                                    {results.length} {dictionary.search.resultsFound}
+                                <div className="text-[9px] font-black uppercase tracking-[0.15em] text-muted-foreground/60 px-4 py-2 border-b border-border bg-muted/5">
+                                    {results.length} {dictionary.search.resultsFound} for "{query}"
                                 </div>
                                 {results.length > 0 ? (
                                     <ul className="space-y-1 pt-1">
                                         {results.map((item) => {
                                             const resolvedHero = getResolvedImage(item);
-                                            const config = typeConfig[item.type];
+                                            const badgeStyle = getBadgeStyle(item.category, item.type);
                                             return (
                                                 <li key={`${item.type}-${item.slug}`}>
-                                                    <NextLink href={item.href} className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-muted/50 transition-all group">
+                                                    <NextLink href={item.href} className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-muted/50 transition-all group">
                                                         <div className="w-[52px] h-[39px] relative rounded-md overflow-hidden bg-muted shrink-0 border border-border/50">
-                                                            {item.heroImage ? (
-                                                                <Image src={resolvedHero} alt="" fill className="object-cover" sizes="52px" />
-                                                            ) : (
-                                                                <div className={cn("w-full h-full flex items-center justify-center", config.bg, config.color)}>
-                                                                    <config.icon className="w-4 h-4" />
-                                                                </div>
-                                                            )}
+                                                            <Image src={resolvedHero} alt="" fill className="object-cover" sizes="52px" />
                                                         </div>
                                                         <div className="flex-1 min-w-0">
                                                             <h4 className="text-sm font-bold font-serif text-foreground line-clamp-1 group-hover:text-accent transition-colors">
                                                                 <HighlightMatch text={item.title} query={query} />
                                                             </h4>
-                                                            <span className="text-[9px] font-black uppercase text-muted-foreground/60 tracking-wider">
-                                                                {item.category || config.label}
-                                                            </span>
+                                                            <div className="mt-0.5">
+                                                                <CategoryBadge label={item.category || (item.type === 'blog' ? 'Article' : 'Note')} style={badgeStyle} />
+                                                            </div>
                                                         </div>
                                                         <ChevronRight className="h-3.5 w-3.5 text-muted-foreground/30 group-hover:text-accent transition-all group-hover:translate-x-1" />
                                                     </NextLink>
@@ -523,21 +617,23 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                                     </ul>
                                 ) : (
                                     <div className="py-16 text-center flex flex-col items-center gap-3">
-                                        <Search className="h-8 w-8 opacity-10 text-muted-foreground" />
-                                        <p className="italic text-xs text-muted-foreground">{dictionary.search.noResults} "{query}"</p>
+                                        <div className="p-4 bg-muted/30 rounded-2xl">
+                                            <Search className="h-8 w-8 opacity-10 text-muted-foreground" />
+                                        </div>
+                                        <p className="italic text-xs text-muted-foreground font-serif">{dictionary.search.noResults} "{query}"</p>
                                     </div>
                                 )}
                             </>
                         ) : (
                             <div className="p-0 space-y-4 pb-4">
                                 <div className="space-y-1">
-                                    <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground px-4 pt-3 pb-2">Quick picks</p>
+                                    <p className="text-[9px] font-black uppercase tracking-[0.15em] text-muted-foreground/60 px-4 pt-3 pb-2">{timeLabel}</p>
                                     <div className="px-2 space-y-1">
                                         {quickPicks.map((item) => {
                                             const resolvedHero = getResolvedImage(item);
-                                            const config = typeConfig[item.type];
+                                            const badgeStyle = getBadgeStyle(item.category, item.type);
                                             return (
-                                                <NextLink key={item.slug} href={item.href} className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-muted/50 transition-all group">
+                                                <NextLink key={item.slug} href={item.href} className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-muted/50 transition-all group">
                                                     <div className="w-[52px] h-[39px] relative rounded-md overflow-hidden bg-muted shrink-0 border border-border/50">
                                                         <Image src={resolvedHero} alt="" fill className="object-cover" sizes="52px" />
                                                     </div>
@@ -545,9 +641,9 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                                                         <h4 className="text-sm font-bold font-serif text-foreground line-clamp-1 group-hover:text-accent transition-colors">
                                                             {item.title}
                                                         </h4>
-                                                        <span className="text-[9px] font-black uppercase text-muted-foreground/60 tracking-wider">
-                                                            {item.category || config.label}
-                                                        </span>
+                                                        <div className="mt-0.5">
+                                                            <CategoryBadge label={item.category || (item.type === 'blog' ? 'Article' : 'Note')} style={badgeStyle} />
+                                                        </div>
                                                     </div>
                                                     <ChevronRight className="h-3.5 w-3.5 text-muted-foreground/20 group-hover:text-accent transition-all group-hover:translate-x-1" />
                                                 </NextLink>
@@ -556,10 +652,22 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                                     </div>
                                 </div>
                                 <div className="px-4">
-                                    <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40 mb-3">{dictionary.search.prompt}</p>
+                                    <p className="text-[9px] font-black uppercase tracking-[0.15em] text-muted-foreground/40 mb-3">{dictionary.search.prompt}</p>
                                     <div className="flex flex-wrap gap-2">
-                                        {['Windows', 'Android', 'Hardware'].map(cat => (
-                                            <Badge key={cat} variant="outline" className="px-4 py-1 rounded-full cursor-pointer hover:bg-accent hover:text-accent-foreground text-[9px] uppercase font-black" onClick={() => setQuery(cat)}>{cat}</Badge>
+                                        {['Windows', 'Android', 'Hardware', 'Tutorial', 'Tips'].map(cat => (
+                                            <button 
+                                                key={cat} 
+                                                className={cn(
+                                                    "px-3 py-1.5 rounded-full border text-[9px] font-black uppercase tracking-wider transition-all",
+                                                    "hover:scale-105 active:scale-95",
+                                                    categoryColorMap[cat] 
+                                                        ? `${categoryColorMap[cat].bg} ${categoryColorMap[cat].text} ${categoryColorMap[cat].border} hover:opacity-80`
+                                                        : "bg-muted/50 text-muted-foreground border-border hover:border-accent hover:text-accent"
+                                                )}
+                                                onClick={() => setQuery(cat)}
+                                            >
+                                                {cat}
+                                            </button>
                                         ))}
                                     </div>
                                 </div>
@@ -567,6 +675,18 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                         )}
                     </div>
                 </ScrollArea>
+                <div className="px-4 py-2 border-t border-border bg-muted/5 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-1.5">
+                            <kbd className="px-1.5 py-0.5 rounded border bg-background text-[8px] font-sans font-bold shadow-sm">ESC</kbd>
+                            <span className="text-[8px] font-black uppercase tracking-widest text-muted-foreground/60">to close</span>
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                            <kbd className="px-1.5 py-0.5 rounded border bg-background text-[8px] font-sans font-bold shadow-sm">↑↓</kbd>
+                            <span className="text-[8px] font-black uppercase tracking-widest text-muted-foreground/60">to navigate</span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </header>

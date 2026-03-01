@@ -12,21 +12,37 @@ import { BackToTop } from '@/components/layout/back-to-top';
 import { ThemeSwitcher } from '@/components/layout/theme-switcher';
 import { getDictionary } from '@/lib/get-dictionary';
 import { DraftList } from '@/components/layout/draft-list';
-import { DM_Sans, Playfair_Display } from 'next/font/google';
+import { Bricolage_Grotesque, Plus_Jakarta_Sans, Lora, JetBrains_Mono } from 'next/font/google';
 import { cn } from '@/lib/utils';
 import Script from 'next/script';
 import { FirebaseClientProvider } from '@/firebase';
 
-const fontSans = DM_Sans({
+const fontDisplay = Bricolage_Grotesque({
   subsets: ['latin'],
-  variable: '--font-sans',
-  weight: ['400', '600', '700', '800'],
+  variable: '--font-display',
+  weight: ['400', '500', '600', '700', '800'],
+  display: 'swap',
 });
 
-const fontHeadline = Playfair_Display({
+const fontSans = Plus_Jakarta_Sans({
   subsets: ['latin'],
-  variable: '--font-headline',
-  weight: ['400', '700', '900'],
+  variable: '--font-sans',
+  weight: ['400', '500', '600', '700', '800'],
+  display: 'swap',
+});
+
+const fontSerif = Lora({
+  subsets: ['latin'],
+  variable: '--font-serif',
+  style: ['normal', 'italic'],
+  display: 'swap',
+});
+
+const fontMono = JetBrains_Mono({
+  subsets: ['latin'],
+  variable: '--font-mono',
+  weight: ['400', '500', '700'],
+  display: 'swap',
 });
 
 export const metadata: Metadata = {
@@ -137,7 +153,7 @@ export default async function LocaleLayout({
   const draftNotes = getDraftNotesData(locale);
   
   return (
-    <html lang={locale} className={cn(fontSans.variable, fontHeadline.variable, "scroll-smooth")} suppressHydrationWarning>
+    <html lang={locale} className={cn(fontDisplay.variable, fontSans.variable, fontSerif.variable, fontMono.variable, "scroll-smooth")} suppressHydrationWarning>
       <head>
         <Script
           async
