@@ -37,7 +37,7 @@ export default function AdminMediaPage() {
   const { data: mediaItems, isLoading } = useCollection(mediaQuery);
 
   const filteredMedia = mediaItems?.filter(item => 
-    item.name.toLowerCase().includes(searchTerm.toLowerCase())
+    (item.name || '').toLowerCase().includes(searchTerm.toLowerCase())
   ) || [];
 
   const handleCopy = (e: React.MouseEvent, url: string, name: string, id: string) => {
@@ -54,17 +54,35 @@ export default function AdminMediaPage() {
     e.preventDefault();
     e.stopPropagation();
     
-    if (confirm(`Hapus permanen ${item.name} dari server?`)) {
+    // Pastikan ID ada
+    if (!item.id) {
+        toast({ variant: "destructive", title: "Error", description: "ID gambar tidak valid." });
+        return;
+    }
+
+    const confirmDelete = window.confirm(`Hapus permanen ${item.name || 'gambar ini'} dari server?`);
+    
+    if (confirmDelete) {
         setDeletingId(item.id);
         try {
-            // 1. Hapus dari Storage
-            await deleteFile(item.path);
+            // 1. Cek apakah path tersedia untuk hapus di Storage
+            if (item.path) {
+                await deleteFile(item.path);
+            } else {
+                console.warn("Item path missing, only deleting Firestore record.");
+            }
+
             // 2. Hapus dari Firestore
             deleteDocumentNonBlocking(doc(db, 'media_library', item.id));
             
-            toast({ title: "Terhapus!", description: "Gambar berhasil dibersihkan dari server." });
+            toast({ title: "Terhapus!", description: "Gambar berhasil dibersihkan." });
         } catch (error: any) {
-            toast({ variant: "destructive", title: "Gagal Hapus", description: error.message });
+            console.error("Delete operation failed:", error);
+            toast({ 
+                variant: "destructive", 
+                title: "Gagal Hapus", 
+                description: error.message || "Terjadi kesalahan saat menghapus file." 
+            });
         } finally {
             setDeletingId(null);
         }
@@ -124,9 +142,16 @@ export default function AdminMediaPage() {
                     {viewMode === 'grid' ? (
                         <>
                             <div className="relative aspect-square bg-muted flex items-center justify-center overflow-hidden">
-                                <Image src={item.url} alt={item.name} fill className="object-cover" />
+                                {item.url && (
+                                    <Image 
+                                        src={item.url} 
+                                        alt={item.name || 'Media'} 
+                                        fill 
+                                        className="object-cover" 
+                                        sizes="(max-width: 768px) 50vw, 25vw"
+                                    />
+                                )}
                                 
-                                {/* Overlay Fix: pointer-events-none when hidden, pointer-events-auto when visible */}
                                 <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2 p-2 pointer-events-none group-hover:pointer-events-auto z-10">
                                     <Button 
                                         size="sm" variant="secondary" className="w-full h-8 text-[10px] gap-2"
@@ -146,7 +171,7 @@ export default function AdminMediaPage() {
                                 </div>
                             </div>
                             <div className="p-3">
-                                <p className="text-[10px] font-bold text-primary truncate" title={item.name}>{item.name}</p>
+                                <p className="text-[10px] font-bold text-primary truncate" title={item.name}>{item.name || 'Unnamed File'}</p>
                                 <p className="text-[8px] text-muted-foreground uppercase mt-1">
                                     {item.uploadedAt ? new Date(item.uploadedAt).toLocaleDateString() : 'Unknown Date'}
                                 </p>
@@ -155,10 +180,10 @@ export default function AdminMediaPage() {
                     ) : (
                         <div className="flex items-center gap-4 p-3">
                             <div className="relative h-12 w-16 bg-muted rounded overflow-hidden flex-shrink-0">
-                                <Image src={item.url} alt={item.name} fill className="object-cover" />
+                                {item.url && <Image src={item.url} alt={item.name || 'Media'} fill className="object-cover" sizes="64px" />}
                             </div>
                             <div className="flex-1 min-w-0">
-                                <p className="text-xs font-bold text-primary truncate">{item.name}</p>
+                                <p className="text-xs font-bold text-primary truncate">{item.name || 'Unnamed File'}</p>
                                 <p className="text-[10px] text-muted-foreground truncate">{item.url}</p>
                             </div>
                             <div className="flex gap-2 shrink-0">
