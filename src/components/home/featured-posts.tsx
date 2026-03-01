@@ -36,8 +36,6 @@ const getCategoryColors = (category: string) => {
 
 /**
  * FeaturedPosts - A sophisticated 4-column staggered gallery grid.
- * Refined with Roboto font, 4px rounded images, 
- * single-word category labels, and simplified metadata (date only).
  */
 export function FeaturedPosts({ posts, dictionary, locale, linkPrefix }: FeaturedPostsProps) {
   if (posts.length === 0) return null;
@@ -65,7 +63,7 @@ export function FeaturedPosts({ posts, dictionary, locale, linkPrefix }: Feature
             }
 
             const rawCategory = post.frontmatter.category || 'Tutorial';
-            // Take only first word and capitalize it
+            // Take only first word and format as Sentence case
             const firstWord = rawCategory.split(' ')[0];
             const category = firstWord.charAt(0).toUpperCase() + firstWord.slice(1).toLowerCase();
             const colors = getCategoryColors(category);
@@ -91,7 +89,7 @@ export function FeaturedPosts({ posts, dictionary, locale, linkPrefix }: Feature
                     <article className="space-y-5">
                         {/* Image Block - 4px rounded */}
                         <div className="relative aspect-[4/3] rounded-lg overflow-hidden bg-muted shadow-md group-hover:shadow-xl group-hover:-translate-y-2 transition-all duration-500">
-                            {/* Category Badge - Frosted Glass */}
+                            {/* Category Badge - Frosted Glass, Sentence Case */}
                             <div className="absolute top-4 left-4 z-20">
                                 <div 
                                     className="flex items-center gap-2 px-3 py-1.5 rounded-full backdrop-blur-md border border-white/20 shadow-sm"
@@ -102,7 +100,7 @@ export function FeaturedPosts({ posts, dictionary, locale, linkPrefix }: Feature
                                         style={{ backgroundColor: colors.dot }} 
                                     />
                                     <span 
-                                        className="text-[10px] font-black uppercase tracking-widest"
+                                        className="text-[10px] font-bold tracking-widest"
                                         style={{ color: colors.text }}
                                     >
                                         {category}
@@ -137,10 +135,8 @@ export function FeaturedPosts({ posts, dictionary, locale, linkPrefix }: Feature
                             </h3>
 
                             <div className="flex items-center justify-between">
-                                <div className="flex flex-col gap-1.5">
-                                    <div className="text-[10px] font-bold uppercase tracking-tighter text-muted-foreground/60">
-                                        {formatRelativeTime(new Date(post.frontmatter.date), locale)}
-                                    </div>
+                                <div className="text-[10px] font-bold uppercase tracking-tighter text-muted-foreground/60">
+                                    {formatRelativeTime(new Date(post.frontmatter.date), locale)}
                                 </div>
                                 
                                 <div className="flex items-center gap-3">

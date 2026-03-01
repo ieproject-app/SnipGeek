@@ -115,8 +115,9 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
                     />
                 </div>
 
+                {/* Category Label - Moved below image, above title */}
                 {post.frontmatter.category && (
-                    <p className="text-[10px] font-medium tracking-wider text-accent mb-1.5">
+                    <p className="text-[10px] font-bold tracking-wider text-accent mb-1.5 uppercase">
                         {post.frontmatter.category}
                     </p>
                 )}
@@ -141,9 +142,9 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
         linkPrefix={linkPrefix} 
       />
 
-      {/* Latest Posts Section - Container expanded to 5xl, aspect ratio 4:3 */}
+      {/* Latest Posts Section - Container reverted to 4xl */}
       {latestPosts.length > 0 && (
-        <section className="container max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-12 sm:pb-16">
+        <section className="container max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-12 sm:pb-16">
           <h2 className="text-3xl font-bold font-headline tracking-tighter text-primary mb-12 text-center">
             {dictionary.home.latestPosts}
           </h2>
@@ -172,7 +173,7 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
         </section>
       )}
 
-      {/* FeatureSlider Section (Tutorials) - Aspect ratio 4:3 */}
+      {/* FeatureSlider Section (Tutorials) */}
       {sliderPosts.length > 0 && (
         <FeatureSlider 
           posts={sliderPosts as any} 

@@ -1,3 +1,4 @@
+
 # Firebase Studio
 
 This is a NextJS starter in Firebase Studio.
@@ -26,10 +27,11 @@ To get started, take a look at src/app/page.tsx.
 - **Hover Effect**: Card lift `translateY(-10px)`, image scale `1.06`, accent bar fade-in.
 
 #### Latest Posts (Homepage)
-- **Layout**: 3-column Grid inside `max-w-5xl` container.
+- **Layout**: 3-column Grid inside `max-w-4xl` container.
 - **Title Size**: `text-3xl` font-bold.
 - **Aspect Ratio**: 4:3 (Standardized with Featured Posts).
 - **Typography**: Roboto Bold, `text-base`.
+- **Category Badge**: Inline label above title, uppercase.
 - **Hover Effect**: Card lift `translateY(-1px)`, image scale `1.10`, bookmark overlay fade-in.
 
 #### Tutorial Slider (FeatureSlider)
