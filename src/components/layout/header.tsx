@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
@@ -15,13 +14,15 @@ import {
   User, 
   Mail,
   Languages,
-  ArrowUpRight
+  ArrowUpRight,
+  ChevronRight,
+  ChevronLeft
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
-import { usePathname } from 'next/navigation';
+import { usePathname, useParams } from 'next/navigation';
 import { useReadingList } from '@/hooks/use-reading-list';
 import { useNotification } from '@/hooks/use-notification';
 import type { Dictionary } from '@/lib/get-dictionary';
@@ -83,6 +84,7 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
   const searchInputRef = useRef<HTMLInputElement>(null);
   const headerRef = useRef<HTMLElement>(null);
   const pathname = usePathname();
+  const params = useParams();
   const [mounted, setMounted] = useState(false);
   const [isGlowing, setIsGlowing] = useState(false);
   const prevCount = useRef(readingListItems.length);
@@ -90,6 +92,20 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
   const isSearchOpen = activeView === 'search';
   const isMenuOpen = activeView === 'menu';
   const isReadingListOpen = activeView === 'readingList';
+
+  const currentLocale = (params.locale as string) || 'en';
+  const linkPrefix = currentLocale === 'en' ? '' : `/${currentLocale}`;
+
+  // Favorite Tags for the Pill Navigation
+  const favoriteTags = [
+    { label: 'Windows', slug: 'windows' },
+    { label: 'Android', slug: 'android' },
+    { label: 'Tutorial', slug: 'tutorial' },
+    { label: 'Hardware', slug: 'hardware' },
+    { label: 'Automation', slug: 'automation' },
+    { label: 'Office', slug: 'office' },
+    { label: 'News', slug: 'news' },
+  ];
 
   useEffect(() => {
     setMounted(true);
@@ -149,7 +165,7 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
 
       if (currentScrollY < 10) {
         setIsVisible(true);
-      } else if (delta > 8 && currentScrollY > 80) {
+      } else if (delta > 8 && currentScrollY > 120) {
         setIsVisible(false);
       } else if (delta < -8) {
         setIsVisible(true);
@@ -222,12 +238,13 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
       ref={headerRef} 
       style={{ willChange: 'transform' }}
       className={cn(
-        "fixed top-0 left-0 right-0 z-50 w-full h-20 bg-background/80 backdrop-blur-md border-b border-border/50 transition-transform [transition-timing-function:cubic-bezier(0.4,0,0.2,1)] will-change-transform",
+        "fixed top-0 left-0 right-0 z-50 w-full bg-background/80 backdrop-blur-md border-b border-border/50 transition-transform [transition-timing-function:cubic-bezier(0.4,0,0.2,1)] will-change-transform",
         isVisible 
           ? "translate-y-0 duration-500" 
           : "-translate-y-full duration-300"
     )}>
-        <div className="max-w-4xl mx-auto h-full px-4 flex items-center justify-between relative">
+        {/* Row 1: Brand & Primary Nav */}
+        <div className="max-w-4xl mx-auto h-20 px-4 flex items-center justify-between relative">
             
             {/* Notification Overlay */}
             <div className={cn(
@@ -268,7 +285,7 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                     {directLinks.map((item) => (
                         <NextLink 
                             key={item.href}
-                            href={item.href}
+                            href={`${linkPrefix}${item.href}`}
                             className={cn(
                                 "px-2.5 py-1 text-[11px] font-black uppercase tracking-widest transition-all",
                                 "hover:-translate-y-0.5 active:scale-95",
@@ -344,6 +361,39 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
             </div>
         </div>
 
+        {/* Row 2: Tag Bar (Pill Navigation) */}
+        <div className="border-t border-border/20">
+            <div className="max-w-4xl mx-auto h-10 flex items-center relative overflow-hidden">
+                {/* Left Gradient Fade */}
+                <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-background to-transparent z-10 pointer-events-none md:hidden" />
+                
+                <ScrollArea className="w-full whitespace-nowrap" orientation="horizontal">
+                    <div className="flex items-center gap-3 px-4 py-2">
+                        {favoriteTags.map((tag) => {
+                            const isActive = pathname.includes(`/tags/${tag.slug}`);
+                            return (
+                                <NextLink 
+                                    key={tag.slug} 
+                                    href={`${linkPrefix}/tags/${tag.slug}`}
+                                    className={cn(
+                                        "px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border transition-all duration-300",
+                                        isActive 
+                                            ? "bg-accent text-accent-foreground border-accent shadow-lg shadow-accent/20" 
+                                            : "bg-muted/20 text-muted-foreground border-border/50 hover:bg-muted/50 hover:text-foreground hover:border-border"
+                                    )}
+                                >
+                                    {tag.label}
+                                </NextLink>
+                            );
+                        })}
+                    </div>
+                </ScrollArea>
+
+                {/* Right Gradient Fade */}
+                <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-background to-transparent z-10 pointer-events-none" />
+            </div>
+        </div>
+
         <div className="max-w-4xl mx-auto relative px-4">
             {/* More Menu */}
             <div className={cn(
@@ -353,14 +403,14 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                 <div className="py-2">
                     <div className="md:hidden border-b border-border pb-2 mb-2">
                         {directLinks.map((item) => (
-                            <NextLink key={item.href} href={item.href} className="flex items-center gap-4 px-6 py-3 text-sm font-bold uppercase tracking-wider hover:bg-muted transition-colors">
+                            <NextLink key={item.href} href={`${linkPrefix}${item.href}`} className="flex items-center gap-4 px-6 py-3 text-sm font-bold uppercase tracking-wider hover:bg-muted transition-colors">
                                 <item.icon className="h-4 w-4 text-accent" />
                                 {item.name}
                             </NextLink>
                         ))}
                     </div>
                     {moreItems.map((item) => (
-                        <NextLink key={item.href} href={item.href} className="flex items-center gap-4 px-6 py-3 text-sm font-bold uppercase tracking-wider hover:bg-muted transition-colors">
+                        <NextLink key={item.href} href={`${linkPrefix}${item.href}`} className="flex items-center gap-4 px-6 py-3 text-sm font-bold uppercase tracking-wider hover:bg-muted transition-colors">
                             <item.icon className="h-4 w-4 text-accent" />
                             {item.name}
                         </NextLink>
