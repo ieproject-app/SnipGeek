@@ -475,7 +475,7 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                                                 <Image src={imgUrl} alt="" fill className="object-cover" sizes="52px" />
                                             </div>
                                             <div className="flex-1 min-w-0 flex flex-col">
-                                                <h4 className="font-serif text-sm font-bold text-foreground line-clamp-1 group-hover:text-accent transition-colors leading-tight">
+                                                <h4 className="font-sans text-sm font-bold text-foreground line-clamp-1 group-hover:text-accent transition-colors leading-tight">
                                                     {item.title}
                                                 </h4>
                                                 <div className="mt-1">
@@ -544,7 +544,7 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                                                             <Image src={resolvedHero} alt="" fill className="object-cover" sizes="52px" />
                                                         </div>
                                                         <div className="flex-1 min-w-0">
-                                                            <h4 className="font-serif text-sm font-bold text-foreground line-clamp-1 group-hover:text-accent transition-colors leading-tight">
+                                                            <h4 className="font-sans text-sm font-bold text-foreground line-clamp-1 group-hover:text-accent transition-colors leading-tight">
                                                                 <HighlightMatch text={item.title} query={query} />
                                                             </h4>
                                                             <div className="mt-1">
@@ -579,7 +579,7 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                                                         <Image src={resolvedHero} alt="" fill className="object-cover" sizes="52px" />
                                                     </div>
                                                     <div className="flex-1 min-w-0">
-                                                        <h4 className="font-serif text-sm font-bold text-foreground line-clamp-1 group-hover:text-accent transition-colors leading-tight">
+                                                        <h4 className="font-sans text-sm font-bold text-foreground line-clamp-1 group-hover:text-accent transition-colors leading-tight">
                                                             {item.title}
                                                         </h4>
                                                         <div className="mt-1">
