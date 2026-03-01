@@ -4,14 +4,13 @@
 import { useFirestore, useCollection, useMemoFirebase, deleteDocumentNonBlocking } from '@/firebase';
 import { collection, doc, query, orderBy } from 'firebase/firestore';
 import { deleteFile } from '@/firebase/storage';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { 
     ImageIcon, 
     Trash2, 
     Copy, 
     Loader2, 
-    ExternalLink, 
     Check,
     Search,
     Grid2X2,
@@ -29,6 +28,7 @@ export default function AdminMediaPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const mediaQuery = useMemoFirebase(() => 
     query(collection(db, 'media_library'), orderBy('uploadedAt', 'desc')), [db]
@@ -40,7 +40,9 @@ export default function AdminMediaPage() {
     item.name.toLowerCase().includes(searchTerm.toLowerCase())
   ) || [];
 
-  const handleCopy = (url: string, name: string, id: string) => {
+  const handleCopy = (e: React.MouseEvent, url: string, name: string, id: string) => {
+    e.preventDefault();
+    e.stopPropagation();
     const mdx = `![${name}](${url})`;
     navigator.clipboard.writeText(mdx);
     setCopiedId(id);
@@ -48,8 +50,12 @@ export default function AdminMediaPage() {
     setTimeout(() => setCopiedId(null), 2000);
   };
 
-  const handleDelete = async (item: any) => {
+  const handleDelete = async (e: React.MouseEvent, item: any) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
     if (confirm(`Hapus permanen ${item.name} dari server?`)) {
+        setDeletingId(item.id);
         try {
             // 1. Hapus dari Storage
             await deleteFile(item.path);
@@ -59,6 +65,8 @@ export default function AdminMediaPage() {
             toast({ title: "Terhapus!", description: "Gambar berhasil dibersihkan dari server." });
         } catch (error: any) {
             toast({ variant: "destructive", title: "Gagal Hapus", description: error.message });
+        } finally {
+            setDeletingId(null);
         }
     }
   };
@@ -112,47 +120,59 @@ export default function AdminMediaPage() {
             viewMode === 'grid' ? "grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5" : "grid-cols-1"
         )}>
             {filteredMedia.map((item) => (
-                <Card key={item.id} className="group overflow-hidden border-primary/5 bg-card/50 hover:border-accent/30 transition-all">
+                <Card key={item.id} className="group overflow-hidden border-primary/5 bg-card/50 hover:border-accent/30 transition-all relative">
                     {viewMode === 'grid' ? (
                         <>
-                            <div className="relative aspect-square bg-muted flex items-center justify-center">
+                            <div className="relative aspect-square bg-muted flex items-center justify-center overflow-hidden">
                                 <Image src={item.url} alt={item.name} fill className="object-cover" />
-                                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2 p-2">
+                                
+                                {/* Overlay Fix: pointer-events-none when hidden, pointer-events-auto when visible */}
+                                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2 p-2 pointer-events-none group-hover:pointer-events-auto z-10">
                                     <Button 
                                         size="sm" variant="secondary" className="w-full h-8 text-[10px] gap-2"
-                                        onClick={() => handleCopy(item.url, item.name, item.id)}
+                                        onClick={(e) => handleCopy(e, item.url, item.name, item.id)}
                                     >
                                         {copiedId === item.id ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
                                         MDX CODE
                                     </Button>
                                     <Button 
                                         size="sm" variant="destructive" className="w-full h-8 text-[10px] gap-2"
-                                        onClick={() => handleDelete(item)}
+                                        disabled={deletingId === item.id}
+                                        onClick={(e) => handleDelete(e, item)}
                                     >
-                                        <Trash2 className="h-3 w-3" /> DELETE
+                                        {deletingId === item.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <Trash2 className="h-3 w-3" />}
+                                        DELETE
                                     </Button>
                                 </div>
                             </div>
                             <div className="p-3">
                                 <p className="text-[10px] font-bold text-primary truncate" title={item.name}>{item.name}</p>
-                                <p className="text-[8px] text-muted-foreground uppercase mt-1">{new Date(item.uploadedAt).toLocaleDateString()}</p>
+                                <p className="text-[8px] text-muted-foreground uppercase mt-1">
+                                    {item.uploadedAt ? new Date(item.uploadedAt).toLocaleDateString() : 'Unknown Date'}
+                                </p>
                             </div>
                         </>
                     ) : (
                         <div className="flex items-center gap-4 p-3">
-                            <div className="relative h-12 w-16 bg-muted rounded overflow-hidden">
+                            <div className="relative h-12 w-16 bg-muted rounded overflow-hidden flex-shrink-0">
                                 <Image src={item.url} alt={item.name} fill className="object-cover" />
                             </div>
                             <div className="flex-1 min-w-0">
                                 <p className="text-xs font-bold text-primary truncate">{item.name}</p>
-                                <p className="text-[10px] text-muted-foreground">{item.url}</p>
+                                <p className="text-[10px] text-muted-foreground truncate">{item.url}</p>
                             </div>
-                            <div className="flex gap-2">
-                                <Button variant="ghost" size="icon" onClick={() => handleCopy(item.url, item.name, item.id)}>
+                            <div className="flex gap-2 shrink-0">
+                                <Button variant="ghost" size="icon" onClick={(e) => handleCopy(e, item.url, item.name, item.id)}>
                                     <Copy className="h-4 w-4" />
                                 </Button>
-                                <Button variant="ghost" size="icon" className="text-destructive hover:bg-destructive/10" onClick={() => handleDelete(item)}>
-                                    <Trash2 className="h-4 w-4" />
+                                <Button 
+                                    variant="ghost" 
+                                    size="icon" 
+                                    className="text-destructive hover:bg-destructive/10" 
+                                    disabled={deletingId === item.id}
+                                    onClick={(e) => handleDelete(e, item)}
+                                >
+                                    {deletingId === item.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
                                 </Button>
                             </div>
                         </div>
