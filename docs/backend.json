@@ -75,6 +75,23 @@
         "authorId"
       ]
     },
+    "QuickNote": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "QuickNote",
+      "type": "object",
+      "description": "Represents a technical snippet or quick reference note.",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "contentMdx": { "type": "string" },
+        "date": { "type": "string", "format": "date-time" },
+        "locale": { "type": "string" },
+        "tags": { "type": "array", "items": { "type": "string" } },
+        "translationKey": { "type": "string" }
+      },
+      "required": ["id", "title", "contentMdx", "date", "locale"]
+    },
     "Author": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "Author",
@@ -153,7 +170,7 @@
           "schema": {
             "$ref": "#/backend/entities/UserRole"
           },
-          "description": "Collection to define users with administrative privileges. The document ID (`userId`) corresponds to the Firebase Authentication UID of the administrator. Existence of a document here grants admin access. This follows the DBAC principle and supports global roles.",
+          "description": "Collection to define users with administrative privileges.",
           "params": [
             {
               "name": "userId",
@@ -169,7 +186,7 @@
           "schema": {
             "$ref": "#/backend/entities/BlogPost"
           },
-          "description": "Stores blog posts that are publicly visible. Documents in this collection are guaranteed to have `isPublished: true`. Public users have read access. Only users with the 'admin' role can create, update, or delete documents here. Includes denormalized 'authorName', 'authorProfileImageUrl', and 'authorBio' for authorization independence and efficient public display.",
+          "description": "Stores blog posts that are publicly visible.",
           "params": [
             {
               "name": "blogPostId",
@@ -179,17 +196,33 @@
         }
       },
       {
-        "path": "/blogPosts_drafts/{blogPostId}",
+        "path": "/notes_published/{noteId}",
         "definition": {
-          "entityName": "BlogPost",
+          "entityName": "QuickNote",
           "schema": {
-            "$ref": "#/backend/entities/BlogPost"
+            "$ref": "#/backend/entities/QuickNote"
           },
-          "description": "Stores blog posts that are currently in draft status and not publicly visible. Documents in this collection are guaranteed to have `isPublished: false`. Only users with the 'admin' role have read, create, update, and delete access. Includes denormalized 'authorName', 'authorProfileImageUrl', and 'authorBio' to avoid cross-collection reads for admin panel views.",
+          "description": "Stores technical snippets that are publicly visible.",
           "params": [
             {
-              "name": "blogPostId",
-              "description": "The unique identifier for the draft blog post."
+              "name": "noteId",
+              "description": "The unique identifier for the published note."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/notes_drafts/{noteId}",
+        "definition": {
+          "entityName": "QuickNote",
+          "schema": {
+            "$ref": "#/backend/entities/QuickNote"
+          },
+          "description": "Stores technical snippets that are in draft status.",
+          "params": [
+            {
+              "name": "noteId",
+              "description": "The unique identifier for the draft note."
             }
           ]
         }
@@ -201,7 +234,7 @@
           "schema": {
             "$ref": "#/backend/entities/Author"
           },
-          "description": "Stores information about authors. This collection is publicly readable for displaying author profiles on blog posts. Only users with the 'admin' role can create, update, or delete author records. `authorId` is the unique identifier for the author.",
+          "description": "Stores information about authors.",
           "params": [
             {
               "name": "authorId",
@@ -217,7 +250,7 @@
           "schema": {
             "$ref": "#/backend/entities/Tag"
           },
-          "description": "Stores categorization tags for blog posts. This collection is publicly readable for display in tag listings or post details. Only users with the 'admin' role can create, update, or delete tag records. `tagId` is the unique identifier for the tag.",
+          "description": "Stores categorization tags for blog posts.",
           "params": [
             {
               "name": "tagId",
@@ -226,7 +259,6 @@
           ]
         }
       }
-    ],
-    "reasoning": "The Firestore structure is designed to provide a secure, scalable, and debuggable backend for the SnipBlog website, explicitly supporting an admin dashboard for content management while maintaining public readability for published articles. \n\n**Authorization Independence (CRITICAL):** This is achieved primarily through **Structural Segregation** and **Denormalization**. Published blog posts reside in `/blogPosts_published`, which are globally readable, eliminating the need for `get()` calls in rules to check permissions. Drafts and administrative actions are confined to `/blogPosts_drafts`, where access is governed by the presence of a user's UID in the `/roles_admin` collection. The authorization logic for blog posts (read access for public posts, admin access for drafts) is self-contained within the document's path or collection, or the requesting user's role, thus avoiding hierarchical dependencies. Furthermore, `BlogPost` documents denormalize key `Author` details (`authorName`, `authorProfileImageUrl`, `authorBio`) to prevent `get()` calls to the `/authors` collection when displaying posts.\n\n**Clarity of Intent (Debuggability):** The separation into `_published` and `_drafts` collections makes the security posture explicit. A document's location clearly indicates its accessibility. The `/roles_admin` collection provides a transparent and single source of truth for administrative privileges.\n\n**DBAC (No Custom Claims):** User roles are managed directly within Firestore via the `/roles_admin/{userId}` collection. Authorization rules will check `request.auth.uid` against the existence of a document in this collection for admin access.\n\n**QAPs (Rules are not Filters):** This design strongly supports secure `list` operations:\n*   For public users, querying `/blogPosts_published` is inherently secure as all documents in this collection are intended for public read access. The security rules will permit `list` on this collection without needing to filter on `isPublished` because only published posts are ever placed here.\n*   For administrators, querying `/blogPosts_drafts` is secure because only authenticated users with the `admin` role can perform `list` operations on this collection. Similarly, only admins can `list` `/authors` and `/tags`.\n\n**Invariants:** The use of explicit `publishDate`, `updatedDate`, `isPublished` fields and unique slugs within their respective collections helps maintain data integrity. The `authorId` linking to the `/authors` collection ensures clear ownership, and denormalized fields maintain consistency for display purposes."
+    ]
   }
 }
