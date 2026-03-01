@@ -269,7 +269,7 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
             {/* Left: Branding */}
             <div className={cn(
                 "flex items-center transition-all duration-500",
-                (isSearchOpen || isReadingListOpen || isMenuOpen) ? "opacity-0 pointer-events-none" : "opacity-100"
+                (isSearchOpen || isReadingListOpen) ? "opacity-0 pointer-events-none" : "opacity-100"
             )}>
                 <NextLink href="/" className="flex items-center gap-3 group" aria-label="SnipGeek Home">
                     <SnipGeekLogo className="h-8 w-8 group-hover:animate-wiggle" />
@@ -283,7 +283,7 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
             {/* Center: Navigation (md+) */}
             <nav className={cn(
                 "hidden md:flex items-center gap-0 absolute left-1/2 -translate-x-1/2 transition-all duration-500",
-                (isSearchOpen || isReadingListOpen || isMenuOpen) ? "opacity-0 pointer-events-none" : "opacity-100"
+                (isSearchOpen || isReadingListOpen) ? "opacity-0 pointer-events-none" : "opacity-100"
             )}>
                 {directLinks.map((item) => {
                     const isActive = pathname.includes(item.href);
@@ -306,32 +306,33 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                 })}
             </nav>
 
-            {/* Right: Utilities */}
+            {/* Right: Utilities Container */}
             <div className={cn(
-                "flex items-center gap-1 transition-all duration-500",
-                (isSearchOpen || isReadingListOpen || isMenuOpen) ? "opacity-0 pointer-events-none" : "opacity-100"
+                "relative flex items-center gap-1 transition-all duration-500",
+                (isSearchOpen || isReadingListOpen) ? "opacity-0 pointer-events-none" : "opacity-100"
             )}>
-                <div className="relative group/more-btn">
-                    <Button 
-                        variant="ghost" 
-                        size="icon"
-                        className={navItemClass} 
-                        onClick={() => toggleView('menu')}
-                        aria-label="More Menu"
-                    >
-                        <MoreHorizontal className={cn(
-                            "h-5 w-5 transition-all duration-300",
-                            isMenuOpen ? "rotate-90 opacity-0 scale-0 absolute" : "opacity-100 scale-100"
-                        )} />
-                        <X className={cn(
-                            "h-5 w-5 transition-all duration-300",
-                            isMenuOpen ? "opacity-100 scale-100" : "-rotate-90 opacity-0 scale-0 absolute"
-                        )} />
-                    </Button>
-                </div>
+                {/* 1. More Menu Toggle */}
+                <Button 
+                    variant="ghost" 
+                    size="icon"
+                    className={navItemClass} 
+                    onClick={() => toggleView('menu')}
+                    aria-label="More Menu"
+                >
+                    <MoreHorizontal className={cn(
+                        "h-5 w-5 transition-all duration-300",
+                        isMenuOpen ? "rotate-90 opacity-0 scale-0 absolute" : "opacity-100 scale-100"
+                    )} />
+                    <X className={cn(
+                        "h-5 w-5 transition-all duration-300",
+                        isMenuOpen ? "opacity-100 scale-100" : "-rotate-90 opacity-0 scale-0 absolute"
+                    )} />
+                </Button>
 
+                {/* Vertical Divider */}
                 <div className="w-px h-4 bg-border/70 mx-0.5 hidden sm:block" />
 
+                {/* 2. Bookmark Icon */}
                 <Button 
                     variant="ghost" 
                     size="icon" 
@@ -350,6 +351,7 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                     )}
                 </Button>
 
+                {/* 3. Search Icon */}
                 <Button 
                     variant="ghost" 
                     size="icon" 
@@ -359,9 +361,54 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                 >
                     <Search className="h-5 w-5 transition-transform group-hover:scale-110 group-hover:rotate-12" />
                 </Button>
+
+                {/* FLOATING MORE MENU DROPDOWN - Anchored here */}
+                <div className={cn(
+                    "absolute top-full right-0 mt-2 min-w-[220px] bg-background/95 backdrop-blur-md border border-border shadow-xl rounded-2xl overflow-hidden transition-all duration-300 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] z-50",
+                    isMenuOpen ? "opacity-100 scale-100 translate-y-0" : "opacity-0 scale-[0.97] -translate-y-2 pointer-events-none"
+                )}>
+                    <div className="py-3">
+                        <div className="px-4 py-2 mb-1">
+                            <p className="font-sans text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">SnipGeek · Navigate</p>
+                        </div>
+                        
+                        {/* Mobile Navigation Links inside Dropdown */}
+                        <div className="md:hidden border-b border-border mb-1 pb-1">
+                            {directLinks.map((item) => (
+                                <NextLink 
+                                    key={item.href} 
+                                    href={`${linkPrefix}${item.href}`} 
+                                    className="group/item flex items-center gap-3 px-4 py-2.5 font-sans text-[11px] font-bold uppercase tracking-wider hover:bg-muted transition-colors rounded-lg mx-1 relative"
+                                >
+                                    <div className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-4 bg-accent opacity-0 group-hover/item:opacity-60 transition-opacity" />
+                                    <item.icon className="h-4 w-4 text-accent" />
+                                    {item.name}
+                                </NextLink>
+                            ))}
+                        </div>
+
+                        {/* Standard More Items (About, Contact) */}
+                        <div className="pt-1">
+                            <div className="px-4 py-2">
+                                <p className="font-sans text-[8px] font-black uppercase tracking-[0.15em] text-accent">Connect</p>
+                            </div>
+                            {moreItems.map((item) => (
+                                <NextLink 
+                                    key={item.href} 
+                                    href={`${linkPrefix}${item.href}`} 
+                                    className="group/item flex items-center gap-3 px-4 py-2.5 font-sans text-[11px] font-bold uppercase tracking-wider hover:bg-muted transition-colors rounded-lg mx-1 relative"
+                                >
+                                    <div className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-4 bg-accent opacity-0 group-hover/item:opacity-60 transition-opacity" />
+                                    <item.icon className="h-4 w-4 text-accent" />
+                                    {item.name}
+                                </NextLink>
+                            ))}
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            {/* Absolute Overlays (Search/Reading List Bars) */}
+            {/* BAR OVERLAYS (Only for Search and Reading List) */}
             <div className={cn(
                 "absolute inset-0 w-full h-16 flex items-center transition-all duration-[280ms] [transition-timing-function:cubic-bezier(0.34,1.56,0.64,1)] z-10 px-6 bg-background",
                 isSearchOpen ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-full pointer-events-none"
@@ -420,12 +467,12 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                         <button className="font-sans text-[9px] font-black uppercase tracking-wider text-destructive hover:opacity-70 transition-opacity">Clear all</button>
                     )}
                 </div>
-                <ScrollArea className="max-h-[320px]">
+                <ScrollArea className="max-h-[300px]">
                     <div className="p-2 space-y-1">
                         {readingListItems.length > 0 ? (
                             readingListItems.map((item) => {
                                 const dataItem = searchableData.find(d => d.slug === item.slug);
-                                const imgUrl = dataItem ? getResolvedImage(dataItem) : '/images/blank/blank.webp';
+                                const imgUrl = dataItem ? getResolvedImage(item) : '/images/blank/blank.webp';
                                 
                                 return (
                                     <div key={`${item.type}-${item.slug}`} className={cn(
@@ -524,7 +571,7 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                                         <div className="p-4 bg-muted/30 rounded-2xl">
                                             <Search className="h-8 w-8 opacity-10 text-muted-foreground" />
                                         </div>
-                                        <p className="font-serif italic text-xs text-muted-foreground">{dictionary.search.noResults} "{query}"</p>
+                                        <p className="font-sans italic text-xs text-muted-foreground">{dictionary.search.noResults} "{query}"</p>
                                     </div>
                                 )}
                             </>
@@ -589,44 +636,6 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                             <kbd className="px-1.5 py-0.5 rounded border bg-background font-sans text-[8px] font-bold shadow-sm">↑↓</kbd>
                             <span className="font-sans text-[8px] font-black uppercase tracking-widest text-muted-foreground/60">to navigate</span>
                         </div>
-                    </div>
-                </div>
-            </div>
-
-            {/* More Menu Dropdown Panel */}
-            <div className={cn(
-                "absolute top-0 right-4 md:right-6 z-30 min-w-[220px] bg-background/95 backdrop-blur-md border border-border shadow-2xl rounded-2xl overflow-hidden transition-all duration-300 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)]",
-                isMenuOpen ? "opacity-100 scale-100 translate-y-2" : "opacity-0 scale-[0.97] -translate-y-1 pointer-events-none"
-            )}>
-                <div className="py-3">
-                    <div className="px-4 py-2 mb-1">
-                        <p className="font-sans text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">SnipGeek · Navigate</p>
-                    </div>
-                    
-                    <div className="md:hidden border-t border-border mt-1 pt-1">
-                        <div className="px-4 py-2">
-                            <p className="font-sans text-[8px] font-black uppercase tracking-[0.15em] text-accent">Explore</p>
-                        </div>
-                        {directLinks.map((item) => (
-                            <NextLink key={item.href} href={`${linkPrefix}${item.href}`} className="group/item flex items-center gap-3 px-4 py-2.5 font-sans text-[11px] font-bold uppercase tracking-wider hover:bg-muted transition-colors relative">
-                                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-4 bg-accent opacity-0 group-hover/item:opacity-60 transition-opacity" />
-                                <item.icon className="h-4 w-4 text-accent" />
-                                {item.name}
-                            </NextLink>
-                        ))}
-                    </div>
-
-                    <div className="border-t border-border mt-1 pt-1">
-                        <div className="px-4 py-2">
-                            <p className="font-sans text-[8px] font-black uppercase tracking-[0.15em] text-accent">Connect</p>
-                        </div>
-                        {moreItems.map((item) => (
-                            <NextLink key={item.href} href={`${linkPrefix}${item.href}`} className="group/item flex items-center gap-3 px-4 py-2.5 font-sans text-[11px] font-bold uppercase tracking-wider hover:bg-muted transition-colors relative">
-                                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-4 bg-accent opacity-0 group-hover/item:opacity-60 transition-opacity" />
-                                <item.icon className="h-4 w-4 text-accent" />
-                                {item.name}
-                            </NextLink>
-                        ))}
                     </div>
                 </div>
             </div>
