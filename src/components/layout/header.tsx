@@ -379,6 +379,7 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                                     key={item.href} 
                                     href={`${linkPrefix}${item.href}`} 
                                     className="group/item flex items-center gap-3 px-4 py-2.5 font-sans text-[11px] font-bold uppercase tracking-wider hover:bg-muted transition-colors rounded-lg mx-1 relative"
+                                    onClick={() => setActiveView('none')}
                                 >
                                     <div className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-4 bg-accent opacity-0 group-hover/item:opacity-60 transition-opacity" />
                                     <item.icon className="h-4 w-4 text-accent" />
@@ -397,6 +398,7 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                                     key={item.href} 
                                     href={`${linkPrefix}${item.href}`} 
                                     className="group/item flex items-center gap-3 px-4 py-2.5 font-sans text-[11px] font-bold uppercase tracking-wider hover:bg-muted transition-colors rounded-lg mx-1 relative"
+                                    onClick={() => setActiveView('none')}
                                 >
                                     <div className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-4 bg-accent opacity-0 group-hover/item:opacity-60 transition-opacity" />
                                     <item.icon className="h-4 w-4 text-accent" />
@@ -472,14 +474,14 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                         {readingListItems.length > 0 ? (
                             readingListItems.map((item) => {
                                 const dataItem = searchableData.find(d => d.slug === item.slug);
-                                const imgUrl = dataItem ? getResolvedImage(item) : '/images/blank/blank.webp';
+                                const imgUrl = dataItem ? getResolvedImage(dataItem as SearchableItem) : '/images/blank/blank.webp';
                                 
                                 return (
                                     <div key={`${item.type}-${item.slug}`} className={cn(
                                         "group flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-[320ms] hover:bg-muted/50", 
                                         removingSlug === item.slug && "opacity-0 -translate-x-2 scale-[0.96] ease-in"
                                     )}>
-                                        <NextLink href={item.href} className="flex items-center gap-3 flex-1 min-w-0">
+                                        <NextLink href={item.href} className="flex items-center gap-3 flex-1 min-w-0" onClick={() => setActiveView('none')}>
                                             <div className="w-[52px] h-[39px] relative rounded-md overflow-hidden bg-muted shrink-0 border border-border/50">
                                                 <Image src={imgUrl} alt="" fill className="object-cover" sizes="52px" />
                                             </div>
@@ -548,7 +550,7 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                                             const resolvedHero = getResolvedImage(item);
                                             return (
                                                 <li key={`${item.type}-${item.slug}`}>
-                                                    <NextLink href={item.href} className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-muted/50 transition-all group">
+                                                    <NextLink href={item.href} className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-muted/50 transition-all group" onClick={() => setActiveView('none')}>
                                                         <div className="w-[52px] h-[39px] relative rounded-md overflow-hidden bg-muted shrink-0 border border-border/50">
                                                             <Image src={resolvedHero} alt="" fill className="object-cover" sizes="52px" />
                                                         </div>
@@ -583,7 +585,7 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                                         {quickPicks.map((item) => {
                                             const resolvedHero = getResolvedImage(item);
                                             return (
-                                                <NextLink key={item.slug} href={item.href} className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-muted/50 transition-all group">
+                                                <NextLink key={item.slug} href={item.href} className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-muted/50 transition-all group" onClick={() => setActiveView('none')}>
                                                     <div className="w-[52px] h-[39px] relative rounded-md overflow-hidden bg-muted shrink-0 border border-border/50">
                                                         <Image src={resolvedHero} alt="" fill className="object-cover" sizes="52px" />
                                                     </div>

@@ -32,12 +32,12 @@ interface FeatureSliderProps {
   posts: SliderPost[];
   title: string;
   viewMoreText: string;
-  readingListDictionary: Dictionary['readingList'];
+  dictionary: Dictionary;
   locale: string;
   tag?: string;
 }
 
-export function FeatureSlider({ posts, title, viewMoreText, readingListDictionary, locale, tag }: FeatureSliderProps) {
+export function FeatureSlider({ posts, title, viewMoreText, dictionary, locale, tag }: FeatureSliderProps) {
   const [api, setApi] = React.useState<CarouselApi>();
   const [current, setCurrent] = React.useState(0);
   const [count, setCount] = React.useState(0);
@@ -122,7 +122,7 @@ export function FeatureSlider({ posts, title, viewMoreText, readingListDictionar
                         />
                         <AddToReadingListButton 
                           item={item}
-                          dictionary={readingListDictionary}
+                          dictionary={dictionary}
                           showText={false}
                           className="absolute top-2 right-2 z-20 text-white bg-black/30 hover:bg-black/50 hover:text-white opacity-0 group-hover/card:opacity-100 transition-opacity"
                         />
