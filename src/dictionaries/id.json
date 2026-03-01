@@ -249,6 +249,17 @@
             "theme": "Ganti Tema"
         }
     },
+    "maintenance": {
+        "title": "Pemeliharaan Sistem",
+        "description": "Alat administrator untuk sinkronisasi dan populasi database.",
+        "populateTitle": "Populasi Database Nomor",
+        "populateDescription": "Peringatan: Aksi ini akan menyuntikkan ribuan nomor urut unik untuk periode 2025-2026. Eksekusi hanya jika database kosong.",
+        "populateButton": "Suntik Nomor Sekarang",
+        "success": "Database berhasil dipopulasi!",
+        "unauthorized": "Akses Ditolak. Memerlukan hak akses Admin.",
+        "loading": "Memproses transaksi...",
+        "error": "Terjadi kesalahan saat populasi."
+    },
     "notifications": {
         "themeLight": "Tema: Terang",
         "themeDark": "Tema: Gelap",
