@@ -1,15 +1,17 @@
+
 'use client';
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth, useUser } from '@/firebase';
-import { initiateEmailSignIn } from '@/firebase/non-blocking-login';
+import { initiateEmailSignIn, initiateGoogleSignIn } from '@/firebase/non-blocking-login';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { SnipGeekLogo } from '@/components/icons/snipgeek-logo';
-import { Loader2, Lock, Mail } from 'lucide-react';
+import { Loader2, Lock, Mail, Chrome } from 'lucide-react';
+import { Separator } from '@/components/ui/separator';
 
 export default function AdminLoginPage() {
   const [email, setEmail] = useState('');
@@ -30,7 +32,10 @@ export default function AdminLoginPage() {
     e.preventDefault();
     setIsSubmitting(true);
     initiateEmailSignIn(auth, email, password);
-    // Note: Success redirect is handled by the useEffect watching the user state
+  };
+
+  const handleGoogleLogin = () => {
+    initiateGoogleSignIn(auth);
   };
 
   if (isUserLoading) {
@@ -55,8 +60,8 @@ export default function AdminLoginPage() {
             Access the SnipGeek control panel to manage your content.
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <form onSubmit={handleLogin} className="space-y-6">
+        <CardContent className="space-y-6">
+          <form onSubmit={handleLogin} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email">Email Address</Label>
               <div className="relative">
@@ -88,12 +93,31 @@ export default function AdminLoginPage() {
             </div>
             <Button 
               type="submit" 
-              className="w-full h-11 font-bold uppercase tracking-widest transition-all"
+              className="w-full h-11 font-bold uppercase tracking-widest"
               disabled={isSubmitting}
             >
               {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : 'Sign In'}
             </Button>
           </form>
+
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <Separator />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-card px-2 text-muted-foreground font-bold">Or continue with</span>
+            </div>
+          </div>
+
+          <Button 
+            variant="outline" 
+            type="button" 
+            className="w-full h-11 font-bold uppercase tracking-widest gap-2 hover:bg-muted/50"
+            onClick={handleGoogleLogin}
+          >
+            <Chrome className="h-4 w-4" />
+            Google Account
+          </Button>
         </CardContent>
       </Card>
     </div>
