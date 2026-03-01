@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from 'next/link';
@@ -27,7 +28,7 @@ interface TopicSectionProps {
   title: string;
   breadcrumbHome: string;
   viewAllText: string;
-  readingListDictionary: Dictionary['readingList'];
+  dictionary: Dictionary;
   locale: string; 
   linkPrefix: string;
   tag: string;
@@ -38,7 +39,7 @@ export function TopicSection({
   title, 
   breadcrumbHome, 
   viewAllText,
-  readingListDictionary,
+  dictionary,
   locale, 
   linkPrefix,
   tag
@@ -93,7 +94,7 @@ export function TopicSection({
             </Link>
             <AddToReadingListButton 
                 item={item}
-                dictionary={readingListDictionary}
+                dictionary={dictionary}
                 showText={false}
                 className="self-center text-muted-foreground hover:text-primary h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity shrink-0"
             />

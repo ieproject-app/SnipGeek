@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
@@ -51,8 +52,9 @@ type ArticleSummary = {
 };
 
 interface PromptGeneratorClientProps {
-  dictionary: any;
+  dictionary: any; // The promptGenerator dictionary section
   existingArticles: ArticleSummary[];
+  fullDictionary?: any; // The full dictionary for notifications
 }
 
 export function PromptGeneratorClient({ dictionary, existingArticles }: PromptGeneratorClientProps) {
@@ -249,6 +251,7 @@ export function PromptGeneratorClient({ dictionary, existingArticles }: PromptGe
   const handleCopyMain = () => {
     navigator.clipboard.writeText(generatedPrompt);
     setIsCopied(true);
+    // Use the localized copied button text as the notification message
     notify(dictionary.copiedButton, <Check className="h-4 w-4 text-emerald-400" />);
     setTimeout(() => setIsCopied(false), 2000);
   };

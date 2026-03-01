@@ -223,7 +223,7 @@
         "slugLabel": "URL Slug (English, Kebab-case)",
         "slugPlaceholder": "how-to-install-rufus",
         "publishDateLabel": "Publish Date",
-        "publishDatePlaceholder": "YYYY-MM-DD",
+        "publishDateLabelModify": "Original Publish Date",
         "statusLabel": "Status",
         "publishSwitchLabel": "Publish Immediately",
         "featuredSwitchLabel": "Mark as Featured",
@@ -249,22 +249,14 @@
             "theme": "Switch Theme"
         }
     },
-    "maintenance": {
-        "title": "System Maintenance",
-        "description": "Administrator tools for database synchronization and population.",
-        "populateTitle": "Populate Number Database",
-        "populateDescription": "Warning: This action will inject thousands of unique sequential numbers for 2025-2026. Only execute if database is empty.",
-        "populateButton": "Inject Numbers Now",
-        "success": "Database successfully populated!",
-        "unauthorized": "Access Denied. Admin privileges required.",
-        "loading": "Processing transaction...",
-        "error": "Error during population."
-    },
     "notifications": {
         "themeLight": "Theme: Light",
         "themeDark": "Theme: Dark",
         "themeSystem": "Theme: System",
         "langEn": "Language: English",
-        "langId": "Language: Indonesia"
+        "langId": "Language: Indonesia",
+        "readingListAdded": "Saved to Reading List",
+        "readingListRemoved": "Removed from Reading List",
+        "copied": "Copied to Clipboard"
     }
 }

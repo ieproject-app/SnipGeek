@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useReadingList, type ReadingListItem } from '@/hooks/use-reading-list';
@@ -9,7 +10,7 @@ import type { Dictionary } from '@/lib/get-dictionary';
 
 interface AddToReadingListButtonProps {
   item: ReadingListItem;
-  dictionary: Dictionary['readingList'];
+  dictionary: Dictionary;
   showText?: boolean;
   className?: string;
 }
@@ -26,18 +27,18 @@ export function AddToReadingListButton({ item, dictionary, showText = true, clas
     
     if (isSaved) {
       removeItem(item.slug);
-      // Trigger notification bar in Header with context icon
-      notify(dictionary.remove, <Bookmark className="h-4 w-4 text-accent" />);
+      // Trigger notification bar in Header using the centralized notification key
+      notify(dictionary.notifications.readingListRemoved, <Bookmark className="h-4 w-4 text-accent" />);
     } else {
       addItem(item);
-      // Trigger notification bar in Header with context icon
-      notify(dictionary.add, <Bookmark className="h-4 w-4 text-accent" />);
+      // Trigger notification bar in Header using the centralized notification key
+      notify(dictionary.notifications.readingListAdded, <Bookmark className="h-4 w-4 text-accent" />);
     }
   };
 
   const buttonText = isSaved 
-    ? dictionary.remove
-    : dictionary.add;
+    ? dictionary.readingList.remove
+    : dictionary.readingList.add;
 
   return (
     <Button

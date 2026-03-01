@@ -100,7 +100,7 @@ export function HomeClient({ initialPosts, dictionary, locale }: { initialPosts:
                     )}
                     <AddToReadingListButton 
                         item={item}
-                        dictionary={dictionary.readingList}
+                        dictionary={dictionary}
                         showText={false}
                         className="absolute top-3 right-3 z-10 text-white bg-black/30 hover:bg-black/50 hover:text-white opacity-0 group-hover:opacity-100 transition-opacity"
                     />
@@ -149,15 +149,15 @@ export function HomeClient({ initialPosts, dictionary, locale }: { initialPosts:
       )}
 
       {sliderPosts.length > 0 && (
-        <FeatureSlider posts={sliderPosts as any} title={dictionary.home.sliderAndShadow.title} viewMoreText={dictionary.home.sliderAndShadow.viewMore} readingListDictionary={dictionary.readingList} locale={locale} tag={sliderCategory} />
+        <FeatureSlider posts={sliderPosts as any} title={dictionary.home.sliderAndShadow.title} viewMoreText={dictionary.home.sliderAndShadow.viewMore} dictionary={dictionary} locale={locale} tag={sliderCategory} />
       )}
 
       {topicPosts.length > 0 && (
-        <TopicSection posts={topicPosts as any} title={dictionary.home.specialTagSectionTitle} breadcrumbHome={dictionary.home.breadcrumbHome} viewAllText={dictionary.home.viewAllPosts} readingListDictionary={dictionary.readingList} locale={locale} linkPrefix={linkPrefix} tag={topicTag} />
+        <TopicSection posts={topicPosts as any} title={dictionary.home.specialTagSectionTitle} breadcrumbHome={dictionary.home.breadcrumbHome} viewAllText={dictionary.home.viewAllPosts} dictionary={dictionary} locale={locale} linkPrefix={linkPrefix} tag={topicTag} />
       )}
 
       {updatePosts.length > 0 && (
-        <HorizontalSlider posts={updatePosts as any} title={dictionary.home.softwareUpdateSlider.title} viewMoreText={dictionary.home.softwareUpdateSlider.viewMore} readingListDictionary={dictionary.readingList} locale={locale} tag={updateTag} />
+        <HorizontalSlider posts={updatePosts as any} title={dictionary.home.softwareUpdateSlider.title} viewMoreText={dictionary.home.softwareUpdateSlider.viewMore} dictionary={dictionary} locale={locale} tag={updateTag} />
       )}
     </div>
   );
