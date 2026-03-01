@@ -299,7 +299,7 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                             {item.name}
                             <div className={cn(
                                 "absolute bottom-0 left-1/2 -translate-x-1/2 h-[2px] bg-accent transition-all duration-300",
-                                isActive ? "w-4" : "w-0"
+                                isActive ? "width-4" : "w-0"
                             )} />
                         </NextLink>
                     );
@@ -362,10 +362,10 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                     <Search className="h-5 w-5 transition-transform group-hover:scale-110 group-hover:rotate-12" />
                 </Button>
 
-                {/* FLOATING MORE MENU DROPDOWN - Anchored here */}
+                {/* FLOATING MORE MENU DROPDOWN - Anchored to Top-Right Corner */}
                 <div className={cn(
-                    "absolute top-full right-0 mt-2 min-w-[220px] bg-background/95 backdrop-blur-md border border-border shadow-xl rounded-2xl overflow-hidden transition-all duration-300 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] z-50",
-                    isMenuOpen ? "opacity-100 scale-100 translate-y-0" : "opacity-0 scale-[0.97] -translate-y-2 pointer-events-none"
+                    "absolute top-full right-0 mt-3 min-w-[220px] bg-background/95 backdrop-blur-xl border border-border shadow-2xl rounded-2xl overflow-hidden origin-top-right transition-all duration-300 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] z-50",
+                    isMenuOpen ? "opacity-100 scale-100 translate-y-0" : "opacity-0 scale-[0.95] -translate-y-2 pointer-events-none"
                 )}>
                     <div className="py-3">
                         <div className="px-4 py-2 mb-1">
