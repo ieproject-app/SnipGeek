@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useEffect } from 'react';
@@ -35,7 +34,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-[calc(100vh-80px)] w-full items-center justify-center px-4 py-12">
+    <div className="flex min-h-[calc(100vh-68px)] w-full items-center justify-center px-4 py-12">
       <Card className="w-full max-w-md shadow-2xl border-primary/10 bg-card/50 backdrop-blur-sm overflow-hidden">
         <div className="h-1.5 w-full bg-accent" />
         <CardHeader className="space-y-4 text-center pt-10 pb-8">
