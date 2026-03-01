@@ -15,9 +15,7 @@ import {
   Mail,
   Languages,
   ChevronRight,
-  ArrowRight,
-  Sparkles,
-  RefreshCw
+  ArrowRight
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -31,6 +29,7 @@ import { SnipGeekLogo } from '@/components/icons/snipgeek-logo';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import NextLink from 'next/link';
 import Image from 'next/image';
+import { CategoryBadge, categoryColorMap } from '@/components/layout/category-badge';
 
 type SearchableItem = {
   slug: string;
@@ -43,62 +42,6 @@ type SearchableItem = {
 };
 
 type ActiveView = 'none' | 'search' | 'menu' | 'readingList';
-
-type BadgeStyle = {
-  bg: string;
-  text: string;
-  border: string;
-  dot: string;
-};
-
-const categoryColorMap: Record<string, BadgeStyle> = {
-  'Windows':  { bg: 'bg-sky-500/12',    text: 'text-sky-400',    border: 'border-sky-500/25',    dot: 'bg-sky-400' },
-  'Android':  { bg: 'bg-green-500/12',  text: 'text-green-400',  border: 'border-green-500/25',  dot: 'bg-green-400' },
-  'Linux':    { bg: 'bg-orange-500/12', text: 'text-orange-400', border: 'border-orange-500/25', dot: 'bg-orange-400' },
-  'macOS':    { bg: 'bg-zinc-500/15',   text: 'text-zinc-300',   border: 'border-zinc-500/25',   dot: 'bg-zinc-300' },
-  'iOS':      { bg: 'bg-blue-500/12',   text: 'text-blue-400',   border: 'border-blue-500/25',   dot: 'bg-blue-400' },
-  'Hardware': { bg: 'bg-violet-500/12', text: 'text-violet-400', border: 'border-violet-500/25', dot: 'bg-violet-400' },
-  'Gadget':   { bg: 'bg-pink-500/12',   text: 'text-pink-400',   border: 'border-pink-500/25',   dot: 'bg-pink-400' },
-  'PC':       { bg: 'bg-indigo-500/12', text: 'text-indigo-400', border: 'border-indigo-500/25', dot: 'bg-indigo-400' },
-  'Software': { bg: 'bg-cyan-500/12',   text: 'text-cyan-400',   border: 'border-cyan-500/25',   dot: 'bg-cyan-400' },
-  'Dev':      { bg: 'bg-teal-500/12',   text: 'text-teal-400',   border: 'border-teal-500/25',   dot: 'bg-teal-400' },
-  'Tips':     { bg: 'bg-yellow-500/12', text: 'text-yellow-400', border: 'border-yellow-500/25', dot: 'bg-yellow-400' },
-  'Tutorial': { bg: 'bg-amber-500/12',  text: 'text-amber-400',  border: 'border-amber-500/25',  dot: 'bg-amber-400' },
-  'Review':   { bg: 'bg-rose-500/12',   text: 'text-rose-400',   border: 'border-rose-500/25',   dot: 'bg-rose-400' },
-  'Article':  { bg: 'bg-sky-500/12',    text: 'text-sky-400',    border: 'border-sky-500/25',    dot: 'bg-sky-400' },
-  'Note':     { bg: 'bg-amber-400/12',  text: 'text-amber-400',  border: 'border-amber-400/25',  dot: 'bg-amber-400' },
-};
-
-const defaultBadgeStyle: BadgeStyle = {
-  bg: 'bg-muted/60', text: 'text-muted-foreground',
-  border: 'border-border', dot: 'bg-muted-foreground',
-};
-
-function getBadgeStyle(category?: string, type?: 'blog' | 'note'): BadgeStyle {
-  if (category && categoryColorMap[category]) return categoryColorMap[category];
-  if (type === 'blog') return categoryColorMap['Article'];
-  if (type === 'note') return categoryColorMap['Note'];
-  return defaultBadgeStyle;
-}
-
-function CategoryBadge({
-  label, style, size = 'xs', showDot = true
-}: { label: string; style: BadgeStyle; size?: 'xs' | 'sm'; showDot?: boolean }) {
-  return (
-    <span className={cn(
-      "inline-flex items-center gap-1 rounded-full border font-black uppercase tracking-wider font-sans",
-      style.bg, style.text, style.border,
-      size === 'xs' ? "text-[8px] px-1.5 py-0.5" : "text-[10px] px-2 py-1"
-    )}>
-      {showDot && (
-        <span className={cn("rounded-full shrink-0", style.dot,
-          size === 'xs' ? "w-1 h-1" : "w-1.5 h-1.5"
-        )} />
-      )}
-      {label}
-    </span>
-  );
-}
 
 const getTimeLabel = () => {
   const hour = new Date().getHours();
@@ -135,7 +78,7 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
   const [removingSlug, setRemovingSlug] = useState<string | null>(null);
   const [timeLabel, setTimeLabel] = useState("");
   
-  const { items: readingListItems, removeItem: removeReadingListItem, addItem: addReadingListItem } = useReadingList();
+  const { items: readingListItems, removeItem: removeReadingListItem } = useReadingList();
   const { message, icon, notify } = useNotification();
   
   const lastScrollY = useRef(0);
@@ -521,7 +464,6 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                             readingListItems.map((item) => {
                                 const dataItem = searchableData.find(d => d.slug === item.slug);
                                 const imgUrl = dataItem ? getResolvedImage(dataItem) : '/images/blank/blank.webp';
-                                const badgeStyle = getBadgeStyle(dataItem?.category, item.type);
                                 
                                 return (
                                     <div key={`${item.type}-${item.slug}`} className={cn(
@@ -537,7 +479,7 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                                                     {item.title}
                                                 </h4>
                                                 <div className="mt-0.5">
-                                                    <CategoryBadge label={dataItem?.category || (item.type === 'blog' ? 'Article' : 'Note')} style={badgeStyle} />
+                                                    <CategoryBadge category={dataItem?.category} type={item.type} />
                                                 </div>
                                             </div>
                                         </NextLink>
@@ -595,7 +537,6 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                                     <ul className="space-y-1 pt-1">
                                         {results.map((item) => {
                                             const resolvedHero = getResolvedImage(item);
-                                            const badgeStyle = getBadgeStyle(item.category, item.type);
                                             return (
                                                 <li key={`${item.type}-${item.slug}`}>
                                                     <NextLink href={item.href} className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-muted/50 transition-all group">
@@ -607,7 +548,7 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                                                                 <HighlightMatch text={item.title} query={query} />
                                                             </h4>
                                                             <div className="mt-0.5">
-                                                                <CategoryBadge label={item.category || (item.type === 'blog' ? 'Article' : 'Note')} style={badgeStyle} />
+                                                                <CategoryBadge category={item.category} type={item.type} />
                                                             </div>
                                                         </div>
                                                         <ChevronRight className="h-3.5 w-3.5 text-muted-foreground/30 group-hover:text-accent transition-all group-hover:translate-x-1" />
@@ -632,7 +573,6 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                                     <div className="px-2 space-y-1">
                                         {quickPicks.map((item) => {
                                             const resolvedHero = getResolvedImage(item);
-                                            const badgeStyle = getBadgeStyle(item.category, item.type);
                                             return (
                                                 <NextLink key={item.slug} href={item.href} className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-muted/50 transition-all group">
                                                     <div className="w-[52px] h-[39px] relative rounded-md overflow-hidden bg-muted shrink-0 border border-border/50">
@@ -643,7 +583,7 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                                                             {item.title}
                                                         </h4>
                                                         <div className="mt-0.5">
-                                                            <CategoryBadge label={item.category || (item.type === 'blog' ? 'Article' : 'Note')} style={badgeStyle} />
+                                                            <CategoryBadge category={item.category} type={item.type} />
                                                         </div>
                                                     </div>
                                                     <ChevronRight className="h-3.5 w-3.5 text-muted-foreground/20 group-hover:text-accent transition-all group-hover:translate-x-1" />
@@ -655,21 +595,22 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                                 <div className="px-4">
                                     <p className="text-[9px] font-black uppercase tracking-[0.15em] text-muted-foreground/40 mb-3">{dictionary.search.prompt}</p>
                                     <div className="flex flex-wrap gap-2">
-                                        {['Windows', 'Android', 'Hardware', 'Tutorial', 'Tips'].map(cat => (
-                                            <button 
-                                                key={cat} 
-                                                className={cn(
-                                                    "px-3 py-1.5 rounded-full border text-[9px] font-black uppercase tracking-wider transition-all",
-                                                    "hover:scale-105 active:scale-95",
-                                                    categoryColorMap[cat] 
-                                                        ? `${categoryColorMap[cat].bg} ${categoryColorMap[cat].text} ${categoryColorMap[cat].border} hover:opacity-80`
-                                                        : "bg-muted/50 text-muted-foreground border-border hover:border-accent hover:text-accent"
-                                                )}
-                                                onClick={() => setQuery(cat)}
-                                            >
-                                                {cat}
-                                            </button>
-                                        ))}
+                                        {['Windows', 'Android', 'Hardware', 'Tutorial', 'Tips'].map(cat => {
+                                            const style = categoryColorMap[cat] || { border: 'border-border', text: 'text-muted-foreground', bg: 'bg-muted/50' };
+                                            return (
+                                                <button 
+                                                    key={cat} 
+                                                    className={cn(
+                                                        "px-3 py-1.5 rounded-full border text-[9px] font-black uppercase tracking-wider transition-all",
+                                                        "hover:scale-105 active:scale-95",
+                                                        style.border, style.text, style.bg, "hover:opacity-80"
+                                                    )}
+                                                    onClick={() => setQuery(cat)}
+                                                >
+                                                    {cat}
+                                                </button>
+                                            );
+                                        })}
                                     </div>
                                 </div>
                             </div>

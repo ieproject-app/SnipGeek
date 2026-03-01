@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useMemo } from 'react';
@@ -6,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { AddToReadingListButton } from '@/components/layout/add-to-reading-list-button';
+import { CategoryBadge } from '@/components/layout/category-badge';
 
 export function BlogListClient({ initialPosts, dictionary, locale }: { initialPosts: any[], dictionary: any, locale: string }) {
   const linkPrefix = locale === 'en' ? '' : `/${locale}`;
@@ -68,7 +68,9 @@ export function BlogListClient({ initialPosts, dictionary, locale }: { initialPo
                                 )}
                             </div>
 
-                            {post.frontmatter.category && <p className="text-sm text-muted-foreground mb-1">{post.frontmatter.category}</p>}
+                            <div className="mb-1.5">
+                                <CategoryBadge category={post.frontmatter.category} />
+                            </div>
                             <h3 className="font-headline text-xl font-bold tracking-tight text-primary transition-colors group-hover:text-accent">
                                 {post.frontmatter.title}
                             </h3>

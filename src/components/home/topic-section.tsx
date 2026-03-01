@@ -1,4 +1,3 @@
-
 'use client';
 
 import Link from 'next/link';
@@ -9,6 +8,7 @@ import { Breadcrumbs } from '@/components/layout/breadcrumbs';
 import { formatRelativeTime } from '@/lib/utils';
 import { AddToReadingListButton } from '@/components/layout/add-to-reading-list-button';
 import type { Dictionary } from '@/lib/get-dictionary';
+import { CategoryBadge } from '@/components/layout/category-badge';
 
 interface TopicPost {
   slug: string;
@@ -28,7 +28,7 @@ interface TopicSectionProps {
   breadcrumbHome: string;
   viewAllText: string;
   readingListDictionary: Dictionary['readingList'];
-  locale: string;
+  locale: string; 
   linkPrefix: string;
   tag: string;
 }
@@ -80,9 +80,9 @@ export function TopicSection({
                     />
                 </div>
                 <div className="flex-1 min-w-0 py-1">
-                    <span className="text-[10px] font-bold tracking-wider text-accent mb-1 block">
-                        {post.frontmatter.category || tag}
-                    </span>
+                    <div className="mb-1">
+                        <CategoryBadge category={post.frontmatter.category || tag} />
+                    </div>
                     <h3 className="font-headline text-[13px] md:text-sm font-medium text-primary leading-snug line-clamp-2 transition-colors group-hover:text-accent">
                         {post.frontmatter.title}
                     </h3>

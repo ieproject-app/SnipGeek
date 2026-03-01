@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useMemo } from 'react';
@@ -7,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { StickyNote } from 'lucide-react';
 import { AddToReadingListButton } from '@/components/layout/add-to-reading-list-button';
+import { CategoryBadge } from '@/components/layout/category-badge';
 
 export function NotesListClient({ initialNotes, dictionary, locale }: { initialNotes: any[], dictionary: any, locale: string }) {
   const linkPrefix = locale === 'en' ? '' : `/${locale}`;
@@ -74,12 +74,10 @@ export function NotesListClient({ initialNotes, dictionary, locale }: { initialN
                 </CardContent>
                 
                 <CardFooter className="px-6 py-4 border-t bg-muted/5">
-                    <div className="flex flex-wrap gap-1">
+                    <div className="flex flex-wrap gap-2">
                         {note.frontmatter.tags && note.frontmatter.tags.slice(0, 2).map((tag: string) => (
                             <Link key={tag} href={`${linkPrefix}/tags/${tag.toLowerCase()}`}>
-                                <Badge variant="outline" className="text-[10px] font-medium bg-background/50 hover:bg-primary hover:text-primary-foreground transition-colors cursor-pointer">
-                                    {tag}
-                                </Badge>
+                                <CategoryBadge category={tag} />
                             </Link>
                         ))}
                     </div>

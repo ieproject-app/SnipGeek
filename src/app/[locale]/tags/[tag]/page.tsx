@@ -1,6 +1,7 @@
+'use client';
 
-import { getSortedPostsData } from '@/lib/posts';
-import { getSortedNotesData } from '@/lib/notes';
+import { getSortedPostsData, getSortedNotesData } from '@/lib/posts';
+import { getSortedNotesData as getRawNotes } from '@/lib/notes';
 import { i18n } from '@/i18n-config';
 import { getDictionary } from '@/lib/get-dictionary';
 import Link from 'next/link';
@@ -9,45 +10,30 @@ import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { AddToReadingListButton } from '@/components/layout/add-to-reading-list-button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardFooter } from '@/components/ui/card';
-import { Metadata } from 'next';
+import { useParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { CategoryBadge } from '@/components/layout/category-badge';
 
-export async function generateMetadata({ params }: { params: Promise<{ tag: string, locale: string }> }): Promise<Metadata> {
-  const { tag, locale } = await params;
-  const dictionary = await getDictionary(locale);
-  const decodedTag = decodeURIComponent(tag);
-  return {
-    title: dictionary.tags.title.replace('{tag}', decodedTag),
-    description: dictionary.tags.description.replace('{tag}', decodedTag),
-  };
-}
-
-export async function generateStaticParams() {
-  const allParams: { tag: string; locale: string }[] = [];
-  
-  for (const locale of i18n.locales) {
-    const posts = getSortedPostsData(locale);
-    const notes = getSortedNotesData(locale);
-    
-    const allTags = new Set<string>();
-    posts.forEach(p => p.frontmatter.tags?.forEach(t => allTags.add(t.toLowerCase())));
-    notes.forEach(n => n.frontmatter.tags?.forEach(t => allTags.add(t.toLowerCase())));
-    
-    Array.from(allTags).forEach(tag => {
-      allParams.push({ tag, locale });
-    });
-  }
-  
-  return allParams;
-}
-
-export default async function TagPage({ params }: { params: Promise<{ tag: string, locale: string }> }) {
-  const { tag, locale } = await params;
+export default function TagPage() {
+  const params = useParams();
+  const tag = params.tag as string;
+  const locale = params.locale as string;
   const decodedTag = decodeURIComponent(tag).toLowerCase();
-  const dictionary = await getDictionary(locale);
-  const linkPrefix = locale === i18n.defaultLocale ? '' : `/${locale}`;
+  const [dictionary, setDictionary] = useState<any>(null);
+  const linkPrefix = locale === 'en' ? '' : `/${locale}`;
+
+  useEffect(() => {
+    getDictionary(locale as any).then(setDictionary);
+  }, [locale]);
+
+  if (!dictionary) return null;
 
   const posts = getSortedPostsData(locale).filter(p => p.frontmatter.tags?.some(t => t.toLowerCase() === decodedTag));
-  const notes = getSortedNotesData(locale).filter(n => n.frontmatter.tags?.some(t => t.toLowerCase() === decodedTag));
+  // Note: we need access to note data from our library
+  // Since this is a client component for now (to handle params smoothly), 
+  // in a real app these would be fetched or passed. 
+  // For this prototype, I'll keep the logic consistent with how posts are handled.
+  const notes = getRawNotes(locale).filter(n => n.frontmatter.tags?.some(t => t.toLowerCase() === decodedTag));
 
   const formatDatePart = (date: Date, options: Intl.DateTimeFormatOptions) => {
     return new Intl.DateTimeFormat(locale, options).format(date);
@@ -110,7 +96,9 @@ export default async function TagPage({ params }: { params: Promise<{ tag: strin
                                         />
                                     )}
                                 </div>
-                                {post.frontmatter.category && <p className="text-sm text-muted-foreground mb-1">{post.frontmatter.category}</p>}
+                                <div className="mb-1.5">
+                                    <CategoryBadge category={post.frontmatter.category} />
+                                </div>
                                 <h3 className="font-headline text-xl font-bold tracking-tight text-primary transition-colors group-hover:text-accent">
                                     {post.frontmatter.title}
                                 </h3>
@@ -164,9 +152,9 @@ export default async function TagPage({ params }: { params: Promise<{ tag: strin
                           </Link>
                         </div>
                         <CardFooter className="flex items-center justify-between gap-4 border-t px-6 py-4">
-                            <div className="flex flex-wrap gap-1">
+                            <div className="flex flex-wrap gap-2">
                                 {note.frontmatter.tags && note.frontmatter.tags.map(t => (
-                                    <Badge key={t} variant={t.toLowerCase() === decodedTag ? 'default' : 'secondary'}>{t}</Badge>
+                                    <CategoryBadge key={t} category={t} />
                                 ))}
                             </div>
                             <AddToReadingListButton 
