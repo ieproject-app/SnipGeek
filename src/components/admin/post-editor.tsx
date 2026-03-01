@@ -1,9 +1,10 @@
+
 'use client';
 
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import { useFirestore, setDocumentNonBlocking, deleteDocumentNonBlocking } from '@/firebase';
-import { doc } from 'firebase/firestore';
+import { useFirestore, setDocumentNonBlocking, deleteDocumentNonBlocking, addDocumentNonBlocking } from '@/firebase';
+import { collection, doc } from 'firebase/firestore';
 import { uploadFile, deleteFile } from '@/firebase/storage';
 import { slugify } from '@/lib/slugify';
 import { Button } from '@/components/ui/button';
@@ -23,7 +24,8 @@ import {
   Plus,
   Copy,
   Trash2,
-  Star
+  Star,
+  Check
 } from 'lucide-react';
 import Image from 'next/image';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -43,6 +45,7 @@ export function PostEditor({ initialData, id }: PostEditorProps) {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
 
   const [formData, setFormData] = useState({
     title: initialData?.title || '',
@@ -56,7 +59,7 @@ export function PostEditor({ initialData, id }: PostEditorProps) {
     category: initialData?.category || '',
     tags: initialData?.tags?.join(', ') || '',
     translationKey: initialData?.translationKey || '',
-    images: initialData?.images || [], // Array of {url, alt}
+    images: initialData?.images || [], // Array of {url, alt, path, mediaId}
     locale: initialData?.locale || currentLocale || 'en'
   });
 
@@ -81,29 +84,41 @@ export function PostEditor({ initialData, id }: PostEditorProps) {
         const file = files[i];
         const fileName = `${Date.now()}-${file.name}`;
         const path = `blog-posts/${fileName}`;
+        
+        // 1. Upload to Storage
         const url = await uploadFile(file, path);
-        uploadedImages.push({ url, alt: file.name.split('.')[0] });
+        
+        // 2. Track in Global Media Library
+        const mediaId = crypto.randomUUID();
+        await addDocumentNonBlocking(collection(db, 'media_library'), {
+            id: mediaId,
+            url,
+            path,
+            name: file.name,
+            uploadedAt: new Date().toISOString(),
+            size: file.size,
+            type: file.type
+        });
+
+        uploadedImages.push({ 
+            url, 
+            alt: file.name.split('.')[0], 
+            path,
+            mediaId
+        });
       }
 
       setFormData(prev => ({ 
         ...prev, 
         images: uploadedImages,
-        // Set first image as hero if none exists
         heroImageUrl: prev.heroImageUrl || uploadedImages[0].url,
         heroImageAltText: prev.heroImageAltText || uploadedImages[0].alt
       }));
 
-      toast({
-        title: "Berhasil!",
-        description: `${files.length} gambar berhasil diunggah.`,
-      });
+      toast({ title: "Berhasil!", description: `${files.length} gambar berhasil diunggah.` });
     } catch (error: any) {
       console.error("Upload failed", error);
-      toast({
-        variant: "destructive",
-        title: "Gagal Mengunggah",
-        description: error.message || "Pastikan izin Storage sudah benar.",
-      });
+      toast({ variant: "destructive", title: "Gagal Mengunggah", description: error.message });
     } finally {
       setIsUploading(false);
     }
@@ -111,45 +126,51 @@ export function PostEditor({ initialData, id }: PostEditorProps) {
 
   const deleteMedia = async (index: number) => {
     const imgToDelete = formData.images[index];
-    const newImages = formData.images.filter((_: any, i: number) => i !== index);
     
-    setFormData(prev => ({ 
-      ...prev, 
-      images: newImages,
-      heroImageUrl: prev.heroImageUrl === imgToDelete.url ? (newImages[0]?.url || '') : prev.heroImageUrl
-    }));
+    if (confirm(`Hapus permanen gambar ini dari server?`)) {
+        try {
+            // 1. Hapus dari Storage jika ada path-nya
+            if (imgToDelete.path) {
+                await deleteFile(imgToDelete.path);
+            }
+            
+            // 2. Hapus dari Global Library jika ada ID-nya
+            if (imgToDelete.mediaId) {
+                deleteDocumentNonBlocking(doc(db, 'media_library', imgToDelete.mediaId));
+            }
 
-    toast({
-      title: "Gambar dihapus",
-      description: "Gambar telah dihapus dari galeri lokal artikel ini.",
-    });
+            // 3. Update local state
+            const newImages = formData.images.filter((_: any, i: number) => i !== index);
+            setFormData(prev => ({ 
+                ...prev, 
+                images: newImages,
+                heroImageUrl: prev.heroImageUrl === imgToDelete.url ? (newImages[0]?.url || '') : prev.heroImageUrl
+            }));
+
+            toast({ title: "Gambar dihapus", description: "File telah dibersihkan dari server." });
+        } catch (error: any) {
+            toast({ variant: "destructive", title: "Gagal menghapus file fisik", description: error.message });
+        }
+    }
   };
 
-  const copyMdx = (url: string, alt: string) => {
+  const copyMdx = (url: string, alt: string, index: number) => {
     const mdx = `![${alt}](${url})`;
     navigator.clipboard.writeText(mdx);
-    toast({
-      title: "MDX Tersalin!",
-      description: "Silakan paste di editor konten.",
-    });
+    setCopiedId(index.toString());
+    toast({ title: "MDX Tersalin!", description: "Silakan paste di editor konten." });
+    setTimeout(() => setCopiedId(null), 2000);
   };
 
   const setAsHero = (url: string, alt: string) => {
     setFormData(prev => ({ ...prev, heroImageUrl: url, heroImageAltText: alt }));
-    toast({
-      title: "Hero Image Diperbarui",
-      description: "Gambar ini sekarang menjadi gambar utama artikel.",
-    });
+    toast({ title: "Hero Image Diperbarui", description: "Gambar ini sekarang menjadi gambar utama artikel." });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.title || !formData.contentMdx) {
-        toast({
-            variant: "destructive",
-            title: "Data Kurang",
-            description: "Judul dan konten wajib diisi.",
-        });
+        toast({ variant: "destructive", title: "Data Kurang", description: "Judul dan konten wajib diisi." });
         return;
     }
 
@@ -177,10 +198,7 @@ export function PostEditor({ initialData, id }: PostEditorProps) {
     
     setTimeout(() => {
       setIsSubmitting(false);
-      toast({
-        title: "Tersimpan",
-        description: "Artikel berhasil diperbarui di database.",
-      });
+      toast({ title: "Tersimpan", description: "Artikel berhasil diperbarui di database." });
       router.push('/admin/posts');
     }, 1000);
   };
@@ -206,7 +224,6 @@ export function PostEditor({ initialData, id }: PostEditorProps) {
       </header>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        {/* Left: Main Content & Media */}
         <div className="lg:col-span-8 space-y-8">
           <Card className="border-primary/10 overflow-hidden shadow-sm">
             <Tabs defaultValue="write" className="w-full">
@@ -261,12 +278,11 @@ export function PostEditor({ initialData, id }: PostEditorProps) {
                                 
                                 <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2 p-2">
                                     <Button 
-                                        size="sm" 
-                                        variant="secondary" 
-                                        className="w-full h-7 text-[10px] gap-1 px-2"
-                                        onClick={() => copyMdx(img.url, img.alt)}
+                                        size="sm" variant="secondary" className="w-full h-7 text-[10px] gap-1 px-2"
+                                        onClick={() => copyMdx(img.url, img.alt, idx)}
                                     >
-                                        <Copy className="h-3 w-3" /> MDX Code
+                                        {copiedId === idx.toString() ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
+                                        MDX Code
                                     </Button>
                                     <div className="flex w-full gap-1">
                                         <Button 
@@ -279,9 +295,7 @@ export function PostEditor({ initialData, id }: PostEditorProps) {
                                             <Star className={cn("h-3 w-3", formData.heroImageUrl === img.url && "fill-current")} />
                                         </Button>
                                         <Button 
-                                            size="icon" 
-                                            variant="destructive" 
-                                            className="flex-1 h-7"
+                                            size="icon" variant="destructive" className="flex-1 h-7"
                                             onClick={() => deleteMedia(idx)}
                                         >
                                             <Trash2 className="h-3 w-3" />
@@ -303,16 +317,14 @@ export function PostEditor({ initialData, id }: PostEditorProps) {
                     </div>
                 </TabsContent>
 
-                <TabsContent value="preview" className="m-0 p-8 prose prose-slate dark:prose-invert max-w-none bg-background min-h-[650px]">
+                <TabsContent value="preview" className="m-0 p-8 prose prose-slate dark:prose-invert max-none bg-background min-h-[650px]">
                   <div className="whitespace-pre-wrap">{formData.contentMdx || 'Nothing to preview yet...'}</div>
                 </TabsContent>
             </Tabs>
           </Card>
         </div>
 
-        {/* Right: Sidebar / Settings */}
         <div className="lg:col-span-4 space-y-8">
-          {/* Featured Image Card */}
           <Card className="border-primary/10 overflow-hidden shadow-sm">
             <CardHeader className="bg-muted/5 py-3 border-b">
               <CardTitle className="text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
@@ -342,7 +354,6 @@ export function PostEditor({ initialData, id }: PostEditorProps) {
             </CardContent>
           </Card>
 
-          {/* Metadata Card */}
           <Card className="border-primary/10 shadow-sm">
             <CardHeader className="bg-muted/5 py-3 border-b">
               <CardTitle className="text-[10px] font-black uppercase tracking-widest">Metadata</CardTitle>
@@ -352,15 +363,11 @@ export function PostEditor({ initialData, id }: PostEditorProps) {
                 <Label className="text-[10px] font-black uppercase text-muted-foreground">Language</Label>
                 <div className="flex gap-2">
                     <Button 
-                        type="button" 
-                        variant={formData.locale === 'en' ? 'default' : 'outline'} 
-                        className="flex-1 h-8 text-[10px] font-black uppercase"
+                        type="button" variant={formData.locale === 'en' ? 'default' : 'outline'} className="flex-1 h-8 text-[10px] font-black uppercase"
                         onClick={() => setFormData(prev => ({ ...prev, locale: 'en' }))}
                     >English</Button>
                     <Button 
-                        type="button" 
-                        variant={formData.locale === 'id' ? 'default' : 'outline'} 
-                        className="flex-1 h-8 text-[10px] font-black uppercase"
+                        type="button" variant={formData.locale === 'id' ? 'default' : 'outline'} className="flex-1 h-8 text-[10px] font-black uppercase"
                         onClick={() => setFormData(prev => ({ ...prev, locale: 'id' }))}
                     >Indonesia</Button>
                 </div>
@@ -388,7 +395,6 @@ export function PostEditor({ initialData, id }: PostEditorProps) {
             </CardContent>
           </Card>
 
-          {/* Publish Settings */}
           <Card className="border-primary/10 bg-emerald-500/[0.02] shadow-sm">
             <CardHeader className="py-3 border-b">
               <CardTitle className="text-[10px] font-black uppercase tracking-widest">Publish Settings</CardTitle>
@@ -399,20 +405,14 @@ export function PostEditor({ initialData, id }: PostEditorProps) {
                   <Label className="text-xs font-bold">Publish Article</Label>
                   <p className="text-[10px] text-muted-foreground uppercase font-medium">Visible on the blog</p>
                 </div>
-                <Switch 
-                  checked={formData.isPublished} 
-                  onCheckedChange={(val) => setFormData(prev => ({ ...prev, isPublished: val }))} 
-                />
+                <Switch checked={formData.isPublished} onCheckedChange={(val) => setFormData(prev => ({ ...prev, isPublished: val }))} />
               </div>
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
                   <Label className="text-xs font-bold">Featured</Label>
                   <p className="text-[10px] text-muted-foreground uppercase font-medium">Hero gallery placement</p>
                 </div>
-                <Switch 
-                  checked={formData.featured} 
-                  onCheckedChange={(val) => setFormData(prev => ({ ...prev, featured: val }))} 
-                />
+                <Switch checked={formData.featured} onCheckedChange={(val) => setFormData(prev => ({ ...prev, featured: val }))} />
               </div>
             </CardContent>
           </Card>

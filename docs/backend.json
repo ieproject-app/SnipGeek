@@ -5,86 +5,38 @@
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "BlogPost",
       "type": "object",
-      "description": "Represents a single blog post on the SnipBlog website, designed for management via an admin dashboard and eventual rendering via MDX.",
+      "description": "Represents a single blog post on the SnipBlog website.",
       "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the BlogPost entity."
-        },
-        "title": {
-          "type": "string",
-          "description": "The main title of the blog post."
-        },
-        "slug": {
-          "type": "string",
-          "description": "A URL-friendly, unique identifier for the blog post, derived from the title, used for permalinks."
-        },
-        "contentMdx": {
-          "type": "string",
-          "description": "The full content of the blog post, written in MDX format."
-        },
-        "excerpt": {
-          "type": "string",
-          "description": "A brief summary or snippet of the blog post content, often displayed in listings."
-        },
-        "heroImageUrl": {
-          "type": "string",
-          "description": "The URL of the hero image displayed prominently at the top of the blog post.",
-          "format": "uri"
-        },
-        "heroImageAltText": {
-          "type": "string",
-          "description": "Alternative text for the hero image, crucial for accessibility and SEO."
-        },
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "slug": { "type": "string" },
+        "contentMdx": { "type": "string" },
+        "excerpt": { "type": "string" },
+        "heroImageUrl": { "type": "string" },
+        "heroImageAltText": { "type": "string" },
         "images": {
           "type": "array",
-          "description": "List of supporting images uploaded for this post.",
           "items": {
             "type": "object",
             "properties": {
               "url": { "type": "string" },
-              "alt": { "type": "string" }
+              "alt": { "type": "string" },
+              "path": { "type": "string" },
+              "mediaId": { "type": "string" }
             }
           }
         },
-        "publishDate": {
-          "type": "string",
-          "description": "The date and time when the blog post was first published.",
-          "format": "date-time"
-        },
-        "updatedDate": {
-          "type": "string",
-          "description": "The date and time when the blog post was last updated.",
-          "format": "date-time"
-        },
-        "isPublished": {
-          "type": "boolean",
-          "description": "Indicates whether the blog post is publicly visible (true) or a draft (false)."
-        },
-        "authorId": {
-          "type": "string",
-          "description": "Reference to the Author who wrote this blog post. (Relationship: Author 1:N BlogPost)"
-        },
-        "tagIds": {
-          "type": "array",
-          "description": "References to tags associated with this blog post for categorization. (Relationship: Tag N:N BlogPost)",
-          "items": {
-            "type": "string"
-          }
-        }
+        "publishDate": { "type": "string", "format": "date-time" },
+        "updatedDate": { "type": "string", "format": "date-time" },
+        "isPublished": { "type": "boolean" },
+        "featured": { "type": "boolean" },
+        "authorId": { "type": "string" },
+        "tagIds": { "type": "array", "items": { "type": "string" } },
+        "locale": { "type": "string" },
+        "category": { "type": "string" },
+        "translationKey": { "type": "string" }
       },
-      "required": [
-        "id",
-        "title",
-        "slug",
-        "contentMdx",
-        "excerpt",
-        "heroImageUrl",
-        "heroImageAltText",
-        "publishDate",
-        "isPublished",
-        "authorId"
-      ]
+      "required": ["id", "title", "slug", "contentMdx", "publishDate", "isPublished", "authorId"]
     },
     "QuickNote": {
       "$schema": "http://json-schema.org/draft-07/schema#",
@@ -100,87 +52,33 @@
         "locale": { "type": "string" },
         "tags": { "type": "array", "items": { "type": "string" } },
         "translationKey": { "type": "string" },
-        "images": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "url": { "type": "string" },
-              "alt": { "type": "string" }
-            }
-          }
-        }
+        "published": { "type": "boolean" }
       },
       "required": ["id", "title", "contentMdx", "date", "locale"]
     },
-    "Author": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "Author",
+    "MediaItem": {
       "type": "object",
-      "description": "Represents an author who can publish blog posts on SnipBlog.",
       "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the Author entity."
-        },
-        "name": {
-          "type": "string",
-          "description": "The full name of the author."
-        },
-        "bio": {
-          "type": "string",
-          "description": "A short biographical description of the author."
-        },
-        "email": {
-          "type": "string",
-          "description": "The email address of the author (not used for authentication).",
-          "format": "email"
-        },
-        "profileImageUrl": {
-          "type": "string",
-          "description": "The URL to the author's profile picture.",
-          "format": "uri"
-        }
-      },
-      "required": [
-        "id",
-        "name",
-        "email"
-      ]
+        "id": { "type": "string" },
+        "url": { "type": "string" },
+        "path": { "type": "string" },
+        "name": { "type": "string" },
+        "uploadedAt": { "type": "string", "format": "date-time" },
+        "size": { "type": "number" },
+        "type": { "type": "string" }
+      }
     },
-    "Tag": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "Tag",
+    "Author": {
       "type": "object",
-      "description": "Represents a categorization tag that can be applied to blog posts for better organization and searchability.",
       "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the Tag entity."
-        },
-        "name": {
-          "type": "string",
-          "description": "The human-readable name of the tag (e.g., 'Next.js', 'Web Development')."
-        },
-        "slug": {
-          "type": "string",
-          "description": "A URL-friendly, unique identifier for the tag, derived from its name.",
-          "format": "uri"
-        }
-      },
-      "required": [
-        "id",
-        "name",
-        "slug"
-      ]
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "email": { "type": "string" }
+      }
     }
   },
   "auth": {
-    "providers": [
-      "password",
-      "google",
-      "anonymous"
-    ]
+    "providers": ["password", "google", "anonymous"]
   },
   "firestore": {
     "structure": [
@@ -188,96 +86,38 @@
         "path": "/roles_admin/{userId}",
         "definition": {
           "entityName": "admin_role",
-          "schema": {
-            "$ref": "#/backend/entities/UserRole"
-          },
-          "description": "Collection to define users with administrative privileges.",
-          "params": [
-            {
-              "name": "userId",
-              "description": "The Firebase Authentication UID of the administrative user."
-            }
-          ]
+          "description": "Admin users."
         }
       },
       {
         "path": "/blogPosts_published/{blogPostId}",
         "definition": {
-          "entityName": "BlogPost",
-          "schema": {
-            "$ref": "#/backend/entities/BlogPost"
-          },
-          "description": "Stores blog posts that are publicly visible.",
-          "params": [
-            {
-              "name": "blogPostId",
-              "description": "The unique identifier for the published blog post."
-            }
-          ]
+          "entityName": "BlogPost"
+        }
+      },
+      {
+        "path": "/blogPosts_drafts/{blogPostId}",
+        "definition": {
+          "entityName": "BlogPost"
         }
       },
       {
         "path": "/notes_published/{noteId}",
         "definition": {
-          "entityName": "QuickNote",
-          "schema": {
-            "$ref": "#/backend/entities/QuickNote"
-          },
-          "description": "Stores technical snippets that are publicly visible.",
-          "params": [
-            {
-              "name": "noteId",
-              "description": "The unique identifier for the published note."
-            }
-          ]
+          "entityName": "QuickNote"
         }
       },
       {
         "path": "/notes_drafts/{noteId}",
         "definition": {
-          "entityName": "QuickNote",
-          "schema": {
-            "$ref": "#/backend/entities/QuickNote"
-          },
-          "description": "Stores technical snippets that are in draft status.",
-          "params": [
-            {
-              "name": "noteId",
-              "description": "The unique identifier for the draft note."
-            }
-          ]
+          "entityName": "QuickNote"
         }
       },
       {
-        "path": "/authors/{authorId}",
+        "path": "/media_library/{mediaId}",
         "definition": {
-          "entityName": "Author",
-          "schema": {
-            "$ref": "#/backend/entities/Author"
-          },
-          "description": "Stores information about authors.",
-          "params": [
-            {
-              "name": "authorId",
-              "description": "The unique identifier for the author."
-            }
-          ]
-        }
-      },
-      {
-        "path": "/tags/{tagId}",
-        "definition": {
-          "entityName": "Tag",
-          "schema": {
-            "$ref": "#/backend/entities/Tag"
-          },
-          "description": "Stores categorization tags for blog posts.",
-          "params": [
-            {
-              "name": "tagId",
-              "description": "The unique identifier for the tag."
-            }
-          ]
+          "entityName": "MediaItem",
+          "description": "Global gallery of uploaded images."
         }
       }
     ]

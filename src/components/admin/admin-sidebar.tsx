@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from 'next/link';
@@ -10,7 +11,7 @@ import {
   Settings, 
   LogOut, 
   ExternalLink,
-  ChevronLeft
+  ImageIcon
 } from 'lucide-react';
 import { SnipGeekLogo } from '@/components/icons/snipgeek-logo';
 import { Button } from '@/components/ui/button';
@@ -24,6 +25,7 @@ export function AdminSidebar() {
     { name: 'Dashboard', href: '/admin/dashboard', icon: LayoutDashboard },
     { name: 'Blog Posts', href: '/admin/posts', icon: FileText },
     { name: 'Quick Notes', href: '/admin/notes', icon: StickyNote },
+    { name: 'Media Library', href: '/admin/media', icon: ImageIcon },
     { name: 'Settings', href: '/admin/settings', icon: Settings },
   ];
 

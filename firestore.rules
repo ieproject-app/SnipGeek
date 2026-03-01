@@ -31,42 +31,38 @@ service cloud.firestore {
 
     match /blogPosts_published/{blogPostId} {
       allow get, list: if true;
-      allow create: if isAdmin() && request.resource.data.id == blogPostId;
-      allow update: if isExistingAdmin() && request.resource.data.authorId == resource.data.authorId;
-      allow delete: if isExistingAdmin();
+      allow create: if isAdmin();
+      allow update, delete: if isAdmin();
     }
 
     match /blogPosts_drafts/{blogPostId} {
       allow get, list: if isAdmin();
-      allow create: if isAdmin() && request.resource.data.id == blogPostId;
-      allow update: if isExistingAdmin() && request.resource.data.authorId == resource.data.authorId;
-      allow delete: if isExistingAdmin();
+      allow create, update, delete: if isAdmin();
     }
 
     match /notes_published/{noteId} {
       allow get, list: if true;
-      allow create: if isAdmin() && request.resource.data.id == noteId;
-      allow update, delete: if isExistingAdmin();
+      allow create, update, delete: if isAdmin();
     }
 
     match /notes_drafts/{noteId} {
       allow get, list: if isAdmin();
-      allow create: if isAdmin() && request.resource.data.id == noteId;
-      allow update, delete: if isExistingAdmin();
+      allow create, update, delete: if isAdmin();
     }
 
     match /authors/{authorId} {
       allow get, list: if true;
-      allow create: if isAdmin() && request.resource.data.id == authorId;
-      allow update: if isExistingAdmin();
-      allow delete: if isExistingAdmin();
+      allow create, update, delete: if isAdmin();
     }
 
     match /tags/{tagId} {
       allow get, list: if true;
-      allow create: if isAdmin() && request.resource.data.id == tagId;
-      allow update: if isExistingAdmin();
-      allow delete: if isExistingAdmin();
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /media_library/{mediaId} {
+      allow get, list: if true;
+      allow create, update, delete: if isAdmin();
     }
   }
 }
