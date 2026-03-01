@@ -1,4 +1,3 @@
-
 import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
 import { i18n } from '@/i18n-config';
@@ -154,7 +153,7 @@ export default async function LocaleLayout({
             <NotificationProvider>
               <ReadingListProvider>
                 <Header searchableData={searchableData} dictionary={dictionary} />
-                <main className="pt-[120px]">{children}</main>
+                <main className="pt-[68px]">{children}</main>
                 <Footer dictionary={dictionary} translationsMap={translationsMap} />
                 <BackToTop dictionary={dictionary} />
                 <ThemeSwitcher dictionary={dictionary} />
