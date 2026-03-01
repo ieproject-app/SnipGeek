@@ -12,21 +12,21 @@ import { BackToTop } from '@/components/layout/back-to-top';
 import { ThemeSwitcher } from '@/components/layout/theme-switcher';
 import { getDictionary } from '@/lib/get-dictionary';
 import { DraftList } from '@/components/layout/draft-list';
-import { Arimo, Roboto } from 'next/font/google';
+import { DM_Sans, Playfair_Display } from 'next/font/google';
 import { cn } from '@/lib/utils';
 import Script from 'next/script';
 import { FirebaseClientProvider } from '@/firebase';
 
-const fontBody = Arimo({
+const fontSans = DM_Sans({
   subsets: ['latin'],
-  variable: '--font-arimo',
-  weight: ['400', '500', '600', '700'],
+  variable: '--font-sans',
+  weight: ['400', '600', '700', '800'],
 });
 
-const fontHeadline = Roboto({
+const fontHeadline = Playfair_Display({
   subsets: ['latin'],
-  variable: '--font-roboto',
-  weight: ['400', '500', '700', '900'],
+  variable: '--font-headline',
+  weight: ['400', '700', '900'],
 });
 
 export const metadata: Metadata = {
@@ -137,7 +137,7 @@ export default async function LocaleLayout({
   const draftNotes = getDraftNotesData(locale);
   
   return (
-    <html lang={locale} className={cn(fontBody.variable, fontHeadline.variable, "scroll-smooth")} suppressHydrationWarning>
+    <html lang={locale} className={cn(fontSans.variable, fontHeadline.variable, "scroll-smooth")} suppressHydrationWarning>
       <head>
         <Script
           async
@@ -146,7 +146,7 @@ export default async function LocaleLayout({
           strategy="afterInteractive"
         />
       </head>
-      <body className="font-body antialiased fade-in-on-load">
+      <body className="font-sans antialiased fade-in-on-load">
         <FirebaseClientProvider>
           <ThemeProvider
               attribute="class"
@@ -157,7 +157,7 @@ export default async function LocaleLayout({
             <NotificationProvider>
               <ReadingListProvider>
                 <Header searchableData={searchableData} dictionary={dictionary} />
-                <main className="pt-[68px]">{children}</main>
+                <main className="pt-16">{children}</main>
                 <Footer dictionary={dictionary} translationsMap={translationsMap} />
                 <BackToTop dictionary={dictionary} />
                 <ThemeSwitcher dictionary={dictionary} />

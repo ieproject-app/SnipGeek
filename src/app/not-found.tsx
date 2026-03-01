@@ -1,31 +1,32 @@
+'use client';
 
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import './globals.css';
-import { Arimo, Roboto } from 'next/font/google';
+import { DM_Sans, Playfair_Display } from 'next/font/google';
 import { cn } from '@/lib/utils';
 import { Search, Home, BookOpen, PenTool } from 'lucide-react';
 
-const fontBody = Arimo({
+const fontSans = DM_Sans({
   subsets: ['latin'],
-  variable: '--font-arimo',
+  variable: '--font-sans',
   weight: ['400', '700'],
 });
 
-const fontHeadline = Roboto({
+const fontHeadline = Playfair_Display({
   subsets: ['latin'],
-  variable: '--font-roboto',
+  variable: '--font-headline',
   weight: ['700', '900'],
 });
 
 export default function NotFound() {
   return (
-    <html lang="en" className={cn(fontBody.variable, fontHeadline.variable)}>
+    <html lang="en" className={cn(fontSans.variable, fontHeadline.variable)}>
       <head>
         <title>404 - Page Not Found | SnipGeek</title>
         <meta name="description" content="Sorry, the page you're looking for doesn't exist. Find tutorials, notes, and tech tools at SnipGeek." />
       </head>
-      <body className="font-body antialiased">
+      <body className="font-sans antialiased">
         <div className="w-full min-h-screen flex items-center justify-center bg-background text-foreground py-20">
           <main className="max-w-xl mx-auto px-6 text-center">
             <header className="mb-8">
