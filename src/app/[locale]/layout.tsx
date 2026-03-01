@@ -117,6 +117,8 @@ export default async function LocaleLayout({
     description: post.frontmatter.description,
     type: 'blog' as const,
     href: `${linkPrefix}/blog/${post.slug}`,
+    heroImage: post.frontmatter.heroImage,
+    category: post.frontmatter.category,
   }));
 
   const searchableNotes = notes.map(note => ({
@@ -125,6 +127,8 @@ export default async function LocaleLayout({
     description: note.frontmatter.description,
     type: 'note' as const,
     href: `${linkPrefix}/notes/${note.slug}`,
+    heroImage: note.frontmatter.heroImage,
+    category: note.frontmatter.category,
   }));
 
   const searchableData = [...searchablePosts, ...searchableNotes];
