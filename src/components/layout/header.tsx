@@ -133,7 +133,7 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<SearchableItem[]>([]);
   const [removingSlug, setRemovingSlug] = useState<string | null>(null);
-  const [timeLabel] = useState(() => getTimeLabel());
+  const [timeLabel, setTimeLabel] = useState("");
   
   const { items: readingListItems, removeItem: removeReadingListItem, addItem: addReadingListItem } = useReadingList();
   const { message, icon, notify } = useNotification();
@@ -156,6 +156,7 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
 
   useEffect(() => {
     setMounted(true);
+    setTimeLabel(getTimeLabel());
   }, []);
 
   useEffect(() => {
@@ -627,7 +628,7 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                         ) : (
                             <div className="p-0 space-y-4 pb-4">
                                 <div className="space-y-1">
-                                    <p className="text-[9px] font-black uppercase tracking-[0.15em] text-muted-foreground/60 px-4 pt-3 pb-2">{timeLabel}</p>
+                                    <p className="text-[9px] font-black uppercase tracking-[0.15em] text-muted-foreground/60 px-4 pt-3 pb-2">{mounted ? timeLabel : ''}</p>
                                     <div className="px-2 space-y-1">
                                         {quickPicks.map((item) => {
                                             const resolvedHero = getResolvedImage(item);
