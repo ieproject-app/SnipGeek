@@ -36,6 +36,17 @@
           "type": "string",
           "description": "Alternative text for the hero image, crucial for accessibility and SEO."
         },
+        "images": {
+          "type": "array",
+          "description": "List of supporting images uploaded for this post.",
+          "items": {
+            "type": "object",
+            "properties": {
+              "url": { "type": "string" },
+              "alt": { "type": "string" }
+            }
+          }
+        },
         "publishDate": {
           "type": "string",
           "description": "The date and time when the blog post was first published.",
@@ -88,7 +99,17 @@
         "date": { "type": "string", "format": "date-time" },
         "locale": { "type": "string" },
         "tags": { "type": "array", "items": { "type": "string" } },
-        "translationKey": { "type": "string" }
+        "translationKey": { "type": "string" },
+        "images": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "url": { "type": "string" },
+              "alt": { "type": "string" }
+            }
+          }
+        }
       },
       "required": ["id", "title", "contentMdx", "date", "locale"]
     },
