@@ -11,9 +11,43 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['var(--font-sans)', 'sans-serif'],
-        headline: ['var(--font-headline)', 'serif'],
-        code: ['var(--font-geist-mono)', 'ui-monospace', 'monospace'],
+        sans: ['var(--font-sans)', 'system-ui', 'sans-serif'],
+        serif: ['var(--font-serif)', 'Georgia', 'serif'],
+        display: ['var(--font-display)', 'system-ui', 'sans-serif'],
+        mono: ['var(--font-mono)', 'Menlo', 'monospace'],
+        headline: ['var(--font-display)', 'system-ui', 'sans-serif'],
+      },
+      fontSize: {
+        'ui-xs': ['0.625rem', { lineHeight: '1rem', letterSpacing: '0.08em' }],
+        'ui-sm': ['0.6875rem', { lineHeight: '1rem', letterSpacing: '0.06em' }],
+        'ui-base': ['0.75rem', { lineHeight: '1.25rem', letterSpacing: '0.02em' }],
+        'ui-md': ['0.875rem', { lineHeight: '1.25rem', letterSpacing: '0.01em' }],
+        'ui-lg': ['1rem', { lineHeight: '1.5rem', letterSpacing: '0' }],
+        'h6': ['0.875rem', { lineHeight: '1.4', letterSpacing: '0.01em', fontWeight: '700' }],
+        'h5': ['1rem', { lineHeight: '1.4', letterSpacing: '0.005em', fontWeight: '700' }],
+        'h4': ['1.125rem', { lineHeight: '1.35', letterSpacing: '0', fontWeight: '700' }],
+        'h3': ['1.375rem', { lineHeight: '1.3', letterSpacing: '-0.01em', fontWeight: '800' }],
+        'h2': ['1.75rem', { lineHeight: '1.25', letterSpacing: '-0.02em', fontWeight: '800' }],
+        'h1': ['2.25rem', { lineHeight: '1.15', letterSpacing: '-0.03em', fontWeight: '900' }],
+        'display-sm': ['2.75rem', { lineHeight: '1.1', letterSpacing: '-0.03em', fontWeight: '900' }],
+        'display-md': ['3.5rem', { lineHeight: '1.05', letterSpacing: '-0.04em', fontWeight: '900' }],
+        'display-lg': ['4.5rem', { lineHeight: '1.0', letterSpacing: '-0.05em', fontWeight: '900' }],
+        'article-sm': ['0.9375rem', { lineHeight: '1.75', letterSpacing: '0.01em' }],
+        'article-base': ['1.0625rem', { lineHeight: '1.8', letterSpacing: '0.005em' }],
+        'article-lg': ['1.125rem', { lineHeight: '1.85', letterSpacing: '0' }],
+      },
+      spacing: {
+        'px-component': '1rem',
+        'px-section': '1.5rem',
+        'px-page': '1.25rem',
+        'prose-gap-sm': '0.75rem',
+        'prose-gap': '1.5rem',
+        'prose-gap-lg': '2.5rem',
+        'prose-gap-xl': '4rem',
+        'section-sm': '3rem',
+        'section-md': '5rem',
+        'section-lg': '7.5rem',
+        'section-xl': '10rem',
       },
       colors: {
         background: 'hsl(var(--background))',
@@ -74,20 +108,12 @@ export default {
       },
       keyframes: {
         'accordion-down': {
-          from: {
-            height: '0',
-          },
-          to: {
-            height: 'var(--radix-accordion-content-height)',
-          },
+          from: { height: '0' },
+          to: { height: 'var(--radix-accordion-content-height)' },
         },
         'accordion-up': {
-          from: {
-            height: 'var(--radix-accordion-content-height)',
-          },
-          to: {
-            height: '0',
-          },
+          from: { height: 'var(--radix-accordion-content-height)' },
+          to: { height: '0' },
         },
         wiggle: {
           '0%, 100%': { transform: 'rotate(0deg) scale(1)' },
@@ -106,5 +132,5 @@ export default {
       },
     },
   },
-  plugins: [require('tailwindcss-animate')],
+  plugins: [require('tailwindcss-animate'), require('@tailwindcss/typography')],
 } satisfies Config;
