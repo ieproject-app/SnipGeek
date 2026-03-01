@@ -13,7 +13,7 @@ if (!admin.apps.length) {
 }
 const db = admin.firestore();
 
-// --- KONFIGURASI TUGAS (Sesuai Chat Mas Iwan) ---
+// --- KONFIGURASI TUGAS (Data HK.800 Jan 2025 Terbaru) ---
 const tasks = [
   { category: 'HK.800', year: 2025, month: 1, start: 8338, end: 8437, regionCode: 'TA-851030' },
 ];
