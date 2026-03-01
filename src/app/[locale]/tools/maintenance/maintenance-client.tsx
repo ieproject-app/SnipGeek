@@ -5,13 +5,13 @@ import { useState, useEffect } from 'react';
 import { useUser, useFirestore } from '@/firebase';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Database, Loader2, AlertCircle, CheckCircle2, ShieldAlert, Terminal as TerminalIcon } from 'lucide-react';
+import { Database, Loader2, AlertCircle, CheckCircle2, ShieldAlert, Terminal as TerminalIcon, User } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { doc, writeBatch } from 'firebase/firestore';
 
 const ADMIN_EMAIL = 'iwan.efndi@gmail.com';
 
-// Daftar tugas terbaru sesuai data yang dikirim Mas Iwan di chat
+// Daftar tugas sesuai data yang dikirim Mas Iwan di chat (08338 - 08437)
 const populateTasks = [
   { category: 'HK.800', year: 2025, month: 1, start: 8338, end: 8437, regionCode: 'TA-851030' },
 ];
@@ -34,14 +34,28 @@ export function MaintenanceClient({ dictionary }: { dictionary: any }) {
     return (
         <div className="flex flex-col h-64 items-center justify-center gap-4">
             <Loader2 className="h-10 w-10 animate-spin text-accent" />
-            <p className="text-xs font-black uppercase tracking-widest text-muted-foreground animate-pulse">Memuat Data...</p>
+            <p className="text-xs font-black uppercase tracking-widest text-muted-foreground animate-pulse">Menghubungkan Auth...</p>
         </div>
     );
   }
 
   const isAuthorized = user?.email?.toLowerCase() === ADMIN_EMAIL.toLowerCase();
 
-  if (!user || !isAuthorized) {
+  if (!user) {
+    return (
+      <div className="flex flex-col items-center justify-center h-96 gap-6 text-center">
+        <div className="p-6 bg-muted rounded-full">
+            <User className="h-16 w-16 text-muted-foreground" />
+        </div>
+        <div>
+            <h2 className="font-headline text-2xl font-black uppercase tracking-tighter">Silakan Login</h2>
+            <p className="text-muted-foreground mt-2">Mas Iwan perlu login dengan email {ADMIN_EMAIL} untuk mengakses fitur ini.</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isAuthorized) {
     return (
       <div className="flex flex-col items-center justify-center h-96 gap-6 text-center animate-in fade-in zoom-in-95 duration-500">
         <div className="p-6 bg-destructive/10 rounded-full">
@@ -51,7 +65,8 @@ export function MaintenanceClient({ dictionary }: { dictionary: any }) {
             <h2 className="font-headline text-3xl font-black uppercase tracking-tighter text-primary">
                 Akses Ditolak
             </h2>
-            <p className="text-muted-foreground mt-2 italic">Halaman ini hanya untuk Mas Iwan Efendi ({ADMIN_EMAIL}).</p>
+            <p className="text-muted-foreground mt-2 italic">Halaman ini hanya untuk Mas Iwan Efendi.</p>
+            <p className="text-[10px] font-bold mt-4 uppercase text-destructive">Terdeteksi: {user.email}</p>
         </div>
       </div>
     );
@@ -59,7 +74,7 @@ export function MaintenanceClient({ dictionary }: { dictionary: any }) {
 
   const handlePopulate = async () => {
     const totalToInfect = populateTasks.reduce((sum, t) => sum + (t.end - t.start + 1), 0);
-    const isConfirmed = window.confirm(`KONFIRMASI: Mas Iwan akan menyuntikkan ${totalToInfect} nomor baru ke database. Lanjutkan?`);
+    const isConfirmed = window.confirm(`KONFIRMASI: Mas Iwan akan menyuntikkan ${totalToInfect} nomor baru ke database ${db.app.options.projectId}. Lanjutkan?`);
     
     if (!isConfirmed) return;
 
@@ -71,7 +86,6 @@ export function MaintenanceClient({ dictionary }: { dictionary: any }) {
         
         for (const task of populateTasks) {
             const { category, year, month, start, end, regionCode } = task;
-            console.log(`Memproses batch: ${category} periode ${month}-${year} (${regionCode})`);
             
             let batch = writeBatch(db);
             let batchCount = 0;
@@ -102,7 +116,6 @@ export function MaintenanceClient({ dictionary }: { dictionary: any }) {
                 totalCreated++;
 
                 if (batchCount === 450) {
-                    console.log(`Mengirim batch (450 data)...`);
                     await batch.commit();
                     batch = writeBatch(db);
                     batchCount = 0;
@@ -110,7 +123,6 @@ export function MaintenanceClient({ dictionary }: { dictionary: any }) {
             }
 
             if (batchCount > 0) {
-                console.log(`Mengirim batch terakhir (${batchCount} data)...`);
                 await batch.commit();
             }
         }
@@ -166,7 +178,11 @@ export function MaintenanceClient({ dictionary }: { dictionary: any }) {
 
                 <div className="p-4 rounded-lg bg-sky-500/5 border border-sky-500/20 flex gap-3 text-sky-700">
                     <TerminalIcon className="h-5 w-5 shrink-0 mt-0.5" />
-                    <p className="text-xs font-medium">Login sebagai: <strong>{user.email}</strong></p>
+                    <div className="space-y-1">
+                        <p className="text-xs font-medium uppercase tracking-widest opacity-60">Status Koneksi</p>
+                        <p className="text-[10px] font-bold">Login: {user.email}</p>
+                        <p className="text-[10px] font-bold">Project: {db.app.options.projectId}</p>
+                    </div>
                 </div>
                 
                 <Button 

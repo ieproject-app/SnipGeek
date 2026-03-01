@@ -1,4 +1,9 @@
 
+/**
+ * WARNING: This script uses an external Service Account Key.
+ * It may point to a different project than your current website.
+ * Recommended: Use the /tools/maintenance page on the website instead.
+ */
 const path = require('path');
 require('dotenv').config({ path: path.resolve(process.cwd(), '.env.local') });
 
@@ -13,6 +18,8 @@ if (!admin.apps.length) {
 }
 const db = admin.firestore();
 
+console.log(`[!] MENYAMBUNG KE PROJECT ID: ${serviceAccount.project_id}`);
+
 // --- KONFIGURASI TUGAS (Data HK.800 Jan 2025 Terbaru) ---
 const tasks = [
   { category: 'HK.800', year: 2025, month: 1, start: 8338, end: 8437, regionCode: 'TA-851030' },
@@ -21,8 +28,6 @@ const tasks = [
 async function populate() {
   const collectionRef = db.collection('availableNumbers');
   let totalGenerated = 0;
-
-  console.log('Memulai proses populasi data via Terminal...');
 
   for (const task of tasks) {
     const { category, year, month, start, end, regionCode } = task;
@@ -34,22 +39,19 @@ async function populate() {
     for (let i = start; i <= end; i++) {
       const sequence = String(i).padStart(5, '0');
       const dateString = `${String(month).padStart(2, '0')}-${year}`;
-      
-      // Simpan dengan placeholder {DOCTYPE} agar bisa diganti di generator
       const fullNumber = `{DOCTYPE} ${sequence}/${category}/${regionCode}/${dateString}`;
 
       const docData = {
         fullNumber,
         category,
-        year, // number
-        month, // number
+        year,
+        month,
         valueCategory: 'below_500m',
         isUsed: false,
         assignedTo: "",
         assignedDate: "",
       };
 
-      // ID unik agar tidak duplikat
       const docId = `${category}-${year}-${month}-below_500m-${sequence}`;
       const docRef = collectionRef.doc(docId);
       
@@ -59,10 +61,10 @@ async function populate() {
 
     await batch.commit();
     totalGenerated += generatedInBatch;
-    console.log(`   [OK] +${generatedInBatch} nomor berhasil disuntik.`);
+    console.log(`   [OK] +${generatedInBatch} nomor berhasil disuntik ke ${serviceAccount.project_id}.`);
   }
 
-  console.log(`\nSelesai! Total: ${totalGenerated} nomor telah masuk ke Firestore.`);
+  console.log(`\nSelesai! Total: ${totalGenerated} nomor.`);
 }
 
 populate().catch(console.error);
