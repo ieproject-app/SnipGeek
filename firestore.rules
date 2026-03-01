@@ -8,6 +8,10 @@ service cloud.firestore {
     function isSignedIn() {
       return request.auth != null;
     }
+    
+    function isAdmin() {
+      return isSignedIn() && request.auth.token.email == 'iwan.efndi@gmail.com';
+    }
 
     // --- COLLECTION RULES ---
 
@@ -26,7 +30,11 @@ service cloud.firestore {
     match /availableNumbers/{numberId} {
       // Allow reading stock availability for logged in users
       allow get, list: if isSignedIn();
-      // Only allow updating the isUsed status, not deleting or creating
+      
+      // Allow admin to populate data
+      allow write: if isAdmin();
+
+      // Only allow normal users updating the isUsed status
       allow update: if isSignedIn() 
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['isUsed', 'assignedTo', 'assignedDate']);
     }
