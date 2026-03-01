@@ -21,16 +21,20 @@ To get started, take a look at src/app/page.tsx.
 - **Aspect Ratio**: 4:3.
 - **Image Radius**: 4px (`rounded-lg`).
 - **Typography**: Roboto Bold (`font-headline`), `text-lg`.
-- **Category Badge**: Frosted Glass style, sentence case capitalization.
-- **Metadata**: Single-word tags only, relative time, and read time.
+- **Category Badge**: Frosted Glass style, single-word only, sentence case capitalization.
+- **Metadata**: Relative time only (Tags and read time removed for minimalist look).
 - **Hover Effect**: Card lift `translateY(-10px)`, image scale `1.06`, accent bar fade-in.
 
 #### Latest Posts (Homepage)
-- **Layout**: 3-column Grid.
-- **Title Size**: `text-5xl` font-black.
-- **Aspect Ratio**: 16:9.
+- **Layout**: 3-column Grid inside `max-w-5xl` container.
+- **Title Size**: `text-3xl` font-bold.
+- **Aspect Ratio**: 4:3 (Standardized with Featured Posts).
 - **Typography**: Roboto Bold, `text-base`.
 - **Hover Effect**: Card lift `translateY(-1px)`, image scale `1.10`, bookmark overlay fade-in.
+
+#### Tutorial Slider (FeatureSlider)
+- **Aspect Ratio**: 4:3.
+- **Layout**: Carousel with 3 visible items on desktop.
 
 #### Post Page (Content)
 - **Max Width**: 768px (`max-w-3xl`) for optimal readability.

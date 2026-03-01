@@ -96,7 +96,7 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
     return (
         <div key={post.slug} className="group relative transition-all duration-500 hover:-translate-y-1">
             <Link href={`${linkPrefix}/blog/${post.slug}`} className="block" aria-label={`Read more about ${post.frontmatter.title}`}>
-                <div className="relative w-full aspect-video overflow-hidden rounded-lg mb-4 shadow-sm transition-all duration-500 border border-primary/5">
+                <div className="relative w-full aspect-[4/3] overflow-hidden rounded-lg mb-4 shadow-sm transition-all duration-500 border border-primary/5">
                     {heroImageSrc && (
                         <Image
                             src={heroImageSrc}
@@ -133,7 +133,7 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
 
   return (
     <div className="w-full">
-      {/* Featured Posts Section - Extracted to dedicated component */}
+      {/* Featured Posts Section */}
       <FeaturedPosts 
         posts={featuredPosts} 
         dictionary={dictionary} 
@@ -141,10 +141,10 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
         linkPrefix={linkPrefix} 
       />
 
-      {/* Latest Posts Section */}
+      {/* Latest Posts Section - Container expanded to 5xl, aspect ratio 4:3 */}
       {latestPosts.length > 0 && (
-        <section className="container max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-12 sm:pb-16">
-          <h2 className="text-5xl font-bold font-headline tracking-tighter text-primary mb-12 text-center">
+        <section className="container max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-12 sm:pb-16">
+          <h2 className="text-3xl font-bold font-headline tracking-tighter text-primary mb-12 text-center">
             {dictionary.home.latestPosts}
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12 mb-16">
@@ -172,7 +172,7 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
         </section>
       )}
 
-      {/* FeatureSlider Section (Tutorials) */}
+      {/* FeatureSlider Section (Tutorials) - Aspect ratio 4:3 */}
       {sliderPosts.length > 0 && (
         <FeatureSlider 
           posts={sliderPosts as any} 

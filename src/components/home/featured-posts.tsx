@@ -8,7 +8,7 @@ import { Dictionary } from '@/lib/get-dictionary';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { cn, formatRelativeTime } from '@/lib/utils';
 import { AddToReadingListButton } from '@/components/layout/add-to-reading-list-button';
-import { Clock, ArrowRight } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 
 interface FeaturedPostsProps {
   posts: Post<PostFrontmatter>[];
@@ -36,8 +36,8 @@ const getCategoryColors = (category: string) => {
 
 /**
  * FeaturedPosts - A sophisticated 4-column staggered gallery grid.
- * Refined with Roboto font, smaller titles, 4px rounded images, 
- * capitalized category labels, and single-word tag filtering.
+ * Refined with Roboto font, 4px rounded images, 
+ * single-word category labels, and simplified metadata (date only).
  */
 export function FeaturedPosts({ posts, dictionary, locale, linkPrefix }: FeaturedPostsProps) {
   if (posts.length === 0) return null;
@@ -65,8 +65,9 @@ export function FeaturedPosts({ posts, dictionary, locale, linkPrefix }: Feature
             }
 
             const rawCategory = post.frontmatter.category || 'Tutorial';
-            // Capitalize only first letter
-            const category = rawCategory.charAt(0).toUpperCase() + rawCategory.slice(1).toLowerCase();
+            // Take only first word and capitalize it
+            const firstWord = rawCategory.split(' ')[0];
+            const category = firstWord.charAt(0).toUpperCase() + firstWord.slice(1).toLowerCase();
             const colors = getCategoryColors(category);
             const isStaggered = index % 2 !== 0;
             
@@ -78,13 +79,6 @@ export function FeaturedPosts({ posts, dictionary, locale, linkPrefix }: Feature
                 type: 'blog' as const,
             };
 
-            // Estimate reading time
-            const wordCount = post.frontmatter.description?.length || 0;
-            const readingTime = Math.max(1, Math.ceil(wordCount / 50));
-
-            // Filter tags: Only single words
-            const filteredTags = post.frontmatter.tags?.filter(tag => !tag.trim().includes(' ')) || [];
-
             return (
               <div 
                 key={post.slug} 
@@ -95,7 +89,7 @@ export function FeaturedPosts({ posts, dictionary, locale, linkPrefix }: Feature
               >
                 <Link href={`${linkPrefix}/blog/${post.slug}`} className="block" aria-label={`Read ${post.frontmatter.title}`}>
                     <article className="space-y-5">
-                        {/* Image Block - Now 4px rounded (rounded-lg maps to --radius 4px) */}
+                        {/* Image Block - 4px rounded */}
                         <div className="relative aspect-[4/3] rounded-lg overflow-hidden bg-muted shadow-md group-hover:shadow-xl group-hover:-translate-y-2 transition-all duration-500">
                             {/* Category Badge - Frosted Glass */}
                             <div className="absolute top-4 left-4 z-20">
@@ -144,19 +138,9 @@ export function FeaturedPosts({ posts, dictionary, locale, linkPrefix }: Feature
 
                             <div className="flex items-center justify-between">
                                 <div className="flex flex-col gap-1.5">
-                                    <div className="flex items-center gap-3 text-[10px] font-bold uppercase tracking-tighter text-muted-foreground/60">
-                                        <span>{formatRelativeTime(new Date(post.frontmatter.date), locale)}</span>
-                                        <span className="w-1 h-1 rounded-full bg-border" />
-                                        <span className="flex items-center gap-1"><Clock className="h-3.5 w-3.5" /> {readingTime} MIN</span>
+                                    <div className="text-[10px] font-bold uppercase tracking-tighter text-muted-foreground/60">
+                                        {formatRelativeTime(new Date(post.frontmatter.date), locale)}
                                     </div>
-                                    {/* Display filtered single-word tags */}
-                                    {filteredTags.length > 0 && (
-                                        <div className="flex flex-wrap gap-2">
-                                            {filteredTags.slice(0, 2).map(tag => (
-                                                <span key={tag} className="text-[9px] font-black text-accent/60 uppercase">#{tag}</span>
-                                            ))}
-                                        </div>
-                                    )}
                                 </div>
                                 
                                 <div className="flex items-center gap-3">

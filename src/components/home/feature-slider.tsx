@@ -110,8 +110,8 @@ export function FeatureSlider({ posts, title, viewMoreText, readingListDictionar
                       "dark:shadow-black/40"
                   )}>
                     <Link href={`${linkPrefix}/blog/${post.slug}`} className="block h-full group">
-                      {/* Image container */}
-                      <div className="relative aspect-video overflow-hidden z-10 rounded-t-lg">
+                      {/* Image container - Changed to aspect 4:3 */}
+                      <div className="relative aspect-[4/3] overflow-hidden z-10 rounded-t-lg">
                         <Image
                           src={heroImageSrc}
                           alt={post.frontmatter.imageAlt || post.frontmatter.title}
