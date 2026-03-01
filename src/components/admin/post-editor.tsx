@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -13,6 +12,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import { 
   Save, 
   ArrowLeft, 
@@ -102,7 +102,7 @@ export function PostEditor({ initialData, id }: PostEditorProps) {
       toast({
         variant: "destructive",
         title: "Gagal Mengunggah",
-        description: "Pastikan izin Storage sudah benar.",
+        description: error.message || "Pastikan izin Storage sudah benar.",
       });
     } finally {
       setIsUploading(false);
@@ -320,7 +320,7 @@ export function PostEditor({ initialData, id }: PostEditorProps) {
               </CardTitle>
             </CardHeader>
             <CardContent className="p-6 space-y-4">
-              <div className="relative aspect-video rounded-lg bg-muted flex items-center justify-center overflow-hidden border border-primary/10 shadow-inner">
+              <div className="relative aspect-video rounded-lg bg-muted flex items-center justify-center overflow-hidden border-2 border-dashed border-primary/10 shadow-inner">
                 {formData.heroImageUrl ? (
                   <Image src={formData.heroImageUrl} alt="Hero" fill className="object-cover" />
                 ) : (
