@@ -3,16 +3,17 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    /**
-     * SNIPGEEK SECURITY RULES
-     */
-
     function isSignedIn() {
       return request.auth != null;
     }
 
     function isAdmin() {
       return isSignedIn() && request.auth.token.email == 'iwan.efndi@gmail.com';
+    }
+
+    // Allow users to check their own admin role
+    match /roles_admin/{userId} {
+      allow read: if isSignedIn() && request.auth.uid == userId;
     }
 
     // Number Generator Rules
@@ -24,7 +25,6 @@ service cloud.firestore {
       allow create, delete: if isAdmin();
       
       // Users can only mark a number as used if it's currently free
-      // They must set assignedTo to themselves
       allow update: if isSignedIn() 
         && resource.data.isUsed == false 
         && request.resource.data.isUsed == true
@@ -32,10 +32,14 @@ service cloud.firestore {
     }
 
     match /userGenerationLimits/{userId} {
-      // Users can manage their own quota
       allow read, write: if isSignedIn() && request.auth.uid == userId;
-      // Admin can check/manage anyone's quota
       allow read, write: if isAdmin();
+    }
+
+    // Media Library Rules
+    match /media_library/{id} {
+      allow read: if true;
+      allow write, delete: if isAdmin();
     }
 
     // Default deny

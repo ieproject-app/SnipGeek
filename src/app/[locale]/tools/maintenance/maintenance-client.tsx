@@ -1,12 +1,13 @@
+
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useUser, useFirestore, useDoc, useMemoFirebase } from '@/firebase';
+import { useUser, useFirestore } from '@/firebase';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Database, Loader2, AlertCircle, CheckCircle2, ShieldAlert, Info, Terminal } from 'lucide-react';
+import { Database, Loader2, AlertCircle, CheckCircle2, ShieldAlert, Terminal } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { doc, writeBatch, collection } from 'firebase/firestore';
+import { doc, writeBatch } from 'firebase/firestore';
 
 const ADMIN_EMAIL = 'iwan.efndi@gmail.com';
 const REGION_CODE = 'TA-760103';
@@ -43,31 +44,25 @@ export function MaintenanceClient({ dictionary }: { dictionary: any }) {
   const [stats, setStats] = useState<number>(0);
   const [mounted, setMounted] = useState(false);
 
-  // Cek tambahan ke koleksi roles_admin agar lebih stabil
-  const adminDocRef = useMemoFirebase(() => (user ? doc(db, 'roles_admin', user.uid) : null), [db, user]);
-  const { data: adminDoc, isLoading: isAdminDocLoading } = useDoc(adminDocRef);
-
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  if (!mounted || isUserLoading || isAdminDocLoading) {
+  if (!mounted || isUserLoading) {
     return (
         <div className="flex flex-col h-64 items-center justify-center gap-4">
             <Loader2 className="h-10 w-10 animate-spin text-accent" />
-            <p className="text-xs font-black uppercase tracking-widest text-muted-foreground animate-pulse">Memverifikasi Hak Akses...</p>
+            <p className="text-xs font-black uppercase tracking-widest text-muted-foreground animate-pulse">Memuat Data...</p>
         </div>
     );
   }
 
-  // Verifikasi apakah ini Mas Iwan (berdasarkan email atau dokumen roles_admin)
-  const isEmailAdmin = user?.email?.toLowerCase() === ADMIN_EMAIL.toLowerCase();
-  const isAuthorized = isEmailAdmin || !!adminDoc;
+  const isAuthorized = user?.email?.toLowerCase() === ADMIN_EMAIL.toLowerCase();
 
   if (!user || !isAuthorized) {
     return (
       <div className="flex flex-col items-center justify-center h-96 gap-6 text-center animate-in fade-in zoom-in-95 duration-500">
-        <div className="p-6 bg-destructive/10 rounded-full ring-8 ring-destructive/5">
+        <div className="p-6 bg-destructive/10 rounded-full">
             <ShieldAlert className="h-16 w-16 text-destructive" />
         </div>
         <div>
@@ -75,15 +70,13 @@ export function MaintenanceClient({ dictionary }: { dictionary: any }) {
                 Akses Ditolak
             </h2>
             <p className="text-muted-foreground mt-2 italic">Halaman ini hanya untuk Mas Iwan Efendi ({ADMIN_EMAIL}).</p>
-            <p className="text-[10px] mt-4 opacity-50 uppercase font-bold">User: {user?.email || 'Unknown'}</p>
         </div>
       </div>
     );
   }
 
   const handlePopulate = async () => {
-    console.log("Memulai proses injeksi nomor...");
-    const isConfirmed = window.confirm("KONFIRMASI: Mas Iwan akan menyuntikkan ribuan nomor baru ke database. Lanjutkan?");
+    const isConfirmed = window.confirm("KONFIRMASI: Mas Iwan akan menyuntikkan sekitar 1.400 nomor baru ke database. Lanjutkan?");
     
     if (!isConfirmed) return;
 
@@ -91,10 +84,8 @@ export function MaintenanceClient({ dictionary }: { dictionary: any }) {
     let totalCreated = 0;
 
     try {
-        // Proses setiap tugas populasi
         for (const task of populateTasks) {
             const { category, year, month, start, end } = task;
-            console.log(`Sedang memproses kategori ${category} periode ${month}-${year}...`);
             
             let batch = writeBatch(db);
             let batchCount = 0;
@@ -102,8 +93,6 @@ export function MaintenanceClient({ dictionary }: { dictionary: any }) {
             for (let i = start; i <= end; i++) {
                 const sequence = String(i).padStart(5, '0');
                 const dateString = `${String(month).padStart(2, '0')}-${year}`;
-                
-                // Format nomor placeholder
                 const fullNumber = `{DOCTYPE} ${sequence}/${category}/${REGION_CODE}/${dateString}`;
                 
                 // ID unik agar tidak ada data ganda
@@ -113,8 +102,8 @@ export function MaintenanceClient({ dictionary }: { dictionary: any }) {
                 batch.set(docRef, {
                     fullNumber,
                     category,
-                    year,
-                    month,
+                    year, // Tipe data angka (number)
+                    month, // Tipe data angka (number)
                     valueCategory: 'below_500m',
                     isUsed: false,
                     assignedTo: "",
@@ -124,7 +113,6 @@ export function MaintenanceClient({ dictionary }: { dictionary: any }) {
                 batchCount++;
                 totalCreated++;
 
-                // Kirim per 450 dokumen (limit Firestore 500)
                 if (batchCount === 450) {
                     await batch.commit();
                     batch = writeBatch(db);
@@ -132,7 +120,6 @@ export function MaintenanceClient({ dictionary }: { dictionary: any }) {
                 }
             }
 
-            // Kirim sisa batch untuk tugas ini
             if (batchCount > 0) {
                 await batch.commit();
             }
@@ -140,15 +127,9 @@ export function MaintenanceClient({ dictionary }: { dictionary: any }) {
 
         setStats(totalCreated);
         setIsFinished(true);
-        console.log(`Berhasil menyuntikkan ${totalCreated} nomor.`);
         toast({ title: "Injeksi Berhasil!", description: `${totalCreated} nomor telah masuk ke stok.` });
     } catch (error: any) {
-        console.error("Gagal melakukan injeksi:", error);
-        toast({ 
-            variant: "destructive", 
-            title: "Gagal Injeksi", 
-            description: error.message || "Pastikan koneksi internet stabil dan Firestore sudah aktif." 
-        });
+        toast({ variant: "destructive", title: "Gagal Injeksi", description: error.message });
     } finally {
         setIsProcessing(false);
     }
@@ -167,8 +148,8 @@ export function MaintenanceClient({ dictionary }: { dictionary: any }) {
                 Pusat Injeksi Stok
             </CardTitle>
           </div>
-          <CardDescription className="text-base leading-relaxed">
-            Satu klik untuk mengisi ribuan nomor dokumen periode 2025-2026 ke dalam Firestore.
+          <CardDescription className="text-base">
+            Isi ribuan nomor dokumen periode 2025-2026 ke dalam database Firestore.
           </CardDescription>
         </CardHeader>
         <CardContent className="p-8">
@@ -179,31 +160,28 @@ export function MaintenanceClient({ dictionary }: { dictionary: any }) {
                 </div>
                 <div className="text-center">
                     <h3 className="font-bold text-xl text-primary">Injeksi Selesai!</h3>
-                    <p className="text-muted-foreground font-mono text-sm mt-1">Total: {stats} nomor berhasil masuk ke database.</p>
+                    <p className="text-muted-foreground text-sm mt-1">Total: {stats} nomor berhasil ditambahkan.</p>
                 </div>
-                <Button variant="outline" className="mt-4 rounded-full px-8" onClick={() => setIsFinished(false)}>
-                    Ingin Suntik Lagi?
+                <Button variant="outline" className="mt-4 rounded-full" onClick={() => setIsFinished(false)}>
+                    Ulangi Injeksi?
                 </Button>
             </div>
           ) : (
             <div className="space-y-6">
                 <div className="flex items-start gap-4 p-4 rounded-lg bg-amber-500/5 border border-amber-500/20 text-amber-600">
                     <AlertCircle className="h-5 w-5 shrink-0 mt-0.5" />
-                    <div className="text-sm font-medium space-y-1">
-                        <p>Sistem akan mengirim ribuan data dalam beberapa grup otomatis.</p>
-                        <p className="text-[10px] uppercase font-black opacity-70">PENTING: Jangan tutup halaman ini sampai muncul tanda centang.</p>
-                    </div>
+                    <p className="text-sm font-medium">Jangan tutup halaman ini selama proses penyuntikan data berjalan.</p>
                 </div>
 
                 <div className="p-4 rounded-lg bg-sky-500/5 border border-sky-500/20 flex gap-3 text-sky-700">
                     <Terminal className="h-5 w-5 shrink-0 mt-0.5" />
-                    <p className="text-xs font-medium">Mas sedang login sebagai: <strong>{user.email}</strong></p>
+                    <p className="text-xs font-medium">Login sebagai: <strong>{user.email}</strong></p>
                 </div>
                 
                 <Button 
                     onClick={handlePopulate} 
                     disabled={isProcessing}
-                    className="w-full h-16 font-black uppercase tracking-widest text-lg shadow-lg shadow-primary/10 transition-all hover:scale-[1.01] active:scale-[0.99] rounded-xl bg-primary text-primary-foreground"
+                    className="w-full h-16 font-black uppercase tracking-widest text-lg shadow-lg shadow-primary/10 rounded-xl"
                 >
                     {isProcessing ? (
                         <>
@@ -221,10 +199,6 @@ export function MaintenanceClient({ dictionary }: { dictionary: any }) {
           )}
         </CardContent>
       </Card>
-      
-      <p className="text-center text-[10px] text-muted-foreground uppercase font-black tracking-widest opacity-30">
-        Internal Management Area &bull; Restricted to Admin
-      </p>
     </div>
   );
 }
