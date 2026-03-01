@@ -8,7 +8,7 @@ To get started, take a look at src/app/page.tsx.
 ## SnipGeek Design System & Specifications
 
 ### 1. Global Layout Rules
-- **Header Height**: 68px (Super-Compact Double-Decker Header).
+- **Header Height**: 68px (Minimalist High-Impact Header).
 - **Main Content Offset**: `pt-[68px]` defined in root layout.
 - **Article Page Symmetry (Symmetry 40px)**:
   - Top: Header to Breadcrumbs = 40px (`pt-10`).
@@ -51,3 +51,4 @@ To get started, take a look at src/app/page.tsx.
 - **Bookmark System**: Floating overlay on cards (visible on hover) or inline in list widgets.
 - **Theme**: System-aware (Dark/Light) with radial gradient backgrounds.
 - **Tag Bar**: Integrated 32px secondary navigation for favorite topics, scrollable on mobile.
+
