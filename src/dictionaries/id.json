@@ -63,7 +63,7 @@
         "new_badge": "Baru",
         "tool_list": {
             "ai_prompt_generator": {
-                "title": "Generator Prompt Artikel AI",
+                "title": "AI Article Prompt Generator",
                 "description": "Buat prompt terstruktur untuk meminta artikel baru dengan detail yang lengkap."
             },
             "number_to_words": {
@@ -223,7 +223,7 @@
         "slugLabel": "Slug URL (Inggris)",
         "slugPlaceholder": "cara-memasang-rufus",
         "publishDateLabel": "Tanggal Terbit",
-        "publishDatePlaceholder": "YYYY-MM-DD",
+        "publishDateLabelModify": "Tanggal Terbit Asli",
         "statusLabel": "Status",
         "publishSwitchLabel": "Terbitkan Langsung",
         "featuredSwitchLabel": "Tandai sebagai Unggulan",
@@ -249,22 +249,14 @@
             "theme": "Ganti Tema"
         }
     },
-    "maintenance": {
-        "title": "Pemeliharaan Sistem",
-        "description": "Alat administrator untuk sinkronisasi dan populasi database.",
-        "populateTitle": "Populasi Database Nomor",
-        "populateDescription": "Peringatan: Aksi ini akan menyuntikkan ribuan nomor urut unik untuk periode 2025-2026. Eksekusi hanya jika database kosong.",
-        "populateButton": "Suntik Nomor Sekarang",
-        "success": "Database berhasil dipopulasi!",
-        "unauthorized": "Akses Ditolak. Memerlukan hak akses Admin.",
-        "loading": "Memproses transaksi...",
-        "error": "Terjadi kesalahan saat populasi."
-    },
     "notifications": {
         "themeLight": "Tema: Terang",
         "themeDark": "Tema: Gelap",
         "themeSystem": "Tema: Sistem",
         "langEn": "Bahasa: Inggris",
-        "langId": "Bahasa: Indonesia"
+        "langId": "Bahasa: Indonesia",
+        "readingListAdded": "Tersimpan ke Daftar Baca",
+        "readingListRemoved": "Dihapus dari Daftar Baca",
+        "copied": "Tersalin ke Clipboard"
     }
 }

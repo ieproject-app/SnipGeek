@@ -44,7 +44,7 @@ export function PostMeta({ frontmatter, item, locale, dictionary, readingTime, i
           </div>
           <AddToReadingListButton 
             item={item}
-            dictionary={dictionary.readingList}
+            dictionary={dictionary}
             showText={false}
             className="h-10 w-10 rounded-full border-white/20 bg-white/10 backdrop-blur-md text-white hover:bg-white hover:text-slate-950 shadow-xl transition-all"
           />
@@ -98,7 +98,7 @@ export function PostMeta({ frontmatter, item, locale, dictionary, readingTime, i
         <div className="w-px h-4 bg-border mx-2" />
         <AddToReadingListButton 
           item={item}
-          dictionary={dictionary.readingList}
+          dictionary={dictionary}
           showText={false}
           className="h-8 w-8 rounded-full border-none bg-muted/50 text-primary shadow-none hover:text-primary"
         />

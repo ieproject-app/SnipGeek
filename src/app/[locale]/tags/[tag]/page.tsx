@@ -1,8 +1,7 @@
 
 'use client';
 
-import { getSortedPostsData, getSortedNotesData } from '@/lib/posts';
-import { getSortedNotesData as getRawNotes } from '@/lib/notes';
+import { getSortedPostsData, getSortedNotesData as getRawNotes } from '@/lib/posts';
 import { i18n } from '@/i18n-config';
 import { getDictionary } from '@/lib/get-dictionary';
 import Link from 'next/link';
@@ -30,10 +29,6 @@ export default function TagPage() {
   if (!dictionary) return null;
 
   const posts = getSortedPostsData(locale).filter(p => p.frontmatter.tags?.some(t => t.toLowerCase() === decodedTag));
-  // Note: we need access to note data from our library
-  // Since this is a client component for now (to handle params smoothly), 
-  // in a real app these would be fetched or passed. 
-  // For this prototype, I'll keep the logic consistent with how posts are handled.
   const notes = getRawNotes(locale).filter(n => n.frontmatter.tags?.some(t => t.toLowerCase() === decodedTag));
 
   const formatDatePart = (date: Date, options: Intl.DateTimeFormatOptions) => {
@@ -109,7 +104,7 @@ export default function TagPage() {
                             </Link>
                              <AddToReadingListButton 
                                 item={item}
-                                dictionary={dictionary.readingList}
+                                dictionary={dictionary}
                                 showText={false}
                                 className="absolute top-3 right-3 z-10 text-white bg-black/30 hover:bg-black/50 hover:text-white opacity-0 group-hover:opacity-100 transition-opacity"
                             />
@@ -161,7 +156,7 @@ export default function TagPage() {
                             <AddToReadingListButton 
                                 item={item}
                                 showText={false}
-                                dictionary={dictionary.readingList}
+                                dictionary={dictionary}
                                 className="text-muted-foreground hover:text-primary z-10 opacity-0 group-hover:opacity-100 transition-opacity shrink-0"
                             />
                         </CardFooter>

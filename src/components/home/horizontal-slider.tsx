@@ -32,12 +32,12 @@ interface HorizontalSliderProps {
   posts: SliderPost[];
   title: string;
   viewMoreText: string;
-  readingListDictionary: Dictionary['readingList'];
+  dictionary: Dictionary;
   locale: string;
   tag?: string;
 }
 
-export function HorizontalSlider({ posts, title, viewMoreText, readingListDictionary, locale, tag }: HorizontalSliderProps) {
+export function HorizontalSlider({ posts, title, viewMoreText, dictionary, locale, tag }: HorizontalSliderProps) {
   const [api, setApi] = React.useState<CarouselApi>();
   const [current, setCurrent] = React.useState(0);
   const [count, setCount] = React.useState(0);
@@ -121,7 +121,7 @@ export function HorizontalSlider({ posts, title, viewMoreText, readingListDictio
                         />
                         <AddToReadingListButton 
                           item={item}
-                          dictionary={readingListDictionary}
+                          dictionary={dictionary}
                           showText={false}
                           className="absolute top-1 right-1 z-20 text-white bg-black/30 hover:bg-black/50 hover:text-white opacity-0 group-hover:opacity-100 transition-opacity h-6 w-6"
                         />

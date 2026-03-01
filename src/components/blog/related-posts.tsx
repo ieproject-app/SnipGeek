@@ -103,7 +103,7 @@ export function RelatedPosts({
                     <AddToReadingListButton 
                         item={readingListItem}
                         showText={false}
-                        dictionary={dictionary.readingList}
+                        dictionary={dictionary}
                         className="absolute top-3 right-3 z-10 text-white bg-black/30 hover:bg-black/50 hover:text-white opacity-0 group-hover:opacity-100 transition-opacity"
                     />
                 </div>
