@@ -20,11 +20,13 @@ import {
   Loader2, 
   Eye, 
   Code2, 
-  CheckCircle2 
+  CheckCircle2,
+  AlertCircle
 } from 'lucide-react';
 import Image from 'next/image';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import Link from 'next/link';
+import { useToast } from '@/hooks/use-toast';
 
 interface PostEditorProps {
   initialData?: any;
@@ -35,6 +37,7 @@ export function PostEditor({ initialData, id }: PostEditorProps) {
   const db = useFirestore();
   const router = useRouter();
   const { locale } = useParams();
+  const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
 
@@ -71,8 +74,17 @@ export function PostEditor({ initialData, id }: PostEditorProps) {
       const path = `blog-posts/${fileName}`;
       const url = await uploadFile(file, path);
       setFormData(prev => ({ ...prev, heroImageUrl: url }));
-    } catch (error) {
+      toast({
+        title: "Berhasil!",
+        description: "Gambar berhasil diunggah ke Firebase Storage.",
+      });
+    } catch (error: any) {
       console.error("Upload failed", error);
+      toast({
+        variant: "destructive",
+        title: "Gagal Mengunggah",
+        description: "Pastikan Storage Rules sudah diatur ke 'allow write: if request.auth != null'.",
+      });
     } finally {
       setIsUploading(false);
     }
@@ -80,6 +92,15 @@ export function PostEditor({ initialData, id }: PostEditorProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!formData.title || !formData.contentMdx) {
+        toast({
+            variant: "destructive",
+            title: "Data Kurang",
+            description: "Judul dan konten wajib diisi.",
+        });
+        return;
+    }
+
     setIsSubmitting(true);
 
     const docId = id || crypto.randomUUID();
@@ -105,6 +126,10 @@ export function PostEditor({ initialData, id }: PostEditorProps) {
     
     setTimeout(() => {
       setIsSubmitting(false);
+      toast({
+        title: "Tersimpan",
+        description: "Artikel berhasil diperbarui di database.",
+      });
       router.push('/admin/posts');
     }, 1000);
   };
