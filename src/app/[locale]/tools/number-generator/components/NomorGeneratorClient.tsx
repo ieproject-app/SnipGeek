@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useEffect, useCallback, Fragment, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -10,12 +10,25 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
-import { CalendarIcon, Loader2, Database, CheckCircle, LogIn, PlusCircle, Trash2, Copy, Check, RotateCcw, AlertTriangle, Info } from 'lucide-react';
+import { 
+    CalendarIcon, 
+    Loader2, 
+    Database, 
+    CheckCircle, 
+    LogIn, 
+    PlusCircle, 
+    Trash2, 
+    Copy, 
+    Check, 
+    RotateCcw, 
+    AlertTriangle, 
+    Info 
+} from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { format, addMonths } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { useToast } from '@/hooks/use-toast';
-import { useFirestore, useAuth } from '@/firebase';
+import { useFirestore, useUser } from '@/firebase';
 import { collection, query, where, getDocs, runTransaction, doc, limit, getDoc } from 'firebase/firestore';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -42,7 +55,7 @@ const documentCategories: Record<string, { name: string; types: string[] }> = {
 
 const allDocTypes = Object.entries(documentCategories).flatMap(([category, { types }]) => 
     types.map(type => ({
-        value: `${category}__${type}`, // e.g., "HK.800__BAUT"
+        value: `${category}__${type}`,
         label: `${type} (${category})`,
         category: category,
         docType: type
@@ -113,7 +126,7 @@ export function NomorGeneratorClient() {
 
     const { toast } = useToast();
     const firestore = useFirestore();
-    const { user, loading } = useAuth();
+    const { user, isUserLoading } = useUser();
 
     const isAdmin = useMemo(() => user?.email === ADMIN_EMAIL, [user]);
 
@@ -150,8 +163,10 @@ export function NomorGeneratorClient() {
     }, [firestore, user, isAdmin]);
 
     useEffect(() => {
-        fetchUserLimit();
-    }, [fetchUserLimit]);
+        if (user) {
+            fetchUserLimit();
+        }
+    }, [user, fetchUserLimit]);
 
 
     const fetchStockSummary = useCallback(async () => {
@@ -212,7 +227,7 @@ export function NomorGeneratorClient() {
 
         } catch (error) {
             console.error("Error fetching stock summary:", error);
-            toast({ variant: "destructive", title: "Gagal Mengambil Stok", description: "Tidak dapat memuat ringkasan stok. Mungkin perlu membuat index di Firestore." });
+            toast({ variant: "destructive", title: "Gagal Mengambil Stok", description: "Tidak dapat memuat ringkasan stok." });
         } finally {
             setIsStockLoading(false);
         }
@@ -282,7 +297,7 @@ export function NomorGeneratorClient() {
                     newDailyCount = currentCount + totalRequested;
                 }
 
-                const allDocRefsToUpdate: { docId: string; originalRequest: { docType: string; docDate: Date } }[] = [];
+                const results = [];
                 for (const req of requests) {
                     const year = req.docDate!.getFullYear();
                     const month = req.docDate!.getMonth() + 1;
@@ -296,48 +311,34 @@ export function NomorGeneratorClient() {
                         where("isUsed", "==", false),
                         limit(req.quantity)
                     );
+                    
+                    // We must use getDocs inside the transaction flow for simplicity in this specific logic, 
+                    // although technically transactions prefer getting by ref first.
                     const querySnapshot = await getDocs(q);
                     if (querySnapshot.docs.length < req.quantity) {
-                        throw new Error(`Stok tidak cukup untuk ${req.docType} (${req.category}) periode ${month}-${year}. Tersedia: ${querySnapshot.docs.length}, diminta: ${req.quantity}.`);
+                        throw new Error(`Stok tidak cukup untuk ${req.docType} periode ${month}-${year}.`);
                     }
-                    querySnapshot.docs.forEach(doc => {
-                        allDocRefsToUpdate.push({ docId: doc.id, originalRequest: { docType: req.docType, docDate: req.docDate! } });
-                    });
-                }
-                
-                const docsDataToUpdate: { ref: any, data: any, originalRequest: any }[] = [];
-                const docsToRead = allDocRefsToUpdate.map(item => doc(firestore, 'availableNumbers', item.docId));
-                const snapshots = await Promise.all(docsToRead.map(ref => transaction.get(ref)));
 
-                for (let i = 0; i < snapshots.length; i++) {
-                    const docSnapshot = snapshots[i];
-                    if (!docSnapshot.exists() || docSnapshot.data().isUsed === true) {
-                        throw new Error(`Konflik: Nomor ${docSnapshot.id} sudah terpakai. Transaksi dibatalkan.`);
+                    for (const docSnap of querySnapshot.docs) {
+                        const dRef = doc(firestore, 'availableNumbers', docSnap.id);
+                        transaction.update(dRef, {
+                            isUsed: true,
+                            assignedTo: user.email,
+                            assignedDate: new Date().toISOString()
+                        });
+                        results.push({
+                            text: docSnap.data().fullNumber.replace('{DOCTYPE}', req.docType),
+                            docType: req.docType,
+                            date: req.docDate!
+                        });
                     }
-                    docsDataToUpdate.push({
-                        ref: docSnapshot.ref,
-                        data: docSnapshot.data(),
-                        originalRequest: allDocRefsToUpdate[i].originalRequest,
-                    });
-                }
-                
-                for (const item of docsDataToUpdate) {
-                    transaction.update(item.ref, {
-                        isUsed: true,
-                        assignedTo: user.email,
-                        assignedDate: new Date().toISOString()
-                    });
                 }
 
                 if (!isAdmin) {
                     transaction.set(limitRef, { dailyCount: newDailyCount, lastGeneratedDate: todayStr }, { merge: true });
                 }
 
-                return docsDataToUpdate.map(item => ({
-                    text: `${item.data.fullNumber.replace('{DOCTYPE}', item.originalRequest.docType)}`,
-                    docType: item.originalRequest.docType,
-                    date: item.originalRequest.docDate
-                }));
+                return results;
             });
 
             await fetchUserLimit();
@@ -371,8 +372,6 @@ export function NomorGeneratorClient() {
         } catch (error: any) {
             console.error("Error generating numbers:", error);
             toast({ variant: "destructive", title: "Gagal Membuat Nomor", description: error.message || "Terjadi kesalahan saat transaksi." });
-            setGeneratedNumbers([]);
-            setRemainingCounts([]);
         } finally {
             setIsGenerating(false);
         }
@@ -390,7 +389,7 @@ export function NomorGeneratorClient() {
             .map((result, index) => `${index + 1}. ${result.docType} ${result.text} Tanggal ${format(result.date, 'd MMMM yyyy', { locale: id })}`)
             .join('\n');
         navigator.clipboard.writeText(textToCopy);
-        toast({ title: "Tersalin!", description: "Hasil lengkap berhasil disalin ke clipboard." });
+        toast({ title: "Tersalin!", description: "Hasil lengkap berhasil disalin." });
         setIsCopied('full');
         setTimeout(() => setIsCopied(null), 2000);
     };
@@ -399,32 +398,32 @@ export function NomorGeneratorClient() {
         if (generatedNumbers.length === 0) return;
         const textToCopy = generatedNumbers.map(result => result.text).join('\n');
         navigator.clipboard.writeText(textToCopy);
-        toast({ title: "Tersalin!", description: "Hanya nomor yang berhasil disalin." });
+        toast({ title: "Tersalin!", description: "Hanya nomor berhasil disalin." });
         setIsCopied('numbers');
         setTimeout(() => setIsCopied(null), 2000);
     };
 
-    if (loading) {
+    if (isUserLoading) {
         return (
-            <div className="flex items-center justify-center min-h-[400px]">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                <p className="ml-3 text-muted-foreground">Memuat komponen...</p>
+            <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
+                <Loader2 className="h-10 w-10 animate-spin text-accent" />
+                <p className="text-sm font-bold uppercase tracking-widest text-muted-foreground animate-pulse">Menghubungkan ke Database...</p>
             </div>
         );
     }
     
     if (!user) {
         return (
-            <Card className="text-center mt-8">
+            <Card className="text-center mt-8 border-primary/10 bg-card/50">
                 <CardHeader>
-                    <CardTitle className="font-heading">Akses Dibatasi</CardTitle>
-                    <CardDescription>Anda harus login untuk menggunakan fitur ini.</CardDescription>
+                    <CardTitle className="font-headline text-2xl font-black uppercase tracking-tighter">Akses Terbatas</CardTitle>
+                    <CardDescription>Silakan masuk untuk mendapatkan nomor dokumen unik.</CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <Button asChild>
+                    <Button asChild className="h-12 px-8 rounded-full shadow-lg shadow-primary/20">
                         <Link href="/login">
                             <LogIn className="mr-2 h-4 w-4"/>
-                            Login
+                            Masuk dengan Google
                         </Link>
                     </Button>
                 </CardContent>
@@ -433,18 +432,24 @@ export function NomorGeneratorClient() {
     }
     
     return (
-        <div className="space-y-8">
-            <Card>
-                <CardHeader>
-                    <CardTitle>Parameter Generator</CardTitle>
-                    <CardDescription>Isi permintaan nomor di bawah ini. Anda bisa menambah beberapa permintaan sekaligus.</CardDescription>
+        <div className="space-y-10 animate-in fade-in duration-700">
+            <Card className="border-primary/10 bg-card/50 shadow-sm overflow-hidden">
+                <CardHeader className="bg-muted/20 border-b">
+                    <CardTitle className="font-headline text-xl uppercase tracking-tight">Konfigurasi Permintaan</CardTitle>
+                    <CardDescription>Tentukan kategori dan periode dokumen yang ingin dibuat.</CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-6">
-                    <div className="space-y-2">
-                        <Label>Kategori Nilai Proyek</Label>
-                        <RadioGroup defaultValue="below_500m" value={valueCategory} className="flex items-center space-x-4" onValueChange={(value) => setValueCategory(value as ValueCategory)}>
-                            <div className="flex items-center space-x-2"><RadioGroupItem value="below_500m" id="below" /><Label htmlFor="below">Di bawah 500 Juta</Label></div>
-                            <div className="flex items-center space-x-2"><RadioGroupItem value="above_500m" id="above" disabled /><Label htmlFor="above" className="text-muted-foreground">500 Juta atau lebih (belum didukung)</Label></div>
+                <CardContent className="space-y-8 p-6">
+                    <div className="space-y-3">
+                        <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Kategori Nilai Proyek</Label>
+                        <RadioGroup defaultValue="below_500m" value={valueCategory} className="flex flex-wrap items-center gap-6" onValueChange={(value) => setValueCategory(value as ValueCategory)}>
+                            <div className="flex items-center space-x-2 bg-background/50 px-4 py-2 rounded-lg border">
+                                <RadioGroupItem value="below_500m" id="below" />
+                                <Label htmlFor="below" className="cursor-pointer font-bold text-sm">Di bawah 500 Juta</Label>
+                            </div>
+                            <div className="flex items-center space-x-2 opacity-40">
+                                <RadioGroupItem value="above_500m" id="above" disabled />
+                                <Label htmlFor="above" className="text-sm">500 Juta atau lebih</Label>
+                            </div>
                         </RadioGroup>
                     </div>
 
@@ -453,16 +458,15 @@ export function NomorGeneratorClient() {
                             {requests.map((req, index) => (
                                 <motion.div 
                                     key={req.id} 
-                                    className="grid grid-cols-1 md:grid-cols-[2fr_1.5fr_0.5fr_auto] gap-4 items-end p-4 border rounded-lg bg-background"
-                                    initial={{ opacity: 0, y: -20 }}
+                                    className="grid grid-cols-1 md:grid-cols-[2fr_1.5fr_0.5fr_auto] gap-4 items-end p-5 border rounded-xl bg-background shadow-inner border-primary/5"
+                                    initial={{ opacity: 0, y: -10 }}
                                     animate={{ opacity: 1, y: 0 }}
-                                    exit={{ opacity: 0, x: -20 }}
-                                    transition={{ duration: 0.3 }}
+                                    exit={{ opacity: 0, scale: 0.95 }}
                                 >
                                     <div className="space-y-2">
-                                        {index === 0 && <Label>Jenis Dokumen</Label>}
+                                        <Label className="text-[10px] font-black uppercase text-muted-foreground ml-1">Jenis Dokumen</Label>
                                         <Select onValueChange={(v) => handleDocTypeChange(req.id, v)} value={req.category && req.docType ? `${req.category}__${req.docType}` : ''}>
-                                            <SelectTrigger><SelectValue placeholder="Pilih Jenis Dokumen..." /></SelectTrigger>
+                                            <SelectTrigger className="h-11 rounded-lg border-primary/10"><SelectValue placeholder="Pilih..." /></SelectTrigger>
                                             <SelectContent>
                                                 {allDocTypes.map(typeInfo => (
                                                     <SelectItem key={typeInfo.value} value={typeInfo.value}>
@@ -473,25 +477,25 @@ export function NomorGeneratorClient() {
                                         </Select>
                                     </div>
                                     <div className="space-y-2">
-                                        {index === 0 && <Label>Tanggal Dokumen</Label>}
+                                        <Label className="text-[10px] font-black uppercase text-muted-foreground ml-1">Tanggal Dokumen</Label>
                                         <Popover>
                                             <PopoverTrigger asChild>
-                                                <Button variant={'outline'} className={cn('w-full justify-start text-left font-normal', !req.docDate && 'text-muted-foreground')}>
-                                                    <CalendarIcon className="mr-2 h-4 w-4" />
+                                                <Button variant={'outline'} className={cn('w-full h-11 justify-start text-left font-normal rounded-lg border-primary/10', !req.docDate && 'text-muted-foreground')}>
+                                                    <CalendarIcon className="mr-2 h-4 w-4 text-accent" />
                                                     {req.docDate ? format(req.docDate, 'd MMM yyyy', { locale: id }) : <span>Pilih tanggal</span>}
                                                 </Button>
                                             </PopoverTrigger>
-                                            <PopoverContent className="w-auto p-0"><Calendar mode="single" selected={req.docDate} onSelect={(d) => handleRequestChange(req.id, 'docDate', d)} initialFocus/></PopoverContent>
+                                            <PopoverContent className="w-auto p-0 border-primary/10 shadow-2xl"><Calendar mode="single" selected={req.docDate} onSelect={(d) => handleRequestChange(req.id, 'docDate', d)} initialFocus/></PopoverContent>
                                         </Popover>
                                     </div>
                                     <div className="space-y-2">
-                                         {index === 0 && <Label>Jumlah</Label>}
-                                        <Input type="number" min="1" max="20" value={req.quantity} onChange={(e) => handleRequestChange(req.id, 'quantity', Number(e.target.value))} className="w-full md:w-20"/>
+                                         <Label className="text-[10px] font-black uppercase text-muted-foreground ml-1">Jumlah</Label>
+                                        <Input type="number" min="1" max="20" value={req.quantity} onChange={(e) => handleRequestChange(req.id, 'quantity', Number(e.target.value))} className="h-11 md:w-20 rounded-lg border-primary/10 font-bold"/>
                                     </div>
-                                    <div className="flex items-center h-10">
+                                    <div className="flex items-center h-11">
                                       {requests.length > 1 && (
-                                        <Button variant="ghost" size="icon" onClick={() => removeRequest(req.id)} aria-label="Hapus Permintaan">
-                                            <Trash2 className="h-4 w-4 text-destructive" />
+                                        <Button variant="ghost" size="icon" onClick={() => removeRequest(req.id)} className="rounded-full hover:bg-destructive/10 text-destructive/40 hover:text-destructive">
+                                            <Trash2 className="h-4 w-4" />
                                         </Button>
                                       )}
                                     </div>
@@ -500,10 +504,10 @@ export function NomorGeneratorClient() {
                         </AnimatePresence>
                     </div>
 
-                    <div className="flex flex-col md:flex-row items-center gap-4">
-                        <Button variant="outline" onClick={addRequest} className="w-full md:w-auto">
+                    <div className="flex flex-col md:flex-row items-center gap-4 pt-4 border-t border-dashed">
+                        <Button variant="outline" onClick={addRequest} className="w-full md:w-auto h-11 px-6 rounded-full border-primary/20 hover:border-primary">
                             <PlusCircle className="mr-2 h-4 w-4" />
-                            Tambah Permintaan
+                            Tambah Baris
                         </Button>
                         
                         <Dialog open={isStockDialogOpen} onOpenChange={(isOpen) => {
@@ -511,50 +515,51 @@ export function NomorGeneratorClient() {
                             setIsStockDialogOpen(isOpen);
                         }}>
                              <DialogTrigger asChild>
-                                 <Button variant="secondary" className="w-full md:w-auto">
-                                     <Database className="mr-2 h-4 w-4" />
-                                     Lihat Stok
+                                 <Button variant="secondary" className="w-full md:w-auto h-11 px-6 rounded-full">
+                                     <Database className="mr-2 h-4 w-4 text-accent" />
+                                     Cek Stok Tersedia
                                  </Button>
                              </DialogTrigger>
-                             <DialogContent className="max-w-4xl">
-                                <DialogHeader>
-                                    <DialogTitle>Matriks Stok Nomor Tersedia</DialogTitle>
+                             <DialogContent className="max-w-4xl p-0 overflow-hidden border-primary/10 rounded-xl shadow-2xl">
+                                <DialogHeader className="p-6 bg-muted/20 border-b">
+                                    <DialogTitle className="font-headline text-2xl font-black uppercase tracking-tighter">Matriks Stok Nomor</DialogTitle>
                                     <DialogDescription>
-                                        Ringkasan lengkap jumlah nomor yang tersedia per kategori dan periode.
+                                        Ringkasan jumlah sisa nomor per kategori dan periode tahun 2025-2026.
                                     </DialogDescription>
                                 </DialogHeader>
                                 {isStockLoading ? (
-                                    <div className="p-4"><Skeleton className="h-[50vh] w-full" /></div>
+                                    <div className="p-12 flex flex-col items-center gap-4">
+                                        <Loader2 className="h-10 w-10 animate-spin text-accent" />
+                                        <Skeleton className="h-64 w-full rounded-lg" />
+                                    </div>
                                 ) : (
-                                <div className="rounded-lg border overflow-hidden">
+                                <div className="bg-background">
                                     <Tabs defaultValue="2025" className="w-full">
-                                        <TabsList className="grid w-full grid-cols-2 rounded-none border-b">
-                                            <TabsTrigger value="2025" className="rounded-none">Tahun 2025</TabsTrigger>
-                                            <TabsTrigger value="2026" className="rounded-none">Tahun 2026</TabsTrigger>
+                                        <TabsList className="grid w-full grid-cols-2 rounded-none border-b h-12">
+                                            <TabsTrigger value="2025" className="rounded-none data-[state=active]:bg-primary/5 data-[state=active]:text-primary font-bold">Tahun 2025</TabsTrigger>
+                                            <TabsTrigger value="2026" className="rounded-none data-[state=active]:bg-primary/5 data-[state=active]:text-primary font-bold">Tahun 2026</TabsTrigger>
                                         </TabsList>
                                         <TabsContent value="2025" className="mt-0">
                                             <div className="relative max-h-[60vh] overflow-auto">
-                                                <table className="w-full border-collapse text-sm">
-                                                    <thead className="sticky top-0 z-10 bg-secondary">
-                                                        <tr className="border-b">
-                                                            <th scope="col" className="sticky left-0 z-20 bg-inherit p-4 text-left font-medium text-muted-foreground w-[100px] min-w-[100px]">Kategori</th>
+                                                <table className="w-full border-collapse text-[11px] font-bold">
+                                                    <thead className="sticky top-0 z-10 bg-muted/80 backdrop-blur-sm border-b">
+                                                        <tr>
+                                                            <th className="sticky left-0 z-20 bg-muted p-4 text-left font-black uppercase tracking-widest w-[100px]">Kategori</th>
                                                             {stockPeriods2025.map(period => (
-                                                                <th scope="col" key={period} className="p-4 text-center font-medium text-muted-foreground min-w-[70px]">
-                                                                    {format(new Date(period), 'MMM', { locale: id })}
-                                                                </th>
+                                                                <th key={period} className="p-4 text-center">{format(new Date(period), 'MMM', { locale: id }).toUpperCase()}</th>
                                                             ))}
                                                         </tr>
                                                     </thead>
-                                                    <tbody className="bg-background">
+                                                    <tbody className="divide-y divide-primary/5">
                                                         {stockCategories.map(category => (
-                                                            <tr key={category} className="border-b transition-colors last:border-0 hover:bg-muted/50">
-                                                                <th scope="row" className="sticky left-0 bg-inherit p-4 text-left font-semibold">{category}</th>
+                                                            <tr key={category} className="hover:bg-primary/[0.02] transition-colors">
+                                                                <th className="sticky left-0 bg-background p-4 text-left font-black text-primary/60 border-r">{category}</th>
                                                                 {stockPeriods2025.map(period => (
                                                                     <td key={`${category}-${period}`} className={cn(
-                                                                        "p-4 text-center font-mono",
-                                                                        stockMatrix[category]?.[period] === 0 && "text-muted-foreground/50",
-                                                                        stockMatrix[category]?.[period] > 0 && stockMatrix[category]?.[period] <= 5 && "text-destructive font-bold",
-                                                                        stockMatrix[category]?.[period] > 5 && "text-primary font-semibold"
+                                                                        "p-4 text-center font-mono text-xs",
+                                                                        stockMatrix[category]?.[period] === 0 && "text-muted-foreground/30 font-normal",
+                                                                        stockMatrix[category]?.[period] > 0 && stockMatrix[category]?.[period] <= 5 && "text-destructive font-black bg-destructive/5",
+                                                                        stockMatrix[category]?.[period] > 5 && "text-accent"
                                                                     )}>
                                                                         {stockMatrix[category]?.[period] ?? 0}
                                                                     </td>
@@ -565,29 +570,28 @@ export function NomorGeneratorClient() {
                                                 </table>
                                             </div>
                                         </TabsContent>
+                                        {/* Tahun 2026 Table follows same style */}
                                         <TabsContent value="2026" className="mt-0">
                                             <div className="relative max-h-[60vh] overflow-auto">
-                                                <table className="w-full border-collapse text-sm">
-                                                    <thead className="sticky top-0 z-10 bg-secondary">
-                                                        <tr className="border-b">
-                                                            <th scope="col" className="sticky left-0 z-20 bg-inherit p-4 text-left font-medium text-muted-foreground w-[100px] min-w-[100px]">Kategori</th>
+                                                <table className="w-full border-collapse text-[11px] font-bold">
+                                                    <thead className="sticky top-0 z-10 bg-muted/80 backdrop-blur-sm border-b">
+                                                        <tr>
+                                                            <th className="sticky left-0 z-20 bg-muted p-4 text-left font-black uppercase tracking-widest w-[100px]">Kategori</th>
                                                             {stockPeriods2026.map(period => (
-                                                                <th scope="col" key={period} className="p-4 text-center font-medium text-muted-foreground min-w-[70px]">
-                                                                    {format(new Date(period), 'MMM', { locale: id })}
-                                                                </th>
+                                                                <th key={period} className="p-4 text-center">{format(new Date(period), 'MMM', { locale: id }).toUpperCase()}</th>
                                                             ))}
                                                         </tr>
                                                     </thead>
-                                                    <tbody className="bg-background">
+                                                    <tbody className="divide-y divide-primary/5">
                                                         {stockCategories.map(category => (
-                                                            <tr key={category} className="border-b transition-colors last:border-0 hover:bg-muted/50">
-                                                                <th scope="row" className="sticky left-0 bg-inherit p-4 text-left font-semibold">{category}</th>
+                                                            <tr key={category} className="hover:bg-primary/[0.02] transition-colors">
+                                                                <th className="sticky left-0 bg-background p-4 text-left font-black text-primary/60 border-r">{category}</th>
                                                                 {stockPeriods2026.map(period => (
                                                                     <td key={`${category}-${period}`} className={cn(
-                                                                        "p-4 text-center font-mono",
-                                                                        stockMatrix[category]?.[period] === 0 && "text-muted-foreground/50",
-                                                                        stockMatrix[category]?.[period] > 0 && stockMatrix[category]?.[period] <= 5 && "text-destructive font-bold",
-                                                                        stockMatrix[category]?.[period] > 5 && "text-primary font-semibold"
+                                                                        "p-4 text-center font-mono text-xs",
+                                                                        stockMatrix[category]?.[period] === 0 && "text-muted-foreground/30 font-normal",
+                                                                        stockMatrix[category]?.[period] > 0 && stockMatrix[category]?.[period] <= 5 && "text-destructive font-black bg-destructive/5",
+                                                                        stockMatrix[category]?.[period] > 5 && "text-accent"
                                                                     )}>
                                                                         {stockMatrix[category]?.[period] ?? 0}
                                                                     </td>
@@ -605,21 +609,21 @@ export function NomorGeneratorClient() {
                         </Dialog>
 
                         <div className="flex-1">
-                            <Button onClick={handleGenerate} disabled={isGenerating || userLimit.isLimited} className="w-full">
+                            <Button onClick={handleGenerate} disabled={isGenerating || userLimit.isLimited} className="w-full h-11 rounded-full shadow-lg shadow-accent/20 bg-primary hover:bg-primary/90 font-bold uppercase tracking-widest">
                                 {isGenerating && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                                {isGenerating ? 'Memproses...' : `Generate Semua Permintaan (${requests.reduce((a,b) => a+b.quantity, 0)})`}
+                                {isGenerating ? 'Memproses...' : `Generate Semua (${requests.reduce((a,b) => a+b.quantity, 0)})`}
                             </Button>
                             {!isAdmin && (
-                                <p className="mt-2 text-xs text-center text-muted-foreground">
-                                    {isLimitLoading ? 'Memeriksa kuota...' : `Kuota harian: ${userLimit.count}/${DAILY_LIMIT}`}
+                                <p className="mt-2 text-[10px] text-center font-black uppercase tracking-tighter text-muted-foreground/60">
+                                    {isLimitLoading ? 'Memeriksa kuota...' : `Sisa kuota hari ini: ${DAILY_LIMIT - userLimit.count}/${DAILY_LIMIT}`}
                                 </p>
                             )}
                         </div>
                     </div>
                     
                     {!isAdmin && userLimit.isLimited && (
-                        <div className="mt-4 flex items-center gap-3 rounded-lg border border-destructive bg-destructive/10 p-3 text-sm text-destructive-foreground">
-                            <Info className="h-5 w-5 flex-shrink-0" />
+                        <div className="mt-4 flex items-center gap-3 rounded-lg border border-destructive/20 bg-destructive/5 p-4 text-sm text-destructive font-medium">
+                            <AlertTriangle className="h-5 w-5 flex-shrink-0" />
                             <p>Anda telah mencapai batas generate harian. Silakan kembali lagi besok.</p>
                         </div>
                     )}
@@ -629,68 +633,56 @@ export function NomorGeneratorClient() {
             <AnimatePresence>
                 {(generatedNumbers.length > 0) && (
                     <motion.div
-                        initial={{ opacity: 0, y: 10 }}
+                        initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                     >
-                        <Card>
-                             <CardHeader>
-                                <CardTitle className="flex items-center gap-2">
-                                    <CheckCircle className="h-6 w-6 text-green-500"/>
-                                    <span>Hasil Generate</span>
-                                </CardTitle>
-                             </CardHeader>
-                             <CardContent className="space-y-6">
-                                <div className="space-y-2">
-                                    <div className="flex flex-wrap justify-between items-center gap-4">
-                                        <Label className="text-base font-semibold text-foreground">
-                                            Nomor yang Berhasil Dibuat:
-                                        </Label>
-                                        <div className="flex flex-wrap gap-2">
-                                            <Button variant="outline" size="sm" onClick={copyFullResults}>
-                                                {isCopied === 'full' ? <Check className="mr-2 h-4 w-4 text-green-500" /> : <Copy className="mr-2 h-4 w-4" />}
-                                                {isCopied === 'full' ? 'Tersalin!' : 'Salin (Lengkap)'}
-                                            </Button>
-                                            <Button variant="outline" size="sm" onClick={copyNumbersOnly}>
-                                                {isCopied === 'numbers' ? <Check className="mr-2 h-4 w-4 text-green-500" /> : <Copy className="mr-2 h-4 w-4" />}
-                                                {isCopied === 'numbers' ? 'Tersalin!' : 'Salin (Nomor Saja)'}
-                                            </Button>
-                                            <Button variant="secondary" size="sm" onClick={handleReset}>
-                                                <RotateCcw className="mr-2 h-4 w-4" />
-                                                Buat Baru
-                                            </Button>
-                                        </div>
+                        <Card className="border-accent/20 bg-accent/5 shadow-xl ring-1 ring-accent/5 overflow-hidden">
+                             <CardHeader className="bg-accent/10 border-b border-accent/10">
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-3">
+                                        <div className="p-2 bg-accent rounded-full"><CheckCircle className="h-5 w-5 text-white"/></div>
+                                        <CardTitle className="font-headline text-2xl font-black uppercase tracking-tighter">Hasil Generate</CardTitle>
                                     </div>
-                                    <ol className="mt-2 space-y-1.5 list-decimal list-inside font-mono rounded-lg border bg-muted/50 p-4">
+                                    <div className="flex gap-2">
+                                        <Button variant="outline" size="sm" onClick={copyFullResults} className="rounded-full bg-background/50 h-8 text-[10px] font-bold">
+                                            {isCopied === 'full' ? <Check className="mr-2 h-3 w-3 text-emerald-500" /> : <Copy className="mr-2 h-3 w-3" />}
+                                            SALIN SEMUA
+                                        </Button>
+                                        <Button variant="secondary" size="sm" onClick={handleReset} className="rounded-full h-8 text-[10px] font-bold">
+                                            <RotateCcw className="mr-2 h-3 w-3" />
+                                            ULANGI
+                                        </Button>
+                                    </div>
+                                </div>
+                             </CardHeader>
+                             <CardContent className="p-6 space-y-8">
+                                <div className="space-y-3">
+                                    <ol className="space-y-2">
                                         {generatedNumbers.map((result, index) => (
-                                            <li key={index} className="text-sm">
-                                                <span className="font-sans font-semibold text-primary">{result.docType}</span>
-                                                <span className="font-sans text-foreground"> {result.text}</span> 
-                                                <span className="font-sans text-muted-foreground"> Tanggal {format(result.date, 'd MMMM yyyy', { locale: id })}</span>
+                                            <li key={index} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-background/80 backdrop-blur-sm rounded-xl border border-accent/10 shadow-sm group">
+                                                <div className="flex flex-col">
+                                                    <span className="text-[10px] font-black uppercase tracking-widest text-accent mb-1">{result.docType}</span>
+                                                    <span className="font-mono text-lg font-bold tracking-tight text-primary">{result.text}</span>
+                                                </div>
+                                                <div className="mt-2 sm:mt-0 text-[10px] font-bold text-muted-foreground uppercase opacity-60">
+                                                    {format(result.date, 'd MMMM yyyy', { locale: id })}
+                                                </div>
                                             </li>
                                         ))}
                                     </ol>
                                 </div>
                                 
                                 {remainingCounts.length > 0 && (
-                                     <div className="space-y-2">
-                                        <Label className="text-base font-semibold text-foreground">
-                                            Sisa Nomor Tersedia:
-                                        </Label>
-                                        <div className="space-y-3">
+                                     <div className="space-y-4 pt-6 border-t border-accent/10">
+                                        <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Update Sisa Stok</Label>
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                             {remainingCounts.map((item, index) => (
-                                                <div key={index} className="rounded-lg border p-3">
-                                                    <div className="flex justify-between items-center">
-                                                        <span className="text-sm font-medium">{item.label}</span>
-                                                        <span className={cn("font-mono font-semibold", item.count <= 3 ? 'text-destructive' : 'text-primary')}>{item.count}</span>
+                                                <div key={index} className="flex justify-between items-center px-4 py-2 rounded-lg bg-background/40 border border-primary/5">
+                                                    <span className="text-[10px] font-bold text-primary/60">{item.label}</span>
+                                                    <div className="flex items-center gap-2">
+                                                        <span className={cn("font-mono text-sm font-black", item.count <= 3 ? 'text-destructive' : 'text-primary')}>{item.count}</span>
+                                                        {item.count <= 3 && <AlertTriangle className="h-3 w-3 text-destructive animate-pulse" />}
                                                     </div>
-                                                    {item.count <= 3 && (
-                                                        <div className="mt-2 flex items-start gap-2 rounded-md border-l-4 border-destructive bg-destructive/10 p-2 text-xs">
-                                                            <AlertTriangle className="h-4 w-4 text-destructive flex-shrink-0 mt-0.5" />
-                                                            <div>
-                                                                Stok menipis! Mohon segera laporkan ke pemilik situs melalui <a href="https://t.me/si_lula" target="_blank" className="font-bold underline hover:text-destructive">Telegram</a> atau halaman <a href="/kontak" target="_blank" className="font-bold underline hover:text-destructive">kontak</a>.
-                                                            </div>
-                                                        </div>
-                                                    )}
                                                 </div>
                                             ))}
                                         </div>
@@ -704,6 +696,3 @@ export function NomorGeneratorClient() {
         </div>
     );
 }
-
-
-    

@@ -11,7 +11,7 @@ service cloud.firestore {
 
     // --- COLLECTION RULES ---
 
-    // Aturan Publik (Baca Saja)
+    // Public Rules (Read Only)
     match /blogPosts_published/{blogPostId} {
       allow get, list: if true;
       allow create, update, delete: if false;
@@ -22,25 +22,13 @@ service cloud.firestore {
       allow create, update, delete: if false;
     }
 
-    match /authors/{authorId} {
-      allow get, list: if true;
-      allow create, update, delete: if false;
-    }
-
-    match /tags/{tagId} {
-      allow get, list: if true;
-      allow create, update, delete: if false;
-    }
-
-    match /media_library/{mediaId} {
-      allow get, list: if true;
-      allow create, update, delete: if false;
-    }
-
-    // Aturan untuk Tool Internal (Contoh: Number Generator)
+    // Unique Number Generator Rules
     match /availableNumbers/{numberId} {
+      // Allow reading stock availability for logged in users
       allow get, list: if isSignedIn();
-      allow update: if isSignedIn();
+      // Only allow updating the isUsed status, not deleting or creating
+      allow update: if isSignedIn() 
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['isUsed', 'assignedTo', 'assignedDate']);
     }
 
     match /userGenerationLimits/{userId} {
