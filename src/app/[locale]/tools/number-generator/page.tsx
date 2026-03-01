@@ -1,37 +1,56 @@
 
 import { Metadata } from 'next';
 import { NomorGeneratorClient } from './components/NomorGeneratorClient';
-import { BackToTop } from '@/components/back-to-top';
+import { BackToTop } from '@/components/layout/back-to-top';
+import { getDictionary } from '@/lib/get-dictionary';
+import { Locale } from '@/i18n-config';
 
-export const metadata: Metadata = {
-  title: 'Unique Number Generator',
-  description: 'A tool to generate unique, centralized, and duplication-proof document numbers, powered by Firebase Firestore.',
-  alternates: {
-    canonical: '/kit/nomor-generator',
-  },
-  robots: {
-    index: false,
-    follow: false,
-  }
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: Locale }>
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const dictionary = await getDictionary(locale);
+  const pageContent = dictionary.tools.tool_list.number_generator;
 
-export default function NomorGeneratorPage() {
-  return (
-    <>
-      <div className="container max-w-screen-lg">
-        <main className="min-w-0 max-w-screen-lg mx-auto">
-            <div className="space-y-4 mb-8">
-              <h1 className="font-heading font-bold tracking-tight text-fluid-h1">
-                Unique Number Generator
-              </h1>
-              <p className="text-fluid-p text-muted-foreground">
-                Generate guaranteed unique document numbers in real-time.
-              </p>
-            </div>
+  return {
+    title: pageContent.title,
+    description: pageContent.description,
+    alternates: {
+      canonical: '/tools/number-generator',
+    },
+    robots: {
+      index: false,
+      follow: false,
+    }
+  };
+}
+
+export default async function NomorGeneratorPage({
+    params,
+  }: {
+    params: Promise<{ locale: Locale }>
+  }) {
+    const { locale } = await params;
+    const dictionary = await getDictionary(locale);
+    const pageContent = dictionary.tools.tool_list.number_generator;
+
+    return (
+      <div className="w-full">
+        <main className="mx-auto max-w-4xl px-4 pt-10 pb-16 sm:px-6">
+            <header className="mb-12 text-center">
+                <h1 className="font-headline text-5xl font-extrabold tracking-tighter text-primary md:text-6xl mb-3">
+                    {pageContent.title}
+                </h1>
+                <p className="mx-auto max-w-2xl text-muted-foreground text-lg italic">
+                    {pageContent.description}
+                </p>
+            </header>
+            
             <NomorGeneratorClient />
         </main>
+        <BackToTop dictionary={dictionary} />
       </div>
-      <BackToTop variant="floating" />
-    </>
-  );
+    );
 }

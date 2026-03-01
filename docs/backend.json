@@ -34,6 +34,34 @@
         "published": { "type": "boolean" }
       },
       "required": ["id", "title", "contentMdx", "date"]
+    },
+    "AvailableNumber": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "AvailableNumber",
+      "type": "object",
+      "description": "A pre-generated unique document number available for assignment.",
+      "properties": {
+        "fullNumber": { "type": "string" },
+        "category": { "type": "string" },
+        "year": { "type": "number" },
+        "month": { "type": "number" },
+        "valueCategory": { "type": "string", "enum": ["below_500m", "above_500m"] },
+        "isUsed": { "type": "boolean" },
+        "assignedTo": { "type": "string", "format": "email" },
+        "assignedDate": { "type": "string", "format": "date-time" }
+      },
+      "required": ["fullNumber", "category", "year", "month", "isUsed"]
+    },
+    "UserGenerationLimit": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "UserGenerationLimit",
+      "type": "object",
+      "description": "Tracks daily generation usage for a user.",
+      "properties": {
+        "dailyCount": { "type": "number" },
+        "lastGeneratedDate": { "type": "string", "format": "date" }
+      },
+      "required": ["dailyCount", "lastGeneratedDate"]
     }
   },
   "auth": {
@@ -43,15 +71,19 @@
     "structure": [
       {
         "path": "/blogPosts_published/{blogPostId}",
-        "definition": {
-          "entityName": "BlogPost"
-        }
+        "definition": { "entityName": "BlogPost" }
       },
       {
         "path": "/notes_published/{noteId}",
-        "definition": {
-          "entityName": "QuickNote"
-        }
+        "definition": { "entityName": "QuickNote" }
+      },
+      {
+        "path": "/availableNumbers/{numberId}",
+        "definition": { "entityName": "AvailableNumber" }
+      },
+      {
+        "path": "/userGenerationLimits/{userId}",
+        "definition": { "entityName": "UserGenerationLimit" }
       }
     ]
   }

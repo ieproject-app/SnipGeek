@@ -58,6 +58,10 @@ export default async function ToolsPage({ params }: { params: Promise<{ locale: 
     {
       id: 'number_generator',
       icon: <Hash className="h-8 w-8" />,
+      isLink: true,
+      href: `${linkPrefix}/tools/number-generator`,
+      badge: pageContent.open_tool,
+      badgeVariant: 'secondary' as const,
     },
   ];
 
@@ -67,16 +71,16 @@ export default async function ToolsPage({ params }: { params: Promise<{ locale: 
       const badgeVariant = tool.badgeVariant || 'outline';
 
       return (
-        <Card key={tool.id} className="flex h-full flex-col bg-card/50 transition-colors hover:border-primary">
+        <Card key={tool.id} className="flex h-full flex-col bg-card/50 transition-colors hover:border-primary shadow-sm">
             <CardHeader className="flex-row items-start justify-between gap-4 space-y-0 pb-4">
                 <div className="space-y-1.5">
-                <CardTitle className="text-lg tracking-tight text-primary">{toolContent.title}</CardTitle>
+                <CardTitle className="text-lg tracking-tight text-primary font-headline font-bold">{toolContent.title}</CardTitle>
                 <Badge variant={badgeVariant}>{badgeText}</Badge>
                 </div>
-                {React.cloneElement(tool.icon, { className: "h-8 w-8 text-muted-foreground" })}
+                {React.cloneElement(tool.icon, { className: "h-8 w-8 text-muted-foreground opacity-20" })}
             </CardHeader>
             <CardContent className="flex-1">
-                <p className="text-sm text-muted-foreground">{toolContent.description}</p>
+                <p className="text-sm text-muted-foreground leading-relaxed">{toolContent.description}</p>
             </CardContent>
         </Card>
       );
@@ -89,13 +93,13 @@ export default async function ToolsPage({ params }: { params: Promise<{ locale: 
             <h1 className="font-headline text-5xl font-extrabold tracking-tighter text-primary md:text-6xl mb-3">
                 {pageContent.title}
             </h1>
-            <p className="mx-auto max-w-2xl text-muted-foreground">{pageContent.description}</p>
+            <p className="mx-auto max-w-2xl text-muted-foreground italic text-lg">{pageContent.description}</p>
         </header>
         
         {/* Public Tools Section */}
         <section className="mb-16">
           <div className="flex items-center gap-4 mb-8">
-             <h2 className="text-2xl font-bold font-headline text-primary shrink-0">{pageContent.public_section}</h2>
+             <h2 className="text-2xl font-bold font-headline text-primary shrink-0 uppercase tracking-tight">{pageContent.public_section}</h2>
              <div className="h-px bg-border flex-1" />
           </div>
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -106,7 +110,7 @@ export default async function ToolsPage({ params }: { params: Promise<{ locale: 
         {/* Internal Tools Section */}
         <section>
           <div className="flex items-center gap-4 mb-8">
-             <h2 className="text-2xl font-bold font-headline text-primary shrink-0">{pageContent.internal_section}</h2>
+             <h2 className="text-2xl font-bold font-headline text-primary shrink-0 uppercase tracking-tight">{pageContent.internal_section}</h2>
              <div className="h-px bg-border flex-1" />
           </div>
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
