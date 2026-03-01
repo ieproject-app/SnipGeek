@@ -36,7 +36,7 @@ const getCategoryColors = (category: string) => {
 
 /**
  * FeaturedPosts - A sophisticated 4-column staggered gallery grid.
- * Features: Image/Caption split, deterministic HSL coloring, and serif titles.
+ * Refined with Roboto font and smaller, non-truncated titles.
  */
 export function FeaturedPosts({ posts, dictionary, locale, linkPrefix }: FeaturedPostsProps) {
   if (posts.length === 0) return null;
@@ -132,10 +132,7 @@ export function FeaturedPosts({ posts, dictionary, locale, linkPrefix }: Feature
 
                         {/* Caption Block */}
                         <div className="px-1 space-y-3">
-                            <h3 
-                                className="text-xl font-bold leading-snug line-clamp-2 text-primary group-hover:text-accent transition-colors duration-300"
-                                style={{ fontFamily: 'Georgia, serif' }}
-                            >
+                            <h3 className="font-headline text-lg font-bold leading-snug text-primary group-hover:text-accent transition-colors duration-300">
                                 {post.frontmatter.title}
                             </h3>
 
