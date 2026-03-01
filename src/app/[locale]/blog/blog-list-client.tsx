@@ -2,46 +2,17 @@
 'use client';
 
 import React, { useMemo } from 'react';
-import { useFirestore, useCollection, useMemoFirebase } from '@/firebase';
-import { collection, query, where, orderBy } from 'firebase/firestore';
 import Link from 'next/link';
 import Image from 'next/image';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { AddToReadingListButton } from '@/components/layout/add-to-reading-list-button';
 
 export function BlogListClient({ initialPosts, dictionary, locale }: { initialPosts: any[], dictionary: any, locale: string }) {
-  const db = useFirestore();
   const linkPrefix = locale === 'en' ? '' : `/${locale}`;
 
-  const postsQuery = useMemoFirebase(() => 
-    query(
-        collection(db, 'blogPosts_published'),
-        where('locale', '==', locale)
-    ), [db, locale]);
-  
-  const { data: firestorePosts } = useCollection(postsQuery);
-
   const allPosts = useMemo(() => {
-    const merged = [...initialPosts];
-    if (firestorePosts) {
-        firestorePosts.forEach(fp => {
-            if (!merged.find(p => p.slug === fp.slug)) {
-                merged.push({
-                    slug: fp.slug,
-                    frontmatter: {
-                        ...fp,
-                        heroImage: fp.heroImageUrl || 'footer-about',
-                        imageAlt: fp.heroImageAltText,
-                        date: fp.publishDate,
-                        updated: fp.updatedDate,
-                        published: true
-                    }
-                });
-            }
-        });
-    }
-    return merged.sort((a, b) => new Date(b.frontmatter.date).getTime() - new Date(a.frontmatter.date).getTime());
-  }, [initialPosts, firestorePosts]);
+    return [...initialPosts].sort((a, b) => new Date(b.frontmatter.date).getTime() - new Date(a.frontmatter.date).getTime());
+  }, [initialPosts]);
 
   return (
     <div className="w-full">
