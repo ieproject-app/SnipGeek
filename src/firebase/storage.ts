@@ -8,7 +8,7 @@ import {
   getDownloadURL, 
   deleteObject 
 } from 'firebase/storage';
-import { getFirebaseApp } from '@/firebase';
+import { initializeFirebase } from '@/firebase';
 
 /**
  * Uploads a file to Firebase Storage and returns the download URL.
@@ -16,7 +16,8 @@ import { getFirebaseApp } from '@/firebase';
  * @param path The path in storage (e.g., 'articles/hero.jpg').
  */
 export async function uploadFile(file: File, path: string): Promise<string> {
-  const storage = getStorage(getFirebaseApp());
+  const { firebaseApp } = initializeFirebase();
+  const storage = getStorage(firebaseApp);
   const storageRef = ref(storage, path);
   
   const uploadTask = uploadBytesResumable(storageRef, file);
@@ -38,7 +39,8 @@ export async function uploadFile(file: File, path: string): Promise<string> {
  * Deletes a file from Firebase Storage.
  */
 export async function deleteFile(path: string): Promise<void> {
-  const storage = getStorage(getFirebaseApp());
+  const { firebaseApp } = initializeFirebase();
+  const storage = getStorage(firebaseApp);
   const storageRef = ref(storage, path);
   try {
     await deleteObject(storageRef);
