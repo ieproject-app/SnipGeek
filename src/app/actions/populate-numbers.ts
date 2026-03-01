@@ -1,21 +1,16 @@
-
 'use client';
 
 import { 
     collection, 
     doc, 
-    writeBatch, 
-    getDocs, 
-    query, 
-    limit as firestoreLimit 
+    writeBatch,
+    Firestore
 } from 'firebase/firestore';
-import { initializeFirebase } from '@/firebase';
 
 const ADMIN_EMAIL = 'iwan.efndi@gmail.com';
 const REGION_CODE = 'TA-760103';
 
 const tasks = [
-  // Data target 2025 & 2026 dari skrip lama Mas
   { category: 'HK.800', year: 2026, month: 2, start: 100, end: 199 },
   { category: 'HK.800', year: 2026, month: 1, start: 2322, end: 2421 },
   { category: 'HK.820', year: 2026, month: 1, start: 12782, end: 12881 },
@@ -37,41 +32,38 @@ const tasks = [
 ];
 
 /**
- * Client-side action to populate Firestore numbers using batches.
- * Sesuai dengan format di screenshot Mas.
+ * Fungsi untuk menyuntikkan ribuan data ke Firestore.
+ * Menggunakan batch write untuk efisiensi.
  */
-export async function populateDatabaseAction(userEmail: string | null) {
+export async function populateDatabaseAction(db: Firestore, userEmail: string | null) {
     if (userEmail !== ADMIN_EMAIL) {
         throw new Error("Unauthorized: Hanya Iwan Efendi yang bisa mempopulasi database.");
     }
 
-    const { firestore } = initializeFirebase();
-    const colRef = collection(firestore, 'availableNumbers');
-    
     let totalCreated = 0;
 
     for (const task of tasks) {
         const { category, year, month, start, end } = task;
         
-        let batch = writeBatch(firestore);
+        let batch = writeBatch(db);
         let batchCount = 0;
 
         for (let i = start; i <= end; i++) {
             const sequence = String(i).padStart(5, '0');
             const dateString = `${String(month).padStart(2, '0')}-${year}`;
             
-            // Format fullNumber sesuai screenshot (dengan placeholder {DOCTYPE})
+            // Format nomor sesuai screenshot proyek lama Mas
             const fullNumber = `{DOCTYPE} ${sequence}/${category}/${REGION_CODE}/${dateString}`;
             
-            // Buat ID dokumen yang konsisten agar tidak ada duplikat jika tombol ditekan 2x
+            // Gunakan ID yang unik dan deskriptif agar tidak ada data ganda
             const docId = `${category}-${year}-${month}-below_500m-${sequence}`;
-            const docRef = doc(firestore, 'availableNumbers', docId);
+            const docRef = doc(db, 'availableNumbers', docId);
 
             batch.set(docRef, {
                 fullNumber,
                 category,
-                year, // Number type
-                month, // Number type
+                year,
+                month,
                 valueCategory: 'below_500m',
                 isUsed: false,
                 assignedTo: "",
@@ -81,10 +73,10 @@ export async function populateDatabaseAction(userEmail: string | null) {
             batchCount++;
             totalCreated++;
 
-            // Commit batch setiap 450 dokumen (Limit Firestore 500)
+            // Commit setiap 450 dokumen agar aman dari limit 500 Firestore
             if (batchCount === 450) {
                 await batch.commit();
-                batch = writeBatch(firestore);
+                batch = writeBatch(db);
                 batchCount = 0;
             }
         }
