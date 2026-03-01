@@ -144,7 +144,9 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
       {/* Latest Posts Section */}
       {latestPosts.length > 0 && (
         <section className="container max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-12 sm:pb-16">
-          <h2 className="text-3xl font-bold font-headline tracking-tighter text-primary mb-12 text-center">{dictionary.home.latestPosts}</h2>
+          <h2 className="text-5xl font-bold font-headline tracking-tighter text-primary mb-12 text-center">
+            {dictionary.home.latestPosts}
+          </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12 mb-16">
             {latestPosts.map((post) => renderLatestCard(post))}
           </div>
