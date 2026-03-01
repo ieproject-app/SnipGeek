@@ -69,13 +69,14 @@ export function TopicSection({
                 href={`${linkPrefix}/blog/${post.slug}`} 
                 className="flex items-start gap-4 flex-1 min-w-0"
             >
-                <div className="relative w-[100px] h-[100px] shrink-0 overflow-hidden rounded-lg shadow-sm border border-primary/5">
+                {/* Image Container - Updated to 4:3 (120x90) */}
+                <div className="relative w-[120px] h-[90px] shrink-0 overflow-hidden rounded-lg shadow-sm border border-primary/5">
                     <Image
                         src={heroImageSrc}
                         alt={post.frontmatter.imageAlt || post.frontmatter.title}
                         fill
                         className="object-cover transition-transform duration-500 group-hover:scale-110"
-                        sizes="100px"
+                        sizes="120px"
                     />
                 </div>
                 <div className="flex-1 min-w-0 py-1">

@@ -38,6 +38,10 @@ To get started, take a look at src/app/page.tsx.
 - **Aspect Ratio**: 4:3.
 - **Layout**: Carousel with 3 visible items on desktop.
 
+#### Topic Section & Software Updates
+- **Aspect Ratio**: 4:3 (Horizontal List).
+- **Dimensions**: 120px x 90px image blocks.
+
 #### Post Page (Content)
 - **Max Width**: 768px (`max-w-3xl`) for optimal readability.
 - **Font**: Body (Arimo), Headings (Roboto).
