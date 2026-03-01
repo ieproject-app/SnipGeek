@@ -10,7 +10,7 @@ import Link from 'next/link';
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
-  const dictionary = await getDictionary(locale);
+  const dictionary = await getDictionary(locale as any);
   return {
     title: dictionary.tools.title,
     description: dictionary.tools.description,
@@ -23,7 +23,7 @@ export async function generateStaticParams() {
 
 export default async function ToolsPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
-  const dictionary = await getDictionary(locale);
+  const dictionary = await getDictionary(locale as any);
   const pageContent = dictionary.tools;
   const linkPrefix = locale === i18n.defaultLocale ? '' : `/${locale}`;
 
@@ -96,7 +96,6 @@ export default async function ToolsPage({ params }: { params: Promise<{ locale: 
             <p className="mx-auto max-w-2xl text-muted-foreground italic text-lg">{pageContent.description}</p>
         </header>
         
-        {/* Public Tools Section */}
         <section className="mb-16">
           <div className="flex items-center gap-4 mb-8">
              <h2 className="text-2xl font-bold font-headline text-primary shrink-0 uppercase tracking-tight">{pageContent.public_section}</h2>
@@ -107,7 +106,6 @@ export default async function ToolsPage({ params }: { params: Promise<{ locale: 
           </div>
         </section>
 
-        {/* Internal Tools Section */}
         <section>
           <div className="flex items-center gap-4 mb-8">
              <h2 className="text-2xl font-bold font-headline text-primary shrink-0 uppercase tracking-tight">{pageContent.internal_section}</h2>

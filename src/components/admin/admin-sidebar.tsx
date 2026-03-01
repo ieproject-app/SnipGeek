@@ -5,10 +5,8 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { 
-  LayoutDashboard, 
   FileText, 
   StickyNote, 
-  Settings, 
   LogOut, 
   ExternalLink,
   ImageIcon
@@ -22,11 +20,9 @@ export function AdminSidebar() {
   const auth = getAuth();
 
   const menuItems = [
-    { name: 'Dashboard', href: '/admin/dashboard', icon: LayoutDashboard },
     { name: 'Blog Posts', href: '/admin/posts', icon: FileText },
     { name: 'Quick Notes', href: '/admin/notes', icon: StickyNote },
     { name: 'Media Library', href: '/admin/media', icon: ImageIcon },
-    { name: 'Settings', href: '/admin/settings', icon: Settings },
   ];
 
   const handleLogout = async () => {
@@ -36,9 +32,8 @@ export function AdminSidebar() {
 
   return (
     <aside className="w-64 border-r bg-card flex flex-col h-screen sticky top-0">
-      {/* Sidebar Header */}
       <div className="p-6 border-b">
-        <Link href="/admin/dashboard" className="flex items-center gap-3">
+        <Link href="/admin/posts" className="flex items-center gap-3">
           <SnipGeekLogo className="h-8 w-8" />
           <div className="font-headline text-xl font-black tracking-tighter">
             Control<span className="text-accent">Panel</span>
@@ -46,7 +41,6 @@ export function AdminSidebar() {
         </Link>
       </div>
 
-      {/* Navigation */}
       <nav className="flex-1 p-4 space-y-1">
         {menuItems.map((item) => {
           const isActive = pathname.includes(item.href);
@@ -68,7 +62,6 @@ export function AdminSidebar() {
         })}
       </nav>
 
-      {/* Footer Actions */}
       <div className="p-4 border-t space-y-2">
         <Button 
             asChild 
