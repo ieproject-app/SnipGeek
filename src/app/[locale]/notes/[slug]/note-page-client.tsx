@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useMemo } from 'react';
@@ -17,7 +16,7 @@ import { notFound } from 'next/navigation';
 import remarkGfm from 'remark-gfm';
 import rehypeShiki from '@shikijs/rehype';
 
-export function NotePageClient({ initialNote, slug, locale, dictionary }: { initialNote: any, slug: string, locale: string, dictionary: any }) {
+export function NotePageClient({ initialNote, slug, locale, dictionary, initialRelatedContent }: { initialNote: any, slug: string, locale: string, dictionary: any, initialRelatedContent: any[] }) {
   const db = useFirestore();
   const linkPrefix = locale === 'en' ? '' : `/${locale}`;
 
@@ -108,7 +107,14 @@ export function NotePageClient({ initialNote, slug, locale, dictionary }: { init
             <PostComments article={{ slug: note.slug, title: note.frontmatter.title }} type="note" locale={locale} />
         </article>
       </main>
-      <RelatedPosts type="note" locale={locale} currentSlug={note.slug} currentTags={note.frontmatter.tags} />
+      <RelatedPosts 
+        type="note" 
+        locale={locale} 
+        currentSlug={note.slug} 
+        currentTags={note.frontmatter.tags} 
+        initialRelatedContent={initialRelatedContent}
+        dictionary={dictionary}
+      />
     </div>
   );
 }
