@@ -1,95 +1,76 @@
+
 {
   "entities": {
-    "BlogPost": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "BlogPost",
+    "AvailableNumber": {
+      "title": "AvailableNumber",
+      "description": "Represents a single sequential document number available for generation.",
       "type": "object",
-      "description": "Represents a single blog post on the SnipBlog website, with its content sourced from local MDX files.",
       "properties": {
-        "id": {
+        "fullNumber": {
           "type": "string",
-          "description": "Unique identifier for the BlogPost entity."
+          "description": "The formatted document number with placeholders (e.g., {DOCTYPE} 13919/HK.800/TA-760103/12-2025)."
         },
-        "slug": {
+        "category": {
           "type": "string",
-          "description": "A unique, URL-friendly identifier (slug) for the blog post, used as part of its URL path."
+          "description": "The document classification code (e.g., HK.800)."
         },
-        "title": {
+        "year": {
+          "type": "number",
+          "description": "The year of validity."
+        },
+        "month": {
+          "type": "number",
+          "description": "The month of validity."
+        },
+        "valueCategory": {
           "type": "string",
-          "description": "The main title of the blog post, displayed prominently on the post page and listings."
+          "enum": ["below_500m", "above_500m"],
+          "description": "The project value threshold classification."
         },
-        "description": {
+        "isUsed": {
+          "type": "boolean",
+          "description": "Whether the number has been assigned to a user."
+        },
+        "assignedTo": {
           "type": "string",
-          "description": "A brief summary or excerpt of the blog post content, primarily used for blog listings, social sharing, and SEO metadata."
+          "description": "The email of the user who generated this number."
         },
-        "datePublished": {
+        "assignedDate": {
           "type": "string",
-          "description": "The date and time when the blog post was originally published.",
-          "format": "date-time"
-        },
-        "dateUpdated": {
-          "type": "string",
-          "description": "The date and time when the blog post was last updated. This property is optional.",
-          "format": "date-time"
-        },
-        "heroImageUrl": {
-          "type": "string",
-          "description": "The URL or file path to the main hero image displayed prominently at the top of the blog post page.",
-          "format": "uri"
-        },
-        "heroImageAlt": {
-          "type": "string",
-          "description": "Alternative text description for the hero image, essential for accessibility and SEO."
-        },
-        "authorName": {
-          "type": "string",
-          "description": "The full name of the author who wrote the blog post."
-        },
-        "tags": {
-          "type": "array",
-          "description": "An array of keywords or categories associated with the blog post, aiding in content organization and discovery.",
-          "items": {
-            "type": "string"
-          }
+          "format": "date-time",
+          "description": "When the number was assigned."
         }
       },
-      "required": [
-        "id",
-        "slug",
-        "title",
-        "description",
-        "datePublished",
-        "heroImageUrl",
-        "heroImageAlt",
-        "authorName"
-      ]
+      "required": ["fullNumber", "category", "year", "month", "valueCategory", "isUsed"]
+    },
+    "UserGenerationLimit": {
+      "title": "UserGenerationLimit",
+      "description": "Tracks the daily generation count for individual users to enforce quotas.",
+      "type": "object",
+      "properties": {
+        "dailyCount": {
+          "type": "number",
+          "description": "Number of items generated today."
+        },
+        "lastGeneratedDate": {
+          "type": "string",
+          "description": "Date of the last generation in YYYY-MM-DD format."
+        }
+      },
+      "required": ["dailyCount", "lastGeneratedDate"]
     }
   },
   "auth": {
-    "providers": [
-      "password",
-      "anonymous"
-    ]
+    "providers": ["google"]
   },
   "firestore": {
-    "structure": [
-      {
-        "path": "/blogPosts/{blogPostSlug}",
-        "definition": {
-          "entityName": "BlogPost",
-          "schema": {
-            "$ref": "#/backend/entities/BlogPost"
-          },
-          "description": "Stores metadata for each public blog post. The document ID is the 'slug' field, which is a unique, URL-friendly identifier. This collection primarily supports public read access. The 'id' field within each document will match the 'slug' for consistency, and all other metadata fields from the BlogPost schema will be present.",
-          "params": [
-            {
-              "name": "blogPostSlug",
-              "description": "The unique, URL-friendly identifier (slug) of the blog post, used as the document ID."
-            }
-          ]
-        }
-      }
-    ],
-    "reasoning": "The primary content for SnipBlog is explicitly stated to be loaded from local MDX files, implying that Firestore is not the direct source of blog post content. However, to fulfill the requirement of generating a Firestore data structure and to provide potential future utility (e.g., search indexing, public APIs, dynamic metadata like view counts, or an admin interface for managing post metadata), the BlogPost entity will be represented in Firestore as a collection of metadata documents. This design adheres to core principles: 1. Authorization Independence: /blogPosts/{blogPostSlug}: Documents in this collection represent public blog posts. Access is granted as allow read: true;. This rule is atomic and does not require get() calls to other documents, thereby ensuring authorization independence. Write access (for administrative purposes, should it be implemented) would ideally rely on an exists() check against a dedicated admin roles collection (e.g., /roles_admin), which is atomic and independent. However, this collection is not formally defined in the firestorePaths as its schema was not provided. 2. Clarity of Intent (Debuggability): The blogPosts collection clearly signifies publicly accessible blog post metadata. Security rules for this collection will be straightforward and easy to audit, reflecting its public nature. 3. DBAC (No Custom Claims): While no explicit user-role entity was provided, if administrative roles were needed for write access to blogPosts (e.g., for authors to upload new post metadata), a standard DBAC pattern would be employed. This would involve a dedicated collection (e.g., /roles_admin/{userId}) where the existence of a document would signify an administrative role, relying solely on request.auth.uid for authorization checks in security rules. 4. QAPs (Rules are not Filters): /blogPosts/{blogPostSlug}: Since all documents in this collection are intended to be public, a list query on /blogPosts will retrieve all documents that meet the allow read: true rule. This ensures that client-side queries will only return permitted data, satisfying the QAP principle without relying on security rules to filter results after an initial broad query. 5. Structural Segregation (Homogeneous Security Posture): The /blogPosts collection exclusively holds PUBLISHED blog post metadata. If a feature for DRAFT posts were introduced, a separate collection (e.g., /users/{userId}/draft_blog_posts) with different, private access rules would be created, maintaining homogeneous security posture within each collection. 6. Access Modeling: The blogPostSlug will serve as the document ID for BlogPost documents, providing a predictable and SEO-friendly identifier. The id field within the document will be identical to slug for consistency. The user's original concern about \"injecting new numbers\" and Firebase connectivity issues seems to relate to a prior project or a client-side implementation detail rather than a structural database design problem for this MDX-driven blog. By using slug as the document ID, we leverage a meaningful, stable identifier rather than arbitrary numbers, which inherently addresses ID management predictability."
+    "/availableNumbers/{numberId}": {
+      "schema": { "$ref": "#/backend/entities/AvailableNumber" },
+      "description": "Collection of unique sequential numbers available for users to claim."
+    },
+    "/userGenerationLimits/{userId}": {
+      "schema": { "$ref": "#/backend/entities/UserGenerationLimit" },
+      "description": "Stores user-specific daily usage quotas."
+    }
   }
 }

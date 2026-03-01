@@ -20,8 +20,9 @@ export function MaintenanceClient({ dictionary }: { dictionary: any }) {
 
   if (isUserLoading) {
     return (
-        <div className="flex h-64 items-center justify-center">
-            <Loader2 className="h-8 w-8 animate-spin text-accent" />
+        <div className="flex flex-col h-64 items-center justify-center gap-4">
+            <Loader2 className="h-10 w-10 animate-spin text-accent" />
+            <p className="text-xs font-black uppercase tracking-widest text-muted-foreground animate-pulse">Verifying Admin Access...</p>
         </div>
     );
   }
@@ -38,23 +39,24 @@ export function MaintenanceClient({ dictionary }: { dictionary: any }) {
             <h2 className="font-headline text-3xl font-black uppercase tracking-tighter text-primary">
                 {dictionary.unauthorized}
             </h2>
-            <p className="text-muted-foreground mt-2">Only {ADMIN_EMAIL} can access this area.</p>
+            <p className="text-muted-foreground mt-2 italic">Akses ini hanya diperuntukkan bagi Mas Iwan Efendi.</p>
         </div>
       </div>
     );
   }
 
   const handlePopulate = async () => {
-    if (confirm("Are you SURE? This will inject thousands of records into Firestore.")) {
+    if (window.confirm("PERINGATAN: Anda akan menyuntikkan ribuan nomor baru ke database Firestore. Lanjutkan?")) {
         setIsProcessing(true);
         try {
-            const result = await populateDatabaseAction(user.email);
+            // Gunakan user.email dengan fallback null untuk keamanan
+            const result = await populateDatabaseAction(user.email || null);
             setStats(result);
             setIsFinished(true);
-            toast({ title: dictionary.success, description: `${result} numbers generated.` });
+            toast({ title: "Injeksi Berhasil!", description: `${result} nomor baru telah ditambahkan.` });
         } catch (error: any) {
             console.error(error);
-            toast({ variant: "destructive", title: dictionary.error, description: error.message });
+            toast({ variant: "destructive", title: "Terjadi Kesalahan", description: error.message });
         } finally {
             setIsProcessing(false);
         }
@@ -71,11 +73,11 @@ export function MaintenanceClient({ dictionary }: { dictionary: any }) {
                 <Database className="h-6 w-6 text-primary" />
             </div>
             <CardTitle className="font-headline text-2xl font-black uppercase tracking-tight">
-                {dictionary.populateTitle}
+                Database Sync
             </CardTitle>
           </div>
           <CardDescription className="text-base leading-relaxed">
-            {dictionary.populateDescription}
+            Gunakan alat ini untuk mengisi stok nomor dokumen terbaru periode 2025-2026.
           </CardDescription>
         </CardHeader>
         <CardContent className="p-8">
@@ -86,33 +88,36 @@ export function MaintenanceClient({ dictionary }: { dictionary: any }) {
                 </div>
                 <div className="text-center">
                     <h3 className="font-bold text-xl text-primary">{dictionary.success}</h3>
-                    <p className="text-muted-foreground font-mono text-sm mt-1">Total: {stats} items created.</p>
+                    <p className="text-muted-foreground font-mono text-sm mt-1">Total: {stats} nomor berhasil disinkronkan.</p>
                 </div>
-                <Button variant="outline" className="mt-4" onClick={() => setIsFinished(false)}>
-                    Populate More?
+                <Button variant="outline" className="mt-4 rounded-full px-8" onClick={() => setIsFinished(false)}>
+                    Ulangi Proses?
                 </Button>
             </div>
           ) : (
             <div className="space-y-6">
                 <div className="flex items-start gap-4 p-4 rounded-lg bg-amber-500/5 border border-amber-500/20 text-amber-600">
                     <AlertCircle className="h-5 w-5 shrink-0 mt-0.5" />
-                    <p className="text-sm font-medium">This process uses Write Batches. It may take up to a minute depending on your connection speed.</p>
+                    <div className="text-sm font-medium space-y-1">
+                        <p>Proses ini akan mengirim ribuan data dalam beberapa kelompok (batch).</p>
+                        <p className="text-[10px] uppercase font-bold opacity-70">Jangan tutup halaman ini sampai selesai.</p>
+                    </div>
                 </div>
                 
                 <Button 
                     onClick={handlePopulate} 
                     disabled={isProcessing}
-                    className="w-full h-14 font-black uppercase tracking-widest text-lg shadow-lg shadow-primary/10 transition-all hover:scale-[1.01] active:scale-[0.99]"
+                    className="w-full h-14 font-black uppercase tracking-widest text-lg shadow-lg shadow-primary/10 transition-all hover:scale-[1.01] active:scale-[0.99] rounded-xl"
                 >
                     {isProcessing ? (
                         <>
                             <Loader2 className="mr-3 h-6 w-6 animate-spin" />
-                            {dictionary.loading}
+                            Memproses Injeksi...
                         </>
                     ) : (
                         <>
                             <Database className="mr-3 h-6 w-6" />
-                            {dictionary.populateButton}
+                            Suntik Nomor Sekarang
                         </>
                     )}
                 </Button>
@@ -122,7 +127,7 @@ export function MaintenanceClient({ dictionary }: { dictionary: any }) {
       </Card>
       
       <p className="text-center text-[10px] text-muted-foreground uppercase font-black tracking-widest opacity-30">
-        System Maintenance Area &bull; Restricted Access
+        System Maintenance Area &bull; Restricted to Admin
       </p>
     </div>
   );

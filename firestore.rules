@@ -1,58 +1,44 @@
+
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
     /**
-     * SNIPBLOG SECURITY RULES (PROTOTYPING MODE)
-     * 
-     * Core Philosophy:
-     * This ruleset facilitates a public-facing blog platform where content metadata is 
-     * globally readable, while write access is strictly controlled. In this prototyping 
-     * phase, we prioritize authorization logic over strict schema validation.
-     * 
-     * Data Structure:
-     * All blog post metadata is stored in a top-level flat collection: `/blogPosts/{blogPostSlug}`.
-     * The `blogPostSlug` acts as the unique identifier for SEO and lookup consistency.
-     * 
-     * Key Security Decisions:
-     * 1. Public Consumption: All blog post metadata is world-readable (get and list) to 
-     *    support search indexing and public discovery without authentication.
-     * 2. Restricted Writes: Administrative actions (create, update, delete) are currently 
-     *    locked. The IR lacks a specific user ownership field (like authorId) to 
-     *    securely delegate writes to specific users.
-     * 3. Denormalization: The rules expect the document ID (slug) to be consistent with 
-     *    internal fields for relational integrity.
+     * SNIPGEEK SECURITY RULES
      */
 
-    // --- Helper Functions ---
-    // The previously defined helper functions 'isSignedIn' and 'isExisting' were
-    // unused in the current ruleset and thus have been removed to resolve the warnings.
-    // They can be re-added and utilized once the schema supports owner-based writes.
-
-    // --- Collection Rules ---
-
-    /**
-     * @description Rules for public blog post metadata.
-     * @path /blogPosts/{blogPostSlug}
-     * @allow (get) Publicly retrieve a single blog post by its slug.
-     * @allow (list) Publicly list all published blog post metadata.
-     * @deny (create, update, delete) Requests from any user, as ownership fields are missing in the schema.
-     * @principle Public Read with Restricted Writes.
-     */
-    match /blogPosts/{blogPostSlug} {
-      allow get, list: if true;
-
-      // CRITICAL: Cannot implement owner-only writes. 
-      // The 'BlogPost' entity is missing an 'ownerId' or 'authorId' field. 
-      // Relying on 'authorName' (string) is insecure for authorization.
-      allow create, update, delete: if false; // TODO: Add owner validation once the schema is updated with an ownership field (e.g., authorId).
+    function isSignedIn() {
+      return request.auth != null;
     }
 
-    // --- System-wide Defaults ---
-    
-    /**
-     * @description Default deny for any paths not explicitly matched.
-     */
+    function isAdmin() {
+      return isSignedIn() && request.auth.token.email == 'iwan.efndi@gmail.com';
+    }
+
+    // Number Generator Rules
+    match /availableNumbers/{numberId} {
+      // Users can see stock to display matrix
+      allow read: if isSignedIn();
+      
+      // Admin (Iwan) can populate/delete data
+      allow create, delete: if isAdmin();
+      
+      // Users can only mark a number as used if it's currently free
+      // They must set assignedTo to themselves
+      allow update: if isSignedIn() 
+        && resource.data.isUsed == false 
+        && request.resource.data.isUsed == true
+        && (request.resource.data.assignedTo == request.auth.token.email || isAdmin());
+    }
+
+    match /userGenerationLimits/{userId} {
+      // Users can manage their own quota
+      allow read, write: if isSignedIn() && request.auth.uid == userId;
+      // Admin can check/manage anyone's quota
+      allow read, write: if isAdmin();
+    }
+
+    // Default deny
     match /{path=**} {
       allow read, write: if false;
     }
