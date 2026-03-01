@@ -2,7 +2,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import { useFirestore, setDocumentNonBlocking } from '@/firebase';
 import { doc } from 'firebase/firestore';
 import { Button } from '@/components/ui/button';
@@ -21,6 +21,7 @@ interface NoteEditorProps {
 export function NoteEditor({ initialData, id }: NoteEditorProps) {
   const db = useFirestore();
   const router = useRouter();
+  const { locale } = useParams();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [formData, setFormData] = useState({
@@ -39,6 +40,7 @@ export function NoteEditor({ initialData, id }: NoteEditorProps) {
     const noteData = {
       ...formData,
       id: docId,
+      locale: initialData?.locale || locale || 'en',
       published: true,
       tags: formData.tags.split(',').map(t => t.trim()).filter(t => t !== ''),
       date: initialData?.date || new Date().toISOString(),

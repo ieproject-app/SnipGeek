@@ -2,7 +2,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import { useFirestore, setDocumentNonBlocking, deleteDocumentNonBlocking } from '@/firebase';
 import { doc, serverTimestamp } from 'firebase/firestore';
 import { uploadFile } from '@/firebase/storage';
@@ -34,6 +34,7 @@ interface PostEditorProps {
 export function PostEditor({ initialData, id }: PostEditorProps) {
   const db = useFirestore();
   const router = useRouter();
+  const { locale } = useParams();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
 
@@ -48,6 +49,7 @@ export function PostEditor({ initialData, id }: PostEditorProps) {
     featured: initialData?.featured ?? false,
     category: initialData?.category || '',
     tags: initialData?.tags?.join(', ') || '',
+    translationKey: initialData?.translationKey || '',
   });
 
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -87,13 +89,14 @@ export function PostEditor({ initialData, id }: PostEditorProps) {
     const postData = {
       ...formData,
       id: docId,
+      locale: initialData?.locale || locale || 'en',
       tags: formData.tags.split(',').map(t => t.trim()).filter(t => t !== ''),
       publishDate: initialData?.publishDate || new Date().toISOString(),
       updatedDate: new Date().toISOString(),
-      authorId: 'admin-user', // Placeholder, replace with actual user UID
+      translationKey: formData.translationKey || `blog-${docId}`,
+      authorId: 'admin-user', 
     };
 
-    // If changing status, delete from old collection first
     if (id && currentCollection !== oldCollection) {
       deleteDocumentNonBlocking(doc(db, oldCollection, id));
     }
@@ -147,7 +150,6 @@ export function PostEditor({ initialData, id }: PostEditorProps) {
                   />
                 </TabsContent>
                 <TabsContent value="preview" className="m-0 p-8 prose prose-slate dark:prose-invert max-w-none bg-background min-h-[600px]">
-                  {/* Simplistic preview, usually you'd render this with a real MDX renderer */}
                   <div className="whitespace-pre-wrap">{formData.contentMdx || 'Nothing to preview yet...'}</div>
                 </TabsContent>
               </Tabs>
@@ -206,6 +208,10 @@ export function PostEditor({ initialData, id }: PostEditorProps) {
               <div className="space-y-2">
                 <Label className="text-[10px] font-black uppercase text-muted-foreground">Slug (URL)</Label>
                 <Input value={formData.slug} onChange={(e) => setFormData(prev => ({ ...prev, slug: e.target.value }))} placeholder="url-friendly-slug" className="font-mono text-xs" />
+              </div>
+              <div className="space-y-2">
+                <Label className="text-[10px] font-black uppercase text-muted-foreground">Translation Key</Label>
+                <Input value={formData.translationKey} onChange={(e) => setFormData(prev => ({ ...prev, translationKey: e.target.value }))} placeholder="my-blog-key" className="font-mono text-xs" />
               </div>
               <div className="space-y-2">
                 <Label className="text-[10px] font-black uppercase text-muted-foreground">Category</Label>

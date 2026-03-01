@@ -16,6 +16,7 @@ import { DraftList } from '@/components/layout/draft-list';
 import { Arimo, Roboto } from 'next/font/google';
 import { cn } from '@/lib/utils';
 import Script from 'next/script';
+import { FirebaseClientProvider } from '@/firebase';
 
 const fontBody = Arimo({
   subsets: ['latin'],
@@ -143,23 +144,25 @@ export default async function LocaleLayout({
         />
       </head>
       <body className="font-body antialiased fade-in-on-load">
-        <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-        >
-          <NotificationProvider>
-            <ReadingListProvider>
-              <Header searchableData={searchableData} dictionary={dictionary} />
-              <main className="pt-20">{children}</main>
-              <Footer dictionary={dictionary} translationsMap={translationsMap} />
-              <BackToTop dictionary={dictionary} />
-              <ThemeSwitcher dictionary={dictionary} />
-              <DraftList draftPosts={draftPosts} draftNotes={draftNotes} dictionary={dictionary} />
-            </ReadingListProvider>
-          </NotificationProvider>
-        </ThemeProvider>
+        <FirebaseClientProvider>
+          <ThemeProvider
+              attribute="class"
+              defaultTheme="system"
+              enableSystem
+              disableTransitionOnChange
+          >
+            <NotificationProvider>
+              <ReadingListProvider>
+                <Header searchableData={searchableData} dictionary={dictionary} />
+                <main className="pt-20">{children}</main>
+                <Footer dictionary={dictionary} translationsMap={translationsMap} />
+                <BackToTop dictionary={dictionary} />
+                <ThemeSwitcher dictionary={dictionary} />
+                <DraftList draftPosts={draftPosts} draftNotes={draftNotes} dictionary={dictionary} />
+              </ReadingListProvider>
+            </NotificationProvider>
+          </ThemeProvider>
+        </FirebaseClientProvider>
       </body>
     </html>
   );
