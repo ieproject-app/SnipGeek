@@ -8,6 +8,7 @@ import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { AddToReadingListButton } from '@/components/layout/add-to-reading-list-button';
 import { StickyNote } from 'lucide-react';
 import { formatRelativeTime } from '@/lib/utils';
+import { CategoryBadge } from '@/components/layout/category-badge';
 
 type RelatedPostsProps = {
   type: 'blog' | 'note';
@@ -107,9 +108,9 @@ export function RelatedPosts({
                     />
                 </div>
 
-                <p className="text-[10px] font-medium tracking-wider text-accent mb-1.5 uppercase">
-                    {item.frontmatter.category || (isBlog ? 'Article' : 'Note')}
-                </p>
+                <div className="mb-2">
+                    <CategoryBadge category={item.frontmatter.category} type={type} />
+                </div>
                 <h3 className="font-headline text-base font-bold tracking-tight text-primary transition-colors group-hover:text-accent leading-tight">
                     {item.frontmatter.title}
                 </h3>

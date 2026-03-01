@@ -7,6 +7,7 @@ import type { ReadingListItem } from '@/hooks/use-reading-list';
 import Link from 'next/link';
 import { i18n } from '@/i18n-config';
 import { cn, formatRelativeTime } from '@/lib/utils';
+import { CategoryBadge } from '@/components/layout/category-badge';
 
 interface PostMetaProps {
   frontmatter: PostFrontmatter | NoteFrontmatter;
@@ -76,6 +77,7 @@ export function PostMeta({ frontmatter, item, locale, dictionary, readingTime, i
         isCentered ? "justify-center" : "justify-start"
     )}>
       <div className="flex items-center gap-3 text-sm font-medium text-muted-foreground">
+        <CategoryBadge category={frontmatter.category} type={item.type} className="mr-2" />
         <span className="text-primary font-bold">{authorName}</span>
         <span className="opacity-30">•</span>
         <time>{timeLabel}{relativeTimeStr}</time>
