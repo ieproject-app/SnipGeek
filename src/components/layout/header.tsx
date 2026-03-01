@@ -58,7 +58,7 @@ const HighlightMatch = ({ text, query }: { text: string; query: string }) => {
     <>
       {parts.map((part, i) =>
         part.toLowerCase() === query.toLowerCase() ? (
-          <mark key={i} className="bg-accent/30 text-accent-foreground rounded-[2px] px-0.5 font-semibold">
+          <mark key={i} className="bg-accent/30 text-accent-foreground rounded-[2px] px-0.5 font-bold">
             {part}
           </mark>
         ) : (
@@ -77,6 +77,8 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
   const [results, setResults] = useState<SearchableItem[]>([]);
   const [removingSlug, setRemovingSlug] = useState<string | null>(null);
   const [timeLabel, setTimeLabel] = useState("");
+  const [mounted, setMounted] = useState(false);
+  const [isGlowing, setIsGlowing] = useState(false);
   
   const { items: readingListItems, removeItem: removeReadingListItem } = useReadingList();
   const { message, icon, notify } = useNotification();
@@ -86,8 +88,6 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
   const headerRef = useRef<HTMLElement>(null);
   const pathname = usePathname();
   const params = useParams();
-  const [mounted, setMounted] = useState(false);
-  const [isGlowing, setIsGlowing] = useState(false);
   const prevCount = useRef(readingListItems.length);
 
   const isSearchOpen = activeView === 'search';
@@ -260,7 +260,7 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
             )}>
                 <div className="flex items-center gap-3">
                     {icon && <div className="text-accent">{React.cloneElement(icon as React.ReactElement, { className: "h-5 w-5" })}</div>}
-                    <p className="text-[10px] font-black uppercase tracking-widest text-foreground font-sans">
+                    <p className="font-sans text-[10px] font-black uppercase tracking-widest text-foreground">
                         {message}
                     </p>
                 </div>
@@ -292,7 +292,7 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                             key={item.href}
                             href={`${linkPrefix}${item.href}`}
                             className={cn(
-                                "px-3 py-2 text-[10px] font-black uppercase tracking-[0.12em] transition-all relative font-sans",
+                                "px-3 py-2 font-sans text-[10px] font-black uppercase tracking-[0.12em] transition-all relative",
                                 isActive ? "text-accent" : "text-foreground/60 hover:text-foreground"
                             )}
                         >
@@ -336,15 +336,15 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                     )}>
                         <div className="py-3">
                             <div className="px-4 py-2 mb-1">
-                                <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">SnipGeek · Navigate</p>
+                                <p className="font-sans text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">SnipGeek · Navigate</p>
                             </div>
                             
                             <div className="md:hidden border-t border-border mt-1 pt-1">
                                 <div className="px-4 py-2">
-                                    <p className="text-[8px] font-black uppercase tracking-[0.15em] text-accent">Explore</p>
+                                    <p className="font-sans text-[8px] font-black uppercase tracking-[0.15em] text-accent">Explore</p>
                                 </div>
                                 {directLinks.map((item) => (
-                                    <NextLink key={item.href} href={`${linkPrefix}${item.href}`} className="group/item flex items-center gap-3 px-4 py-2.5 text-[11px] font-bold uppercase tracking-wider hover:bg-muted transition-colors relative">
+                                    <NextLink key={item.href} href={`${linkPrefix}${item.href}`} className="group/item flex items-center gap-3 px-4 py-2.5 font-sans text-[11px] font-bold uppercase tracking-wider hover:bg-muted transition-colors relative">
                                         <div className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-4 bg-accent opacity-0 group-hover/item:opacity-60 transition-opacity" />
                                         <item.icon className="h-4 w-4 text-accent" />
                                         {item.name}
@@ -354,10 +354,10 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
 
                             <div className="border-t border-border mt-1 pt-1">
                                 <div className="px-4 py-2">
-                                    <p className="text-[8px] font-black uppercase tracking-[0.15em] text-accent">Connect</p>
+                                    <p className="font-sans text-[8px] font-black uppercase tracking-[0.15em] text-accent">Connect</p>
                                 </div>
                                 {moreItems.map((item) => (
-                                    <NextLink key={item.href} href={`${linkPrefix}${item.href}`} className="group/item flex items-center gap-3 px-4 py-2.5 text-[11px] font-bold uppercase tracking-wider hover:bg-muted transition-colors relative">
+                                    <NextLink key={item.href} href={`${linkPrefix}${item.href}`} className="group/item flex items-center gap-3 px-4 py-2.5 font-sans text-[11px] font-bold uppercase tracking-wider hover:bg-muted transition-colors relative">
                                         <div className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-4 bg-accent opacity-0 group-hover/item:opacity-60 transition-opacity" />
                                         <item.icon className="h-4 w-4 text-accent" />
                                         {item.name}
@@ -382,7 +382,7 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                         readingListItems.length > 0 ? "fill-accent text-accent" : ""
                     )} />
                     {mounted && readingListItems.length > 0 && (
-                        <span className="absolute top-1.5 right-1.5 flex h-3.5 min-w-[14px] items-center justify-center rounded-full bg-accent text-accent-foreground text-[8px] font-black px-1 animate-badge-pop shadow-sm">
+                        <span className="absolute top-1.5 right-1.5 flex h-3.5 min-w-[14px] items-center justify-center rounded-full bg-accent text-accent-foreground font-sans text-[8px] font-black px-1 animate-badge-pop shadow-sm">
                             {readingListItems.length}
                         </span>
                     )}
@@ -408,7 +408,7 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                 <Input 
                     ref={searchInputRef}
                     placeholder={dictionary.search.placeholder}
-                    className="flex-1 bg-transparent border-none text-xl font-display focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-foreground/20 placeholder:font-sans"
+                    className="flex-1 bg-transparent border-none text-xl font-display font-black tracking-tight focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:font-sans placeholder:text-foreground/20 placeholder:font-normal placeholder:tracking-normal"
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
                 />
@@ -430,7 +430,7 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                     <Bookmark className="h-6 w-6 text-accent fill-current" />
                     <span className="font-display text-xl font-black uppercase tracking-tight">Reading List</span>
                     {mounted && (
-                        <Badge variant="secondary" className="rounded-full bg-accent/10 text-accent border-none font-black h-6 px-3">
+                        <Badge variant="secondary" className="rounded-full bg-accent/10 text-accent border-none font-sans font-black h-6 px-3">
                             {readingListItems.length}
                         </Badge>
                     )}
@@ -453,9 +453,9 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                 isReadingListOpen ? "opacity-100 scale-100 translate-y-2" : "opacity-0 scale-[0.97] -translate-y-1 pointer-events-none"
             )}>
                 <div className="flex items-center justify-between px-4 pt-3 pb-2 border-b border-border bg-muted/5">
-                    <p className="text-[9px] font-black uppercase tracking-[0.15em] text-muted-foreground/60">Queue · {readingListItems.length} items</p>
+                    <p className="font-sans text-[9px] font-black uppercase tracking-[0.15em] text-muted-foreground/60">Queue · {readingListItems.length} items</p>
                     {readingListItems.length > 0 && (
-                        <button className="text-[9px] font-black uppercase tracking-wider text-destructive hover:opacity-70 transition-opacity">Clear all</button>
+                        <button className="font-sans text-[9px] font-black uppercase tracking-wider text-destructive hover:opacity-70 transition-opacity">Clear all</button>
                     )}
                 </div>
                 <ScrollArea className="max-h-[320px]">
@@ -475,10 +475,10 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                                                 <Image src={imgUrl} alt="" fill className="object-cover" sizes="52px" />
                                             </div>
                                             <div className="flex-1 min-w-0 flex flex-col">
-                                                <h4 className="text-sm font-bold font-serif text-foreground line-clamp-1 group-hover:text-accent transition-colors">
+                                                <h4 className="font-serif text-sm font-bold text-foreground line-clamp-1 group-hover:text-accent transition-colors leading-tight">
                                                     {item.title}
                                                 </h4>
-                                                <div className="mt-0.5">
+                                                <div className="mt-1">
                                                     <CategoryBadge category={dataItem?.category} type={item.type} />
                                                 </div>
                                             </div>
@@ -499,8 +499,8 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                                     <Bookmark className="h-8 w-8 opacity-20" />
                                 </div>
                                 <div className="space-y-1">
-                                    <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">{dictionary.readingList.empty}</p>
-                                    <NextLink href={`${linkPrefix}/blog`} onClick={() => setActiveView('none')} className="text-xs font-bold text-accent hover:underline flex items-center justify-center gap-1">
+                                    <p className="font-sans text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">{dictionary.readingList.empty}</p>
+                                    <NextLink href={`${linkPrefix}/blog`} onClick={() => setActiveView('none')} className="font-sans text-[11px] font-bold text-accent hover:underline flex items-center justify-center gap-1">
                                         Start Reading <ArrowRight className="h-3 w-3" />
                                     </NextLink>
                                 </div>
@@ -512,7 +512,7 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                     <div className="border-t border-border mt-1 p-1">
                         <NextLink 
                             href={`${linkPrefix}/blog`} 
-                            className="w-full py-2.5 flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-wider text-muted-foreground hover:bg-muted hover:text-accent transition-all rounded-lg"
+                            className="w-full py-2.5 flex items-center justify-center gap-2 font-sans text-[10px] font-black uppercase tracking-wider text-muted-foreground hover:bg-muted hover:text-accent transition-all rounded-lg"
                             onClick={() => setActiveView('none')}
                         >
                             Browse all posts <ArrowRight className="h-3 w-3" />
@@ -530,7 +530,7 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                     <div className="p-2">
                         {query.length > 1 ? (
                             <>
-                                <div className="text-[9px] font-black uppercase tracking-[0.15em] text-muted-foreground/60 px-4 py-2 border-b border-border bg-muted/5">
+                                <div className="font-sans text-[9px] font-black uppercase tracking-[0.15em] text-muted-foreground/60 px-4 py-2 border-b border-border bg-muted/5">
                                     {results.length} {dictionary.search.resultsFound} for "{query}"
                                 </div>
                                 {results.length > 0 ? (
@@ -544,10 +544,10 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                                                             <Image src={resolvedHero} alt="" fill className="object-cover" sizes="52px" />
                                                         </div>
                                                         <div className="flex-1 min-w-0">
-                                                            <h4 className="text-sm font-bold font-serif text-foreground line-clamp-1 group-hover:text-accent transition-colors">
+                                                            <h4 className="font-serif text-sm font-bold text-foreground line-clamp-1 group-hover:text-accent transition-colors leading-tight">
                                                                 <HighlightMatch text={item.title} query={query} />
                                                             </h4>
-                                                            <div className="mt-0.5">
+                                                            <div className="mt-1">
                                                                 <CategoryBadge category={item.category} type={item.type} />
                                                             </div>
                                                         </div>
@@ -562,14 +562,14 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                                         <div className="p-4 bg-muted/30 rounded-2xl">
                                             <Search className="h-8 w-8 opacity-10 text-muted-foreground" />
                                         </div>
-                                        <p className="italic text-xs text-muted-foreground font-serif">{dictionary.search.noResults} "{query}"</p>
+                                        <p className="font-serif italic text-xs text-muted-foreground">{dictionary.search.noResults} "{query}"</p>
                                     </div>
                                 )}
                             </>
                         ) : (
                             <div className="p-0 space-y-4 pb-4">
                                 <div className="space-y-1">
-                                    <p className="text-[9px] font-black uppercase tracking-[0.15em] text-muted-foreground/60 px-4 pt-3 pb-2">{mounted ? timeLabel : ''}</p>
+                                    <p className="font-sans text-[9px] font-black uppercase tracking-[0.15em] text-muted-foreground/60 px-4 pt-3 pb-2">{mounted ? timeLabel : ''}</p>
                                     <div className="px-2 space-y-1">
                                         {quickPicks.map((item) => {
                                             const resolvedHero = getResolvedImage(item);
@@ -579,10 +579,10 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                                                         <Image src={resolvedHero} alt="" fill className="object-cover" sizes="52px" />
                                                     </div>
                                                     <div className="flex-1 min-w-0">
-                                                        <h4 className="text-sm font-bold font-serif text-foreground line-clamp-1 group-hover:text-accent transition-colors">
+                                                        <h4 className="font-serif text-sm font-bold text-foreground line-clamp-1 group-hover:text-accent transition-colors leading-tight">
                                                             {item.title}
                                                         </h4>
-                                                        <div className="mt-0.5">
+                                                        <div className="mt-1">
                                                             <CategoryBadge category={item.category} type={item.type} />
                                                         </div>
                                                     </div>
@@ -593,7 +593,7 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                                     </div>
                                 </div>
                                 <div className="px-4">
-                                    <p className="text-[9px] font-black uppercase tracking-[0.15em] text-muted-foreground/40 mb-3">{dictionary.search.prompt}</p>
+                                    <p className="font-sans text-[9px] font-black uppercase tracking-[0.15em] text-muted-foreground/40 mb-3">{dictionary.search.prompt}</p>
                                     <div className="flex flex-wrap gap-2">
                                         {['Windows', 'Android', 'Hardware', 'Tutorial', 'Tips'].map(cat => {
                                             const style = categoryColorMap[cat] || { border: 'border-border', text: 'text-muted-foreground', bg: 'bg-muted/50' };
@@ -601,7 +601,7 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                                                 <button 
                                                     key={cat} 
                                                     className={cn(
-                                                        "px-3 py-1.5 rounded-full border text-[9px] font-black uppercase tracking-wider transition-all",
+                                                        "px-3 py-1.5 rounded-full border font-sans text-[9px] font-black uppercase tracking-wider transition-all",
                                                         "hover:scale-105 active:scale-95",
                                                         style.border, style.text, style.bg, "hover:opacity-80"
                                                     )}
@@ -620,12 +620,12 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                 <div className="px-4 py-2 border-t border-border bg-muted/5 flex items-center justify-between">
                     <div className="flex items-center gap-3">
                         <div className="flex items-center gap-1.5">
-                            <kbd className="px-1.5 py-0.5 rounded border bg-background text-[8px] font-sans font-bold shadow-sm">ESC</kbd>
-                            <span className="text-[8px] font-black uppercase tracking-widest text-muted-foreground/60">to close</span>
+                            <kbd className="px-1.5 py-0.5 rounded border bg-background font-sans text-[8px] font-bold shadow-sm">ESC</kbd>
+                            <span className="font-sans text-[8px] font-black uppercase tracking-widest text-muted-foreground/60">to close</span>
                         </div>
                         <div className="flex items-center gap-1.5">
-                            <kbd className="px-1.5 py-0.5 rounded border bg-background text-[8px] font-sans font-bold shadow-sm">↑↓</kbd>
-                            <span className="text-[8px] font-black uppercase tracking-widest text-muted-foreground/60">to navigate</span>
+                            <kbd className="px-1.5 py-0.5 rounded border bg-background font-sans text-[8px] font-bold shadow-sm">↑↓</kbd>
+                            <span className="font-sans text-[8px] font-black uppercase tracking-widest text-muted-foreground/60">to navigate</span>
                         </div>
                     </div>
                 </div>
