@@ -1,5 +1,4 @@
-
-import { getNoteData, getAllNoteSlugs, getAllLocales } from '@/lib/notes';
+import { getNoteData, getAllNoteSlugs, getAllLocales, getSortedNotesData } from '@/lib/notes';
 import { getDictionary } from '@/lib/get-dictionary';
 import { i18n } from '@/i18n-config';
 import { NotePageClient } from './note-page-client';
@@ -17,12 +16,18 @@ export default async function Page({ params }: { params: Promise<{ slug: string,
   const initialNote = await getNoteData(slug, locale);
   const dictionary = await getDictionary(locale as any);
 
+  const allNotes = getSortedNotesData(locale);
+  const initialRelatedContent = allNotes
+    .filter(n => n.slug !== slug)
+    .slice(0, 10);
+
   return (
-    <NotePageClient 
+    <PostPageClient 
         initialNote={initialNote as any} 
         slug={slug} 
         locale={locale} 
         dictionary={dictionary} 
+        initialRelatedContent={initialRelatedContent}
     />
   );
 }

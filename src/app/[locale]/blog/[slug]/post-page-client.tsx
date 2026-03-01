@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useMemo } from 'react';
@@ -19,7 +18,7 @@ import { notFound } from 'next/navigation';
 import remarkGfm from 'remark-gfm';
 import rehypeShiki from '@shikijs/rehype';
 
-export function PostPageClient({ initialPost, slug, locale, dictionary }: { initialPost: any, slug: string, locale: string, dictionary: any }) {
+export function PostPageClient({ initialPost, slug, locale, dictionary, initialRelatedContent }: { initialPost: any, slug: string, locale: string, dictionary: any, initialRelatedContent: any[] }) {
   const db = useFirestore();
   const linkPrefix = locale === 'en' ? '' : `/${locale}`;
 
@@ -147,7 +146,15 @@ export function PostPageClient({ initialPost, slug, locale, dictionary }: { init
             <PostComments article={{ slug: post.slug, title: post.frontmatter.title }} type="blog" locale={locale} />
         </article>
       </main>
-      <RelatedPosts type="blog" locale={locale} currentSlug={post.slug} currentTags={post.frontmatter.tags} currentCategory={post.frontmatter.category} />
+      <RelatedPosts 
+        type="blog" 
+        locale={locale} 
+        currentSlug={post.slug} 
+        currentTags={post.frontmatter.tags} 
+        currentCategory={post.frontmatter.category} 
+        initialRelatedContent={initialRelatedContent}
+        dictionary={dictionary}
+      />
     </div>
   );
 }
