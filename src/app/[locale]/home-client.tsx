@@ -12,6 +12,7 @@ import { FeatureSlider } from '@/components/home/feature-slider';
 import { TopicSection } from '@/components/home/topic-section';
 import { HorizontalSlider } from '@/components/home/horizontal-slider';
 import { FeaturedPosts } from '@/components/home/featured-posts';
+import { CategoryBadge } from '@/components/layout/category-badge';
 
 export function HomeClient({ initialPosts, dictionary, locale }: { initialPosts: any[], dictionary: any, locale: string }) {
   const linkPrefix = locale === 'en' ? '' : `/${locale}`;
@@ -105,11 +106,9 @@ export function HomeClient({ initialPosts, dictionary, locale }: { initialPosts:
                     />
                 </div>
 
-                {post.frontmatter.category && (
-                    <p className="text-[10px] font-bold tracking-wider text-accent mb-1.5 uppercase">
-                        {post.frontmatter.category}
-                    </p>
-                )}
+                <div className="mb-2">
+                    <CategoryBadge category={post.frontmatter.category} />
+                </div>
                 <h3 className="font-headline text-base font-bold tracking-tight text-primary transition-colors group-hover:text-accent leading-tight">
                     {post.frontmatter.title}
                 </h3>

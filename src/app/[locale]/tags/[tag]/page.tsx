@@ -1,3 +1,4 @@
+
 'use client';
 
 import { getSortedPostsData, getSortedNotesData } from '@/lib/posts';
