@@ -1,15 +1,13 @@
+
 'use client';
 
 import React, { useMemo } from 'react';
-import { useFirestore, useCollection, useMemoFirebase } from '@/firebase';
-import { collection, query, where } from 'firebase/firestore';
 import Link from 'next/link';
 import Image from 'next/image';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { AddToReadingListButton } from '@/components/layout/add-to-reading-list-button';
-import { i18n } from '@/i18n-config';
 import { StickyNote } from 'lucide-react';
-import { cn, formatRelativeTime } from '@/lib/utils';
+import { formatRelativeTime } from '@/lib/utils';
 
 type RelatedPostsProps = {
   type: 'blog' | 'note';
@@ -30,42 +28,11 @@ export function RelatedPosts({
     initialRelatedContent,
     dictionary 
 }: RelatedPostsProps) {
-  const db = useFirestore();
   const linkPrefix = locale === 'en' ? '' : `/${locale}`;
 
-  // Fetch Firestore Related Content
-  const collectionName = type === 'blog' ? 'blogPosts_published' : 'notes_published';
-  const fsQuery = useMemoFirebase(() => 
-    query(
-        collection(db, collectionName),
-        where('locale', '==', locale)
-    ), [db, locale, collectionName]);
-  
-  const { data: firestoreContent } = useCollection(fsQuery);
-
+  // Related content is now strictly from local MDX files
   const allRelated = useMemo(() => {
-    // 1. Combine initial (files) and Firestore
-    const merged = [...initialRelatedContent];
-    
-    if (firestoreContent) {
-        firestoreContent.forEach(fp => {
-            if (fp.slug !== currentSlug && !merged.find(item => item.slug === fp.slug)) {
-                merged.push({
-                    slug: fp.slug,
-                    frontmatter: {
-                        ...fp,
-                        heroImage: fp.heroImageUrl || 'footer-about',
-                        imageAlt: fp.heroImageAltText,
-                        date: fp.publishDate || fp.date,
-                        published: true
-                    }
-                });
-            }
-        });
-    }
-
-    // 2. Score them
-    const scored = merged.map(item => {
+    const scored = initialRelatedContent.map(item => {
         let score = 0;
         const itemTags = item.frontmatter.tags || [];
         const itemCategory = item.frontmatter.category;
@@ -82,11 +49,10 @@ export function RelatedPosts({
 
         return { ...item, score };
     })
-    .filter(item => item.score > 0 || initialRelatedContent.some(i => i.slug === item.slug))
     .sort((a, b) => b.score - a.score);
 
     return scored.slice(0, 3);
-  }, [initialRelatedContent, firestoreContent, currentSlug, currentTags, currentCategory, type]);
+  }, [initialRelatedContent, currentCategory, currentTags, type]);
 
   if (allRelated.length === 0) return null;
 

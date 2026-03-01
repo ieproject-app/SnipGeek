@@ -2,8 +2,6 @@
 'use client';
 
 import React, { useMemo } from 'react';
-import { useFirestore, useCollection, useMemoFirebase } from '@/firebase';
-import { collection, query, where, orderBy } from 'firebase/firestore';
 import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
@@ -11,35 +9,11 @@ import { StickyNote } from 'lucide-react';
 import { AddToReadingListButton } from '@/components/layout/add-to-reading-list-button';
 
 export function NotesListClient({ initialNotes, dictionary, locale }: { initialNotes: any[], dictionary: any, locale: string }) {
-  const db = useFirestore();
   const linkPrefix = locale === 'en' ? '' : `/${locale}`;
 
-  const notesQuery = useMemoFirebase(() => 
-    query(
-        collection(db, 'notes_published'),
-        where('locale', '==', locale)
-    ), [db, locale]);
-  
-  const { data: firestoreNotes } = useCollection(notesQuery);
-
   const allNotes = useMemo(() => {
-    const merged = [...initialNotes];
-    if (firestoreNotes) {
-        firestoreNotes.forEach(fn => {
-            if (!merged.find(n => n.slug === fn.slug)) {
-                merged.push({
-                    slug: fn.slug,
-                    frontmatter: {
-                        ...fn,
-                        date: fn.publishDate || fn.date,
-                        published: true
-                    }
-                });
-            }
-        });
-    }
-    return merged.sort((a, b) => new Date(b.frontmatter.date).getTime() - new Date(a.frontmatter.date).getTime());
-  }, [initialNotes, firestoreNotes]);
+    return [...initialNotes].sort((a, b) => new Date(b.frontmatter.date).getTime() - new Date(a.frontmatter.date).getTime());
+  }, [initialNotes]);
 
   const formatDate = (date: Date) => {
     return new Intl.DateTimeFormat(locale, { 

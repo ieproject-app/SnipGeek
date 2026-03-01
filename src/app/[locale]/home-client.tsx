@@ -2,8 +2,6 @@
 'use client';
 
 import React, { useMemo } from 'react';
-import { useFirestore, useCollection, useMemoFirebase } from '@/firebase';
-import { collection, query, where, orderBy } from 'firebase/firestore';
 import Link from 'next/link';
 import Image from 'next/image';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
@@ -16,40 +14,12 @@ import { HorizontalSlider } from '@/components/home/horizontal-slider';
 import { FeaturedPosts } from '@/components/home/featured-posts';
 
 export function HomeClient({ initialPosts, dictionary, locale }: { initialPosts: any[], dictionary: any, locale: string }) {
-  const db = useFirestore();
   const linkPrefix = locale === 'en' ? '' : `/${locale}`;
 
-  // Fetch Firestore Posts
-  const postsQuery = useMemoFirebase(() => 
-    query(
-        collection(db, 'blogPosts_published'),
-        where('locale', '==', locale)
-    ), [db, locale]);
-  
-  const { data: firestorePosts } = useCollection(postsQuery);
-
-  // Merge Data
+  // We now only use initialPosts from local MDX files
   const allPosts = useMemo(() => {
-    const merged = [...initialPosts];
-    if (firestorePosts) {
-        firestorePosts.forEach(fp => {
-            if (!merged.find(p => p.slug === fp.slug)) {
-                merged.push({
-                    slug: fp.slug,
-                    frontmatter: {
-                        ...fp,
-                        heroImage: fp.heroImageUrl || 'footer-about',
-                        imageAlt: fp.heroImageAltText,
-                        date: fp.publishDate,
-                        updated: fp.updatedDate,
-                        published: true
-                    }
-                });
-            }
-        });
-    }
-    return merged.sort((a, b) => new Date(b.frontmatter.date).getTime() - new Date(a.frontmatter.date).getTime());
-  }, [initialPosts, firestorePosts]);
+    return [...initialPosts].sort((a, b) => new Date(b.frontmatter.date).getTime() - new Date(a.frontmatter.date).getTime());
+  }, [initialPosts]);
 
   // 1. Featured Posts (Top 4)
   const featuredPosts = allPosts.filter(post => post.frontmatter.published && post.frontmatter.featured).slice(0, 4);
@@ -71,7 +41,6 @@ export function HomeClient({ initialPosts, dictionary, locale }: { initialPosts:
 
   // 4. Topic Section (Filtered by tag 'Windows', 8 items)
   const topicTag = "Windows"; 
-  topicTag; // quiet unused warning if needed
   const topicPosts = allPosts
     .filter(post => 
       post.frontmatter.published &&
