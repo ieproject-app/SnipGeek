@@ -14,7 +14,8 @@ import {
   User, 
   Mail,
   Languages,
-  ChevronRight
+  ChevronRight,
+  ArrowRight
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -222,6 +223,10 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
     return placeholder?.imageUrl || '/images/blank/blank.webp';
   };
 
+  const quickPicks = useMemo(() => {
+    return searchableData.slice(0, 3);
+  }, [searchableData]);
+
   const directLinks = [
     { name: dictionary.navigation.blog, href: '/blog', icon: BookOpen },
     { name: dictionary.navigation.notes, href: '/notes', icon: StickyNote },
@@ -411,65 +416,63 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                 </div>
             </div>
 
-            {/* Reading List Results Overlay */}
+            {/* Reading List Overlay (Single Column List) */}
             <div className={cn(
                 "absolute top-0 left-4 right-4 z-30 bg-background border border-border shadow-2xl rounded-lg overflow-hidden transition-all duration-300",
                 isReadingListOpen ? "opacity-100 scale-100 translate-y-2" : "opacity-0 scale-95 pointer-events-none"
             )}>
-                <ScrollArea className="max-h-[500px]">
-                    <div className="p-4">
+                <ScrollArea className="max-h-[320px]">
+                    <div className="p-2 space-y-1">
                         {readingListItems.length > 0 ? (
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                {readingListItems.map((item) => {
-                                    const dataItem = searchableData.find(d => d.slug === item.slug);
-                                    const imgUrl = dataItem ? getResolvedImage(dataItem) : '/images/blank/blank.webp';
-                                    const config = typeConfig[item.type];
-                                    
-                                    return (
-                                        <div key={`${item.type}-${item.slug}`} className={cn("transition-all", removingSlug === item.slug && "opacity-0 scale-95")}>
-                                            <div className="group relative flex flex-col rounded-lg border bg-card overflow-hidden transition-all hover:border-accent/50 hover:shadow-lg h-full">
-                                                <NextLink href={item.href} className="contents">
-                                                    <div className="aspect-video relative overflow-hidden bg-muted shrink-0">
-                                                        <Image 
-                                                            src={imgUrl} 
-                                                            alt={item.title} 
-                                                            fill 
-                                                            className="object-cover transition-transform duration-500 group-hover:scale-105"
-                                                            sizes="(max-width: 768px) 100vw, 400px"
-                                                        />
-                                                        <Badge className={cn("absolute top-2 left-2 text-[8px] font-black uppercase tracking-tighter border-none h-5 px-2", config.bg, config.color)}>
-                                                            {config.label}
-                                                        </Badge>
-                                                    </div>
-                                                    <div className="p-4 flex-1 flex flex-col">
-                                                        {dataItem?.category && (
-                                                            <p className="text-[9px] font-black text-accent uppercase mb-1 tracking-widest">{dataItem.category}</p>
-                                                        )}
-                                                        <h4 className="font-headline text-sm font-bold text-foreground leading-snug line-clamp-2 transition-colors group-hover:text-accent">
-                                                            {item.title}
-                                                        </h4>
-                                                    </div>
-                                                </NextLink>
-                                                <Button 
-                                                    variant="destructive" size="icon" 
-                                                    className="absolute top-2 right-2 h-8 w-8 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity z-10"
-                                                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleRemoveReadingListItem(item.slug); }}
-                                                >
-                                                    <Trash2 className="h-4 w-4" />
-                                                </Button>
+                            readingListItems.map((item) => {
+                                const dataItem = searchableData.find(d => d.slug === item.slug);
+                                const imgUrl = dataItem ? getResolvedImage(dataItem) : '/images/blank/blank.webp';
+                                const config = typeConfig[item.type];
+                                
+                                return (
+                                    <div key={`${item.type}-${item.slug}`} className={cn("group flex items-center gap-3 p-2 rounded-md transition-all hover:bg-muted/50", removingSlug === item.slug && "opacity-0 scale-95")}>
+                                        <NextLink href={item.href} className="flex items-center gap-3 flex-1 min-w-0">
+                                            <div className="w-[52px] h-[39px] relative rounded-md overflow-hidden bg-muted shrink-0 border border-border/50">
+                                                <Image src={imgUrl} alt="" fill className="object-cover" sizes="52px" />
                                             </div>
-                                        </div>
-                                    );
-                                })}
-                            </div>
+                                            <div className="flex-1 min-w-0 flex flex-col">
+                                                <h4 className="text-sm font-bold text-foreground line-clamp-1 group-hover:text-accent transition-colors">
+                                                    {item.title}
+                                                </h4>
+                                                <span className="text-[9px] font-black uppercase text-muted-foreground/60 tracking-wider">
+                                                    {dataItem?.category || config.label}
+                                                </span>
+                                            </div>
+                                        </NextLink>
+                                        <Button 
+                                            variant="ghost" size="icon" 
+                                            className="h-8 w-8 rounded-full text-muted-foreground hover:text-destructive opacity-0 group-hover:opacity-100 transition-opacity"
+                                            onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleRemoveReadingListItem(item.slug); }}
+                                        >
+                                            <Trash2 className="h-4 w-4" />
+                                        </Button>
+                                    </div>
+                                );
+                            })
                         ) : (
-                            <div className="py-20 text-center text-muted-foreground flex flex-col items-center gap-4">
-                                <Bookmark className="h-12 w-12 opacity-10" />
-                                <p className="text-[10px] font-black uppercase tracking-widest opacity-40">{dictionary.readingList.empty}</p>
+                            <div className="py-16 text-center text-muted-foreground flex flex-col items-center gap-3">
+                                <Bookmark className="h-8 w-8 opacity-20" />
+                                <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">{dictionary.readingList.empty}</p>
                             </div>
                         )}
                     </div>
                 </ScrollArea>
+                {readingListItems.length > 0 && (
+                    <div className="p-3 border-t bg-muted/10 flex justify-center">
+                        <NextLink 
+                            href={`${linkPrefix}/blog`} 
+                            className="text-[10px] font-black uppercase tracking-wider text-muted-foreground hover:text-accent transition-colors flex items-center gap-1"
+                            onClick={() => setActiveView('none')}
+                        >
+                            Browse all posts <ArrowRight className="h-3 w-3" />
+                        </NextLink>
+                    </div>
+                )}
             </div>
 
             {/* Search Results Overlay */}
@@ -480,55 +483,84 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                 <ScrollArea className="max-h-[450px]">
                     <div className="p-2">
                         {query.length > 1 ? (
-                            results.length > 0 ? (
-                                <ul className="space-y-1">
-                                    {results.map((item) => {
-                                        const config = typeConfig[item.type];
-                                        const resolvedHero = getResolvedImage(item);
-                                        return (
-                                            <li key={`${item.type}-${item.slug}`}>
-                                                <NextLink href={item.href} className="flex items-center gap-4 px-4 py-3 rounded-md hover:bg-muted transition-all group">
-                                                    {item.heroImage ? (
-                                                        <div className="w-[56px] h-[42px] rounded overflow-hidden shrink-0 border border-border/50 bg-muted relative">
-                                                            <Image src={resolvedHero} alt="" fill className="object-cover" sizes="56px" />
-                                                        </div>
-                                                    ) : (
-                                                        <div className={cn("w-10 h-10 rounded-md flex items-center justify-center shrink-0", config.bg, config.color)}>
-                                                            <config.icon className="w-5 h-5" />
-                                                        </div>
-                                                    )}
-                                                    <div className="flex-1 min-w-0">
-                                                        <div className="flex items-center gap-2 mb-0.5">
-                                                            <Badge variant="outline" className={cn("text-[8px] h-4 px-1.5 uppercase font-black tracking-tighter border-none", config.bg, config.color)}>
-                                                                {config.label}
-                                                            </Badge>
-                                                            {item.category && (
-                                                                <span className="text-[9px] font-bold text-muted-foreground/60 uppercase tracking-widest">{item.category}</span>
+                            <>
+                                <div className="px-4 py-2 border-b border-border/50 mb-1">
+                                    <p className="text-[10px] font-black uppercase text-muted-foreground tracking-widest">
+                                        {results.length} {dictionary.search.resultsFound} for "{query}"
+                                    </p>
+                                </div>
+                                {results.length > 0 ? (
+                                    <ul className="space-y-1">
+                                        {results.map((item) => {
+                                            const resolvedHero = getResolvedImage(item);
+                                            const config = typeConfig[item.type];
+                                            return (
+                                                <li key={`${item.type}-${item.slug}`}>
+                                                    <NextLink href={item.href} className="flex items-center gap-4 px-4 py-2.5 rounded-md hover:bg-muted/50 transition-all group">
+                                                        <div className="w-[52px] h-[39px] relative rounded-md overflow-hidden bg-muted shrink-0 border border-border/50">
+                                                            {item.heroImage ? (
+                                                                <Image src={resolvedHero} alt="" fill className="object-cover" sizes="52px" />
+                                                            ) : (
+                                                                <div className={cn("w-full h-full flex items-center justify-center", config.bg, config.color)}>
+                                                                    <config.icon className="w-4 h-4" />
+                                                                </div>
                                                             )}
                                                         </div>
-                                                        <h4 className="text-sm font-bold text-foreground line-clamp-1 group-hover:text-accent transition-colors">
-                                                            <HighlightMatch text={item.title} query={query} />
-                                                        </h4>
-                                                        <p className="text-[11px] text-muted-foreground line-clamp-1 opacity-60">
-                                                            <HighlightMatch text={item.description} query={query} />
-                                                        </p>
-                                                    </div>
-                                                    <ChevronRight className="h-4 w-4 text-muted-foreground/20 group-hover:text-accent transition-all group-hover:translate-x-1" />
-                                                </NextLink>
-                                            </li>
-                                        );
-                                    })}
-                                </ul>
-                            ) : (
-                                <div className="py-12 text-center text-xs text-muted-foreground italic">No results found for "{query}".</div>
-                            )
+                                                        <div className="flex-1 min-w-0">
+                                                            <h4 className="text-sm font-bold font-serif text-foreground line-clamp-1 group-hover:text-accent transition-colors">
+                                                                <HighlightMatch text={item.title} query={query} />
+                                                            </h4>
+                                                            <span className="text-[9px] font-black uppercase text-muted-foreground/60 tracking-wider">
+                                                                {item.category || config.label}
+                                                            </span>
+                                                        </div>
+                                                        <ChevronRight className="h-3.5 w-3.5 text-muted-foreground/20 group-hover:text-accent transition-all group-hover:translate-x-1" />
+                                                    </NextLink>
+                                                </li>
+                                            );
+                                        })}
+                                    </ul>
+                                ) : (
+                                    <div className="py-16 text-center flex flex-col items-center gap-3">
+                                        <Search className="h-8 w-8 opacity-20 text-muted-foreground" />
+                                        <p className="italic text-xs text-muted-foreground">{dictionary.search.noResults} "{query}"</p>
+                                    </div>
+                                )}
+                            </>
                         ) : (
-                            <div className="p-8 text-center">
-                                <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40 mb-6">{dictionary.search.prompt}</p>
-                                <div className="flex flex-wrap justify-center gap-2">
-                                    {['Windows', 'Android', 'Hardware'].map(cat => (
-                                        <Badge key={cat} variant="outline" className="px-4 py-1 rounded-full cursor-pointer hover:bg-accent hover:text-accent-foreground text-[9px] uppercase font-black" onClick={() => setQuery(cat)}>{cat}</Badge>
-                                    ))}
+                            <div className="p-2 space-y-6">
+                                <div className="space-y-2">
+                                    <p className="px-2 text-[10px] font-black uppercase text-muted-foreground tracking-widest">Quick picks</p>
+                                    <div className="space-y-1">
+                                        {quickPicks.map((item) => {
+                                            const resolvedHero = getResolvedImage(item);
+                                            const config = typeConfig[item.type];
+                                            return (
+                                                <NextLink key={item.slug} href={item.href} className="flex items-center gap-4 px-4 py-2.5 rounded-md hover:bg-muted/50 transition-all group">
+                                                    <div className="w-[52px] h-[39px] relative rounded-md overflow-hidden bg-muted shrink-0 border border-border/50">
+                                                        <Image src={resolvedHero} alt="" fill className="object-cover" sizes="52px" />
+                                                    </div>
+                                                    <div className="flex-1 min-w-0">
+                                                        <h4 className="text-sm font-bold text-foreground line-clamp-1 group-hover:text-accent transition-colors">
+                                                            {item.title}
+                                                        </h4>
+                                                        <span className="text-[9px] font-black uppercase text-muted-foreground/60 tracking-wider">
+                                                            {item.category || config.label}
+                                                        </span>
+                                                    </div>
+                                                    <ChevronRight className="h-3.5 w-3.5 text-muted-foreground/20 group-hover:text-accent transition-all group-hover:translate-x-1" />
+                                                </NextLink>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+                                <div className="px-2 pb-4">
+                                    <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40 mb-3">{dictionary.search.prompt}</p>
+                                    <div className="flex flex-wrap gap-2">
+                                        {['Windows', 'Android', 'Hardware'].map(cat => (
+                                            <Badge key={cat} variant="outline" className="px-4 py-1 rounded-full cursor-pointer hover:bg-accent hover:text-accent-foreground text-[9px] uppercase font-black" onClick={() => setQuery(cat)}>{cat}</Badge>
+                                        ))}
+                                    </div>
                                 </div>
                             </div>
                         )}
