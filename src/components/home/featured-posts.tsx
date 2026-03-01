@@ -111,7 +111,7 @@ export function FeaturedPosts({ posts, dictionary, locale, linkPrefix }: Feature
                                 <div className="flex items-center gap-3">
                                     <AddToReadingListButton 
                                         item={item}
-                                        dictionary={dictionary.readingList}
+                                        dictionary={dictionary}
                                         showText={false}
                                         className="h-8 w-8 rounded-full border-none bg-primary/[0.03] text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all"
                                     />
