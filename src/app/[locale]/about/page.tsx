@@ -1,4 +1,3 @@
-
 import { i18n } from '@/i18n-config';
 import type { Metadata } from 'next';
 import { getPageContent } from '@/lib/pages';
@@ -56,10 +55,10 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
   
   return (
     <div className="w-full">
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-16 sm:pb-24">
+      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-12 sm:pb-16">
         
         {/* Hero Section */}
-        <section className="mb-16 text-center animate-in fade-in slide-in-from-bottom-4 duration-700">
+        <section className="mb-12 text-center animate-in fade-in slide-in-from-bottom-4 duration-700">
             <Avatar className="w-32 h-32 mx-auto mb-6 shadow-xl ring-4 ring-primary/10">
                 <AvatarImage src={authorAvatar} alt={data.name} />
                 <AvatarFallback>IE</AvatarFallback>
@@ -83,7 +82,7 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
         </section>
 
         {/* Summary Section */}
-        <section className="mb-20">
+        <section className="mb-16">
             <div className="flex items-center gap-4 mb-8">
                 <h2 className="text-2xl font-bold font-headline text-primary shrink-0 uppercase tracking-tight">{dictionary.about.summary}</h2>
                 <div className="h-px bg-border flex-1" />
@@ -94,7 +93,7 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
         </section>
 
         {/* MDX Content */}
-        <section className="mb-20 prose prose-lg dark:prose-invert max-w-none">
+        <section className="mb-16 prose prose-lg dark:prose-invert max-w-none">
              <div className="flex items-center gap-4 mb-8">
                 <h2 className="text-2xl font-bold font-headline text-primary shrink-0 uppercase tracking-tight">{dictionary.about.title}</h2>
                 <div className="h-px bg-border flex-1" />
@@ -114,7 +113,7 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
         </section>
 
         {/* Experience Section */}
-        <section className="mb-20">
+        <section className="mb-16">
             <div className="flex items-center gap-4 mb-10">
                 <h2 className="text-2xl font-bold font-headline text-primary shrink-0 uppercase tracking-tight">{dictionary.about.experience}</h2>
                 <div className="h-px bg-border flex-1" />
@@ -126,7 +125,7 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
                         <div className="flex items-center justify-center w-10 h-10 rounded-full border bg-background shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10">
                             <Briefcase className="w-5 h-5 text-primary" />
                         </div>
-                        <Card className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] bg-card/50 transition-all duration-300 hover:shadow-lg hover:-translate-y-1 border-primary/10">
+                        <Card className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] bg-card/50 transition-all duration-300 hover:shadow-lg hover:-translate-y-1 border-primary/10 rounded-xl">
                             <CardHeader className="p-6">
                                 <time className="text-xs font-bold uppercase tracking-widest text-muted-foreground block mb-2">{exp.period}</time>
                                 <CardTitle className="text-xl font-headline font-bold text-primary">{exp.title}</CardTitle>
@@ -149,7 +148,7 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
         </section>
 
         {/* Skills Section */}
-        <section className="mb-20">
+        <section className="mb-16">
             <div className="flex items-center gap-4 mb-10">
                 <h2 className="text-2xl font-bold font-headline text-primary shrink-0 uppercase tracking-tight">{dictionary.about.skills}</h2>
                 <div className="h-px bg-border flex-1" />
@@ -157,7 +156,7 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {data.skills.map((cat, index) => (
-                    <Card key={index} className="bg-card/50 border-primary/10 h-full flex flex-col">
+                    <Card key={index} className="bg-card/50 border-primary/10 h-full flex flex-col rounded-xl">
                         <CardHeader>
                             <CardTitle className="text-lg font-headline text-primary uppercase tracking-wide">{cat.name}</CardTitle>
                         </CardHeader>
@@ -172,14 +171,14 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
         </section>
 
         {/* Education & Certs */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-20">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-16">
             <section>
                 <div className="flex items-center gap-4 mb-8">
                     <h2 className="text-2xl font-bold font-headline text-primary shrink-0 uppercase tracking-tight">{dictionary.about.education}</h2>
                     <div className="h-px bg-border flex-1" />
                 </div>
                 {data.education.map((edu, index) => (
-                    <Card key={index} className="bg-card/50 border-primary/10">
+                    <Card key={index} className="bg-card/50 border-primary/10 rounded-xl">
                         <CardHeader>
                             <div className="flex items-center gap-3 mb-2">
                                 <GraduationCap className="w-5 h-5 text-primary" />
@@ -197,7 +196,7 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
                     <div className="h-px bg-border flex-1" />
                 </div>
                 {data.certifications.map((cert, index) => (
-                    <Card key={index} className="bg-card/50 border-primary/10">
+                    <Card key={index} className="bg-card/50 border-primary/10 rounded-xl">
                         <CardHeader>
                             <div className="flex items-center gap-3 mb-2">
                                 <Award className="w-5 h-5 text-primary" />
@@ -213,7 +212,7 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
         </div>
 
         {/* Download Section */}
-        <section className="text-center bg-primary/5 border border-primary/10 rounded-lg p-8 md:p-12">
+        <section className="text-center bg-primary/5 border border-primary/10 rounded-xl p-8 md:p-12">
             <FileText className="w-12 h-12 text-primary mx-auto mb-6" />
             <h2 className="text-2xl font-bold font-headline text-primary mb-4 uppercase tracking-tight">{dictionary.about.downloadResume}</h2>
             <div className="flex justify-center">
