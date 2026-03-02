@@ -58,7 +58,7 @@
 
 @layer base {
   * {
-    @apply border-border;
+    @apply border-border transition-colors duration-500 ease-in-out;
   }
   body {
     @apply bg-background text-foreground font-sans antialiased;
