@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
@@ -11,37 +12,30 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Calendar } from '@/components/ui/calendar';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { 
     CalendarIcon, 
     Loader2, 
     Database, 
     CheckCircle, 
-    LogIn, 
     PlusCircle, 
     Trash2, 
     Copy, 
     Check, 
     RotateCcw, 
     AlertTriangle, 
-    Info,
     Plus,
     Minus,
     Zap,
     Hash,
     History,
-    FileSpreadsheet,
-    LogOut,
-    User
+    FileSpreadsheet
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { format, addMonths, startOfDay } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { useToast } from '@/hooks/use-toast';
-import { useFirestore, useUser, useAuth } from '@/firebase';
+import { useFirestore, useUser } from '@/firebase';
 import { collection, query, where, getDocs, runTransaction, doc, limit, getDoc, orderBy } from 'firebase/firestore';
-import { signOut } from 'firebase/auth';
-import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Dialog,
@@ -54,6 +48,7 @@ import {
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useNotification } from '@/hooks/use-notification';
+import { InternalToolWrapper } from '@/components/tools/internal-tool-wrapper';
 
 const DAILY_LIMIT = 10;
 const ADMIN_EMAIL = 'iwan.efndi@gmail.com';
@@ -126,11 +121,9 @@ export function NomorGeneratorClient() {
     const [isCopied, setIsCopied] = useState<'full' | 'numbers' | null>(null);
     const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
     
-    // Multi-user & History States
     const [myHistory, setMyHistory] = useState<GeneratedResult[]>([]);
     const [isHistoryLoading, setIsHistoryLoading] = useState(false);
     
-    // State for Stock Dialog
     const [isStockDialogOpen, setIsStockDialogOpen] = useState(false);
     const [stockMatrix, setStockMatrix] = useState<StockMatrix>({});
     const [stockPeriods2025, setStockPeriods2025] = useState<string[]>([]);
@@ -138,15 +131,13 @@ export function NomorGeneratorClient() {
     const [stockCategories, setStockCategories] = useState<string[]>([]);
     const [isStockLoading, setIsStockLoading] = useState(false);
     
-    // State for user limits
     const [userLimit, setUserLimit] = useState<UserLimit>({ count: 0, isLimited: false });
     const [isLimitLoading, setIsLimitLoading] = useState(true);
 
     const { toast } = useToast();
     const { notify } = useNotification();
     const firestore = useFirestore();
-    const auth = useAuth();
-    const { user, isUserLoading } = useUser();
+    const { user } = useUser();
 
     const isAdmin = useMemo(() => user?.email === ADMIN_EMAIL, [user]);
 
@@ -501,443 +492,314 @@ export function NomorGeneratorClient() {
         setTimeout(() => setCopiedIndex(null), 2000);
     };
 
-    const handleLogout = async () => {
-        try {
-            await signOut(auth);
-            notify("Berhasil keluar akun.", <LogOut className="h-4 w-4" />);
-        } catch (error) {
-            console.error("Logout error:", error);
-        }
-    };
-
-    if (isUserLoading) {
-        return (
-            <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
-                <Loader2 className="h-10 w-10 animate-spin text-accent" />
-                <p className="text-sm font-bold uppercase tracking-widest text-muted-foreground animate-pulse">Menghubungkan ke Database...</p>
-            </div>
-        );
-    }
-    
-    if (!user) {
-        return (
-            <Card className="text-center mt-8 border-primary/10 bg-card/50">
-                <CardHeader>
-                    <CardTitle className="font-headline text-2xl font-black uppercase tracking-tighter">Akses Terbatas</CardTitle>
-                    <CardDescription>Silakan masuk untuk mendapatkan nomor dokumen unik.</CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <Button asChild className="h-12 px-8 rounded-full shadow-lg shadow-primary/20 transition-all duration-200 active:scale-95">
-                        <Link href="/login">
-                            <LogIn className="mr-2 h-4 w-4"/>
-                            Masuk dengan Google
-                        </Link>
-                    </Button>
-                </CardContent>
-            </Card>
-        );
-    }
-
     const totalQuantity = requests.reduce((sum, req) => sum + req.quantity, 0);
     const hasResults = generatedNumbers.length > 0;
     
     return (
-        <div className="space-y-10 animate-in fade-in duration-700">
-            {/* 0. User Profile Bar */}
-            <div className="flex flex-col md:flex-row items-center justify-between gap-4 p-4 bg-muted/30 backdrop-blur-sm rounded-2xl border border-primary/5 shadow-inner">
-                <div className="flex items-center gap-3">
-                    <Avatar className="h-10 w-10 border-2 border-background shadow-md">
-                        <AvatarImage src={user.photoURL || ''} />
-                        <AvatarFallback className="bg-primary text-primary-foreground font-black">
-                            {user.email?.charAt(0).toUpperCase() || <User className="h-4 w-4" />}
-                        </AvatarFallback>
-                    </Avatar>
-                    <div className="flex flex-col">
-                        <span className="text-sm font-black text-primary leading-none mb-1">{user.displayName || 'Pengguna SnipGeek'}</span>
-                        <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-tight">{user.email}</span>
+        <InternalToolWrapper 
+            title="Number Generator" 
+            description="Generate unique sequential numbers for internal tracking purposes."
+        >
+            <div className="space-y-10">
+                {/* 1. Stepper Visual */}
+                <div className="max-w-2xl mx-auto mb-12">
+                    <div className="relative flex justify-between">
+                        <div className="absolute top-4 left-0 right-0 h-0.5 border-t-2 border-dashed border-primary/20 -z-10" />
+                        
+                        {[
+                            { step: 1, label: "Pilih Jenis & Tanggal", active: !hasResults },
+                            { step: 2, label: "Generate Nomor", active: !hasResults },
+                            { step: 3, label: "Salin Hasil", active: hasResults }
+                        ].map((s, idx) => (
+                            <div key={s.step} className="flex flex-col items-center gap-3 bg-background px-4">
+                                <div className={cn(
+                                    "w-8 h-8 rounded-full flex items-center justify-center text-xs font-black transition-all duration-500",
+                                    s.active ? "bg-primary text-primary-foreground shadow-lg scale-110" : "bg-muted text-muted-foreground"
+                                )}>
+                                    {s.step}
+                                </div>
+                                <span className={cn(
+                                    "text-[10px] uppercase tracking-widest font-black text-center max-w-[80px]",
+                                    s.active ? "text-primary" : "text-muted-foreground/40"
+                                )}>
+                                    {s.label}
+                                </span>
+                            </div>
+                        ))}
                     </div>
                 </div>
-                <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    onClick={handleLogout}
-                    className="text-[10px] font-black uppercase tracking-widest text-destructive hover:bg-destructive/10 hover:text-destructive rounded-full h-9 px-6 transition-all active:scale-95"
-                >
-                    <LogOut className="mr-2 h-3.5 w-3.5" />
-                    Keluar Akun
-                </Button>
-            </div>
 
-            {/* 1. Stepper Visual */}
-            <div className="max-w-2xl mx-auto mb-12">
-                <div className="relative flex justify-between">
-                    <div className="absolute top-4 left-0 right-0 h-0.5 border-t-2 border-dashed border-primary/20 -z-10" />
-                    
-                    {[
-                        { step: 1, label: "Pilih Jenis & Tanggal", active: !hasResults },
-                        { step: 2, label: "Generate Nomor", active: !hasResults },
-                        { step: 3, label: "Salin Hasil", active: hasResults }
-                    ].map((s, idx) => (
-                        <div key={s.step} className="flex flex-col items-center gap-3 bg-background px-4">
-                            <div className={cn(
-                                "w-8 h-8 rounded-full flex items-center justify-center text-xs font-black transition-all duration-500",
-                                s.active ? "bg-primary text-primary-foreground shadow-lg scale-110" : "bg-muted text-muted-foreground"
-                            )}>
-                                {s.step}
-                            </div>
-                            <span className={cn(
-                                "text-[10px] uppercase tracking-widest font-black text-center max-w-[80px]",
-                                s.active ? "text-primary" : "text-muted-foreground/40"
-                            )}>
-                                {s.label}
-                            </span>
-                        </div>
-                    ))}
-                </div>
-            </div>
+                <Tabs defaultValue="generator" className="w-full">
+                    <div className="flex justify-center mb-8">
+                        <TabsList className="bg-muted/40 p-1 h-12 rounded-full border border-primary/5">
+                            <TabsTrigger value="generator" className="rounded-full px-8 gap-2 font-black uppercase text-[10px] tracking-widest data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+                                <Zap className="h-3.5 w-3.5" />
+                                Generator
+                            </TabsTrigger>
+                            <TabsTrigger value="history" className="rounded-full px-8 gap-2 font-black uppercase text-[10px] tracking-widest data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+                                <History className="h-3.5 w-3.5" />
+                                Riwayat Saya
+                            </TabsTrigger>
+                        </TabsList>
+                    </div>
 
-            <Tabs defaultValue="generator" className="w-full">
-                <div className="flex justify-center mb-8">
-                    <TabsList className="bg-muted/40 p-1 h-12 rounded-full border border-primary/5">
-                        <TabsTrigger value="generator" className="rounded-full px-8 gap-2 font-black uppercase text-[10px] tracking-widest data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-                            <Zap className="h-3.5 w-3.5" />
-                            Generator
-                        </TabsTrigger>
-                        <TabsTrigger value="history" className="rounded-full px-8 gap-2 font-black uppercase text-[10px] tracking-widest data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-                            <History className="h-3.5 w-3.5" />
-                            Riwayat Saya
-                        </TabsTrigger>
-                    </TabsList>
-                </div>
-
-                <TabsContent value="generator" className="space-y-10 mt-0">
-                    <Card className="border-primary/10 bg-card/50 shadow-sm overflow-hidden transition-shadow duration-300 hover:shadow-md">
-                        <CardHeader className="bg-muted/20 border-b flex flex-col md:flex-row md:items-center justify-between gap-6 p-6">
-                            <div className="space-y-1">
-                                <CardTitle className="font-headline text-xl uppercase tracking-tight">Konfigurasi Permintaan</CardTitle>
-                                <CardDescription>Tentukan kategori dan periode dokumen yang ingin dibuat.</CardDescription>
-                            </div>
-                            
-                            {!isAdmin && (
-                                <div className="shrink-0">
-                                    {isLimitLoading ? (
-                                        <Skeleton className="h-16 w-40 rounded-xl" />
-                                    ) : (
-                                        <div className="bg-background/80 backdrop-blur-sm p-4 rounded-xl border border-primary/5 shadow-inner min-w-[180px]">
-                                            <div className="flex items-center justify-between mb-2">
-                                                <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-1">
-                                                    <Database className="h-3" /> Kuota Hari Ini
-                                                </span>
-                                                <span className="text-[10px] font-bold text-primary">
-                                                    {DAILY_LIMIT - userLimit.count} / {DAILY_LIMIT} tersisa
-                                                </span>
-                                            </div>
-                                            <Progress 
-                                                value={((DAILY_LIMIT - userLimit.count) / DAILY_LIMIT) * 100} 
-                                                className="h-1.5"
-                                                indicatorClassName={cn(
-                                                    (DAILY_LIMIT - userLimit.count) <= 3 ? "bg-destructive" : "bg-accent"
-                                                )}
-                                            />
-                                        </div>
-                                    )}
+                    <TabsContent value="generator" className="space-y-10 mt-0">
+                        <Card className="border-primary/10 bg-card/50 shadow-sm overflow-hidden transition-shadow duration-300 hover:shadow-md">
+                            <CardHeader className="bg-muted/20 border-b flex flex-col md:flex-row md:items-center justify-between gap-6 p-6">
+                                <div className="space-y-1">
+                                    <CardTitle className="font-headline text-xl uppercase tracking-tight">Konfigurasi Permintaan</CardTitle>
+                                    <CardDescription>Tentukan kategori dan periode dokumen yang ingin dibuat.</CardDescription>
                                 </div>
-                            )}
-                        </CardHeader>
-                        <CardContent className="space-y-8 p-6">
-                            <div className="space-y-3">
-                                <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Kategori Nilai Proyek</Label>
-                                <RadioGroup defaultValue="below_500m" value={valueCategory} className="flex flex-wrap items-center gap-6" onValueChange={(value) => setValueCategory(value as ValueCategory)}>
-                                    <div className="flex items-center space-x-2 bg-background/50 px-4 py-2 rounded-lg border focus-within:ring-2 focus-within:ring-accent/20 transition-all">
-                                        <RadioGroupItem value="below_500m" id="below" className="focus-visible:ring-accent" />
-                                        <Label htmlFor="below" className="cursor-pointer font-bold text-sm">Di bawah 500 Juta</Label>
-                                    </div>
-                                    <div className="flex items-center space-x-2 opacity-40">
-                                        <RadioGroupItem value="above_500m" id="above" disabled />
-                                        <Label htmlFor="above" className="text-sm">500 Juta atau lebih</Label>
-                                    </div>
-                                </RadioGroup>
-                            </div>
-
-                            <div className="space-y-4">
-                                <AnimatePresence>
-                                    {requests.map((req, index) => (
-                                        <motion.div 
-                                            key={req.id} 
-                                            className="grid grid-cols-1 md:grid-cols-[auto_2fr_1.5fr_1fr_auto] gap-4 items-end p-4 md:p-5 border-2 border-primary/5 hover:border-primary/15 transition-colors rounded-2xl bg-gradient-to-br from-background to-muted/20 shadow-inner"
-                                            initial={{ opacity: 0, y: -10 }}
-                                            animate={{ opacity: 1, y: 0 }}
-                                            exit={{ opacity: 0, scale: 0.95 }}
-                                        >
-                                            <div className="hidden md:flex items-center justify-center h-11 w-8 rounded-lg bg-primary/10 text-primary font-black text-sm">
-                                                {index + 1}
-                                            </div>
-                                            <div className="space-y-2">
-                                                <Label className="text-[10px] font-black uppercase text-muted-foreground ml-1">Jenis Dokumen</Label>
-                                                <Select onValueChange={(v) => handleDocTypeChange(req.id, v)} value={req.category && req.docType ? `${req.category}__${req.docType}` : ''}>
-                                                    <SelectTrigger className="h-11 rounded-lg border-primary/10 focus:ring-accent focus:ring-offset-0"><SelectValue placeholder="Pilih..." /></SelectTrigger>
-                                                    <SelectContent>
-                                                        {allDocTypes.map(typeInfo => (
-                                                            <SelectItem key={typeInfo.value} value={typeInfo.value}>
-                                                                {typeInfo.label}
-                                                            </SelectItem>
-                                                        ))}
-                                                    </SelectContent>
-                                                </Select>
-                                            </div>
-                                            <div className="space-y-2">
-                                                <Label className="text-[10px] font-black uppercase text-muted-foreground ml-1">Tanggal Dokumen</Label>
-                                                <Popover>
-                                                    <PopoverTrigger asChild>
-                                                        <Button variant={'outline'} className={cn('w-full h-11 justify-start text-left font-normal rounded-lg border-primary/10 hover:border-primary/30 focus-visible:ring-accent', !req.docDate && 'text-muted-foreground')}>
-                                                            <CalendarIcon className="mr-2 h-4 w-4 text-accent" />
-                                                            {req.docDate ? format(req.docDate, 'd MMM yyyy', { locale: id }) : <span>Pilih tanggal</span>}
-                                                        </Button>
-                                                    </PopoverTrigger>
-                                                    <PopoverContent className="w-auto p-0 border-primary/15 shadow-2xl rounded-2xl overflow-hidden backdrop-blur-sm">
-                                                        <Calendar
-                                                            mode="single"
-                                                            selected={req.docDate}
-                                                            onSelect={(d) => handleRequestChange(req.id, 'docDate', d)}
-                                                            initialFocus
-                                                            fixedWeeks={true}
-                                                            classNames={{
-                                                                months: "p-3",
-                                                                month: "space-y-3",
-                                                                caption: "flex justify-center pt-1 relative items-center px-8",
-                                                                caption_label: "text-sm font-black uppercase tracking-widest text-primary",
-                                                                nav: "space-x-1 flex items-center",
-                                                                nav_button: cn(
-                                                                    "h-7 w-7 bg-primary/5 hover:bg-primary/15 rounded-lg border-0 p-0 flex items-center justify-center transition-colors"
-                                                                ),
-                                                                nav_button_previous: "absolute left-1",
-                                                                nav_button_next: "absolute right-1",
-                                                                table: "w-full border-collapse",
-                                                                head_row: "flex",
-                                                                head_cell: "text-muted-foreground rounded-md w-9 font-normal text-[0.8rem] text-center",
-                                                                weekdays: "flex",
-                                                                weekday: "text-muted-foreground rounded-md w-9 font-black text-[10px] uppercase tracking-widest",
-                                                                row: "flex w-full mt-1",
-                                                                cell: cn(
-                                                                    "relative p-0 text-center text-sm focus-within:relative focus-within:z-20",
-                                                                    "first:[&:has([aria-selected])]:rounded-l-lg last:[&:has([aria-selected])]:rounded-r-lg"
-                                                                ),
-                                                                day: cn(
-                                                                    "h-9 w-9 p-0 font-semibold rounded-lg text-sm",
-                                                                    "hover:bg-accent/15 hover:text-accent transition-colors duration-150",
-                                                                    "focus:bg-accent/15 focus:outline-none"
-                                                                ),
-                                                                day_selected: cn(
-                                                                    "bg-primary text-primary-foreground font-black rounded-lg",
-                                                                    "hover:bg-primary hover:text-primary-foreground",
-                                                                    "shadow-md shadow-primary/30"
-                                                                ),
-                                                                day_today: cn(
-                                                                    "bg-accent/10 text-accent font-black rounded-lg ring-1 ring-accent/30"
-                                                                ),
-                                                                day_outside: "text-muted-foreground/30 hover:bg-transparent",
-                                                                day_disabled: "text-muted-foreground/20 hover:bg-transparent cursor-not-allowed",
-                                                            }}
-                                                        />
-                                                        <div className="border-t border-primary/5 px-3 py-2 flex gap-2">
-                                                            <button
-                                                                onClick={() => handleRequestChange(req.id, 'docDate', new Date())}
-                                                                className="flex-1 text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-accent hover:bg-accent/5 rounded-lg py-1.5 transition-colors"
-                                                            >
-                                                                Hari Ini
-                                                            </button>
-                                                            <button
-                                                                onClick={() => handleRequestChange(req.id, 'docDate', addMonths(new Date(), 1))}
-                                                                className="flex-1 text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-accent hover:bg-accent/5 rounded-lg py-1.5 transition-colors"
-                                                            >
-                                                                Bulan Depan
-                                                            </button>
-                                                        </div>
-                                                    </PopoverContent>
-                                                </Popover>
-                                            </div>
-                                            <div className="space-y-2">
-                                                 <Label className="text-[10px] font-black uppercase text-muted-foreground ml-1">Jumlah</Label>
-                                                 <div className="flex items-center gap-1">
-                                                    <Button 
-                                                        variant="outline" size="icon" className="h-11 w-11 rounded-lg border-primary/10 focus-visible:ring-accent"
-                                                        onClick={() => handleRequestChange(req.id, 'quantity', Math.max(1, req.quantity - 1))}
-                                                    >
-                                                        <Minus className="h-3 w-3" />
-                                                    </Button>
-                                                    <Input 
-                                                        type="number" min="1" max="20" value={req.quantity} 
-                                                        onChange={(e) => handleRequestChange(req.id, 'quantity', Number(e.target.value))} 
-                                                        className="h-11 flex-1 min-w-[50px] text-center rounded-lg border-primary/10 font-bold [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none focus-visible:ring-accent"
-                                                    />
-                                                    <Button 
-                                                        variant="outline" size="icon" className="h-11 w-11 rounded-lg border-primary/10 focus-visible:ring-accent"
-                                                        onClick={() => handleRequestChange(req.id, 'quantity', Math.min(20, req.quantity + 1))}
-                                                    >
-                                                        <Plus className="h-3 w-3" />
-                                                    </Button>
-                                                 </div>
-                                            </div>
-                                            <div className="flex items-center h-11">
-                                              {requests.length > 1 && (
-                                                <Button variant="ghost" size="icon" onClick={() => removeRequest(req.id)} className="rounded-full hover:bg-destructive/10 text-destructive/40 hover:text-destructive transition-all">
-                                                    <Trash2 className="h-4 w-4" />
-                                                </Button>
-                                              )}
-                                            </div>
-                                        </motion.div>
-                                    ))}
-                                </AnimatePresence>
-                            </div>
-
-                            <div className="flex flex-col md:flex-row items-center gap-4 pt-6 border-t border-dashed">
-                                <Button 
-                                    variant="ghost" 
-                                    onClick={addRequest} 
-                                    className="w-full md:w-auto h-11 px-6 rounded-full text-primary hover:bg-primary/5 transition-all duration-200 active:scale-95"
-                                >
-                                    <PlusCircle className="mr-2 h-4 w-4" />
-                                    Tambah Baris
-                                </Button>
                                 
-                                <Dialog open={isStockDialogOpen} onOpenChange={(isOpen) => {
-                                    if (isOpen) { fetchStockSummary(); }
-                                    setIsStockDialogOpen(isOpen);
-                                }}>
-                                     <DialogTrigger asChild>
-                                         <Button variant="secondary" className="w-full md:w-auto h-11 px-6 rounded-full transition-all duration-200 active:scale-95">
-                                             <Database className="mr-2 h-4 w-4 text-accent" />
-                                             Cek Stok Tersedia
-                                         </Button>
-                                     </DialogTrigger>
-                                     <DialogContent className="max-w-5xl p-0 overflow-hidden border-primary/10 rounded-2xl shadow-2xl shadow-primary/10">
-                                        <DialogHeader className="p-6 bg-gradient-to-br from-primary/5 to-accent/5 border-b border-primary/10">
-                                            <div className="flex items-center gap-4">
-                                                <div className="p-3 rounded-xl bg-primary/10 ring-1 ring-primary/10">
-                                                    <Database className="h-6 w-6 text-primary" />
-                                                </div>
-                                                <div>
-                                                    <DialogTitle className="font-headline text-2xl font-black uppercase tracking-tighter">
-                                                        Matriks Stok Nomor
-                                                    </DialogTitle>
-                                                    <DialogDescription className="text-xs mt-0.5">
-                                                        Ringkasan sisa nomor per kategori · Periode 2025–2026
-                                                    </DialogDescription>
-                                                </div>
-                                            </div>
-                                        </DialogHeader>
-                                        {isStockLoading ? (
-                                            <div className="p-16 flex flex-col items-center gap-5 bg-background">
-                                                <div className="relative">
-                                                    <div className="h-14 w-14 rounded-2xl bg-primary/5 flex items-center justify-center">
-                                                        <Database className="h-6 w-6 text-primary/30" />
-                                                    </div>
-                                                    <Loader2 className="h-5 w-5 animate-spin text-accent absolute -top-1 -right-1" />
-                                                </div>
-                                                <div className="space-y-2 text-center">
-                                                    <Skeleton className="h-3 w-48 rounded-full mx-auto" />
-                                                    <Skeleton className="h-3 w-32 rounded-full mx-auto" />
-                                                </div>
-                                                <Skeleton className="h-52 w-full rounded-xl" />
-                                            </div>
+                                {!isAdmin && (
+                                    <div className="shrink-0">
+                                        {isLimitLoading ? (
+                                            <Skeleton className="h-16 w-40 rounded-xl" />
                                         ) : (
-                                        <>
-                                            <div className="bg-background">
-                                                <Tabs defaultValue="2025" className="w-full">
-                                                    <div className="flex items-center justify-between px-6 py-3 bg-muted/20 border-b">
-                                                        <TabsList className="h-9 p-1 bg-background/80 rounded-xl border border-primary/10 gap-1">
-                                                            <TabsTrigger
-                                                                value="2025"
-                                                                className="rounded-lg px-5 text-xs font-black uppercase tracking-widest data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm"
-                                                            >
-                                                                2025
-                                                            </TabsTrigger>
-                                                            <TabsTrigger
-                                                                value="2026"
-                                                                className="rounded-lg px-5 text-xs font-black uppercase tracking-widest data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm"
-                                                            >
-                                                                2026
-                                                            </TabsTrigger>
-                                                        </TabsList>
+                                            <div className="bg-background/80 backdrop-blur-sm p-4 rounded-xl border border-primary/5 shadow-inner min-w-[180px]">
+                                                <div className="flex items-center justify-between mb-2">
+                                                    <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-1">
+                                                        <Database className="h-3" /> Kuota Hari Ini
+                                                    </span>
+                                                    <span className="text-[10px] font-bold text-primary">
+                                                        {DAILY_LIMIT - userLimit.count} / {DAILY_LIMIT} tersisa
+                                                    </span>
+                                                </div>
+                                                <Progress 
+                                                    value={((DAILY_LIMIT - userLimit.count) / DAILY_LIMIT) * 100} 
+                                                    className="h-1.5"
+                                                    indicatorClassName={cn(
+                                                        (DAILY_LIMIT - userLimit.count) <= 3 ? "bg-destructive" : "bg-accent"
+                                                    )}
+                                                />
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+                            </CardHeader>
+                            <CardContent className="space-y-8 p-6">
+                                <div className="space-y-3">
+                                    <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Kategori Nilai Proyek</Label>
+                                    <RadioGroup defaultValue="below_500m" value={valueCategory} className="flex flex-wrap items-center gap-6" onValueChange={(value) => setValueCategory(value as ValueCategory)}>
+                                        <div className="flex items-center space-x-2 bg-background/50 px-4 py-2 rounded-lg border focus-within:ring-2 focus-within:ring-accent/20 transition-all">
+                                            <RadioGroupItem value="below_500m" id="below" className="focus-visible:ring-accent" />
+                                            <Label htmlFor="below" className="cursor-pointer font-bold text-sm">Di bawah 500 Juta</Label>
+                                        </div>
+                                        <div className="flex items-center space-x-2 opacity-40">
+                                            <RadioGroupItem value="above_500m" id="above" disabled />
+                                            <Label htmlFor="above" className="text-sm">500 Juta atau lebih</Label>
+                                        </div>
+                                    </RadioGroup>
+                                </div>
 
-                                                        <div className="flex items-center gap-4">
-                                                            <div className="flex items-center gap-1.5">
-                                                                <span className="h-2.5 w-2.5 rounded-full bg-muted-foreground/20 inline-block" />
-                                                                <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/50">Kosong</span>
+                                <div className="space-y-4">
+                                    <AnimatePresence>
+                                        {requests.map((req, index) => (
+                                            <motion.div 
+                                                key={req.id} 
+                                                className="grid grid-cols-1 md:grid-cols-[auto_2fr_1.5fr_1fr_auto] gap-4 items-end p-4 md:p-5 border-2 border-primary/5 hover:border-primary/15 transition-colors rounded-2xl bg-gradient-to-br from-background to-muted/20 shadow-inner"
+                                                initial={{ opacity: 0, y: -10 }}
+                                                animate={{ opacity: 1, y: 0 }}
+                                                exit={{ opacity: 0, scale: 0.95 }}
+                                            >
+                                                <div className="hidden md:flex items-center justify-center h-11 w-8 rounded-lg bg-primary/10 text-primary font-black text-sm">
+                                                    {index + 1}
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <Label className="text-[10px] font-black uppercase text-muted-foreground ml-1">Jenis Dokumen</Label>
+                                                    <Select onValueChange={(v) => handleDocTypeChange(req.id, v)} value={req.category && req.docType ? `${req.category}__${req.docType}` : ''}>
+                                                        <SelectTrigger className="h-11 rounded-lg border-primary/10 focus:ring-accent focus:ring-offset-0"><SelectValue placeholder="Pilih..." /></SelectTrigger>
+                                                        <SelectContent>
+                                                            {allDocTypes.map(typeInfo => (
+                                                                <SelectItem key={typeInfo.value} value={typeInfo.value}>
+                                                                    {typeInfo.label}
+                                                                </SelectItem>
+                                                            ))}
+                                                        </SelectContent>
+                                                    </Select>
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <Label className="text-[10px] font-black uppercase text-muted-foreground ml-1">Tanggal Dokumen</Label>
+                                                    <Popover>
+                                                        <PopoverTrigger asChild>
+                                                            <Button variant={'outline'} className={cn('w-full h-11 justify-start text-left font-normal rounded-lg border-primary/10 hover:border-primary/30 focus-visible:ring-accent', !req.docDate && 'text-muted-foreground')}>
+                                                                <CalendarIcon className="mr-2 h-4 w-4 text-accent" />
+                                                                {req.docDate ? format(req.docDate, 'd MMM yyyy', { locale: id }) : <span>Pilih tanggal</span>}
+                                                            </Button>
+                                                        </PopoverTrigger>
+                                                        <PopoverContent className="w-auto p-0 border-primary/15 shadow-2xl rounded-2xl overflow-hidden backdrop-blur-sm">
+                                                            <Calendar
+                                                                mode="single"
+                                                                selected={req.docDate}
+                                                                onSelect={(d) => handleRequestChange(req.id, 'docDate', d)}
+                                                                initialFocus
+                                                                fixedWeeks={true}
+                                                            />
+                                                            <div className="border-t border-primary/5 px-3 py-2 flex gap-2">
+                                                                <button
+                                                                    onClick={() => handleRequestChange(req.id, 'docDate', new Date())}
+                                                                    className="flex-1 text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-accent hover:bg-accent/5 rounded-lg py-1.5 transition-colors"
+                                                                >
+                                                                    Hari Ini
+                                                                </button>
+                                                                <button
+                                                                    onClick={() => handleRequestChange(req.id, 'docDate', addMonths(new Date(), 1))}
+                                                                    className="flex-1 text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-accent hover:bg-accent/5 rounded-lg py-1.5 transition-colors"
+                                                                >
+                                                                    Bulan Depan
+                                                                </button>
                                                             </div>
-                                                            <div className="flex items-center gap-1.5">
-                                                                <span className="h-2.5 w-2.5 rounded-full bg-destructive inline-block" />
-                                                                <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">≤ 5 Kritis</span>
-                                                            </div>
-                                                            <div className="flex items-center gap-1.5">
-                                                                <span className="h-2.5 w-2.5 rounded-full bg-accent inline-block" />
-                                                                <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Tersedia</span>
-                                                            </div>
-                                                        </div>
+                                                        </PopoverContent>
+                                                    </Popover>
+                                                </div>
+                                                <div className="space-y-2">
+                                                     <Label className="text-[10px] font-black uppercase text-muted-foreground ml-1">Jumlah</Label>
+                                                     <div className="flex items-center gap-1">
+                                                        <Button 
+                                                            variant="outline" size="icon" className="h-11 w-11 rounded-lg border-primary/10 focus-visible:ring-accent"
+                                                            onClick={() => handleRequestChange(req.id, 'quantity', Math.max(1, req.quantity - 1))}
+                                                        >
+                                                            <Minus className="h-3 w-3" />
+                                                        </Button>
+                                                        <Input 
+                                                            type="number" min="1" max="20" value={req.quantity} 
+                                                            onChange={(e) => handleRequestChange(req.id, 'quantity', Number(e.target.value))} 
+                                                            className="h-11 flex-1 min-w-[50px] text-center rounded-lg border-primary/10 font-bold [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none focus-visible:ring-accent"
+                                                        />
+                                                        <Button 
+                                                            variant="outline" size="icon" className="h-11 w-11 rounded-lg border-primary/10 focus-visible:ring-accent"
+                                                            onClick={() => handleRequestChange(req.id, 'quantity', Math.min(20, req.quantity + 1))}
+                                                        >
+                                                            <Plus className="h-3 w-3" />
+                                                        </Button>
+                                                     </div>
+                                                </div>
+                                                <div className="flex items-center h-11">
+                                                  {requests.length > 1 && (
+                                                    <Button variant="ghost" size="icon" onClick={() => removeRequest(req.id)} className="rounded-full hover:bg-destructive/10 text-destructive/40 hover:text-destructive transition-all">
+                                                        <Trash2 className="h-4 w-4" />
+                                                    </Button>
+                                                  )}
+                                                </div>
+                                            </motion.div>
+                                        ))}
+                                    </AnimatePresence>
+                                </div>
+
+                                <div className="flex flex-col md:flex-row items-center gap-4 pt-6 border-t border-dashed">
+                                    <Button 
+                                        variant="ghost" 
+                                        onClick={addRequest} 
+                                        className="w-full md:w-auto h-11 px-6 rounded-full text-primary hover:bg-primary/5 transition-all duration-200 active:scale-95"
+                                    >
+                                        <PlusCircle className="mr-2 h-4 w-4" />
+                                        Tambah Baris
+                                    </Button>
+                                    
+                                    <Dialog open={isStockDialogOpen} onOpenChange={(isOpen) => {
+                                        if (isOpen) { fetchStockSummary(); }
+                                        setIsStockDialogOpen(isOpen);
+                                    }}>
+                                         <DialogTrigger asChild>
+                                             <Button variant="secondary" className="w-full md:w-auto h-11 px-6 rounded-full transition-all duration-200 active:scale-95">
+                                                 <Database className="mr-2 h-4 w-4 text-accent" />
+                                                 Cek Stok Tersedia
+                                             </Button>
+                                         </DialogTrigger>
+                                         <DialogContent className="max-w-5xl p-0 overflow-hidden border-primary/10 rounded-2xl shadow-2xl shadow-primary/10">
+                                            <DialogHeader className="p-6 bg-gradient-to-br from-primary/5 to-accent/5 border-b border-primary/10">
+                                                <div className="flex items-center gap-4">
+                                                    <div className="p-3 rounded-xl bg-primary/10 ring-1 ring-primary/10">
+                                                        <Database className="h-6 w-6 text-primary" />
                                                     </div>
-                                                    <TabsContent value="2025" className="mt-0">
-                                                        <div className="relative max-h-[55vh] overflow-auto bg-background">
-                                                            <table className="w-full border-collapse text-[11px]">
-                                                                <thead className="sticky top-0 z-10 bg-background border-b-2 border-primary/10">
-                                                                    <tr className="bg-muted/30">
-                                                                        <th className="sticky left-0 z-20 bg-muted/60 backdrop-blur-sm p-4 text-left font-black uppercase tracking-widest text-muted-foreground w-[110px] border-r border-primary/10">Kategori</th>
-                                                                        {stockPeriods2025.map(period => (
-                                                                            <th key={period} className="p-3 text-center font-black uppercase tracking-widest text-muted-foreground min-w-[64px]">{format(new Date(period), 'MMM', { locale: id }).toUpperCase()}</th>
-                                                                        ))}
-                                                                    </tr>
-                                                                </thead>
-                                                                <tbody className="divide-y divide-primary/5">
-                                                                    {stockCategories.map(category => (
-                                                                        <tr key={category} className="group hover:bg-primary/[0.03] transition-colors">
-                                                                            <th className="sticky left-0 bg-background group-hover:bg-primary/[0.03] p-4 text-left font-black text-[10px] tracking-widest text-primary/50 border-r border-primary/5 transition-colors">{category}</th>
+                                                    <div>
+                                                        <DialogTitle className="font-headline text-2xl font-black uppercase tracking-tighter">
+                                                            Matriks Stok Nomor
+                                                        </DialogTitle>
+                                                        <DialogDescription className="text-xs mt-0.5">
+                                                            Ringkasan sisa nomor per kategori · Periode 2025–2026
+                                                        </DialogDescription>
+                                                    </div>
+                                                </div>
+                                            </DialogHeader>
+                                            {isStockLoading ? (
+                                                <div className="p-16 flex flex-col items-center gap-5 bg-background">
+                                                    <Loader2 className="h-8 w-8 animate-spin text-accent" />
+                                                    <Skeleton className="h-52 w-full rounded-xl" />
+                                                </div>
+                                            ) : (
+                                            <>
+                                                <div className="bg-background">
+                                                    <Tabs defaultValue="2025" className="w-full">
+                                                        <div className="flex items-center justify-between px-6 py-3 bg-muted/20 border-b">
+                                                            <TabsList className="h-9 p-1 bg-background/80 rounded-xl border border-primary/10 gap-1">
+                                                                <TabsTrigger value="2025" className="rounded-lg px-5 text-xs font-black uppercase tracking-widest">2025</TabsTrigger>
+                                                                <TabsTrigger value="2026" className="rounded-lg px-5 text-xs font-black uppercase tracking-widest">2026</TabsTrigger>
+                                                            </TabsList>
+                                                        </div>
+                                                        <TabsContent value="2025" className="mt-0">
+                                                            <div className="relative max-h-[55vh] overflow-auto bg-background">
+                                                                <table className="w-full border-collapse text-[11px]">
+                                                                    <thead className="sticky top-0 z-10 bg-background border-b-2 border-primary/10">
+                                                                        <tr className="bg-muted/30">
+                                                                            <th className="sticky left-0 z-20 bg-muted/60 backdrop-blur-sm p-4 text-left font-black uppercase tracking-widest text-muted-foreground w-[110px] border-r border-primary/10">Kategori</th>
                                                                             {stockPeriods2025.map(period => (
-                                                                                <td key={`${category}-${period}`} className={cn(
-                                                                                    "p-3 text-center font-mono text-xs transition-colors",
-                                                                                    stockMatrix[category]?.[period] === 0
-                                                                                        ? "text-muted-foreground/25"
-                                                                                        : stockMatrix[category]?.[period] <= 5
-                                                                                        ? "text-destructive font-black bg-destructive/5"
-                                                                                        : "text-accent font-bold"
-                                                                                )}>
-                                                                                    {stockMatrix[category]?.[period] === 0
-                                                                                        ? <span className="text-muted-foreground/20">—</span>
-                                                                                        : stockMatrix[category]?.[period] ?? 0
-                                                                                    }
-                                                                                </td>
+                                                                                <th key={period} className="p-3 text-center font-black uppercase tracking-widest text-muted-foreground min-w-[64px]">{format(new Date(period), 'MMM', { locale: id }).toUpperCase()}</th>
                                                                             ))}
                                                                         </tr>
-                                                                    ))}
-                                                                </tbody>
-                                                            </table>
-                                                        </div>
-                                                    </TabsContent>
-                                                    <TabsContent value="2026" className="mt-0">
-                                                        <div className="relative max-h-[55vh] overflow-auto bg-background">
-                                                            <table className="w-full border-collapse text-[11px]">
-                                                                <thead className="sticky top-0 z-10 bg-background border-b-2 border-primary/10">
-                                                                    <tr className="bg-muted/30">
-                                                                        <th className="sticky left-0 z-20 bg-muted/60 backdrop-blur-sm p-4 text-left font-black uppercase tracking-widest text-muted-foreground w-[110px] border-r border-primary/10">Kategori</th>
-                                                                        {stockPeriods2026.map(period => (
-                                                                            <th key={period} className="p-3 text-center font-black uppercase tracking-widest text-muted-foreground min-w-[64px]">{format(new Date(period), 'MMM', { locale: id }).toUpperCase()}</th>
+                                                                    </thead>
+                                                                    <tbody className="divide-y divide-primary/5">
+                                                                        {stockCategories.map(category => (
+                                                                            <tr key={category} className="group hover:bg-primary/[0.03] transition-colors">
+                                                                                <th className="sticky left-0 bg-background group-hover:bg-primary/[0.03] p-4 text-left font-black text-[10px] tracking-widest text-primary/50 border-r border-primary/5 transition-colors">{category}</th>
+                                                                                {stockPeriods2025.map(period => (
+                                                                                    <td key={`${category}-${period}`} className={cn(
+                                                                                        "p-3 text-center font-mono text-xs transition-colors",
+                                                                                        stockMatrix[category]?.[period] === 0
+                                                                                            ? "text-muted-foreground/25"
+                                                                                            : stockMatrix[category]?.[period] <= 5
+                                                                                            ? "text-destructive font-black bg-destructive/5"
+                                                                                            : "text-accent font-bold"
+                                                                                    )}>
+                                                                                        {stockMatrix[category]?.[period] === 0
+                                                                                            ? <span className="text-muted-foreground/20">—</span>
+                                                                                            : stockMatrix[category]?.[period] ?? 0
+                                                                                        }
+                                                                                    </td>
+                                                                                ))}
+                                                                            </tr>
                                                                         ))}
-                                                                    </tr>
-                                                                </thead>
-                                                                <tbody className="divide-y divide-primary/5">
-                                                                    {stockCategories.map(category => (
-                                                                        <tr key={category} className="group hover:bg-primary/[0.03] transition-colors">
-                                                                            <th className="sticky left-0 bg-background group-hover:bg-primary/[0.03] p-4 text-left font-black text-[10px] tracking-widest text-primary/50 border-r border-primary/5 transition-colors">{category}</th>
+                                                                    </tbody>
+                                                                </table>
+                                                            </div>
+                                                        </TabsContent>
+                                                        <TabsContent value="2026" className="mt-0">
+                                                            <div className="relative max-h-[55vh] overflow-auto bg-background">
+                                                                <table className="w-full border-collapse text-[11px]">
+                                                                    <thead className="sticky top-0 z-10 bg-background border-b-2 border-primary/10">
+                                                                        <tr className="bg-muted/30">
+                                                                            <th className="sticky left-0 z-20 bg-muted/60 backdrop-blur-sm p-4 text-left font-black uppercase tracking-widest text-muted-foreground w-[110px] border-r border-primary/10">Kategori</th>
                                                                             {stockPeriods2026.map(period => (
-                                                                                <td key={`${category}-${period}`} className={cn(
-                                                                                    "p-3 text-center font-mono text-xs transition-colors",
-                                                                                    stockMatrix[category]?.[period] === 0
-                                                                                        ? "text-muted-foreground/25"
-                                                                                        : stockMatrix[category]?.[period] <= 5
-                                                                                        ? "text-destructive font-black bg-destructive/5"
-                                                                                        : "text-accent font-bold"
-                                                                                )}>
-                                                                                    {stockMatrix[category]?.[period] === 0
-                                                                                        ? <span className="text-muted-foreground/20">—</span>
-                                                                                        : stockMatrix[category]?.[period] ?? 0
+                                                                                <th key={period} className="p-3 text-center font-black uppercase tracking-widest text-muted-foreground min-w-[64px]">{format(new Date(period), 'MMM', { locale: id }).toUpperCase()}</th>
+                                                                            ))}
+                                                                        </tr>
+                                                                    </thead>
+                                                                    <tbody className="divide-y divide-primary/5">
+                                                                        {stockCategories.map(category => (
+                                                                            <tr key={category} className="group hover:bg-primary/[0.03] transition-colors">
+                                                                                <th className="sticky left-0 bg-background group-hover:bg-primary/[0.03] p-4 text-left font-black text-[10px] tracking-widest text-primary/50 border-r border-primary/5 transition-colors">{category}</th>
+                                                                                {stockPeriods2026.map(period => (
+                                                                                    <td key={`${category}-${period}`} className={cn(
+                                                                                        "p-3 text-center font-mono text-xs transition-colors",
+                                                                                        stockMatrix[category]?.[period] === 0
+                                                                                            ? "text-muted-foreground/25"
+                                                                                            : stockMatrix[category]?.[period] <= 5
+                                                                                            ? "text-destructive font-black bg-destructive/5"
+                                                                                            : "text-accent font-bold"
+                                                                                    )}>
+                                                                                        {stockMatrix[category]?.[period] === 0
+                                                                                            ? <span className="text-muted-foreground/20">—</span>
+                                                                                            : stockMatrix[category]?.[period] ?? 0
                                                                                     }
                                                                                 </td>
                                                                             ))}
@@ -950,16 +812,8 @@ export function NomorGeneratorClient() {
                                                 </Tabs>
                                             </div>
                                             <div className="flex items-center justify-between px-6 py-3 bg-muted/10 border-t border-primary/5">
-                                                <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50">
-                                                    Data diambil langsung dari database · Realtime
-                                                </p>
-                                                <button
-                                                    onClick={fetchStockSummary}
-                                                    className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-accent transition-colors"
-                                                >
-                                                    <RotateCcw className="h-3 w-3" />
-                                                    Refresh
-                                                </button>
+                                                <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50">Data diambil langsung dari database · Realtime</p>
+                                                <button onClick={fetchStockSummary} className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-accent transition-colors"><RotateCcw className="h-3 w-3" /> Refresh</button>
                                             </div>
                                         </>
                                         )}
@@ -995,11 +849,7 @@ export function NomorGeneratorClient() {
 
                     <AnimatePresence>
                         {hasResults && (
-                            <motion.div
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                className="animate-in zoom-in-95 duration-500"
-                            >
+                            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="animate-in zoom-in-95 duration-500">
                                 <Card className="border-accent/20 bg-accent/5 shadow-xl ring-1 ring-accent/5 overflow-hidden transition-shadow duration-300 hover:shadow-2xl">
                                      <CardHeader className="bg-gradient-to-r from-accent/15 to-accent/5 border-b border-accent/10 p-6">
                                         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -1024,12 +874,6 @@ export function NomorGeneratorClient() {
                                         </div>
                                      </CardHeader>
                                      <CardContent className="p-6 space-y-6">
-                                        <div className="flex justify-start">
-                                            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent/10 text-accent text-[10px] font-black uppercase tracking-widest border border-accent/10">
-                                                Total: {generatedNumbers.length} nomor diproses
-                                            </div>
-                                        </div>
-
                                         <div className="space-y-3">
                                             <ol className="space-y-3">
                                                 {generatedNumbers.map((result, index) => (
@@ -1056,43 +900,14 @@ export function NomorGeneratorClient() {
                                                             )}>{result.text}</span>
                                                         </div>
                                                         {!result.isError && (
-                                                            <div className="mt-3 sm:mt-0">
-                                                                <Button 
-                                                                    variant="ghost" 
-                                                                    size="icon" 
-                                                                    className="h-10 w-10 rounded-xl hover:bg-accent/10 text-accent opacity-0 group-hover:opacity-100 transition-all focus-visible:ring-accent"
-                                                                    onClick={() => copyItem(result.text, index)}
-                                                                >
-                                                                    {copiedIndex === index ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-                                                                </Button>
-                                                            </div>
-                                                        )}
-                                                        {result.isError && (
-                                                            <Badge variant="destructive" className="mt-3 sm:mt-0 text-[8px] font-black uppercase py-0.5">
-                                                                {result.text === 'KUOTA HABIS' ? 'Limit Tercapai' : 'Stok Habis'}
-                                                            </Badge>
+                                                            <Button variant="ghost" size="icon" className="h-10 w-10 rounded-xl hover:bg-accent/10 text-accent opacity-0 group-hover:opacity-100 transition-all" onClick={() => copyItem(result.text, index)}>
+                                                                {copiedIndex === index ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                                                            </Button>
                                                         )}
                                                     </li>
                                                 ))}
                                             </ol>
                                         </div>
-                                        
-                                        {remainingCounts.length > 0 && (
-                                             <div className="space-y-4 pt-6 border-t border-accent/10">
-                                                <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Update Sisa Stok</Label>
-                                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                                    {remainingCounts.map((item, index) => (
-                                                        <div key={index} className="flex justify-between items-center px-4 py-2.5 rounded-xl bg-background/40 border border-primary/5 transition-colors hover:bg-background/60">
-                                                            <span className="text-[10px] font-bold text-primary/60 uppercase tracking-tight">{item.label}</span>
-                                                            <div className="flex items-center gap-2">
-                                                                <span className={cn("font-mono text-sm font-black", item.count <= 3 ? 'text-destructive' : 'text-primary')}>{item.count}</span>
-                                                                {item.count <= 3 && <AlertTriangle className="h-3.5 w-3.5 text-destructive animate-pulse" />}
-                                                            </div>
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            </div>
-                                        )}
                                      </CardContent>
                                 </Card>
                             </motion.div>
@@ -1116,10 +931,7 @@ export function NomorGeneratorClient() {
                         </CardHeader>
                         <CardContent className="p-6">
                             {isHistoryLoading ? (
-                                <div className="py-20 text-center space-y-4">
-                                    <Loader2 className="h-10 w-10 animate-spin text-accent mx-auto" />
-                                    <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Memuat Riwayat...</p>
-                                </div>
+                                <div className="py-20 text-center"><Loader2 className="h-10 w-10 animate-spin text-accent mx-auto" /></div>
                             ) : myHistory.length > 0 ? (
                                 <div className="space-y-3">
                                     {myHistory.map((item, index) => (
@@ -1128,39 +940,26 @@ export function NomorGeneratorClient() {
                                                 <div className="flex items-center gap-3 mb-1">
                                                     <Badge variant="outline" className="text-[8px] font-black uppercase bg-primary/5 text-primary border-primary/10">{item.docType}</Badge>
                                                     <span className="h-1 w-1 rounded-full bg-muted-foreground/30" />
-                                                    <span className="text-[10px] font-bold text-muted-foreground/60 uppercase">
-                                                        {format(item.date, 'HH:mm', { locale: id })} WIB
-                                                    </span>
+                                                    <span className="text-[10px] font-bold text-muted-foreground/60 uppercase">{format(item.date, 'HH:mm', { locale: id })} WIB</span>
                                                 </div>
                                                 <span className="font-mono text-base font-black tracking-tight text-primary">{item.text}</span>
                                             </div>
-                                            <Button 
-                                                variant="ghost" 
-                                                size="icon" 
-                                                className="h-9 w-9 rounded-xl hover:bg-accent/10 text-accent opacity-0 group-hover:opacity-100 transition-all"
-                                                onClick={() => copyItem(item.text, index + 100)} // Offset index for copied state
-                                            >
+                                            <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl hover:bg-accent/10 text-accent opacity-0 group-hover:opacity-100 transition-all" onClick={() => copyItem(item.text, index + 100)}>
                                                 {copiedIndex === index + 100 ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
                                             </Button>
                                         </div>
                                     ))}
-                                    <p className="text-center pt-6 text-[10px] font-bold uppercase tracking-widest text-muted-foreground/40 italic">
-                                        Menampilkan {myHistory.length} transaksi terakhir Anda hari ini
-                                    </p>
                                 </div>
                             ) : (
                                 <div className="py-20 text-center border-2 border-dashed rounded-2xl bg-muted/5">
                                     <FileSpreadsheet className="h-12 w-12 mx-auto text-muted-foreground/20 mb-4" />
                                     <p className="text-xs font-bold text-muted-foreground/40 uppercase tracking-widest">Belum ada aktivitas hari ini</p>
-                                    <Button variant="link" onClick={() => {}} className="text-accent text-[10px] font-black uppercase mt-2">
-                                        Mulai buat nomor baru
-                                    </Button>
                                 </div>
                             )}
                         </CardContent>
                     </Card>
                 </TabsContent>
-            </Tabs>
-        </div>
+            </div>
+        </InternalToolWrapper>
     );
 }
