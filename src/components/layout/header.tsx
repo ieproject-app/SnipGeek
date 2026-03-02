@@ -106,12 +106,6 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
   }, []);
 
   useEffect(() => {
-    if (message) {
-      setIsVisible(true);
-    }
-  }, [message]);
-
-  useEffect(() => {
     if (mounted) {
       const pendingKey = typeof window !== 'undefined' ? localStorage.getItem('snipgeek-pending-notify') : null;
       if (pendingKey) {
@@ -262,71 +256,6 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
     )}>
         <div className="max-w-4xl mx-auto h-16 min-h-[64px] px-4 md:px-6 flex items-center justify-between relative overflow-visible">
             
-            {/* Notification Overlay - Seamless Integrated Version */}
-            <div className={cn(
-                "absolute inset-0 z-40 h-[63px] flex flex-col overflow-hidden",
-                "bg-background",
-                (mounted && message)
-                ? [
-                    "translate-y-0 opacity-100",
-                    "duration-500 [transition-timing-function:cubic-bezier(0.34,1.56,0.64,1)]",
-                    ].join(" ")
-                : [
-                    "translate-y-[-100%] opacity-0",
-                    "duration-[200ms] ease-in pointer-events-none",
-                    ].join(" ")
-            )}>
-                {/* Content row with stagger */}
-                <div className="flex-1 flex items-center justify-center gap-3 px-6 relative">
-                    {/* Icon — slide from left, delay 80ms */}
-                    <div className={cn(
-                        "text-accent transition-all duration-300",
-                        message
-                        ? "opacity-100 translate-x-0 scale-100 delay-[80ms]"
-                        : "opacity-0 -translate-x-2 scale-75"
-                    )}>
-                        {icon && React.cloneElement(icon as React.ReactElement,
-                        { className: "h-5 w-5" }
-                        )}
-                    </div>
-
-                    {/* Text — slide from bottom, delay 120ms */}
-                    <p className={cn(
-                        "font-sans text-[10px] font-black uppercase tracking-widest",
-                        "transition-all duration-300",
-                        message
-                        ? "opacity-100 translate-y-0 delay-[120ms]"
-                        : "opacity-0 translate-y-1"
-                    )}>
-                        {message}
-                    </p>
-
-                    {/* Dismiss button */}
-                    <button
-                        onClick={clear}
-                        className={cn(
-                        "absolute right-4 h-8 w-8 rounded-full flex items-center justify-center",
-                        "text-foreground/25 hover:text-foreground/60 hover:bg-muted/50",
-                        "transition-all duration-150",
-                        message ? "opacity-100 delay-[200ms]" : "opacity-0"
-                        )}
-                    >
-                        <X className="h-4 w-4" />
-                    </button>
-                </div>
-
-                {/* Progress bar countdown - Ultra thin and subtle */}
-                <div className="h-[1.5px] bg-accent/5">
-                    <div
-                        className="h-full bg-accent/40 transition-none"
-                        style={{
-                        width: `${progress}%`,
-                        borderRadius: '0 2px 2px 0',
-                        }}
-                    />
-                </div>
-            </div>
-
             {/* Left: Branding */}
             <div className={cn(
                 "flex items-center transition-all duration-500",
@@ -463,19 +392,26 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                 <Button 
                     variant="ghost" 
                     size="icon" 
-                    className={cn(navItemClass, "group/theme")} 
+                    className={cn(navItemClass, "group/theme overflow-hidden")} 
                     onClick={toggleTheme}
                     aria-label="Toggle Theme"
                 >
-                    {mounted ? (
-                        resolvedTheme === 'dark' ? (
-                            <Moon className="h-5 w-5 transition-transform duration-500 group-hover/theme:rotate-[12deg]" />
-                        ) : (
-                            <Sun className="h-5 w-5 transition-transform duration-500 group-hover/theme:rotate-[12deg]" />
-                        )
-                    ) : (
-                        <Sun className="h-5 w-5 opacity-0" />
-                    )}
+                    <div className="relative h-5 w-5">
+                        {/* Sun icon — visible in light mode */}
+                        <Sun className={cn(
+                            "absolute inset-0 h-5 w-5 transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)]",
+                            mounted && resolvedTheme === 'dark'
+                                ? "opacity-0 scale-0 rotate-90"
+                                : "opacity-100 scale-100 rotate-0"
+                        )} />
+                        {/* Moon icon — visible in dark mode */}
+                        <Moon className={cn(
+                            "absolute inset-0 h-5 w-5 transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)]",
+                            mounted && resolvedTheme === 'dark'
+                                ? "opacity-100 scale-100 rotate-0"
+                                : "opacity-0 scale-0 -rotate-90"
+                        )} />
+                    </div>
                 </Button>
 
                 {/* 4. Search Icon */}
@@ -721,6 +657,52 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                     </div>
                 </div>
             </div>
+        </div>
+
+        {/* ── Notification Toast Bar ── */}
+        <div
+          className={cn(
+            "w-full overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]",
+            mounted && message
+              ? "max-h-10 opacity-100"
+              : "max-h-0 opacity-0"
+          )}
+        >
+          <div className="relative flex items-center justify-center gap-2.5 h-9 px-6 bg-accent/[0.08] border-t border-accent/10">
+            
+            {/* Icon */}
+            <span className={cn(
+              "text-accent transition-all duration-300 delay-100",
+              message ? "opacity-100 scale-100" : "opacity-0 scale-75"
+            )}>
+              {icon && React.cloneElement(icon as React.ReactElement, { className: "h-3.5 w-3.5" })}
+            </span>
+
+            {/* Message */}
+            <p className={cn(
+              "font-sans text-[9px] font-black uppercase tracking-widest text-foreground/70 transition-all duration-300 delay-150",
+              message ? "opacity-100 translate-y-0" : "opacity-0 translate-y-1"
+            )}>
+              {message}
+            </p>
+
+            {/* Dismiss */}
+            <button
+              onClick={clear}
+              className="absolute right-3 h-6 w-6 rounded-full flex items-center justify-center text-foreground/30 hover:text-foreground/60 hover:bg-muted/50 transition-all"
+            >
+              <X className="h-3.5 w-3.5" />
+            </button>
+
+            {/* Progress line at the very bottom of this bar */}
+            <div className="absolute bottom-0 left-0 right-0 h-[1.5px] bg-accent/5">
+              <div
+                className="h-full bg-accent/50 transition-none"
+                style={{ width: `${progress}%`, borderRadius: '0 2px 2px 0' }}
+              />
+            </div>
+
+          </div>
         </div>
     </header>
   );
