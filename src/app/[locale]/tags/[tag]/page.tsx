@@ -1,4 +1,5 @@
-import { getSortedPostsData, getSortedNotesData as getRawNotes } from '@/lib/posts';
+import { getSortedPostsData } from '@/lib/posts';
+import { getSortedNotesData as getRawNotes } from '@/lib/notes';
 import { i18n } from '@/i18n-config';
 import { getDictionary } from '@/lib/get-dictionary';
 import Link from 'next/link';
