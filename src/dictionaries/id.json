@@ -257,6 +257,9 @@
         "langId": "Bahasa: Indonesia",
         "readingListAdded": "Tersimpan ke Daftar Baca",
         "readingListRemoved": "Dihapus dari Daftar Baca",
-        "copied": "Tersalin ke Clipboard"
+        "copied": "Tersalin ke Clipboard",
+        "stockInsufficient": "Stok tidak cukup untuk {type}",
+        "stockEmpty": "Periode yang dipilih sedang kosong",
+        "stockGenerated": "Berhasil generate {count} nomor"
     }
 }
