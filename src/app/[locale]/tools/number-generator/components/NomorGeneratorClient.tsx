@@ -300,7 +300,6 @@ export function NomorGeneratorClient() {
                     if (currentCount >= DAILY_LIMIT) {
                         throw new Error(`Batas generate harian (${DAILY_LIMIT}) telah tercapai.`);
                     }
-                    // We check full count at the end if needed, but for now we proceed
                 }
 
                 const results: GeneratedResult[] = [];
@@ -625,7 +624,9 @@ export function NomorGeneratorClient() {
                                                         nav_button_next: "absolute right-1",
                                                         table: "w-full border-collapse",
                                                         head_row: "flex",
-                                                        head_cell: "text-muted-foreground rounded-md w-9 font-black text-[10px] uppercase tracking-widest",
+                                                        head_cell: "text-muted-foreground rounded-md w-9 font-normal text-[0.8rem] text-center",
+                                                        weekdays: "flex",
+                                                        weekday: "text-muted-foreground rounded-md w-9 font-black text-[10px] uppercase tracking-widest",
                                                         row: "flex w-full mt-1",
                                                         cell: cn(
                                                             "relative p-0 text-center text-sm focus-within:relative focus-within:z-20",
