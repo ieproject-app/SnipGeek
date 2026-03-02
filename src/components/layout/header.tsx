@@ -362,9 +362,9 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                     <Search className="h-5 w-5 transition-transform group-hover:scale-110 group-hover:rotate-12" />
                 </Button>
 
-                {/* FLOATING MORE MENU DROPDOWN - Anchored to Top-Right Corner */}
+                {/* FLOATING MORE MENU DROPDOWN - Optimized Flyout Position */}
                 <div className={cn(
-                    "absolute top-full right-0 mt-3 min-w-[220px] bg-background/95 backdrop-blur-xl border border-border shadow-2xl rounded-2xl overflow-hidden origin-top-right transition-all duration-300 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] z-50",
+                    "absolute top-full right-2 mt-5 min-w-[220px] bg-background/95 backdrop-blur-xl border border-border shadow-2xl rounded-2xl overflow-hidden origin-top-right transition-all duration-300 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] z-50 ring-1 ring-black/[0.03]",
                     isMenuOpen ? "opacity-100 scale-100 translate-y-0" : "opacity-0 scale-[0.95] -translate-y-2 pointer-events-none"
                 )}>
                     <div className="py-3">
