@@ -8,7 +8,7 @@ import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { cn, formatRelativeTime } from '@/lib/utils';
 import { AddToReadingListButton } from '@/components/layout/add-to-reading-list-button';
 import { ArrowRight } from 'lucide-react';
-import { CategoryBadge, getBadgeStyle } from '@/components/layout/category-badge';
+import { CategoryBadge, getBadgeStyle, simplifyCategoryLabel } from '@/components/layout/category-badge';
 
 interface FeaturedPostsProps {
   posts: Post<PostFrontmatter>[];
@@ -19,7 +19,7 @@ interface FeaturedPostsProps {
 
 /**
  * FeaturedPosts - A sophisticated 4-column staggered gallery grid using the colorful badge system.
- * Updated with standard section spacing (py-12 sm:py-16).
+ * Updated: Category badge moved to Caption Block (Option 1) and minimalist labels implemented.
  */
 export function FeaturedPosts({ posts, dictionary, locale, linkPrefix }: FeaturedPostsProps) {
   if (posts.length === 0) return null;
@@ -46,8 +46,9 @@ export function FeaturedPosts({ posts, dictionary, locale, linkPrefix }: Feature
                 }
             }
 
-            const category = post.frontmatter.category || 'Tutorial';
-            const badgeStyle = getBadgeStyle(category);
+            const rawCategory = post.frontmatter.category || 'Tutorial';
+            const simplifiedCategory = simplifyCategoryLabel(rawCategory);
+            const badgeStyle = getBadgeStyle(simplifiedCategory);
             const isStaggered = index % 2 !== 0;
             
             const item = {
@@ -70,16 +71,7 @@ export function FeaturedPosts({ posts, dictionary, locale, linkPrefix }: Feature
                     <article className="space-y-5">
                         {/* Image Block */}
                         <div className="relative aspect-[4/3] rounded-xl overflow-hidden bg-muted shadow-md group-hover:shadow-xl group-hover:-translate-y-2 transition-all duration-500">
-                            {/* Category Badge */}
-                            <div className="absolute top-4 left-4 z-20">
-                                <CategoryBadge 
-                                    category={category} 
-                                    size="sm" 
-                                    className="backdrop-blur-md border-white/20 shadow-sm"
-                                />
-                            </div>
-
-                            {/* Accent Bar */}
+                            {/* Accent Bar (Bottom) - Color matches category */}
                             <div 
                                 className={cn("absolute bottom-0 left-0 right-0 h-[3px] z-30 transition-opacity duration-500 opacity-0 group-hover:opacity-100", badgeStyle.dot)}
                             />
@@ -100,6 +92,15 @@ export function FeaturedPosts({ posts, dictionary, locale, linkPrefix }: Feature
 
                         {/* Caption Block */}
                         <div className="px-1 space-y-3">
+                            {/* Option 1: Category Badge inside text block, above title */}
+                            <div>
+                                <CategoryBadge 
+                                    category={rawCategory} 
+                                    size="sm" 
+                                    className="shadow-sm"
+                                />
+                            </div>
+
                             <h3 className="font-headline text-lg font-bold leading-snug text-primary group-hover:text-accent transition-colors duration-300">
                                 {post.frontmatter.title}
                             </h3>

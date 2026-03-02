@@ -31,6 +31,7 @@ export const categoryColorMap: Record<string, BadgeStyle> = {
   'Review':   { bg: 'bg-rose-500/12',   text: 'text-rose-400',   border: 'border-rose-500/25',   dot: 'bg-rose-400' },
   'Article':  { bg: 'bg-sky-500/12',    text: 'text-sky-400',    border: 'border-sky-500/25',    dot: 'bg-sky-400' },
   'Note':     { bg: 'bg-amber-400/12',  text: 'text-amber-400',  border: 'border-amber-400/25',  dot: 'bg-amber-400' },
+  'Update':   { bg: 'bg-cyan-500/12',   text: 'text-cyan-400',   border: 'border-cyan-500/25',   dot: 'bg-cyan-400' },
 };
 
 const defaultBadgeStyle: BadgeStyle = {
@@ -39,16 +40,36 @@ const defaultBadgeStyle: BadgeStyle = {
 };
 
 /**
+ * Helper to simplify labels to single-word versions for a minimalist look.
+ */
+export function simplifyCategoryLabel(label: string): string {
+  const map: Record<string, string> = {
+    'pembaruan perangkat lunak': 'Update',
+    'software update': 'Update',
+    'perangkat keras': 'Hardware',
+    'perangkat lunak': 'Software',
+    'tips & trik': 'Tips',
+    'gawai': 'Gadget',
+    'ulasan': 'Review',
+    'postingan': 'Article'
+  };
+  return map[label.toLowerCase()] || label;
+}
+
+/**
  * Helper to resolve badge style based on category name or content type.
  */
 export function getBadgeStyle(category?: string, type?: 'blog' | 'note'): BadgeStyle {
   if (!category && !type) return defaultBadgeStyle;
   
+  // Simplify the category before lookup
+  const simplified = category ? simplifyCategoryLabel(category) : undefined;
+  
   // Try exact match first
-  if (category && categoryColorMap[category]) return categoryColorMap[category];
+  if (simplified && categoryColorMap[simplified]) return categoryColorMap[simplified];
   
   // Try case-insensitive match
-  const foundKey = Object.keys(categoryColorMap).find(key => key.toLowerCase() === category?.toLowerCase());
+  const foundKey = Object.keys(categoryColorMap).find(key => key.toLowerCase() === simplified?.toLowerCase());
   if (foundKey) return categoryColorMap[foundKey];
 
   // Fallback to type
@@ -73,8 +94,9 @@ interface CategoryBadgeProps {
 export function CategoryBadge({
   label, category, type, size = 'xs', showDot = true, className
 }: CategoryBadgeProps) {
-  const displayLabel = label || category || (type === 'blog' ? 'Article' : 'Note');
-  const style = getBadgeStyle(category, type);
+  const rawLabel = label || category || (type === 'blog' ? 'Article' : 'Note');
+  const displayLabel = simplifyCategoryLabel(rawLabel);
+  const style = getBadgeStyle(displayLabel, type);
 
   return (
     <span className={cn(
