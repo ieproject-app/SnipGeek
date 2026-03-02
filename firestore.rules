@@ -18,8 +18,12 @@ service cloud.firestore {
 
     // Number Generator Rules
     match /availableNumbers/{numberId} {
-      // Users can see stock to display matrix
-      allow read: if isSignedIn();
+      // Users can see unused stock OR their own assigned numbers
+      allow read: if isSignedIn() && (
+        resource.data.isUsed == false || 
+        resource.data.assignedTo == request.auth.token.email || 
+        isAdmin()
+      );
       
       // Admin (Iwan) can populate/delete data
       allow create, delete: if isAdmin();
