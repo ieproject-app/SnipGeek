@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useState, useEffect, useRef, useMemo } from 'react';
@@ -244,7 +243,7 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
     { name: dictionary.navigation.contact, href: '/contact', icon: Mail },
   ];
 
-  const navItemClass = "h-9 w-9 rounded-xl transition-all duration-300 text-foreground/70 hover:text-foreground hover:bg-muted/60 flex items-center justify-center relative";
+  const navItemClass = "h-9 w-9 p-0 rounded-xl transition-all duration-300 text-foreground/70 hover:text-foreground hover:bg-muted/60 flex items-center justify-center relative";
 
   return (
     <header 
@@ -397,7 +396,7 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                     onClick={toggleTheme}
                     aria-label="Toggle Theme"
                 >
-                    <div className="relative h-5 w-5">
+                    <div className="relative h-5 w-5 pointer-events-none">
                         {/* Sun icon — visible in light mode */}
                         <Sun className={cn(
                             "absolute inset-0 h-5 w-5 transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] transform origin-center",
