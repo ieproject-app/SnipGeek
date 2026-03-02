@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useMemo } from 'react';
@@ -87,7 +86,7 @@ export function HomeClient({ initialPosts, dictionary, locale }: { initialPosts:
     return (
         <div key={post.slug} className="group relative transition-all duration-500 hover:-translate-y-1">
             <Link href={`${linkPrefix}/blog/${post.slug}`} className="block" aria-label={`Read more about ${post.frontmatter.title}`}>
-                <div className="relative w-full aspect-[4/3] overflow-hidden rounded-lg mb-4 shadow-sm transition-all duration-500 border border-primary/5">
+                <div className="relative w-full aspect-[4/3] overflow-hidden rounded-xl mb-4 shadow-sm transition-all duration-500 border border-primary/5">
                     {heroImageSrc && (
                         <Image
                             src={heroImageSrc}

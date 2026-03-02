@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useMemo } from 'react';
@@ -20,6 +19,10 @@ type RelatedPostsProps = {
   dictionary: any;
 };
 
+/**
+ * RelatedPosts - Shows suggested content at the bottom of post pages.
+ * Updated with Windows 11 rounded-xl (12px) containers.
+ */
 export function RelatedPosts({ 
     type, 
     locale, 
@@ -87,7 +90,7 @@ export function RelatedPosts({
     return (
         <div key={item.slug} className="group relative transition-all duration-500 hover:-translate-y-1">
             <Link href={readingListItem.href} className="block">
-                <div className="relative w-full aspect-video overflow-hidden rounded-lg mb-4 shadow-sm border border-primary/5 bg-primary/5 flex items-center justify-center">
+                <div className="relative w-full aspect-video overflow-hidden rounded-xl mb-4 shadow-sm border border-primary/5 bg-primary/5 flex items-center justify-center">
                     {heroImageSrc ? (
                         <Image
                             src={heroImageSrc}
