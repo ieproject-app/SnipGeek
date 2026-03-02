@@ -1,4 +1,3 @@
-
 import { getSortedPostsData } from '@/lib/posts';
 import { i18n } from '@/i18n-config';
 import { getDictionary } from '@/lib/get-dictionary';
@@ -10,7 +9,7 @@ export async function generateStaticParams() {
 
 export default async function Home({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
-  const initialPosts = getSortedPostsData(locale);
+  const initialPosts = await getSortedPostsData(locale);
   const dictionary = await getDictionary(locale);
 
   return (

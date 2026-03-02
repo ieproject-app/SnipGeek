@@ -1,3 +1,4 @@
+"use server";
 import fs from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
@@ -28,7 +29,7 @@ export type Post<TFrontmatter> = {
 };
 
 
-export function getSortedPostsData(locale?: string): Post<PostFrontmatter>[] {
+export async function getSortedPostsData(locale?: string): Promise<Post<PostFrontmatter>[]> {
   const targetLocale = i18n.locales.includes(locale as Locale) ? locale : i18n.defaultLocale;
   const localeDirectory = path.join(postsDirectory, targetLocale!);
   
@@ -84,7 +85,7 @@ export function getSortedPostsData(locale?: string): Post<PostFrontmatter>[] {
   });
 }
 
-export function getDraftPostsData(locale?: string): Post<PostFrontmatter>[] {
+export async function getDraftPostsData(locale?: string): Promise<Post<PostFrontmatter>[]> {
   const targetLocale = i18n.locales.includes(locale as Locale) ? locale : i18n.defaultLocale;
   const localeDirectory = path.join(postsDirectory, targetLocale!);
   
@@ -154,7 +155,7 @@ export async function getPostData(slug: string, locale?: string): Promise<PostDa
   };
 }
 
-export function getAllPostSlugs(locale?: string) {
+export async function getAllPostSlugs(locale?: string) {
     const targetLocale = i18n.locales.includes(locale as Locale) ? locale : i18n.defaultLocale;
     const localeDirectory = path.join(postsDirectory, targetLocale!);
     let fileNames: string[];
@@ -180,13 +181,13 @@ export function getAllPostSlugs(locale?: string) {
       .filter(slug => slug !== null);
 }
 
-export function getPostTranslation(translationKey: string, targetLocale: string): Post<PostFrontmatter> | null {
-  const allPosts = getSortedPostsData(targetLocale);
+export async function getPostTranslation(translationKey: string, targetLocale: string): Promise<Post<PostFrontmatter> | null> {
+  const allPosts = await getSortedPostsData(targetLocale);
   const translatedPost = allPosts.find(p => p.frontmatter.translationKey === translationKey);
   return translatedPost || null;
 }
 
-export function getAllLocales() {
+export async function getAllLocales() {
   try {
     return fs.readdirSync(postsDirectory).filter(item => 
       fs.statSync(path.join(postsDirectory, item)).isDirectory()
@@ -203,8 +204,8 @@ export type TranslationsMap = {
   }[];
 };
 
-export function getAllTranslationsMap(): TranslationsMap {
-  const allLocales = getAllLocales();
+export async function getAllTranslationsMap(): Promise<TranslationsMap> {
+  const allLocales = await getAllLocales();
   const translationsMap: TranslationsMap = {};
 
   for (const locale of allLocales) {
