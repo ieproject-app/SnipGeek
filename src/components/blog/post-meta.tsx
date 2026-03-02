@@ -89,14 +89,16 @@ export function PostMeta({ frontmatter, item, locale, dictionary, readingTime, i
         )}
       </div>
       
-      <div className="flex items-center gap-2 ml-auto sm:ml-0">
-        <AddToReadingListButton 
-          item={item}
-          dictionary={dictionary}
-          showText={false}
-          className="h-8 w-8 rounded-full border-none bg-muted/50 text-primary shadow-none hover:text-primary"
-        />
-      </div>
+      {!isCentered && (
+        <div className="flex items-center gap-2 ml-auto sm:ml-0">
+            <AddToReadingListButton 
+            item={item}
+            dictionary={dictionary}
+            showText={false}
+            className="h-8 w-8 rounded-full border-none bg-muted/50 text-primary shadow-none hover:text-primary"
+            />
+        </div>
+      )}
     </div>
   );
 }
