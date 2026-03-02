@@ -1,3 +1,4 @@
+
 import { getSortedPostsData } from '@/lib/posts';
 import { getSortedNotesData as getRawNotes } from '@/lib/notes';
 import { i18n } from '@/i18n-config';
@@ -9,10 +10,20 @@ import { AddToReadingListButton } from '@/components/layout/add-to-reading-list-
 import { Card, CardFooter } from '@/components/ui/card';
 import { CategoryBadge } from '@/components/layout/category-badge';
 import { formatRelativeTime } from '@/lib/utils';
+import type { Metadata } from 'next';
+
+export async function generateMetadata({ params }: { params: Promise<{ locale: string, tag: string }> }): Promise<Metadata> {
+  const { locale, tag } = await params;
+  const decodedTag = decodeURIComponent(tag).toUpperCase();
+  const dictionary = await getDictionary(locale as any);
+  return {
+    title: dictionary.tags.title.replace('{tag}', decodedTag),
+    description: dictionary.tags.description.replace('{tag}', decodedTag),
+  };
+}
 
 export async function generateStaticParams() {
   const locales = i18n.locales;
-  // This is a simplified version, in a real app you might want to extract all unique tags from MDX
   return locales.map(locale => ({ locale, tag: 'tutorial' }));
 }
 
@@ -25,7 +36,6 @@ export default async function TagPage({ params }: { params: Promise<{ locale: st
   const allPosts = await getSortedPostsData(locale);
   const posts = allPosts.filter(p => p.frontmatter.tags?.some(t => t.toLowerCase() === decodedTag));
   
-  // getRawNotes returns a Promise, so it must be awaited
   const rawNotes = await getRawNotes(locale);
   const notes = rawNotes.filter(n => n.frontmatter.tags?.some(t => t.toLowerCase() === decodedTag));
 

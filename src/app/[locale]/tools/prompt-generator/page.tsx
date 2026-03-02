@@ -31,8 +31,7 @@ export default async function PromptGeneratorPage({ params }: { params: Promise<
   const dictionary = await getDictionary(lang as any);
   const pageContent = dictionary.promptGenerator;
 
-  // Fetch existing articles to populate the selection list
-  // MUST await these because they are async functions
+  // MUST await both async calls
   const posts = await getSortedPostsData(lang);
   const notes = await getSortedNotesData(lang);
   
