@@ -170,7 +170,7 @@ const MdxBlockquote = ({ children, class: _class, className, parentName, ...prop
 const MdxPre = ({ className, class: _class, parentName, style, ...props }: any) => (
     <pre
         className={cn(
-            "rounded-lg p-6 my-6 overflow-x-auto border border-primary/5",
+            "rounded-lg p-6 my-6 overflow-x-auto border border-primary/5 text-[13px] leading-relaxed",
             _class,
             className
         )}

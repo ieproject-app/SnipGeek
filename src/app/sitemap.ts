@@ -5,7 +5,7 @@ import { i18n } from '@/i18n-config';
 
 const DOMAIN = 'https://snipgeek.com';
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const routes = ['', '/blog', '/notes', '/tools', '/about', '/contact', '/archive', '/projects'];
   
   // 1. Static Routes
@@ -22,30 +22,34 @@ export default function sitemap(): MetadataRoute.Sitemap {
   });
 
   // 2. Blog Posts
-  const blogEntries: MetadataRoute.Sitemap = i18n.locales.flatMap((locale) => {
-    const posts = getSortedPostsData(locale);
-    const localePrefix = locale === i18n.defaultLocale ? '' : `/${locale}`;
-    
-    return posts.map((post) => ({
-      url: `${DOMAIN}${localePrefix}/blog/${post.slug}`,
-      lastModified: new Date(post.frontmatter.updated || post.frontmatter.date),
-      changeFrequency: 'monthly' as const,
-      priority: 0.6,
-    }));
-  });
+  const blogEntries = await Promise.all(
+    i18n.locales.map(async (locale) => {
+      const posts = await getSortedPostsData(locale);
+      const localePrefix = locale === i18n.defaultLocale ? '' : `/${locale}`;
+      
+      return posts.map((post) => ({
+        url: `${DOMAIN}${localePrefix}/blog/${post.slug}`,
+        lastModified: new Date(post.frontmatter.updated || post.frontmatter.date),
+        changeFrequency: 'monthly' as const,
+        priority: 0.6,
+      }));
+    })
+  );
 
   // 3. Notes
-  const noteEntries: MetadataRoute.Sitemap = i18n.locales.flatMap((locale) => {
-    const notes = getSortedNotesData(locale);
-    const localePrefix = locale === i18n.defaultLocale ? '' : `/${locale}`;
-    
-    return notes.map((note) => ({
-      url: `${DOMAIN}${localePrefix}/notes/${note.slug}`,
-      lastModified: new Date(note.frontmatter.updated || note.frontmatter.date),
-      changeFrequency: 'monthly' as const,
-      priority: 0.5,
-    }));
-  });
+  const noteEntries = await Promise.all(
+    i18n.locales.map(async (locale) => {
+        const notes = await getSortedNotesData(locale);
+        const localePrefix = locale === i18n.defaultLocale ? '' : `/${locale}`;
+        
+        return notes.map((note) => ({
+          url: `${DOMAIN}${localePrefix}/notes/${note.slug}`,
+          lastModified: new Date(note.frontmatter.updated || note.frontmatter.date),
+          changeFrequency: 'monthly' as const,
+          priority: 0.5,
+        }));
+    })
+  );
 
-  return [...staticEntries, ...blogEntries, ...noteEntries];
+  return [...staticEntries, ...blogEntries.flat(), ...noteEntries.flat()];
 }
