@@ -257,6 +257,9 @@
         "langId": "Language: Indonesia",
         "readingListAdded": "Saved to Reading List",
         "readingListRemoved": "Removed from Reading List",
-        "copied": "Copied to Clipboard"
+        "copied": "Copied to Clipboard",
+        "stockInsufficient": "Stock insufficient for {type}",
+        "stockEmpty": "Selected period is out of stock",
+        "stockGenerated": "Successfully generated {count} numbers"
     }
 }
