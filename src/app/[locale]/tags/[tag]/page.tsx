@@ -24,7 +24,10 @@ export default async function TagPage({ params }: { params: Promise<{ locale: st
 
   const allPosts = await getSortedPostsData(locale);
   const posts = allPosts.filter(p => p.frontmatter.tags?.some(t => t.toLowerCase() === decodedTag));
-  const notes = getRawNotes(locale).filter(n => n.frontmatter.tags?.some(t => t.toLowerCase() === decodedTag));
+  
+  // getRawNotes returns a Promise, so it must be awaited
+  const rawNotes = await getRawNotes(locale);
+  const notes = rawNotes.filter(n => n.frontmatter.tags?.some(t => t.toLowerCase() === decodedTag));
 
   const formatDatePart = (date: Date, options: Intl.DateTimeFormatOptions) => {
     return new Intl.DateTimeFormat(locale, options).format(date);
