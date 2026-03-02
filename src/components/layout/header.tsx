@@ -396,20 +396,20 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                     onClick={toggleTheme}
                     aria-label="Toggle Theme"
                 >
-                    <div className="relative h-5 w-5 pointer-events-none">
+                    <div className="relative h-5 w-5 flex items-center justify-center">
                         {/* Sun icon — visible in light mode */}
                         <Sun className={cn(
-                            "absolute inset-0 h-5 w-5 transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] transform origin-center",
+                            "absolute transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] transform origin-center",
                             mounted && resolvedTheme === 'dark'
-                                ? "opacity-0 scale-0 rotate-180"
+                                ? "opacity-0 scale-0 rotate-[180deg]"
                                 : "opacity-100 scale-100 rotate-0"
                         )} />
                         {/* Moon icon — visible in dark mode */}
                         <Moon className={cn(
-                            "absolute inset-0 h-5 w-5 transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] transform origin-center",
+                            "absolute transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] transform origin-center",
                             mounted && resolvedTheme === 'dark'
                                 ? "opacity-100 scale-100 rotate-0"
-                                : "opacity-0 scale-0 -rotate-180"
+                                : "opacity-0 scale-0 -rotate-[180deg]"
                         )} />
                     </div>
                 </Button>
