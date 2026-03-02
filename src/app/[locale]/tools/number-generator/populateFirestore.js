@@ -1,9 +1,5 @@
 
-/**
- * WARNING: This script uses an external Service Account Key.
- * It may point to a different project than your current website.
- * Recommended: Use the /tools/maintenance page on the website instead.
- */
+const fs = require('fs');
 const path = require('path');
 require('dotenv').config({ path: path.resolve(process.cwd(), '.env.local') });
 
@@ -20,51 +16,92 @@ const db = admin.firestore();
 
 console.log(`[!] MENYAMBUNG KE PROJECT ID: ${serviceAccount.project_id}`);
 
-// --- KONFIGURASI TUGAS (Data HK.800 Jan 2025 Terbaru) ---
-const tasks = [
-  { category: 'HK.800', year: 2025, month: 1, start: 8338, end: 8437, regionCode: 'TA-851030' },
-];
+// Path ke file .txt
+const filePath = path.join(__dirname, 'nomor_surat.txt');
 
-async function populate() {
+async function populateFromFile() {
   const collectionRef = db.collection('availableNumbers');
-  let totalGenerated = 0;
+  let totalInjected = 0;
+  let batch = db.batch();
+  let batchCounter = 0;
 
-  for (const task of tasks) {
-    const { category, year, month, start, end, regionCode } = task;
-    const batch = db.batch();
-    let generatedInBatch = 0;
+  try {
+    const fileContent = fs.readFileSync(filePath, 'utf8');
+    const lines = fileContent.split('\n');
 
-    console.log(`-> Memproses ${category} (${month}/${year}) - Region: ${regionCode}`);
+    console.log(`Membaca ${filePath}...`);
+    console.log(`Ditemukan ${lines.length} baris untuk diproses.`);
 
-    for (let i = start; i <= end; i++) {
-      const sequence = String(i).padStart(5, '0');
-      const dateString = `${String(month).padStart(2, '0')}-${year}`;
-      const fullNumber = `{DOCTYPE} ${sequence}/${category}/${regionCode}/${dateString}`;
+    for (const line of lines) {
+      const trimmedLine = line.trim();
+      // Lewati baris header atau baris kosong
+      if (trimmedLine.startsWith('===') || trimmedLine === '') {
+        continue;
+      }
 
+      // Format: 08338/HK.800/TA-851030/01-2025
+      const parts = trimmedLine.split('/');
+      if (parts.length !== 4) {
+        console.warn(` -> [SKIPPING] Baris tidak valid: ${trimmedLine}`);
+        continue;
+      }
+      
+      const sequence = parts[0];
+      const category = parts[1];
+      const dateParts = parts[3].split('-'); // [MM, YYYY]
+
+      if (dateParts.length !== 2) {
+        console.warn(` -> [SKIPPING] Format tanggal tidak valid: ${parts[3]}`);
+        continue;
+      }
+
+      const month = parseInt(dateParts[0], 10);
+      const year = parseInt(dateParts[1], 10);
+
+      // Buat fullNumber dengan placeholder {DOCTYPE} di depan.
+      // Aplikasi akan mengganti {DOCTYPE} dengan jenis dokumen spesifik (misal: 'BAUT').
+      const fullNumberForDB = `{DOCTYPE} ${trimmedLine}`;
+      
       const docData = {
-        fullNumber,
-        category,
-        year,
-        month,
-        valueCategory: 'below_500m',
+        fullNumber: fullNumberForDB,
+        category: category,
+        year: year,
+        month: month,
+        valueCategory: 'below_500m', // Asumsi default
         isUsed: false,
         assignedTo: "",
         assignedDate: "",
       };
 
+      // Buat ID dokumen yang unik untuk mencegah duplikasi dan memungkinkan penimpaan.
       const docId = `${category}-${year}-${month}-below_500m-${sequence}`;
       const docRef = collectionRef.doc(docId);
       
-      batch.set(docRef, docData);
-      generatedInBatch++;
+      // Gunakan set dengan { merge: true } untuk membuat atau menimpa dokumen.
+      batch.set(docRef, docData, { merge: true }); 
+      batchCounter++;
+      totalInjected++;
+
+      // Batas operasi dalam satu batch adalah 500. Commit lebih awal untuk keamanan.
+      if (batchCounter >= 499) {
+        await batch.commit();
+        console.log(`   [OK] ${batchCounter} nomor berhasil disuntik dalam satu batch.`);
+        batch = db.batch(); // Buat batch baru
+        batchCounter = 0;
+      }
     }
 
-    await batch.commit();
-    totalGenerated += generatedInBatch;
-    console.log(`   [OK] +${generatedInBatch} nomor berhasil disuntik ke ${serviceAccount.project_id}.`);
-  }
+    // Commit sisa data di batch terakhir.
+    if (batchCounter > 0) {
+      await batch.commit();
+      console.log(`   [OK] ${batchCounter} nomor berhasil disuntik di batch terakhir.`);
+    }
 
-  console.log(`\nSelesai! Total: ${totalGenerated} nomor.`);
+    console.log(`\nSelesai! Total: ${totalInjected} nomor telah berhasil diproses dan disuntik ke Firestore.`);
+
+  } catch (error) {
+    console.error("Terjadi kesalahan saat memproses file:", error);
+  }
 }
 
-populate().catch(console.error);
+populateFromFile().catch(console.error);
