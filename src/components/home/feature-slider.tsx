@@ -1,4 +1,3 @@
-
 'use client';
 
 import * as React from 'react';
@@ -104,7 +103,7 @@ export function FeatureSlider({ posts, title, viewMoreText, dictionary, locale, 
               };
 
               return (
-                <CarouselItem key={post.slug} className="pl-4 sm:pl-6 md:basis-1/2 lg:basis-1/3 pb-10 pt-2">
+                <CarouselItem key={post.slug} className="pl-4 sm:pl-6 md:basis-1/2 lg:basis-1/3 pb-6 pt-2">
                   <article className={cn(
                       "relative bg-card rounded-lg border border-primary/5 transition-all duration-500 h-full flex flex-col group/card overflow-hidden shadow-md",
                       "hover:-translate-y-1.5 hover:border-primary/10",
@@ -147,7 +146,7 @@ export function FeatureSlider({ posts, title, viewMoreText, dictionary, locale, 
           </CarouselContent>
 
           {/* Controls & Custom "View More" Style */}
-          <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-8">
+          <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-8">
             <div className="flex items-center gap-6 bg-muted/30 px-5 py-2.5 rounded-full border border-primary/5">
               <div className="flex items-center gap-2 pr-4 border-r border-primary/10">
                 <div className="h-1.5 w-8 bg-accent rounded-full" />
