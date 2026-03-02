@@ -15,7 +15,9 @@ import {
   Mail,
   Languages,
   ChevronRight,
-  ArrowRight
+  ArrowRight,
+  Sun,
+  Moon
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -30,6 +32,7 @@ import { PlaceHolderImages } from '@/lib/placeholder-images';
 import NextLink from 'next/link';
 import Image from 'next/image';
 import { CategoryBadge, categoryColorMap } from '@/components/layout/category-badge';
+import { useTheme } from 'next-themes';
 
 type SearchableItem = {
   slug: string;
@@ -81,6 +84,7 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
   
   const { items: readingListItems, removeItem: removeReadingListItem } = useReadingList();
   const { message, icon, progress, notify, clear } = useNotification();
+  const { setTheme, resolvedTheme } = useTheme();
   
   const lastScrollY = useRef(0);
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -200,6 +204,18 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
       setQuery('');
     }
   }
+
+  const toggleTheme = () => {
+    const nextTheme = resolvedTheme === 'dark' ? 'light' : 'dark';
+    setTheme(nextTheme);
+    
+    const key = `theme${nextTheme.charAt(0).toUpperCase() + nextTheme.slice(1)}`;
+    const msg = (dictionary?.notifications as any)?.[key];
+    
+    if (msg) {
+      notify(msg, nextTheme === 'dark' ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />);
+    }
+  };
 
   const handleRemoveReadingListItem = (slug: string) => {
     setRemovingSlug(slug);
@@ -443,7 +459,26 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                     )}
                 </Button>
 
-                {/* 3. Search Icon */}
+                {/* 3. Theme Toggle */}
+                <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className={cn(navItemClass, "group/theme")} 
+                    onClick={toggleTheme}
+                    aria-label="Toggle Theme"
+                >
+                    {mounted ? (
+                        resolvedTheme === 'dark' ? (
+                            <Moon className="h-5 w-5 transition-transform duration-500 group-hover/theme:rotate-[12deg]" />
+                        ) : (
+                            <Sun className="h-5 w-5 transition-transform duration-500 group-hover/theme:rotate-[12deg]" />
+                        )
+                    ) : (
+                        <Sun className="h-5 w-5 opacity-0" />
+                    )}
+                </Button>
+
+                {/* 4. Search Icon */}
                 <Button 
                     variant="ghost" 
                     size="icon" 
