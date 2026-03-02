@@ -1,52 +1,42 @@
 
-# Firebase Studio
+# SnipGeek - Modern Minimalist Tech Blog
 
-This is a NextJS starter in Firebase Studio.
+A highly optimized tech blog built with Next.js 15, React 19, and Tailwind CSS.
 
-To get started, take a look at src/app/page.tsx.
+## Design System & Specifications (v2.0)
 
-## SnipGeek Design System & Specifications
-
-### 1. Global Layout Rules
-- **Header Height**: 64px (`h-16`).
-- **Main Content Offset**: `pt-16` defined in root layout.
+### 1. Global Layout & Aesthetic
+- **Background**: Solid colors (no gradients) for a clean, professional look.
+- **Transisi Tema**: Smooth 500ms fading transition between Light and Dark mode.
 - **Typography**: 
-  - Headlines: Playfair Display (Serif).
-  - UI & Body: DM Sans (Sans).
-- **Standard Border Radius**: 4px (`--radius: 0.25rem`).
+  - Headlines: Bricolage Grotesque (Bold/Black).
+  - UI & Body: Plus Jakarta Sans.
+  - Serif Accents: Lora.
+  - Code: JetBrains Mono.
+- **Border Radius**: 8px (`rounded-lg`) standard, 12px (`rounded-xl`) for main cards.
 
 ### 2. Component Specifications
 
-#### Featured Posts (Gallery Grid)
-- **Layout**: 4-column Staggered Grid.
-- **Aspect Ratio**: 4:3.
-- **Image Radius**: 4px (`rounded-lg`).
-- **Typography**: Playfair Display Bold (`font-headline`), `text-lg`.
-- **Category Badge**: Frosted Glass style, single-word only, sentence case capitalization.
-- **Metadata**: Relative time only.
-- **Hover Effect**: Card lift `translateY(-10px)`, image scale `1.06`, accent bar fade-in.
+#### Grid Lists (Blog, Notes, Tags)
+- **Desktop Layout**: 3-column Grid inside `max-w-4xl` container.
+- **Card Aspect Ratio**: 4:3 for all thumbnails.
+- **Hover Interaction**: 
+  - Image scale `1.10`.
+  - Bookmark overlay appears on hover (top-right).
+  - Floating pill tooltips for global buttons.
 
-#### Latest Posts (Homepage)
-- **Layout**: 3-column Grid inside `max-w-4xl` container.
-- **Title Size**: `text-3xl` font-bold.
-- **Aspect Ratio**: 4:3.
-- **Typography**: Playfair Display Bold, `text-base`.
-- **Hover Effect**: Card lift `translateY(-1px)`, image scale `1.10`, bookmark overlay fade-in.
+#### Internal Tools
+- **Access Control**: Internal tools are protected by Google Authentication via Firebase.
+- **Profile Bar**: Unified user profile header with logout capability.
+- **Visuals**: Glassmorphism accents on card headers and profile bars.
 
-#### Tutorial Slider (FeatureSlider)
-- **Aspect Ratio**: 4:3.
-- **Layout**: Carousel with 3 visible items on desktop.
+### 3. Navigation & Search
+- **Header**: Minimalist top navigation with hidden-on-scroll logic.
+- **Search**: Compact overlay with quick picks and category filtering.
+- **TOC**: Clean, non-scroll-spy table of contents for better performance.
 
-#### Topic Section & Software Updates
-- **Aspect Ratio**: 4:3 (Horizontal List).
-- **Dimensions**: 120px x 90px image blocks.
-
-#### Post Page (Content)
-- **Max Width**: 768px (`max-w-3xl`) for optimal readability.
-- **Font**: Body (DM Sans), Headings (Playfair Display).
-- **Heading 2 Style**: 3xl, bold, with 12px accent line.
-
-### 3. Interactive Behavior
-- **Bookmark System**: Floating overlay on cards or integrated queue in Header.
-- **Theme**: System-aware (Dark/Light) with radial gradient backgrounds.
-- **Search**: Compact overlay with quick picks and image support.
+### 4. Technical Stack
+- **Framework**: Next.js 15 (App Router).
+- **Styling**: Tailwind CSS + ShadCN UI.
+- **Backend**: Firebase (Auth & Firestore for Tools).
+- **Content**: Local MDX files with `next-mdx-remote`.
