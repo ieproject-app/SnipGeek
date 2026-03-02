@@ -1,4 +1,3 @@
-
 'use client';
 
 import Link from 'next/link';
@@ -34,6 +33,9 @@ interface TopicSectionProps {
   tag: string;
 }
 
+/**
+ * TopicSection - Redesigned with standard py-12 sm:py-16 spacing.
+ */
 export function TopicSection({ 
   posts, 
   title, 
@@ -70,7 +72,6 @@ export function TopicSection({
                 href={`${linkPrefix}/blog/${post.slug}`} 
                 className="flex items-start gap-4 flex-1 min-w-0"
             >
-                {/* Image Container - Updated to 4:3 (120x90) */}
                 <div className="relative w-[120px] h-[90px] shrink-0 overflow-hidden rounded-lg shadow-sm border border-primary/5">
                     <Image
                         src={heroImageSrc}
@@ -108,8 +109,8 @@ export function TopicSection({
   ];
 
   return (
-    <section className="container max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <header className="mb-10 text-left">
+    <section className="container max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
+        <header className="mb-8 text-left">
             <h2 className="text-3xl font-extrabold font-headline tracking-tight text-primary mb-2">
                 {title}
             </h2>
@@ -121,7 +122,7 @@ export function TopicSection({
             {posts.map((post) => renderHorizontalCard(post))}
         </div>
 
-        <footer className="mt-12 flex items-center justify-between">
+        <footer className="mt-10 flex items-center justify-between">
             <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-muted-foreground opacity-50 select-none">
                 <Undo2 className="h-4 w-4" />
                 {breadcrumbHome}

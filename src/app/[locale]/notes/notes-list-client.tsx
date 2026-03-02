@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useMemo } from 'react';
@@ -26,8 +25,8 @@ export function NotesListClient({ initialNotes, dictionary, locale }: { initialN
 
   return (
     <div className="w-full">
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-16">
-        <header className="mb-16 text-center">
+      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-12 sm:pb-16">
+        <header className="mb-12 text-center">
             <h1 className="font-headline text-5xl md:text-6xl font-extrabold tracking-tighter text-primary mb-3">
                 {dictionary.notes.title}
             </h1>
@@ -47,7 +46,7 @@ export function NotesListClient({ initialNotes, dictionary, locale }: { initialN
                 type: 'note' as const
             };
             return (
-              <Card key={note.slug} className="group relative flex flex-col overflow-hidden rounded-lg border bg-card/50 shadow-sm transition-all hover:shadow-lg hover:-translate-y-2 h-full">
+              <Card key={note.slug} className="group relative flex flex-col overflow-hidden rounded-xl border bg-card/50 shadow-sm transition-all hover:shadow-lg hover:-translate-y-2 h-full">
                 <CardHeader className="p-6 pb-0 flex-row justify-between items-start space-y-0">
                     <div className="p-2 bg-muted/50 rounded-lg group-hover:bg-primary/10 transition-colors">
                         <StickyNote className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" />

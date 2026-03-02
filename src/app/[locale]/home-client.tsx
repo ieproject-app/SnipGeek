@@ -16,21 +16,17 @@ import { CategoryBadge } from '@/components/layout/category-badge';
 export function HomeClient({ initialPosts, dictionary, locale }: { initialPosts: any[], dictionary: any, locale: string }) {
   const linkPrefix = locale === 'en' ? '' : `/${locale}`;
 
-  // We now only use initialPosts from local MDX files
   const allPosts = useMemo(() => {
     return [...initialPosts].sort((a, b) => new Date(b.frontmatter.date).getTime() - new Date(a.frontmatter.date).getTime());
   }, [initialPosts]);
 
-  // 1. Featured Posts (Top 4)
   const featuredPosts = allPosts.filter(post => post.frontmatter.published && post.frontmatter.featured).slice(0, 4);
   const featuredSlugs = new Set(featuredPosts.map(p => p.slug));
 
-  // 2. Latest Posts (Excluding Featured, Top 6)
   const latestPosts = allPosts
     .filter(post => post.frontmatter.published && !featuredSlugs.has(post.slug))
     .slice(0, 6);
   
-  // 3. Slider (Filtered by category 'Tutorial')
   const sliderCategory = "Tutorial";
   const sliderPosts = allPosts
     .filter(post => 
@@ -39,7 +35,6 @@ export function HomeClient({ initialPosts, dictionary, locale }: { initialPosts:
     )
     .slice(0, 6); 
 
-  // 4. Topic Section (Filtered by tag 'Windows', 8 items)
   const topicTag = "Windows"; 
   const topicPosts = allPosts
     .filter(post => 
@@ -48,7 +43,6 @@ export function HomeClient({ initialPosts, dictionary, locale }: { initialPosts:
     )
     .slice(0, 8);
 
-  // 5. Software Updates Slider
   const updateTag = "Android";
   const updatePosts = allPosts
     .filter(post => 
@@ -124,11 +118,11 @@ export function HomeClient({ initialPosts, dictionary, locale }: { initialPosts:
       <FeaturedPosts posts={featuredPosts as any} dictionary={dictionary} locale={locale} linkPrefix={linkPrefix} />
 
       {latestPosts.length > 0 && (
-        <section className="container max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-12 sm:pb-16">
-          <h2 className="text-3xl font-bold font-headline tracking-tighter text-primary mb-12 text-center">
+        <section className="container max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
+          <h2 className="text-3xl font-bold font-headline tracking-tighter text-primary mb-10 text-center">
             {dictionary.home.latestPosts}
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12 mb-16">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-8 mb-12">
             {latestPosts.map((post) => renderLatestCard(post))}
           </div>
           <div className="flex justify-center">
