@@ -1,3 +1,4 @@
+
 'use client';
 
 import * as React from 'react';
@@ -103,7 +104,7 @@ export function HorizontalSlider({ posts, title, viewMoreText, dictionary, local
               };
 
               return (
-                <CarouselItem key={post.slug} className="pl-4 sm:pl-6 md:basis-1/2">
+                <CarouselItem key={post.slug} className="pl-4 sm:pl-6 md:basis-1/2 py-2">
                   <article className={cn(
                       "bg-card/50 rounded-lg overflow-hidden border border-primary/5 p-3 transition-all duration-500 h-full flex gap-4 shadow-sm group",
                       "hover:-translate-y-1 hover:bg-card hover:border-primary/10"
