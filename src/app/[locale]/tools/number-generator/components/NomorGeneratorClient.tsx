@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
@@ -959,6 +958,7 @@ export function NomorGeneratorClient() {
                         </CardContent>
                     </Card>
                 </TabsContent>
+                </Tabs>
             </div>
         </InternalToolWrapper>
     );
