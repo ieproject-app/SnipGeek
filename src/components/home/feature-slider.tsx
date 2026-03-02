@@ -1,3 +1,4 @@
+
 'use client';
 
 import * as React from 'react';
@@ -103,7 +104,7 @@ export function FeatureSlider({ posts, title, viewMoreText, dictionary, locale, 
               };
 
               return (
-                <CarouselItem key={post.slug} className="pl-4 sm:pl-6 md:basis-1/2 lg:basis-1/3 py-8">
+                <CarouselItem key={post.slug} className="pl-4 sm:pl-6 md:basis-1/2 lg:basis-1/3 pb-10 pt-2">
                   <article className={cn(
                       "relative bg-card rounded-lg border border-primary/5 transition-all duration-500 h-full flex flex-col group/card overflow-hidden shadow-md",
                       "hover:-translate-y-1.5 hover:border-primary/10",
