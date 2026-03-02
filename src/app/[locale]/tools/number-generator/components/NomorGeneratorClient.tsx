@@ -42,6 +42,7 @@ import {
 } from "@/components/ui/dialog"
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useNotification } from '@/hooks/use-notification';
 
 const DAILY_LIMIT = 10;
 const ADMIN_EMAIL = 'iwan.efndi@gmail.com';
@@ -125,6 +126,7 @@ export function NomorGeneratorClient() {
     const [isLimitLoading, setIsLimitLoading] = useState(true);
 
     const { toast } = useToast();
+    const { notify } = useNotification();
     const firestore = useFirestore();
     const { user, isUserLoading } = useUser();
 
@@ -255,13 +257,13 @@ export function NomorGeneratorClient() {
 
     const handleGenerate = async () => {
         if (!firestore || !user) {
-            toast({ variant: "destructive", title: "Koneksi Gagal", description: "Tidak dapat terhubung ke database atau Anda belum login." });
+            notify("Koneksi Gagal: Anda belum login.", <AlertTriangle className="h-4 w-4" />);
             return;
         }
 
         for (const req of requests) {
             if (!req.category || !req.docType || !req.docDate || req.quantity < 1) {
-                toast({ variant: "destructive", title: "Input Tidak Lengkap", description: "Pastikan semua baris permintaan terisi dengan benar." });
+                notify("Input Tidak Lengkap: Periksa kembali baris permintaan.", <AlertTriangle className="h-4 w-4" />);
                 return;
             }
         }
@@ -272,7 +274,6 @@ export function NomorGeneratorClient() {
 
         try {
             // --- 1. PRE-CHECK VALIDATION (SOFT CHECK) ---
-            // To avoid hard system errors, we perform a read-only check for stock first.
             for (const req of requests) {
                 const year = req.docDate!.getFullYear();
                 const month = req.docDate!.getMonth() + 1;
@@ -287,14 +288,13 @@ export function NomorGeneratorClient() {
                 
                 const checkSnapshot = await getDocs(qCheck);
                 if (checkSnapshot.size < req.quantity) {
-                    toast({ 
-                        variant: "default", 
-                        title: "Stok Tidak Mencukupi", 
-                        description: `Maaf, stok untuk ${req.docType} periode ${month}-${year} hanya tersisa ${checkSnapshot.size} nomor. Silakan pilih periode lain atau hubungi admin.`,
-                        className: "border-amber-500 bg-amber-50 dark:bg-amber-950/20 text-amber-900 dark:text-amber-200"
-                    });
+                    const msg = checkSnapshot.size === 0 
+                        ? `Stok Kosong untuk periode ${month}-${year}.` 
+                        : `Stok hanya tersisa ${checkSnapshot.size} nomor untuk periode ${month}-${year}.`;
+                    
+                    notify(msg, <AlertTriangle className="h-4 w-4 text-amber-500" />);
                     setIsGenerating(false);
-                    return; // Stop the process early
+                    return; 
                 }
             }
 
@@ -317,10 +317,10 @@ export function NomorGeneratorClient() {
                     }
                     
                     if (currentCount >= DAILY_LIMIT) {
-                        throw new Error(`Anda telah mencapai batas generate harian (${DAILY_LIMIT} kali).`);
+                        throw new Error(`Batas generate harian (${DAILY_LIMIT}) telah tercapai.`);
                     }
                     if (currentCount + totalRequested > DAILY_LIMIT) {
-                        throw new Error(`Permintaan Anda (${totalRequested}) melebihi sisa kuota harian (${DAILY_LIMIT - currentCount}).`);
+                        throw new Error(`Permintaan (${totalRequested}) melebihi sisa kuota (${DAILY_LIMIT - currentCount}).`);
                     }
                     newDailyCount = currentCount + totalRequested;
                 }
@@ -340,11 +340,9 @@ export function NomorGeneratorClient() {
                         limit(req.quantity)
                     );
                     
-                    // Note: getDocs inside transaction is technically outside standard atomic get patterns, 
-                    // but used here for dynamic fetching based on criteria.
                     const querySnapshot = await getDocs(q);
                     if (querySnapshot.docs.length < req.quantity) {
-                        throw new Error(`Stok habis untuk ${req.docType} periode ${month}-${year}.`);
+                        throw new Error(`Stok habis untuk periode ${month}-${year}.`);
                     }
 
                     for (const docSnap of querySnapshot.docs) {
@@ -392,22 +390,16 @@ export function NomorGeneratorClient() {
                         };
                     })
             );
-            setRemainingCounts(counts.sort((a,b) => a.label.commaCompare?.(b.label) ?? a.label.localeCompare(b.label)));
+            setRemainingCounts(counts);
 
             const sortedGenerated = generated.sort((a, b) => a.date.getTime() - b.date.getTime());
             setGeneratedNumbers(sortedGenerated);
-            toast({ title: "Sukses!", description: `${generated.length} nomor berhasil dibuat.` });
+            
+            notify(`Berhasil! ${generated.length} nomor baru telah dibuat.`, <CheckCircle className="h-4 w-4 text-emerald-500" />);
 
         } catch (error: any) {
             console.error("Error generating numbers:", error);
-            // Distinguish between stock errors and system errors
-            const isStockError = error.message?.toLowerCase().includes('stok');
-            toast({ 
-                variant: isStockError ? "default" : "destructive", 
-                title: isStockError ? "Stok Kosong" : "Gagal Membuat Nomor", 
-                description: error.message || "Terjadi kesalahan saat transaksi.",
-                className: isStockError ? "border-amber-500 bg-amber-50" : ""
-            });
+            notify(error.message || "Gagal membuat nomor. Terjadi kesalahan sistem.", <AlertTriangle className="h-4 w-4" />);
         } finally {
             setIsGenerating(false);
         }
@@ -425,7 +417,7 @@ export function NomorGeneratorClient() {
             .map((result, index) => `${index + 1}. ${result.docType} ${result.text} Tanggal ${format(result.date, 'd MMMM yyyy', { locale: id })}`)
             .join('\n');
         navigator.clipboard.writeText(textToCopy);
-        toast({ title: "Tersalin!", description: "Hasil lengkap berhasil disalin." });
+        notify("Hasil lengkap berhasil disalin ke clipboard.", <Check className="h-4 w-4" />);
         setIsCopied('full');
         setTimeout(() => setIsCopied(null), 2000);
     };
@@ -434,7 +426,7 @@ export function NomorGeneratorClient() {
         if (generatedNumbers.length === 0) return;
         const textToCopy = generatedNumbers.map(result => result.text).join('\n');
         navigator.clipboard.writeText(textToCopy);
-        toast({ title: "Tersalin!", description: "Hanya nomor berhasil disalin." });
+        notify("Nomor berhasil disalin.", <Check className="h-4 w-4" />);
         setIsCopied('numbers');
         setTimeout(() => setIsCopied(null), 2000);
     };
