@@ -109,9 +109,10 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
 
   useEffect(() => {
     if (mounted) {
-      const pending = localStorage.getItem('snipgeek-pending-notify');
-      if (pending) {
-        const msg = (dictionary?.notifications as any)?.[pending];
+      const pending = localStorage.setItem('snipgeek-pending-notify', '');
+      const pendingKey = typeof window !== 'undefined' ? localStorage.getItem('snipgeek-pending-notify') : null;
+      if (pendingKey) {
+        const msg = (dictionary?.notifications as any)?.[pendingKey];
         if (msg) notify(msg, <Languages className="h-4 w-4" />);
         localStorage.removeItem('snipgeek-pending-notify');
       }
@@ -246,10 +247,10 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
     )}>
         <div className="max-w-4xl mx-auto h-16 min-h-[64px] px-4 md:px-6 flex items-center justify-between relative overflow-visible">
             
-            {/* Notification Overlay - Solid Background Version */}
+            {/* Notification Overlay - High Opacity Refined Glass Version */}
             <div className={cn(
                 "absolute inset-0 z-40 h-16 flex flex-col overflow-hidden",
-                "bg-background border-b border-border shadow-sm", // Solid background, no blur
+                "bg-background/95 backdrop-blur-xl border-b border-accent/30 shadow-md",
                 (mounted && message)
                 ? [
                     "translate-y-0 opacity-100",
@@ -378,7 +379,7 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
 
                     {/* FLOATING MORE MENU DROPDOWN */}
                     <div className={cn(
-                        "absolute top-full right-0 mt-5 min-w-[220px] bg-background/95 backdrop-blur-xl border border-border shadow-2xl rounded-2xl overflow-hidden origin-top-right transition-all duration-300 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] z-[100] ring-1 ring-black/[0.03]",
+                        "absolute top-full right-2 mt-5 min-w-[220px] bg-background/95 backdrop-blur-xl border border-border shadow-2xl rounded-2xl overflow-hidden origin-top-right transition-all duration-300 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] z-[100] ring-1 ring-black/[0.03]",
                         isMenuOpen ? "opacity-100 scale-100 translate-y-0" : "opacity-0 scale-[0.95] -translate-y-2 pointer-events-none"
                     )}>
                         <div className="py-3">
