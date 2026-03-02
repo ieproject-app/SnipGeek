@@ -35,7 +35,7 @@ export function NotesListClient({ initialNotes, dictionary, locale }: { initialN
             </p>
         </header>
 
-        <section className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
+        <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
           {allNotes.map((note) => {
             const noteDate = new Date(note.frontmatter.date);
             const item = {
@@ -64,7 +64,7 @@ export function NotesListClient({ initialNotes, dictionary, locale }: { initialN
                     <time className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-2 block">
                         {formatDate(noteDate)}
                     </time>
-                    <h3 className="font-headline text-lg font-bold tracking-tight text-primary transition-colors group-hover/link:text-accent mb-2">
+                    <h3 className="font-headline text-base font-bold tracking-tight text-primary transition-colors group-hover/link:text-accent mb-2 leading-tight">
                         {note.frontmatter.title}
                     </h3>
                     <p className="text-sm text-muted-foreground line-clamp-2">
