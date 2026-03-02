@@ -1,4 +1,3 @@
-
 'use client';
 
 import * as React from 'react';
@@ -148,7 +147,7 @@ export function HorizontalSlider({ posts, title, viewMoreText, dictionary, local
           </CarouselContent>
 
           {/* Controls - Redesigned Style */}
-          <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-8">
+          <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-8">
             <div className="flex items-center gap-6 bg-muted/30 px-5 py-2.5 rounded-full border border-primary/5">
               <div className="flex items-center gap-2 pr-4 border-r border-primary/10">
                 <div className="h-1.5 w-8 bg-accent rounded-full" />
