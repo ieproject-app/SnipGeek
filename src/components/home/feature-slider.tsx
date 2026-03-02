@@ -146,22 +146,21 @@ export function FeatureSlider({ posts, title, viewMoreText, dictionary, locale, 
           </CarouselContent>
 
           {/* Controls & Custom "View More" Style */}
-          <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-8">
-            <div className="flex items-center gap-6 bg-muted/30 px-5 py-2.5 rounded-full border border-primary/5">
+          <div className="mt-6 flex justify-center">
+            <Link 
+              href={viewMoreHref} 
+              className="flex items-center gap-6 bg-muted/30 px-5 py-2.5 rounded-full border border-primary/5 hover:bg-muted/50 transition-all group"
+            >
               <div className="flex items-center gap-2 pr-4 border-r border-primary/10">
                 <div className="h-1.5 w-8 bg-accent rounded-full" />
                 <div className="h-1.5 w-1.5 bg-primary/20 rounded-full" />
                 <div className="h-1.5 w-1.5 bg-primary/20 rounded-full" />
               </div>
-
-              <Link 
-                href={viewMoreHref} 
-                className="text-sm font-bold text-primary/80 hover:text-primary transition-all flex items-center gap-2 group/more"
-              >
+              <span className="text-[11px] font-black uppercase tracking-widest text-primary/80 group-hover:text-primary transition-all flex items-center gap-2">
                 {viewMoreText}
-                <ChevronRight className="h-3.5 w-3.5 transition-transform group-hover/more:translate-x-1" />
-              </Link>
-            </div>
+                <ChevronRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
+              </span>
+            </Link>
           </div>
         </Carousel>
       </div>
