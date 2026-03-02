@@ -36,7 +36,6 @@ export async function getSortedPostsData(locale?: string): Promise<Post<PostFron
   let fileNames: string[];
   try {
     if (!fs.existsSync(localeDirectory)) {
-        // Create directory if missing to prevent readdirSync crash
         fs.mkdirSync(localeDirectory, { recursive: true });
         return [];
     }
