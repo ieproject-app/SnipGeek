@@ -11,6 +11,10 @@
   pre code {
     @apply bg-transparent text-inherit p-0 font-normal rounded-none static text-[13px] leading-relaxed;
   }
+
+  .prose-content {
+    @apply leading-relaxed;
+  }
 }
 
 @layer base {
