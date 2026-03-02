@@ -1,4 +1,3 @@
-
 import { getPostData, getAllPostSlugs, getAllLocales, getSortedPostsData } from '@/lib/posts';
 import { getDictionary } from '@/lib/get-dictionary';
 import { i18n } from '@/i18n-config';
@@ -19,11 +18,14 @@ import remarkGfm from 'remark-gfm';
 import rehypeShiki from '@shikijs/rehype';
 
 export async function generateStaticParams() {
-  const locales = getAllLocales();
-  return locales.flatMap((locale) => {
-    const slugs = getAllPostSlugs(locale);
-    return slugs.map(item => ({ slug: item.slug, locale }));
-  });
+  const locales = await getAllLocales();
+  const allSlugs = await Promise.all(
+    locales.map(async (locale) => {
+      const slugs = await getAllPostSlugs(locale);
+      return slugs.map(item => ({ slug: item.slug, locale }));
+    })
+  );
+  return allSlugs.flat();
 }
 
 export default async function Page({ params }: { params: Promise<{ slug: string, locale: string }> }) {
@@ -68,7 +70,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string,
     { label: initialPost.frontmatter.category || 'Blog' }
   ];
 
-  const allPosts = getSortedPostsData(locale);
+  const allPosts = await getSortedPostsData(locale);
   const initialRelatedContent = allPosts
     .filter(p => p.slug !== slug)
     .slice(0, 10);

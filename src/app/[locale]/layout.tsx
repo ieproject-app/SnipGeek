@@ -118,11 +118,11 @@ export default async function LocaleLayout({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
-  const postTranslationsMap = getAllPostTranslationsMap();
+  const postTranslationsMap = await getAllPostTranslationsMap();
   const noteTranslationsMap = getAllNotesTranslationsMap();
   const translationsMap = {...postTranslationsMap, ...noteTranslationsMap};
 
-  const posts = getSortedPostsData(locale);
+  const posts = await getSortedPostsData(locale);
   const notes = getSortedNotesData(locale);
   const linkPrefix = locale === i18n.defaultLocale ? '' : `/${locale}`;
 
@@ -148,7 +148,7 @@ export default async function LocaleLayout({
 
   const searchableData = [...searchablePosts, ...searchableNotes];
   const dictionary = await getDictionary(locale as any);
-  const draftPosts = getDraftPostsData(locale);
+  const draftPosts = await getDraftPostsData(locale);
   const draftNotes = getDraftNotesData(locale);
   
   return (

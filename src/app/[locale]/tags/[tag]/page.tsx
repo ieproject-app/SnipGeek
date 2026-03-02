@@ -1,5 +1,3 @@
-'use client';
-
 import { getSortedPostsData, getSortedNotesData as getRawNotes } from '@/lib/posts';
 import { i18n } from '@/i18n-config';
 import { getDictionary } from '@/lib/get-dictionary';
@@ -7,28 +5,24 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { AddToReadingListButton } from '@/components/layout/add-to-reading-list-button';
-import { Badge } from '@/components/ui/badge';
 import { Card, CardFooter } from '@/components/ui/card';
-import { useParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
 import { CategoryBadge } from '@/components/layout/category-badge';
 import { formatRelativeTime } from '@/lib/utils';
 
-export default function TagPage() {
-  const params = useParams();
-  const tag = params.tag as string;
-  const locale = params.locale as string;
+export async function generateStaticParams() {
+  const locales = i18n.locales;
+  // This is a simplified version, in a real app you might want to extract all unique tags from MDX
+  return locales.map(locale => ({ locale, tag: 'tutorial' }));
+}
+
+export default async function TagPage({ params }: { params: Promise<{ locale: string, tag: string }> }) {
+  const { locale, tag } = await params;
   const decodedTag = decodeURIComponent(tag).toLowerCase();
-  const [dictionary, setDictionary] = useState<any>(null);
+  const dictionary = await getDictionary(locale as any);
   const linkPrefix = locale === 'en' ? '' : `/${locale}`;
 
-  useEffect(() => {
-    getDictionary(locale as any).then(setDictionary);
-  }, [locale]);
-
-  if (!dictionary) return null;
-
-  const posts = getSortedPostsData(locale).filter(p => p.frontmatter.tags?.some(t => t.toLowerCase() === decodedTag));
+  const allPosts = await getSortedPostsData(locale);
+  const posts = allPosts.filter(p => p.frontmatter.tags?.some(t => t.toLowerCase() === decodedTag));
   const notes = getRawNotes(locale).filter(n => n.frontmatter.tags?.some(t => t.toLowerCase() === decodedTag));
 
   const formatDatePart = (date: Date, options: Intl.DateTimeFormatOptions) => {
