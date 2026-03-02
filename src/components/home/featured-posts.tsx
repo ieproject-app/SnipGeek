@@ -19,6 +19,7 @@ interface FeaturedPostsProps {
 
 /**
  * FeaturedPosts - A sophisticated 4-column staggered gallery grid using the colorful badge system.
+ * Updated with Windows 11 rounded-xl (12px) for a more premium look.
  */
 export function FeaturedPosts({ posts, dictionary, locale, linkPrefix }: FeaturedPostsProps) {
   if (posts.length === 0) return null;
@@ -67,8 +68,8 @@ export function FeaturedPosts({ posts, dictionary, locale, linkPrefix }: Feature
               >
                 <Link href={`${linkPrefix}/blog/${post.slug}`} className="block" aria-label={`Read ${post.frontmatter.title}`}>
                     <article className="space-y-5">
-                        {/* Image Block - 4px rounded */}
-                        <div className="relative aspect-[4/3] rounded-lg overflow-hidden bg-muted shadow-md group-hover:shadow-xl group-hover:-translate-y-2 transition-all duration-500">
+                        {/* Image Block - rounded-xl (12px) for Windows 11 Spotlight style */}
+                        <div className="relative aspect-[4/3] rounded-xl overflow-hidden bg-muted shadow-md group-hover:shadow-xl group-hover:-translate-y-2 transition-all duration-500">
                             {/* Category Badge - Colorful glass style */}
                             <div className="absolute top-4 left-4 z-20">
                                 <CategoryBadge 
