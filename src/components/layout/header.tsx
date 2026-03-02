@@ -78,10 +78,9 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
   const [removingSlug, setRemovingSlug] = useState<string | null>(null);
   const [timeLabel, setTimeLabel] = useState("");
   const [mounted, setMounted] = useState(false);
-  const [isGlowing, setIsGlowing] = useState(false);
   
   const { items: readingListItems, removeItem: removeReadingListItem } = useReadingList();
-  const { message, icon, notify } = useNotification();
+  const { message, icon, progress, notify, clear } = useNotification();
   
   const lastScrollY = useRef(0);
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -105,9 +104,6 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
   useEffect(() => {
     if (message) {
       setIsVisible(true);
-      setIsGlowing(true);
-      const timer = setTimeout(() => setIsGlowing(false), 500);
-      return () => clearTimeout(timer);
     }
   }, [message]);
 
@@ -250,19 +246,69 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
     )}>
         <div className="max-w-4xl mx-auto h-16 min-h-[64px] px-4 md:px-6 flex items-center justify-between relative">
             
-            {/* Notification Overlay */}
+            {/* Notification Overlay with Progress Bar and Auto-Dismiss */}
             <div className={cn(
-                "absolute inset-0 z-40 bg-background/95 backdrop-blur-md transition-all flex items-center justify-center px-6 h-16",
-                isGlowing && "border-b-2 border-accent/20",
-                (mounted && message) 
-                    ? "translate-y-0 opacity-100 ease-out duration-500" 
-                    : "translate-y-[-100%] opacity-0 ease-in duration-300 pointer-events-none"
+                "absolute inset-0 z-40 h-16 flex flex-col overflow-hidden",
+                "bg-background/97 backdrop-blur-md",
+                (mounted && message)
+                ? [
+                    "translate-y-0 opacity-100",
+                    "duration-500 [transition-timing-function:cubic-bezier(0.34,1.56,0.64,1)]",
+                    ].join(" ")
+                : [
+                    "translate-y-[-100%] opacity-0",
+                    "duration-[200ms] ease-in pointer-events-none",
+                    ].join(" ")
             )}>
-                <div className="flex items-center gap-3">
-                    {icon && <div className="text-accent">{React.cloneElement(icon as React.ReactElement, { className: "h-5 w-5" })}</div>}
-                    <p className="font-sans text-[10px] font-black uppercase tracking-widest text-foreground">
+                {/* Content row dengan stagger */}
+                <div className="flex-1 flex items-center justify-center gap-3 px-6 relative">
+                    {/* Icon — slide dari kiri, delay 80ms */}
+                    <div className={cn(
+                        "text-accent transition-all duration-300",
+                        message
+                        ? "opacity-100 translate-x-0 scale-100 delay-[80ms]"
+                        : "opacity-0 -translate-x-2 scale-75"
+                    )}>
+                        {icon && React.cloneElement(icon as React.ReactElement,
+                        { className: "h-5 w-5" }
+                        )}
+                    </div>
+
+                    {/* Teks — slide dari bawah, delay 120ms */}
+                    <p className={cn(
+                        "font-sans text-[10px] font-black uppercase tracking-widest",
+                        "transition-all duration-300",
+                        message
+                        ? "opacity-100 translate-y-0 delay-[120ms]"
+                        : "opacity-0 translate-y-1"
+                    )}>
                         {message}
                     </p>
+
+                    {/* Dismiss button */}
+                    <button
+                        onClick={clear}
+                        className={cn(
+                        "absolute right-4 h-8 w-8 rounded-full flex items-center justify-center",
+                        "text-foreground/25 hover:text-foreground/60 hover:bg-muted/50",
+                        "transition-all duration-150",
+                        message ? "opacity-100 delay-[200ms]" : "opacity-0"
+                        )}
+                    >
+                        <X className="h-4 w-4" />
+                    </button>
+                </div>
+
+                {/* Progress bar countdown */}
+                <div className="h-[2px] bg-accent/10">
+                    <div
+                        className="h-full bg-accent/50 transition-none"
+                        style={{
+                        width: `${progress}%`,
+                        boxShadow: '0 0 6px hsl(var(--accent) / 0.4)',
+                        borderRadius: '0 2px 2px 0',
+                        }}
+                    />
                 </div>
             </div>
 
@@ -308,26 +354,73 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
 
             {/* Right: Utilities Container */}
             <div className={cn(
-                "relative flex items-center gap-1 transition-all duration-500",
+                "flex items-center gap-1 transition-all duration-500",
                 (isSearchOpen || isReadingListOpen) ? "opacity-0 pointer-events-none" : "opacity-100"
             )}>
-                {/* 1. More Menu Toggle */}
-                <Button 
-                    variant="ghost" 
-                    size="icon"
-                    className={navItemClass} 
-                    onClick={() => toggleView('menu')}
-                    aria-label="More Menu"
-                >
-                    <MoreHorizontal className={cn(
-                        "h-5 w-5 transition-all duration-300",
-                        isMenuOpen ? "rotate-90 opacity-0 scale-0 absolute" : "opacity-100 scale-100"
-                    )} />
-                    <X className={cn(
-                        "h-5 w-5 transition-all duration-300",
-                        isMenuOpen ? "opacity-100 scale-100" : "-rotate-90 opacity-0 scale-0 absolute"
-                    )} />
-                </Button>
+                {/* 1. More Menu Toggle dalam wrapper relative-nya sendiri */}
+                <div className="relative">
+                    <Button 
+                        variant="ghost" 
+                        size="icon"
+                        className={navItemClass} 
+                        onClick={() => toggleView('menu')}
+                        aria-label="More Menu"
+                    >
+                        <MoreHorizontal className={cn(
+                            "h-5 w-5 transition-all duration-300",
+                            isMenuOpen ? "rotate-90 opacity-0 scale-0 absolute" : "opacity-100 scale-100"
+                        )} />
+                        <X className={cn(
+                            "h-5 w-5 transition-all duration-300",
+                            isMenuOpen ? "opacity-100 scale-100" : "-rotate-90 opacity-0 scale-0 absolute"
+                        )} />
+                    </Button>
+
+                    {/* FLOATING MORE MENU DROPDOWN - Fixed Positioningrata-kanan */}
+                    <div className={cn(
+                        "absolute top-full right-0 mt-5 min-w-[220px] bg-background/95 backdrop-blur-xl border border-border shadow-2xl rounded-2xl overflow-hidden origin-top-right transition-all duration-300 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] z-[100] ring-1 ring-black/[0.03]",
+                        isMenuOpen ? "opacity-100 scale-100 translate-y-0" : "opacity-0 scale-[0.95] -translate-y-2 pointer-events-none"
+                    )}>
+                        <div className="py-3">
+                            <div className="px-4 py-2 mb-1">
+                                <p className="font-sans text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">SnipGeek · Navigate</p>
+                            </div>
+                            
+                            <div className="md:hidden border-b border-border mb-1 pb-1">
+                                {directLinks.map((item) => (
+                                    <NextLink 
+                                        key={item.href} 
+                                        href={`${linkPrefix}${item.href}`} 
+                                        className="group/item flex items-center gap-3 px-4 py-2.5 font-sans text-[11px] font-bold uppercase tracking-wider hover:bg-muted transition-colors rounded-lg mx-1 relative"
+                                        onClick={() => setActiveView('none')}
+                                    >
+                                        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-4 bg-accent opacity-0 group-hover/item:opacity-60 transition-opacity" />
+                                        <item.icon className="h-4 w-4 text-accent" />
+                                        {item.name}
+                                    </NextLink>
+                                ))}
+                            </div>
+
+                            <div className="pt-1">
+                                <div className="px-4 py-2">
+                                    <p className="font-sans text-[8px] font-black uppercase tracking-[0.15em] text-accent">Connect</p>
+                                </div>
+                                {moreItems.map((item) => (
+                                    <NextLink 
+                                        key={item.href} 
+                                        href={`${linkPrefix}${item.href}`} 
+                                        className="group/item flex items-center gap-3 px-4 py-2.5 font-sans text-[11px] font-bold uppercase tracking-wider hover:bg-muted transition-colors rounded-lg mx-1 relative"
+                                        onClick={() => setActiveView('none')}
+                                    >
+                                        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-4 bg-accent opacity-0 group-hover/item:opacity-60 transition-opacity" />
+                                        <item.icon className="h-4 w-4 text-accent" />
+                                        {item.name}
+                                    </NextLink>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
                 {/* Vertical Divider */}
                 <div className="w-px h-4 bg-border/70 mx-0.5 hidden sm:block" />
@@ -361,53 +454,6 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                 >
                     <Search className="h-5 w-5 transition-transform group-hover:scale-110 group-hover:rotate-12" />
                 </Button>
-
-                {/* FLOATING MORE MENU DROPDOWN - Optimized Flyout Position */}
-                <div className={cn(
-                    "absolute top-full right-2 mt-5 min-w-[220px] bg-background/95 backdrop-blur-xl border border-border shadow-2xl rounded-2xl overflow-hidden origin-top-right transition-all duration-300 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] z-50 ring-1 ring-black/[0.03]",
-                    isMenuOpen ? "opacity-100 scale-100 translate-y-0" : "opacity-0 scale-[0.95] -translate-y-2 pointer-events-none"
-                )}>
-                    <div className="py-3">
-                        <div className="px-4 py-2 mb-1">
-                            <p className="font-sans text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">SnipGeek · Navigate</p>
-                        </div>
-                        
-                        {/* Mobile Navigation Links inside Dropdown */}
-                        <div className="md:hidden border-b border-border mb-1 pb-1">
-                            {directLinks.map((item) => (
-                                <NextLink 
-                                    key={item.href} 
-                                    href={`${linkPrefix}${item.href}`} 
-                                    className="group/item flex items-center gap-3 px-4 py-2.5 font-sans text-[11px] font-bold uppercase tracking-wider hover:bg-muted transition-colors rounded-lg mx-1 relative"
-                                    onClick={() => setActiveView('none')}
-                                >
-                                    <div className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-4 bg-accent opacity-0 group-hover/item:opacity-60 transition-opacity" />
-                                    <item.icon className="h-4 w-4 text-accent" />
-                                    {item.name}
-                                </NextLink>
-                            ))}
-                        </div>
-
-                        {/* Standard More Items (About, Contact) */}
-                        <div className="pt-1">
-                            <div className="px-4 py-2">
-                                <p className="font-sans text-[8px] font-black uppercase tracking-[0.15em] text-accent">Connect</p>
-                            </div>
-                            {moreItems.map((item) => (
-                                <NextLink 
-                                    key={item.href} 
-                                    href={`${linkPrefix}${item.href}`} 
-                                    className="group/item flex items-center gap-3 px-4 py-2.5 font-sans text-[11px] font-bold uppercase tracking-wider hover:bg-muted transition-colors rounded-lg mx-1 relative"
-                                    onClick={() => setActiveView('none')}
-                                >
-                                    <div className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-4 bg-accent opacity-0 group-hover/item:opacity-60 transition-opacity" />
-                                    <item.icon className="h-4 w-4 text-accent" />
-                                    {item.name}
-                                </NextLink>
-                            ))}
-                        </div>
-                    </div>
-                </div>
             </div>
 
             {/* BAR OVERLAYS (Only for Search and Reading List) */}
