@@ -9,7 +9,6 @@ import { ThemeProvider } from '@/components/theme-provider';
 import { ReadingListProvider } from '@/hooks/use-reading-list';
 import { NotificationProvider } from '@/hooks/use-notification';
 import { BackToTop } from '@/components/layout/back-to-top';
-import { ThemeSwitcher } from '@/components/layout/theme-switcher';
 import { getDictionary } from '@/lib/get-dictionary';
 import { DraftList } from '@/components/layout/draft-list';
 import { Bricolage_Grotesque, Plus_Jakarta_Sans, Lora, JetBrains_Mono } from 'next/font/google';
@@ -176,7 +175,6 @@ export default async function LocaleLayout({
                 <main className="pt-16">{children}</main>
                 <Footer dictionary={dictionary} translationsMap={translationsMap} />
                 <BackToTop dictionary={dictionary} />
-                <ThemeSwitcher dictionary={dictionary} />
                 <DraftList draftPosts={draftPosts} draftNotes={draftNotes} dictionary={dictionary} />
               </ReadingListProvider>
             </NotificationProvider>
