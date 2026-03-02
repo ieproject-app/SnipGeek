@@ -1,3 +1,4 @@
+"use server";
 import fs from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
@@ -24,7 +25,7 @@ export type Note<TFrontmatter> = {
 };
 
 
-export function getSortedNotesData(locale?: string): Note<NoteFrontmatter>[] {
+export async function getSortedNotesData(locale?: string): Promise<Note<NoteFrontmatter>[]> {
   const targetLocale = i18n.locales.includes(locale as Locale) ? locale : i18n.defaultLocale;
   const localeDirectory = path.join(notesDirectory, targetLocale!);
   
@@ -66,7 +67,7 @@ export function getSortedNotesData(locale?: string): Note<NoteFrontmatter>[] {
   });
 }
 
-export function getDraftNotesData(locale?: string): Note<NoteFrontmatter>[] {
+export async function getDraftNotesData(locale?: string): Promise<Note<NoteFrontmatter>[]> {
   const targetLocale = i18n.locales.includes(locale as Locale) ? locale : i18n.defaultLocale;
   const localeDirectory = path.join(notesDirectory, targetLocale!);
   
@@ -135,7 +136,7 @@ export async function getNoteData(slug: string, locale?: string): Promise<NoteDa
   };
 }
 
-export function getAllNoteSlugs(locale?: string) {
+export async function getAllNoteSlugs(locale?: string) {
     const targetLocale = i18n.locales.includes(locale as Locale) ? locale : i18n.defaultLocale;
     const localeDirectory = path.join(notesDirectory, targetLocale!);
     let fileNames: string[];
@@ -161,7 +162,7 @@ export function getAllNoteSlugs(locale?: string) {
       .filter(slug => slug !== null);
 }
 
-export function getAllLocales() {
+export async function getAllLocales() {
   try {
     return fs.readdirSync(notesDirectory).filter(item => 
       fs.statSync(path.join(notesDirectory, item)).isDirectory()
@@ -178,8 +179,8 @@ export type NotesTranslationsMap = {
   }[];
 };
 
-export function getAllNotesTranslationsMap(): NotesTranslationsMap {
-  const allLocales = getAllLocales();
+export async function getAllNotesTranslationsMap(): Promise<NotesTranslationsMap> {
+  const allLocales = await getAllLocales();
   const translationsMap: NotesTranslationsMap = {};
 
   for (const locale of allLocales) {

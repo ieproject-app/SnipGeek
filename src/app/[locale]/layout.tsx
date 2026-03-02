@@ -14,7 +14,7 @@ import { DraftList } from '@/components/layout/draft-list';
 import { Bricolage_Grotesque, Plus_Jakarta_Sans, Lora, JetBrains_Mono } from 'next/font/google';
 import { cn } from '@/lib/utils';
 import Script from 'next/script';
-import { FirebaseClientProvider } from '@/firebase';
+import { FirebaseProviderWrapper } from '@/components/layout/firebase-provider-wrapper';
 
 const fontDisplay = Bricolage_Grotesque({
   subsets: ['latin'],
@@ -119,11 +119,11 @@ export default async function LocaleLayout({
 }) {
   const { locale } = await params;
   const postTranslationsMap = await getAllPostTranslationsMap();
-  const noteTranslationsMap = getAllNotesTranslationsMap();
+  const noteTranslationsMap = await getAllNotesTranslationsMap();
   const translationsMap = {...postTranslationsMap, ...noteTranslationsMap};
 
   const posts = await getSortedPostsData(locale);
-  const notes = getSortedNotesData(locale);
+  const notes = await getSortedNotesData(locale);
   const linkPrefix = locale === i18n.defaultLocale ? '' : `/${locale}`;
 
   const searchablePosts = posts.map(post => ({
@@ -149,7 +149,7 @@ export default async function LocaleLayout({
   const searchableData = [...searchablePosts, ...searchableNotes];
   const dictionary = await getDictionary(locale as any);
   const draftPosts = await getDraftPostsData(locale);
-  const draftNotes = getDraftNotesData(locale);
+  const draftNotes = await getDraftNotesData(locale);
   
   return (
     <html lang={locale} className={cn(fontDisplay.variable, fontSans.variable, fontSerif.variable, fontMono.variable, "scroll-smooth")} suppressHydrationWarning>
@@ -162,7 +162,7 @@ export default async function LocaleLayout({
         />
       </head>
       <body className="font-sans antialiased fade-in-on-load">
-        <FirebaseClientProvider>
+        <FirebaseProviderWrapper>
           <ThemeProvider
               attribute="class"
               defaultTheme="system"
@@ -178,7 +178,7 @@ export default async function LocaleLayout({
               </ReadingListProvider>
             </NotificationProvider>
           </ThemeProvider>
-        </FirebaseClientProvider>
+        </FirebaseProviderWrapper>
       </body>
     </html>
   );

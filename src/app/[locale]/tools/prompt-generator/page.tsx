@@ -32,8 +32,9 @@ export default async function PromptGeneratorPage({ params }: { params: Promise<
   const pageContent = dictionary.promptGenerator;
 
   // Fetch existing articles to populate the selection list
-  const posts = getSortedPostsData(lang);
-  const notes = getSortedNotesData(lang);
+  // MUST await these because they are async functions
+  const posts = await getSortedPostsData(lang);
+  const notes = await getSortedNotesData(lang);
   
   const existingArticles = [
     ...posts.map(p => ({ slug: p.slug, title: p.frontmatter.title, type: 'blog' as const })),
