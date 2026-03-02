@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
@@ -25,7 +26,8 @@ import {
     Info,
     Plus,
     Minus,
-    Zap
+    Zap,
+    Hash
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { format, addMonths } from 'date-fns';
@@ -80,6 +82,7 @@ interface GeneratedResult {
   text: string;
   date: Date;
   docType: string;
+  isError?: boolean;
 }
 
 interface RemainingCount {
@@ -277,32 +280,6 @@ export function NomorGeneratorClient() {
         setRemainingCounts([]);
 
         try {
-            // --- 1. PRE-CHECK VALIDATION (SOFT CHECK) ---
-            for (const req of requests) {
-                const year = req.docDate!.getFullYear();
-                const month = req.docDate!.getMonth() + 1;
-                const qCheck = query(
-                    collection(firestore, 'availableNumbers'),
-                    where("category", "==", req.category),
-                    where("year", "==", year),
-                    where("month", "==", month),
-                    where("valueCategory", "==", valueCategory),
-                    where("isUsed", "==", false)
-                );
-                
-                const checkSnapshot = await getDocs(qCheck);
-                if (checkSnapshot.size < req.quantity) {
-                    const msg = checkSnapshot.size === 0 
-                        ? `Stok Kosong untuk periode ${month}-${year}.` 
-                        : `Stok hanya tersisa ${checkSnapshot.size} nomor untuk periode ${month}-${year}.`;
-                    
-                    notify(msg, <AlertTriangle className="h-4 w-4 text-amber-500" />);
-                    setIsGenerating(false);
-                    return; 
-                }
-            }
-
-            // --- 2. EXECUTE TRANSACTION ---
             const totalRequested = requests.reduce((sum, req) => sum + req.quantity, 0);
 
             const generated = await runTransaction(firestore, async (transaction) => {
@@ -323,16 +300,27 @@ export function NomorGeneratorClient() {
                     if (currentCount >= DAILY_LIMIT) {
                         throw new Error(`Batas generate harian (${DAILY_LIMIT}) telah tercapai.`);
                     }
-                    if (currentCount + totalRequested > DAILY_LIMIT) {
-                        throw new Error(`Permintaan (${totalRequested}) melebihi sisa kuota (${DAILY_LIMIT - currentCount}).`);
-                    }
-                    newDailyCount = currentCount + totalRequested;
+                    // We check full count at the end if needed, but for now we proceed
                 }
 
-                const results = [];
+                const results: GeneratedResult[] = [];
+                let actualGeneratedCount = 0;
+
                 for (const req of requests) {
                     const year = req.docDate!.getFullYear();
                     const month = req.docDate!.getMonth() + 1;
+                    
+                    // Partial logic: Only request what fits in the remaining quota
+                    const remainingQuota = isAdmin ? 999 : (DAILY_LIMIT - currentCount - actualGeneratedCount);
+                    const processQuantity = Math.min(req.quantity, remainingQuota);
+
+                    if (processQuantity <= 0 && !isAdmin) {
+                        for(let i = 0; i < req.quantity; i++) {
+                            results.push({ text: 'KUOTA HABIS', docType: req.docType, date: req.docDate!, isError: true });
+                        }
+                        continue;
+                    }
+
                     const numbersRef = collection(firestore, 'availableNumbers');
                     const q = query(
                         numbersRef,
@@ -341,14 +329,13 @@ export function NomorGeneratorClient() {
                         where("month", "==", month),
                         where("valueCategory", "==", valueCategory),
                         where("isUsed", "==", false),
-                        limit(req.quantity)
+                        limit(processQuantity)
                     );
                     
                     const querySnapshot = await getDocs(q);
-                    if (querySnapshot.docs.length < req.quantity) {
-                        throw new Error(`Stok habis untuk periode ${month}-${year}.`);
-                    }
+                    const foundCount = querySnapshot.docs.length;
 
+                    // 1. Success cases
                     for (const docSnap of querySnapshot.docs) {
                         const dRef = doc(firestore, 'availableNumbers', docSnap.id);
                         transaction.update(dRef, {
@@ -361,10 +348,25 @@ export function NomorGeneratorClient() {
                             docType: req.docType,
                             date: req.docDate!
                         });
+                        actualGeneratedCount++;
+                    }
+
+                    // 2. Failure cases (Stock empty for remainder)
+                    if (foundCount < req.quantity) {
+                        const missingCount = req.quantity - foundCount;
+                        for (let i = 0; i < missingCount; i++) {
+                            results.push({
+                                text: 'STOK HABIS',
+                                docType: req.docType,
+                                date: req.docDate!,
+                                isError: true
+                            });
+                        }
                     }
                 }
 
                 if (!isAdmin) {
+                    newDailyCount = currentCount + actualGeneratedCount;
                     transaction.set(limitRef, { dailyCount: newDailyCount, lastGeneratedDate: todayStr }, { merge: true });
                 }
 
@@ -399,7 +401,12 @@ export function NomorGeneratorClient() {
             const sortedGenerated = generated.sort((a, b) => a.date.getTime() - b.date.getTime());
             setGeneratedNumbers(sortedGenerated);
             
-            notify(`Berhasil! ${generated.length} nomor baru telah dibuat.`, <CheckCircle className="h-4 w-4 text-emerald-500" />);
+            const successCount = generated.filter(r => !r.isError).length;
+            if (successCount > 0) {
+                notify(`Berhasil! ${successCount} nomor baru telah dibuat.`, <CheckCircle className="h-4 w-4 text-emerald-500" />);
+            } else {
+                notify(`Gagal! Tidak ada nomor yang tersedia untuk dibuat.`, <AlertTriangle className="h-4 w-4 text-destructive" />);
+            }
 
         } catch (error: any) {
             console.error("Error generating numbers:", error);
@@ -418,7 +425,10 @@ export function NomorGeneratorClient() {
     const copyFullResults = () => {
         if (generatedNumbers.length === 0) return;
         const textToCopy = generatedNumbers
-            .map((result, index) => `${index + 1}. ${result.docType} ${result.text} Tanggal ${format(result.date, 'd MMMM yyyy', { locale: id })}`)
+            .map((result, index) => {
+                if (result.isError) return `${index + 1}. [GAGAL] ${result.docType} periode ${format(result.date, 'MM-yyyy')}: ${result.text}`;
+                return `${index + 1}. ${result.docType} ${result.text} Tanggal ${format(result.date, 'd MMMM yyyy', { locale: id })}`
+            })
             .join('\n');
         navigator.clipboard.writeText(textToCopy);
         notify("Hasil lengkap berhasil disalin ke clipboard.", <Check className="h-4 w-4" />);
@@ -428,9 +438,18 @@ export function NomorGeneratorClient() {
 
     const copyNumbersOnly = () => {
         if (generatedNumbers.length === 0) return;
-        const textToCopy = generatedNumbers.map(result => result.text).join('\n');
+        const textToCopy = generatedNumbers
+            .filter(r => !r.isError)
+            .map(result => result.text)
+            .join('\n');
+        
+        if (textToCopy === '') {
+            notify("Tidak ada nomor valid untuk disalin.", <AlertTriangle className="h-4 w-4" />);
+            return;
+        }
+
         navigator.clipboard.writeText(textToCopy);
-        notify("Nomor berhasil disalin.", <Check className="h-4 w-4" />);
+        notify("Daftar nomor berhasil disalin.", <Check className="h-4 w-4" />);
         setIsCopied('numbers');
         setTimeout(() => setIsCopied(null), 2000);
     };
@@ -592,6 +611,7 @@ export function NomorGeneratorClient() {
                                                     selected={req.docDate}
                                                     onSelect={(d) => handleRequestChange(req.id, 'docDate', d)}
                                                     initialFocus
+                                                    fixedWeeks={true}
                                                     classNames={{
                                                         months: "p-3",
                                                         month: "space-y-3",
@@ -891,15 +911,19 @@ export function NomorGeneratorClient() {
                     >
                         <Card className="border-accent/20 bg-accent/5 shadow-xl ring-1 ring-accent/5 overflow-hidden transition-shadow duration-300 hover:shadow-2xl">
                              <CardHeader className="bg-gradient-to-r from-accent/15 to-accent/5 border-b border-accent/10 p-6">
-                                <div className="flex items-center justify-between">
+                                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                                     <div className="flex items-center gap-3">
                                         <div className="p-2 bg-accent rounded-xl shadow-lg shadow-accent/30"><CheckCircle className="h-5 w-5 text-white"/></div>
                                         <CardTitle className="font-headline text-2xl font-black uppercase tracking-tighter">Hasil Generate</CardTitle>
                                     </div>
-                                    <div className="flex gap-2">
+                                    <div className="flex flex-wrap gap-2">
                                         <Button variant="outline" size="sm" onClick={copyFullResults} className="rounded-full bg-background/50 h-9 text-[10px] font-black border-accent/20 hover:border-accent transition-all active:scale-95">
                                             {isCopied === 'full' ? <Check className="mr-2 h-3.5 w-3.5 text-emerald-500" /> : <Copy className="mr-2 h-3.5 w-3.5" />}
-                                            SALIN SEMUA
+                                            SALIN LENGKAP
+                                        </Button>
+                                        <Button variant="outline" size="sm" onClick={copyNumbersOnly} className="rounded-full bg-background/50 h-9 text-[10px] font-black border-accent/20 hover:border-accent transition-all active:scale-95">
+                                            {isCopied === 'numbers' ? <Check className="mr-2 h-3.5 w-3.5 text-emerald-500" /> : <Hash className="mr-2 h-3.5 w-3.5" />}
+                                            SALIN NOMOR SAJA
                                         </Button>
                                         <Button variant="secondary" size="sm" onClick={handleReset} className="rounded-full h-9 text-[10px] font-black transition-all active:scale-95">
                                             <RotateCcw className="mr-2 h-3.5 w-3.5" />
@@ -911,34 +935,52 @@ export function NomorGeneratorClient() {
                              <CardContent className="p-6 space-y-6">
                                 <div className="flex justify-start">
                                     <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent/10 text-accent text-[10px] font-black uppercase tracking-widest border border-accent/10">
-                                        Total: {generatedNumbers.length} nomor dihasilkan
+                                        Total: {generatedNumbers.length} nomor diproses
                                     </div>
                                 </div>
 
                                 <div className="space-y-3">
                                     <ol className="space-y-3">
                                         {generatedNumbers.map((result, index) => (
-                                            <li key={index} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-background/80 backdrop-blur-sm rounded-xl border border-accent/10 shadow-sm group border-l-4 border-l-accent/40 hover:border-accent hover:bg-accent/5 transition-all">
+                                            <li key={index} className={cn(
+                                                "flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-background/80 backdrop-blur-sm rounded-xl border shadow-sm group border-l-4 transition-all",
+                                                result.isError 
+                                                    ? "border-destructive/40 border-l-destructive bg-destructive/5" 
+                                                    : "border-accent/10 border-l-accent/40 hover:border-accent hover:bg-accent/5"
+                                            )}>
                                                 <div className="flex flex-col">
                                                     <div className="flex items-center gap-3 mb-1">
-                                                        <span className="text-[10px] font-black uppercase tracking-[0.15em] text-accent">{result.docType}</span>
+                                                        <span className={cn(
+                                                            "text-[10px] font-black uppercase tracking-[0.15em]",
+                                                            result.isError ? "text-destructive" : "text-accent"
+                                                        )}>{result.docType}</span>
                                                         <span className="h-1 w-1 rounded-full bg-muted-foreground/30" />
                                                         <span className="text-[10px] font-bold text-muted-foreground/60 uppercase">
                                                             {format(result.date, 'd MMMM yyyy', { locale: id })}
                                                         </span>
                                                     </div>
-                                                    <span className="font-mono text-lg font-black tracking-tight text-primary">{result.text}</span>
+                                                    <span className={cn(
+                                                        "font-mono text-lg font-black tracking-tight",
+                                                        result.isError ? "text-destructive/60 italic" : "text-primary"
+                                                    )}>{result.text}</span>
                                                 </div>
-                                                <div className="mt-3 sm:mt-0">
-                                                    <Button 
-                                                        variant="ghost" 
-                                                        size="icon" 
-                                                        className="h-10 w-10 rounded-xl hover:bg-accent/10 text-accent opacity-0 group-hover:opacity-100 transition-all focus-visible:ring-accent"
-                                                        onClick={() => copyItem(result.text, index)}
-                                                    >
-                                                        {copiedIndex === index ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-                                                    </Button>
-                                                </div>
+                                                {!result.isError && (
+                                                    <div className="mt-3 sm:mt-0">
+                                                        <Button 
+                                                            variant="ghost" 
+                                                            size="icon" 
+                                                            className="h-10 w-10 rounded-xl hover:bg-accent/10 text-accent opacity-0 group-hover:opacity-100 transition-all focus-visible:ring-accent"
+                                                            onClick={() => copyItem(result.text, index)}
+                                                        >
+                                                            {copiedIndex === index ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                                                        </Button>
+                                                    </div>
+                                                )}
+                                                {result.isError && (
+                                                    <Badge variant="destructive" className="mt-3 sm:mt-0 text-[8px] font-black uppercase py-0.5">
+                                                        {result.text === 'KUOTA HABIS' ? 'Limit Tercapai' : 'Stok Habis'}
+                                                    </Badge>
+                                                )}
                                             </li>
                                         ))}
                                     </ol>
