@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState, useEffect, useRef, useMemo } from 'react';
@@ -399,17 +400,17 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                     <div className="relative h-5 w-5">
                         {/* Sun icon — visible in light mode */}
                         <Sun className={cn(
-                            "absolute inset-0 h-5 w-5 transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)]",
+                            "absolute inset-0 h-5 w-5 transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] transform origin-center",
                             mounted && resolvedTheme === 'dark'
-                                ? "opacity-0 scale-0 rotate-90"
+                                ? "opacity-0 scale-0 rotate-180"
                                 : "opacity-100 scale-100 rotate-0"
                         )} />
                         {/* Moon icon — visible in dark mode */}
                         <Moon className={cn(
-                            "absolute inset-0 h-5 w-5 transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)]",
+                            "absolute inset-0 h-5 w-5 transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] transform origin-center",
                             mounted && resolvedTheme === 'dark'
                                 ? "opacity-100 scale-100 rotate-0"
-                                : "opacity-0 scale-0 -rotate-90"
+                                : "opacity-0 scale-0 -rotate-180"
                         )} />
                     </div>
                 </Button>
@@ -494,7 +495,7 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                                 
                                 return (
                                     <div key={`${item.type}-${item.slug}`} className={cn(
-                                        "group flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-[320ms] hover:bg-muted/50", 
+                                        "group flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-[320ms] hover:bg-muted/50",
                                         removingSlug === item.slug && "opacity-0 -translate-x-2 scale-[0.96] ease-in"
                                     )}>
                                         <NextLink href={item.href} className="flex items-center gap-3 flex-1 min-w-0" onClick={() => setActiveView('none')}>
@@ -514,7 +515,7 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                                             variant="ghost" size="icon" 
                                             className="h-8 w-8 rounded-full text-destructive opacity-0 group-hover:opacity-100 transition-all translate-x-2 group-hover:translate-x-0"
                                             onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleRemoveReadingListItem(item.slug); }}
-                                        >
+                                         >
                                             <Trash2 className="h-3.5 w-3.5" />
                                         </Button>
                                     </div>
@@ -603,7 +604,7 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                                             return (
                                                 <NextLink key={item.slug} href={item.href} className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-muted/50 transition-all group" onClick={() => setActiveView('none')}>
                                                     <div className="w-[52px] h-[39px] relative rounded-md overflow-hidden bg-muted shrink-0 border border-border/50">
-                                                        <Image src={resolvedHero} alt="" fill className="object-cover" sizes="52px" />
+                                                        <Image src={resolvedHero} alt="" fill className="object-cover " sizes="52px" />
                                                     </div>
                                                     <div className="flex-1 min-w-0">
                                                         <h4 className="font-sans text-sm font-bold text-foreground line-clamp-1 group-hover:text-accent transition-colors leading-tight">
@@ -622,9 +623,9 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                                 <div className="px-4">
                                     <p className="font-sans text-[9px] font-black uppercase tracking-[0.15em] text-muted-foreground/40 mb-3">{dictionary.search.prompt}</p>
                                     <div className="flex flex-wrap gap-2">
-                                        {['Windows', 'Android', 'Hardware', 'Tutorial', 'Tips'].map(cat => {
+                                         {['Windows', 'Android', 'Hardware', 'Tutorial', 'Tips'].map(cat => {
                                             const style = categoryColorMap[cat] || { border: 'border-border', text: 'text-muted-foreground', bg: 'bg-muted/50' };
-                                            return (
+                                             return (
                                                 <button 
                                                     key={cat} 
                                                     className={cn(
@@ -646,7 +647,7 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                 </ScrollArea>
                 <div className="px-4 py-2 border-t border-border bg-muted/5 flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                        <div className="flex items-center gap-1.5">
+                         <div className="flex items-center gap-1.5">
                             <kbd className="px-1.5 py-0.5 rounded border bg-background font-sans text-[8px] font-bold shadow-sm">ESC</kbd>
                             <span className="font-sans text-[8px] font-black uppercase tracking-widest text-muted-foreground/60">to close</span>
                         </div>
