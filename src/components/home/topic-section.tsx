@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { Undo2, ArrowRight } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { Breadcrumbs } from '@/components/layout/breadcrumbs';
 import { formatRelativeTime } from '@/lib/utils';
@@ -122,18 +122,20 @@ export function TopicSection({
             {posts.map((post) => renderHorizontalCard(post))}
         </div>
 
-        <footer className="mt-10 flex items-center justify-between">
-            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-muted-foreground opacity-50 select-none">
-                <Undo2 className="h-4 w-4" />
-                {breadcrumbHome}
-            </div>
-            
+        <footer className="mt-10 flex justify-center">
             <Link 
                 href={`${linkPrefix}/tags/${tag.toLowerCase()}`}
-                className="flex items-center gap-2 text-sm font-bold text-accent hover:text-primary transition-all group"
+                className="flex items-center gap-6 bg-muted/30 px-5 py-2.5 rounded-full border border-primary/5 hover:bg-muted/50 transition-all group"
             >
-                <span>{viewAllText}</span>
-                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                <div className="flex items-center gap-2 pr-4 border-r border-primary/10">
+                    <div className="h-1.5 w-8 bg-accent rounded-full" />
+                    <div className="h-1.5 w-1.5 bg-primary/20 rounded-full" />
+                    <div className="h-1.5 w-1.5 bg-primary/20 rounded-full" />
+                </div>
+                <span className="text-[11px] font-black uppercase tracking-widest text-primary/80 group-hover:text-primary transition-all flex items-center gap-2">
+                    {viewAllText}
+                    <ChevronRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
+                </span>
             </Link>
         </footer>
     </section>
