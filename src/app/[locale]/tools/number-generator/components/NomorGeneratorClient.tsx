@@ -11,6 +11,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Calendar } from '@/components/ui/calendar';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { 
     CalendarIcon, 
     Loader2, 
@@ -29,14 +30,17 @@ import {
     Zap,
     Hash,
     History,
-    FileSpreadsheet
+    FileSpreadsheet,
+    LogOut,
+    User
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { format, addMonths, startOfDay } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { useToast } from '@/hooks/use-toast';
-import { useFirestore, useUser } from '@/firebase';
+import { useFirestore, useUser, useAuth } from '@/firebase';
 import { collection, query, where, getDocs, runTransaction, doc, limit, getDoc, orderBy } from 'firebase/firestore';
+import { signOut } from 'firebase/auth';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -141,6 +145,7 @@ export function NomorGeneratorClient() {
     const { toast } = useToast();
     const { notify } = useNotification();
     const firestore = useFirestore();
+    const auth = useAuth();
     const { user, isUserLoading } = useUser();
 
     const isAdmin = useMemo(() => user?.email === ADMIN_EMAIL, [user]);
@@ -496,6 +501,15 @@ export function NomorGeneratorClient() {
         setTimeout(() => setCopiedIndex(null), 2000);
     };
 
+    const handleLogout = async () => {
+        try {
+            await signOut(auth);
+            notify("Berhasil keluar akun.", <LogOut className="h-4 w-4" />);
+        } catch (error) {
+            console.error("Logout error:", error);
+        }
+    };
+
     if (isUserLoading) {
         return (
             <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
@@ -529,6 +543,31 @@ export function NomorGeneratorClient() {
     
     return (
         <div className="space-y-10 animate-in fade-in duration-700">
+            {/* 0. User Profile Bar */}
+            <div className="flex flex-col md:flex-row items-center justify-between gap-4 p-4 bg-muted/30 backdrop-blur-sm rounded-2xl border border-primary/5 shadow-inner">
+                <div className="flex items-center gap-3">
+                    <Avatar className="h-10 w-10 border-2 border-background shadow-md">
+                        <AvatarImage src={user.photoURL || ''} />
+                        <AvatarFallback className="bg-primary text-primary-foreground font-black">
+                            {user.email?.charAt(0).toUpperCase() || <User className="h-4 w-4" />}
+                        </AvatarFallback>
+                    </Avatar>
+                    <div className="flex flex-col">
+                        <span className="text-sm font-black text-primary leading-none mb-1">{user.displayName || 'Pengguna SnipGeek'}</span>
+                        <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-tight">{user.email}</span>
+                    </div>
+                </div>
+                <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={handleLogout}
+                    className="text-[10px] font-black uppercase tracking-widest text-destructive hover:bg-destructive/10 hover:text-destructive rounded-full h-9 px-6 transition-all active:scale-95"
+                >
+                    <LogOut className="mr-2 h-3.5 w-3.5" />
+                    Keluar Akun
+                </Button>
+            </div>
+
             {/* 1. Stepper Visual */}
             <div className="max-w-2xl mx-auto mb-12">
                 <div className="relative flex justify-between">
@@ -587,7 +626,7 @@ export function NomorGeneratorClient() {
                                         <div className="bg-background/80 backdrop-blur-sm p-4 rounded-xl border border-primary/5 shadow-inner min-w-[180px]">
                                             <div className="flex items-center justify-between mb-2">
                                                 <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-1">
-                                                    <Database className="h-3 w-3" /> Kuota Hari Ini
+                                                    <Database className="h-3" /> Kuota Hari Ini
                                                 </span>
                                                 <span className="text-[10px] font-bold text-primary">
                                                     {DAILY_LIMIT - userLimit.count} / {DAILY_LIMIT} tersisa
