@@ -240,16 +240,16 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
       ref={headerRef} 
       data-scrolled={isScrolled}
       className={cn(
-        "fixed top-0 left-0 right-0 z-50 w-full bg-background/80 backdrop-blur-md border-b border-border/50 transition-all [transition-timing-function:cubic-bezier(0.4,0,0.2,1)] will-change-transform",
+        "fixed top-0 left-0 right-0 z-50 w-full bg-background/80 backdrop-blur-md border-b border-border/50 transition-all [transition-timing-function:cubic-bezier(0.4,0,0.2,1)] will-change-transform overflow-visible",
         isVisible ? "translate-y-0 duration-500" : "-translate-y-full duration-300",
         isScrolled && "shadow-sm border-border/80"
     )}>
-        <div className="max-w-4xl mx-auto h-16 min-h-[64px] px-4 md:px-6 flex items-center justify-between relative">
+        <div className="max-w-4xl mx-auto h-16 min-h-[64px] px-4 md:px-6 flex items-center justify-between relative overflow-visible">
             
-            {/* Notification Overlay with Progress Bar and Auto-Dismiss */}
+            {/* Notification Overlay - Solid Background Version */}
             <div className={cn(
                 "absolute inset-0 z-40 h-16 flex flex-col overflow-hidden",
-                "bg-background/97 backdrop-blur-md",
+                "bg-background border-b border-border shadow-sm", // Solid background, no blur
                 (mounted && message)
                 ? [
                     "translate-y-0 opacity-100",
@@ -260,9 +260,9 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                     "duration-[200ms] ease-in pointer-events-none",
                     ].join(" ")
             )}>
-                {/* Content row dengan stagger */}
+                {/* Content row with stagger */}
                 <div className="flex-1 flex items-center justify-center gap-3 px-6 relative">
-                    {/* Icon — slide dari kiri, delay 80ms */}
+                    {/* Icon — slide from left, delay 80ms */}
                     <div className={cn(
                         "text-accent transition-all duration-300",
                         message
@@ -274,7 +274,7 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                         )}
                     </div>
 
-                    {/* Teks — slide dari bawah, delay 120ms */}
+                    {/* Text — slide from bottom, delay 120ms */}
                     <p className={cn(
                         "font-sans text-[10px] font-black uppercase tracking-widest",
                         "transition-all duration-300",
@@ -345,7 +345,7 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                             {item.name}
                             <div className={cn(
                                 "absolute bottom-0 left-1/2 -translate-x-1/2 h-[2px] bg-accent transition-all duration-300",
-                                isActive ? "width-4" : "w-0"
+                                isActive ? "w-4" : "w-0"
                             )} />
                         </NextLink>
                     );
@@ -357,7 +357,7 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                 "flex items-center gap-1 transition-all duration-500",
                 (isSearchOpen || isReadingListOpen) ? "opacity-0 pointer-events-none" : "opacity-100"
             )}>
-                {/* 1. More Menu Toggle dalam wrapper relative-nya sendiri */}
+                {/* 1. More Menu Toggle */}
                 <div className="relative">
                     <Button 
                         variant="ghost" 
@@ -376,7 +376,7 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                         )} />
                     </Button>
 
-                    {/* FLOATING MORE MENU DROPDOWN - Fixed Positioningrata-kanan */}
+                    {/* FLOATING MORE MENU DROPDOWN */}
                     <div className={cn(
                         "absolute top-full right-0 mt-5 min-w-[220px] bg-background/95 backdrop-blur-xl border border-border shadow-2xl rounded-2xl overflow-hidden origin-top-right transition-all duration-300 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] z-[100] ring-1 ring-black/[0.03]",
                         isMenuOpen ? "opacity-100 scale-100 translate-y-0" : "opacity-0 scale-[0.95] -translate-y-2 pointer-events-none"
@@ -503,7 +503,7 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
             </div>
         </div>
 
-        <div className="max-w-4xl mx-auto relative px-4 md:px-6">
+        <div className="max-w-4xl mx-auto relative px-4 md:px-6 overflow-visible">
             {/* Reading List Results Panel */}
             <div className={cn(
                 "absolute top-0 left-4 right-4 md:left-6 md:right-6 z-30 bg-background border border-border shadow-2xl rounded-2xl overflow-hidden transition-all duration-300 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)]",
