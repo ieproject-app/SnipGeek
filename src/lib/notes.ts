@@ -1,5 +1,4 @@
 
-"use server";
 import fs from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
@@ -32,7 +31,10 @@ export async function getSortedNotesData(locale?: string): Promise<Note<NoteFron
   
   let fileNames: string[];
   try {
-    if (!fs.existsSync(localeDirectory)) return [];
+    if (!fs.existsSync(localeDirectory)) {
+        fs.mkdirSync(localeDirectory, { recursive: true });
+        return [];
+    }
     fileNames = fs.readdirSync(localeDirectory);
   } catch (err) {
     return [];
