@@ -1,4 +1,3 @@
-
 'use client';
 
 import React from 'react';
@@ -8,10 +7,9 @@ import { signOut } from 'firebase/auth';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { SnipGeekLogo } from '@/components/icons/snipgeek-logo';
+import { Badge } from '@/components/ui/badge';
 import { Loader2, Chrome, LogOut, User as UserIcon, Lock } from 'lucide-react';
 import { useNotification } from '@/hooks/use-notification';
-import Link from 'next/link';
 
 interface InternalToolWrapperProps {
   children: React.ReactNode;
@@ -124,5 +122,3 @@ export function InternalToolWrapper({ children, title, description }: InternalTo
     </div>
   );
 }
-
-import { Badge } from '@/components/ui/badge';
