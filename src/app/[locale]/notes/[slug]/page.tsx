@@ -4,6 +4,7 @@ import { getDictionary } from '@/lib/get-dictionary';
 import { i18n } from '@/i18n-config';
 import { notFound } from 'next/navigation';
 import { MDXRemote } from 'next-mdx-remote/rsc';
+import Link from 'next/link';
 import { mdxComponents } from '@/components/mdx-components';
 import { PostComments } from '@/components/blog/post-comments';
 import { PostMeta } from '@/components/blog/post-meta';
@@ -79,6 +80,18 @@ export default async function Page({ params }: { params: Promise<{ slug: string,
                     }}
                 />
             </div>
+
+            {/* Tags section moved here */}
+            {initialNote.frontmatter.tags && initialNote.frontmatter.tags.length > 0 && (
+                <div className="mt-12 flex flex-wrap gap-3">
+                    {initialNote.frontmatter.tags.map(tag => (
+                        <Link key={tag} href={`${linkPrefix}/tags/${tag.toLowerCase()}`}>
+                            <span className="text-sm font-bold text-accent hover:text-primary transition-all duration-300">#{tag}</span>
+                        </Link>
+                    ))}
+                </div>
+            )}
+
             <div className="mt-16 flex flex-col gap-4 text-center border-t pt-12">
                 <h3 className="text-lg font-semibold tracking-tight text-primary">{dictionary.post.shareArticle}</h3>
                 <ShareButtons title={initialNote.frontmatter.title} />

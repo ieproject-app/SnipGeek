@@ -70,7 +70,7 @@ export function PostMeta({ frontmatter, item, locale, dictionary, readingTime, i
     );
   }
 
-  // Standalone Style
+  // Standalone Style (Normal page header)
   return (
     <div className={cn(
         "flex flex-wrap items-center gap-6 py-4 mb-8 border-b border-primary/5",
@@ -90,12 +90,6 @@ export function PostMeta({ frontmatter, item, locale, dictionary, readingTime, i
       </div>
       
       <div className="flex items-center gap-2 ml-auto sm:ml-0">
-        {frontmatter.tags && frontmatter.tags.slice(0, 2).map(tag => (
-          <Link key={tag} href={`${linkPrefix}/tags/${tag.toLowerCase()}`}>
-            <span className="text-xs font-bold text-accent/80 hover:text-accent">#{tag}</span>
-          </Link>
-        ))}
-        <div className="w-px h-4 bg-border mx-2" />
         <AddToReadingListButton 
           item={item}
           dictionary={dictionary}
