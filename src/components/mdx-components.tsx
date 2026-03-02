@@ -1,4 +1,3 @@
-
 import type {MDXComponents} from 'next-mdx-remote/rsc/types'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -34,7 +33,7 @@ const getPlatformIcon = (platform?: string, className?: string) => {
 }
 
 /**
- * ZoomableImage - Wrapper component to make images clickable and expandable.
+ * ZoomableImage - Wrapper component to make images clickable and expandabe.
  */
 const ZoomableImage = ({ src, alt, width, height, className, priority, ...props }: any) => {
     return (
@@ -75,7 +74,6 @@ const CustomImage = ({ class: _class, className, parentName, priority, ...props 
         return null;
     }
 
-    // Clean src if it starts with public/
     let src = props.src;
     if (src.startsWith('public/')) {
         src = src.replace('public/', '/');
@@ -98,7 +96,6 @@ export const DownloadButton = ({ id }: { id: string }) => {
   const linkData = downloadLinks[id];
 
   if (!linkData) {
-    console.warn(`[DownloadButton Component]: The ID "${id}" was not found in data-downloads.ts.`);
     if (process.env.NODE_ENV === 'development') {
       return <span className="block font-bold text-destructive">[DownloadButton Error: Invalid ID &quot;{id}&quot;]</span>;
     }
