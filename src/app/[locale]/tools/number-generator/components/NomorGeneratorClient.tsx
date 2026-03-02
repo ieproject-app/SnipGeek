@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
@@ -587,7 +586,63 @@ export function NomorGeneratorClient() {
                                                     {req.docDate ? format(req.docDate, 'd MMM yyyy', { locale: id }) : <span>Pilih tanggal</span>}
                                                 </Button>
                                             </PopoverTrigger>
-                                            <PopoverContent className="w-auto p-0 border-primary/10 shadow-2xl"><Calendar mode="single" selected={req.docDate} onSelect={(d) => handleRequestChange(req.id, 'docDate', d)} initialFocus/></PopoverContent>
+                                            <PopoverContent className="w-auto p-0 border-primary/15 shadow-2xl rounded-2xl overflow-hidden backdrop-blur-sm">
+                                                <Calendar
+                                                    mode="single"
+                                                    selected={req.docDate}
+                                                    onSelect={(d) => handleRequestChange(req.id, 'docDate', d)}
+                                                    initialFocus
+                                                    classNames={{
+                                                        months: "p-3",
+                                                        month: "space-y-3",
+                                                        caption: "flex justify-center pt-1 relative items-center px-8",
+                                                        caption_label: "text-sm font-black uppercase tracking-widest text-primary",
+                                                        nav: "space-x-1 flex items-center",
+                                                        nav_button: cn(
+                                                            "h-7 w-7 bg-primary/5 hover:bg-primary/15 rounded-lg border-0 p-0 flex items-center justify-center transition-colors"
+                                                        ),
+                                                        nav_button_previous: "absolute left-1",
+                                                        nav_button_next: "absolute right-1",
+                                                        table: "w-full border-collapse",
+                                                        head_row: "flex",
+                                                        head_cell: "text-muted-foreground rounded-md w-9 font-black text-[10px] uppercase tracking-widest",
+                                                        row: "flex w-full mt-1",
+                                                        cell: cn(
+                                                            "relative p-0 text-center text-sm focus-within:relative focus-within:z-20",
+                                                            "first:[&:has([aria-selected])]:rounded-l-lg last:[&:has([aria-selected])]:rounded-r-lg"
+                                                        ),
+                                                        day: cn(
+                                                            "h-9 w-9 p-0 font-semibold rounded-lg text-sm",
+                                                            "hover:bg-accent/15 hover:text-accent transition-colors duration-150",
+                                                            "focus:bg-accent/15 focus:outline-none"
+                                                        ),
+                                                        day_selected: cn(
+                                                            "bg-primary text-primary-foreground font-black rounded-lg",
+                                                            "hover:bg-primary hover:text-primary-foreground",
+                                                            "shadow-md shadow-primary/30"
+                                                        ),
+                                                        day_today: cn(
+                                                            "bg-accent/10 text-accent font-black rounded-lg ring-1 ring-accent/30"
+                                                        ),
+                                                        day_outside: "text-muted-foreground/30 hover:bg-transparent",
+                                                        day_disabled: "text-muted-foreground/20 hover:bg-transparent cursor-not-allowed",
+                                                    }}
+                                                />
+                                                <div className="border-t border-primary/5 px-3 py-2 flex gap-2">
+                                                    <button
+                                                        onClick={() => handleRequestChange(req.id, 'docDate', new Date())}
+                                                        className="flex-1 text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-accent hover:bg-accent/5 rounded-lg py-1.5 transition-colors"
+                                                    >
+                                                        Hari Ini
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleRequestChange(req.id, 'docDate', addMonths(new Date(), 1))}
+                                                        className="flex-1 text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-accent hover:bg-accent/5 rounded-lg py-1.5 transition-colors"
+                                                    >
+                                                        Bulan Depan
+                                                    </button>
+                                                </div>
+                                            </PopoverContent>
                                         </Popover>
                                     </div>
                                     <div className="space-y-2">
@@ -644,49 +699,99 @@ export function NomorGeneratorClient() {
                                      Cek Stok Tersedia
                                  </Button>
                              </DialogTrigger>
-                             <DialogContent className="max-w-4xl p-0 overflow-hidden border-primary/10 rounded-xl shadow-2xl">
-                                <DialogHeader className="p-6 bg-muted/20 border-b">
-                                    <DialogTitle className="font-headline text-2xl font-black uppercase tracking-tighter">Matriks Stok Nomor</DialogTitle>
-                                    <DialogDescription>
-                                        Ringkasan jumlah sisa nomor per kategori dan periode tahun 2025-2026.
-                                    </DialogDescription>
+                             <DialogContent className="max-w-5xl p-0 overflow-hidden border-primary/10 rounded-2xl shadow-2xl shadow-primary/10">
+                                <DialogHeader className="p-6 bg-gradient-to-br from-primary/5 to-accent/5 border-b border-primary/10">
+                                    <div className="flex items-center gap-4">
+                                        <div className="p-3 rounded-xl bg-primary/10 ring-1 ring-primary/10">
+                                            <Database className="h-6 w-6 text-primary" />
+                                        </div>
+                                        <div>
+                                            <DialogTitle className="font-headline text-2xl font-black uppercase tracking-tighter">
+                                                Matriks Stok Nomor
+                                            </DialogTitle>
+                                            <DialogDescription className="text-xs mt-0.5">
+                                                Ringkasan sisa nomor per kategori · Periode 2025–2026
+                                            </DialogDescription>
+                                        </div>
+                                    </div>
                                 </DialogHeader>
                                 {isStockLoading ? (
-                                    <div className="p-12 flex flex-col items-center gap-4">
-                                        <Loader2 className="h-10 w-10 animate-spin text-accent" />
-                                        <Skeleton className="h-64 w-full rounded-lg" />
+                                    <div className="p-16 flex flex-col items-center gap-5 bg-background">
+                                        <div className="relative">
+                                            <div className="h-14 w-14 rounded-2xl bg-primary/5 flex items-center justify-center">
+                                                <Database className="h-6 w-6 text-primary/30" />
+                                            </div>
+                                            <Loader2 className="h-5 w-5 animate-spin text-accent absolute -top-1 -right-1" />
+                                        </div>
+                                        <div className="space-y-2 text-center">
+                                            <Skeleton className="h-3 w-48 rounded-full mx-auto" />
+                                            <Skeleton className="h-3 w-32 rounded-full mx-auto" />
+                                        </div>
+                                        <Skeleton className="h-52 w-full rounded-xl" />
                                     </div>
                                 ) : (
                                 <>
                                     <div className="bg-background">
                                         <Tabs defaultValue="2025" className="w-full">
-                                            <TabsList className="grid w-full grid-cols-2 rounded-none border-b h-12">
-                                                <TabsTrigger value="2025" className="rounded-none data-[state=active]:bg-primary/5 data-[state=active]:text-primary font-bold">Tahun 2025</TabsTrigger>
-                                                <TabsTrigger value="2026" className="rounded-none data-[state=active]:bg-primary/5 data-[state=active]:text-primary font-bold">Tahun 2026</TabsTrigger>
-                                            </TabsList>
+                                            <div className="flex items-center justify-between px-6 py-3 bg-muted/20 border-b">
+                                                <TabsList className="h-9 p-1 bg-background/80 rounded-xl border border-primary/10 gap-1">
+                                                    <TabsTrigger
+                                                        value="2025"
+                                                        className="rounded-lg px-5 text-xs font-black uppercase tracking-widest data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm"
+                                                    >
+                                                        2025
+                                                    </TabsTrigger>
+                                                    <TabsTrigger
+                                                        value="2026"
+                                                        className="rounded-lg px-5 text-xs font-black uppercase tracking-widest data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm"
+                                                    >
+                                                        2026
+                                                    </TabsTrigger>
+                                                </TabsList>
+
+                                                <div className="flex items-center gap-4">
+                                                    <div className="flex items-center gap-1.5">
+                                                        <span className="h-2.5 w-2.5 rounded-full bg-muted-foreground/20 inline-block" />
+                                                        <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/50">Kosong</span>
+                                                    </div>
+                                                    <div className="flex items-center gap-1.5">
+                                                        <span className="h-2.5 w-2.5 rounded-full bg-destructive inline-block" />
+                                                        <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">≤ 5 Kritis</span>
+                                                    </div>
+                                                    <div className="flex items-center gap-1.5">
+                                                        <span className="h-2.5 w-2.5 rounded-full bg-accent inline-block" />
+                                                        <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Tersedia</span>
+                                                    </div>
+                                                </div>
+                                            </div>
                                             <TabsContent value="2025" className="mt-0">
-                                                <div className="relative max-h-[60vh] overflow-auto">
-                                                    <table className="w-full border-collapse text-[11px] font-bold">
-                                                        <thead className="sticky top-0 z-10 bg-muted/80 backdrop-blur-sm border-b">
-                                                            <tr>
-                                                                <th className="sticky left-0 z-20 bg-muted p-4 text-left font-black uppercase tracking-widest w-[100px]">Kategori</th>
+                                                <div className="relative max-h-[55vh] overflow-auto bg-background">
+                                                    <table className="w-full border-collapse text-[11px]">
+                                                        <thead className="sticky top-0 z-10 bg-background border-b-2 border-primary/10">
+                                                            <tr className="bg-muted/30">
+                                                                <th className="sticky left-0 z-20 bg-muted/60 backdrop-blur-sm p-4 text-left font-black uppercase tracking-widest text-muted-foreground w-[110px] border-r border-primary/10">Kategori</th>
                                                                 {stockPeriods2025.map(period => (
-                                                                    <th key={period} className="p-4 text-center">{format(new Date(period), 'MMM', { locale: id }).toUpperCase()}</th>
+                                                                    <th key={period} className="p-3 text-center font-black uppercase tracking-widest text-muted-foreground min-w-[64px]">{format(new Date(period), 'MMM', { locale: id }).toUpperCase()}</th>
                                                                 ))}
                                                             </tr>
                                                         </thead>
                                                         <tbody className="divide-y divide-primary/5">
                                                             {stockCategories.map(category => (
-                                                                <tr key={category} className="hover:bg-primary/[0.02] transition-colors">
-                                                                    <th className="sticky left-0 bg-background p-4 text-left font-black text-primary/60 border-r">{category}</th>
+                                                                <tr key={category} className="group hover:bg-primary/[0.03] transition-colors">
+                                                                    <th className="sticky left-0 bg-background group-hover:bg-primary/[0.03] p-4 text-left font-black text-[10px] tracking-widest text-primary/50 border-r border-primary/5 transition-colors">{category}</th>
                                                                     {stockPeriods2025.map(period => (
                                                                         <td key={`${category}-${period}`} className={cn(
-                                                                            "p-4 text-center font-mono text-xs",
-                                                                            stockMatrix[category]?.[period] === 0 && "text-muted-foreground/30 font-normal",
-                                                                            stockMatrix[category]?.[period] > 0 && stockMatrix[category]?.[period] <= 5 && "text-destructive font-black bg-destructive/5",
-                                                                            stockMatrix[category]?.[period] > 5 && "text-accent"
+                                                                            "p-3 text-center font-mono text-xs transition-colors",
+                                                                            stockMatrix[category]?.[period] === 0
+                                                                                ? "text-muted-foreground/25"
+                                                                                : stockMatrix[category]?.[period] <= 5
+                                                                                ? "text-destructive font-black bg-destructive/5"
+                                                                                : "text-accent font-bold"
                                                                         )}>
-                                                                            {stockMatrix[category]?.[period] ?? 0}
+                                                                            {stockMatrix[category]?.[period] === 0
+                                                                                ? <span className="text-muted-foreground/20">—</span>
+                                                                                : stockMatrix[category]?.[period] ?? 0
+                                                                            }
                                                                         </td>
                                                                     ))}
                                                                 </tr>
@@ -696,28 +801,33 @@ export function NomorGeneratorClient() {
                                                 </div>
                                             </TabsContent>
                                             <TabsContent value="2026" className="mt-0">
-                                                <div className="relative max-h-[60vh] overflow-auto">
-                                                    <table className="w-full border-collapse text-[11px] font-bold">
-                                                        <thead className="sticky top-0 z-10 bg-muted/80 backdrop-blur-sm border-b">
-                                                            <tr>
-                                                                <th className="sticky left-0 z-20 bg-muted p-4 text-left font-black uppercase tracking-widest w-[100px]">Kategori</th>
+                                                <div className="relative max-h-[55vh] overflow-auto bg-background">
+                                                    <table className="w-full border-collapse text-[11px]">
+                                                        <thead className="sticky top-0 z-10 bg-background border-b-2 border-primary/10">
+                                                            <tr className="bg-muted/30">
+                                                                <th className="sticky left-0 z-20 bg-muted/60 backdrop-blur-sm p-4 text-left font-black uppercase tracking-widest text-muted-foreground w-[110px] border-r border-primary/10">Kategori</th>
                                                                 {stockPeriods2026.map(period => (
-                                                                    <th key={period} className="p-4 text-center">{format(new Date(period), 'MMM', { locale: id }).toUpperCase()}</th>
+                                                                    <th key={period} className="p-3 text-center font-black uppercase tracking-widest text-muted-foreground min-w-[64px]">{format(new Date(period), 'MMM', { locale: id }).toUpperCase()}</th>
                                                                 ))}
                                                             </tr>
                                                         </thead>
                                                         <tbody className="divide-y divide-primary/5">
                                                             {stockCategories.map(category => (
-                                                                <tr key={category} className="hover:bg-primary/[0.02] transition-colors">
-                                                                    <th className="sticky left-0 bg-background p-4 text-left font-black text-primary/60 border-r">{category}</th>
+                                                                <tr key={category} className="group hover:bg-primary/[0.03] transition-colors">
+                                                                    <th className="sticky left-0 bg-background group-hover:bg-primary/[0.03] p-4 text-left font-black text-[10px] tracking-widest text-primary/50 border-r border-primary/5 transition-colors">{category}</th>
                                                                     {stockPeriods2026.map(period => (
                                                                         <td key={`${category}-${period}`} className={cn(
-                                                                            "p-4 text-center font-mono text-xs",
-                                                                            stockMatrix[category]?.[period] === 0 && "text-muted-foreground/30 font-normal",
-                                                                            stockMatrix[category]?.[period] > 0 && stockMatrix[category]?.[period] <= 5 && "text-destructive font-black bg-destructive/5",
-                                                                            stockMatrix[category]?.[period] > 5 && "text-accent"
+                                                                            "p-3 text-center font-mono text-xs transition-colors",
+                                                                            stockMatrix[category]?.[period] === 0
+                                                                                ? "text-muted-foreground/25"
+                                                                                : stockMatrix[category]?.[period] <= 5
+                                                                                ? "text-destructive font-black bg-destructive/5"
+                                                                                : "text-accent font-bold"
                                                                         )}>
-                                                                            {stockMatrix[category]?.[period] ?? 0}
+                                                                            {stockMatrix[category]?.[period] === 0
+                                                                                ? <span className="text-muted-foreground/20">—</span>
+                                                                                : stockMatrix[category]?.[period] ?? 0
+                                                                            }
                                                                         </td>
                                                                     ))}
                                                                 </tr>
@@ -728,10 +838,17 @@ export function NomorGeneratorClient() {
                                             </TabsContent>
                                         </Tabs>
                                     </div>
-                                    <div className="flex gap-4 px-6 py-3 bg-muted/20 border-t text-[10px] font-bold uppercase tracking-widest">
-                                        <div className="flex items-center gap-1.5"><div className="w-2.5 h-2.5 rounded-full bg-destructive" /> Kritis (≤ 5)</div>
-                                        <div className="flex items-center gap-1.5"><div className="w-2.5 h-2.5 rounded-full bg-accent" /> Tersedia (&gt; 5)</div>
-                                        <div className="flex items-center gap-1.5"><div className="w-2.5 h-2.5 rounded-full bg-muted-foreground/30" /> Kosong</div>
+                                    <div className="flex items-center justify-between px-6 py-3 bg-muted/10 border-t border-primary/5">
+                                        <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50">
+                                            Data diambil langsung dari database · Realtime
+                                        </p>
+                                        <button
+                                            onClick={fetchStockSummary}
+                                            className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-accent transition-colors"
+                                        >
+                                            <RotateCcw className="h-3 w-3" />
+                                            Refresh
+                                        </button>
                                     </div>
                                 </>
                                 )}
