@@ -1,3 +1,4 @@
+
 import fs from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
@@ -34,6 +35,7 @@ export async function getSortedPostsData(locale?: string): Promise<Post<PostFron
   
   let fileNames: string[];
   try {
+    if (!fs.existsSync(localeDirectory)) return [];
     fileNames = fs.readdirSync(localeDirectory);
   } catch (err) {
     return [];
@@ -44,19 +46,24 @@ export async function getSortedPostsData(locale?: string): Promise<Post<PostFron
     .map((fileName) => {
       const slug = fileName.replace(/\.mdx$/, '');
       const fullPath = path.join(localeDirectory, fileName);
-      const fileContents = fs.readFileSync(fullPath, 'utf8');
-      const { data } = matter(fileContents);
+      try {
+        const fileContents = fs.readFileSync(fullPath, 'utf8');
+        const { data } = matter(fileContents);
 
-      if (!data.heroImage) {
-        data.heroImage = 'footer-about';
+        if (!data.heroImage) {
+          data.heroImage = 'footer-about';
+        }
+
+        return {
+          slug,
+          frontmatter: data as PostFrontmatter,
+          locale: targetLocale!,
+        };
+      } catch (e) {
+        return null;
       }
-
-      return {
-        slug,
-        frontmatter: data as PostFrontmatter,
-        locale: targetLocale!,
-      };
     })
+    .filter((p): p is Post<PostFrontmatter> => p !== null)
     .filter(post => post.frontmatter.published === true);
 
   const postsWithKeys = new Map<string, Post<PostFrontmatter>>();
@@ -90,6 +97,7 @@ export async function getDraftPostsData(locale?: string): Promise<Post<PostFront
   
   let fileNames: string[];
   try {
+    if (!fs.existsSync(localeDirectory)) return [];
     fileNames = fs.readdirSync(localeDirectory);
   } catch (err) {
     return [];
@@ -100,19 +108,24 @@ export async function getDraftPostsData(locale?: string): Promise<Post<PostFront
     .map((fileName) => {
       const slug = fileName.replace(/\.mdx$/, '');
       const fullPath = path.join(localeDirectory, fileName);
-      const fileContents = fs.readFileSync(fullPath, 'utf8');
-      const { data } = matter(fileContents);
+      try {
+        const fileContents = fs.readFileSync(fullPath, 'utf8');
+        const { data } = matter(fileContents);
 
-      if (!data.heroImage) {
-        data.heroImage = 'footer-about';
+        if (!data.heroImage) {
+          data.heroImage = 'footer-about';
+        }
+
+        return {
+          slug,
+          frontmatter: data as PostFrontmatter,
+          locale: targetLocale!,
+        };
+      } catch (e) {
+        return null;
       }
-
-      return {
-        slug,
-        frontmatter: data as PostFrontmatter,
-        locale: targetLocale!,
-      };
     })
+    .filter((p): p is Post<PostFrontmatter> => p !== null)
     .filter(post => post.frontmatter.published !== true);
 
   return allPostsData.sort((a, b) => {
@@ -139,19 +152,23 @@ export async function getPostData(slug: string, locale?: string): Promise<PostDa
     return null;
   }
 
-  const fileContents = fs.readFileSync(fullPath, 'utf8');
-  const { data, content } = matter(fileContents);
+  try {
+    const fileContents = fs.readFileSync(fullPath, 'utf8');
+    const { data, content } = matter(fileContents);
 
-  if (!data.heroImage) {
-    data.heroImage = 'footer-about';
+    if (!data.heroImage) {
+      data.heroImage = 'footer-about';
+    }
+
+    return {
+      slug,
+      frontmatter: data as PostFrontmatter,
+      content,
+      locale: targetLocale!,
+    };
+  } catch (e) {
+    return null;
   }
-
-  return {
-    slug,
-    frontmatter: data as PostFrontmatter,
-    content,
-    locale: targetLocale!,
-  };
 }
 
 export async function getAllPostSlugs(locale?: string) {
@@ -159,6 +176,7 @@ export async function getAllPostSlugs(locale?: string) {
     const localeDirectory = path.join(postsDirectory, targetLocale!);
     let fileNames: string[];
     try {
+      if (!fs.existsSync(localeDirectory)) return [];
       fileNames = fs.readdirSync(localeDirectory);
     } catch (err) {
       return [];
@@ -168,14 +186,18 @@ export async function getAllPostSlugs(locale?: string) {
       .filter((fileName) => fileName.endsWith('.mdx'))
       .map((fileName) => {
         const fullPath = path.join(localeDirectory, fileName);
-        const fileContents = fs.readFileSync(fullPath, 'utf8');
-        const { data } = matter(fileContents);
-        if (data.published === true) {
-            return {
-                slug: fileName.replace(/\.mdx$/, ''),
-            };
+        try {
+          const fileContents = fs.readFileSync(fullPath, 'utf8');
+          const { data } = matter(fileContents);
+          if (data.published === true) {
+              return {
+                  slug: fileName.replace(/\.mdx$/, ''),
+              };
+          }
+          return null;
+        } catch (e) {
+          return null;
         }
-        return null;
       })
       .filter(slug => slug !== null);
 }
@@ -188,6 +210,7 @@ export async function getPostTranslation(translationKey: string, targetLocale: s
 
 export async function getAllLocales() {
   try {
+    if (!fs.existsSync(postsDirectory)) return [];
     return fs.readdirSync(postsDirectory).filter(item => 
       fs.statSync(path.join(postsDirectory, item)).isDirectory()
     );
@@ -211,6 +234,7 @@ export async function getAllTranslationsMap(): Promise<TranslationsMap> {
     const localeDirectory = path.join(postsDirectory, locale);
     let fileNames: string[];
     try {
+      if (!fs.existsSync(localeDirectory)) continue;
       fileNames = fs.readdirSync(localeDirectory);
     } catch (err) {
       continue;
@@ -221,21 +245,23 @@ export async function getAllTranslationsMap(): Promise<TranslationsMap> {
       
       const slug = fileName.replace(/\.mdx$/, '');
       const fullPath = path.join(localeDirectory, fileName);
-      const fileContents = fs.readFileSync(fullPath, 'utf8');
-      const { data } = matter(fileContents);
-      const frontmatter = data as PostFrontmatter;
+      try {
+        const fileContents = fs.readFileSync(fullPath, 'utf8');
+        const { data } = matter(fileContents);
+        const frontmatter = data as PostFrontmatter;
 
-      const key = frontmatter.translationKey;
-      if (!key) continue;
+        const key = frontmatter.translationKey;
+        if (!key) continue;
 
-      if (!translationsMap[key]) {
-        translationsMap[key] = [];
-      }
+        if (!translationsMap[key]) {
+          translationsMap[key] = [];
+        }
 
-      const existing = translationsMap[key].find(t => t.locale === locale);
-      if (!existing) {
-        translationsMap[key].push({ locale, slug });
-      }
+        const existing = translationsMap[key].find(t => t.locale === locale);
+        if (!existing) {
+          translationsMap[key].push({ locale, slug });
+        }
+      } catch (e) {}
     }
   }
   return translationsMap;

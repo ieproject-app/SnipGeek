@@ -1,3 +1,4 @@
+
 "use server";
 import fs from 'fs';
 import path from 'path';
@@ -31,6 +32,7 @@ export async function getSortedNotesData(locale?: string): Promise<Note<NoteFron
   
   let fileNames: string[];
   try {
+    if (!fs.existsSync(localeDirectory)) return [];
     fileNames = fs.readdirSync(localeDirectory);
   } catch (err) {
     return [];
@@ -41,19 +43,23 @@ export async function getSortedNotesData(locale?: string): Promise<Note<NoteFron
     .map((fileName) => {
       const slug = fileName.replace(/\.mdx$/, '');
       const fullPath = path.join(localeDirectory, fileName);
-      const fileContents = fs.readFileSync(fullPath, 'utf8');
-      const { data } = matter(fileContents);
+      try {
+        const fileContents = fs.readFileSync(fullPath, 'utf8');
+        const { data } = matter(fileContents);
 
-      // Return null for invalid/empty files
-      if (!data.title || !data.date) {
+        // Return null for invalid/empty files
+        if (!data.title || !data.date) {
+          return null;
+        }
+
+        return {
+          slug,
+          frontmatter: data as NoteFrontmatter,
+          locale: targetLocale!,
+        };
+      } catch (e) {
         return null;
       }
-
-      return {
-        slug,
-        frontmatter: data as NoteFrontmatter,
-        locale: targetLocale!,
-      };
     })
     .filter((note): note is Note<NoteFrontmatter> => note !== null)
     .filter(note => note.frontmatter.published === true); // Only show published notes
@@ -73,6 +79,7 @@ export async function getDraftNotesData(locale?: string): Promise<Note<NoteFront
   
   let fileNames: string[];
   try {
+    if (!fs.existsSync(localeDirectory)) return [];
     fileNames = fs.readdirSync(localeDirectory);
   } catch (err) {
     return [];
@@ -83,19 +90,23 @@ export async function getDraftNotesData(locale?: string): Promise<Note<NoteFront
     .map((fileName) => {
       const slug = fileName.replace(/\.mdx$/, '');
       const fullPath = path.join(localeDirectory, fileName);
-      const fileContents = fs.readFileSync(fullPath, 'utf8');
-      const { data } = matter(fileContents);
+      try {
+        const fileContents = fs.readFileSync(fullPath, 'utf8');
+        const { data } = matter(fileContents);
 
-      // Return null for invalid/empty files
-      if (!data.title || !data.date) {
+        // Return null for invalid/empty files
+        if (!data.title || !data.date) {
+          return null;
+        }
+
+        return {
+          slug,
+          frontmatter: data as NoteFrontmatter,
+          locale: targetLocale!,
+        };
+      } catch (e) {
         return null;
       }
-
-      return {
-        slug,
-        frontmatter: data as NoteFrontmatter,
-        locale: targetLocale!,
-      };
     })
     .filter((note): note is Note<NoteFrontmatter> => note !== null)
     .filter(note => note.frontmatter.published !== true); // Only show drafts
@@ -125,15 +136,19 @@ export async function getNoteData(slug: string, locale?: string): Promise<NoteDa
     return null;
   }
 
-  const fileContents = fs.readFileSync(fullPath, 'utf8');
-  const { data, content } = matter(fileContents);
+  try {
+    const fileContents = fs.readFileSync(fullPath, 'utf8');
+    const { data, content } = matter(fileContents);
 
-  return {
-    slug,
-    frontmatter: data as NoteFrontmatter,
-    content,
-    locale: targetLocale!,
-  };
+    return {
+      slug,
+      frontmatter: data as NoteFrontmatter,
+      content,
+      locale: targetLocale!,
+    };
+  } catch (e) {
+    return null;
+  }
 }
 
 export async function getAllNoteSlugs(locale?: string) {
@@ -141,6 +156,7 @@ export async function getAllNoteSlugs(locale?: string) {
     const localeDirectory = path.join(notesDirectory, targetLocale!);
     let fileNames: string[];
     try {
+      if (!fs.existsSync(localeDirectory)) return [];
       fileNames = fs.readdirSync(localeDirectory);
     } catch (err) {
       return [];
@@ -150,20 +166,25 @@ export async function getAllNoteSlugs(locale?: string) {
       .filter((fileName) => fileName.endsWith('.mdx'))
       .map((fileName) => {
         const fullPath = path.join(localeDirectory, fileName);
-        const fileContents = fs.readFileSync(fullPath, 'utf8');
-        const { data } = matter(fileContents);
-        if (data.published === true) {
-            return {
-                slug: fileName.replace(/\.mdx$/, ''),
-            };
+        try {
+          const fileContents = fs.readFileSync(fullPath, 'utf8');
+          const { data } = matter(fileContents);
+          if (data.published === true) {
+              return {
+                  slug: fileName.replace(/\.mdx$/, ''),
+              };
+          }
+          return null;
+        } catch (e) {
+          return null;
         }
-        return null;
       })
       .filter(slug => slug !== null);
 }
 
 export async function getAllLocales() {
   try {
+    if (!fs.existsSync(notesDirectory)) return [];
     return fs.readdirSync(notesDirectory).filter(item => 
       fs.statSync(path.join(notesDirectory, item)).isDirectory()
     );
@@ -187,6 +208,7 @@ export async function getAllNotesTranslationsMap(): Promise<NotesTranslationsMap
     const localeDirectory = path.join(notesDirectory, locale);
     let fileNames: string[];
     try {
+      if (!fs.existsSync(localeDirectory)) continue;
       fileNames = fs.readdirSync(localeDirectory);
     } catch (err) {
       continue; 
@@ -197,23 +219,25 @@ export async function getAllNotesTranslationsMap(): Promise<NotesTranslationsMap
       
       const slug = fileName.replace(/\.mdx$/, '');
       const fullPath = path.join(localeDirectory, fileName);
-      const fileContents = fs.readFileSync(fullPath, 'utf8');
-      const { data } = matter(fileContents);
+      try {
+        const fileContents = fs.readFileSync(fullPath, 'utf8');
+        const { data } = matter(fileContents);
 
-      if (!data.translationKey || !data.published) continue;
-      const frontmatter = data as NoteFrontmatter;
+        if (!data.translationKey || !data.published) continue;
+        const frontmatter = data as NoteFrontmatter;
 
-      const key = frontmatter.translationKey;
-      if (!key) continue;
+        const key = frontmatter.translationKey;
+        if (!key) continue;
 
-      if (!translationsMap[key]) {
-        translationsMap[key] = [];
-      }
+        if (!translationsMap[key]) {
+          translationsMap[key] = [];
+        }
 
-      const existing = translationsMap[key].find(t => t.locale === locale);
-      if (!existing) {
-        translationsMap[key].push({ locale, slug });
-      }
+        const existing = translationsMap[key].find(t => t.locale === locale);
+        if (!existing) {
+          translationsMap[key].push({ locale, slug });
+        }
+      } catch (e) {}
     }
   }
   return translationsMap;
