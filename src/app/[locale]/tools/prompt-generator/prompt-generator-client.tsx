@@ -3,13 +3,14 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { 
   Copy, 
   Check, 
@@ -31,13 +32,20 @@ import {
   ArrowUpRight,
   Terminal,
   Type,
-  MousePointer2
+  MousePointer2,
+  LogOut,
+  LogIn,
+  User as UserIcon,
+  Loader2
 } from 'lucide-react';
 import { downloadLinks } from '@/lib/data-downloads';
 import { useNotification } from '@/hooks/use-notification';
 import { cn } from '@/lib/utils';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
+import { useUser, useAuth } from '@/firebase';
+import { signOut } from 'firebase/auth';
+import Link from 'next/link';
 
 type DownloadItem = {
   id: string;
@@ -54,7 +62,6 @@ type ArticleSummary = {
 interface PromptGeneratorClientProps {
   dictionary: any; // The promptGenerator dictionary section
   existingArticles: ArticleSummary[];
-  fullDictionary?: any; // The full dictionary for notifications
 }
 
 export function PromptGeneratorClient({ dictionary, existingArticles }: PromptGeneratorClientProps) {
@@ -89,6 +96,8 @@ export function PromptGeneratorClient({ dictionary, existingArticles }: PromptGe
   const [generatedPrompt, setGeneratedPrompt] = useState('');
   const [isCopied, setIsCopied] = useState(false);
   const { notify } = useNotification();
+  const { user, isUserLoading } = useUser();
+  const auth = useAuth();
 
   const downloadIds = useMemo(() => Object.keys(downloadLinks).sort(), []);
 
@@ -251,7 +260,6 @@ export function PromptGeneratorClient({ dictionary, existingArticles }: PromptGe
   const handleCopyMain = () => {
     navigator.clipboard.writeText(generatedPrompt);
     setIsCopied(true);
-    // Use the localized copied button text as the notification message
     notify(dictionary.copiedButton, <Check className="h-4 w-4 text-emerald-400" />);
     setTimeout(() => setIsCopied(false), 2000);
   };
@@ -278,18 +286,83 @@ export function PromptGeneratorClient({ dictionary, existingArticles }: PromptGe
     setModInstructions(prev => prev ? `${prev}\n- ${text}` : `- ${text}`);
   };
 
+  const handleLogout = async () => {
+    try {
+        await signOut(auth);
+        notify("Berhasil keluar akun.", <LogOut className="h-4 w-4" />);
+    } catch (error) {
+        console.error("Logout error:", error);
+    }
+  };
+
+  if (isUserLoading) {
+    return (
+        <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
+            <Loader2 className="h-10 w-10 animate-spin text-accent" />
+            <p className="text-sm font-bold uppercase tracking-widest text-muted-foreground animate-pulse">Menghubungkan ke Akun...</p>
+        </div>
+    );
+  }
+
+  if (!user) {
+    return (
+        <div className="max-w-md mx-auto">
+            <Card className="text-center mt-8 border-primary/10 bg-card/50 shadow-xl rounded-2xl overflow-hidden">
+                <div className="h-1.5 w-full bg-accent" />
+                <CardHeader className="pt-8 pb-4">
+                    <CardTitle className="font-headline text-3xl font-black uppercase tracking-tighter">Akses Terbatas</CardTitle>
+                    <CardDescription className="text-sm px-6">Tool ini memerlukan login untuk menjaga integritas format konten SnipGeek.</CardDescription>
+                </CardHeader>
+                <CardContent className="pb-10">
+                    <Button asChild className="h-14 px-10 rounded-full shadow-lg shadow-primary/20 transition-all duration-200 active:scale-95 text-lg font-black uppercase tracking-widest">
+                        <Link href="/login">
+                            <LogIn className="mr-3 h-5 w-5"/>
+                            Masuk dengan Google
+                        </Link>
+                    </Button>
+                </CardContent>
+            </Card>
+        </div>
+    );
+  }
+
   const focusInputClass = "focus-visible:ring-primary/20 focus-visible:ring-offset-0 focus-visible:border-primary/30 transition-all duration-300";
 
   return (
-    <div className="max-w-[1600px] mx-auto">
+    <div className="max-w-[1600px] mx-auto space-y-10 animate-in fade-in duration-700">
       
-      {/* 1. Main Toolbar (Non-sticky as requested) */}
-      <div className="mb-8 px-4">
+      {/* 0. User Profile Bar */}
+      <div className="flex flex-col md:flex-row items-center justify-between gap-4 p-4 bg-muted/30 backdrop-blur-sm rounded-2xl border border-primary/5 shadow-inner">
+          <div className="flex items-center gap-3">
+              <Avatar className="h-10 w-10 border-2 border-background shadow-md">
+                  <AvatarImage src={user.photoURL || ''} />
+                  <AvatarFallback className="bg-primary text-primary-foreground font-black">
+                      {user.email?.charAt(0).toUpperCase() || <UserIcon className="h-4 w-4" />}
+                  </AvatarFallback>
+              </Avatar>
+              <div className="flex flex-col">
+                  <span className="text-sm font-black text-primary leading-none mb-1">{user.displayName || 'Editor SnipGeek'}</span>
+                  <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-tight">{user.email}</span>
+              </div>
+          </div>
+          <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={handleLogout}
+              className="text-[10px] font-black uppercase tracking-widest text-destructive hover:bg-destructive/10 hover:text-destructive rounded-full h-9 px-6 transition-all active:scale-95"
+          >
+              <LogOut className="mr-2 h-3.5 w-3.5" />
+              Keluar Akun
+          </Button>
+      </div>
+
+      {/* 1. Main Toolbar */}
+      <div className="px-4">
         <Card className="bg-background/80 backdrop-blur-xl border-primary/10 shadow-xl overflow-hidden rounded-lg ring-1 ring-black/[0.03]">
           <div className="p-3 flex flex-wrap items-center justify-between gap-6">
             
             <div className="flex flex-wrap items-center gap-4">
-              {/* Mode Switcher with Sliding Pill Logic */}
+              {/* Mode Switcher */}
               <div className="relative flex bg-muted/40 p-1 rounded-lg border border-primary/5 min-w-[240px]">
                   <div className={cn(
                       "absolute top-1 bottom-1 w-[calc(50%-4px)] bg-background rounded-lg shadow-sm transition-all duration-300 ease-in-out z-0",
