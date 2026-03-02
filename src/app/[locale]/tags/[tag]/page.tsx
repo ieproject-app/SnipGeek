@@ -36,8 +36,8 @@ export default async function TagPage({ params }: { params: Promise<{ locale: st
   const allPosts = await getSortedPostsData(locale);
   const posts = allPosts.filter(p => p.frontmatter.tags?.some(t => t.toLowerCase() === decodedTag));
   
-  const rawNotes = await getRawNotes(locale);
-  const notes = rawNotes.filter(n => n.frontmatter.tags?.some(t => t.toLowerCase() === decodedTag));
+  const notes = await getRawNotes(locale);
+  const filteredNotes = notes.filter(n => n.frontmatter.tags?.some(t => t.toLowerCase() === decodedTag));
 
   const formatDatePart = (date: Date, options: Intl.DateTimeFormatOptions) => {
     return new Intl.DateTimeFormat(locale, options).format(date);
@@ -53,7 +53,7 @@ export default async function TagPage({ params }: { params: Promise<{ locale: st
             <p className="text-muted-foreground">{dictionary.tags.description.replace('{tag}', decodedTag.toUpperCase())}</p>
         </header>
 
-        {posts.length === 0 && notes.length === 0 ? (
+        {posts.length === 0 && filteredNotes.length === 0 ? (
           <p className="text-center text-muted-foreground py-12">{dictionary.tags.noItems}</p>
         ) : (
           <div className="space-y-16">
@@ -126,14 +126,14 @@ export default async function TagPage({ params }: { params: Promise<{ locale: st
               </section>
             )}
 
-            {notes.length > 0 && (
+            {filteredNotes.length > 0 && (
               <section>
                 <div className="flex items-center gap-4 mb-8">
                     <h2 className="text-2xl font-bold font-headline text-primary shrink-0 uppercase tracking-tight">{dictionary.navigation.notes}</h2>
                     <div className="h-px bg-border flex-1" />
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-                  {notes.map((note) => {
+                  {filteredNotes.map((note) => {
                     const noteDate = new Date(note.frontmatter.date);
                     const item = {
                         slug: note.slug,
