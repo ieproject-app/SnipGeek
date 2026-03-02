@@ -271,6 +271,34 @@ export function NomorGeneratorClient() {
         setRemainingCounts([]);
 
         try {
+            // --- 1. PRE-CHECK VALIDATION (SOFT CHECK) ---
+            // To avoid hard system errors, we perform a read-only check for stock first.
+            for (const req of requests) {
+                const year = req.docDate!.getFullYear();
+                const month = req.docDate!.getMonth() + 1;
+                const qCheck = query(
+                    collection(firestore, 'availableNumbers'),
+                    where("category", "==", req.category),
+                    where("year", "==", year),
+                    where("month", "==", month),
+                    where("valueCategory", "==", valueCategory),
+                    where("isUsed", "==", false)
+                );
+                
+                const checkSnapshot = await getDocs(qCheck);
+                if (checkSnapshot.size < req.quantity) {
+                    toast({ 
+                        variant: "default", 
+                        title: "Stok Tidak Mencukupi", 
+                        description: `Maaf, stok untuk ${req.docType} periode ${month}-${year} hanya tersisa ${checkSnapshot.size} nomor. Silakan pilih periode lain atau hubungi admin.`,
+                        className: "border-amber-500 bg-amber-50 dark:bg-amber-950/20 text-amber-900 dark:text-amber-200"
+                    });
+                    setIsGenerating(false);
+                    return; // Stop the process early
+                }
+            }
+
+            // --- 2. EXECUTE TRANSACTION ---
             const totalRequested = requests.reduce((sum, req) => sum + req.quantity, 0);
 
             const generated = await runTransaction(firestore, async (transaction) => {
@@ -312,11 +340,11 @@ export function NomorGeneratorClient() {
                         limit(req.quantity)
                     );
                     
-                    // We must use getDocs inside the transaction flow for simplicity in this specific logic, 
-                    // although technically transactions prefer getting by ref first.
+                    // Note: getDocs inside transaction is technically outside standard atomic get patterns, 
+                    // but used here for dynamic fetching based on criteria.
                     const querySnapshot = await getDocs(q);
                     if (querySnapshot.docs.length < req.quantity) {
-                        throw new Error(`Stok tidak cukup untuk ${req.docType} periode ${month}-${year}.`);
+                        throw new Error(`Stok habis untuk ${req.docType} periode ${month}-${year}.`);
                     }
 
                     for (const docSnap of querySnapshot.docs) {
@@ -341,6 +369,7 @@ export function NomorGeneratorClient() {
                 return results;
             });
 
+            // --- 3. POST-PROCESS ---
             await fetchUserLimit();
 
             const counts = await Promise.all(
@@ -363,7 +392,7 @@ export function NomorGeneratorClient() {
                         };
                     })
             );
-            setRemainingCounts(counts.sort((a,b) => a.label.localeCompare(b.label)));
+            setRemainingCounts(counts.sort((a,b) => a.label.commaCompare?.(b.label) ?? a.label.localeCompare(b.label)));
 
             const sortedGenerated = generated.sort((a, b) => a.date.getTime() - b.date.getTime());
             setGeneratedNumbers(sortedGenerated);
@@ -371,7 +400,14 @@ export function NomorGeneratorClient() {
 
         } catch (error: any) {
             console.error("Error generating numbers:", error);
-            toast({ variant: "destructive", title: "Gagal Membuat Nomor", description: error.message || "Terjadi kesalahan saat transaksi." });
+            // Distinguish between stock errors and system errors
+            const isStockError = error.message?.toLowerCase().includes('stok');
+            toast({ 
+                variant: isStockError ? "default" : "destructive", 
+                title: isStockError ? "Stok Kosong" : "Gagal Membuat Nomor", 
+                description: error.message || "Terjadi kesalahan saat transaksi.",
+                className: isStockError ? "border-amber-500 bg-amber-50" : ""
+            });
         } finally {
             setIsGenerating(false);
         }
@@ -570,7 +606,6 @@ export function NomorGeneratorClient() {
                                                 </table>
                                             </div>
                                         </TabsContent>
-                                        {/* Tahun 2026 Table follows same style */}
                                         <TabsContent value="2026" className="mt-0">
                                             <div className="relative max-h-[60vh] overflow-auto">
                                                 <table className="w-full border-collapse text-[11px] font-bold">
