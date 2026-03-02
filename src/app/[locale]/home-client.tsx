@@ -118,7 +118,7 @@ export function HomeClient({ initialPosts, dictionary, locale }: { initialPosts:
       <FeaturedPosts posts={featuredPosts as any} dictionary={dictionary} locale={locale} linkPrefix={linkPrefix} />
 
       {latestPosts.length > 0 && (
-        <section className="container max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pb-12 sm:pb-16">
+        <section className="container max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
           <h2 className="text-3xl font-bold font-headline tracking-tighter text-primary mb-10 text-center">
             {dictionary.home.latestPosts}
           </h2>
