@@ -4,6 +4,7 @@
 import React, { useMemo } from 'react';
 import { MDXRemote } from 'next-mdx-remote/rsc';
 import Image from 'next/image';
+import Link from 'next/link';
 import { mdxComponents } from '@/components/mdx-components';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { PostComments } from '@/components/blog/post-comments';
@@ -20,7 +21,6 @@ import rehypeShiki from '@shikijs/rehype';
 export function PostPageClient({ initialPost, slug, locale, dictionary, initialRelatedContent }: { initialPost: any, slug: string, locale: string, dictionary: any, initialRelatedContent: any[] }) {
   const linkPrefix = locale === 'en' ? '' : `/${locale}`;
 
-  // Pure MDX logic, no Firestore fetch for posts
   if (!initialPost) {
     notFound();
   }
@@ -99,6 +99,18 @@ export function PostPageClient({ initialPost, slug, locale, dictionary, initialR
                     }}
                 />
             </div>
+
+            {/* Tags section moved here */}
+            {initialPost.frontmatter.tags && initialPost.frontmatter.tags.length > 0 && (
+                <div className="mt-12 flex flex-wrap gap-3">
+                    {initialPost.frontmatter.tags.map(tag => (
+                        <Link key={tag} href={`${linkPrefix}/tags/${tag.toLowerCase()}`}>
+                            <span className="text-sm font-bold text-accent hover:text-primary transition-all duration-300">#{tag}</span>
+                        </Link>
+                    ))}
+                </div>
+            )}
+
             <div className="mt-16 flex flex-col gap-4 text-center border-t pt-12">
                 <h3 className="text-lg font-semibold tracking-tight text-primary">{dictionary.post.shareArticle}</h3>
                 <ShareButtons title={initialPost.frontmatter.title} imageUrl={heroSource?.url} />
