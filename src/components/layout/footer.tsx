@@ -29,9 +29,9 @@ export function Footer({ dictionary, translationsMap }: { dictionary: Dictionary
     ];
 
     return (
-        <footer className="relative w-full mt-32">
+        <footer className="relative w-full mt-16 sm:mt-24">
             {/* Top Navigation Section - Links Cards */}
-            <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+            <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
                     {footerNavItems.map((item, index) => {
                         const image = PlaceHolderImages.find(p => p.id === item.id);
@@ -45,7 +45,7 @@ export function Footer({ dictionary, translationsMap }: { dictionary: Dictionary
                                 )}
                             >
                                 <Link href={item.href} className="block group">
-                                    <article className="relative w-full aspect-[4/3] rounded-lg overflow-hidden shadow-lg transition-shadow group-hover:shadow-2xl">
+                                    <article className="relative w-full aspect-[4/3] rounded-xl overflow-hidden shadow-lg transition-shadow group-hover:shadow-2xl">
                                         {image && (
                                             <Image
                                                 src={image.imageUrl}
@@ -72,14 +72,14 @@ export function Footer({ dictionary, translationsMap }: { dictionary: Dictionary
             </div>
 
             {/* Sub-Footer Section */}
-            <div className="relative w-full pt-20 pb-12 bg-gradient-to-br from-muted/40 via-background to-muted/20 border-t border-primary/5 transition-all duration-300 ease-in-out">
-                {/* Decorative Ambient Light Circles (Clipped inside this layer) */}
+            <div className="relative w-full pt-16 pb-12 bg-gradient-to-br from-muted/40 via-background to-muted/20 border-t border-primary/5 transition-all duration-300 ease-in-out">
+                {/* Decorative Ambient Light Circles */}
                 <div className="absolute inset-0 overflow-hidden pointer-events-none">
                     <div className="absolute top-0 left-0 w-96 h-96 rounded-full blur-3xl opacity-10 bg-primary -translate-x-1/2 -translate-y-1/2" />
                     <div className="absolute bottom-0 right-0 w-96 h-96 rounded-full blur-3xl opacity-10 bg-primary translate-x-1/2 translate-y-1/2" />
                 </div>
 
-                {/* Bisected Avatar - Positioned absolute to the top-0 of this relative section */}
+                {/* Bisected Avatar */}
                 <div className="absolute left-1/2 -translate-x-1/2 top-0 -translate-y-1/2 z-20">
                     <div className="relative rounded-full ring-2 ring-primary/20 ring-offset-4 ring-offset-background shadow-2xl transition-all duration-300 ease-in-out group hover:ring-primary/40">
                         <Avatar className="w-24 h-24 mx-auto border-4 border-background bg-background transition-transform duration-500 group-hover:scale-105">
@@ -90,13 +90,13 @@ export function Footer({ dictionary, translationsMap }: { dictionary: Dictionary
                 </div>
 
                 <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="text-center mb-16">
+                    <div className="text-center mb-12">
                         <h4 className="font-headline text-3xl font-bold text-foreground tracking-tight">{authorName}</h4>
                         <p className="mt-4 text-muted-foreground max-w-md mx-auto text-lg leading-relaxed font-medium animate-in fade-in duration-700">
                             {dictionary.footer.authorBio}
                         </p>
                         
-                        {/* Social Links with Tooltips and Brand-Specific Glow */}
+                        {/* Social Links */}
                         <div className="flex items-center justify-center gap-4 mt-8">
                             {socialLinks.map((social) => {
                                 const brandStyles: Record<string, string> = {
@@ -120,7 +120,6 @@ export function Footer({ dictionary, translationsMap }: { dictionary: Dictionary
                                         )}
                                         aria-label={social.label}
                                     >
-                                        {/* Tooltip Label */}
                                         <span className="absolute -top-8 left-1/2 -translate-x-1/2 px-2 py-1 rounded bg-primary text-primary-foreground text-[10px] font-bold uppercase tracking-widest opacity-0 group-hover:opacity-100 -translate-y-1 group-hover:-translate-y-3 transition-all duration-300 pointer-events-none whitespace-nowrap z-20">
                                             {social.label}
                                         </span>

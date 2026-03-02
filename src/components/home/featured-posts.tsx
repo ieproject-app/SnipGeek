@@ -19,13 +19,13 @@ interface FeaturedPostsProps {
 
 /**
  * FeaturedPosts - A sophisticated 4-column staggered gallery grid using the colorful badge system.
- * Updated with Windows 11 rounded-xl (12px) for a more premium look.
+ * Updated with standard section spacing (py-12 sm:py-16).
  */
 export function FeaturedPosts({ posts, dictionary, locale, linkPrefix }: FeaturedPostsProps) {
   if (posts.length === 0) return null;
 
   return (
-    <section className="py-16 sm:py-24 bg-primary/[0.03] border-y border-primary/5">
+    <section className="py-12 sm:py-16 bg-primary/[0.03] border-y border-primary/5">
       <div className="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 items-start">
           {posts.map((post, index) => {
@@ -68,9 +68,9 @@ export function FeaturedPosts({ posts, dictionary, locale, linkPrefix }: Feature
               >
                 <Link href={`${linkPrefix}/blog/${post.slug}`} className="block" aria-label={`Read ${post.frontmatter.title}`}>
                     <article className="space-y-5">
-                        {/* Image Block - rounded-xl (12px) for Windows 11 Spotlight style */}
+                        {/* Image Block */}
                         <div className="relative aspect-[4/3] rounded-xl overflow-hidden bg-muted shadow-md group-hover:shadow-xl group-hover:-translate-y-2 transition-all duration-500">
-                            {/* Category Badge - Colorful glass style */}
+                            {/* Category Badge */}
                             <div className="absolute top-4 left-4 z-20">
                                 <CategoryBadge 
                                     category={category} 
@@ -79,7 +79,7 @@ export function FeaturedPosts({ posts, dictionary, locale, linkPrefix }: Feature
                                 />
                             </div>
 
-                            {/* Accent Bar - Bottom of Image */}
+                            {/* Accent Bar */}
                             <div 
                                 className={cn("absolute bottom-0 left-0 right-0 h-[3px] z-30 transition-opacity duration-500 opacity-0 group-hover:opacity-100", badgeStyle.dot)}
                             />

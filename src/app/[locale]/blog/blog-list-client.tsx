@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useMemo } from 'react';
@@ -17,8 +16,8 @@ export function BlogListClient({ initialPosts, dictionary, locale }: { initialPo
 
   return (
     <div className="w-full">
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-16">
-        <header className="mb-16 text-center">
+      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-12 sm:pb-16">
+        <header className="mb-12 text-center">
             <h1 className="font-headline text-5xl md:text-6xl font-extrabold tracking-tighter text-primary mb-3">
                 {dictionary.navigation.blog}
             </h1>
@@ -27,7 +26,7 @@ export function BlogListClient({ initialPosts, dictionary, locale }: { initialPo
             </p>
         </header>
 
-        <section className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-12">
+        <section className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-8">
             {allPosts.map((post) => {
                 const heroImageValue = post.frontmatter.heroImage;
                 let heroImageSrc: string | undefined;
@@ -56,7 +55,7 @@ export function BlogListClient({ initialPosts, dictionary, locale }: { initialPo
                 return (
                     <div key={post.slug} className="group relative transition-all duration-300 hover:-translate-y-1">
                         <Link href={`${linkPrefix}/blog/${post.slug}`} className="block" aria-label={`Read more about ${post.frontmatter.title}`}>
-                            <div className="relative w-full aspect-video overflow-hidden rounded-lg mb-4 shadow-sm transition-shadow duration-300">
+                            <div className="relative w-full aspect-video overflow-hidden rounded-xl mb-4 shadow-sm transition-shadow duration-300">
                                 {heroImageSrc && (
                                     <Image
                                         src={heroImageSrc}
