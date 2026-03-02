@@ -34,7 +34,7 @@ interface TopicSectionProps {
 }
 
 /**
- * TopicSection - Redesigned with standard py-12 sm:py-16 spacing.
+ * TopicSection - Standardized with pb-12 sm:pb-16 to prevent padding stacking.
  */
 export function TopicSection({ 
   posts, 
@@ -109,7 +109,7 @@ export function TopicSection({
   ];
 
   return (
-    <section className="container max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
+    <section className="container max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pb-12 sm:pb-16">
         <header className="mb-8 text-left">
             <h2 className="text-3xl font-extrabold font-headline tracking-tight text-primary mb-2">
                 {title}
