@@ -34,21 +34,11 @@ export default async function NomorGeneratorPage({
   }) {
     const { locale } = await params;
     const dictionary = await getDictionary(locale);
-    const pageContent = dictionary.tools.tool_list.number_generator;
 
     return (
       <div className="w-full">
         <main className="mx-auto max-w-4xl px-4 pt-10 pb-16 sm:px-6">
-            <header className="mb-12 text-center">
-                <h1 className="font-headline text-5xl font-extrabold tracking-tighter text-primary md:text-6xl mb-3">
-                    {pageContent.title}
-                </h1>
-                <p className="mx-auto max-w-2xl text-muted-foreground text-lg italic">
-                    {pageContent.description}
-                </p>
-            </header>
-            
-            <NomorGeneratorClient />
+            <NomorGeneratorClient dictionary={dictionary} />
         </main>
         <BackToTop dictionary={dictionary} />
       </div>

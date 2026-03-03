@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
@@ -48,6 +49,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useNotification } from '@/hooks/use-notification';
 import { InternalToolWrapper } from '@/components/tools/internal-tool-wrapper';
+import { Dictionary } from '@/lib/get-dictionary';
 
 const DAILY_LIMIT = 10;
 const ADMIN_EMAIL = 'iwan.efndi@gmail.com';
@@ -111,7 +113,7 @@ function createNewRequest(): GenerationRequest {
     };
 }
 
-export function NomorGeneratorClient() {
+export function NomorGeneratorClient({ dictionary }: { dictionary: Dictionary }) {
     const [requests, setRequests] = useState<GenerationRequest[]>([createNewRequest()]);
     const [valueCategory, setValueCategory] = useState<ValueCategory>('below_500m');
     const [isGenerating, setIsGenerating] = useState(false);
@@ -138,6 +140,7 @@ export function NomorGeneratorClient() {
     const firestore = useFirestore();
     const { user } = useUser();
 
+    const toolMeta = dictionary.tools.tool_list.number_generator;
     const isAdmin = useMemo(() => user?.email === ADMIN_EMAIL, [user]);
 
     const fetchUserLimit = useCallback(async () => {
@@ -496,8 +499,8 @@ export function NomorGeneratorClient() {
     
     return (
         <InternalToolWrapper 
-            title="Number Generator" 
-            description="Generate unique sequential numbers for internal tracking purposes."
+            title={toolMeta.title} 
+            description={toolMeta.description}
         >
             <div className="space-y-10">
                 {/* 1. Stepper Visual */}
