@@ -6,9 +6,9 @@ import { initiateGoogleSignIn } from '@/firebase/non-blocking-login';
 import { signOut } from 'firebase/auth';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/avatar';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, Chrome, LogOut, User as UserIcon, Lock, Github, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Loader2, Chrome, LogOut, User as UserIcon, Lock, Github, CheckCircle2, AlertCircle, RefreshCw } from 'lucide-react';
 import { useNotification } from '@/hooks/use-notification';
 
 interface InternalToolWrapperProps {
@@ -68,34 +68,34 @@ export function InternalToolWrapper({ children, title, description }: InternalTo
                     <CheckCircle2 className="h-4 w-4 text-emerald-500" />
                 </div>
                 <div className="space-y-1">
-                    <p className="text-sm font-bold text-primary uppercase tracking-tight">Langkah 1: Isi Dashboard</p>
-                    <p className="text-xs text-muted-foreground">Pastikan NEXT_PUBLIC_FIREBASE_API_KEY dkk sudah diisi di tab Environment.</p>
+                    <p className="text-sm font-bold text-primary uppercase tracking-tight">Langkah 1: Hubungkan & Simpan</p>
+                    <p className="text-xs text-muted-foreground">Pilih repositori <strong>SnipGeek</strong> di tab Deployment dan klik <strong>Save</strong>.</p>
                 </div>
               </div>
 
               <div className="flex items-start gap-3">
                 <div className="h-6 w-6 rounded-full bg-amber-500/10 flex items-center justify-center shrink-0 mt-0.5">
-                    <AlertCircle className="h-4 w-4 text-amber-500" />
+                    <RefreshCw className="h-4 w-4 text-amber-500" />
                 </div>
                 <div className="space-y-1">
-                    <p className="text-sm font-bold text-primary uppercase tracking-tight">Langkah 2: Hubungkan GitHub</p>
-                    <p className="text-xs text-muted-foreground">Pastikan koneksi repositori GitHub di menu Deployment sudah berwarna hijau (Success).</p>
+                    <p className="text-sm font-bold text-primary uppercase tracking-tight">Langkah 2: Start Rollout (Wajib)</p>
+                    <p className="text-xs text-muted-foreground">Buka tab <strong>Rollouts</strong> dan klik <strong>Start Rollout</strong> untuk menyeduh variabel terbaru.</p>
                 </div>
               </div>
 
               <div className="flex items-start gap-3">
                 <div className="h-6 w-6 rounded-full bg-blue-500/10 flex items-center justify-center shrink-0 mt-0.5">
-                    <Github className="h-4 w-4 text-blue-500" />
+                    <AlertCircle className="h-4 w-4 text-blue-500" />
                 </div>
                 <div className="space-y-1">
-                    <p className="text-sm font-bold text-primary uppercase tracking-tight">Langkah 3: Pemicu Build</p>
-                    <p className="text-xs text-muted-foreground">Lakukan <strong>Start New Rollout</strong> atau push kode ke GitHub agar variabel diserap ke website.</p>
+                    <p className="text-sm font-bold text-primary uppercase tracking-tight">Langkah 3: Cek Prefix</p>
+                    <p className="text-xs text-muted-foreground">Pastikan nama variabel di tab Environment diawali dengan <strong>NEXT_PUBLIC_</strong>.</p>
                 </div>
               </div>
             </div>
 
             <p className="text-[10px] text-muted-foreground italic max-w-sm">
-              Tanpa proses "Build" melalui GitHub, browser Mas Iwan tidak diizinkan membaca kunci rahasia demi keamanan sistem.
+              Tanpa proses "Start Rollout", browser Mas Iwan tidak diizinkan membaca kunci rahasia demi keamanan sistem.
             </p>
           </div>
         </Card>
