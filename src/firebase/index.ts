@@ -1,7 +1,7 @@
 
 'use client';
 
-import { firebaseConfig } from '@/firebase/config';
+import { firebaseConfig, isFirebaseConfigValid } from '@/firebase/config';
 import { initializeApp, getApps, getApp, FirebaseApp } from 'firebase/app';
 import { getAuth, Auth } from 'firebase/auth';
 import { getFirestore, Firestore } from 'firebase/firestore';
@@ -14,50 +14,31 @@ export interface FirebaseServices {
 
 /**
  * Initializes Firebase and returns an object with the SDK instances.
- * Returns null properties if configuration is missing to prevent total server crash.
+ * Dibuat sangat defensif agar tidak menyebabkan Internal Server Error (ISE).
  */
 export function initializeFirebase(): FirebaseServices {
-  let firebaseApp: FirebaseApp | null = null;
+  try {
+    let firebaseApp: FirebaseApp | null = null;
 
-  // 1. Check if already initialized
-  if (getApps().length > 0) {
-    firebaseApp = getApp();
-  } else {
-    // 2. Try manual config first if we have the minimum requirements (API Key and Project ID)
-    const hasConfig = !!(firebaseConfig.apiKey && firebaseConfig.projectId);
-    
-    if (hasConfig) {
-      try {
-        firebaseApp = initializeApp(firebaseConfig);
-      } catch (e) {
-        // Silent fail, will try automatic fallback
-      }
+    if (getApps().length > 0) {
+      firebaseApp = getApp();
+    } else if (isFirebaseConfigValid()) {
+      firebaseApp = initializeApp(firebaseConfig);
     }
 
-    // 3. Fallback to automatic (only works in specific environments like some CI or JSON files)
     if (!firebaseApp) {
-      try {
-        firebaseApp = initializeApp();
-      } catch (e) {
-        // Silent fail, let the UI components handle the null state through hooks
-      }
+      return { firebaseApp: null, auth: null, firestore: null };
     }
-  }
 
-  // Final check: if no app was created, return nulls safely
-  if (!firebaseApp) {
+    return {
+      firebaseApp,
+      auth: getAuth(firebaseApp),
+      firestore: getFirestore(firebaseApp)
+    };
+  } catch (error) {
+    // Gagal inisialisasi tidak boleh mematikan seluruh app
     return { firebaseApp: null, auth: null, firestore: null };
   }
-
-  return getSdks(firebaseApp);
-}
-
-export function getSdks(firebaseApp: FirebaseApp): FirebaseServices {
-  return {
-    firebaseApp,
-    auth: getAuth(firebaseApp),
-    firestore: getFirestore(firebaseApp)
-  };
 }
 
 export * from './provider';
