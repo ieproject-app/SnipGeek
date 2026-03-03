@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState, useEffect, useRef, useMemo } from 'react';
@@ -60,7 +61,7 @@ const escapeRegExp = (string: string) => {
 };
 
 const HighlightMatch = ({ text, query }: { text: string; query: string }) => {
-  if (!query.trim()) return <>{text}</>;
+  if (!text || typeof text !== 'string' || !query.trim()) return <>{text || ''}</>;
   
   const escapedQuery = escapeRegExp(query.trim());
   try {
@@ -142,10 +143,10 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
   useEffect(() => {
     if (query.length > 1) {
       const lowerCaseQuery = query.toLowerCase();
-      const filteredData = searchableData.filter(
+      const filteredData = (searchableData || []).filter(
         item =>
-          item.title.toLowerCase().includes(lowerCaseQuery) ||
-          (item.description && item.description.toLowerCase().includes(lowerCaseQuery))
+          (item.title || "").toLowerCase().includes(lowerCaseQuery) ||
+          (item.description || "").toLowerCase().includes(lowerCaseQuery)
       );
       setResults(filteredData);
     } else {
@@ -240,7 +241,7 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
   };
 
   const quickPicks = useMemo(() => {
-    return searchableData.slice(0, 3);
+    return (searchableData || []).slice(0, 3);
   }, [searchableData]);
 
   const directLinks = [
@@ -500,7 +501,7 @@ export function Header({ searchableData, dictionary }: { searchableData: Searcha
                     <div className="p-2 space-y-1">
                         {readingListItems.length > 0 ? (
                             readingListItems.map((item) => {
-                                const dataItem = searchableData.find(d => d.slug === item.slug);
+                                const dataItem = (searchableData || []).find(d => d.slug === item.slug);
                                 const imgUrl = dataItem ? getResolvedImage(dataItem as SearchableItem) : '/images/blank/blank.webp';
                                 
                                 return (

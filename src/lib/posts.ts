@@ -33,12 +33,12 @@ export async function getSortedPostsData(locale?: string): Promise<Post<PostFron
   const targetLocale = i18n.locales.includes(locale as Locale) ? locale : i18n.defaultLocale;
   const localeDirectory = path.join(postsDirectory, targetLocale!);
   
+  if (!fs.existsSync(localeDirectory)) {
+      return [];
+  }
+
   let fileNames: string[];
   try {
-    if (!fs.existsSync(localeDirectory)) {
-        fs.mkdirSync(localeDirectory, { recursive: true });
-        return [];
-    }
     fileNames = fs.readdirSync(localeDirectory);
   } catch (err) {
     console.error("Error reading posts directory:", err);
@@ -99,9 +99,10 @@ export async function getDraftPostsData(locale?: string): Promise<Post<PostFront
   const targetLocale = i18n.locales.includes(locale as Locale) ? locale : i18n.defaultLocale;
   const localeDirectory = path.join(postsDirectory, targetLocale!);
   
+  if (!fs.existsSync(localeDirectory)) return [];
+
   let fileNames: string[];
   try {
-    if (!fs.existsSync(localeDirectory)) return [];
     fileNames = fs.readdirSync(localeDirectory);
   } catch (err) {
     return [];
@@ -178,9 +179,11 @@ export async function getPostData(slug: string, locale?: string): Promise<PostDa
 export async function getAllPostSlugs(locale?: string) {
     const targetLocale = i18n.locales.includes(locale as Locale) ? locale : i18n.defaultLocale;
     const localeDirectory = path.join(postsDirectory, targetLocale!);
+    
+    if (!fs.existsSync(localeDirectory)) return [];
+
     let fileNames: string[];
     try {
-      if (!fs.existsSync(localeDirectory)) return [];
       fileNames = fs.readdirSync(localeDirectory);
     } catch (err) {
       return [];
@@ -236,9 +239,11 @@ export async function getAllTranslationsMap(): Promise<TranslationsMap> {
 
   for (const locale of allLocales) {
     const localeDirectory = path.join(postsDirectory, locale);
+    
+    if (!fs.existsSync(localeDirectory)) continue;
+
     let fileNames: string[];
     try {
-      if (!fs.existsSync(localeDirectory)) continue;
       fileNames = fs.readdirSync(localeDirectory);
     } catch (err) {
       continue;
