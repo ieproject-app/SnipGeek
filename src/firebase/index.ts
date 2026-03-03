@@ -3,7 +3,7 @@
 import { firebaseConfig } from '@/firebase/config';
 import { initializeApp, getApps, getApp, FirebaseApp } from 'firebase/app';
 import { getAuth, Auth } from 'firebase/auth';
-import { getFirestore, Firestore } from 'firebase/firestore'
+import { getFirestore, Firestore } from 'firebase/firestore';
 
 export interface FirebaseServices {
   firebaseApp: FirebaseApp | null;
@@ -14,27 +14,28 @@ export interface FirebaseServices {
 /**
  * Initializes Firebase and returns an object with the SDK instances.
  * Returns null properties if configuration is missing to prevent total server crash.
+ * Optimized for robustness during environment variable synchronization.
  */
 export function initializeFirebase(): FirebaseServices {
   if (!getApps().length) {
     let firebaseApp: FirebaseApp | null = null;
+    
+    // 1. Try automatic initialization (for Firebase App Hosting)
     try {
-      // Attempt to initialize via Firebase App Hosting environment variables
       firebaseApp = initializeApp();
     } catch (e) {
-      // Fallback to config object if automatic init fails
+      // 2. Fallback to manual config object
       if (firebaseConfig.apiKey) {
         try {
           firebaseApp = initializeApp(firebaseConfig);
         } catch (initError) {
-          console.error('Firebase initialization failed with config:', initError);
+          console.error('Firebase manual initialization failed:', initError);
         }
-      } else {
-        console.warn('Firebase configuration is missing. App will run with limited functionality.');
       }
     }
 
     if (!firebaseApp) {
+      console.warn('Firebase services are not yet configured. Some features may be disabled.');
       return { firebaseApp: null, auth: null, firestore: null };
     }
 

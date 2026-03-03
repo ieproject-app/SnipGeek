@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, Chrome, LogOut, User as UserIcon, Lock } from 'lucide-react';
+import { Loader2, Chrome, LogOut, User as UserIcon, Lock, AlertTriangle } from 'lucide-react';
 import { useNotification } from '@/hooks/use-notification';
 
 interface InternalToolWrapperProps {
@@ -19,6 +19,7 @@ interface InternalToolWrapperProps {
 
 /**
  * InternalToolWrapper - Centralizes authentication and profile UI for all internal tools.
+ * Added defensive checks for null auth services to prevent crashes.
  */
 export function InternalToolWrapper({ children, title, description }: InternalToolWrapperProps) {
   const { user, isUserLoading } = useUser();
@@ -26,10 +27,15 @@ export function InternalToolWrapper({ children, title, description }: InternalTo
   const { notify } = useNotification();
 
   const handleGoogleLogin = () => {
+    if (!auth) {
+      notify("Layanan Login belum siap. Periksa konfigurasi Firebase.", <AlertTriangle className="h-4 w-4" />);
+      return;
+    }
     initiateGoogleSignIn(auth);
   };
 
   const handleLogout = async () => {
+    if (!auth) return;
     try {
       await signOut(auth);
       notify("Berhasil keluar akun.", <LogOut className="h-4 w-4" />);
@@ -43,6 +49,21 @@ export function InternalToolWrapper({ children, title, description }: InternalTo
       <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
         <Loader2 className="h-10 w-10 animate-spin text-accent" />
         <p className="text-sm font-bold uppercase tracking-widest text-muted-foreground animate-pulse">Menghubungkan...</p>
+      </div>
+    );
+  }
+
+  // Handle case where Firebase isn't initialized yet
+  if (!auth) {
+    return (
+      <div className="max-w-md mx-auto py-12">
+        <Card className="border-destructive/20 bg-destructive/5 text-center p-8 rounded-2xl">
+          <AlertTriangle className="h-12 w-12 text-destructive mx-auto mb-4" />
+          <CardTitle className="text-lg font-black uppercase mb-2">Sistem Belum Siap</CardTitle>
+          <CardDescription>
+            Konfigurasi database (Firebase) belum terdeteksi. Silakan isi Environment Variables di dashboard hosting Anda.
+          </CardDescription>
+        </Card>
       </div>
     );
   }
@@ -79,7 +100,6 @@ export function InternalToolWrapper({ children, title, description }: InternalTo
 
   return (
     <div className="space-y-8 animate-in fade-in duration-700">
-      {/* User Profile Bar */}
       <div className="flex flex-col md:flex-row items-center justify-between gap-4 p-4 bg-muted/30 backdrop-blur-sm rounded-2xl border border-primary/5 shadow-inner">
         <div className="flex items-center gap-3">
           <Avatar className="h-10 w-10 border-2 border-background shadow-md">
