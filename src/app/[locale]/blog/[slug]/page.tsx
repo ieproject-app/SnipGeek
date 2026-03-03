@@ -1,4 +1,3 @@
-
 import { getPostData, getAllPostSlugs, getAllLocales, getSortedPostsData } from '@/lib/posts';
 import { getDictionary } from '@/lib/get-dictionary';
 import { i18n } from '@/i18n-config';
@@ -44,7 +43,12 @@ export default async function Page({ params }: { params: Promise<{ slug: string,
 
   if (heroImageValue) {
     if (heroImageValue.startsWith('http') || heroImageValue.startsWith('/')) {
-      heroSource = { url: heroImageValue, hint: imageAlt?.toLowerCase().split(' ').slice(0, 2).join(' ') };
+      // Safe splitting by ensuring imageAlt is a string first
+      const imageHint = imageAlt 
+        ? imageAlt.toLowerCase().split(/\s+/).slice(0, 2).join(' ') 
+        : initialPost.frontmatter.title.toLowerCase().split(/\s+/).slice(0, 2).join(' ');
+        
+      heroSource = { url: heroImageValue, hint: imageHint };
     } else {
       const placeholder = PlaceHolderImages.find(p => p.id === heroImageValue);
       if (placeholder) {
