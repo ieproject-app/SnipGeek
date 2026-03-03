@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { DependencyList, createContext, useContext, ReactNode, useMemo, useState, useEffect } from 'react';
@@ -102,14 +103,22 @@ export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({
 };
 
 /**
- * Robust useFirebase hook that returns the current context state without throwing.
- * This prevents 500 Internal Server Errors during SSR when env vars are missing.
+ * Robust useFirebase hook that returns a safe state instead of throwing.
+ * This prevents 500 Internal Server Errors if context is temporarily undefined.
  */
 export const useFirebase = (): FirebaseContextState => {
   const context = useContext(FirebaseContext);
 
   if (context === undefined) {
-    throw new Error('useFirebase must be used within a FirebaseProvider.');
+    return {
+      areServicesAvailable: false,
+      firebaseApp: null,
+      firestore: null,
+      auth: null,
+      user: null,
+      isUserLoading: false,
+      userError: null,
+    };
   }
 
   return context;

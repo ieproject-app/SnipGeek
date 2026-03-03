@@ -29,12 +29,12 @@ export async function getSortedNotesData(locale?: string): Promise<Note<NoteFron
   const targetLocale = i18n.locales.includes(locale as Locale) ? locale : i18n.defaultLocale;
   const localeDirectory = path.join(notesDirectory, targetLocale!);
   
+  if (!fs.existsSync(localeDirectory)) {
+      return [];
+  }
+
   let fileNames: string[];
   try {
-    if (!fs.existsSync(localeDirectory)) {
-        fs.mkdirSync(localeDirectory, { recursive: true });
-        return [];
-    }
     fileNames = fs.readdirSync(localeDirectory);
   } catch (err) {
     return [];
@@ -79,9 +79,10 @@ export async function getDraftNotesData(locale?: string): Promise<Note<NoteFront
   const targetLocale = i18n.locales.includes(locale as Locale) ? locale : i18n.defaultLocale;
   const localeDirectory = path.join(notesDirectory, targetLocale!);
   
+  if (!fs.existsSync(localeDirectory)) return [];
+
   let fileNames: string[];
   try {
-    if (!fs.existsSync(localeDirectory)) return [];
     fileNames = fs.readdirSync(localeDirectory);
   } catch (err) {
     return [];
@@ -156,9 +157,11 @@ export async function getNoteData(slug: string, locale?: string): Promise<NoteDa
 export async function getAllNoteSlugs(locale?: string) {
     const targetLocale = i18n.locales.includes(locale as Locale) ? locale : i18n.defaultLocale;
     const localeDirectory = path.join(notesDirectory, targetLocale!);
+    
+    if (!fs.existsSync(localeDirectory)) return [];
+
     let fileNames: string[];
     try {
-      if (!fs.existsSync(localeDirectory)) return [];
       fileNames = fs.readdirSync(localeDirectory);
     } catch (err) {
       return [];
@@ -208,9 +211,11 @@ export async function getAllNotesTranslationsMap(): Promise<NotesTranslationsMap
 
   for (const locale of allLocales) {
     const localeDirectory = path.join(notesDirectory, locale);
+    
+    if (!fs.existsSync(localeDirectory)) continue;
+
     let fileNames: string[];
     try {
-      if (!fs.existsSync(localeDirectory)) continue;
       fileNames = fs.readdirSync(localeDirectory);
     } catch (err) {
       continue; 
