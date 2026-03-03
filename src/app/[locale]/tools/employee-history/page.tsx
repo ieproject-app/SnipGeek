@@ -1,4 +1,3 @@
-
 import { getDictionary } from '@/lib/get-dictionary'
 import { Locale } from '@/i18n-config'
 import EmployeeHistoryClient from './employee-history-client'
@@ -48,23 +47,11 @@ export default async function EmployeeHistoryPage({
   const { locale } = await params;
   const dictionary = await getDictionary(locale)
   const employeeData = getEmployeeData()
-  const pageContent = dictionary.tools.tool_list.employee_history;
 
   return (
     <div className="w-full">
       <main className="mx-auto max-w-5xl px-4 pt-10 pb-16 sm:px-6">
-        <header className="mb-12 text-center">
-            <h1 className="font-headline text-5xl font-extrabold tracking-tighter text-primary md:text-6xl mb-3">
-                {pageContent.title}
-            </h1>
-            <p className="mx-auto max-w-2xl text-muted-foreground text-lg italic">
-                {pageContent.description}
-            </p>
-        </header>
-        
-        <div>
-            <EmployeeHistoryClient dictionary={dictionary} employeeData={employeeData} locale={locale} />
-        </div>
+        <EmployeeHistoryClient dictionary={dictionary} employeeData={employeeData} locale={locale} />
       </main>
     </div>
   );
