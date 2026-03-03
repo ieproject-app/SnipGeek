@@ -1,3 +1,4 @@
+
 'use client';
 
 import React from 'react';
@@ -8,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, Chrome, LogOut, User as UserIcon, Lock, AlertTriangle, RefreshCcw } from 'lucide-react';
+import { Loader2, Chrome, LogOut, User as UserIcon, Lock, AlertTriangle, RefreshCcw, Github } from 'lucide-react';
 import { useNotification } from '@/hooks/use-notification';
 
 interface InternalToolWrapperProps {
@@ -37,33 +38,44 @@ export function InternalToolWrapper({ children, title, description }: InternalTo
     }
   };
 
-  const handleReload = () => {
-    window.location.reload();
-  };
-
   if (isUserLoading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
         <Loader2 className="h-10 w-10 animate-spin text-accent" />
-        <p className="text-sm font-bold uppercase tracking-widest text-muted-foreground animate-pulse">Menghubungkan...</p>
+        <p className="text-sm font-bold uppercase tracking-widest text-muted-foreground animate-pulse">Menghubungkan ke Cloud...</p>
       </div>
     );
   }
 
+  // JIKA AUTH TIDAK ADA (Variabel Environment Belum Aktif)
   if (!auth) {
     return (
-      <div className="max-w-md mx-auto py-12">
-        <Card className="border-destructive/20 bg-destructive/5 text-center p-8 rounded-2xl">
-          <AlertTriangle className="h-12 w-12 text-destructive mx-auto mb-4" />
-          <CardTitle className="text-lg font-black uppercase mb-2">Sistem Belum Siap</CardTitle>
-          <CardDescription className="mb-6">
-            Konfigurasi Firebase belum terdeteksi oleh browser. 
-            <br/><br/>
-            Jika Anda sudah mengisi dashboard, silakan coba <strong>Redeploy</strong> atau klik tombol di bawah untuk menyegarkan halaman.
-          </CardDescription>
-          <Button onClick={handleReload} variant="outline" className="w-full gap-2">
-            <RefreshCcw className="h-4 w-4" /> Segarkan Halaman
-          </Button>
+      <div className="max-w-2xl mx-auto py-12">
+        <Card className="border-accent/20 bg-accent/5 p-8 rounded-2xl shadow-xl">
+          <div className="flex flex-col items-center text-center space-y-6">
+            <div className="p-4 bg-accent/10 rounded-full animate-bounce">
+              <Github className="h-12 w-12 text-accent" />
+            </div>
+            <div className="space-y-2">
+              <CardTitle className="text-2xl font-black uppercase tracking-tighter">Konfigurasi Belum Aktif</CardTitle>
+              <CardDescription className="text-base text-foreground/70">
+                Data API Key di dashboard Firebase belum terserap ke dalam sistem website.
+              </CardDescription>
+            </div>
+            
+            <div className="bg-background/80 p-6 rounded-xl border text-left w-full space-y-4 shadow-inner">
+              <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Langkah Penyelesaian:</p>
+              <ol className="text-sm space-y-3 list-decimal pl-4 font-medium">
+                <li>Pastikan kodenya sudah di-push ke <strong>GitHub</strong>.</li>
+                <li>Hubungkan GitHub tersebut ke menu <strong>App Hosting</strong> di Firebase.</li>
+                <li>Lakukan <strong>Deployment Baru</strong> agar variabel di dashboard Mas Iwan ikut terbaca saat proses Build.</li>
+              </ol>
+            </div>
+
+            <p className="text-[10px] text-muted-foreground italic">
+              Tanpa proses Build via GitHub, browser tidak diizinkan membaca kunci rahasia Mas Iwan demi keamanan.
+            </p>
+          </div>
         </Card>
       </div>
     );

@@ -1,8 +1,8 @@
 
 /**
  * Firebase configuration object.
- * Reads from environment variables with NEXT_PUBLIC_ prefix for client-side access.
- * Fallbacks to non-prefixed variables for server-side initialization if available.
+ * Mengambil data dari environment variables.
+ * Penting: Variabel client-side WAJIB diawali dengan NEXT_PUBLIC_.
  */
 export const firebaseConfig = {
   projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || process.env.FIREBASE_PROJECT_ID || '',
@@ -11,4 +11,11 @@ export const firebaseConfig = {
   authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || process.env.FIREBASE_AUTH_DOMAIN || '',
   measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID || process.env.FIREBASE_MEASUREMENT_ID || '',
   messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || process.env.FIREBASE_MESSAGING_SENDER_ID || ''
+};
+
+/**
+ * Helper untuk mengecek apakah konfigurasi sudah lengkap.
+ */
+export const isFirebaseConfigValid = () => {
+  return !!(firebaseConfig.apiKey && firebaseConfig.projectId && firebaseConfig.appId);
 };
