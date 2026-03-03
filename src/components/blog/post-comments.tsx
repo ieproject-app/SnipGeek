@@ -5,7 +5,6 @@ import { DiscussionEmbed } from 'disqus-react';
 import { useState, useEffect, useRef } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 
-// TODO: Replace with your actual production domain and Disqus shortname
 const productionHostname = 'snipgeek.com'; 
 const disqusShortname = 'snipgeek-com';
 
@@ -26,11 +25,14 @@ export function PostComments({ article, type, locale }: PostCommentsProps) {
   useEffect(() => {
     setMounted(true);
     
-    // This logic ensures that Disqus is only loaded on the production domain
-    // and when the comments section is scrolled into view (lazy-loading).
+    // Logic to ensure Disqus ONLY loads in production environment AND on the correct domain
+    const isProduction = process.env.NODE_ENV === 'production';
+    
     const observer = new IntersectionObserver(([entry]) => {
       if (entry.isIntersecting) {
-        if (typeof window !== 'undefined' && window.location.hostname === productionHostname) {
+        const isCorrectDomain = typeof window !== 'undefined' && window.location.hostname === productionHostname;
+        
+        if (isProduction && isCorrectDomain) {
           setShouldLoad(true);
         }
         // Disconnect the observer once it has done its job
@@ -70,9 +72,9 @@ export function PostComments({ article, type, locale }: PostCommentsProps) {
         <p className="text-center text-[10px] text-muted-foreground uppercase font-bold tracking-widest opacity-30 pt-4">
             {!mounted 
               ? 'Loading Conversation...' 
-              : window.location.hostname === productionHostname 
+              : (process.env.NODE_ENV === 'production' && window.location.hostname === productionHostname) 
                 ? 'Loading Conversation...' 
-                : `Comments available on ${productionHostname}`}
+                : `Comments are disabled in Development Mode. Available on ${productionHostname}`}
         </p>
       </div>
     );
