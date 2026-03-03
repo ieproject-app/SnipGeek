@@ -1,3 +1,4 @@
+
 'use client';
 
 import { firebaseConfig } from '@/firebase/config';
@@ -22,24 +23,23 @@ export function initializeFirebase(): FirebaseServices {
   if (getApps().length > 0) {
     firebaseApp = getApp();
   } else {
-    // 2. Try manual config first if we have the API Key (more reliable on client)
-    if (firebaseConfig.apiKey && firebaseConfig.projectId) {
+    // 2. Try manual config first if we have the minimum requirements (API Key and Project ID)
+    const hasConfig = !!(firebaseConfig.apiKey && firebaseConfig.projectId);
+    
+    if (hasConfig) {
       try {
         firebaseApp = initializeApp(firebaseConfig);
       } catch (e) {
-        console.warn('Firebase manual initialization failed, trying automatic...', e);
+        // Silent fail, will try automatic fallback
       }
     }
 
-    // 3. Fallback to automatic (for Firebase App Hosting runtime)
+    // 3. Fallback to automatic (only works in specific environments like some CI or JSON files)
     if (!firebaseApp) {
       try {
         firebaseApp = initializeApp();
       } catch (e) {
-        // If everything fails, we don't throw, we just log
-        if (typeof window !== 'undefined') {
-          console.error('Firebase could not be initialized. Missing environment variables?');
-        }
+        // Silent fail, let the UI components handle the null state through hooks
       }
     }
   }
