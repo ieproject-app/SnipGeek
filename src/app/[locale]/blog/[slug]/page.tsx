@@ -43,7 +43,6 @@ export default async function Page({ params }: { params: Promise<{ slug: string,
 
   if (heroImageValue) {
     if (heroImageValue.startsWith('http') || heroImageValue.startsWith('/')) {
-      // Safe splitting by ensuring we have a string
       const imageHint = (imageAlt || title || 'article')
         .toString()
         .toLowerCase()
@@ -60,9 +59,9 @@ export default async function Page({ params }: { params: Promise<{ slug: string,
     }
   }
   
-  const headings = extractHeadings(initialPost.content);
-  const wordCount = initialPost.content.trim().split(/\s+/).length;
-  const readingTime = Math.ceil(wordCount / 200);
+  const headings = extractHeadings(initialPost.content || '');
+  const wordCount = (initialPost.content || '').trim().split(/\s+/).length || 0;
+  const readingTime = Math.max(1, Math.ceil(wordCount / 200));
 
   const itemForMeta = {
       slug: initialPost.slug,
@@ -129,7 +128,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string,
                 
                 <div className="text-lg text-foreground/80 prose-content">
                     <MDXRemote
-                        source={initialPost.content}
+                        source={initialPost.content || ''}
                         components={mdxComponents}
                         options={{
                             mdxOptions: {
