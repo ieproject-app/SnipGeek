@@ -82,6 +82,23 @@
                 "title": "Number Generator",
                 "description": "Generate unique sequential numbers for internal tracking purposes."
             }
+        },
+        "systemNotReady": {
+            "title": "System Not Ready",
+            "description": "The application cannot detect the Firebase API Key from your dashboard.",
+            "step1": "Step 1: Connect & Save",
+            "step1Desc": "Select the SnipGeek repository in the Deployment tab and click Save.",
+            "step2": "Step 2: Start Rollout (Required)",
+            "step2Desc": "Go to the Rollouts tab and click Start Rollout to inject the latest variables.",
+            "step3": "Step 3: Check Prefix",
+            "step3Desc": "Ensure variable names in the Environment tab start with NEXT_PUBLIC_.",
+            "footer": "Without a 'Start Rollout' process, the browser is not authorized to read secret keys for security reasons.",
+            "authorized": "Authorized",
+            "logout": "Sign Out",
+            "connecting": "Connecting to Cloud...",
+            "restrictedAccess": "Restricted Access",
+            "restrictedDesc": "The {tool} tool requires a registered Google account login to maintain system integrity.",
+            "loginWithGoogle": "Login with Google"
         }
     },
     "employeeHistory": {

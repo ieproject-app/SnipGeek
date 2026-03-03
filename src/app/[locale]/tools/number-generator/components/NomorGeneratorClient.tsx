@@ -501,6 +501,7 @@ export function NomorGeneratorClient({ dictionary }: { dictionary: Dictionary })
         <InternalToolWrapper 
             title={toolMeta.title} 
             description={toolMeta.description}
+            dictionary={dictionary}
         >
             <div className="space-y-10">
                 {/* 1. Stepper Visual */}
