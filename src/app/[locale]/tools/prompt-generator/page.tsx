@@ -43,16 +43,11 @@ export default async function PromptGeneratorPage({ params }: { params: Promise<
   return (
     <div className="w-full">
       <main className="mx-auto max-w-6xl px-4 pt-6 pb-12 sm:px-6 sm:pt-8 sm:pb-16">
-        <header className="mb-12 text-center">
-            <h1 className="font-headline text-5xl font-extrabold tracking-tighter text-primary md:text-6xl mb-3">
-                {pageContent.title}
-            </h1>
-            <p className="mx-auto max-w-2xl text-muted-foreground">
-                {pageContent.description}
-            </p>
-        </header>
-        
-        <PromptGeneratorClient dictionary={pageContent} existingArticles={existingArticles} />
+        <PromptGeneratorClient 
+            dictionary={pageContent} 
+            existingArticles={existingArticles} 
+            fullDictionary={dictionary}
+        />
       </main>
     </div>
   );

@@ -82,6 +82,23 @@
                 "title": "Generator Nomor",
                 "description": "Menghasilkan nomor urut unik untuk keperluan pelacakan internal."
             }
+        },
+        "systemNotReady": {
+            "title": "SISTEM BELUM SIAP",
+            "description": "Aplikasi belum bisa mendeteksi Kunci API dari dashboard Firebase Mas Iwan.",
+            "step1": "LANGKAH 1: HUBUNGKAN & SIMPAN",
+            "step1Desc": "Pilih repositori SnipGeek di tab Deployment dan klik Save.",
+            "step2": "LANGKAH 2: START ROLLOUT (WAJIB)",
+            "step2Desc": "Buka tab Rollouts dan klik Start Rollout untuk menyeduh variabel terbaru.",
+            "step3": "LANGKAH 3: CEK PREFIX",
+            "step3Desc": "Pastikan nama variabel di tab Environment diawali dengan NEXT_PUBLIC_.",
+            "footer": "Tanpa proses 'Start Rollout', browser Mas Iwan tidak diizinkan membaca kunci rahasia demi keamanan sistem.",
+            "authorized": "Authorized",
+            "logout": "Keluar Akun",
+            "connecting": "Menghubungkan ke Cloud...",
+            "restrictedAccess": "Akses Terbatas",
+            "restrictedDesc": "Tool {tool} memerlukan login akun Google terdaftar untuk menjaga integritas sistem.",
+            "loginWithGoogle": "Masuk dengan Google"
         }
     },
     "employeeHistory": {

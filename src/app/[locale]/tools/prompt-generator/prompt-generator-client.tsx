@@ -38,6 +38,7 @@ import { cn } from '@/lib/utils';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { InternalToolWrapper } from '@/components/tools/internal-tool-wrapper';
+import type { Dictionary } from '@/lib/get-dictionary';
 
 type DownloadItem = {
   id: string;
@@ -54,9 +55,10 @@ type ArticleSummary = {
 interface PromptGeneratorClientProps {
   dictionary: any; 
   existingArticles: ArticleSummary[];
+  fullDictionary: Dictionary;
 }
 
-export function PromptGeneratorClient({ dictionary, existingArticles }: PromptGeneratorClientProps) {
+export function PromptGeneratorClient({ dictionary, existingArticles, fullDictionary }: PromptGeneratorClientProps) {
   const [mounted, setMounted] = useState(false);
   const [mode, setMode] = useState<'create' | 'modify'>('create');
   const [contentType, setContentType] = useState<'blog' | 'note'>('blog');
@@ -229,7 +231,11 @@ export function PromptGeneratorClient({ dictionary, existingArticles }: PromptGe
   const focusInputClass = "focus-visible:ring-primary/20 focus-visible:ring-offset-0 focus-visible:border-primary/30 transition-all duration-300";
 
   return (
-    <InternalToolWrapper title="AI Content Prompt Generator" description="Create a structured prompt to request a new or modified article with complete details.">
+    <InternalToolWrapper 
+        title={dictionary.title} 
+        description={dictionary.description}
+        dictionary={fullDictionary}
+    >
         <div className="max-w-[1600px] mx-auto space-y-10">
             {/* Toolbar */}
             <Card className="bg-background/80 backdrop-blur-xl border-primary/10 shadow-xl overflow-hidden rounded-lg">

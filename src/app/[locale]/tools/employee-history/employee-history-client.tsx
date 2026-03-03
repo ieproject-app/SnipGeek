@@ -1,3 +1,4 @@
+
 'use client'
 
 import { useState, useMemo, useEffect } from 'react'
@@ -6,7 +7,7 @@ import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Button } from '@/components/ui/button'
-import { getDictionary } from '@/lib/get-dictionary'
+import { getDictionary, type Dictionary } from '@/lib/get-dictionary'
 import { parse, isValid } from 'date-fns'
 import { cn } from '@/lib/utils'
 import { Search, FileText, UserCheck, Plus, Trash2 } from 'lucide-react'
@@ -80,7 +81,7 @@ export default function EmployeeHistoryClient({
   employeeData,
   locale
 }: { 
-  dictionary: Awaited<ReturnType<typeof getDictionary>>,
+  dictionary: Dictionary,
   employeeData: string,
   locale: string
 }) {
@@ -197,7 +198,11 @@ export default function EmployeeHistoryClient({
   };
 
   return (
-    <InternalToolWrapper title={toolMeta.title} description={toolMeta.description}>
+    <InternalToolWrapper 
+        title={toolMeta.title} 
+        description={toolMeta.description}
+        dictionary={dictionary}
+    >
       <div className="space-y-12">
         {/* Search Section */}
         <Card className="border bg-card/50 rounded-lg overflow-hidden shadow-sm border-primary/10">
