@@ -17,14 +17,17 @@ export interface FirebaseServices {
  * Optimized for robustness during environment variable synchronization.
  */
 export function initializeFirebase(): FirebaseServices {
-  if (!getApps().length) {
-    let firebaseApp: FirebaseApp | null = null;
-    
-    // 1. Try automatic initialization (for Firebase App Hosting)
+  let firebaseApp: FirebaseApp | null = null;
+
+  // 1. If already initialized, get the existing app
+  if (getApps().length > 0) {
+    firebaseApp = getApp();
+  } else {
+    // 2. Try automatic initialization (for Firebase App Hosting)
     try {
       firebaseApp = initializeApp();
     } catch (e) {
-      // 2. Fallback to manual config object
+      // 3. Fallback to manual config object if apiKey exists
       if (firebaseConfig.apiKey) {
         try {
           firebaseApp = initializeApp(firebaseConfig);
@@ -33,17 +36,14 @@ export function initializeFirebase(): FirebaseServices {
         }
       }
     }
-
-    if (!firebaseApp) {
-      console.warn('Firebase services are not yet configured. Some features may be disabled.');
-      return { firebaseApp: null, auth: null, firestore: null };
-    }
-
-    return getSdks(firebaseApp);
   }
 
-  const app = getApp();
-  return getSdks(app);
+  // Final check: if no app was created, return nulls safely
+  if (!firebaseApp) {
+    return { firebaseApp: null, auth: null, firestore: null };
+  }
+
+  return getSdks(firebaseApp);
 }
 
 export function getSdks(firebaseApp: FirebaseApp): FirebaseServices {
