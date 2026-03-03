@@ -1,8 +1,8 @@
-
 /**
  * Firebase configuration object.
  * Fetches values from environment variables.
  * In Next.js, client-side variables MUST be prefixed with NEXT_PUBLIC_.
+ * We also attempt to read non-prefixed versions as a fallback for the server-side.
  */
 export const firebaseConfig = {
   projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || process.env.FIREBASE_PROJECT_ID || '',
@@ -17,9 +17,16 @@ export const firebaseConfig = {
  * Helper to check if the minimum required configuration is present.
  */
 export const isFirebaseConfigValid = () => {
-  return !!(
+  const hasValues = !!(
     firebaseConfig.apiKey && 
     firebaseConfig.projectId && 
     firebaseConfig.appId
   );
+  
+  // Debugging log for development or tracking missing keys
+  if (!hasValues && typeof window !== 'undefined') {
+    console.warn('Firebase config is incomplete. Check environment variables.');
+  }
+  
+  return hasValues;
 };
