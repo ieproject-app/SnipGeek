@@ -1,42 +1,39 @@
 
-# SnipGeek - Modern Minimalist Tech Blog
+# SnipGeek - Modern Minimalist Tech Blog (v2.5)
 
-A highly optimized tech blog built with Next.js 15, React 19, and Tailwind CSS.
+A high-performance tech blog and toolkit built with **Next.js 15**, **React 19**, and **Tailwind CSS**.
 
-## Design System & Specifications (v2.0)
+## Design System & Specifications
 
 ### 1. Global Layout & Aesthetic
-- **Background**: Solid colors (no gradients) for a clean, professional look.
-- **Transisi Tema**: Smooth 500ms fading transition between Light and Dark mode.
+- **Visual Style**: Clean, high-contrast typography with solid backgrounds.
+- **Cinematic Centered Layout**: Articles feature centered breadcrumbs, headlines, and metadata, followed by an ultra-wide hero image aligned with the site header.
+- **Theme Transition**: Smooth 500ms fading transition between Light and Dark mode.
 - **Typography**: 
-  - Headlines: Bricolage Grotesque (Bold/Black).
-  - UI & Body: Plus Jakarta Sans.
-  - Serif Accents: Lora.
-  - Code: JetBrains Mono.
+  - Headlines: **Bricolage Grotesque** (Bold/Black).
+  - UI & Body: **Plus Jakarta Sans**.
+  - Code: **JetBrains Mono** (Optimized at 13px for readability).
 - **Border Radius**: 8px (`rounded-lg`) standard, 12px (`rounded-xl`) for main cards.
 
 ### 2. Component Specifications
 
-#### Grid Lists (Blog, Notes, Tags)
-- **Desktop Layout**: 3-column Grid inside `max-w-4xl` container.
-- **Card Aspect Ratio**: 4:3 for all thumbnails.
-- **Hover Interaction**: 
-  - Image scale `1.10`.
-  - Bookmark overlay appears on hover (top-right).
-  - Floating pill tooltips for global buttons.
+#### Content Rendering (Blog & Notes)
+- **Engine**: Local MDX files with `next-mdx-remote/rsc` (Server Side Rendering).
+- **Robustness**: Automatically handles empty content directories without crashing using robust file-system checks.
+- **MDX Components**: Custom interactive components including Zoomable Images, Image Grids, and Platform-specific Download Buttons.
 
 #### Internal Tools
-- **Access Control**: Internal tools are protected by Google Authentication via Firebase.
-- **Profile Bar**: Unified user profile header with logout capability.
-- **Visuals**: Glassmorphism accents on card headers and profile bars.
+- **Access Control**: Protected by Google Authentication via Firebase Auth.
+- **Categorization**: Clear distinction between Public (Accessible) and Internal (Authorized) tools.
+- **Visuals**: Glassmorphism accents on headers and unified profile bars with hover-responsive cards.
 
 ### 3. Navigation & Search
-- **Header**: Minimalist top navigation with hidden-on-scroll logic.
-- **Search**: Compact overlay with quick picks and category filtering.
-- **TOC**: Clean, non-scroll-spy table of contents for better performance.
+- **Adaptive Header**: Smart visibility logic (hidden on scroll down, revealed on scroll up).
+- **Universal Search**: Real-time filtering for both Blog Posts and Quick Notes with visual match highlighting.
+- **Reading List**: Persistent local storage for saving articles to read later.
 
 ### 4. Technical Stack
 - **Framework**: Next.js 15 (App Router).
-- **Styling**: Tailwind CSS + ShadCN UI.
-- **Backend**: Firebase (Auth & Firestore for Tools).
-- **Content**: Local MDX files with `next-mdx-remote`.
+- **Language**: TypeScript.
+- **Backend**: Firebase (Auth & Firestore for Tools usage tracking).
+- **Deployment**: Fully synchronized for production domain `snipgeek.com`.
