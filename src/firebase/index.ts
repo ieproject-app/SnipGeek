@@ -14,25 +14,31 @@ export interface FirebaseServices {
 /**
  * Initializes Firebase and returns an object with the SDK instances.
  * Returns null properties if configuration is missing to prevent total server crash.
- * Optimized for robustness during environment variable synchronization.
  */
 export function initializeFirebase(): FirebaseServices {
   let firebaseApp: FirebaseApp | null = null;
 
-  // 1. If already initialized, get the existing app
+  // 1. Check if already initialized
   if (getApps().length > 0) {
     firebaseApp = getApp();
   } else {
-    // 2. Try automatic initialization (for Firebase App Hosting)
-    try {
-      firebaseApp = initializeApp();
-    } catch (e) {
-      // 3. Fallback to manual config object if apiKey exists
-      if (firebaseConfig.apiKey) {
-        try {
-          firebaseApp = initializeApp(firebaseConfig);
-        } catch (initError) {
-          console.error('Firebase manual initialization failed:', initError);
+    // 2. Try manual config first if we have the API Key (more reliable on client)
+    if (firebaseConfig.apiKey && firebaseConfig.projectId) {
+      try {
+        firebaseApp = initializeApp(firebaseConfig);
+      } catch (e) {
+        console.warn('Firebase manual initialization failed, trying automatic...', e);
+      }
+    }
+
+    // 3. Fallback to automatic (for Firebase App Hosting runtime)
+    if (!firebaseApp) {
+      try {
+        firebaseApp = initializeApp();
+      } catch (e) {
+        // If everything fails, we don't throw, we just log
+        if (typeof window !== 'undefined') {
+          console.error('Firebase could not be initialized. Missing environment variables?');
         }
       }
     }
