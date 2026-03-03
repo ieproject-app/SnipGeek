@@ -1,4 +1,3 @@
-
 'use client'
 
 import { useState, useMemo, useEffect } from 'react'
@@ -51,7 +50,9 @@ const docRules: DocRule = {
 
 // --- HELPER FUNCTIONS ---
 const parseDate = (dateStr: string): Date => {
+  if (!dateStr) return new Date();
   const [day, month, year] = dateStr.split('/').map(Number);
+  if (isNaN(year)) return new Date();
   if (year === 9999) return new Date(9999, 11, 31);
   return new Date(year, month - 1, day);
 };
@@ -60,13 +61,16 @@ const tryParseDate = (text: string): Date | null => {
   if (!text) return null;
   const formats = ['d MMMM yyyy', 'd MMM yyyy', 'd MMMM', 'd MMM', 'd/M/yyyy', 'd/M/yy'];
   for (const format of formats) {
-    const parsedDate = parse(text, format, new Date());
-    if (isValid(parsedDate)) return parsedDate;
+    try {
+      const parsedDate = parse(text, format, new Date());
+      if (isValid(parsedDate)) return parsedDate;
+    } catch (e) {}
   }
   return null;
 };
 
 const formatDate = (date: Date, locale: string = 'id-ID') => {
+    if (!date || isNaN(date.getTime())) return 'N/A';
     return date.toLocaleDateString(locale, { day: 'numeric', month: 'long', year: 'numeric' });
 }
 
@@ -111,7 +115,7 @@ export default function EmployeeHistoryClient({
     setIsSearching(true);
     const timeoutId = setTimeout(() => {
         const parsedDate = tryParseDate(searchText);
-        const lowerSearchText = searchText.toLowerCase().trim();
+        const lowerSearchText = (searchText || '').toLowerCase().trim();
 
         const results = allPejabat
         .filter(p => {
@@ -123,26 +127,21 @@ export default function EmployeeHistoryClient({
             } else if (lowerSearchText) {
                 const searchTerms = lowerSearchText.split(' ').filter(term => term.length > 0);
                 return searchTerms.every(term => 
-                    p.nama.toLowerCase().includes(term) || 
-                    (p.nik && p.nik.toLowerCase().includes(term)) ||
-                    (p.jabatan && p.jabatan.toLowerCase().includes(term)) ||
-                    (p.grupJabatan && p.grupJabatan.toLowerCase().includes(term))
+                    (p.nama || '').toLowerCase().includes(term) || 
+                    (p.nik || '').toLowerCase().includes(term) ||
+                    (p.jabatan || '').toLowerCase().includes(term) ||
+                    (p.grupJabatan || '').toLowerCase().includes(term)
                 );
             } else {
                 return true;
             }
         })
         .sort((a, b) => {
-            // Sort by end date descending (newest first)
             const dateSort = b.tglSelesai.getTime() - a.tglSelesai.getTime();
             if (dateSort !== 0) return dateSort;
-            
-            // If end dates are same, sort by start date descending
             const startSort = b.tglMulai.getTime() - a.tglMulai.getTime();
             if (startSort !== 0) return startSort;
-
-            // Fallback to name
-            return a.nama.localeCompare(b.nama);
+            return (a.nama || '').localeCompare(b.nama || '');
         });
 
         setFilteredPejabat(results);
@@ -176,6 +175,8 @@ export default function EmployeeHistoryClient({
       if (!query.docType || !query.docDate) return;
       
       const targetDate = new Date(query.docDate);
+      if (isNaN(targetDate.getTime())) return;
+
       let requiredGrups = docRules[query.docType] || [];
 
       if (['AMD PENUTUP', 'BAST'].includes(query.docType) && query.projectValue > 500000000) {

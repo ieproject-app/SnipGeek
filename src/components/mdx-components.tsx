@@ -12,8 +12,13 @@ import { Dialog, DialogContent, DialogTrigger, DialogTitle, DialogDescription } 
 
 // Helper to generate IDs for TOC
 const generateId = (children: any) => {
-    if (typeof children !== 'string') return undefined;
-    return children
+    const text = React.Children.toArray(children)
+        .map(child => (typeof child === 'string' ? child : ''))
+        .join('');
+        
+    if (!text) return undefined;
+    
+    return text
       .toLowerCase()
       .replace(/[^\w\s-]/g, '')
       .replace(/\s+/g, '-');
@@ -49,8 +54,8 @@ const ZoomableImage = ({ src, alt, width, height, className, priority, ...props 
                         priority={priority}
                         {...props}
                     />
-                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center">
-                        <Maximize2 className="text-white opacity-0 group-hover:opacity-100 transition-opacity h-8 w-8 drop-shadow-lg" />
+                    <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-colors flex items-center justify-center">
+                        <Maximize2 className="text-white h-8 w-8 drop-shadow-lg" />
                     </div>
                 </div>
             </DialogTrigger>
@@ -93,7 +98,7 @@ const CustomImage = ({ class: _class, className, parentName, priority, ...props 
 };
 
 export const DownloadButton = ({ id }: { id: string }) => {
-  const linkData = downloadLinks[id];
+  const linkData = id ? downloadLinks[id] : null;
 
   if (!linkData) {
     if (process.env.NODE_ENV === 'development') {
