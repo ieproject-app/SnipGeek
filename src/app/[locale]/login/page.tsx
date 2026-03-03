@@ -7,7 +7,7 @@ import { initiateGoogleSignIn } from '@/firebase/non-blocking-login';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { SnipGeekLogo } from '@/components/icons/snipgeek-logo';
-import { Loader2, Chrome } from 'lucide-react';
+import { Loader2, Chrome, AlertCircle } from 'lucide-react';
 
 export default function LoginPage() {
   const { user, isUserLoading } = useUser();
@@ -22,6 +22,7 @@ export default function LoginPage() {
   }, [user, router]);
 
   const handleGoogleLogin = () => {
+    if (!auth) return;
     initiateGoogleSignIn(auth);
   };
 
@@ -29,6 +30,35 @@ export default function LoginPage() {
     return (
       <div className="flex h-screen w-full items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-accent" />
+      </div>
+    );
+  }
+
+  // JIKA AUTH TIDAK ADA (Variabel Environment Belum Aktif di Browser)
+  if (!auth) {
+    return (
+      <div className="flex min-h-[calc(100vh-68px)] w-full items-center justify-center px-4 py-12">
+        <Card className="w-full max-w-md shadow-2xl border-destructive/20 bg-destructive/5 rounded-2xl overflow-hidden">
+          <div className="h-1.5 w-full bg-destructive" />
+          <CardHeader className="space-y-4 text-center pt-10 pb-8">
+            <div className="flex justify-center mb-2">
+              <div className="p-4 bg-destructive/10 rounded-full">
+                <AlertCircle className="h-12 w-12 text-destructive" />
+              </div>
+            </div>
+            <CardTitle className="font-headline text-3xl font-black tracking-tighter uppercase text-destructive">
+              Koneksi Terputus
+            </CardTitle>
+            <CardDescription className="text-base px-6">
+              Sistem tidak dapat mendeteksi Kunci API Firebase. Pastikan proses <strong>Rollout</strong> di dashboard Firebase sudah selesai.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="pb-12 text-center">
+             <p className="text-xs text-muted-foreground italic">
+               Halaman login tidak dapat berfungsi tanpa konfigurasi server yang benar.
+             </p>
+          </CardContent>
+        </Card>
       </div>
     );
   }
