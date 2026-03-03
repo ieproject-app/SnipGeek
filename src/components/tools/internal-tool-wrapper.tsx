@@ -6,7 +6,7 @@ import { initiateGoogleSignIn } from '@/firebase/non-blocking-login';
 import { signOut } from 'firebase/auth';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Avatar, AvatarFallback, AvatarImage } from '@/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Loader2, Chrome, LogOut, User as UserIcon, Lock, Github, CheckCircle2, AlertCircle, RefreshCw } from 'lucide-react';
 import { useNotification } from '@/hooks/use-notification';
