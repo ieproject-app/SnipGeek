@@ -54,22 +54,33 @@ const getTimeLabel = () => {
   return "🌙 Night Owl Picks";
 };
 
+// Helper to escape regex special characters
+const escapeRegExp = (string: string) => {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+};
+
 const HighlightMatch = ({ text, query }: { text: string; query: string }) => {
   if (!query.trim()) return <>{text}</>;
-  const parts = text.split(new RegExp(`(${query})`, 'gi'));
-  return (
-    <>
-      {parts.map((part, i) =>
-        part.toLowerCase() === query.toLowerCase() ? (
-          <mark key={i} className="bg-accent/30 text-accent-foreground rounded-[2px] px-0.5 font-bold">
-            {part}
-          </mark>
-        ) : (
-          part
-        )
-      )}
-    </>
-  );
+  
+  const escapedQuery = escapeRegExp(query.trim());
+  try {
+    const parts = text.split(new RegExp(`(${escapedQuery})`, 'gi'));
+    return (
+      <>
+        {parts.map((part, i) =>
+          part.toLowerCase() === query.toLowerCase().trim() ? (
+            <mark key={i} className="bg-accent/30 text-accent-foreground rounded-[2px] px-0.5 font-bold">
+              {part}
+            </mark>
+          ) : (
+            part
+          )
+        )}
+      </>
+    );
+  } catch (e) {
+    return <>{text}</>;
+  }
 };
 
 export function Header({ searchableData, dictionary }: { searchableData: SearchableItem[], dictionary: Dictionary }) {

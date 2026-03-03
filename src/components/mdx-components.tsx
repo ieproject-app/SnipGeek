@@ -163,9 +163,10 @@ const MdxA = ({ class: _class, className, parentName, ...props }: React.AnchorHT
 const MdxUl = ({ children, class: _class, className, parentName, ...props }: any) => <ul className={cn("my-6 ml-6 list-disc [&>li]:mt-2", _class, className)} {...props}>{children}</ul>;
 const MdxOl = ({ children, class: _class, className, parentName, ...props }: any) => <ol className={cn("my-6 ml-6 list-decimal [&>li]:mt-2", _class, className)} {...props}>{children}</ol>;
 const MdxAItem = ({ children, class: _class, className, parentName, ...props }: any) => <li className={cn(_class, className)} {...props}>{children}</li>;
+const MdxAItemOl = ({ children, class: _class, className, parentName, ...props }: any) => <li className={cn(_class, className)} {...props}>{children}</li>;
 const MdxBlockquote = ({ children, class: _class, className, parentName, ...props }: any) => <blockquote className={cn("mt-6 border-l-2 border-primary/20 pl-6 italic text-muted-foreground", _class, className)} {...props}>{children}</blockquote>;
 
-const MdxPre = ({ className, class: _class, parentName, style, ...props }: any) => (
+const MdxPre = ({ children, className, class: _class, parentName, style, ...props }: any) => (
     <pre
         className={cn(
             "rounded-lg p-6 my-6 overflow-x-auto border border-primary/5 text-[13px] leading-relaxed font-mono",
@@ -174,7 +175,9 @@ const MdxPre = ({ className, class: _class, parentName, style, ...props }: any) 
         )}
         style={style}
         {...props}
-    />
+    >
+      {children}
+    </pre>
 );
 
 export const mdxComponents: MDXComponents = {
