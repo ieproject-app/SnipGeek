@@ -38,15 +38,18 @@ export default async function Page({ params }: { params: Promise<{ slug: string,
   }
 
   const linkPrefix = locale === 'en' ? '' : `/${locale}`;
-  const { heroImage: heroImageValue, imageAlt } = initialPost.frontmatter;
+  const { heroImage: heroImageValue, imageAlt, title } = initialPost.frontmatter;
   let heroSource: { url: string; hint?: string } | undefined;
 
   if (heroImageValue) {
     if (heroImageValue.startsWith('http') || heroImageValue.startsWith('/')) {
-      // Safe splitting by ensuring imageAlt is a string first
-      const imageHint = imageAlt 
-        ? imageAlt.toLowerCase().split(/\s+/).slice(0, 2).join(' ') 
-        : initialPost.frontmatter.title.toLowerCase().split(/\s+/).slice(0, 2).join(' ');
+      // Safe splitting by ensuring we have a string
+      const imageHint = (imageAlt || title || 'article')
+        .toString()
+        .toLowerCase()
+        .split(/\s+/)
+        .slice(0, 2)
+        .join(' ');
         
       heroSource = { url: heroImageValue, hint: imageHint };
     } else {

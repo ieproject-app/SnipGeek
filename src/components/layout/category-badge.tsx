@@ -42,7 +42,9 @@ const defaultBadgeStyle: BadgeStyle = {
 /**
  * Helper to simplify labels to single-word versions for a minimalist look.
  */
-export function simplifyCategoryLabel(label: string): string {
+export function simplifyCategoryLabel(label: any): string {
+  if (!label) return 'Article';
+  const strLabel = String(label).toLowerCase();
   const map: Record<string, string> = {
     'pembaruan perangkat lunak': 'Update',
     'software update': 'Update',
@@ -53,7 +55,7 @@ export function simplifyCategoryLabel(label: string): string {
     'ulasan': 'Review',
     'postingan': 'Article'
   };
-  return map[label.toLowerCase()] || label;
+  return map[strLabel] || String(label);
 }
 
 /**
@@ -62,17 +64,13 @@ export function simplifyCategoryLabel(label: string): string {
 export function getBadgeStyle(category?: string, type?: 'blog' | 'note'): BadgeStyle {
   if (!category && !type) return defaultBadgeStyle;
   
-  // Simplify the category before lookup
   const simplified = category ? simplifyCategoryLabel(category) : undefined;
   
-  // Try exact match first
   if (simplified && categoryColorMap[simplified]) return categoryColorMap[simplified];
   
-  // Try case-insensitive match
   const foundKey = Object.keys(categoryColorMap).find(key => key.toLowerCase() === simplified?.toLowerCase());
   if (foundKey) return categoryColorMap[foundKey];
 
-  // Fallback to type
   if (type === 'blog') return categoryColorMap['Article'];
   if (type === 'note') return categoryColorMap['Note'];
   
@@ -88,9 +86,6 @@ interface CategoryBadgeProps {
   className?: string;
 }
 
-/**
- * A consistent, colorful badge component for categories across SnipGeek.
- */
 export function CategoryBadge({
   label, category, type, size = 'xs', showDot = true, className
 }: CategoryBadgeProps) {
