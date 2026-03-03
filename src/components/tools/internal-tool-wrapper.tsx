@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, Chrome, LogOut, User as UserIcon, Lock, AlertTriangle } from 'lucide-react';
+import { Loader2, Chrome, LogOut, User as UserIcon, Lock, AlertTriangle, RefreshCcw } from 'lucide-react';
 import { useNotification } from '@/hooks/use-notification';
 
 interface InternalToolWrapperProps {
@@ -17,20 +17,13 @@ interface InternalToolWrapperProps {
   description: string;
 }
 
-/**
- * InternalToolWrapper - Centralizes authentication and profile UI for all internal tools.
- * Added defensive checks for null auth services to prevent crashes.
- */
 export function InternalToolWrapper({ children, title, description }: InternalToolWrapperProps) {
   const { user, isUserLoading } = useUser();
   const auth = useAuth();
   const { notify } = useNotification();
 
   const handleGoogleLogin = () => {
-    if (!auth) {
-      notify("Layanan Login belum siap. Periksa konfigurasi Firebase.", <AlertTriangle className="h-4 w-4" />);
-      return;
-    }
+    if (!auth) return;
     initiateGoogleSignIn(auth);
   };
 
@@ -44,6 +37,10 @@ export function InternalToolWrapper({ children, title, description }: InternalTo
     }
   };
 
+  const handleReload = () => {
+    window.location.reload();
+  };
+
   if (isUserLoading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
@@ -53,16 +50,20 @@ export function InternalToolWrapper({ children, title, description }: InternalTo
     );
   }
 
-  // Handle case where Firebase isn't initialized yet
   if (!auth) {
     return (
       <div className="max-w-md mx-auto py-12">
         <Card className="border-destructive/20 bg-destructive/5 text-center p-8 rounded-2xl">
           <AlertTriangle className="h-12 w-12 text-destructive mx-auto mb-4" />
           <CardTitle className="text-lg font-black uppercase mb-2">Sistem Belum Siap</CardTitle>
-          <CardDescription>
-            Konfigurasi database (Firebase) belum terdeteksi. Silakan isi Environment Variables di dashboard hosting Anda.
+          <CardDescription className="mb-6">
+            Konfigurasi Firebase belum terdeteksi oleh browser. 
+            <br/><br/>
+            Jika Anda sudah mengisi dashboard, silakan coba <strong>Redeploy</strong> atau klik tombol di bawah untuk menyegarkan halaman.
           </CardDescription>
+          <Button onClick={handleReload} variant="outline" className="w-full gap-2">
+            <RefreshCcw className="h-4 w-4" /> Segarkan Halaman
+          </Button>
         </Card>
       </div>
     );
