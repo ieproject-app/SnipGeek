@@ -1,4 +1,3 @@
-
 'use client';
 
 import React from 'react';
@@ -9,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, Chrome, LogOut, User as UserIcon, Lock, AlertTriangle, RefreshCcw, Github } from 'lucide-react';
+import { Loader2, Chrome, LogOut, User as UserIcon, Lock, Github, CheckCircle2, AlertCircle } from 'lucide-react';
 import { useNotification } from '@/hooks/use-notification';
 
 interface InternalToolWrapperProps {
@@ -47,33 +46,56 @@ export function InternalToolWrapper({ children, title, description }: InternalTo
     );
   }
 
-  // JIKA AUTH TIDAK ADA (Variabel Environment Belum Aktif)
+  // JIKA AUTH TIDAK ADA (Variabel Environment Belum Aktif di Browser)
   if (!auth) {
     return (
-      <div className="max-w-2xl mx-auto py-12">
-        <Card className="border-accent/20 bg-accent/5 p-8 rounded-2xl shadow-xl">
+      <div className="max-w-2xl mx-auto py-12 px-4">
+        <Card className="border-accent/20 bg-accent/5 p-8 rounded-2xl shadow-xl border-t-4 border-t-accent">
           <div className="flex flex-col items-center text-center space-y-6">
-            <div className="p-4 bg-accent/10 rounded-full animate-bounce">
+            <div className="p-4 bg-accent/10 rounded-full">
               <Github className="h-12 w-12 text-accent" />
             </div>
             <div className="space-y-2">
-              <CardTitle className="text-2xl font-black uppercase tracking-tighter">Konfigurasi Belum Aktif</CardTitle>
+              <CardTitle className="text-3xl font-black uppercase tracking-tighter">Sistem Belum Siap</CardTitle>
               <CardDescription className="text-base text-foreground/70">
-                Data API Key di dashboard Firebase belum terserap ke dalam sistem website.
+                Aplikasi belum bisa mendeteksi <strong>Kunci API</strong> dari dashboard Firebase Mas Iwan.
               </CardDescription>
             </div>
             
-            <div className="bg-background/80 p-6 rounded-xl border text-left w-full space-y-4 shadow-inner">
-              <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Langkah Penyelesaian:</p>
-              <ol className="text-sm space-y-3 list-decimal pl-4 font-medium">
-                <li>Pastikan kodenya sudah di-push ke <strong>GitHub</strong>.</li>
-                <li>Hubungkan GitHub tersebut ke menu <strong>App Hosting</strong> di Firebase.</li>
-                <li>Lakukan <strong>Deployment Baru</strong> agar variabel di dashboard Mas Iwan ikut terbaca saat proses Build.</li>
-              </ol>
+            <div className="bg-background/80 p-6 rounded-xl border text-left w-full space-y-5 shadow-inner">
+              <div className="flex items-start gap-3">
+                <div className="h-6 w-6 rounded-full bg-emerald-500/10 flex items-center justify-center shrink-0 mt-0.5">
+                    <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+                </div>
+                <div className="space-y-1">
+                    <p className="text-sm font-bold text-primary uppercase tracking-tight">Langkah 1: Isi Dashboard</p>
+                    <p className="text-xs text-muted-foreground">Pastikan NEXT_PUBLIC_FIREBASE_API_KEY dkk sudah diisi di tab Environment.</p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3">
+                <div className="h-6 w-6 rounded-full bg-amber-500/10 flex items-center justify-center shrink-0 mt-0.5">
+                    <AlertCircle className="h-4 w-4 text-amber-500" />
+                </div>
+                <div className="space-y-1">
+                    <p className="text-sm font-bold text-primary uppercase tracking-tight">Langkah 2: Hubungkan GitHub</p>
+                    <p className="text-xs text-muted-foreground">Pastikan koneksi repositori GitHub di menu Deployment sudah berwarna hijau (Success).</p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3">
+                <div className="h-6 w-6 rounded-full bg-blue-500/10 flex items-center justify-center shrink-0 mt-0.5">
+                    <Github className="h-4 w-4 text-blue-500" />
+                </div>
+                <div className="space-y-1">
+                    <p className="text-sm font-bold text-primary uppercase tracking-tight">Langkah 3: Pemicu Build</p>
+                    <p className="text-xs text-muted-foreground">Lakukan <strong>Start New Rollout</strong> atau push kode ke GitHub agar variabel diserap ke website.</p>
+                </div>
+              </div>
             </div>
 
-            <p className="text-[10px] text-muted-foreground italic">
-              Tanpa proses Build via GitHub, browser tidak diizinkan membaca kunci rahasia Mas Iwan demi keamanan.
+            <p className="text-[10px] text-muted-foreground italic max-w-sm">
+              Tanpa proses "Build" melalui GitHub, browser Mas Iwan tidak diizinkan membaca kunci rahasia demi keamanan sistem.
             </p>
           </div>
         </Card>
