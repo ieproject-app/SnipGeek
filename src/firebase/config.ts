@@ -1,5 +1,6 @@
-// src/firebase/config.ts
 import { initializeApp, getApps, getApp } from 'firebase/app';
+import { getAuth } from 'firebase/auth';
+import { getFirestore } from 'firebase/firestore';
 
 // Firebase configuration using environment variables
 export const firebaseConfig = {
@@ -18,17 +19,25 @@ export const isFirebaseConfigValid = () => {
   );
 };
 
-// Metadata for diagnostics UI - MUST BE EXPORTED
+// Metadata for diagnostics UI
 export const firebaseConfigStatus = {
   isComplete: isFirebaseConfigValid(),
   config: firebaseConfig,
 };
 
-// Initialize Firebase only if config is valid to prevent SDK crashes
-const getInitializedApp = () => {
+/**
+ * Single entry point for initializing Firebase services.
+ * This ensures we don't initialize multiple instances.
+ */
+export const initializeFirebase = () => {
   if (!isFirebaseConfigValid()) return null;
-  return !getApps().length ? initializeApp(firebaseConfig) : getApp();
+  const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+  const auth = getAuth(app);
+  const firestore = getFirestore(app);
+  return { firebaseApp: app, auth, firestore };
 };
 
-export const firebaseApp = getInitializedApp();
-export const isFirebaseInitialized = !!firebaseApp;
+// Legacy exports for components that use them directly
+const initializedApp = isFirebaseConfigValid() ? (!getApps().length ? initializeApp(firebaseConfig) : getApp()) : null;
+export const firebaseApp = initializedApp;
+export const isFirebaseInitialized = !!initializedApp;
