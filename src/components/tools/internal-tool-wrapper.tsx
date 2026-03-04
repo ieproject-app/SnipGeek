@@ -22,6 +22,7 @@ import {
 } from 'lucide-react';
 import { useNotification } from '@/hooks/use-notification';
 import type { Dictionary } from '@/lib/get-dictionary';
+import { Separator } from '@/components/ui/separator';
 
 interface InternalToolWrapperProps {
   children: React.ReactNode;
@@ -128,7 +129,7 @@ export function InternalToolWrapper({ children, title, description, dictionary }
                   <div className="h-5 w-5 rounded-full bg-primary/10 flex items-center justify-center shrink-0 mt-0.5 text-[10px] font-black">1</div>
                   <div className="space-y-1">
                       <p className="text-[11px] font-bold text-primary uppercase tracking-tight">Cek Dashboard Firebase</p>
-                      <p className="text-[10px] text-muted-foreground leading-relaxed">Pastikan nama variabel di tab <b>Settings -> Environment Variables</b> menggunakan awalan <b>NEXT_PUBLIC_</b> dan di-set ke <b>Build & Runtime</b>.</p>
+                      <p className="text-[10px] text-muted-foreground leading-relaxed">Pastikan nama variabel di tab <b>Settings &rarr; Environment Variables</b> menggunakan awalan <b>NEXT_PUBLIC_</b> dan di-set ke <b>Build & Runtime</b>.</p>
                   </div>
                 </div>
 
@@ -227,5 +228,3 @@ export function InternalToolWrapper({ children, title, description, dictionary }
     </div>
   );
 }
-
-import { Separator } from '@/components/ui/separator';
