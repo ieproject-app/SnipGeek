@@ -235,6 +235,7 @@ export function PromptGeneratorClient({ dictionary, existingArticles, fullDictio
         title={dictionary.title} 
         description={dictionary.description}
         dictionary={fullDictionary}
+        isPublic={true}
     >
         <div className="max-w-[1600px] mx-auto space-y-10">
             {/* Toolbar */}

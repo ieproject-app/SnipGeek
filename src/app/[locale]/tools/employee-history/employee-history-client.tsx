@@ -202,6 +202,7 @@ export default function EmployeeHistoryClient({
         title={toolMeta.title} 
         description={toolMeta.description}
         dictionary={dictionary}
+        isPublic={true}
     >
       <div className="space-y-12">
         {/* Search Section */}

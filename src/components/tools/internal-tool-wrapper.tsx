@@ -29,9 +29,10 @@ interface InternalToolWrapperProps {
   title: string;
   description: string;
   dictionary: Dictionary;
+  isPublic?: boolean; // Allow public access to certain tools
 }
 
-export function InternalToolWrapper({ children, title, description, dictionary }: InternalToolWrapperProps) {
+export function InternalToolWrapper({ children, title, description, dictionary, isPublic = false }: InternalToolWrapperProps) {
   const { user, isUserLoading } = useUser();
   const auth = useAuth();
   const { notify } = useNotification();
@@ -152,7 +153,8 @@ export function InternalToolWrapper({ children, title, description, dictionary }
     );
   }
 
-  if (!user) {
+  // If the tool is not public and the user is not logged in, show the login prompt.
+  if (!isPublic && !user) {
     return (
       <div className="max-w-md mx-auto animate-in fade-in zoom-in-95 duration-500">
         <Card className="text-center mt-8 border-primary/10 bg-card/50 shadow-xl rounded-2xl overflow-hidden">
@@ -182,36 +184,52 @@ export function InternalToolWrapper({ children, title, description, dictionary }
     );
   }
 
-  return (
-    <div className="space-y-8 animate-in fade-in duration-700">
-      <div className="flex flex-col md:flex-row items-center justify-between gap-4 p-4 bg-muted/30 backdrop-blur-sm rounded-2xl border border-primary/5 shadow-inner">
-        <div className="flex items-center gap-3">
-          <Avatar className="h-10 w-10 border-2 border-background shadow-md">
-            <AvatarImage src={user.photoURL || ''} />
-            <AvatarFallback className="bg-primary text-primary-foreground font-black">
-              {user.email?.charAt(0).toUpperCase() || <UserIcon className="h-4 w-4" />}
-            </AvatarFallback>
-          </Avatar>
-          <div className="flex flex-col">
-            <span className="text-sm font-black text-primary leading-none mb-1">{user.displayName || 'Editor SnipGeek'}</span>
-            <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-tight">{user.email}</span>
+  // --- USER IS LOGGED IN OR TOOL IS PUBLIC ---
+
+  const renderHeader = () => {
+    if (isPublic && !user) {
+      // Public view without login, don't show user info
+      return null;
+    }
+    if (user) {
+      // Logged-in view
+      return (
+        <div className="flex flex-col md:flex-row items-center justify-between gap-4 p-4 bg-muted/30 backdrop-blur-sm rounded-2xl border border-primary/5 shadow-inner">
+          <div className="flex items-center gap-3">
+            <Avatar className="h-10 w-10 border-2 border-background shadow-md">
+              <AvatarImage src={user.photoURL || ''} />
+              <AvatarFallback className="bg-primary text-primary-foreground font-black">
+                {user.email?.charAt(0).toUpperCase() || <UserIcon className="h-4 w-4" />}
+              </AvatarFallback>
+            </Avatar>
+            <div className="flex flex-col">
+              <span className="text-sm font-black text-primary leading-none mb-1">{user.displayName || 'Editor SnipGeek'}</span>
+              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-tight">{user.email}</span>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+              <Badge variant="outline" className="hidden sm:inline-flex text-[8px] font-black uppercase border-primary/10 bg-background/50 text-emerald-500">
+                <CheckCircle2 className="mr-1 h-2 w-2" /> Authorized
+              </Badge>
+              <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={handleLogout}
+                  className="text-[10px] font-black uppercase tracking-widest text-destructive hover:bg-destructive/10 hover:text-destructive rounded-full h-9 px-6 transition-all active:scale-95"
+              >
+                  <LogOut className="mr-2 h-3.5 w-3.5" />
+                  Logout
+              </Button>
           </div>
         </div>
-        <div className="flex items-center gap-2">
-            <Badge variant="outline" className="hidden sm:inline-flex text-[8px] font-black uppercase border-primary/10 bg-background/50 text-emerald-500">
-              <CheckCircle2 className="mr-1 h-2 w-2" /> Authorized
-            </Badge>
-            <Button 
-                variant="ghost" 
-                size="sm" 
-                onClick={handleLogout}
-                className="text-[10px] font-black uppercase tracking-widest text-destructive hover:bg-destructive/10 hover:text-destructive rounded-full h-9 px-6 transition-all active:scale-95"
-            >
-                <LogOut className="mr-2 h-3.5 w-3.5" />
-                Logout
-            </Button>
-        </div>
-      </div>
+      );
+    }
+    return null;
+  };
+
+  return (
+    <div className="space-y-8 animate-in fade-in duration-700">
+      {renderHeader()}
 
       <header className="text-center space-y-3">
         <h1 className="font-headline text-5xl font-extrabold tracking-tighter text-primary md:text-6xl">
