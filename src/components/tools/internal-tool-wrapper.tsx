@@ -59,7 +59,6 @@ export function InternalToolWrapper({ children, title, description, dictionary, 
     );
   }
 
-  // Blocker: Only show the "System Not Ready" screen for PRIVATE tools if Firebase is not initialized
   if (!isFirebaseInitialized && !isPublic) {
     return (
       <div className="max-w-2xl mx-auto py-12 px-4 animate-in fade-in duration-700">
@@ -126,7 +125,6 @@ export function InternalToolWrapper({ children, title, description, dictionary, 
     );
   }
 
-  // Login Wall: If tool is private and user is not logged in
   if (!isPublic && !user) {
     return (
       <div className="max-w-md mx-auto animate-in fade-in zoom-in-95 duration-500">
@@ -158,7 +156,6 @@ export function InternalToolWrapper({ children, title, description, dictionary, 
 
   return (
     <div className="space-y-8 animate-in fade-in duration-700">
-      {/* Small warning for public tools only if Firebase is missing */}
       {!isFirebaseInitialized && isPublic && (
         <div className="p-4 bg-amber-500/10 border-l-4 border-amber-500 rounded-lg text-amber-700">
           <div className="flex items-center gap-3">
