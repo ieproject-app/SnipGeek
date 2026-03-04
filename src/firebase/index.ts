@@ -1,46 +1,7 @@
 
 'use client';
 
-import { firebaseConfig, isFirebaseConfigValid } from '@/firebase/config';
-import { initializeApp, getApps, getApp, FirebaseApp } from 'firebase/app';
-import { getAuth, Auth } from 'firebase/auth';
-import { getFirestore, Firestore } from 'firebase/firestore';
-
-export interface FirebaseServices {
-  firebaseApp: FirebaseApp | null;
-  auth: Auth | null;
-  firestore: Firestore | null;
-}
-
-/**
- * Initializes Firebase and returns an object with the SDK instances.
- * Dibuat sangat defensif agar tidak menyebabkan Internal Server Error (ISE).
- */
-export function initializeFirebase(): FirebaseServices {
-  try {
-    let firebaseApp: FirebaseApp | null = null;
-
-    if (getApps().length > 0) {
-      firebaseApp = getApp();
-    } else if (isFirebaseConfigValid()) {
-      firebaseApp = initializeApp(firebaseConfig);
-    }
-
-    if (!firebaseApp) {
-      return { firebaseApp: null, auth: null, firestore: null };
-    }
-
-    return {
-      firebaseApp,
-      auth: getAuth(firebaseApp),
-      firestore: getFirestore(firebaseApp)
-    };
-  } catch (error) {
-    // Gagal inisialisasi tidak boleh mematikan seluruh app
-    return { firebaseApp: null, auth: null, firestore: null };
-  }
-}
-
+export * from './config';
 export * from './provider';
 export * from './client-provider';
 export * from './firestore/use-collection';

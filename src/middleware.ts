@@ -13,10 +13,10 @@ function getPreferredLocale(request: NextRequest): Locale {
   // 2. If no cookie, check the 'Accept-Language' header
   const headers: Record<string, string> = {};
   request.headers.forEach((value, key) => (headers[key] = value));
-  
+
   // @ts-ignore Negotiator can handle the headers object
   const languages = new Negotiator({ headers }).languages();
-  
+
   try {
     return matchLocale(languages, i18n.locales as string[], i18n.defaultLocale) as Locale;
   } catch (e) {
@@ -32,11 +32,11 @@ export function middleware(request: NextRequest) {
   if (
     pathname.startsWith('/api') ||
     pathname.startsWith('/_next') ||
-    pathname.includes('.') 
+    pathname.includes('.')
   ) {
     return NextResponse.next();
   }
-  
+
   const pathnameIsMissingLocale = i18n.locales.every(
     (locale) => !pathname.startsWith(`/${locale}/`) && pathname !== `/${locale}`
   );
@@ -44,7 +44,7 @@ export function middleware(request: NextRequest) {
   // If the path is missing a locale, decide to rewrite or redirect.
   if (pathnameIsMissingLocale) {
     const locale = getPreferredLocale(request);
-    
+
     // For the default locale, we rewrite the URL to keep it clean (e.g., /about).
     if (locale === i18n.defaultLocale) {
       return NextResponse.rewrite(
@@ -57,7 +57,7 @@ export function middleware(request: NextRequest) {
       new URL(`/${locale}${pathname.startsWith('/') ? '' : '/'}${pathname}`, request.url)
     );
   }
-  
+
   return NextResponse.next();
 }
 
