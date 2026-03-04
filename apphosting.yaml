@@ -2,7 +2,7 @@
 kind: "AppHostingYaml"
 schemaVersion: "v1"
 
-# Memberitahu Firebase untuk mengambil variabel ini dari dashboard saat merakit website
+# Memaksa Firebase untuk mengambil variabel dari Dashboard selama proses Build (Next.js)
 env:
   - variable: NEXT_PUBLIC_FIREBASE_API_KEY
     availability: ["BUILD", "RUNTIME"]
