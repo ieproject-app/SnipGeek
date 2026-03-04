@@ -1,6 +1,7 @@
+
 'use client';
 
-import { firebaseConfig, isFirebaseConfigValid } from '@/firebase/config';
+import { firebaseConfig, isFirebaseConfigValid } from './config';
 import { initializeApp, getApps, getApp, FirebaseApp } from 'firebase/app';
 import { getAuth, Auth } from 'firebase/auth';
 import { getFirestore, Firestore } from 'firebase/firestore';
@@ -38,7 +39,9 @@ export function initializeFirebase(): FirebaseServices {
   }
 }
 
+// Export config-related variables
 export * from './config';
+// Export components and hooks
 export * from './provider';
 export * from './client-provider';
 export * from './firestore/use-collection';
