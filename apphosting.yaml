@@ -1,11 +1,25 @@
-
-kind: "apphosting.yaml"
 version: "v1"
+runConfig:
+  cpu: 1
+  memoryMiB: 512
 
-# Menjelaskan kepada Firebase App Hosting variabel apa saja yang harus dibawa
-# saat proses perakitan (Build) agar Next.js bisa membacanya.
 env:
   - variable: NEXT_PUBLIC_FIREBASE_API_KEY
+    availability:
+      - BUILD
+      - RUNTIME
+
   - variable: NEXT_PUBLIC_FIREBASE_PROJECT_ID
+    availability:
+      - BUILD
+      - RUNTIME
+
   - variable: NEXT_PUBLIC_FIREBASE_APP_ID
+    availability:
+      - BUILD
+      - RUNTIME
+
   - variable: NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN
+    availability:
+      - BUILD
+      - RUNTIME
