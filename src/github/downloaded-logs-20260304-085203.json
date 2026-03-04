@@ -1,0 +1,662 @@
+[
+  {
+    "textPayload": "starting build \"eb89de64-aca8-4751-9457-01f810beaeeb\"\n",
+    "insertId": "eb89de64-aca8-4751-9457-01f810beaeeb-0",
+    "resource": {
+      "type": "build",
+      "labels": {
+        "project_id": "studio-8697076532-14512",
+        "build_id": "eb89de64-aca8-4751-9457-01f810beaeeb",
+        "build_trigger_id": ""
+      }
+    },
+    "timestamp": "2026-03-04T01:50:24.537583938Z",
+    "severity": "INFO",
+    "labels": {
+      "build_step": "MAIN",
+      "build_tags": "fah,build-2026-03-04-002,studio,d3a356c280a05ae8a6be700d085b6b9c1b2d706e,p-fah,r-nodejs,b-nodejs_20260220a_RC00,bt-LIFECYCLE"
+    },
+    "logName": "projects/studio-8697076532-14512/logs/cloudbuild",
+    "receiveTimestamp": "2026-03-04T01:50:24.854004931Z"
+  },
+  {
+    "textPayload": "FETCHSOURCE",
+    "insertId": "eb89de64-aca8-4751-9457-01f810beaeeb-1",
+    "resource": {
+      "type": "build",
+      "labels": {
+        "project_id": "studio-8697076532-14512",
+        "build_trigger_id": "",
+        "build_id": "eb89de64-aca8-4751-9457-01f810beaeeb"
+      }
+    },
+    "timestamp": "2026-03-04T01:50:24.537659874Z",
+    "severity": "INFO",
+    "labels": {
+      "build_step": "MAIN",
+      "build_tags": "fah,build-2026-03-04-002,studio,d3a356c280a05ae8a6be700d085b6b9c1b2d706e,p-fah,r-nodejs,b-nodejs_20260220a_RC00,bt-LIFECYCLE"
+    },
+    "logName": "projects/studio-8697076532-14512/logs/cloudbuild",
+    "receiveTimestamp": "2026-03-04T01:50:24.854004931Z"
+  },
+  {
+    "textPayload": "From https://github.com/ieproject-app/SnipGeek",
+    "insertId": "eb89de64-aca8-4751-9457-01f810beaeeb-2",
+    "resource": {
+      "type": "build",
+      "labels": {
+        "project_id": "studio-8697076532-14512",
+        "build_id": "eb89de64-aca8-4751-9457-01f810beaeeb",
+        "build_trigger_id": ""
+      }
+    },
+    "timestamp": "2026-03-04T01:50:26.482102847Z",
+    "severity": "INFO",
+    "labels": {
+      "build_tags": "fah,build-2026-03-04-002,studio,d3a356c280a05ae8a6be700d085b6b9c1b2d706e,p-fah,r-nodejs,b-nodejs_20260220a_RC00,bt-LIFECYCLE",
+      "build_step": "gsutil:STDERR"
+    },
+    "logName": "projects/studio-8697076532-14512/logs/cloudbuild",
+    "receiveTimestamp": "2026-03-04T01:50:25.845476309Z"
+  },
+  {
+    "textPayload": " * branch            d3a356c280a05ae8a6be700d085b6b9c1b2d706e -> FETCH_HEAD",
+    "insertId": "eb89de64-aca8-4751-9457-01f810beaeeb-3",
+    "resource": {
+      "type": "build",
+      "labels": {
+        "build_trigger_id": "",
+        "build_id": "eb89de64-aca8-4751-9457-01f810beaeeb",
+        "project_id": "studio-8697076532-14512"
+      }
+    },
+    "timestamp": "2026-03-04T01:50:26.482119971Z",
+    "severity": "INFO",
+    "labels": {
+      "build_tags": "fah,build-2026-03-04-002,studio,d3a356c280a05ae8a6be700d085b6b9c1b2d706e,p-fah,r-nodejs,b-nodejs_20260220a_RC00,bt-LIFECYCLE",
+      "build_step": "gsutil:STDERR"
+    },
+    "logName": "projects/studio-8697076532-14512/logs/cloudbuild",
+    "receiveTimestamp": "2026-03-04T01:50:25.845476309Z"
+  },
+  {
+    "textPayload": "HEAD is now at d3a356c fix(firebase): Use FIREBASE_WEBAPP_CONFIG for client-side init",
+    "insertId": "eb89de64-aca8-4751-9457-01f810beaeeb-4",
+    "resource": {
+      "type": "build",
+      "labels": {
+        "build_id": "eb89de64-aca8-4751-9457-01f810beaeeb",
+        "build_trigger_id": "",
+        "project_id": "studio-8697076532-14512"
+      }
+    },
+    "timestamp": "2026-03-04T01:50:26.554991906Z",
+    "severity": "INFO",
+    "labels": {
+      "build_step": "gsutil:STDOUT",
+      "build_tags": "fah,build-2026-03-04-002,studio,d3a356c280a05ae8a6be700d085b6b9c1b2d706e,p-fah,r-nodejs,b-nodejs_20260220a_RC00,bt-LIFECYCLE"
+    },
+    "logName": "projects/studio-8697076532-14512/logs/cloudbuild",
+    "receiveTimestamp": "2026-03-04T01:50:26.839690933Z"
+  },
+  {
+    "textPayload": "GitCommit:",
+    "insertId": "eb89de64-aca8-4751-9457-01f810beaeeb-5",
+    "resource": {
+      "type": "build",
+      "labels": {
+        "build_id": "eb89de64-aca8-4751-9457-01f810beaeeb",
+        "build_trigger_id": "",
+        "project_id": "studio-8697076532-14512"
+      }
+    },
+    "timestamp": "2026-03-04T01:50:26.556190014Z",
+    "severity": "INFO",
+    "labels": {
+      "build_step": "gsutil:STDOUT",
+      "build_tags": "fah,build-2026-03-04-002,studio,d3a356c280a05ae8a6be700d085b6b9c1b2d706e,p-fah,r-nodejs,b-nodejs_20260220a_RC00,bt-LIFECYCLE"
+    },
+    "logName": "projects/studio-8697076532-14512/logs/cloudbuild",
+    "receiveTimestamp": "2026-03-04T01:50:26.839690933Z"
+  },
+  {
+    "textPayload": "d3a356c280a05ae8a6be700d085b6b9c1b2d706e",
+    "insertId": "eb89de64-aca8-4751-9457-01f810beaeeb-6",
+    "resource": {
+      "type": "build",
+      "labels": {
+        "build_trigger_id": "",
+        "build_id": "eb89de64-aca8-4751-9457-01f810beaeeb",
+        "project_id": "studio-8697076532-14512"
+      }
+    },
+    "timestamp": "2026-03-04T01:50:26.558281953Z",
+    "severity": "INFO",
+    "labels": {
+      "build_tags": "fah,build-2026-03-04-002,studio,d3a356c280a05ae8a6be700d085b6b9c1b2d706e,p-fah,r-nodejs,b-nodejs_20260220a_RC00,bt-LIFECYCLE",
+      "build_step": "gsutil:STDOUT"
+    },
+    "logName": "projects/studio-8697076532-14512/logs/cloudbuild",
+    "receiveTimestamp": "2026-03-04T01:50:26.839690933Z"
+  },
+  {
+    "textPayload": "BUILD",
+    "insertId": "eb89de64-aca8-4751-9457-01f810beaeeb-7",
+    "resource": {
+      "type": "build",
+      "labels": {
+        "build_id": "eb89de64-aca8-4751-9457-01f810beaeeb",
+        "build_trigger_id": "",
+        "project_id": "studio-8697076532-14512"
+      }
+    },
+    "timestamp": "2026-03-04T01:50:26.799823519Z",
+    "severity": "INFO",
+    "labels": {
+      "build_step": "MAIN",
+      "build_tags": "fah,build-2026-03-04-002,studio,d3a356c280a05ae8a6be700d085b6b9c1b2d706e,p-fah,r-nodejs,b-nodejs_20260220a_RC00,bt-LIFECYCLE"
+    },
+    "logName": "projects/studio-8697076532-14512/logs/cloudbuild",
+    "receiveTimestamp": "2026-03-04T01:50:26.839690933Z"
+  },
+  {
+    "textPayload": "Starting Step #0 - \"ubuntu\"",
+    "insertId": "eb89de64-aca8-4751-9457-01f810beaeeb-8",
+    "resource": {
+      "type": "build",
+      "labels": {
+        "project_id": "studio-8697076532-14512",
+        "build_id": "eb89de64-aca8-4751-9457-01f810beaeeb",
+        "build_trigger_id": ""
+      }
+    },
+    "timestamp": "2026-03-04T01:50:27.410126256Z",
+    "severity": "INFO",
+    "labels": {
+      "build_tags": "fah,build-2026-03-04-002,studio,d3a356c280a05ae8a6be700d085b6b9c1b2d706e,p-fah,r-nodejs,b-nodejs_20260220a_RC00,bt-LIFECYCLE",
+      "build_step": "MAIN"
+    },
+    "logName": "projects/studio-8697076532-14512/logs/cloudbuild",
+    "receiveTimestamp": "2026-03-04T01:50:26.839690933Z"
+  },
+  {
+    "textPayload": "Step #0 - \"ubuntu\": Already have image (with digest): gcr.io/cloud-builders/gcloud",
+    "insertId": "eb89de64-aca8-4751-9457-01f810beaeeb-9",
+    "resource": {
+      "type": "build",
+      "labels": {
+        "project_id": "studio-8697076532-14512",
+        "build_id": "eb89de64-aca8-4751-9457-01f810beaeeb",
+        "build_trigger_id": ""
+      }
+    },
+    "timestamp": "2026-03-04T01:50:27.415970452Z",
+    "severity": "INFO",
+    "labels": {
+      "build_step": "Step #0 - \"ubuntu\"",
+      "build_tags": "fah,build-2026-03-04-002,studio,d3a356c280a05ae8a6be700d085b6b9c1b2d706e,p-fah,r-nodejs,b-nodejs_20260220a_RC00,bt-LIFECYCLE"
+    },
+    "logName": "projects/studio-8697076532-14512/logs/cloudbuild",
+    "receiveTimestamp": "2026-03-04T01:50:26.839690933Z"
+  },
+  {
+    "textPayload": "Finished Step #0 - \"ubuntu\"",
+    "insertId": "eb89de64-aca8-4751-9457-01f810beaeeb-10",
+    "resource": {
+      "type": "build",
+      "labels": {
+        "project_id": "studio-8697076532-14512",
+        "build_trigger_id": "",
+        "build_id": "eb89de64-aca8-4751-9457-01f810beaeeb"
+      }
+    },
+    "timestamp": "2026-03-04T01:50:28.271319880Z",
+    "severity": "INFO",
+    "labels": {
+      "build_step": "MAIN",
+      "build_tags": "fah,build-2026-03-04-002,studio,d3a356c280a05ae8a6be700d085b6b9c1b2d706e,p-fah,r-nodejs,b-nodejs_20260220a_RC00,bt-LIFECYCLE"
+    },
+    "logName": "projects/studio-8697076532-14512/logs/cloudbuild",
+    "receiveTimestamp": "2026-03-04T01:50:27.854282938Z"
+  },
+  {
+    "textPayload": "Starting Step #1 - \"preparer\"",
+    "insertId": "eb89de64-aca8-4751-9457-01f810beaeeb-11",
+    "resource": {
+      "type": "build",
+      "labels": {
+        "build_trigger_id": "",
+        "build_id": "eb89de64-aca8-4751-9457-01f810beaeeb",
+        "project_id": "studio-8697076532-14512"
+      }
+    },
+    "timestamp": "2026-03-04T01:50:28.271551107Z",
+    "severity": "INFO",
+    "labels": {
+      "build_tags": "fah,build-2026-03-04-002,studio,d3a356c280a05ae8a6be700d085b6b9c1b2d706e,p-fah,r-nodejs,b-nodejs_20260220a_RC00,bt-LIFECYCLE",
+      "build_step": "MAIN"
+    },
+    "logName": "projects/studio-8697076532-14512/logs/cloudbuild",
+    "receiveTimestamp": "2026-03-04T01:50:27.854282938Z"
+  },
+  {
+    "textPayload": "Step #1 - \"preparer\": Pulling image: us-central1-docker.pkg.dev/serverless-runtimes/utilities/preparer:base_20260130_18_04_RC00",
+    "insertId": "eb89de64-aca8-4751-9457-01f810beaeeb-12",
+    "resource": {
+      "type": "build",
+      "labels": {
+        "build_trigger_id": "",
+        "build_id": "eb89de64-aca8-4751-9457-01f810beaeeb",
+        "project_id": "studio-8697076532-14512"
+      }
+    },
+    "timestamp": "2026-03-04T01:50:28.272449796Z",
+    "severity": "INFO",
+    "labels": {
+      "build_step": "Step #1 - \"preparer\"",
+      "build_tags": "fah,build-2026-03-04-002,studio,d3a356c280a05ae8a6be700d085b6b9c1b2d706e,p-fah,r-nodejs,b-nodejs_20260220a_RC00,bt-LIFECYCLE"
+    },
+    "logName": "projects/studio-8697076532-14512/logs/cloudbuild",
+    "receiveTimestamp": "2026-03-04T01:50:27.854282938Z"
+  },
+  {
+    "textPayload": "Step #1 - \"preparer\": base_20260130_18_04_RC00: Pulling from serverless-runtimes/utilities/preparer",
+    "insertId": "eb89de64-aca8-4751-9457-01f810beaeeb-13",
+    "resource": {
+      "type": "build",
+      "labels": {
+        "project_id": "studio-8697076532-14512",
+        "build_trigger_id": "",
+        "build_id": "eb89de64-aca8-4751-9457-01f810beaeeb"
+      }
+    },
+    "timestamp": "2026-03-04T01:50:29.159516868Z",
+    "severity": "INFO",
+    "labels": {
+      "build_step": "Step #1 - \"preparer\"",
+      "build_tags": "fah,build-2026-03-04-002,studio,d3a356c280a05ae8a6be700d085b6b9c1b2d706e,p-fah,r-nodejs,b-nodejs_20260220a_RC00,bt-LIFECYCLE"
+    },
+    "logName": "projects/studio-8697076532-14512/logs/cloudbuild",
+    "receiveTimestamp": "2026-03-04T01:50:28.838391740Z"
+  },
+  {
+    "textPayload": "Step #1 - \"preparer\": 7bd52cab96b1: Pulling fs layer",
+    "insertId": "eb89de64-aca8-4751-9457-01f810beaeeb-14",
+    "resource": {
+      "type": "build",
+      "labels": {
+        "project_id": "studio-8697076532-14512",
+        "build_trigger_id": "",
+        "build_id": "eb89de64-aca8-4751-9457-01f810beaeeb"
+      }
+    },
+    "timestamp": "2026-03-04T01:50:29.159570635Z",
+    "severity": "INFO",
+    "labels": {
+      "build_tags": "fah,build-2026-03-04-002,studio,d3a356c280a05ae8a6be700d085b6b9c1b2d706e,p-fah,r-nodejs,b-nodejs_20260220a_RC00,bt-LIFECYCLE",
+      "build_step": "Step #1 - \"preparer\""
+    },
+    "logName": "projects/studio-8697076532-14512/logs/cloudbuild",
+    "receiveTimestamp": "2026-03-04T01:50:28.838391740Z"
+  },
+  {
+    "textPayload": "Step #1 - \"preparer\": 7bd52cab96b1: Verifying Checksum",
+    "insertId": "eb89de64-aca8-4751-9457-01f810beaeeb-15",
+    "resource": {
+      "type": "build",
+      "labels": {
+        "project_id": "studio-8697076532-14512",
+        "build_id": "eb89de64-aca8-4751-9457-01f810beaeeb",
+        "build_trigger_id": ""
+      }
+    },
+    "timestamp": "2026-03-04T01:50:30.466395460Z",
+    "severity": "INFO",
+    "labels": {
+      "build_step": "Step #1 - \"preparer\"",
+      "build_tags": "fah,build-2026-03-04-002,studio,d3a356c280a05ae8a6be700d085b6b9c1b2d706e,p-fah,r-nodejs,b-nodejs_20260220a_RC00,bt-LIFECYCLE"
+    },
+    "logName": "projects/studio-8697076532-14512/logs/cloudbuild",
+    "receiveTimestamp": "2026-03-04T01:50:29.845439376Z"
+  },
+  {
+    "textPayload": "Step #1 - \"preparer\": 7bd52cab96b1: Download complete",
+    "insertId": "eb89de64-aca8-4751-9457-01f810beaeeb-16",
+    "resource": {
+      "type": "build",
+      "labels": {
+        "project_id": "studio-8697076532-14512",
+        "build_trigger_id": "",
+        "build_id": "eb89de64-aca8-4751-9457-01f810beaeeb"
+      }
+    },
+    "timestamp": "2026-03-04T01:50:30.466407835Z",
+    "severity": "INFO",
+    "labels": {
+      "build_tags": "fah,build-2026-03-04-002,studio,d3a356c280a05ae8a6be700d085b6b9c1b2d706e,p-fah,r-nodejs,b-nodejs_20260220a_RC00,bt-LIFECYCLE",
+      "build_step": "Step #1 - \"preparer\""
+    },
+    "logName": "projects/studio-8697076532-14512/logs/cloudbuild",
+    "receiveTimestamp": "2026-03-04T01:50:29.845439376Z"
+  },
+  {
+    "textPayload": "Step #1 - \"preparer\": 7bd52cab96b1: Pull complete",
+    "insertId": "eb89de64-aca8-4751-9457-01f810beaeeb-17",
+    "resource": {
+      "type": "build",
+      "labels": {
+        "project_id": "studio-8697076532-14512",
+        "build_id": "eb89de64-aca8-4751-9457-01f810beaeeb",
+        "build_trigger_id": ""
+      }
+    },
+    "timestamp": "2026-03-04T01:50:34.516428875Z",
+    "severity": "INFO",
+    "labels": {
+      "build_tags": "fah,build-2026-03-04-002,studio,d3a356c280a05ae8a6be700d085b6b9c1b2d706e,p-fah,r-nodejs,b-nodejs_20260220a_RC00,bt-LIFECYCLE",
+      "build_step": "Step #1 - \"preparer\""
+    },
+    "logName": "projects/studio-8697076532-14512/logs/cloudbuild",
+    "receiveTimestamp": "2026-03-04T01:50:33.838548785Z"
+  },
+  {
+    "textPayload": "Step #1 - \"preparer\": Digest: sha256:f54bf3bf700d4edae8a482da8431cfc540732beb53b5fddd0f85213518f381bf",
+    "insertId": "eb89de64-aca8-4751-9457-01f810beaeeb-18",
+    "resource": {
+      "type": "build",
+      "labels": {
+        "project_id": "studio-8697076532-14512",
+        "build_trigger_id": "",
+        "build_id": "eb89de64-aca8-4751-9457-01f810beaeeb"
+      }
+    },
+    "timestamp": "2026-03-04T01:50:34.526680728Z",
+    "severity": "INFO",
+    "labels": {
+      "build_tags": "fah,build-2026-03-04-002,studio,d3a356c280a05ae8a6be700d085b6b9c1b2d706e,p-fah,r-nodejs,b-nodejs_20260220a_RC00,bt-LIFECYCLE",
+      "build_step": "Step #1 - \"preparer\""
+    },
+    "logName": "projects/studio-8697076532-14512/logs/cloudbuild",
+    "receiveTimestamp": "2026-03-04T01:50:33.838548785Z"
+  },
+  {
+    "textPayload": "Step #1 - \"preparer\": Status: Downloaded newer image for us-central1-docker.pkg.dev/serverless-runtimes/utilities/preparer:base_20260130_18_04_RC00",
+    "insertId": "eb89de64-aca8-4751-9457-01f810beaeeb-19",
+    "resource": {
+      "type": "build",
+      "labels": {
+        "build_trigger_id": "",
+        "build_id": "eb89de64-aca8-4751-9457-01f810beaeeb",
+        "project_id": "studio-8697076532-14512"
+      }
+    },
+    "timestamp": "2026-03-04T01:50:34.531630127Z",
+    "severity": "INFO",
+    "labels": {
+      "build_tags": "fah,build-2026-03-04-002,studio,d3a356c280a05ae8a6be700d085b6b9c1b2d706e,p-fah,r-nodejs,b-nodejs_20260220a_RC00,bt-LIFECYCLE",
+      "build_step": "Step #1 - \"preparer\""
+    },
+    "logName": "projects/studio-8697076532-14512/logs/cloudbuild",
+    "receiveTimestamp": "2026-03-04T01:50:33.838548785Z"
+  },
+  {
+    "textPayload": "Step #1 - \"preparer\": us-central1-docker.pkg.dev/serverless-runtimes/utilities/preparer:base_20260130_18_04_RC00",
+    "insertId": "eb89de64-aca8-4751-9457-01f810beaeeb-20",
+    "resource": {
+      "type": "build",
+      "labels": {
+        "project_id": "studio-8697076532-14512",
+        "build_id": "eb89de64-aca8-4751-9457-01f810beaeeb",
+        "build_trigger_id": ""
+      }
+    },
+    "timestamp": "2026-03-04T01:50:34.535200734Z",
+    "severity": "INFO",
+    "labels": {
+      "build_tags": "fah,build-2026-03-04-002,studio,d3a356c280a05ae8a6be700d085b6b9c1b2d706e,p-fah,r-nodejs,b-nodejs_20260220a_RC00,bt-LIFECYCLE",
+      "build_step": "Step #1 - \"preparer\""
+    },
+    "logName": "projects/studio-8697076532-14512/logs/cloudbuild",
+    "receiveTimestamp": "2026-03-04T01:50:33.838548785Z"
+  },
+  {
+    "textPayload": "Step #1 - \"preparer\": --------------------------------------------------------------------------------",
+    "insertId": "eb89de64-aca8-4751-9457-01f810beaeeb-21",
+    "resource": {
+      "type": "build",
+      "labels": {
+        "build_id": "eb89de64-aca8-4751-9457-01f810beaeeb",
+        "build_trigger_id": "",
+        "project_id": "studio-8697076532-14512"
+      }
+    },
+    "timestamp": "2026-03-04T01:50:36.164326577Z",
+    "severity": "INFO",
+    "labels": {
+      "build_step": "Step #1 - \"preparer\"",
+      "build_tags": "fah,build-2026-03-04-002,studio,d3a356c280a05ae8a6be700d085b6b9c1b2d706e,p-fah,r-nodejs,b-nodejs_20260220a_RC00,bt-LIFECYCLE"
+    },
+    "logName": "projects/studio-8697076532-14512/logs/cloudbuild",
+    "receiveTimestamp": "2026-03-04T01:50:35.842095369Z"
+  },
+  {
+    "textPayload": "Step #1 - \"preparer\": {\"reason\":\"Invalid apphosting.yaml\",\"code\":\"fah/invalid-apphosting-yaml\",\"userFacingMessage\":\"Your apphosting.yaml file at path '/workspace/apphosting.yaml' is not formatted properly. Please see https://firebase.google.com/docs/app-hosting/configure#apphosting-yaml for guidance on how to format your apphosting.yaml file.\",\"rawLog\":\"either 'value' or 'secret' field is required\",\"isUserAttributed\":true}",
+    "insertId": "eb89de64-aca8-4751-9457-01f810beaeeb-22",
+    "resource": {
+      "type": "build",
+      "labels": {
+        "project_id": "studio-8697076532-14512",
+        "build_trigger_id": "",
+        "build_id": "eb89de64-aca8-4751-9457-01f810beaeeb"
+      }
+    },
+    "timestamp": "2026-03-04T01:50:36.164339219Z",
+    "severity": "INFO",
+    "labels": {
+      "build_step": "Step #1 - \"preparer\"",
+      "build_tags": "fah,build-2026-03-04-002,studio,d3a356c280a05ae8a6be700d085b6b9c1b2d706e,p-fah,r-nodejs,b-nodejs_20260220a_RC00,bt-LIFECYCLE"
+    },
+    "logName": "projects/studio-8697076532-14512/logs/cloudbuild",
+    "receiveTimestamp": "2026-03-04T01:50:35.842095369Z"
+  },
+  {
+    "textPayload": "Step #1 - \"preparer\": --------------------------------------------------------------------------------",
+    "insertId": "eb89de64-aca8-4751-9457-01f810beaeeb-23",
+    "resource": {
+      "type": "build",
+      "labels": {
+        "build_trigger_id": "",
+        "build_id": "eb89de64-aca8-4751-9457-01f810beaeeb",
+        "project_id": "studio-8697076532-14512"
+      }
+    },
+    "timestamp": "2026-03-04T01:50:36.164340740Z",
+    "severity": "INFO",
+    "labels": {
+      "build_tags": "fah,build-2026-03-04-002,studio,d3a356c280a05ae8a6be700d085b6b9c1b2d706e,p-fah,r-nodejs,b-nodejs_20260220a_RC00,bt-LIFECYCLE",
+      "build_step": "Step #1 - \"preparer\""
+    },
+    "logName": "projects/studio-8697076532-14512/logs/cloudbuild",
+    "receiveTimestamp": "2026-03-04T01:50:35.842095369Z"
+  },
+  {
+    "textPayload": "Step #1 - \"preparer\": Sorry your project couldn't be built.",
+    "insertId": "eb89de64-aca8-4751-9457-01f810beaeeb-24",
+    "resource": {
+      "type": "build",
+      "labels": {
+        "project_id": "studio-8697076532-14512",
+        "build_trigger_id": "",
+        "build_id": "eb89de64-aca8-4751-9457-01f810beaeeb"
+      }
+    },
+    "timestamp": "2026-03-04T01:50:36.164341651Z",
+    "severity": "INFO",
+    "labels": {
+      "build_tags": "fah,build-2026-03-04-002,studio,d3a356c280a05ae8a6be700d085b6b9c1b2d706e,p-fah,r-nodejs,b-nodejs_20260220a_RC00,bt-LIFECYCLE",
+      "build_step": "Step #1 - \"preparer\""
+    },
+    "logName": "projects/studio-8697076532-14512/logs/cloudbuild",
+    "receiveTimestamp": "2026-03-04T01:50:35.842095369Z"
+  },
+  {
+    "textPayload": "Step #1 - \"preparer\": Our documentation explains ways to configure Buildpacks to better recognise your project:",
+    "insertId": "eb89de64-aca8-4751-9457-01f810beaeeb-25",
+    "resource": {
+      "type": "build",
+      "labels": {
+        "project_id": "studio-8697076532-14512",
+        "build_id": "eb89de64-aca8-4751-9457-01f810beaeeb",
+        "build_trigger_id": ""
+      }
+    },
+    "timestamp": "2026-03-04T01:50:36.164342917Z",
+    "severity": "INFO",
+    "labels": {
+      "build_tags": "fah,build-2026-03-04-002,studio,d3a356c280a05ae8a6be700d085b6b9c1b2d706e,p-fah,r-nodejs,b-nodejs_20260220a_RC00,bt-LIFECYCLE",
+      "build_step": "Step #1 - \"preparer\""
+    },
+    "logName": "projects/studio-8697076532-14512/logs/cloudbuild",
+    "receiveTimestamp": "2026-03-04T01:50:35.842095369Z"
+  },
+  {
+    "textPayload": "Step #1 - \"preparer\":  -> https://cloud.google.com/docs/buildpacks/overview",
+    "insertId": "eb89de64-aca8-4751-9457-01f810beaeeb-26",
+    "resource": {
+      "type": "build",
+      "labels": {
+        "build_trigger_id": "",
+        "build_id": "eb89de64-aca8-4751-9457-01f810beaeeb",
+        "project_id": "studio-8697076532-14512"
+      }
+    },
+    "timestamp": "2026-03-04T01:50:36.164343588Z",
+    "severity": "INFO",
+    "labels": {
+      "build_step": "Step #1 - \"preparer\"",
+      "build_tags": "fah,build-2026-03-04-002,studio,d3a356c280a05ae8a6be700d085b6b9c1b2d706e,p-fah,r-nodejs,b-nodejs_20260220a_RC00,bt-LIFECYCLE"
+    },
+    "logName": "projects/studio-8697076532-14512/logs/cloudbuild",
+    "receiveTimestamp": "2026-03-04T01:50:35.842095369Z"
+  },
+  {
+    "textPayload": "Step #1 - \"preparer\": If you think you've found an issue, please report it:",
+    "insertId": "eb89de64-aca8-4751-9457-01f810beaeeb-27",
+    "resource": {
+      "type": "build",
+      "labels": {
+        "build_id": "eb89de64-aca8-4751-9457-01f810beaeeb",
+        "build_trigger_id": "",
+        "project_id": "studio-8697076532-14512"
+      }
+    },
+    "timestamp": "2026-03-04T01:50:36.164344190Z",
+    "severity": "INFO",
+    "labels": {
+      "build_tags": "fah,build-2026-03-04-002,studio,d3a356c280a05ae8a6be700d085b6b9c1b2d706e,p-fah,r-nodejs,b-nodejs_20260220a_RC00,bt-LIFECYCLE",
+      "build_step": "Step #1 - \"preparer\""
+    },
+    "logName": "projects/studio-8697076532-14512/logs/cloudbuild",
+    "receiveTimestamp": "2026-03-04T01:50:35.842095369Z"
+  },
+  {
+    "textPayload": "Step #1 - \"preparer\":  -> https://github.com/GoogleCloudPlatform/buildpacks/issues/new",
+    "insertId": "eb89de64-aca8-4751-9457-01f810beaeeb-28",
+    "resource": {
+      "type": "build",
+      "labels": {
+        "build_trigger_id": "",
+        "build_id": "eb89de64-aca8-4751-9457-01f810beaeeb",
+        "project_id": "studio-8697076532-14512"
+      }
+    },
+    "timestamp": "2026-03-04T01:50:36.164373717Z",
+    "severity": "INFO",
+    "labels": {
+      "build_step": "Step #1 - \"preparer\"",
+      "build_tags": "fah,build-2026-03-04-002,studio,d3a356c280a05ae8a6be700d085b6b9c1b2d706e,p-fah,r-nodejs,b-nodejs_20260220a_RC00,bt-LIFECYCLE"
+    },
+    "logName": "projects/studio-8697076532-14512/logs/cloudbuild",
+    "receiveTimestamp": "2026-03-04T01:50:35.842095369Z"
+  },
+  {
+    "textPayload": "Step #1 - \"preparer\": --------------------------------------------------------------------------------",
+    "insertId": "eb89de64-aca8-4751-9457-01f810beaeeb-29",
+    "resource": {
+      "type": "build",
+      "labels": {
+        "project_id": "studio-8697076532-14512",
+        "build_id": "eb89de64-aca8-4751-9457-01f810beaeeb",
+        "build_trigger_id": ""
+      }
+    },
+    "timestamp": "2026-03-04T01:50:36.164374395Z",
+    "severity": "INFO",
+    "labels": {
+      "build_tags": "fah,build-2026-03-04-002,studio,d3a356c280a05ae8a6be700d085b6b9c1b2d706e,p-fah,r-nodejs,b-nodejs_20260220a_RC00,bt-LIFECYCLE",
+      "build_step": "Step #1 - \"preparer\""
+    },
+    "logName": "projects/studio-8697076532-14512/logs/cloudbuild",
+    "receiveTimestamp": "2026-03-04T01:50:35.842095369Z"
+  },
+  {
+    "textPayload": "Finished Step #1 - \"preparer\"",
+    "insertId": "eb89de64-aca8-4751-9457-01f810beaeeb-30",
+    "resource": {
+      "type": "build",
+      "labels": {
+        "build_trigger_id": "",
+        "build_id": "eb89de64-aca8-4751-9457-01f810beaeeb",
+        "project_id": "studio-8697076532-14512"
+      }
+    },
+    "timestamp": "2026-03-04T01:50:36.471568956Z",
+    "severity": "INFO",
+    "labels": {
+      "build_tags": "fah,build-2026-03-04-002,studio,d3a356c280a05ae8a6be700d085b6b9c1b2d706e,p-fah,r-nodejs,b-nodejs_20260220a_RC00,bt-LIFECYCLE",
+      "build_step": "MAIN"
+    },
+    "logName": "projects/studio-8697076532-14512/logs/cloudbuild",
+    "receiveTimestamp": "2026-03-04T01:50:35.842095369Z"
+  },
+  {
+    "textPayload": "ERROR",
+    "insertId": "eb89de64-aca8-4751-9457-01f810beaeeb-31",
+    "resource": {
+      "type": "build",
+      "labels": {
+        "build_id": "eb89de64-aca8-4751-9457-01f810beaeeb",
+        "build_trigger_id": "",
+        "project_id": "studio-8697076532-14512"
+      }
+    },
+    "timestamp": "2026-03-04T01:50:36.471666693Z",
+    "severity": "INFO",
+    "labels": {
+      "build_tags": "fah,build-2026-03-04-002,studio,d3a356c280a05ae8a6be700d085b6b9c1b2d706e,p-fah,r-nodejs,b-nodejs_20260220a_RC00,bt-LIFECYCLE",
+      "build_step": "MAIN"
+    },
+    "logName": "projects/studio-8697076532-14512/logs/cloudbuild",
+    "receiveTimestamp": "2026-03-04T01:50:35.842095369Z"
+  },
+  {
+    "textPayload": "ERROR: build step 1 \"us-central1-docker.pkg.dev/serverless-runtimes/utilities/preparer:base_20260130_18_04_RC00\" failed: step exited with non-zero status: 100",
+    "insertId": "eb89de64-aca8-4751-9457-01f810beaeeb-32",
+    "resource": {
+      "type": "build",
+      "labels": {
+        "project_id": "studio-8697076532-14512",
+        "build_id": "eb89de64-aca8-4751-9457-01f810beaeeb",
+        "build_trigger_id": ""
+      }
+    },
+    "timestamp": "2026-03-04T01:50:36.471687637Z",
+    "severity": "INFO",
+    "labels": {
+      "build_tags": "fah,build-2026-03-04-002,studio,d3a356c280a05ae8a6be700d085b6b9c1b2d706e,p-fah,r-nodejs,b-nodejs_20260220a_RC00,bt-LIFECYCLE",
+      "build_step": "MAIN"
+    },
+    "logName": "projects/studio-8697076532-14512/logs/cloudbuild",
+    "receiveTimestamp": "2026-03-04T01:50:35.842095369Z"
+  }
+]

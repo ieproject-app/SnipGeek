@@ -4,15 +4,7 @@ schemaVersion: "v1"
 
 # Memaksa Firebase untuk mengambil variabel dari Dashboard selama proses Build (Next.js)
 env:
-  - variable: NEXT_PUBLIC_FIREBASE_API_KEY
-    availability: ["BUILD", "RUNTIME"]
-  - variable: NEXT_PUBLIC_FIREBASE_PROJECT_ID
-    availability: ["BUILD", "RUNTIME"]
-  - variable: NEXT_PUBLIC_FIREBASE_APP_ID
-    availability: ["BUILD", "RUNTIME"]
-  - variable: NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN
-    availability: ["BUILD", "RUNTIME"]
-  - variable: NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID
-    availability: ["BUILD", "RUNTIME"]
-  - variable: NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
+  - variable: NEXT_PUBLIC_FIREBASE_WEBAPP_CONFIG
+    # Ambil nilai dari variabel 'super' yang disediakan sistem App Hosting
+    value: "{{.System.FirebaseWebAppConfig}}"
     availability: ["BUILD", "RUNTIME"]
