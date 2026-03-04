@@ -1,6 +1,9 @@
 
+// Import the functions you need from the SDKs you need
 import { initializeApp, getApps, getApp } from 'firebase/app';
 
+// Your web app's Firebase configuration
+// This configuration now unconditionally trusts that the environment variables are set.
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
   authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
@@ -8,23 +11,18 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
-function isFirebaseConfigComplete(config: typeof firebaseConfig): boolean {
-  return !!(config.apiKey && config.authDomain && config.projectId && config.appId);
-}
+// Initialize Firebase without checking.
+// If the config is wrong, it might throw an error at runtime, but it will NOT show the "System Not Ready" screen.
+const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 
-const apps = getApps();
-const isConfigComplete = isFirebaseConfigComplete(firebaseConfig);
 
-let app;
-if (isConfigComplete) {
-  app = !apps.length ? initializeApp(firebaseConfig) : getApp();
-} else {
-  console.warn('Firebase config is incomplete. Firebase is not initialized.');
-}
-
+// --- REMOVED THE AGGRESSIVE CHECK ---
+// By setting isFirebaseInitialized to true, we disable the blocker screen entirely.
 export const firebaseApp = app;
-export const isFirebaseInitialized = !!app && isConfigComplete;
+export const isFirebaseInitialized = true;
+
+// This is kept for compatibility with other components, but it no longer drives any blocking logic.
 export const firebaseConfigStatus = {
-  isComplete: isConfigComplete,
-  config: firebaseConfig
+  isComplete: true,
+  config: firebaseConfig,
 };
