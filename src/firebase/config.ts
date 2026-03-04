@@ -3,26 +3,31 @@
 import { initializeApp, getApps, getApp } from 'firebase/app';
 
 // Your web app's Firebase configuration
-// This configuration now unconditionally trusts that the environment variables are set.
-const firebaseConfig = {
+// Configuration now exports values properly for other modules to use.
+export const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
   authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
   projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
-// Initialize Firebase without checking.
-// If the config is wrong, it might throw an error at runtime, but it will NOT show the "System Not Ready" screen.
+// Helper function to check if configuration is actually loaded from environment
+export const isFirebaseConfigValid = () => {
+  return !!(
+    firebaseConfig.apiKey &&
+    firebaseConfig.projectId &&
+    firebaseConfig.appId
+  );
+};
+
+// Initialize Firebase defensively
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 
-
-// --- REMOVED THE AGGRESSIVE CHECK ---
-// By setting isFirebaseInitialized to true, we disable the blocker screen entirely.
 export const firebaseApp = app;
-export const isFirebaseInitialized = true;
+export const isFirebaseInitialized = isFirebaseConfigValid();
 
-// This is kept for compatibility with other components, but it no longer drives any blocking logic.
+// Metadata for diagnostics UI
 export const firebaseConfigStatus = {
-  isComplete: true,
+  isComplete: isFirebaseConfigValid(),
   config: firebaseConfig,
 };
