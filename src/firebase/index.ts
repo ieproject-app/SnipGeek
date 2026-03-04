@@ -1,4 +1,3 @@
-
 'use client';
 
 import { firebaseConfig, isFirebaseConfigValid } from './config';
@@ -17,29 +16,29 @@ export interface FirebaseServices {
  */
 export function initializeFirebase(): FirebaseServices {
   try {
-    let firebaseApp: FirebaseApp | null = null;
+    let firebaseAppInstance: FirebaseApp | null = null;
 
     if (getApps().length > 0) {
-      firebaseApp = getApp();
+      firebaseAppInstance = getApp();
     } else if (isFirebaseConfigValid()) {
-      firebaseApp = initializeApp(firebaseConfig);
+      firebaseAppInstance = initializeApp(firebaseConfig);
     }
 
-    if (!firebaseApp) {
+    if (!firebaseAppInstance) {
       return { firebaseApp: null, auth: null, firestore: null };
     }
 
     return {
-      firebaseApp,
-      auth: getAuth(firebaseApp),
-      firestore: getFirestore(firebaseApp)
+      firebaseApp: firebaseAppInstance,
+      auth: getAuth(firebaseAppInstance),
+      firestore: getFirestore(firebaseAppInstance)
     };
   } catch (error) {
     return { firebaseApp: null, auth: null, firestore: null };
   }
 }
 
-// Export config-related variables
+// Export everything from config including firebaseConfigStatus
 export * from './config';
 // Export components and hooks
 export * from './provider';
