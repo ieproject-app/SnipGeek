@@ -1,4 +1,3 @@
-
 'use client';
 
 import React from 'react';
@@ -14,7 +13,7 @@ import { useNotification } from '@/hooks/use-notification';
 import type { Dictionary } from '@/lib/get-dictionary';
 
 interface InternalToolWrapperProps {
-  children: React.ReactNode;
+  children: React.Node;
   title: string;
   description: string;
   dictionary: Dictionary;
@@ -24,7 +23,16 @@ export function InternalToolWrapper({ children, title, description, dictionary }
   const { user, isUserLoading } = useUser();
   const auth = useAuth();
   const { notify } = useNotification();
-  const t = dictionary.tools.systemNotReady;
+  
+  // Safety check for dictionary
+  const t = dictionary?.tools?.systemNotReady || {
+    title: "SISTEM BELUM SIAP",
+    description: "Aplikasi belum bisa mendeteksi Kunci API.",
+    connecting: "Menghubungkan...",
+    restrictedAccess: "Akses Terbatas",
+    restrictedDesc: "Tool ini memerlukan login.",
+    loginWithGoogle: "Masuk dengan Google"
+  };
 
   const handleGoogleLogin = () => {
     if (!auth) return;
@@ -35,7 +43,7 @@ export function InternalToolWrapper({ children, title, description, dictionary }
     if (!auth) return;
     try {
       await signOut(auth);
-      notify(dictionary.notifications.logoutSuccess || "Successfully logged out.", <LogOut className="h-4 w-4" />);
+      notify(dictionary?.notifications?.logoutSuccess || "Successfully logged out.", <LogOut className="h-4 w-4" />);
     } catch (error) {
       console.error("Logout error:", error);
     }
@@ -45,12 +53,14 @@ export function InternalToolWrapper({ children, title, description, dictionary }
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
         <Loader2 className="h-10 w-10 animate-spin text-accent" />
-        <p className="text-sm font-bold uppercase tracking-widest text-muted-foreground animate-pulse">{t.connecting}</p>
+        <p className="text-sm font-bold uppercase tracking-widest text-muted-foreground animate-pulse">
+          {t.connecting}
+        </p>
       </div>
     );
   }
 
-  // JIKA AUTH TIDAK ADA (Variabel Environment Belum Aktif di Browser)
+  // JIKA AUTH TIDAK ADA (Konfigurasi belum mengalir ke browser)
   if (!auth) {
     return (
       <div className="max-w-2xl mx-auto py-12 px-4">
@@ -72,8 +82,8 @@ export function InternalToolWrapper({ children, title, description, dictionary }
                     <CheckCircle2 className="h-4 w-4 text-emerald-500" />
                 </div>
                 <div className="space-y-1">
-                    <p className="text-sm font-bold text-primary uppercase tracking-tight">{t.step1}</p>
-                    <p className="text-xs text-muted-foreground">{t.step1Desc}</p>
+                    <p className="text-sm font-bold text-primary uppercase tracking-tight">{(t as any).step1 || "LANGKAH 1"}</p>
+                    <p className="text-xs text-muted-foreground">{(t as any).step1Desc || "Pastikan variabel sudah di-save."}</p>
                 </div>
               </div>
 
@@ -82,24 +92,14 @@ export function InternalToolWrapper({ children, title, description, dictionary }
                     <RefreshCw className="h-4 w-4 text-amber-500" />
                 </div>
                 <div className="space-y-1">
-                    <p className="text-sm font-bold text-primary uppercase tracking-tight">{t.step2}</p>
-                    <p className="text-xs text-muted-foreground">{t.step2Desc}</p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-3">
-                <div className="h-6 w-6 rounded-full bg-blue-500/10 flex items-center justify-center shrink-0 mt-0.5">
-                    <AlertCircle className="h-4 w-4 text-blue-500" />
-                </div>
-                <div className="space-y-1">
-                    <p className="text-sm font-bold text-primary uppercase tracking-tight">{t.step3}</p>
-                    <p className="text-xs text-muted-foreground">{t.step3Desc}</p>
+                    <p className="text-sm font-bold text-primary uppercase tracking-tight">{(t as any).step2 || "LANGKAH 2"}</p>
+                    <p className="text-xs text-muted-foreground">{(t as any).step2Desc || "Klik Start Rollout di dashboard."}</p>
                 </div>
               </div>
             </div>
 
             <p className="text-[10px] text-muted-foreground italic max-w-sm">
-              {t.footer}
+              {(t as any).footer || "Website perlu dirakit ulang agar kunci API bisa terbaca."}
             </p>
           </div>
         </Card>
@@ -153,7 +153,7 @@ export function InternalToolWrapper({ children, title, description, dictionary }
           </div>
         </div>
         <div className="flex items-center gap-2">
-            <Badge variant="outline" className="hidden sm:inline-flex text-[8px] font-black uppercase border-primary/10 bg-background/50">{t.authorized}</Badge>
+            <Badge variant="outline" className="hidden sm:inline-flex text-[8px] font-black uppercase border-primary/10 bg-background/50">Authorized</Badge>
             <Button 
                 variant="ghost" 
                 size="sm" 
@@ -161,7 +161,7 @@ export function InternalToolWrapper({ children, title, description, dictionary }
                 className="text-[10px] font-black uppercase tracking-widest text-destructive hover:bg-destructive/10 hover:text-destructive rounded-full h-9 px-6 transition-all active:scale-95"
             >
                 <LogOut className="mr-2 h-3.5 w-3.5" />
-                {t.logout}
+                Logout
             </Button>
         </div>
       </div>
