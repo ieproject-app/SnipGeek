@@ -7,7 +7,6 @@ import { signOut } from 'firebase/auth';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
 import { 
   Loader2, 
   Chrome, 
@@ -60,7 +59,7 @@ export function InternalToolWrapper({ children, title, description, dictionary, 
     );
   }
 
-  // Blocker: If system is not ready AND it's a private tool
+  // Blocker: Only show the "System Not Ready" screen for PRIVATE tools if Firebase is not initialized
   if (!isFirebaseInitialized && !isPublic) {
     return (
       <div className="max-w-2xl mx-auto py-12 px-4 animate-in fade-in duration-700">
@@ -82,16 +81,21 @@ export function InternalToolWrapper({ children, title, description, dictionary, 
                     { key: 'projectId', label: 'NEXT_PUBLIC_FIREBASE_PROJECT_ID' },
                     { key: 'appId', label: 'NEXT_PUBLIC_FIREBASE_APP_ID' },
                     { key: 'authDomain', label: 'NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN' },
-                ].map((v) => (
-                    <div key={v.key} className="flex items-center justify-between p-3 rounded-xl bg-background border border-border">
-                        <span className="text-[10px] font-mono font-bold text-muted-foreground truncate mr-2">{v.label}</span>
-                        {firebaseConfigStatus.config[v.key as keyof typeof firebaseConfigStatus.config] ? (
-                            <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0" />
-                        ) : (
-                            <AlertTriangle className="h-4 w-4 text-destructive shrink-0" />
-                        )}
-                    </div>
-                ))}
+                ].map((v) => {
+                    const configValue = firebaseConfigStatus.config[v.key as keyof typeof firebaseConfigStatus.config];
+                    const isOk = !!configValue && configValue !== 'undefined';
+                    
+                    return (
+                        <div key={v.key} className="flex items-center justify-between p-3 rounded-xl bg-background border border-border">
+                            <span className="text-[10px] font-mono font-bold text-muted-foreground truncate mr-2">{v.label}</span>
+                            {isOk ? (
+                                <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0" />
+                            ) : (
+                                <AlertTriangle className="h-4 w-4 text-destructive shrink-0" />
+                            )}
+                        </div>
+                    );
+                })}
             </div>
 
             <div className="bg-background/50 p-6 rounded-xl border border-border w-full space-y-4">
@@ -99,7 +103,7 @@ export function InternalToolWrapper({ children, title, description, dictionary, 
                   <div className="h-5 w-5 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">1</div>
                   <div className="space-y-1">
                       <p className="text-[11px] font-bold text-primary uppercase tracking-tight text-left">Cek Dashboard Firebase</p>
-                      <p className="text-[10px] text-muted-foreground leading-relaxed text-left">Pastikan nama variabel di tab <b>Settings -&gt; Environment Variables</b> menggunakan awalan <b>NEXT_PUBLIC_</b> dan di-set ke <b>Build &amp; Runtime</b>.</p>
+                      <p className="text-[10px] text-muted-foreground leading-relaxed text-left">Pastikan nama variabel di tab <b>Settings &gt; Environment Variables</b> menggunakan awalan <b>NEXT_PUBLIC_</b> dan di-set ke <b>Build &amp; Runtime</b>.</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
@@ -144,7 +148,7 @@ export function InternalToolWrapper({ children, title, description, dictionary, 
 
   return (
     <div className="space-y-8 animate-in fade-in duration-700">
-      {/* Small warning for public tools if API is missing */}
+      {/* Small warning for public tools only if Firebase is missing */}
       {!isFirebaseInitialized && isPublic && (
         <div className="p-4 bg-amber-500/10 border-l-4 border-amber-500 rounded-lg text-amber-700">
           <div className="flex items-center gap-3">

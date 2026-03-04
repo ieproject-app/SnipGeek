@@ -1,8 +1,7 @@
-
-// Import the functions you need from the SDKs you need
+// src/firebase/config.ts
 import { initializeApp, getApps, getApp } from 'firebase/app';
 
-// Your web app's Firebase configuration
+// Firebase configuration using environment variables
 export const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
   authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
@@ -19,14 +18,17 @@ export const isFirebaseConfigValid = () => {
   );
 };
 
-// Initialize Firebase defensively
-const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
-
-export const firebaseApp = app;
-export const isFirebaseInitialized = isFirebaseConfigValid();
-
-// Metadata for diagnostics UI
+// Metadata for diagnostics UI - MUST BE EXPORTED
 export const firebaseConfigStatus = {
   isComplete: isFirebaseConfigValid(),
   config: firebaseConfig,
 };
+
+// Initialize Firebase only if config is valid to prevent SDK crashes
+const getInitializedApp = () => {
+  if (!isFirebaseConfigValid()) return null;
+  return !getApps().length ? initializeApp(firebaseConfig) : getApp();
+};
+
+export const firebaseApp = getInitializedApp();
+export const isFirebaseInitialized = !!firebaseApp;
