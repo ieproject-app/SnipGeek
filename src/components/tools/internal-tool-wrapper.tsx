@@ -1,4 +1,3 @@
-
 'use client';
 
 import React from 'react';
@@ -16,14 +15,11 @@ import {
   User as UserIcon, 
   Lock, 
   AlertTriangle, 
-  RefreshCw, 
   CheckCircle2, 
-  Terminal,
   ShieldX
 } from 'lucide-react';
 import { useNotification } from '@/hooks/use-notification';
 import type { Dictionary } from '@/lib/get-dictionary';
-import { Separator } from '@/components/ui/separator';
 
 interface InternalToolWrapperProps {
   children: React.ReactNode;
@@ -37,15 +33,6 @@ export function InternalToolWrapper({ children, title, description, dictionary, 
   const { user, isUserLoading } = useUser();
   const auth = useAuth();
   const { notify } = useNotification();
-
-  const t = dictionary?.tools?.systemNotReady || {
-    title: "SISTEM BELUM SIAP",
-    description: "Next.js tidak menemukan kunci rahasia di dalam website yang sudah dirakit.",
-    connecting: "Menghubungkan...",
-    restrictedAccess: "Akses Terbatas",
-    restrictedDesc: "Tool ini memerlukan login untuk dapat digunakan.",
-    loginWithGoogle: "Masuk dengan Google",
-  };
 
   const handleGoogleLogin = () => {
     if (!auth) return;
@@ -67,63 +54,130 @@ export function InternalToolWrapper({ children, title, description, dictionary, 
       <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
         <Loader2 className="h-10 w-10 animate-spin text-accent" />
         <p className="text-sm font-bold uppercase tracking-widest text-muted-foreground animate-pulse">
-          {t.connecting}
+          Menghubungkan ke Cloud...
         </p>
       </div>
     );
   }
 
-  // BLOCKER: Jika sistem Firebase TIDAK siap SAMA SEKALI, dan tool ini TIDAK publik.
+  // Blocker: If system is not ready AND it's a private tool
   if (!isFirebaseInitialized && !isPublic) {
-    const missingVars = Object.entries(firebaseConfigStatus.config)
-      .filter(([_, value]) => !value)
-      .map(([key]) => `NEXT_PUBLIC_FIREBASE_${key.replace('Id', '_ID').toUpperCase()}`);
-
     return (
       <div className="max-w-2xl mx-auto py-12 px-4 animate-in fade-in duration-700">
         <Card className="border-destructive/20 bg-destructive/[0.02] p-8 rounded-2xl shadow-xl border-t-4 border-t-destructive">
-          {/* ... konten error seperti sebelumnya ... */}
+          <div className="flex flex-col items-center text-center space-y-6">
+            <div className="p-4 bg-destructive/10 rounded-full">
+              <ShieldX className="h-12 w-12 text-destructive" />
+            </div>
+            <div className="space-y-2">
+              <CardTitle className="font-headline text-3xl font-black text-destructive uppercase tracking-tighter">SISTEM BELUM SIAP</CardTitle>
+              <CardDescription className="text-base text-foreground/70">
+                Aplikasi tidak mendeteksi <b>Kunci API Firebase</b>. Tanpa kunci ini, tool internal tidak dapat berkomunikasi dengan database.
+              </CardDescription>
+            </div>
+
+            <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-4 text-left">
+                {[
+                    { key: 'apiKey', label: 'NEXT_PUBLIC_FIREBASE_API_KEY' },
+                    { key: 'projectId', label: 'NEXT_PUBLIC_FIREBASE_PROJECT_ID' },
+                    { key: 'appId', label: 'NEXT_PUBLIC_FIREBASE_APP_ID' },
+                    { key: 'authDomain', label: 'NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN' },
+                ].map((v) => (
+                    <div key={v.key} className="flex items-center justify-between p-3 rounded-xl bg-background border border-border">
+                        <span className="text-[10px] font-mono font-bold text-muted-foreground truncate mr-2">{v.label}</span>
+                        {firebaseConfigStatus.config[v.key as keyof typeof firebaseConfigStatus.config] ? (
+                            <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0" />
+                        ) : (
+                            <AlertTriangle className="h-4 w-4 text-destructive shrink-0" />
+                        )}
+                    </div>
+                ))}
+            </div>
+
+            <div className="bg-background/50 p-6 rounded-xl border border-border w-full space-y-4">
+                <div className="flex items-start gap-3">
+                  <div className="h-5 w-5 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">1</div>
+                  <div className="space-y-1">
+                      <p className="text-[11px] font-bold text-primary uppercase tracking-tight text-left">Cek Dashboard Firebase</p>
+                      <p className="text-[10px] text-muted-foreground leading-relaxed text-left">Pastikan nama variabel di tab <b>Settings -&gt; Environment Variables</b> menggunakan awalan <b>NEXT_PUBLIC_</b> dan di-set ke <b>Build &amp; Runtime</b>.</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="h-5 w-5 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">2</div>
+                  <div className="space-y-1 text-left">
+                      <p className="text-[11px] font-bold text-primary uppercase tracking-tight">Klik Start Rollout</p>
+                      <p className="text-[10px] text-muted-foreground leading-relaxed">Setelah menyimpan variabel, buka tab <b>Rollouts</b> dan klik <b>Start Rollout</b> agar Next.js membungkus variabel tersebut ke dalam kode.</p>
+                  </div>
+                </div>
+            </div>
+          </div>
         </Card>
       </div>
     );
   }
 
-  // LOGIN WALL: Jika tool TIDAK publik dan user BELUM login.
+  // Login Wall: If tool is private and user is not logged in
   if (!isPublic && !user) {
     return (
       <div className="max-w-md mx-auto animate-in fade-in zoom-in-95 duration-500">
         <Card className="text-center mt-8 border-primary/10 bg-card/50 shadow-xl rounded-2xl overflow-hidden">
-          {/* ... konten login seperti sebelumnya ... */}
+          <div className="h-1.5 w-full bg-accent" />
+          <CardHeader className="pt-10 pb-6">
+            <div className="mx-auto p-4 bg-primary/5 rounded-full w-fit mb-4">
+              <Lock className="h-10 w-10 text-primary" />
+            </div>
+            <CardTitle className="font-headline text-3xl font-black uppercase tracking-tighter">AKSES TERBATAS</CardTitle>
+            <CardDescription className="px-6">Tool ini memerlukan login akun Google terdaftar untuk menjaga integritas data.</CardDescription>
+          </CardHeader>
+          <CardContent className="pb-12 px-10">
+            <Button 
+              className="w-full h-12 font-black uppercase tracking-widest gap-3 rounded-full shadow-lg shadow-primary/10"
+              onClick={handleGoogleLogin}
+            >
+              <Chrome className="h-5 w-5" /> Masuk dengan Google
+            </Button>
+          </CardContent>
         </Card>
       </div>
     );
   }
-  
-  // RENDER KONTEN UTAMA
+
   return (
     <div className="space-y-8 animate-in fade-in duration-700">
-      
-      {/* Peringatan kecil jika sistem belum siap tapi toolnya publik */}
+      {/* Small warning for public tools if API is missing */}
       {!isFirebaseInitialized && isPublic && (
         <div className="p-4 bg-amber-500/10 border-l-4 border-amber-500 rounded-lg text-amber-700">
           <div className="flex items-center gap-3">
             <AlertTriangle className="h-5 w-5" />
-            <p className="text-xs font-bold">Fitur yang memerlukan login (seperti menyimpan atau memuat data) tidak akan berfungsi karena sistem belum terkonfigurasi dengan benar.</p>
+            <p className="text-xs font-bold text-amber-800">API Key tidak terdeteksi. Fitur simpan data tidak akan berfungsi hingga Rollout dilakukan.</p>
           </div>
         </div>
       )}
 
       {user && (
          <div className="flex flex-col md:flex-row items-center justify-between gap-4 p-4 bg-muted/30 backdrop-blur-sm rounded-2xl border border-primary/5 shadow-inner">
-          {/* ... header user seperti sebelumnya ... */}
+            <div className="flex items-center gap-4 text-left w-full">
+                <Avatar className="h-12 w-12 border-2 border-background shadow-md">
+                    <AvatarImage src={user.photoURL || ''} />
+                    <AvatarFallback><UserIcon /></AvatarFallback>
+                </Avatar>
+                <div className="flex-1">
+                    <p className="text-[10px] font-black uppercase tracking-widest text-accent">Authorized Personnel</p>
+                    <p className="font-bold text-sm leading-tight">{user.displayName || user.email}</p>
+                    <p className="text-[10px] text-muted-foreground font-mono">{user.email}</p>
+                </div>
+                <Button variant="ghost" size="sm" onClick={handleLogout} className="rounded-full gap-2 text-muted-foreground hover:text-destructive hover:bg-destructive/10 text-[10px] font-black uppercase tracking-widest h-9 px-5">
+                    <LogOut className="h-3.5 w-3.5" /> Log Out
+                </Button>
+            </div>
         </div>
       )}
 
       <header className="text-center space-y-3">
-        <h1 className="font-headline text-5xl font-extrabold tracking-tighter text-primary md:text-6xl">
+        <h1 className="font-headline text-5xl font-extrabold tracking-tighter text-primary md:text-6xl uppercase">
             {title}
         </h1>
-        <p className="mx-auto max-w-2xl text-muted-foreground italic text-lg">
+        <p className="mx-auto max-w-2xl text-muted-foreground italic text-lg leading-relaxed">
             {description}
         </p>
       </header>
