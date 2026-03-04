@@ -4,21 +4,25 @@ runConfig:
 
 env:
   - variable: NEXT_PUBLIC_FIREBASE_API_KEY
+    value: "AIzaSyAtcWDqJ28CI3Pc4pHDN5ET7iTsgmxe2-E"
     availability:
       - BUILD
       - RUNTIME
 
   - variable: NEXT_PUBLIC_FIREBASE_PROJECT_ID
+    value: "studio-8697076532-14512"
     availability:
       - BUILD
       - RUNTIME
 
   - variable: NEXT_PUBLIC_FIREBASE_APP_ID
+    value: "1:910122792787:web:183c7da1ae114ac74ad3a6"
     availability:
       - BUILD
       - RUNTIME
 
   - variable: NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN
+    value: "studio-8697076532-14512.firebaseapp.com"
     availability:
       - BUILD
       - RUNTIME

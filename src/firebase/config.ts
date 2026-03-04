@@ -3,7 +3,6 @@
 import { initializeApp, getApps, getApp } from 'firebase/app';
 
 // Your web app's Firebase configuration
-// Configuration now exports values properly for other modules to use.
 export const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
   authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
@@ -11,7 +10,7 @@ export const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
-// Helper function to check if configuration is actually loaded from environment
+// Helper function to check if configuration is actually loaded
 export const isFirebaseConfigValid = () => {
   return !!(
     firebaseConfig.apiKey &&
