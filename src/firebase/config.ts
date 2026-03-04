@@ -1,4 +1,3 @@
-
 /**
  * Firebase configuration object.
  * Fetches values from environment variables.
@@ -15,8 +14,11 @@ const safeJsonParse = (str: string | undefined) => {
   }
 };
 
-// App Hosting provides the config as a system environment variable.
-const webAppConfig = safeJsonParse(process.env.FIREBASE_WEBAPP_CONFIG);
+/**
+ * App Hosting menyediakan konfigurasi otomatis melalui variabel FIREBASE_WEBAPP_CONFIG.
+ * Kita cek versi dengan prefix NEXT_PUBLIC agar bisa dibaca di sisi browser (Client Side).
+ */
+const webAppConfig = safeJsonParse(process.env.NEXT_PUBLIC_FIREBASE_WEBAPP_CONFIG || process.env.FIREBASE_WEBAPP_CONFIG);
 
 export const firebaseConfig = {
     projectId: webAppConfig?.projectId || process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || '',
@@ -38,7 +40,8 @@ export const isFirebaseConfigValid = () => {
   );
   
   if (!hasValues && typeof window !== 'undefined') {
-    console.warn('Firebase config missing. Checked FIREBASE_WEBAPP_CONFIG and individual NEXT_PUBLIC_ variables.');
+    // Log info saja, jangan error agar tidak mematikan UI
+    console.info('Firebase Config Status:', firebaseConfig);
   }
   
   return hasValues;
