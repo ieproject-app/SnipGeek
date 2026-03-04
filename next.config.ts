@@ -31,10 +31,6 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  // This ensures that the FIREBASE_WEBAPP_CONFIG is available on the client-side.
-  env: {
-    NEXT_PUBLIC_FIREBASE_CONFIG: process.env.FIREBASE_WEBAPP_CONFIG,
-  }
 };
 
 export default nextConfig;
