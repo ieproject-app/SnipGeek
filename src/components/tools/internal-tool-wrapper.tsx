@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useUser, useAuth } from '@/firebase';
 import { initiateGoogleSignIn } from '@/firebase/non-blocking-login';
 import { signOut } from 'firebase/auth';
@@ -8,12 +8,23 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, Chrome, LogOut, User as UserIcon, Lock, Github, CheckCircle2, AlertCircle, RefreshCw } from 'lucide-react';
+import { 
+  Loader2, 
+  Chrome, 
+  LogOut, 
+  User as UserIcon, 
+  Lock, 
+  AlertCircle, 
+  RefreshCw, 
+  CheckCircle2, 
+  Terminal,
+  ShieldX
+} from 'lucide-react';
 import { useNotification } from '@/hooks/use-notification';
 import type { Dictionary } from '@/lib/get-dictionary';
 
 interface InternalToolWrapperProps {
-  children: React.Node;
+  children: React.ReactNode;
   title: string;
   description: string;
   dictionary: Dictionary;
@@ -23,8 +34,23 @@ export function InternalToolWrapper({ children, title, description, dictionary }
   const { user, isUserLoading } = useUser();
   const auth = useAuth();
   const { notify } = useNotification();
+  const [missingVars, setMissingVars] = useState<string[]>([]);
   
-  // Safety check for dictionary
+  // Diagnostic check
+  useEffect(() => {
+    const required = [
+      'NEXT_PUBLIC_FIREBASE_API_KEY',
+      'NEXT_PUBLIC_FIREBASE_PROJECT_ID',
+      'NEXT_PUBLIC_FIREBASE_APP_ID',
+      'NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN'
+    ];
+    const missing = required.filter(key => {
+      const val = process.env[key];
+      return !val || val === '';
+    });
+    setMissingVars(missing);
+  }, []);
+
   const t = dictionary?.tools?.systemNotReady || {
     title: "SISTEM BELUM SIAP",
     description: "Aplikasi belum bisa mendeteksi Kunci API.",
@@ -60,47 +86,65 @@ export function InternalToolWrapper({ children, title, description, dictionary }
     );
   }
 
-  // JIKA AUTH TIDAK ADA (Konfigurasi belum mengalir ke browser)
-  if (!auth) {
+  // JIKA KUNCI API TIDAK TERDETEKSI
+  if (!auth || missingVars.length > 0) {
     return (
-      <div className="max-w-2xl mx-auto py-12 px-4">
-        <Card className="border-accent/20 bg-accent/5 p-8 rounded-2xl shadow-xl border-t-4 border-t-accent">
+      <div className="max-w-2xl mx-auto py-12 px-4 animate-in fade-in duration-700">
+        <Card className="border-destructive/20 bg-destructive/[0.02] p-8 rounded-2xl shadow-xl border-t-4 border-t-destructive">
           <div className="flex flex-col items-center text-center space-y-6">
-            <div className="p-4 bg-accent/10 rounded-full">
-              <Github className="h-12 w-12 text-accent" />
+            <div className="p-4 bg-destructive/10 rounded-full">
+              <ShieldX className="h-12 w-12 text-destructive" />
             </div>
             <div className="space-y-2">
-              <CardTitle className="text-3xl font-black uppercase tracking-tighter">{t.title}</CardTitle>
+              <CardTitle className="text-3xl font-black uppercase tracking-tighter text-destructive">{t.title}</CardTitle>
               <CardDescription className="text-base text-foreground/70">
-                {t.description}
+                Next.js tidak menemukan kunci rahasia di dalam website yang sudah dirakit.
               </CardDescription>
             </div>
             
-            <div className="bg-background/80 p-6 rounded-xl border text-left w-full space-y-5 shadow-inner">
-              <div className="flex items-start gap-3">
-                <div className="h-6 w-6 rounded-full bg-emerald-500/10 flex items-center justify-center shrink-0 mt-0.5">
-                    <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+            <div className="bg-background/80 p-6 rounded-xl border text-left w-full space-y-4 shadow-inner">
+              <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-2 flex items-center gap-2">
+                <Terminal className="h-3 w-3" /> Hasil Diagnosa Sistem:
+              </p>
+              {missingVars.length > 0 ? (
+                <div className="space-y-2">
+                  <p className="text-xs font-bold text-primary italic">Variabel berikut terdeteksi KOSONG:</p>
+                  <ul className="space-y-1">
+                    {missingVars.map(v => (
+                      <li key={v} className="text-[10px] font-mono bg-destructive/5 text-destructive px-2 py-1 rounded border border-destructive/10">
+                        ❌ {v}
+                      </li>
+                    ))}
+                  </ul>
                 </div>
-                <div className="space-y-1">
-                    <p className="text-sm font-bold text-primary uppercase tracking-tight">{(t as any).step1 || "LANGKAH 1"}</p>
-                    <p className="text-xs text-muted-foreground">{(t as any).step1Desc || "Pastikan variabel sudah di-save."}</p>
-                </div>
-              </div>
+              ) : (
+                <p className="text-xs text-emerald-600 font-bold">✅ Semua variabel terdefinisi, namun Firebase gagal inisialisasi.</p>
+              )}
 
-              <div className="flex items-start gap-3">
-                <div className="h-6 w-6 rounded-full bg-amber-500/10 flex items-center justify-center shrink-0 mt-0.5">
-                    <RefreshCw className="h-4 w-4 text-amber-500" />
+              <Separator className="my-4" />
+
+              <div className="space-y-4">
+                <div className="flex items-start gap-3">
+                  <div className="h-5 w-5 rounded-full bg-primary/10 flex items-center justify-center shrink-0 mt-0.5 text-[10px] font-black">1</div>
+                  <div className="space-y-1">
+                      <p className="text-[11px] font-bold text-primary uppercase tracking-tight">Cek Dashboard Firebase</p>
+                      <p className="text-[10px] text-muted-foreground leading-relaxed">Pastikan nama variabel di tab <b>Settings -> Environment Variables</b> menggunakan awalan <b>NEXT_PUBLIC_</b> dan di-set ke <b>Build & Runtime</b>.</p>
+                  </div>
                 </div>
-                <div className="space-y-1">
-                    <p className="text-sm font-bold text-primary uppercase tracking-tight">{(t as any).step2 || "LANGKAH 2"}</p>
-                    <p className="text-xs text-muted-foreground">{(t as any).step2Desc || "Klik Start Rollout di dashboard."}</p>
+
+                <div className="flex items-start gap-3">
+                  <div className="h-5 w-5 rounded-full bg-primary/10 flex items-center justify-center shrink-0 mt-0.5 text-[10px] font-black">2</div>
+                  <div className="space-y-1">
+                      <p className="text-[11px] font-bold text-primary uppercase tracking-tight">Wajib Start Rollout</p>
+                      <p className="text-[10px] text-muted-foreground leading-relaxed">Setiap ada perubahan variabel, Mas Iwan wajib klik tombol <b>Start Rollout</b> agar Google menyeduh ulang websitenya.</p>
+                  </div>
                 </div>
               </div>
             </div>
 
-            <p className="text-[10px] text-muted-foreground italic max-w-sm">
-              {(t as any).footer || "Website perlu dirakit ulang agar kunci API bisa terbaca."}
-            </p>
+            <Button variant="outline" className="text-[10px] font-black uppercase tracking-widest h-10 px-8 rounded-full" onClick={() => window.location.reload()}>
+              <RefreshCw className="mr-2 h-3.5 w-3.5" /> Segarkan Halaman
+            </Button>
           </div>
         </Card>
       </div>
@@ -153,7 +197,9 @@ export function InternalToolWrapper({ children, title, description, dictionary }
           </div>
         </div>
         <div className="flex items-center gap-2">
-            <Badge variant="outline" className="hidden sm:inline-flex text-[8px] font-black uppercase border-primary/10 bg-background/50">Authorized</Badge>
+            <Badge variant="outline" className="hidden sm:inline-flex text-[8px] font-black uppercase border-primary/10 bg-background/50 text-emerald-500">
+              <CheckCircle2 className="mr-1 h-2 w-2" /> Authorized
+            </Badge>
             <Button 
                 variant="ghost" 
                 size="sm" 
@@ -181,3 +227,5 @@ export function InternalToolWrapper({ children, title, description, dictionary }
     </div>
   );
 }
+
+import { Separator } from '@/components/ui/separator';
