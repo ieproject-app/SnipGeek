@@ -40,6 +40,7 @@ export function InternalToolWrapper({ children, title, description, dictionary, 
   
   // Diagnostic check
   useEffect(() => {
+    if (isPublic) return; // Skip check for public tools
     const required = [
       'NEXT_PUBLIC_FIREBASE_API_KEY',
       'NEXT_PUBLIC_FIREBASE_PROJECT_ID',
@@ -51,7 +52,7 @@ export function InternalToolWrapper({ children, title, description, dictionary, 
       return !val || val === '';
     });
     setMissingVars(missing);
-  }, []);
+  }, [isPublic]);
 
   const t = dictionary?.tools?.systemNotReady || {
     title: "SISTEM BELUM SIAP",
@@ -77,7 +78,8 @@ export function InternalToolWrapper({ children, title, description, dictionary, 
     }
   };
 
-  if (isUserLoading) {
+  // For non-public tools, show loading state while checking user.
+  if (!isPublic && isUserLoading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
         <Loader2 className="h-10 w-10 animate-spin text-accent" />
@@ -88,8 +90,8 @@ export function InternalToolWrapper({ children, title, description, dictionary, 
     );
   }
 
-  // JIKA KUNCI API TIDAK TERDETEKSI
-  if (!auth || missingVars.length > 0) {
+  // JIKA KUNCI API TIDAK TERDETEKSI (DAN BUKAN PUBLIC)
+  if (!isPublic && (!auth || missingVars.length > 0)) {
     return (
       <div className="max-w-2xl mx-auto py-12 px-4 animate-in fade-in duration-700">
         <Card className="border-destructive/20 bg-destructive/[0.02] p-8 rounded-2xl shadow-xl border-t-4 border-t-destructive">
