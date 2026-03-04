@@ -1,28 +1,67 @@
 
-// Import the functions you need from the SDKs you need
-import { initializeApp, getApps, getApp } from 'firebase/app';
+import { initializeApp, getApps, getApp, FirebaseApp } from 'firebase/app';
+import { getAuth, Auth } from 'firebase/auth';
+import { getFirestore, Firestore } from 'firebase/firestore';
 
-// Your web app's Firebase configuration
-// This configuration now unconditionally trusts that the environment variables are set.
-const firebaseConfig = {
+export const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
   authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
   projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
-// Initialize Firebase without checking.
-// If the config is wrong, it might throw an error at runtime, but it will NOT show the "System Not Ready" screen.
-const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
-
-
-// --- REMOVED THE AGGRESSIVE CHECK ---
-// By setting isFirebaseInitialized to true, we disable the blocker screen entirely.
-export const firebaseApp = app;
-export const isFirebaseInitialized = true;
-
-// This is kept for compatibility with other components, but it no longer drives any blocking logic.
-export const firebaseConfigStatus = {
-  isComplete: true,
-  config: firebaseConfig,
+export const isFirebaseConfigValid = () => {
+  return !!(
+    firebaseConfig.apiKey &&
+    firebaseConfig.projectId &&
+    firebaseConfig.appId
+  );
 };
+
+export interface FirebaseServices {
+  firebaseApp: FirebaseApp | null;
+  auth: Auth | null;
+  firestore: Firestore | null;
+}
+
+/**
+ * Singleton-like initialization to ensure stable instances across the app.
+ */
+let memoizedServices: FirebaseServices | null = null;
+
+export function initializeFirebase(): FirebaseServices {
+  if (typeof window === 'undefined') {
+    return { firebaseApp: null, auth: null, firestore: null };
+  }
+
+  if (memoizedServices) return memoizedServices;
+
+  try {
+    let app: FirebaseApp;
+    if (getApps().length > 0) {
+      app = getApp();
+    } else if (isFirebaseConfigValid()) {
+      app = initializeApp(firebaseConfig);
+    } else {
+      return { firebaseApp: null, auth: null, firestore: null };
+    }
+
+    memoizedServices = {
+      firebaseApp: app,
+      auth: getAuth(app),
+      firestore: getFirestore(app)
+    };
+    return memoizedServices;
+  } catch (error) {
+    console.error("Firebase initialization failed:", error);
+    return { firebaseApp: null, auth: null, firestore: null };
+  }
+}
+
+// Diagnostics helper
+export const firebaseConfigStatus = {
+  isComplete: isFirebaseConfigValid(),
+  config: { ...firebaseConfig, apiKey: '***' }, // Mask sensitive info in logs
+};
+
+export const isFirebaseInitialized = isFirebaseConfigValid();
