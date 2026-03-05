@@ -10,6 +10,8 @@ import { AddToReadingListButton } from '@/components/layout/add-to-reading-list-
 import type { Dictionary } from '@/lib/get-dictionary';
 import { CategoryBadge } from '@/components/layout/category-badge';
 
+import { ScrollReveal } from '@/components/ui/scroll-reveal';
+
 interface TopicPost {
     slug: string;
     frontmatter: {
@@ -46,7 +48,7 @@ export function TopicSection({
     linkPrefix,
     tag
 }: TopicSectionProps) {
-    const renderHorizontalCard = (post: TopicPost) => {
+    const renderHorizontalCard = (post: TopicPost, index: number) => {
         const heroImageValue = post.frontmatter.heroImage;
         let heroImageSrc = "/images/blank/blank.webp";
         if (heroImageValue) {
@@ -67,39 +69,41 @@ export function TopicSection({
         };
 
         return (
-            <div key={post.slug} className="group relative flex items-start gap-4 py-3 border-b border-primary/5 transition-all duration-300">
-                <Link
-                    href={`${linkPrefix}/blog/${post.slug}`}
-                    className="flex items-start gap-4 flex-1 min-w-0"
-                >
-                    <div className="relative w-[120px] h-[90px] shrink-0 overflow-hidden rounded-lg shadow-sm border border-primary/5">
-                        <Image
-                            src={heroImageSrc}
-                            alt={post.frontmatter.imageAlt || post.frontmatter.title}
-                            fill
-                            className="object-cover transition-transform duration-500 group-hover:scale-110"
-                            sizes="120px"
-                        />
-                    </div>
-                    <div className="flex-1 min-w-0 py-1">
-                        <div className="mb-1">
-                            <CategoryBadge category={post.frontmatter.category || tag} />
+            <ScrollReveal key={post.slug} direction="up" delay={index * 0.1}>
+                <div className="group relative flex items-start gap-4 py-3 border-b border-primary/5 transition-all duration-300">
+                    <Link
+                        href={`${linkPrefix}/blog/${post.slug}`}
+                        className="flex items-start gap-4 flex-1 min-w-0"
+                    >
+                        <div className="relative w-[120px] h-[90px] shrink-0 overflow-hidden rounded-lg shadow-sm border border-primary/5">
+                            <Image
+                                src={heroImageSrc}
+                                alt={post.frontmatter.imageAlt || post.frontmatter.title}
+                                fill
+                                className="object-cover transition-transform duration-500 group-hover:scale-110"
+                                sizes="120px"
+                            />
                         </div>
-                        <h3 className="font-headline text-h6 font-medium text-primary leading-snug line-clamp-2 transition-colors group-hover:text-accent">
-                            {post.frontmatter.title}
-                        </h3>
-                        <time className="text-[10px] text-muted-foreground mt-2 block font-medium opacity-60">
-                            {formatRelativeTime(new Date(post.frontmatter.date), locale)}
-                        </time>
-                    </div>
-                </Link>
-                <AddToReadingListButton
-                    item={item}
-                    dictionary={dictionary}
-                    showText={false}
-                    className="self-center text-muted-foreground hover:text-primary h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity shrink-0"
-                />
-            </div>
+                        <div className="flex-1 min-w-0 py-1">
+                            <div className="mb-1">
+                                <CategoryBadge category={post.frontmatter.category || tag} />
+                            </div>
+                            <h3 className="font-headline text-h6 font-medium text-primary leading-snug line-clamp-2 transition-colors group-hover:text-accent">
+                                {post.frontmatter.title}
+                            </h3>
+                            <time className="text-[10px] text-muted-foreground mt-2 block font-medium opacity-60">
+                                {formatRelativeTime(new Date(post.frontmatter.date), locale)}
+                            </time>
+                        </div>
+                    </Link>
+                    <AddToReadingListButton
+                        item={item}
+                        dictionary={dictionary}
+                        showText={false}
+                        className="self-center text-muted-foreground hover:text-primary h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity shrink-0"
+                    />
+                </div>
+            </ScrollReveal>
         );
     };
 
@@ -109,35 +113,39 @@ export function TopicSection({
     ];
 
     return (
-        <section className="container max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pb-12 sm:pb-16">
-            <header className="mb-8 text-left">
-                <h2 className="text-3xl font-extrabold font-headline tracking-tight text-primary mb-2">
-                    {title}
-                </h2>
-                <Breadcrumbs segments={breadcrumbSegments} className="mb-4" />
-                <div className="w-12 h-1 bg-accent rounded-full" />
-            </header>
+        <section className="container max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pb-12 sm:pb-16 overflow-hidden">
+            <ScrollReveal direction="left">
+                <header className="mb-8 text-left">
+                    <h2 className="text-3xl font-extrabold font-headline tracking-tight text-primary mb-2">
+                        {title}
+                    </h2>
+                    <Breadcrumbs segments={breadcrumbSegments} className="mb-4" />
+                    <div className="w-12 h-1 bg-accent rounded-full" />
+                </header>
+            </ScrollReveal>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12">
-                {posts.map((post) => renderHorizontalCard(post))}
+                {posts.map((post, index) => renderHorizontalCard(post, index))}
             </div>
 
-            <footer className="mt-10 flex justify-center">
-                <Link
-                    href={`${linkPrefix}/tags/${tag.toLowerCase()}`}
-                    className="flex items-center gap-6 bg-muted/30 px-5 py-2.5 rounded-full border border-primary/5 hover:bg-muted/50 transition-all group"
-                >
-                    <div className="flex items-center gap-2 pr-4 border-r border-primary/10">
-                        <div className="h-1.5 w-8 bg-accent rounded-full" />
-                        <div className="h-1.5 w-1.5 bg-primary/20 rounded-full" />
-                        <div className="h-1.5 w-1.5 bg-primary/20 rounded-full" />
-                    </div>
-                    <span className="text-[11px] font-black uppercase tracking-widest text-primary/80 group-hover:text-primary transition-all flex items-center gap-2">
-                        {viewAllText}
-                        <ChevronRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
-                    </span>
-                </Link>
-            </footer>
+            <ScrollReveal direction="up" delay={0.3}>
+                <footer className="mt-10 flex justify-center">
+                    <Link
+                        href={`${linkPrefix}/tags/${tag.toLowerCase()}`}
+                        className="flex items-center gap-6 bg-muted/30 px-5 py-2.5 rounded-full border border-primary/5 hover:bg-muted/50 transition-all group"
+                    >
+                        <div className="flex items-center gap-2 pr-4 border-r border-primary/10">
+                            <div className="h-1.5 w-8 bg-accent rounded-full" />
+                            <div className="h-1.5 w-1.5 bg-primary/20 rounded-full" />
+                            <div className="h-1.5 w-1.5 bg-primary/20 rounded-full" />
+                        </div>
+                        <span className="text-[11px] font-black uppercase tracking-widest text-primary/80 group-hover:text-primary transition-all flex items-center gap-2">
+                            {viewAllText}
+                            <ChevronRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
+                        </span>
+                    </Link>
+                </footer>
+            </ScrollReveal>
         </section>
     );
 }
