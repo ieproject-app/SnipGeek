@@ -75,6 +75,8 @@ export function FeaturedPosts({ posts, dictionary, locale, linkPrefix }: Feature
                                             <div
                                                 className={cn("absolute bottom-0 left-0 right-0 h-[3px] z-30 transition-opacity duration-500 opacity-0 group-hover:opacity-100", badgeStyle.dot)}
                                             />
+                                            {/* Cinematic Gradient Overlay */}
+                                            <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-10" />
 
                                             {/* Hero Image */}
                                             {heroImageSrc && (
@@ -96,7 +98,7 @@ export function FeaturedPosts({ posts, dictionary, locale, linkPrefix }: Feature
                                             <div>
                                                 <CategoryBadge
                                                     category={rawCategory}
-                                                    size="sm"
+                                                    size="xs"
                                                     className="shadow-sm"
                                                 />
                                             </div>
@@ -110,17 +112,21 @@ export function FeaturedPosts({ posts, dictionary, locale, linkPrefix }: Feature
                                                     {formatRelativeTime(new Date(post.frontmatter.date), locale)}
                                                 </div>
 
-                                                <div className="flex items-center gap-3">
+                                                <div className="flex items-center gap-2">
                                                     <AddToReadingListButton
                                                         item={item}
                                                         dictionary={dictionary}
                                                         showText={false}
-                                                        className="h-8 w-8 rounded-full border-none bg-primary/[0.03] text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all"
+                                                        className="h-8 w-8 rounded-full border-none bg-primary/[0.03] text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0"
                                                     />
                                                     <div
-                                                        className={cn("flex items-center gap-1 text-[10px] font-black uppercase tracking-widest transition-transform duration-300 group-hover:translate-x-1", badgeStyle.text)}
+                                                        className={cn(
+                                                            "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all duration-300",
+                                                            badgeStyle.text,
+                                                            "group-hover:bg-primary/5"
+                                                        )}
                                                     >
-                                                        READ <ArrowRight className="h-3.5 w-3.5" />
+                                                        READ <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
                                                     </div>
                                                 </div>
                                             </div>
