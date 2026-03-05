@@ -54,6 +54,97 @@ AI must recognize these built-in features of SnipGeek:
 ### i18n (Internationalization)
 - Uses `/[locale]/` folder structure
 - Whenever content or components are changed in one language, **ALWAYS check** if the changes need to be applied to the other language as well
+- English (`en`) is the **default locale** — no prefix in URLs (e.g., `/blog/my-post`)
+- Indonesian (`id`) uses `/id/` prefix (e.g., `/id/blog/my-post`)
+
+### 🔴 hreflang — MANDATORY on ALL Public Pages
+Every public-facing `page.tsx` **MUST** export `generateMetadata` with `alternates.languages` for SEO. This tells Google which language version belongs to which URL.
+
+**Pattern for static pages (no slug):**
+```typescript
+import { i18n } from "@/i18n-config";
+import type { Locale } from "@/i18n-config";
+import type { Metadata } from "next";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: Locale }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const canonicalPath =
+    locale === i18n.defaultLocale ? "/about" : `/${locale}/about`;
+
+  const languages: Record<string, string> = {};
+  i18n.locales.forEach((loc) => {
+    const prefix = loc === i18n.defaultLocale ? "" : `/${loc}`;
+    languages[loc] = `${prefix}/about`;
+  });
+
+  return {
+    title: "...",
+    alternates: {
+      canonical: canonicalPath,
+      languages: {
+        ...languages,
+        "x-default": languages[i18n.defaultLocale] || canonicalPath,
+      },
+    },
+  };
+}
+```
+
+**Pattern for content pages (with slug + translation lookup):**
+```typescript
+// For blog/[slug] and notes/[slug] — checks translation pairs
+const languages: Record<string, string> = {};
+await Promise.all(
+  i18n.locales.map(async (loc) => {
+    const prefix = loc === i18n.defaultLocale ? "" : `/${loc}`;
+    if (loc === locale) {
+      languages[loc] = `${prefix}/blog/${slug}`;
+    } else {
+      const translation = await getPostTranslation(
+        post.frontmatter.translationKey, loc,
+      );
+      if (translation) {
+        languages[loc] = `${prefix}/blog/${translation.slug}`;
+      }
+    }
+  }),
+);
+```
+
+**Pages that MUST have hreflang:**
+| Page | Status |
+|---|---|
+| `page.tsx` (home) | ✅ Required |
+| `blog/page.tsx` | ✅ Required |
+| `blog/[slug]/page.tsx` | ✅ Required (with translation lookup) |
+| `notes/page.tsx` | ✅ Required |
+| `notes/[slug]/page.tsx` | ✅ Required (with translation lookup) |
+| `about/page.tsx` | ✅ Required |
+| `contact/page.tsx` | ✅ Required |
+| `projects/page.tsx` | ✅ Required |
+| `archive/page.tsx` | ✅ Required |
+| `tags/[tag]/page.tsx` | ✅ Required |
+| `tools/*` (internal/noindex) | ⛔ Not required |
+| `login/page.tsx` | ⛔ Not required |
+
+### Notes Translation Lookup
+`getNoteTranslation()` is available in `@/lib/notes` — analogous to `getPostTranslation()` in `@/lib/posts`.
+Use it inside `notes/[slug]/page.tsx` `generateMetadata` to resolve the correct translated slug for hreflang.
+
+```typescript
+import { getNoteTranslation } from "@/lib/notes";
+
+const translation = await getNoteTranslation(
+  note.frontmatter.translationKey, loc,
+);
+if (translation) {
+  languages[loc] = `${prefix}/notes/${translation.slug}`;
+}
+```
 
 ### 🔴 Locale Casting Pattern — MANDATORY
 When accessing `params.locale` in Next.js page files, the value comes in as `string` by default.
@@ -176,6 +267,12 @@ const storage = getStorage(firebaseApp);
 
 ## 5. Dictionary & Notification Rules
 
+### 🔴 Required Keys — Both Dictionaries Must Always Be In Sync
+The following top-level keys MUST exist in **both** `en.json` and `id.json`:
+- `home.title` and `home.description` — used by `page.tsx` `generateMetadata` for SEO
+- All section keys that are referenced in `generateMetadata` of any page (e.g., `notes.title`, `blog.title`, `tags.title`)
+
+
 ### 🔴 Dictionary Sync — Always Update Both Languages
 When adding a new key to `notifications` or any section of the dictionary, you MUST update **both** files simultaneously:
 - `src/dictionaries/en.json`
@@ -272,6 +369,84 @@ Do NOT attempt to install `@radix-ui/react-progress` or use any external progres
 
 ## 7. Design & UI System
 
+### 📐 Typography Scale — MANDATORY Token Usage
+SnipGeek has a **fluid typography system** defined in `tailwind.config.ts`. Always use these semantic tokens instead of hardcoded responsive size classes.
+
+**DO NOT use:**
+```tsx
+// ❌ Hardcoded responsive sizes
+<h1 className="text-5xl md:text-6xl">...</h1>
+<h1 className="text-4xl md:text-5xl lg:text-6xl">...</h1>
+<h2 className="text-3xl">...</h2>
+```
+
+**ALWAYS use:**
+```tsx
+// ✅ Semantic fluid typography tokens
+<h1 className="text-display-sm">...</h1>  // Page/section titles
+<h1 className="text-h1">...</h1>          // Article/note titles (medium)
+<h2 className="text-h2">...</h2>          // Section headings
+<h3 className="text-h3">...</h3>          // Section subheadings
+<h4 className="text-h4">...</h4>          // Minor headings
+```
+
+**Token Reference:**
+| Token | Fluid Range | Use Case |
+|---|---|---|
+| `text-display-lg` | 48px → 96px | Hero displays only |
+| `text-display-md` | 40px → 76px | Large hero sections |
+| `text-display-sm` | 36px → 68px | Page H1 titles (blog list, notes list, tags, tools, contact) |
+| `text-h1` | 30px → 52px | Article detail H1 (also used in MDX `# heading`) |
+| `text-h2` | 24px → 36px | Section headings (related posts, home sections) |
+| `text-h3` | 20px → 28px | Section subheadings, footer author name |
+| `text-h4` | 18px → 24px | Minor headings |
+| `text-h5` | 16px → 20px | Card titles, small headings |
+| `text-h6` | 14px → 18px | Topic section cards, compact labels |
+| `text-article-base` | 17px → 20px | Article body text |
+| `text-ui-md` | 14px | UI labels, badges |
+| `text-ui-sm` | 11px | Small UI labels |
+| `text-ui-xs` | 10px | Micro labels, timestamps |
+
+**MDX Content Headings** (`mdx-components.tsx`) already use these tokens:
+- `##` → `text-h2`
+- `###` → `text-h3`
+
+### 📏 Spacing Tokens — Use Semantic Section Spacing
+SnipGeek defines semantic spacing tokens in `tailwind.config.ts`. Use them for section-level padding.
+
+**Token Reference:**
+| Token | Value | Use Case |
+|---|---|---|
+| `section-sm` | 3rem (48px) | Compact section vertical padding |
+| `section-md` | 5rem (80px) | Standard section vertical padding |
+| `section-lg` | 7.5rem (120px) | Large section vertical padding |
+| `section-xl` | 10rem (160px) | Hero / landing sections |
+| `prose-gap` | 1.5rem | Spacing between prose elements |
+| `prose-gap-lg` | 2.5rem | Larger prose element gaps |
+
+**Pattern:**
+```tsx
+// ✅ Use semantic tokens for section padding
+<section className="py-section-sm sm:py-section-md">
+<section className="py-section-md sm:py-section-lg">
+
+// ❌ Avoid hardcoded section spacing
+<section className="py-12 sm:py-16">
+<section className="py-16 sm:py-24">
+```
+
+**Standard page container pattern** (keep consistent across all pages):
+```tsx
+// Detail pages (blog/notes)
+<main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-16 sm:pb-24">
+
+// Simple/list pages (contact, archive, projects)
+<main className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-16">
+
+// List pages with grid (blog list, notes list)
+<main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-12 sm:pb-16">
+```
+
 ### 🎨 Color Philosophy (Theme Protocol)
 - **NEVER** use hardcoded Tailwind color classes like `text-blue-500` or `bg-red-200`
 - Always use CSS HSL variables from `globals.css`: `text-primary`, `text-accent`, `text-muted-foreground`
@@ -279,9 +454,10 @@ Do NOT attempt to install `@radix-ui/react-progress` or use any external progres
 - **Dark Mode Aware**: Always write code that looks good in both light and dark mode. Never allow dark text on a dark background
 
 ### ✍️ Typography Hierarchy
-- `font-display` (Bricolage Grotesque) → **ONLY** for headings (h1, h2, h3) and card titles
+- `font-display` (Bricolage Grotesque) → **ONLY** for headings (h1, h2, h3) and card titles. Use via `font-headline` alias.
 - `font-sans` (Plus Jakarta Sans) → for body text and paragraphs
 - Section labels and badges → use `uppercase` with `tracking-widest` for a clean technical look
+- **See Typography Scale section above** for the full fluid token reference (`text-display-sm`, `text-h1` – `text-h6`, etc.)
 
 ### 🖼️ Visual Signature & Assets
 These are the design "fingerprints" and asset rules that must be preserved:

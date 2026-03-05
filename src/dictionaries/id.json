@@ -12,6 +12,8 @@
     "authorBio": "Seorang developer bersemangat yang menjelajahi web dan berbagi temuan di sepanjang jalan."
   },
   "home": {
+    "title": "SnipGeek - Blog Teknologi Modern dan Minimalis",
+    "description": "Blog teknologi modern dan minimalis untuk para geek, menjelajahi software, hardware, dan otomasi IT.",
     "featuredPosts": "Postingan Unggulan",
     "latestPosts": "Postingan Terbaru",
     "viewAllPosts": "Lihat Semua Postingan",
@@ -172,7 +174,7 @@
     "title": "Mempersiapkan Unduhan Anda",
     "fileSizeLabel": "Ukuran:",
     "continueButton": "Lanjutkan untuk Mengunduh",
-    "redirecting": "atau unduhan Anda akan dimulai otomatis..."
+    "redirecting": "atau unduhan Anda akan dimulai otomatis dalam {countdown} detik..."
   },
   "notFound": {
     "title": "Halaman Tidak Ditemukan",

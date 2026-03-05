@@ -1,26 +1,43 @@
-'use client';
+"use client";
 
-import React, { useMemo } from 'react';
-import Link from 'next/link';
-import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
-import { StickyNote } from 'lucide-react';
-import { AddToReadingListButton } from '@/components/layout/add-to-reading-list-button';
-import { CategoryBadge } from '@/components/layout/category-badge';
-import { ScrollReveal } from '@/components/ui/scroll-reveal';
+import React, { useMemo } from "react";
+import Link from "next/link";
+import { Badge } from "@/components/ui/badge";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+} from "@/components/ui/card";
+import { StickyNote } from "lucide-react";
+import { AddToReadingListButton } from "@/components/layout/add-to-reading-list-button";
+import { CategoryBadge } from "@/components/layout/category-badge";
+import { ScrollReveal } from "@/components/ui/scroll-reveal";
 
-export function NotesListClient({ initialNotes, dictionary, locale }: { initialNotes: any[], dictionary: any, locale: string }) {
-  const linkPrefix = locale === 'en' ? '' : `/${locale}`;
+export function NotesListClient({
+  initialNotes,
+  dictionary,
+  locale,
+}: {
+  initialNotes: any[];
+  dictionary: any;
+  locale: string;
+}) {
+  const linkPrefix = locale === "en" ? "" : `/${locale}`;
 
   const allNotes = useMemo(() => {
-    return [...initialNotes].sort((a, b) => new Date(b.frontmatter.date).getTime() - new Date(a.frontmatter.date).getTime());
+    return [...initialNotes].sort(
+      (a, b) =>
+        new Date(b.frontmatter.date).getTime() -
+        new Date(a.frontmatter.date).getTime(),
+    );
   }, [initialNotes]);
 
   const formatDate = (date: Date) => {
     return new Intl.DateTimeFormat(locale, {
-      day: 'numeric',
-      month: 'short',
-      year: 'numeric'
+      day: "numeric",
+      month: "short",
+      year: "numeric",
     }).format(date);
   };
 
@@ -28,7 +45,7 @@ export function NotesListClient({ initialNotes, dictionary, locale }: { initialN
     <div className="w-full">
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-12 sm:pb-16">
         <header className="mb-12 text-center">
-          <h1 className="font-headline text-5xl md:text-6xl font-extrabold tracking-tighter text-primary mb-3">
+          <h1 className="font-headline text-display-sm font-extrabold tracking-tighter text-primary mb-3">
             {dictionary.notes.title}
           </h1>
           <p className="text-muted-foreground max-w-xl mx-auto text-lg italic">
@@ -44,7 +61,7 @@ export function NotesListClient({ initialNotes, dictionary, locale }: { initialN
               title: note.frontmatter.title,
               description: note.frontmatter.description,
               href: `${linkPrefix}/notes/${note.slug}`,
-              type: 'note' as const
+              type: "note" as const,
             };
             return (
               <ScrollReveal key={note.slug} delay={index * 0.05} direction="up">
@@ -62,7 +79,10 @@ export function NotesListClient({ initialNotes, dictionary, locale }: { initialN
                   </CardHeader>
 
                   <CardContent className="p-6 pt-4 flex-1">
-                    <Link href={`${linkPrefix}/notes/${note.slug}`} className="block group/link">
+                    <Link
+                      href={`${linkPrefix}/notes/${note.slug}`}
+                      className="block group/link"
+                    >
                       <time className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-2 block">
                         {formatDate(noteDate)}
                       </time>
@@ -77,16 +97,20 @@ export function NotesListClient({ initialNotes, dictionary, locale }: { initialN
 
                   <CardFooter className="px-6 py-4 border-t bg-muted/5">
                     <div className="flex flex-wrap gap-2">
-                      {note.frontmatter.tags && note.frontmatter.tags.slice(0, 2).map((tag: string) => (
-                        <Link key={tag} href={`${linkPrefix}/tags/${tag.toLowerCase()}`}>
-                          <CategoryBadge category={tag} />
-                        </Link>
-                      ))}
+                      {note.frontmatter.tags &&
+                        note.frontmatter.tags.slice(0, 2).map((tag: string) => (
+                          <Link
+                            key={tag}
+                            href={`${linkPrefix}/tags/${tag.toLowerCase()}`}
+                          >
+                            <CategoryBadge category={tag} />
+                          </Link>
+                        ))}
                     </div>
                   </CardFooter>
                 </Card>
               </ScrollReveal>
-            )
+            );
           })}
         </section>
       </main>
