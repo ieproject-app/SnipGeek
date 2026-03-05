@@ -1,26 +1,37 @@
+"use client";
 
-'use client';
+import React, { useMemo } from "react";
+import { MDXRemote } from "next-mdx-remote/rsc";
+import Image from "next/image";
+import Link from "next/link";
+import { mdxComponents } from "@/components/mdx-components";
+import { PlaceHolderImages } from "@/lib/placeholder-images";
+import { PostComments } from "@/components/blog/post-comments";
+import { PostMeta } from "@/components/blog/post-meta";
+import { ShareButtons } from "@/components/blog/share-buttons";
+import { RelatedPosts } from "@/components/blog/related-posts";
+import { TableOfContents } from "@/components/blog/table-of-contents";
+import { extractHeadings } from "@/lib/mdx-utils";
+import { Breadcrumbs } from "@/components/layout/breadcrumbs";
+import { notFound } from "next/navigation";
+import remarkGfm from "remark-gfm";
+import rehypeShiki from "@shikijs/rehype";
+import { ScrollReveal } from "@/components/ui/scroll-reveal";
 
-import React, { useMemo } from 'react';
-import { MDXRemote } from 'next-mdx-remote/rsc';
-import Image from 'next/image';
-import Link from 'next/link';
-import { mdxComponents } from '@/components/mdx-components';
-import { PlaceHolderImages } from '@/lib/placeholder-images';
-import { PostComments } from '@/components/blog/post-comments';
-import { PostMeta } from '@/components/blog/post-meta';
-import { ShareButtons } from '@/components/blog/share-buttons';
-import { RelatedPosts } from '@/components/blog/related-posts';
-import { TableOfContents } from '@/components/blog/table-of-contents';
-import { extractHeadings } from '@/lib/mdx-utils';
-import { Breadcrumbs } from '@/components/layout/breadcrumbs';
-import { notFound } from 'next/navigation';
-import remarkGfm from 'remark-gfm';
-import rehypeShiki from '@shikijs/rehype';
-import { ScrollReveal } from '@/components/ui/scroll-reveal';
-
-export function PostPageClient({ initialPost, slug, locale, dictionary, initialRelatedContent }: { initialPost: any, slug: string, locale: string, dictionary: any, initialRelatedContent: any[] }) {
-  const linkPrefix = locale === 'en' ? '' : `/${locale}`;
+export function PostPageClient({
+  initialPost,
+  slug,
+  locale,
+  dictionary,
+  initialRelatedContent,
+}: {
+  initialPost: any;
+  slug: string;
+  locale: string;
+  dictionary: any;
+  initialRelatedContent: any[];
+}) {
+  const linkPrefix = locale === "en" ? "" : `/${locale}`;
 
   if (!initialPost) {
     notFound();
@@ -30,10 +41,15 @@ export function PostPageClient({ initialPost, slug, locale, dictionary, initialR
   let heroSource: { url: string; hint?: string } | undefined;
 
   if (heroImageValue) {
-    if (heroImageValue.startsWith('http') || heroImageValue.startsWith('/')) {
-      heroSource = { url: heroImageValue, hint: imageAlt?.toLowerCase().split(' ').slice(0, 2).join(' ') };
+    if (heroImageValue.startsWith("http") || heroImageValue.startsWith("/")) {
+      heroSource = {
+        url: heroImageValue,
+        hint: imageAlt?.toLowerCase().split(" ").slice(0, 2).join(" "),
+      };
     } else {
-      const placeholder = PlaceHolderImages.find(p => p.id === heroImageValue);
+      const placeholder = PlaceHolderImages.find(
+        (p) => p.id === heroImageValue,
+      );
       if (placeholder) {
         heroSource = { url: placeholder.imageUrl, hint: placeholder.imageHint };
       }
@@ -49,18 +65,18 @@ export function PostPageClient({ initialPost, slug, locale, dictionary, initialR
     title: initialPost.frontmatter.title,
     description: initialPost.frontmatter.description,
     href: `${linkPrefix}/blog/${initialPost.slug}`,
-    type: 'blog' as const,
+    type: "blog" as const,
   };
 
   const breadcrumbSegments = [
-    { label: dictionary.home.breadcrumbHome, href: linkPrefix || '/' },
+    { label: dictionary.home.breadcrumbHome, href: linkPrefix || "/" },
     { label: dictionary.navigation.blog, href: `${linkPrefix}/blog` },
-    { label: initialPost.frontmatter.category || 'Blog' }
+    { label: initialPost.frontmatter.category || "Blog" },
   ];
 
   return (
     <div className="w-full">
-      <main className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-16 sm:pb-24">
+      <main className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-16 sm:pb-24">
         <article>
           <header className="mb-12">
             <Breadcrumbs segments={breadcrumbSegments} className="mb-10" />
@@ -78,14 +94,23 @@ export function PostPageClient({ initialPost, slug, locale, dictionary, initialR
                 />
               ) : (
                 <div className="w-full aspect-video flex items-center justify-center bg-primary/5">
-                  <span className="text-primary/20 font-headline text-6xl font-black">SnipGeek</span>
+                  <span className="text-primary/20 font-headline text-6xl font-black">
+                    SnipGeek
+                  </span>
                 </div>
               )}
             </div>
             <h1 className="font-headline text-4xl md:text-5xl font-extrabold tracking-tighter text-primary mb-6">
               {initialPost.frontmatter.title}
             </h1>
-            <PostMeta frontmatter={initialPost.frontmatter} item={itemForMeta} locale={locale} dictionary={dictionary} readingTime={readingTime} isOverlay={false} />
+            <PostMeta
+              frontmatter={initialPost.frontmatter}
+              item={itemForMeta}
+              locale={locale}
+              dictionary={dictionary}
+              readingTime={readingTime}
+              isOverlay={false}
+            />
           </header>
           <TableOfContents headings={headings} title={dictionary.post.toc} />
           <div className="text-lg text-foreground/80">
@@ -95,34 +120,52 @@ export function PostPageClient({ initialPost, slug, locale, dictionary, initialR
               options={{
                 mdxOptions: {
                   remarkPlugins: [remarkGfm],
-                  rehypePlugins: [[rehypeShiki, { theme: 'github-dark' }]],
+                  rehypePlugins: [[rehypeShiki, { theme: "github-dark" }]],
                 },
               }}
             />
           </div>
 
           {/* Tags section moved here */}
-          {initialPost.frontmatter.tags && initialPost.frontmatter.tags.length > 0 && (
-            <ScrollReveal direction="up" delay={0.1}>
-              <div className="mt-12 flex flex-wrap gap-3">
-                {initialPost.frontmatter.tags.map((tag: string) => (
-                  <Link key={tag} href={`${linkPrefix}/tags/${tag.toLowerCase()}`}>
-                    <span className="text-sm font-bold text-accent hover:text-primary transition-all duration-300">#{tag}</span>
-                  </Link>
-                ))}
-              </div>
-            </ScrollReveal>
-          )}
+          {initialPost.frontmatter.tags &&
+            initialPost.frontmatter.tags.length > 0 && (
+              <ScrollReveal direction="up" delay={0.1}>
+                <div className="mt-12 flex flex-wrap gap-3">
+                  {initialPost.frontmatter.tags.map((tag: string) => (
+                    <Link
+                      key={tag}
+                      href={`${linkPrefix}/tags/${tag.toLowerCase()}`}
+                    >
+                      <span className="text-sm font-bold text-accent hover:text-primary transition-all duration-300">
+                        #{tag}
+                      </span>
+                    </Link>
+                  ))}
+                </div>
+              </ScrollReveal>
+            )}
 
           <ScrollReveal direction="up" delay={0.2}>
             <div className="mt-16 flex flex-col gap-4 text-center border-t pt-12">
-              <h3 className="text-lg font-semibold tracking-tight text-primary">{dictionary.post.shareArticle}</h3>
-              <ShareButtons title={initialPost.frontmatter.title} imageUrl={heroSource?.url} />
+              <h3 className="text-lg font-semibold tracking-tight text-primary">
+                {dictionary.post.shareArticle}
+              </h3>
+              <ShareButtons
+                title={initialPost.frontmatter.title}
+                imageUrl={heroSource?.url}
+              />
             </div>
           </ScrollReveal>
 
           <ScrollReveal direction="up" delay={0.3}>
-            <PostComments article={{ slug: initialPost.slug, title: initialPost.frontmatter.title }} type="blog" locale={locale} />
+            <PostComments
+              article={{
+                slug: initialPost.slug,
+                title: initialPost.frontmatter.title,
+              }}
+              type="blog"
+              locale={locale}
+            />
           </ScrollReveal>
         </article>
       </main>

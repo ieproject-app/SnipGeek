@@ -1,29 +1,34 @@
+"use client";
 
-'use client';
-
-import React from 'react';
-import { useUser, useAuth, isFirebaseInitialized } from '@/firebase';
-import { initiateGoogleSignIn } from '@/firebase/non-blocking-login';
-import { signOut } from 'firebase/auth';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
-import { 
-  Loader2, 
-  Chrome, 
-  LogOut, 
-  Lock, 
-  AlertTriangle, 
-  CheckCircle2, 
+import React from "react";
+import { useUser, useAuth, isFirebaseInitialized } from "@/firebase";
+import { initiateGoogleSignIn } from "@/firebase/non-blocking-login";
+import { signOut } from "firebase/auth";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import {
+  Loader2,
+  Chrome,
+  LogOut,
+  Lock,
+  AlertTriangle,
+  CheckCircle2,
   Terminal,
   ShieldX,
-  ChevronRight
-} from 'lucide-react';
-import { useNotification } from '@/hooks/use-notification';
-import type { Dictionary } from '@/lib/get-dictionary';
-import { Separator } from '@/components/ui/separator';
-import { cn } from '@/lib/utils';
+  ChevronRight,
+} from "lucide-react";
+import { useNotification } from "@/hooks/use-notification";
+import type { Dictionary } from "@/lib/get-dictionary";
+import { Separator } from "@/components/ui/separator";
+import { cn } from "@/lib/utils";
 
 interface InternalToolWrapperProps {
   children: React.ReactNode;
@@ -33,7 +38,13 @@ interface InternalToolWrapperProps {
   isPublic?: boolean;
 }
 
-export function InternalToolWrapper({ children, title, description, dictionary, isPublic = false }: InternalToolWrapperProps) {
+export function InternalToolWrapper({
+  children,
+  title,
+  description,
+  dictionary,
+  isPublic = false,
+}: InternalToolWrapperProps) {
   const { user, isUserLoading } = useUser();
   const auth = useAuth();
   const { notify } = useNotification();
@@ -56,7 +67,10 @@ export function InternalToolWrapper({ children, title, description, dictionary, 
     if (!auth) return;
     try {
       await signOut(auth);
-      notify(dictionary?.notifications?.logoutSuccess || "Berhasil keluar.", <LogOut className="h-4 w-4" />);
+      notify(
+        dictionary?.notifications?.logoutSuccess || "Berhasil keluar.",
+        <LogOut className="h-4 w-4" />,
+      );
     } catch (error) {
       console.error("Logout error:", error);
     }
@@ -80,49 +94,63 @@ export function InternalToolWrapper({ children, title, description, dictionary, 
           <div className="p-4 bg-amber-500/10 border-l-4 border-amber-500 rounded-lg text-amber-700">
             <div className="flex items-center gap-3">
               <AlertTriangle className="h-5 w-5" />
-              <p className="text-xs font-bold italic">Sistem Cloud sedang dalam pemeliharaan.</p>
+              <p className="text-xs font-bold italic">
+                Sistem Cloud sedang dalam pemeliharaan.
+              </p>
             </div>
           </div>
         )}
-        
+
         {user && (
           <div className="flex flex-col md:flex-row items-center justify-between gap-4 p-4 bg-muted/30 backdrop-blur-sm rounded-2xl border border-primary/5 shadow-inner">
-              <div className="flex items-center gap-4">
-                <Avatar className="h-12 w-12 border-2 border-background shadow-md">
-                  <AvatarImage src={user.photoURL || ''} alt={user.displayName || 'User'} />
-                  <AvatarFallback className="bg-primary text-primary-foreground font-black">{user.displayName?.charAt(0) || 'U'}</AvatarFallback>
-                </Avatar>
-                <div className="space-y-0.5">
-                  <div className="flex items-center gap-2">
-                    <p className="text-sm font-black uppercase tracking-tight text-primary">{user.displayName}</p>
-                    <Badge variant="secondary" className="h-4 px-1.5 text-[8px] font-black uppercase bg-emerald-500/10 text-emerald-600 border-none">
-                      <CheckCircle2 className="h-2 w-2 mr-1" /> Verified
-                    </Badge>
-                  </div>
-                  <p className="text-[10px] font-mono text-muted-foreground opacity-60">{user.email}</p>
+            <div className="flex items-center gap-4">
+              <Avatar className="h-12 w-12 border-2 border-background shadow-md">
+                <AvatarImage
+                  src={user.photoURL || ""}
+                  alt={user.displayName || "User"}
+                />
+                <AvatarFallback className="bg-primary text-primary-foreground font-black">
+                  {user.displayName?.charAt(0) || "U"}
+                </AvatarFallback>
+              </Avatar>
+              <div className="space-y-0.5">
+                <div className="flex items-center gap-2">
+                  <p className="text-sm font-black uppercase tracking-tight text-primary">
+                    {user.displayName}
+                  </p>
+                  <Badge
+                    variant="secondary"
+                    className="h-4 px-1.5 text-[8px] font-black uppercase bg-emerald-500/10 text-emerald-600 border-none"
+                  >
+                    <CheckCircle2 className="h-2 w-2 mr-1" /> Verified
+                  </Badge>
                 </div>
+                <p className="text-[10px] font-mono text-muted-foreground opacity-60">
+                  {user.email}
+                </p>
               </div>
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                onClick={handleLogout}
-                className="rounded-full text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-all"
-              >
-                <LogOut className="h-3.5 w-3.5 mr-2" /> Keluar Akun
-              </Button>
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleLogout}
+              className="rounded-full text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-all"
+            >
+              <LogOut className="h-3.5 w-3.5 mr-2" /> Keluar Akun
+            </Button>
           </div>
         )}
 
         <header className="text-center space-y-3">
-          <h1 className="font-headline text-5xl font-extrabold tracking-tighter text-primary md:text-6xl uppercase">
-              {title}
+          <h1 className="font-headline text-display-sm font-extrabold tracking-tighter text-primary uppercase">
+            {title}
           </h1>
           <div className="flex items-center justify-center gap-3">
-              <div className="h-px w-8 bg-accent/30" />
-              <p className="text-muted-foreground italic text-lg font-medium">
-                  {description}
-              </p>
-              <div className="h-px w-8 bg-accent/30" />
+            <div className="h-px w-8 bg-accent/30" />
+            <p className="text-muted-foreground italic text-lg font-medium">
+              {description}
+            </p>
+            <div className="h-px w-8 bg-accent/30" />
           </div>
         </header>
 
@@ -140,30 +168,57 @@ export function InternalToolWrapper({ children, title, description, dictionary, 
               <ShieldX className="h-12 w-12 text-destructive" />
             </div>
             <div className="space-y-1">
-              <CardTitle className="font-headline text-3xl font-black tracking-tighter text-destructive uppercase">{t.title}</CardTitle>
-              <CardDescription className="text-base">{t.description}</CardDescription>
+              <CardTitle className="font-headline text-3xl font-black tracking-tighter text-destructive uppercase">
+                {t.title}
+              </CardTitle>
+              <CardDescription className="text-base">
+                {t.description}
+              </CardDescription>
             </div>
           </CardHeader>
           <CardContent className="mt-6 space-y-8">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {[
-                  { step: "1", title: "Push Kode", desc: "Pastikan file apphosting.yaml sudah dikirim." },
-                  { step: "2", title: "Rollout", desc: "Klik Start Rollout di dashboard Firebase." },
-                  { step: "3", title: "Cek Status", desc: "Pastikan status Build berwarna hijau." }
-                ].map((s) => (
-                  <div key={s.step} className="p-4 rounded-xl bg-background border border-destructive/10 space-y-2">
-                    <span className="text-2xl font-black text-destructive/20">0{s.step}</span>
-                    <p className="text-xs font-black uppercase tracking-tight text-primary">{s.title}</p>
-                    <p className="text-[10px] leading-relaxed text-muted-foreground">{s.desc}</p>
-                  </div>
-                ))}
+              {[
+                {
+                  step: "1",
+                  title: "Push Kode",
+                  desc: "Pastikan file apphosting.yaml sudah dikirim.",
+                },
+                {
+                  step: "2",
+                  title: "Rollout",
+                  desc: "Klik Start Rollout di dashboard Firebase.",
+                },
+                {
+                  step: "3",
+                  title: "Cek Status",
+                  desc: "Pastikan status Build berwarna hijau.",
+                },
+              ].map((s) => (
+                <div
+                  key={s.step}
+                  className="p-4 rounded-xl bg-background border border-destructive/10 space-y-2"
+                >
+                  <span className="text-2xl font-black text-destructive/20">
+                    0{s.step}
+                  </span>
+                  <p className="text-xs font-black uppercase tracking-tight text-primary">
+                    {s.title}
+                  </p>
+                  <p className="text-[10px] leading-relaxed text-muted-foreground">
+                    {s.desc}
+                  </p>
+                </div>
+              ))}
             </div>
             <Separator className="bg-destructive/10" />
             <div className="flex flex-col items-center gap-4 text-center">
-                <div className="flex items-center gap-2 p-3 bg-destructive/5 rounded-lg border border-destructive/10 w-full justify-center">
-                  <Terminal className="h-4 w-4 text-destructive" />
-                  <p className="text-[10px] font-mono text-destructive font-bold uppercase">Status: Auth Disabled</p>
-                </div>
+              <div className="flex items-center gap-2 p-3 bg-destructive/5 rounded-lg border border-destructive/10 w-full justify-center">
+                <Terminal className="h-4 w-4 text-destructive" />
+                <p className="text-[10px] font-mono text-destructive font-bold uppercase">
+                  Status: Auth Disabled
+                </p>
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -181,16 +236,20 @@ export function InternalToolWrapper({ children, title, description, dictionary, 
               <Lock className="h-8 w-8 text-primary opacity-40" />
             </div>
             <div className="space-y-1">
-              <CardTitle className="font-headline text-2xl font-black uppercase tracking-tighter">{t.restrictedAccess}</CardTitle>
-              <CardDescription className="text-xs uppercase font-bold tracking-widest opacity-60">Internal Team Only</CardDescription>
+              <CardTitle className="font-headline text-2xl font-black uppercase tracking-tighter">
+                {t.restrictedAccess}
+              </CardTitle>
+              <CardDescription className="text-xs uppercase font-bold tracking-widest opacity-60">
+                Internal Team Only
+              </CardDescription>
             </div>
           </CardHeader>
           <CardContent className="px-10 pb-12 space-y-8">
             <p className="text-sm text-muted-foreground leading-relaxed">
               Silakan login dengan Google untuk mengakses tool {title}.
             </p>
-            <Button 
-              onClick={handleGoogleLogin} 
+            <Button
+              onClick={handleGoogleLogin}
               className="w-full h-12 rounded-full gap-3 font-black uppercase tracking-widest shadow-lg shadow-primary/10 hover:scale-[1.02] transition-transform"
             >
               <Chrome className="h-5 w-5" />
@@ -201,45 +260,57 @@ export function InternalToolWrapper({ children, title, description, dictionary, 
       </div>
     );
   }
-  
+
   return (
     <div className="space-y-8 animate-in fade-in duration-700">
       <div className="flex flex-col md:flex-row items-center justify-between gap-4 p-4 bg-muted/30 backdrop-blur-sm rounded-2xl border border-primary/5 shadow-inner">
-          <div className="flex items-center gap-4">
-            <Avatar className="h-12 w-12 border-2 border-background shadow-md">
-              <AvatarImage src={user.photoURL || ''} alt={user.displayName || 'User'} />
-              <AvatarFallback className="bg-primary text-primary-foreground font-black">{user.displayName?.charAt(0) || 'U'}</AvatarFallback>
-            </Avatar>
-            <div className="space-y-0.5">
-              <div className="flex items-center gap-2">
-                <p className="text-sm font-black uppercase tracking-tight text-primary">{user.displayName}</p>
-                <Badge variant="secondary" className="h-4 px-1.5 text-[8px] font-black uppercase bg-emerald-500/10 text-emerald-600 border-none">
-                  <CheckCircle2 className="h-2 w-2 mr-1" /> Verified
-                </Badge>
-              </div>
-              <p className="text-[10px] font-mono text-muted-foreground opacity-60">{user.email}</p>
+        <div className="flex items-center gap-4">
+          <Avatar className="h-12 w-12 border-2 border-background shadow-md">
+            <AvatarImage
+              src={user.photoURL || ""}
+              alt={user.displayName || "User"}
+            />
+            <AvatarFallback className="bg-primary text-primary-foreground font-black">
+              {user.displayName?.charAt(0) || "U"}
+            </AvatarFallback>
+          </Avatar>
+          <div className="space-y-0.5">
+            <div className="flex items-center gap-2">
+              <p className="text-sm font-black uppercase tracking-tight text-primary">
+                {user.displayName}
+              </p>
+              <Badge
+                variant="secondary"
+                className="h-4 px-1.5 text-[8px] font-black uppercase bg-emerald-500/10 text-emerald-600 border-none"
+              >
+                <CheckCircle2 className="h-2 w-2 mr-1" /> Verified
+              </Badge>
             </div>
+            <p className="text-[10px] font-mono text-muted-foreground opacity-60">
+              {user.email}
+            </p>
           </div>
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={handleLogout}
-            className="rounded-full text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-all"
-          >
-            <LogOut className="h-3.5 w-3.5 mr-2" /> Keluar Akun
-          </Button>
+        </div>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={handleLogout}
+          className="rounded-full text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-all"
+        >
+          <LogOut className="h-3.5 w-3.5 mr-2" /> Keluar Akun
+        </Button>
       </div>
 
       <header className="text-center space-y-3">
-        <h1 className="font-headline text-5xl font-extrabold tracking-tighter text-primary md:text-6xl uppercase">
-            {title}
+        <h1 className="font-headline text-display-sm font-extrabold tracking-tighter text-primary uppercase">
+          {title}
         </h1>
         <div className="flex items-center justify-center gap-3">
-            <div className="h-px w-8 bg-accent/30" />
-            <p className="text-muted-foreground italic text-lg font-medium">
-                {description}
-            </p>
-            <div className="h-px w-8 bg-accent/30" />
+          <div className="h-px w-8 bg-accent/30" />
+          <p className="text-muted-foreground italic text-lg font-medium">
+            {description}
+          </p>
+          <div className="h-px w-8 bg-accent/30" />
         </div>
       </header>
 

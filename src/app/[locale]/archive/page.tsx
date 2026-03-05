@@ -10,9 +10,25 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   const dictionary = await getDictionary(locale);
+  const canonicalPath =
+    locale === i18n.defaultLocale ? "/archive" : `/${locale}/archive`;
+
+  const languages: Record<string, string> = {};
+  i18n.locales.forEach((loc) => {
+    const prefix = loc === i18n.defaultLocale ? "" : `/${loc}`;
+    languages[loc] = `${prefix}/archive`;
+  });
+
   return {
     title: dictionary.archive.title,
     description: dictionary.archive.description,
+    alternates: {
+      canonical: canonicalPath,
+      languages: {
+        ...languages,
+        "x-default": languages[i18n.defaultLocale] || canonicalPath,
+      },
+    },
   };
 }
 
@@ -33,7 +49,7 @@ export default async function Page({
     <div className="w-full">
       <main className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-16">
         <header className="mb-12 text-center">
-          <h1 className="font-headline text-5xl md:text-6xl font-extrabold tracking-tighter text-primary mb-3">
+          <h1 className="font-headline text-display-sm font-extrabold tracking-tighter text-primary mb-3">
             {pageContent.title}
           </h1>
         </header>

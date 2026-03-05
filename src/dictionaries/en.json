@@ -12,6 +12,8 @@
     "authorBio": "A passionate developer exploring the web and sharing findings along the way."
   },
   "home": {
+    "title": "SnipGeek - A Modern Minimalist Tech Blog",
+    "description": "A modern minimalist tech blog for geeks, exploring software, hardware, and IT automation.",
     "featuredPosts": "Featured Posts",
     "latestPosts": "Latest Posts",
     "viewAllPosts": "View All Posts",
@@ -172,7 +174,7 @@
     "title": "Preparing Your Download",
     "fileSizeLabel": "Size:",
     "continueButton": "Continue to Download",
-    "redirecting": "or your download will begin automatically..."
+    "redirecting": "or your download will begin automatically in {countdown} seconds..."
   },
   "notFound": {
     "title": "Page Not Found",
