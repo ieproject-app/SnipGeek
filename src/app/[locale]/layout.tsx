@@ -1,95 +1,118 @@
-
-import { Header } from '@/components/layout/header';
-import { Footer } from '@/components/layout/footer';
-import { i18n } from '@/i18n-config';
-import { getAllTranslationsMap as getAllPostTranslationsMap, getSortedPostsData, getDraftPostsData } from '@/lib/posts';
-import { getAllNotesTranslationsMap, getSortedNotesData, getDraftNotesData } from '@/lib/notes';
-import '../globals.css';
-import type { Metadata } from 'next';
-import { ThemeProvider } from '@/components/theme-provider';
-import { ReadingListProvider } from '@/hooks/use-reading-list';
-import { NotificationProvider } from '@/hooks/use-notification';
-import { BackToTop } from '@/components/layout/back-to-top';
-import { getDictionary } from '@/lib/get-dictionary';
-import { DraftList } from '@/components/layout/draft-list';
-import { Bricolage_Grotesque, Plus_Jakarta_Sans, Lora, JetBrains_Mono } from 'next/font/google';
-import { cn } from '@/lib/utils';
-import Script from 'next/script';
-import { FirebaseProviderWrapper } from '@/components/layout/firebase-provider-wrapper';
+import { Header } from "@/components/layout/header";
+import { Footer } from "@/components/layout/footer";
+import { i18n } from "@/i18n-config";
+import {
+  getAllTranslationsMap as getAllPostTranslationsMap,
+  getSortedPostsData,
+  getDraftPostsData,
+} from "@/lib/posts";
+import {
+  getAllNotesTranslationsMap,
+  getSortedNotesData,
+  getDraftNotesData,
+} from "@/lib/notes";
+import "../globals.css";
+import type { Metadata } from "next";
+import { ThemeProvider } from "@/components/theme-provider";
+import { ReadingListProvider } from "@/hooks/use-reading-list";
+import { NotificationProvider } from "@/hooks/use-notification";
+import { BackToTop } from "@/components/layout/back-to-top";
+import { getDictionary } from "@/lib/get-dictionary";
+import { DraftList } from "@/components/layout/draft-list";
+import {
+  Bricolage_Grotesque,
+  Plus_Jakarta_Sans,
+  Lora,
+  JetBrains_Mono,
+} from "next/font/google";
+import { cn } from "@/lib/utils";
+import Script from "next/script";
+import { FirebaseProviderWrapper } from "@/components/layout/firebase-provider-wrapper";
 
 const fontDisplay = Bricolage_Grotesque({
-  subsets: ['latin'],
-  variable: '--font-display',
-  weight: ['400', '500', '600', '700', '800'],
-  display: 'swap',
+  subsets: ["latin"],
+  variable: "--font-display",
+  weight: ["400", "500", "600", "700", "800"],
+  display: "swap",
 });
 
 const fontSans = Plus_Jakarta_Sans({
-  subsets: ['latin'],
-  variable: '--font-sans',
-  weight: ['400', '500', '600', '700', '800'],
-  display: 'swap',
+  subsets: ["latin"],
+  variable: "--font-sans",
+  weight: ["400", "500", "600", "700", "800"],
+  display: "swap",
 });
 
 const fontSerif = Lora({
-  subsets: ['latin'],
-  variable: '--font-serif',
-  style: ['normal', 'italic'],
-  display: 'swap',
+  subsets: ["latin"],
+  variable: "--font-serif",
+  style: ["normal", "italic"],
+  display: "swap",
 });
 
 const fontMono = JetBrains_Mono({
-  subsets: ['latin'],
-  variable: '--font-mono',
-  weight: ['400', '500', '700'],
-  display: 'swap',
+  subsets: ["latin"],
+  variable: "--font-mono",
+  weight: ["400", "500", "700"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://snipgeek.com'),
+  metadataBase: new URL("https://snipgeek.com"),
   title: {
-    default: 'SnipGeek - A Modern Minimalist Tech Blog',
-    template: '%s | SnipGeek',
+    default: "SnipGeek - A Modern Minimalist Tech Blog",
+    template: "%s | SnipGeek",
   },
-  description: 'A modern minimalist tech blog for geeks, exploring software, hardware, and IT automation.',
-  keywords: ['Tech Blog', 'Next.js', 'Programming', 'Windows', 'Web Development', 'Tutorials', 'SnipGeek'],
-  authors: [{ name: 'Iwan Efendi' }],
-  creator: 'Iwan Efendi',
-  publisher: 'SnipGeek',
+  description:
+    "A modern minimalist tech blog for geeks, exploring software, hardware, and IT automation.",
+  keywords: [
+    "Tech Blog",
+    "Next.js",
+    "Programming",
+    "Windows",
+    "Web Development",
+    "Tutorials",
+    "SnipGeek",
+  ],
+  authors: [{ name: "Iwan Efendi" }],
+  creator: "Iwan Efendi",
+  publisher: "SnipGeek",
   icons: {
-    icon: '/logo.svg',
-    shortcut: '/logo.svg',
-    apple: '/logo.svg',
+    icon: "/logo.svg",
+    shortcut: "/logo.svg",
+    apple: "/logo.svg",
   },
   alternates: {
-    canonical: '/',
+    canonical: "/",
     languages: {
-      'en': '/',
-      'id': '/id',
+      en: "/",
+      id: "/id",
     },
   },
   openGraph: {
-    type: 'website',
-    locale: 'en_US',
-    url: 'https://snipgeek.com',
-    siteName: 'SnipGeek',
-    title: 'SnipGeek - A Modern Minimalist Tech Blog',
-    description: 'A modern minimalist tech blog for geeks, exploring software, hardware, and IT automation.',
+    type: "website",
+    locale: "en_US",
+    url: "https://snipgeek.com",
+    siteName: "SnipGeek",
+    title: "SnipGeek - A Modern Minimalist Tech Blog",
+    description:
+      "A modern minimalist tech blog for geeks, exploring software, hardware, and IT automation.",
     images: [
       {
-        url: '/images/footer/about.webp',
+        url: "/images/footer/about.webp",
         width: 1200,
         height: 630,
-        alt: 'SnipGeek - Modern Tech Insights',
+        alt: "SnipGeek - Modern Tech Insights",
       },
     ],
   },
   twitter: {
-    card: 'summary_large_image',
-    title: 'SnipGeek - A Modern Minimalist Tech Blog',
-    description: 'A modern minimalist tech blog for geeks, exploring software, hardware, and IT automation.',
-    images: ['/images/footer/about.webp'],
-    creator: '@iwnefnd',
+    card: "summary_large_image",
+    title: "SnipGeek - A Modern Minimalist Tech Blog",
+    description:
+      "A modern minimalist tech blog for geeks, exploring software, hardware, and IT automation.",
+    images: ["/images/footer/about.webp"],
+    creator: "@iwnefnd",
   },
   robots: {
     index: true,
@@ -97,13 +120,13 @@ export const metadata: Metadata = {
     googleBot: {
       index: true,
       follow: true,
-      'max-video-preview': -1,
-      'max-image-preview': 'large',
-      'max-snippet': -1,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
     },
   },
   other: {
-    'google-adsense-account': 'ca-pub-6235611333449307',
+    "google-adsense-account": "ca-pub-6235611333449307",
   },
 };
 
@@ -121,27 +144,27 @@ export default async function LocaleLayout({
   const { locale } = await params;
   const postTranslationsMap = await getAllPostTranslationsMap();
   const noteTranslationsMap = await getAllNotesTranslationsMap();
-  const translationsMap = {...postTranslationsMap, ...noteTranslationsMap};
+  const translationsMap = { ...postTranslationsMap, ...noteTranslationsMap };
 
   const posts = await getSortedPostsData(locale);
   const notes = await getSortedNotesData(locale);
-  const linkPrefix = locale === i18n.defaultLocale ? '' : `/${locale}`;
+  const linkPrefix = locale === i18n.defaultLocale ? "" : `/${locale}`;
 
-  const searchablePosts = posts.map(post => ({
+  const searchablePosts = posts.map((post) => ({
     slug: post.slug,
     title: post.frontmatter.title,
     description: post.frontmatter.description,
-    type: 'blog' as const,
+    type: "blog" as const,
     href: `${linkPrefix}/blog/${post.slug}`,
     heroImage: post.frontmatter.heroImage,
     category: post.frontmatter.category,
   }));
 
-  const searchableNotes = notes.map(note => ({
+  const searchableNotes = notes.map((note) => ({
     slug: note.slug,
     title: note.frontmatter.title,
     description: note.frontmatter.description,
-    type: 'note' as const,
+    type: "note" as const,
     href: `${linkPrefix}/notes/${note.slug}`,
     heroImage: note.frontmatter.heroImage,
     category: note.frontmatter.category,
@@ -151,31 +174,46 @@ export default async function LocaleLayout({
   const dictionary = await getDictionary(locale as any);
   const draftPosts = await getDraftPostsData(locale);
   const draftNotes = await getDraftNotesData(locale);
-  
+
   return (
-    <html lang={locale} className={cn(fontDisplay.variable, fontSans.variable, fontSerif.variable, fontMono.variable, "scroll-smooth")} suppressHydrationWarning>
-      <head suppressHydrationWarning>
+    <html
+      lang={locale}
+      className={cn(
+        fontDisplay.variable,
+        fontSans.variable,
+        fontSerif.variable,
+        fontMono.variable,
+        "scroll-smooth",
+      )}
+      suppressHydrationWarning
+    >
+      <body className="font-sans antialiased fade-in-on-load">
+        {/* Google AdSense — lazyOnload prevents blocking FCP/LCP */}
         <Script
           async
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6235611333449307"
           crossOrigin="anonymous"
-          strategy="afterInteractive"
+          strategy="lazyOnload"
         />
-      </head>
-      <body className="font-sans antialiased fade-in-on-load">
         <FirebaseProviderWrapper>
-          <ThemeProvider
-              attribute="class"
-              defaultTheme="system"
-              enableSystem
-          >
+          <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
             <NotificationProvider>
               <ReadingListProvider>
-                <Header searchableData={searchableData} dictionary={dictionary} />
+                <Header
+                  searchableData={searchableData}
+                  dictionary={dictionary}
+                />
                 <main className="pt-16">{children}</main>
-                <Footer dictionary={dictionary} translationsMap={translationsMap} />
+                <Footer
+                  dictionary={dictionary}
+                  translationsMap={translationsMap}
+                />
                 <BackToTop dictionary={dictionary} />
-                <DraftList draftPosts={draftPosts} draftNotes={draftNotes} dictionary={dictionary} />
+                <DraftList
+                  draftPosts={draftPosts}
+                  draftNotes={draftNotes}
+                  dictionary={dictionary}
+                />
               </ReadingListProvider>
             </NotificationProvider>
           </ThemeProvider>

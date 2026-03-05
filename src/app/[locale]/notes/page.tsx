@@ -1,18 +1,57 @@
-import { getSortedNotesData } from '@/lib/notes';
-import { i18n } from '@/i18n-config';
-import { getDictionary } from '@/lib/get-dictionary';
-import { NotesListClient } from './notes-list-client';
+import { getSortedNotesData } from "@/lib/notes";
+import { i18n } from "@/i18n-config";
+import type { Locale } from "@/i18n-config";
+import { getDictionary } from "@/lib/get-dictionary";
+import { NotesListClient } from "./notes-list-client";
+import type { Metadata } from "next";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: Locale }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const dictionary = await getDictionary(locale);
+  const canonicalPath =
+    locale === i18n.defaultLocale ? "/notes" : `/${locale}/notes`;
+
+  const languages: Record<string, string> = {};
+  i18n.locales.forEach((loc) => {
+    const prefix = loc === i18n.defaultLocale ? "" : `/${loc}`;
+    languages[loc] = `${prefix}/notes`;
+  });
+
+  return {
+    title: dictionary.notes.title,
+    description: dictionary.notes.description,
+    alternates: {
+      canonical: canonicalPath,
+      languages: {
+        ...languages,
+        "x-default": languages[i18n.defaultLocale] || canonicalPath,
+      },
+    },
+  };
+}
 
 export async function generateStaticParams() {
   return i18n.locales.map((locale) => ({ locale }));
 }
 
-export default async function NotesPage({ params }: { params: Promise<{ locale: string }> }) {
+export default async function NotesPage({
+  params,
+}: {
+  params: Promise<{ locale: Locale }>;
+}) {
   const { locale } = await params;
   const initialNotes = await getSortedNotesData(locale);
-  const dictionary = await getDictionary(locale as any);
+  const dictionary = await getDictionary(locale);
 
   return (
-    <NotesListClient initialNotes={initialNotes} dictionary={dictionary} locale={locale} />
+    <NotesListClient
+      initialNotes={initialNotes}
+      dictionary={dictionary}
+      locale={locale}
+    />
   );
 }

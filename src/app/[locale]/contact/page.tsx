@@ -52,7 +52,7 @@ export default async function Page({
     <div className="w-full">
       <main className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-16">
         <header className="mb-12 text-center">
-          <h1 className="font-headline text-5xl md:text-6xl font-extrabold tracking-tighter text-primary mb-3">
+          <h1 className="font-headline text-display-sm font-extrabold tracking-tighter text-primary mb-3">
             {pageContent.title}
           </h1>
           <p className="text-muted-foreground max-w-xl mx-auto">

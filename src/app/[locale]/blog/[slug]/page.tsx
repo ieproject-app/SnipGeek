@@ -168,7 +168,7 @@ export default async function Page({
               className="mb-6 justify-center"
             />
 
-            <h1 className="font-headline text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tighter text-primary mb-6 max-w-3xl mx-auto">
+            <h1 className="font-headline text-display-sm font-extrabold tracking-tighter text-primary mb-6 max-w-3xl mx-auto">
               {initialPost.frontmatter.title}
             </h1>
 
