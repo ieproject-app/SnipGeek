@@ -134,13 +134,13 @@ export function Footer({ dictionary, translationsMap }: { dictionary: Dictionary
                     </ScrollReveal>
 
                     <ScrollReveal direction="up" delay={0.6}>
-                        <div className="flex flex-col justify-center items-center gap-6 text-sm text-muted-foreground/60 border-t pt-12 mt-12">
+                        <div className="flex flex-col justify-center items-center gap-6 text-sm text-primary/80 border-t border-primary/10 pt-12 mt-12">
                             <div className="flex items-center gap-4">
                                 <div className="bg-primary/90 backdrop-blur-sm rounded-full p-1.5 flex items-center gap-2 shadow-xl border border-white/5">
                                     <LanguageSwitcher translationsMap={translationsMap} dictionary={dictionary} />
                                 </div>
                             </div>
-                            <p className="font-medium tracking-wide">&copy; {new Date().getFullYear()} SnipGeek. All Rights Reserved.</p>
+                            <p className="font-semibold tracking-wider text-primary/60 hover:text-primary transition-colors duration-300">&copy; {new Date().getFullYear()} SnipGeek. All Rights Reserved.</p>
                         </div>
                     </ScrollReveal>
                 </div>
