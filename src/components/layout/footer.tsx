@@ -9,6 +9,7 @@ import { LanguageSwitcher } from './language-switcher';
 import type { TranslationsMap } from '@/lib/posts';
 import { Facebook, Youtube, Instagram, User2, StickyNote, LayoutGrid, Mail } from 'lucide-react';
 import { TikTokLogo } from '@/components/icons/tiktok-logo';
+import { ScrollReveal } from '@/components/ui/scroll-reveal';
 
 export function Footer({ dictionary, translationsMap }: { dictionary: Dictionary, translationsMap: TranslationsMap }) {
     const footerNavItems = [
@@ -29,43 +30,44 @@ export function Footer({ dictionary, translationsMap }: { dictionary: Dictionary
     ];
 
     return (
-        <footer className="relative w-full mt-16 sm:mt-24">
+        <footer className="relative w-full mt-16 sm:mt-24 overflow-hidden">
             {/* Top Navigation Section - Links Cards */}
             <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-24 sm:pt-16 sm:pb-32">
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
                     {footerNavItems.map((item, index) => {
                         const image = PlaceHolderImages.find(p => p.id === item.id);
                         return (
-                            <div
-                                key={item.id}
-                                className={cn(
-                                    "transform transition-all duration-300 ease-in-out hover:-translate-y-2 will-change-transform",
-                                    (index === 0 || index === 2) && "rotate-2",
-                                    (index === 1 || index === 3) && "-rotate-2"
-                                )}
-                            >
-                                <Link href={item.href} className="block group">
-                                    <article className="relative w-full aspect-[4/3] rounded-xl overflow-hidden shadow-lg transition-shadow group-hover:shadow-2xl">
-                                        {image && (
-                                            <Image
-                                                src={image.imageUrl}
-                                                alt={image.description}
-                                                fill
-                                                className="object-cover"
-                                                sizes="(max-width: 768px) 50vw, 200px"
-                                                data-ai-hint={image.imageHint}
-                                            />
-                                        )}
-                                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
-                                        <div className="absolute bottom-0 left-0 p-4 text-white">
-                                            <h3 className="font-headline text-lg font-bold flex items-center gap-2">
-                                                {item.icon}
-                                                <span>{item.title}</span>
-                                            </h3>
-                                        </div>
-                                    </article>
-                                </Link>
-                            </div>
+                            <ScrollReveal key={item.id} direction="up" delay={index * 0.1}>
+                                <div
+                                    className={cn(
+                                        "transform transition-all duration-300 ease-in-out hover:-translate-y-2 will-change-transform",
+                                        (index === 0 || index === 2) && "rotate-2",
+                                        (index === 1 || index === 3) && "-rotate-2"
+                                    )}
+                                >
+                                    <Link href={item.href} className="block group">
+                                        <article className="relative w-full aspect-[4/3] rounded-xl overflow-hidden shadow-lg transition-shadow group-hover:shadow-2xl">
+                                            {image && (
+                                                <Image
+                                                    src={image.imageUrl}
+                                                    alt={image.description}
+                                                    fill
+                                                    className="object-cover"
+                                                    sizes="(max-width: 768px) 50vw, 200px"
+                                                    data-ai-hint={image.imageHint}
+                                                />
+                                            )}
+                                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+                                            <div className="absolute bottom-0 left-0 p-4 text-white">
+                                                <h3 className="font-headline text-lg font-bold flex items-center gap-2">
+                                                    {item.icon}
+                                                    <span>{item.title}</span>
+                                                </h3>
+                                            </div>
+                                        </article>
+                                    </Link>
+                                </div>
+                            </ScrollReveal>
                         );
                     })}
                 </div>
@@ -81,16 +83,16 @@ export function Footer({ dictionary, translationsMap }: { dictionary: Dictionary
 
                 {/* Bisected Avatar */}
                 <div className="absolute left-1/2 -translate-x-1/2 top-0 -translate-y-1/2 z-20">
-                    <div className="relative rounded-full ring-2 ring-primary/20 ring-offset-4 ring-offset-background shadow-2xl transition-all duration-300 ease-in-out group hover:ring-primary/40">
+                    <ScrollReveal direction="down" delay={0.2} className="relative rounded-full ring-2 ring-primary/20 ring-offset-4 ring-offset-background shadow-2xl transition-all duration-300 ease-in-out group hover:ring-primary/40">
                         <Avatar className="w-24 h-24 mx-auto border-4 border-background bg-background transition-transform duration-500 group-hover:scale-105">
                             <AvatarImage src={authorAvatar} alt={authorName} />
                             <AvatarFallback className="bg-muted text-primary">{authorName.split(' ').map(n => n[0]).join('')}</AvatarFallback>
                         </Avatar>
-                    </div>
+                    </ScrollReveal>
                 </div>
 
                 <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="text-center mb-12">
+                    <ScrollReveal direction="up" delay={0.3} className="text-center mb-12">
                         <h4 className="font-headline text-3xl font-bold text-foreground tracking-tight">{authorName}</h4>
                         <p className="mt-4 text-muted-foreground max-w-md mx-auto text-lg leading-relaxed font-medium animate-in fade-in duration-700">
                             {dictionary.footer.authorBio}
@@ -98,7 +100,7 @@ export function Footer({ dictionary, translationsMap }: { dictionary: Dictionary
 
                         {/* Social Links */}
                         <div className="flex items-center justify-center gap-4 mt-8">
-                            {socialLinks.map((social) => {
+                            {socialLinks.map((social, index) => {
                                 const brandStyles: Record<string, string> = {
                                     "Facebook": "hover:shadow-[0_0_20px_rgba(59,89,152,0.5)] hover:bg-[#3b5998]",
                                     "YouTube": "hover:shadow-[0_0_20px_rgba(255,0,0,0.5)] hover:bg-[#ff0000]",
@@ -108,36 +110,39 @@ export function Footer({ dictionary, translationsMap }: { dictionary: Dictionary
                                 const brandStyle = brandStyles[social.label] || "hover:bg-accent hover:text-primary";
 
                                 return (
-                                    <a
-                                        key={social.label}
-                                        href={social.href}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className={cn(
-                                            "group relative p-3 rounded-full bg-primary/90 text-primary-foreground shadow-md transition-all duration-300 ease-in-out",
-                                            "hover:-translate-y-1 hover:scale-115",
-                                            brandStyle
-                                        )}
-                                        aria-label={social.label}
-                                    >
-                                        <span className="absolute -top-8 left-1/2 -translate-x-1/2 px-2 py-1 rounded bg-primary text-primary-foreground text-[10px] font-bold uppercase tracking-widest opacity-0 group-hover:opacity-100 -translate-y-1 group-hover:-translate-y-3 transition-all duration-300 pointer-events-none whitespace-nowrap z-20">
-                                            {social.label}
-                                        </span>
-                                        {social.icon}
-                                    </a>
+                                    <ScrollReveal key={social.label} direction="up" delay={0.4 + (index * 0.1)}>
+                                        <a
+                                            href={social.href}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className={cn(
+                                                "group relative p-3 rounded-full bg-primary/90 text-primary-foreground shadow-md transition-all duration-300 ease-in-out block",
+                                                "hover:-translate-y-1 hover:scale-115",
+                                                brandStyle
+                                            )}
+                                            aria-label={social.label}
+                                        >
+                                            <span className="absolute -top-8 left-1/2 -translate-x-1/2 px-2 py-1 rounded bg-primary text-primary-foreground text-[10px] font-bold uppercase tracking-widest opacity-0 group-hover:opacity-100 -translate-y-1 group-hover:-translate-y-3 transition-all duration-300 pointer-events-none whitespace-nowrap z-20">
+                                                {social.label}
+                                            </span>
+                                            {social.icon}
+                                        </a>
+                                    </ScrollReveal>
                                 );
                             })}
                         </div>
-                    </div>
+                    </ScrollReveal>
 
-                    <div className="flex flex-col justify-center items-center gap-6 text-sm text-muted-foreground/60 border-t pt-12">
-                        <div className="flex items-center gap-4">
-                            <div className="bg-primary/90 backdrop-blur-sm rounded-full p-1.5 flex items-center gap-2 shadow-xl border border-white/5">
-                                <LanguageSwitcher translationsMap={translationsMap} dictionary={dictionary} />
+                    <ScrollReveal direction="up" delay={0.6}>
+                        <div className="flex flex-col justify-center items-center gap-6 text-sm text-muted-foreground/60 border-t pt-12 mt-12">
+                            <div className="flex items-center gap-4">
+                                <div className="bg-primary/90 backdrop-blur-sm rounded-full p-1.5 flex items-center gap-2 shadow-xl border border-white/5">
+                                    <LanguageSwitcher translationsMap={translationsMap} dictionary={dictionary} />
+                                </div>
                             </div>
+                            <p className="font-medium tracking-wide">&copy; {new Date().getFullYear()} SnipGeek. All Rights Reserved.</p>
                         </div>
-                        <p className="font-medium tracking-wide">&copy; {new Date().getFullYear()} SnipGeek. All Rights Reserved.</p>
-                    </div>
+                    </ScrollReveal>
                 </div>
             </div>
         </footer>

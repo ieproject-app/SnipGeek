@@ -16,6 +16,8 @@ import { AddToReadingListButton } from '@/components/layout/add-to-reading-list-
 import type { Dictionary } from '@/lib/get-dictionary';
 import { CategoryBadge } from '@/components/layout/category-badge';
 
+import { ScrollReveal } from '@/components/ui/scroll-reveal';
+
 interface SliderPost {
   slug: string;
   frontmatter: {
@@ -60,110 +62,114 @@ export function HorizontalSlider({ posts, title, viewMoreText, dictionary, local
     <section className="pb-12 sm:pb-16 overflow-hidden">
       <div className="container max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
-        <div className="mb-8 text-left">
-          <h2 className="text-sm font-medium font-headline text-primary mb-2 italic">
-            {title}
-          </h2>
-          <div className="w-12 h-1 bg-accent rounded-full" />
-        </div>
+        <ScrollReveal direction="left">
+          <div className="mb-8 text-left">
+            <h2 className="text-sm font-medium font-headline text-primary mb-2 italic">
+              {title}
+            </h2>
+            <div className="w-12 h-1 bg-accent rounded-full" />
+          </div>
+        </ScrollReveal>
 
         {/* Carousel */}
-        <Carousel
-          setApi={setApi}
-          opts={{
-            align: 'start',
-            loop: false,
-          }}
-          className="w-full"
-        >
-          <CarouselContent className="-ml-4 sm:-ml-6">
-            {posts.map((post) => {
-              const heroImageValue = post.frontmatter.heroImage;
-              let heroImageSrc = "/images/blank/blank.webp";
-              let heroImageHint = post.frontmatter.imageAlt || post.frontmatter.title;
+        <ScrollReveal direction="up" delay={0.2}>
+          <Carousel
+            setApi={setApi}
+            opts={{
+              align: 'start',
+              loop: false,
+            }}
+            className="w-full"
+          >
+            <CarouselContent className="-ml-4 sm:-ml-6">
+              {posts.map((post) => {
+                const heroImageValue = post.frontmatter.heroImage;
+                let heroImageSrc = "/images/blank/blank.webp";
+                let heroImageHint = post.frontmatter.imageAlt || post.frontmatter.title;
 
-              if (heroImageValue) {
-                if (heroImageValue.startsWith('http') || heroImageValue.startsWith('/')) {
-                  heroImageSrc = heroImageValue;
-                } else {
-                  const placeholder = PlaceHolderImages.find(p => p.id === heroImageValue);
-                  if (placeholder) {
-                    heroImageSrc = placeholder.imageUrl;
-                    heroImageHint = placeholder.imageHint;
+                if (heroImageValue) {
+                  if (heroImageValue.startsWith('http') || heroImageValue.startsWith('/')) {
+                    heroImageSrc = heroImageValue;
+                  } else {
+                    const placeholder = PlaceHolderImages.find(p => p.id === heroImageValue);
+                    if (placeholder) {
+                      heroImageSrc = placeholder.imageUrl;
+                      heroImageHint = placeholder.imageHint;
+                    }
                   }
                 }
-              }
 
-              const item = {
-                slug: post.slug,
-                title: post.frontmatter.title,
-                description: post.frontmatter.description,
-                href: `${linkPrefix}/blog/${post.slug}`,
-                type: 'blog' as const,
-              };
+                const item = {
+                  slug: post.slug,
+                  title: post.frontmatter.title,
+                  description: post.frontmatter.description,
+                  href: `${linkPrefix}/blog/${post.slug}`,
+                  type: 'blog' as const,
+                };
 
-              return (
-                <CarouselItem key={post.slug} className="pl-4 sm:pl-6 md:basis-1/2 py-2">
-                  <article className={cn(
-                    "bg-card/50 rounded-lg overflow-hidden border border-primary/5 p-3 transition-all duration-500 h-full flex gap-4 shadow-sm group",
-                    "hover:-translate-y-1 hover:bg-card hover:border-primary/10"
-                  )}>
-                    <Link href={`${linkPrefix}/blog/${post.slug}`} className="contents">
-                      {/* Thumbnail Container - Updated to 4:3 (120x90) */}
-                      <div className="relative w-[120px] h-[90px] shrink-0 overflow-hidden rounded-lg shadow-sm border border-primary/5">
-                        <Image
-                          src={heroImageSrc}
-                          alt={post.frontmatter.imageAlt || post.frontmatter.title}
-                          fill
-                          className="object-cover transition-transform duration-700 group-hover:scale-110"
-                          sizes="120px"
-                          data-ai-hint={heroImageHint}
-                        />
-                        <AddToReadingListButton
-                          item={item}
-                          dictionary={dictionary}
-                          showText={false}
-                          className="absolute top-1 right-1 z-20 text-white bg-black/30 hover:bg-black/50 hover:text-white opacity-0 group-hover:opacity-100 transition-opacity h-6 w-6"
-                        />
-                      </div>
-
-                      {/* Content Area */}
-                      <div className="flex-1 min-w-0 py-1">
-                        <div className="mb-1">
-                          <CategoryBadge category={post.frontmatter.category || 'Update'} />
+                return (
+                  <CarouselItem key={post.slug} className="pl-4 sm:pl-6 md:basis-1/2 py-2">
+                    <article className={cn(
+                      "bg-card/50 rounded-lg overflow-hidden border border-primary/5 p-3 transition-all duration-500 h-full flex gap-4 shadow-sm group",
+                      "hover:-translate-y-1 hover:bg-card hover:border-primary/10"
+                    )}>
+                      <Link href={`${linkPrefix}/blog/${post.slug}`} className="contents">
+                        {/* Thumbnail Container - Updated to 4:3 (120x90) */}
+                        <div className="relative w-[120px] h-[90px] shrink-0 overflow-hidden rounded-lg shadow-sm border border-primary/5">
+                          <Image
+                            src={heroImageSrc}
+                            alt={post.frontmatter.imageAlt || post.frontmatter.title}
+                            fill
+                            className="object-cover transition-transform duration-700 group-hover:scale-110"
+                            sizes="120px"
+                            data-ai-hint={heroImageHint}
+                          />
+                          <AddToReadingListButton
+                            item={item}
+                            dictionary={dictionary}
+                            showText={false}
+                            className="absolute top-1 right-1 z-20 text-white bg-black/30 hover:bg-black/50 hover:text-white opacity-0 group-hover:opacity-100 transition-opacity h-6 w-6"
+                          />
                         </div>
-                        <h3 className="font-headline text-h6 font-medium text-primary leading-snug line-clamp-2 transition-colors group-hover:text-accent">
-                          {post.frontmatter.title}
-                        </h3>
-                        <time className="text-[10px] text-muted-foreground mt-2 block font-medium opacity-60">
-                          {formatRelativeTime(new Date(post.frontmatter.date), locale)}
-                        </time>
-                      </div>
-                    </Link>
-                  </article>
-                </CarouselItem>
-              );
-            })}
-          </CarouselContent>
 
-          {/* Controls - Redesigned Style */}
-          <div className="mt-6 flex justify-center">
-            <Link
-              href={viewMoreHref}
-              className="flex items-center gap-6 bg-muted/30 px-5 py-2.5 rounded-full border border-primary/5 hover:bg-muted/50 transition-all group"
-            >
-              <div className="flex items-center gap-2 pr-4 border-r border-primary/10">
-                <div className="h-1.5 w-8 bg-accent rounded-full" />
-                <div className="h-1.5 w-1.5 bg-primary/20 rounded-full" />
-                <div className="h-1.5 w-1.5 bg-primary/20 rounded-full" />
-              </div>
-              <span className="text-[11px] font-black uppercase tracking-widest text-primary/80 group-hover:text-primary transition-all flex items-center gap-2">
-                {viewMoreText}
-                <ChevronRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
-              </span>
-            </Link>
-          </div>
-        </Carousel>
+                        {/* Content Area */}
+                        <div className="flex-1 min-w-0 py-1">
+                          <div className="mb-1">
+                            <CategoryBadge category={post.frontmatter.category || 'Update'} />
+                          </div>
+                          <h3 className="font-headline text-h6 font-medium text-primary leading-snug line-clamp-2 transition-colors group-hover:text-accent">
+                            {post.frontmatter.title}
+                          </h3>
+                          <time className="text-[10px] text-muted-foreground mt-2 block font-medium opacity-60">
+                            {formatRelativeTime(new Date(post.frontmatter.date), locale)}
+                          </time>
+                        </div>
+                      </Link>
+                    </article>
+                  </CarouselItem>
+                );
+              })}
+            </CarouselContent>
+
+            {/* Controls - Redesigned Style */}
+            <div className="mt-6 flex justify-center">
+              <Link
+                href={viewMoreHref}
+                className="flex items-center gap-6 bg-muted/30 px-5 py-2.5 rounded-full border border-primary/5 hover:bg-muted/50 transition-all group"
+              >
+                <div className="flex items-center gap-2 pr-4 border-r border-primary/10">
+                  <div className="h-1.5 w-8 bg-accent rounded-full" />
+                  <div className="h-1.5 w-1.5 bg-primary/20 rounded-full" />
+                  <div className="h-1.5 w-1.5 bg-primary/20 rounded-full" />
+                </div>
+                <span className="text-[11px] font-black uppercase tracking-widest text-primary/80 group-hover:text-primary transition-all flex items-center gap-2">
+                  {viewMoreText}
+                  <ChevronRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
+                </span>
+              </Link>
+            </div>
+          </Carousel>
+        </ScrollReveal>
       </div>
     </section>
   );
