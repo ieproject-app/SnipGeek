@@ -1,10 +1,9 @@
+import fs from "fs";
+import path from "path";
+import matter from "gray-matter";
+import { i18n, type Locale } from "@/i18n-config";
 
-import fs from 'fs';
-import path from 'path';
-import matter from 'gray-matter';
-import { i18n, type Locale } from '@/i18n-config';
-
-const postsDirectory = path.join(process.cwd(), '_posts');
+const postsDirectory = path.join(process.cwd(), "_posts");
 
 export type PostFrontmatter = {
   title: string;
@@ -28,13 +27,16 @@ export type Post<TFrontmatter> = {
   locale: string;
 };
 
-
-export async function getSortedPostsData(locale?: string): Promise<Post<PostFrontmatter>[]> {
-  const targetLocale = i18n.locales.includes(locale as Locale) ? locale : i18n.defaultLocale;
+export async function getSortedPostsData(
+  locale?: string,
+): Promise<Post<PostFrontmatter>[]> {
+  const targetLocale = i18n.locales.includes(locale as Locale)
+    ? locale
+    : i18n.defaultLocale;
   const localeDirectory = path.join(postsDirectory, targetLocale!);
-  
+
   if (!fs.existsSync(localeDirectory)) {
-      return [];
+    return [];
   }
 
   let fileNames: string[];
@@ -46,16 +48,16 @@ export async function getSortedPostsData(locale?: string): Promise<Post<PostFron
   }
 
   const allPostsData = fileNames
-    .filter((fileName) => fileName.endsWith('.mdx'))
+    .filter((fileName) => fileName.endsWith(".mdx"))
     .map((fileName) => {
-      const slug = fileName.replace(/\.mdx$/, '');
+      const slug = fileName.replace(/\.mdx$/, "");
       const fullPath = path.join(localeDirectory, fileName);
       try {
-        const fileContents = fs.readFileSync(fullPath, 'utf8');
+        const fileContents = fs.readFileSync(fullPath, "utf8");
         const { data } = matter(fileContents);
 
         if (!data.heroImage) {
-          data.heroImage = 'footer-about';
+          data.heroImage = "footer-about";
         }
 
         return {
@@ -68,23 +70,30 @@ export async function getSortedPostsData(locale?: string): Promise<Post<PostFron
       }
     })
     .filter((p): p is Post<PostFrontmatter> => p !== null)
-    .filter(post => post.frontmatter.published === true);
+    .filter((post) => post.frontmatter.published === true);
 
   const postsWithKeys = new Map<string, Post<PostFrontmatter>>();
   const postsWithoutKeys: Post<PostFrontmatter>[] = [];
 
   for (const post of allPostsData) {
-      const key = post.frontmatter.translationKey;
-      if (key) {
-          if (!postsWithKeys.has(key) || new Date(post.frontmatter.date) > new Date(postsWithKeys.get(key)!.frontmatter.date)) {
-              postsWithKeys.set(key, post);
-          }
-      } else {
-          postsWithoutKeys.push(post);
+    const key = post.frontmatter.translationKey;
+    if (key) {
+      if (
+        !postsWithKeys.has(key) ||
+        new Date(post.frontmatter.date) >
+          new Date(postsWithKeys.get(key)!.frontmatter.date)
+      ) {
+        postsWithKeys.set(key, post);
       }
+    } else {
+      postsWithoutKeys.push(post);
+    }
   }
 
-  const uniquePosts = [...Array.from(postsWithKeys.values()), ...postsWithoutKeys];
+  const uniquePosts = [
+    ...Array.from(postsWithKeys.values()),
+    ...postsWithoutKeys,
+  ];
 
   return uniquePosts.sort((a, b) => {
     if (new Date(a.frontmatter.date) < new Date(b.frontmatter.date)) {
@@ -95,10 +104,14 @@ export async function getSortedPostsData(locale?: string): Promise<Post<PostFron
   });
 }
 
-export async function getDraftPostsData(locale?: string): Promise<Post<PostFrontmatter>[]> {
-  const targetLocale = i18n.locales.includes(locale as Locale) ? locale : i18n.defaultLocale;
+export async function getDraftPostsData(
+  locale?: string,
+): Promise<Post<PostFrontmatter>[]> {
+  const targetLocale = i18n.locales.includes(locale as Locale)
+    ? locale
+    : i18n.defaultLocale;
   const localeDirectory = path.join(postsDirectory, targetLocale!);
-  
+
   if (!fs.existsSync(localeDirectory)) return [];
 
   let fileNames: string[];
@@ -109,16 +122,16 @@ export async function getDraftPostsData(locale?: string): Promise<Post<PostFront
   }
 
   const allPostsData = fileNames
-    .filter((fileName) => fileName.endsWith('.mdx'))
+    .filter((fileName) => fileName.endsWith(".mdx"))
     .map((fileName) => {
-      const slug = fileName.replace(/\.mdx$/, '');
+      const slug = fileName.replace(/\.mdx$/, "");
       const fullPath = path.join(localeDirectory, fileName);
       try {
-        const fileContents = fs.readFileSync(fullPath, 'utf8');
+        const fileContents = fs.readFileSync(fullPath, "utf8");
         const { data } = matter(fileContents);
 
         if (!data.heroImage) {
-          data.heroImage = 'footer-about';
+          data.heroImage = "footer-about";
         }
 
         return {
@@ -131,7 +144,7 @@ export async function getDraftPostsData(locale?: string): Promise<Post<PostFront
       }
     })
     .filter((p): p is Post<PostFrontmatter> => p !== null)
-    .filter(post => post.frontmatter.published !== true);
+    .filter((post) => post.frontmatter.published !== true);
 
   return allPostsData.sort((a, b) => {
     if (new Date(a.frontmatter.date) < new Date(b.frontmatter.date)) {
@@ -147,29 +160,48 @@ export type PostData = {
   frontmatter: PostFrontmatter;
   content: string;
   locale: string;
+  isFallback?: boolean;
 };
 
-export async function getPostData(slug: string, locale?: string): Promise<PostData | null> {
-  const targetLocale = i18n.locales.includes(locale as Locale) ? locale : i18n.defaultLocale;
+export async function getPostData(
+  slug: string,
+  locale?: string,
+): Promise<PostData | null> {
+  const targetLocale = i18n.locales.includes(locale as Locale)
+    ? locale
+    : i18n.defaultLocale;
   const fullPath = path.join(postsDirectory, targetLocale!, `${slug}.mdx`);
-  
-  if (!fs.existsSync(fullPath)) {
+
+  // If file not found in requested locale, fallback to default locale (EN)
+  const fallbackPath = path.join(
+    postsDirectory,
+    i18n.defaultLocale,
+    `${slug}.mdx`,
+  );
+  const resolvedPath = fs.existsSync(fullPath)
+    ? { path: fullPath, locale: targetLocale! }
+    : fs.existsSync(fallbackPath)
+      ? { path: fallbackPath, locale: i18n.defaultLocale }
+      : null;
+
+  if (!resolvedPath) {
     return null;
   }
 
   try {
-    const fileContents = fs.readFileSync(fullPath, 'utf8');
+    const fileContents = fs.readFileSync(resolvedPath.path, "utf8");
     const { data, content } = matter(fileContents);
 
     if (!data.heroImage) {
-      data.heroImage = 'footer-about';
+      data.heroImage = "footer-about";
     }
 
     return {
       slug,
       frontmatter: data as PostFrontmatter,
       content,
-      locale: targetLocale!,
+      locale: resolvedPath.locale,
+      isFallback: resolvedPath.locale !== targetLocale,
     };
   } catch (e) {
     return null;
@@ -177,50 +209,59 @@ export async function getPostData(slug: string, locale?: string): Promise<PostDa
 }
 
 export async function getAllPostSlugs(locale?: string) {
-    const targetLocale = i18n.locales.includes(locale as Locale) ? locale : i18n.defaultLocale;
-    const localeDirectory = path.join(postsDirectory, targetLocale!);
-    
-    if (!fs.existsSync(localeDirectory)) return [];
+  const targetLocale = i18n.locales.includes(locale as Locale)
+    ? locale
+    : i18n.defaultLocale;
+  const localeDirectory = path.join(postsDirectory, targetLocale!);
 
-    let fileNames: string[];
-    try {
-      fileNames = fs.readdirSync(localeDirectory);
-    } catch (err) {
-      return [];
-    }
+  if (!fs.existsSync(localeDirectory)) return [];
 
-    return fileNames
-      .filter((fileName) => fileName.endsWith('.mdx'))
-      .map((fileName) => {
-        const fullPath = path.join(localeDirectory, fileName);
-        try {
-          const fileContents = fs.readFileSync(fullPath, 'utf8');
-          const { data } = matter(fileContents);
-          if (data.published === true) {
-              return {
-                  slug: fileName.replace(/\.mdx$/, ''),
-              };
-          }
-          return null;
-        } catch (e) {
-          return null;
+  let fileNames: string[];
+  try {
+    fileNames = fs.readdirSync(localeDirectory);
+  } catch (err) {
+    return [];
+  }
+
+  return fileNames
+    .filter((fileName) => fileName.endsWith(".mdx"))
+    .map((fileName) => {
+      const fullPath = path.join(localeDirectory, fileName);
+      try {
+        const fileContents = fs.readFileSync(fullPath, "utf8");
+        const { data } = matter(fileContents);
+        if (data.published === true) {
+          return {
+            slug: fileName.replace(/\.mdx$/, ""),
+          };
         }
-      })
-      .filter(slug => slug !== null);
+        return null;
+      } catch (e) {
+        return null;
+      }
+    })
+    .filter((slug) => slug !== null);
 }
 
-export async function getPostTranslation(translationKey: string, targetLocale: string): Promise<Post<PostFrontmatter> | null> {
+export async function getPostTranslation(
+  translationKey: string,
+  targetLocale: string,
+): Promise<Post<PostFrontmatter> | null> {
   const allPosts = await getSortedPostsData(targetLocale);
-  const translatedPost = allPosts.find(p => p.frontmatter.translationKey === translationKey);
+  const translatedPost = allPosts.find(
+    (p) => p.frontmatter.translationKey === translationKey,
+  );
   return translatedPost || null;
 }
 
 export async function getAllLocales() {
   try {
     if (!fs.existsSync(postsDirectory)) return [];
-    return fs.readdirSync(postsDirectory).filter(item => 
-      fs.statSync(path.join(postsDirectory, item)).isDirectory()
-    );
+    return fs
+      .readdirSync(postsDirectory)
+      .filter((item) =>
+        fs.statSync(path.join(postsDirectory, item)).isDirectory(),
+      );
   } catch (error) {
     return [];
   }
@@ -239,7 +280,7 @@ export async function getAllTranslationsMap(): Promise<TranslationsMap> {
 
   for (const locale of allLocales) {
     const localeDirectory = path.join(postsDirectory, locale);
-    
+
     if (!fs.existsSync(localeDirectory)) continue;
 
     let fileNames: string[];
@@ -250,12 +291,12 @@ export async function getAllTranslationsMap(): Promise<TranslationsMap> {
     }
 
     for (const fileName of fileNames) {
-      if (!fileName.endsWith('.mdx')) continue;
-      
-      const slug = fileName.replace(/\.mdx$/, '');
+      if (!fileName.endsWith(".mdx")) continue;
+
+      const slug = fileName.replace(/\.mdx$/, "");
       const fullPath = path.join(localeDirectory, fileName);
       try {
-        const fileContents = fs.readFileSync(fullPath, 'utf8');
+        const fileContents = fs.readFileSync(fullPath, "utf8");
         const { data } = matter(fileContents);
         const frontmatter = data as PostFrontmatter;
 
@@ -266,7 +307,7 @@ export async function getAllTranslationsMap(): Promise<TranslationsMap> {
           translationsMap[key] = [];
         }
 
-        const existing = translationsMap[key].find(t => t.locale === locale);
+        const existing = translationsMap[key].find((t) => t.locale === locale);
         if (!existing) {
           translationsMap[key].push({ locale, slug });
         }
