@@ -1,282 +1,282 @@
-
 {
-    "navigation": {
-        "blog": "Blog",
-        "projects": "Proyek",
-        "about": "Tentang",
-        "archive": "Arsip",
-        "contact": "Kontak",
-        "notes": "Catatan",
-        "tools": "Alat"
+  "navigation": {
+    "blog": "Blog",
+    "projects": "Proyek",
+    "about": "Tentang",
+    "archive": "Arsip",
+    "contact": "Kontak",
+    "notes": "Catatan",
+    "tools": "Alat"
+  },
+  "footer": {
+    "authorBio": "Seorang developer bersemangat yang menjelajahi web dan berbagi temuan di sepanjang jalan."
+  },
+  "home": {
+    "featuredPosts": "Postingan Unggulan",
+    "latestPosts": "Postingan Terbaru",
+    "viewAllPosts": "Lihat Semua Postingan",
+    "specialTagSectionTitle": "Postingan",
+    "breadcrumbHome": "Beranda",
+    "sliderAndShadow": {
+      "title": "Cari tutorial apa?",
+      "viewMore": "selengkapnya"
     },
-    "footer": {
-        "authorBio": "Seorang developer bersemangat yang menjelajahi web dan berbagi temuan di sepanjang jalan."
-    },
-    "home": {
-        "featuredPosts": "Postingan Unggulan",
-        "latestPosts": "Postingan Terbaru",
-        "viewAllPosts": "Lihat Semua Postingan",
-        "specialTagSectionTitle": "Postingan",
-        "breadcrumbHome": "Beranda",
-        "sliderAndShadow": {
-            "title": "Cari tutorial apa?",
-            "viewMore": "selengkapnya"
-        },
-        "softwareUpdateSlider": {
-            "title": "Ada pembaruan software?",
-            "viewMore": "cek pembaruan"
-        }
-    },
-    "blog": {
-        "title": "Blog",
-        "description": "Pembahasan mendalam tentang teknologi, tutorial, dan wawasan pengembangan."
-    },
-    "notes": {
-        "title": "Catatan",
-        "description": "Catatan teknis pribadi dan referensi cepat."
-    },
-    "projects": {
-        "title": "Proyek",
-        "description": "Sebuah pameran proyek-proyek saya.",
-        "wip": "Halaman ini sedang dalam tahap pembuatan."
-    },
-    "about": {
-        "title": "Tentang Saya",
-        "description": "Perjalanan saya dari teknisi lapangan hingga pengoptimal digital.",
-        "experience": "Pengalaman Profesional",
-        "skills": "Keahlian Teknis",
-        "education": "Pendidikan",
-        "certifications": "Lisensi & Sertifikasi",
-        "downloadResume": "Unduh Resume Lengkap Saya",
-        "getInTouch": "Ayo Terhubung",
-        "summary": "Ringkasan Profesional"
-    },
-    "tools": {
-        "title": "Alat",
-        "description": "Kumpulan alat bantu untuk alur kerja saya.",
-        "public_section": "Alat Publik",
-        "internal_section": "Alat Internal",
-        "wip": "Halaman ini sedang dalam tahap pembuatan.",
-        "internal": "Internal",
-        "open_tool": "Buka Alat",
-        "coming_soon": "Segera Hadir",
-        "new_badge": "Baru",
-        "tool_list": {
-            "ai_prompt_generator": {
-                "title": "AI Article Prompt Generator",
-                "description": "Buat prompt terstruktur untuk meminta artikel baru dengan detail yang lengkap."
-            },
-            "number_to_words": {
-                "title": "Generator Terbilang",
-                "description": "Mengubah angka menjadi bentuk tulisan dalam Bahasa Indonesia."
-            },
-            "random_name": {
-                "title": "Pemilih Nama Acak",
-                "description": "Pilih nama secara acak dari sebuah daftar, cocok untuk undian."
-            },
-            "employee_history": {
-                "title": "Riwayat Karyawan",
-                "description": "Catatan pribadi untuk melacak riwayat kerja dan kinerja karyawan."
-            },
-            "number_generator": {
-                "title": "Generator Nomor",
-                "description": "Menghasilkan nomor urut unik untuk keperluan pelacakan internal."
-            }
-        },
-        "systemNotReady": {
-            "title": "SISTEM BELUM SIAP",
-            "description": "Aplikasi belum bisa mendeteksi Kunci API dari dashboard Firebase Mas Iwan.",
-            "step1": "LANGKAH 1: HUBUNGKAN & SIMPAN",
-            "step1Desc": "Pilih repositori SnipGeek di tab Deployment dan klik Save.",
-            "step2": "LANGKAH 2: START ROLLOUT (WAJIB)",
-            "step2Desc": "Buka tab Rollouts dan klik Start Rollout untuk menyeduh variabel terbaru.",
-            "step3": "LANGKAH 3: CEK PREFIX",
-            "step3Desc": "Pastikan nama variabel di tab Environment diawali dengan NEXT_PUBLIC_.",
-            "footer": "Tanpa proses 'Start Rollout', browser Mas Iwan tidak diizinkan membaca kunci rahasia demi keamanan sistem.",
-            "authorized": "Authorized",
-            "logout": "Keluar Akun",
-            "connecting": "Menghubungkan ke Cloud...",
-            "restrictedAccess": "Akses Terbatas",
-            "restrictedDesc": "Tool {tool} memerlukan login akun Google terdaftar untuk menjaga integritas sistem.",
-            "loginWithGoogle": "Masuk dengan Google"
-        }
-    },
-    "employeeHistory": {
-        "searchTitle": "Cari Riwayat Karyawan",
-        "searchDescription": "Cari berdasarkan nama, jabatan, atau grup. Anda juga bisa mengetikkan tanggal (misal: 20/05/2023) untuk melihat siapa yang aktif pada hari itu.",
-        "searchPlaceholder": "Masukkan nama atau tanggal...",
-        "groupPlaceholder": "Filter Grup",
-        "allGroups": "Semua Grup",
-        "nameHeader": "Nama",
-        "positionHeader": "Jabatan",
-        "groupHeader": "Grup",
-        "nikHeader": "NIK",
-        "startDateHeader": "Tgl Mulai",
-        "endDateHeader": "Tgl Selesai",
-        "present": "Sekarang",
-        "generatorTitle": "Generator Penandatangan Dokumen",
-        "generatorDescription": "Identifikasi penandatangan yang tepat dengan cepat untuk jenis dokumen tertentu berdasarkan tanggal target.",
-        "docTypePlaceholder": "Pilih Jenis Dokumen",
-        "projectValuePlaceholder": "Nilai Proyek (Rp)"
-    },
-    "archive": {
-        "title": "Arsip",
-        "description": "Telusuri semua postingan dan catatan.",
-        "wip": "Halaman ini sedang dalam pembuatan."
-    },
-    "contact": {
-        "title": "Kontak",
-        "description": "Hubungi saya. Cara terbaik untuk menghubungi saya adalah melalui email.",
-        "intro": "Jangan ragu untuk menghubungi. Cara terbaik untuk menghubungi saya adalah melalui email.",
-        "wip": "Halaman ini sedang dalam tahap pembuatan."
-    },
-    "tags": {
-        "title": "Tag: {tag}",
-        "description": "Semua artikel dan catatan dengan tag {tag}.",
-        "noItems": "Tidak ada artikel yang ditemukan untuk tag ini."
-    },
-    "search": {
-        "placeholder": "Cari postingan dan catatan...",
-        "prompt": "Cari artikel berdasarkan judul atau deskripsi.",
-        "noResults": "Tidak ada hasil yang ditemukan untuk",
-        "resultsFound": "hasil ditemukan"
-    },
-    "post": {
-        "by": "Oleh",
-        "readingTime": "{minutes} mnt baca",
-        "share": "Bagikan",
-        "shareArticle": "Bagikan artikel ini",
-        "relatedContent": "Anda Mungkin Juga Suka",
-        "toc": "Daftar Isi"
-    },
-    "readingList": {
-        "add": "Simpan ke Daftar",
-        "remove": "Hapus dari Daftar",
-        "added": {
-            "title": "Disimpan ke Daftar Baca",
-            "description": "telah ditambahkan."
-        },
-        "removed": {
-            "title": "Dihapus dari Daftar Baca",
-            "description": "telah dihapus."
-        },
-        "item": "item",
-        "items": "item",
-        "inYourList": "dalam daftar baca Anda",
-        "empty": "Daftar baca Anda kosong. Simpan artikel untuk membacanya nanti."
-    },
-    "drafts": {
-        "title": "Draf",
-        "noDrafts": "Tidak ada draf dalam kategori ini."
-    },
-    "downloadGate": {
-        "title": "Mempersiapkan Unduhan Anda",
-        "fileSizeLabel": "Ukuran:",
-        "continueButton": "Lanjutkan untuk Mengunduh",
-        "redirecting": "atau unduhan Anda akan dimulai otomatis..."
-    },
-    "notFound": {
-        "title": "Halaman Tidak Ditemukan",
-        "description": "Halaman yang Anda cari mungkin telah dipindahkan atau dihapus.",
-        "backHome": "Kembali ke Beranda",
-        "popularLinks": "Coba lihat ini saja:"
-    },
-    "promptGenerator": {
-        "title": "Generator Prompt Konten AI",
-        "description": "Gunakan formulir ini untuk menghasilkan prompt terstruktur untuk meminta konten baru atau modifikasi.",
-        "modes": {
-            "create": "Buat Baru",
-            "modify": "Modifikasi"
-        },
-        "contentTypeLabel": "Jenis Konten",
-        "contentTypeBlog": "Artikel Blog",
-        "contentTypeNote": "Catatan (Note)",
-        "selectArticleLabel": "Target Artikel untuk Dimodifikasi",
-        "selectArticlePlaceholder": "Pilih artikel yang sudah ada...",
-        "searchArticlePlaceholder": "Ketik judul atau slug artikel untuk mencari...",
-        "features": {
-            "title": "Fitur Opsional",
-            "downloads": "Tombol Unduhan",
-            "grids": "Grid Gambar",
-            "images": "Gambar Pendukung"
-        },
-        "draftTitle": "Draf Konten / Poin Utama",
-        "draftPlaceholder": "Tempelkan draf konten baru Anda di sini...",
-        "originalContentTitle": "Konten Asli (File yang ingin diedit)",
-        "originalContentPlaceholder": "Tempelkan isi lengkap file MDX yang sekarang di sini...",
-        "modInstructionsTitle": "Instruksi Perubahan",
-        "modInstructionsPlaceholder": "Bagian mana yang mau diubah? (misal: Update narasi intro, tambahkan kesimpulan tentang desain 4px...)",
-        "quickActions": {
-            "label": "Instruksi Cepat:",
-            "narrative": "Hanya update narasi",
-            "images": "Hanya update gambar",
-            "metadata": "Hanya tambah tgl update"
-        },
-        "downloadLinks": {
-            "title": "Tautan Unduhan",
-            "description": "Petakan placeholder [DOWNLOAD_X] dengan ID yang sudah ada atau enter URL baru.",
-            "addDownload": "Tambah Item Unduhan",
-            "selectId": "Pilih ID yang sudah ada...",
-            "urlPlaceholder": "Tempel URL unduhan...",
-            "promptTitle": "Tombol Unduhan",
-            "promptInstruction": "Tolong ganti placeholder [DOWNLOAD_X] dengan komponen <DownloadButton> sesuai detail berikut:"
-        },
-        "imageGrid": {
-            "title": "Grid Gambar (Otomatis)",
-            "description": "Masukkan data grid per baris (format: cols | path1, path2...).",
-            "placeholder": "3 | /img1.webp, /img2.webp, /img3.webp",
-            "promptTitle": "Grid Gambar",
-            "promptInstruction": "Tolong grupkan gambar-gambar berikut menggunakan komponen <ImageGrid>:"
-        },
-        "imagesTitle": "Detail Gambar",
-        "imagesDescription": "Baris pertama ADALAH gambar utama (hero image), dipisahkan `|` untuk teks alt.",
-        "imagesPlaceholder": "/images/blank/blank.webp | Teks alt hero\n/images/articles/sub.webp | Teks alt sub",
-        "imagesTitleNote": "Gambar Pendukung (Opsional)",
-        "imagesDescriptionNote": "Masukkan path dan teks alt untuk gambar yang akan disisipkan di dalam catatan.",
-        "imagesPlaceholderNote": "/images/notes/img.webp | Teks alt",
-        "metadataTitle": "Metadata & Penautan",
-        "articleTitleLabel": "Judul Konten",
-        "articleTitleDescription": "Judul Inggris disarankan. Untuk SEO, WAJIB 50-60 karakter.",
-        "slugLabel": "Slug URL (Inggris)",
-        "slugPlaceholder": "cara-memasang-rufus",
-        "publishDateLabel": "Tanggal Terbit",
-        "publishDateLabelModify": "Tanggal Terbit Asli",
-        "statusLabel": "Status",
-        "publishSwitchLabel": "Terbitkan Langsung",
-        "featuredSwitchLabel": "Tandai sebagai Unggulan",
-        "idOnlySwitchLabel": "ID Only",
-        "tagsLabel": "Tag",
-        "generatedPromptTitle": "Hasil Prompt",
-        "copyButton": "Salin Prompt",
-        "copiedButton": "Tersalin!",
-        "promptBaseBlog": "Tolong buat dan terbitkan artikel blog baru untuk saya berdasarkan detail berikut. Versi Bahasa Inggris harus menggunakan slug yang ditentukan, dan versi Bahasa Indonesia juga harus menggunakan SLUG YANG SAMA PERSIS.",
-        "modifyPromptBase": "Tolong MODIFIKASI konten yang sudah ada untuk saya. PENTING: Anda WAJIB menjaga SLUG ASLI dan TANGGAL TERBIT ASLI. HANYA ubah apa yang diminta di instruksi. JANGAN menulis ulang bagian yang tidak terkait. Pertahankan semua langkah teknis, blok kode, dan gambar yang sudah ada kecuali diminta diubah.",
-        "frontmatterDetails": "Detail Frontmatter",
-        "titleLabel": "Judul",
-        "titlePlaceholder": "Judul SEO-friendly (50-60 karakter)",
-        "dateLabel": "Tanggal Terbit Asli",
-        "supportingImagesLabel": "Gambar Pendukung",
-        "supportingImagesLabelNote": "Gambar untuk disisipkan",
-        "draftContentLabel": "Konten/Draf Utama",
-        "originalContentLabel": "Konten Asli untuk Dimodifikasi",
-        "modInstructionsLabel": "Poin Perubahan",
-        "finalInstruction": "Instruksi Tambahan: 1. Konfirmasi translationKey dan slug Inggris. 2. Panjang judul HARUS 50-60 karakter. 3. KEPATUHAN MDX KETAT: Gunakan hanya komponen yang didukung (<DownloadButton />, <ImageGrid />, tabel Markdown standar). 4. Kepatuhan React: SELALU gunakan 'className'. 5. Teks Alt Gambar: Buat teks alt SEO yang berkualitas jika kosong.",
-        "tooltips": {
-            "backToTop": "Ke Atas",
-            "theme": "Ganti Tema"
-        }
-    },
-    "notifications": {
-        "themeLight": "Tema: Terang",
-        "themeDark": "Tema: Gelap",
-        "themeSystem": "Tema: Sistem",
-        "langEn": "Bahasa: Inggris",
-        "langId": "Bahasa: Indonesia",
-        "readingListAdded": "Tersimpan ke Daftar Baca",
-        "readingListRemoved": "Dihapus dari Daftar Baca",
-        "copied": "Tersalin ke Clipboard",
-        "stockInsufficient": "Stok tidak cukup untuk {type}",
-        "stockEmpty": "Periode yang dipilih sedang kosong",
-        "stockGenerated": "Berhasil generate {count} nomor"
+    "softwareUpdateSlider": {
+      "title": "Ada pembaruan software?",
+      "viewMore": "cek pembaruan"
     }
+  },
+  "blog": {
+    "title": "Blog",
+    "description": "Pembahasan mendalam tentang teknologi, tutorial, dan wawasan pengembangan."
+  },
+  "notes": {
+    "title": "Catatan",
+    "description": "Catatan teknis pribadi dan referensi cepat."
+  },
+  "projects": {
+    "title": "Proyek",
+    "description": "Sebuah pameran proyek-proyek saya.",
+    "wip": "Halaman ini sedang dalam tahap pembuatan."
+  },
+  "about": {
+    "title": "Tentang Saya",
+    "description": "Perjalanan saya dari teknisi lapangan hingga pengoptimal digital.",
+    "experience": "Pengalaman Profesional",
+    "skills": "Keahlian Teknis",
+    "education": "Pendidikan",
+    "certifications": "Lisensi & Sertifikasi",
+    "downloadResume": "Unduh Resume Lengkap Saya",
+    "getInTouch": "Ayo Terhubung",
+    "summary": "Ringkasan Profesional"
+  },
+  "tools": {
+    "title": "Alat",
+    "description": "Kumpulan alat bantu untuk alur kerja saya.",
+    "public_section": "Alat Publik",
+    "internal_section": "Alat Internal",
+    "wip": "Halaman ini sedang dalam tahap pembuatan.",
+    "internal": "Internal",
+    "open_tool": "Buka Alat",
+    "coming_soon": "Segera Hadir",
+    "new_badge": "Baru",
+    "tool_list": {
+      "ai_prompt_generator": {
+        "title": "AI Article Prompt Generator",
+        "description": "Buat prompt terstruktur untuk meminta artikel baru dengan detail yang lengkap."
+      },
+      "number_to_words": {
+        "title": "Generator Terbilang",
+        "description": "Mengubah angka menjadi bentuk tulisan dalam Bahasa Indonesia."
+      },
+      "random_name": {
+        "title": "Pemilih Nama Acak",
+        "description": "Pilih nama secara acak dari sebuah daftar, cocok untuk undian."
+      },
+      "employee_history": {
+        "title": "Riwayat Karyawan",
+        "description": "Catatan pribadi untuk melacak riwayat kerja dan kinerja karyawan."
+      },
+      "number_generator": {
+        "title": "Generator Nomor",
+        "description": "Menghasilkan nomor urut unik untuk keperluan pelacakan internal."
+      }
+    },
+    "systemNotReady": {
+      "title": "SISTEM BELUM SIAP",
+      "description": "Aplikasi belum bisa mendeteksi Kunci API dari dashboard Firebase Mas Iwan.",
+      "step1": "LANGKAH 1: HUBUNGKAN & SIMPAN",
+      "step1Desc": "Pilih repositori SnipGeek di tab Deployment dan klik Save.",
+      "step2": "LANGKAH 2: START ROLLOUT (WAJIB)",
+      "step2Desc": "Buka tab Rollouts dan klik Start Rollout untuk menyeduh variabel terbaru.",
+      "step3": "LANGKAH 3: CEK PREFIX",
+      "step3Desc": "Pastikan nama variabel di tab Environment diawali dengan NEXT_PUBLIC_.",
+      "footer": "Tanpa proses 'Start Rollout', browser Mas Iwan tidak diizinkan membaca kunci rahasia demi keamanan sistem.",
+      "authorized": "Authorized",
+      "logout": "Keluar Akun",
+      "connecting": "Menghubungkan ke Cloud...",
+      "restrictedAccess": "Akses Terbatas",
+      "restrictedDesc": "Tool {tool} memerlukan login akun Google terdaftar untuk menjaga integritas sistem.",
+      "loginWithGoogle": "Masuk dengan Google"
+    }
+  },
+  "employeeHistory": {
+    "searchTitle": "Cari Riwayat Karyawan",
+    "searchDescription": "Cari berdasarkan nama, jabatan, atau grup. Anda juga bisa mengetikkan tanggal (misal: 20/05/2023) untuk melihat siapa yang aktif pada hari itu.",
+    "searchPlaceholder": "Masukkan nama atau tanggal...",
+    "groupPlaceholder": "Filter Grup",
+    "allGroups": "Semua Grup",
+    "nameHeader": "Nama",
+    "positionHeader": "Jabatan",
+    "groupHeader": "Grup",
+    "nikHeader": "NIK",
+    "startDateHeader": "Tgl Mulai",
+    "endDateHeader": "Tgl Selesai",
+    "present": "Sekarang",
+    "generatorTitle": "Generator Penandatangan Dokumen",
+    "generatorDescription": "Identifikasi penandatangan yang tepat dengan cepat untuk jenis dokumen tertentu berdasarkan tanggal target.",
+    "docTypePlaceholder": "Pilih Jenis Dokumen",
+    "projectValuePlaceholder": "Nilai Proyek (Rp)"
+  },
+  "archive": {
+    "title": "Arsip",
+    "description": "Telusuri semua postingan dan catatan.",
+    "wip": "Halaman ini sedang dalam pembuatan."
+  },
+  "contact": {
+    "title": "Kontak",
+    "description": "Hubungi saya. Cara terbaik untuk menghubungi saya adalah melalui email.",
+    "intro": "Jangan ragu untuk menghubungi. Cara terbaik untuk menghubungi saya adalah melalui email.",
+    "wip": "Halaman ini sedang dalam tahap pembuatan."
+  },
+  "tags": {
+    "title": "Tag: {tag}",
+    "description": "Semua artikel dan catatan dengan tag {tag}.",
+    "noItems": "Tidak ada artikel yang ditemukan untuk tag ini."
+  },
+  "search": {
+    "placeholder": "Cari postingan dan catatan...",
+    "prompt": "Cari artikel berdasarkan judul atau deskripsi.",
+    "noResults": "Tidak ada hasil yang ditemukan untuk",
+    "resultsFound": "hasil ditemukan"
+  },
+  "post": {
+    "by": "Oleh",
+    "readingTime": "{minutes} mnt baca",
+    "share": "Bagikan",
+    "shareArticle": "Bagikan artikel ini",
+    "relatedContent": "Anda Mungkin Juga Suka",
+    "toc": "Daftar Isi"
+  },
+  "readingList": {
+    "add": "Simpan ke Daftar",
+    "remove": "Hapus dari Daftar",
+    "added": {
+      "title": "Disimpan ke Daftar Baca",
+      "description": "telah ditambahkan."
+    },
+    "removed": {
+      "title": "Dihapus dari Daftar Baca",
+      "description": "telah dihapus."
+    },
+    "item": "item",
+    "items": "item",
+    "inYourList": "dalam daftar baca Anda",
+    "empty": "Daftar baca Anda kosong. Simpan artikel untuk membacanya nanti."
+  },
+  "drafts": {
+    "title": "Draf",
+    "noDrafts": "Tidak ada draf dalam kategori ini."
+  },
+  "downloadGate": {
+    "title": "Mempersiapkan Unduhan Anda",
+    "fileSizeLabel": "Ukuran:",
+    "continueButton": "Lanjutkan untuk Mengunduh",
+    "redirecting": "atau unduhan Anda akan dimulai otomatis..."
+  },
+  "notFound": {
+    "title": "Halaman Tidak Ditemukan",
+    "description": "Halaman yang Anda cari mungkin telah dipindahkan atau dihapus.",
+    "backHome": "Kembali ke Beranda",
+    "popularLinks": "Coba lihat ini saja:"
+  },
+  "promptGenerator": {
+    "title": "Generator Prompt Konten AI",
+    "description": "Gunakan formulir ini untuk menghasilkan prompt terstruktur untuk meminta konten baru atau modifikasi.",
+    "modes": {
+      "create": "Buat Baru",
+      "modify": "Modifikasi"
+    },
+    "contentTypeLabel": "Jenis Konten",
+    "contentTypeBlog": "Artikel Blog",
+    "contentTypeNote": "Catatan (Note)",
+    "selectArticleLabel": "Target Artikel untuk Dimodifikasi",
+    "selectArticlePlaceholder": "Pilih artikel yang sudah ada...",
+    "searchArticlePlaceholder": "Ketik judul atau slug artikel untuk mencari...",
+    "features": {
+      "title": "Fitur Opsional",
+      "downloads": "Tombol Unduhan",
+      "grids": "Grid Gambar",
+      "images": "Gambar Pendukung"
+    },
+    "draftTitle": "Draf Konten / Poin Utama",
+    "draftPlaceholder": "Tempelkan draf konten baru Anda di sini...",
+    "originalContentTitle": "Konten Asli (File yang ingin diedit)",
+    "originalContentPlaceholder": "Tempelkan isi lengkap file MDX yang sekarang di sini...",
+    "modInstructionsTitle": "Instruksi Perubahan",
+    "modInstructionsPlaceholder": "Bagian mana yang mau diubah? (misal: Update narasi intro, tambahkan kesimpulan tentang desain 4px...)",
+    "quickActions": {
+      "label": "Instruksi Cepat:",
+      "narrative": "Hanya update narasi",
+      "images": "Hanya update gambar",
+      "metadata": "Hanya tambah tgl update"
+    },
+    "downloadLinks": {
+      "title": "Tautan Unduhan",
+      "description": "Petakan placeholder [DOWNLOAD_X] dengan ID yang sudah ada atau enter URL baru.",
+      "addDownload": "Tambah Item Unduhan",
+      "selectId": "Pilih ID yang sudah ada...",
+      "urlPlaceholder": "Tempel URL unduhan...",
+      "promptTitle": "Tombol Unduhan",
+      "promptInstruction": "Tolong ganti placeholder [DOWNLOAD_X] dengan komponen <DownloadButton> sesuai detail berikut:"
+    },
+    "imageGrid": {
+      "title": "Grid Gambar (Otomatis)",
+      "description": "Masukkan data grid per baris (format: cols | path1, path2...).",
+      "placeholder": "3 | /img1.webp, /img2.webp, /img3.webp",
+      "promptTitle": "Grid Gambar",
+      "promptInstruction": "Tolong grupkan gambar-gambar berikut menggunakan komponen <ImageGrid>:"
+    },
+    "imagesTitle": "Detail Gambar",
+    "imagesDescription": "Baris pertama ADALAH gambar utama (hero image), dipisahkan `|` untuk teks alt.",
+    "imagesPlaceholder": "/images/blank/blank.webp | Teks alt hero\n/images/articles/sub.webp | Teks alt sub",
+    "imagesTitleNote": "Gambar Pendukung (Opsional)",
+    "imagesDescriptionNote": "Masukkan path dan teks alt untuk gambar yang akan disisipkan di dalam catatan.",
+    "imagesPlaceholderNote": "/images/notes/img.webp | Teks alt",
+    "metadataTitle": "Metadata & Penautan",
+    "articleTitleLabel": "Judul Konten",
+    "articleTitleDescription": "Judul Inggris disarankan. Untuk SEO, WAJIB 50-60 karakter.",
+    "slugLabel": "Slug URL (Inggris)",
+    "slugPlaceholder": "cara-memasang-rufus",
+    "publishDateLabel": "Tanggal Terbit",
+    "publishDateLabelModify": "Tanggal Terbit Asli",
+    "statusLabel": "Status",
+    "publishSwitchLabel": "Terbitkan Langsung",
+    "featuredSwitchLabel": "Tandai sebagai Unggulan",
+    "idOnlySwitchLabel": "ID Only",
+    "tagsLabel": "Tag",
+    "generatedPromptTitle": "Hasil Prompt",
+    "copyButton": "Salin Prompt",
+    "copiedButton": "Tersalin!",
+    "promptBaseBlog": "Tolong buat dan terbitkan artikel blog baru untuk saya berdasarkan detail berikut. Versi Bahasa Inggris harus menggunakan slug yang ditentukan, dan versi Bahasa Indonesia juga harus menggunakan SLUG YANG SAMA PERSIS.",
+    "modifyPromptBase": "Tolong MODIFIKASI konten yang sudah ada untuk saya. PENTING: Anda WAJIB menjaga SLUG ASLI dan TANGGAL TERBIT ASLI. HANYA ubah apa yang diminta di instruksi. JANGAN menulis ulang bagian yang tidak terkait. Pertahankan semua langkah teknis, blok kode, dan gambar yang sudah ada kecuali diminta diubah.",
+    "frontmatterDetails": "Detail Frontmatter",
+    "titleLabel": "Judul",
+    "titlePlaceholder": "Judul SEO-friendly (50-60 karakter)",
+    "dateLabel": "Tanggal Terbit Asli",
+    "supportingImagesLabel": "Gambar Pendukung",
+    "supportingImagesLabelNote": "Gambar untuk disisipkan",
+    "draftContentLabel": "Konten/Draf Utama",
+    "originalContentLabel": "Konten Asli untuk Dimodifikasi",
+    "modInstructionsLabel": "Poin Perubahan",
+    "finalInstruction": "Instruksi Tambahan: 1. Konfirmasi translationKey dan slug Inggris. 2. Panjang judul HARUS 50-60 karakter. 3. KEPATUHAN MDX KETAT: Gunakan hanya komponen yang didukung (<DownloadButton />, <ImageGrid />, tabel Markdown standar). 4. Kepatuhan React: SELALU gunakan 'className'. 5. Teks Alt Gambar: Buat teks alt SEO yang berkualitas jika kosong.",
+    "tooltips": {
+      "backToTop": "Ke Atas",
+      "theme": "Ganti Tema"
+    }
+  },
+  "notifications": {
+    "themeLight": "Tema: Terang",
+    "themeDark": "Tema: Gelap",
+    "themeSystem": "Tema: Sistem",
+    "langEn": "Bahasa: Inggris",
+    "langId": "Bahasa: Indonesia",
+    "readingListAdded": "Tersimpan ke Daftar Baca",
+    "readingListRemoved": "Dihapus dari Daftar Baca",
+    "copied": "Tersalin ke Clipboard",
+    "stockInsufficient": "Stok tidak cukup untuk {type}",
+    "stockEmpty": "Periode yang dipilih sedang kosong",
+    "stockGenerated": "Berhasil generate {count} nomor",
+    "logoutSuccess": "Berhasil keluar"
+  }
 }

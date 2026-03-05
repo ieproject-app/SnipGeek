@@ -1,282 +1,282 @@
-
 {
-    "navigation": {
-        "blog": "Blog",
-        "projects": "Projects",
-        "about": "About",
-        "archive": "Archive",
-        "contact": "Contact",
-        "notes": "Notes",
-        "tools": "Tools"
+  "navigation": {
+    "blog": "Blog",
+    "projects": "Projects",
+    "about": "About",
+    "archive": "Archive",
+    "contact": "Contact",
+    "notes": "Notes",
+    "tools": "Tools"
+  },
+  "footer": {
+    "authorBio": "A passionate developer exploring the web and sharing findings along the way."
+  },
+  "home": {
+    "featuredPosts": "Featured Posts",
+    "latestPosts": "Latest Posts",
+    "viewAllPosts": "View All Posts",
+    "specialTagSectionTitle": "Postingan",
+    "breadcrumbHome": "Home",
+    "sliderAndShadow": {
+      "title": "Looking for tutorials?",
+      "viewMore": "see more"
     },
-    "footer": {
-        "authorBio": "A passionate developer exploring the web and sharing findings along the way."
-    },
-    "home": {
-        "featuredPosts": "Featured Posts",
-        "latestPosts": "Latest Posts",
-        "viewAllPosts": "View All Posts",
-        "specialTagSectionTitle": "Postingan",
-        "breadcrumbHome": "Home",
-        "sliderAndShadow": {
-            "title": "Looking for tutorials?",
-            "viewMore": "see more"
-        },
-        "softwareUpdateSlider": {
-            "title": "New software updates?",
-            "viewMore": "check updates"
-        }
-    },
-    "blog": {
-        "title": "Blog",
-        "description": "Deep dives into tech, tutorials, and development insights."
-    },
-    "notes": {
-        "title": "Notes",
-        "description": "Personal technical snippets and quick references."
-    },
-    "projects": {
-        "title": "Projects",
-        "description": "A showcase of my projects.",
-        "wip": "This page is under construction."
-    },
-    "about": {
-        "title": "About Me",
-        "description": "My journey from field technician to digital optimizer.",
-        "experience": "Professional Experience",
-        "skills": "Technical Expertise",
-        "education": "Education",
-        "certifications": "Licenses & Certs",
-        "downloadResume": "Download My Full Resume",
-        "getInTouch": "Let's Connect",
-        "summary": "Professional Summary"
-    },
-    "tools": {
-        "title": "Tools",
-        "description": "A collection of helper tools for my workflow.",
-        "public_section": "Public Tools",
-        "internal_section": "Internal Tools",
-        "wip": "This page is under construction.",
-        "internal": "Internal",
-        "open_tool": "Open Tool",
-        "coming_soon": "Coming Soon",
-        "new_badge": "New",
-        "tool_list": {
-            "ai_prompt_generator": {
-                "title": "AI Article Prompt Generator",
-                "description": "Create a structured prompt to request a new article with complete details."
-            },
-            "number_to_words": {
-                "title": "Number to Words Generator",
-                "description": "Convert numbers into their written-out form in Indonesian."
-            },
-            "random_name": {
-                "title": "Random Name Picker",
-                "description": "Randomly select a name from a list, perfect for giveaways."
-            },
-            "employee_history": {
-                "title": "Employee History",
-                "description": "A private log for tracking employee work history and performance."
-            },
-            "number_generator": {
-                "title": "Number Generator",
-                "description": "Generate unique sequential numbers for internal tracking purposes."
-            }
-        },
-        "systemNotReady": {
-            "title": "System Not Ready",
-            "description": "The application cannot detect the Firebase API Key from your dashboard.",
-            "step1": "Step 1: Connect & Save",
-            "step1Desc": "Select the SnipGeek repository in the Deployment tab and click Save.",
-            "step2": "Step 2: Start Rollout (Required)",
-            "step2Desc": "Go to the Rollouts tab and click Start Rollout to inject the latest variables.",
-            "step3": "Step 3: Check Prefix",
-            "step3Desc": "Ensure variable names in the Environment tab start with NEXT_PUBLIC_.",
-            "footer": "Without a 'Start Rollout' process, the browser is not authorized to read secret keys for security reasons.",
-            "authorized": "Authorized",
-            "logout": "Sign Out",
-            "connecting": "Connecting to Cloud...",
-            "restrictedAccess": "Restricted Access",
-            "restrictedDesc": "The {tool} tool requires a registered Google account login to maintain system integrity.",
-            "loginWithGoogle": "Login with Google"
-        }
-    },
-    "employeeHistory": {
-        "searchTitle": "Search Employee Records",
-        "searchDescription": "Search by name, position, or group. You can also type a date (e.g., 20/05/2023) to see who was active on that day.",
-        "searchPlaceholder": "Enter name or date...",
-        "groupPlaceholder": "Filter by Group",
-        "allGroups": "All Groups",
-        "nameHeader": "Name",
-        "positionHeader": "Position",
-        "groupHeader": "Group",
-        "nikHeader": "NIK",
-        "startDateHeader": "Start Date",
-        "endDateHeader": "End Date",
-        "present": "Present",
-        "generatorTitle": "Document Signer Generator",
-        "generatorDescription": "Quickly identify the correct signers for specific document types based on a target date.",
-        "docTypePlaceholder": "Select Document Type",
-        "projectValuePlaceholder": "Project Value (IDR)"
-    },
-    "archive": {
-        "title": "Archive",
-        "description": "Browse all posts and notes.",
-        "wip": "This page is under construction."
-    },
-    "contact": {
-        "title": "Contact",
-        "description": "Get in touch with me. The best way to reach me is by email.",
-        "intro": "Feel free to reach out. The best way to get in touch is by email.",
-        "wip": "This page is under construction."
-    },
-    "tags": {
-        "title": "Tag: {tag}",
-        "description": "All articles and notes tagged with {tag}.",
-        "noItems": "No articles found for this tag."
-    },
-    "search": {
-        "placeholder": "Search posts and notes...",
-        "prompt": "Search for articles by title or description.",
-        "noResults": "No results found for",
-        "resultsFound": "results found"
-    },
-    "post": {
-        "by": "By",
-        "readingTime": "{minutes} min read",
-        "share": "Share",
-        "shareArticle": "Share this article",
-        "relatedContent": "You Might Also Like",
-        "toc": "On this page"
-    },
-    "readingList": {
-        "add": "Save to List",
-        "remove": "Remove from List",
-        "added": {
-            "title": "Saved to Reading List",
-            "description": "has been added."
-        },
-        "removed": {
-            "title": "Removed from Reading List",
-            "description": "has been removed."
-        },
-        "item": "item",
-        "items": "items",
-        "inYourList": "in your reading list",
-        "empty": "Your reading list is empty. Save articles to read them later."
-    },
-    "drafts": {
-        "title": "Drafts",
-        "noDrafts": "No drafts in this category."
-    },
-    "downloadGate": {
-        "title": "Preparing Your Download",
-        "fileSizeLabel": "Size:",
-        "continueButton": "Continue to Download",
-        "redirecting": "or your download will begin automatically..."
-    },
-    "notFound": {
-        "title": "Page Not Found",
-        "description": "The page you are looking for might have been moved or deleted.",
-        "backHome": "Back to Home",
-        "popularLinks": "Try these instead:"
-    },
-    "promptGenerator": {
-        "title": "AI Content Prompt Generator",
-        "description": "Use this form to generate a structured prompt for requesting new or modified content.",
-        "modes": {
-            "create": "Create New",
-            "modify": "Modify Existing"
-        },
-        "contentTypeLabel": "Content Type",
-        "contentTypeBlog": "Blog Article",
-        "contentTypeNote": "Note",
-        "selectArticleLabel": "Target Article to Modify",
-        "selectArticlePlaceholder": "Select an existing article...",
-        "searchArticlePlaceholder": "Type to search articles by title or slug...",
-        "features": {
-            "title": "Optional Features",
-            "downloads": "Download Buttons",
-            "grids": "Image Grids",
-            "images": "Supporting Images"
-        },
-        "draftTitle": "Content Draft / Main Points",
-        "draftPlaceholder": "Paste your full content draft here...",
-        "originalContentTitle": "Original Content (The file you want to edit)",
-        "originalContentPlaceholder": "Paste the current full MDX content of the file here...",
-        "modInstructionsTitle": "Modification Instructions",
-        "modInstructionsPlaceholder": "What exactly do you want to change? (e.g., Update the intro, add a conclusion about design updates...)",
-        "quickActions": {
-            "label": "Quick Instructions:",
-            "narrative": "Update narrative only",
-            "images": "Update images only",
-            "metadata": "Add update date only"
-        },
-        "downloadLinks": {
-            "title": "Download Links",
-            "description": "Map [DOWNLOAD_X] placeholders to existing IDs from our database or enter new URLs.",
-            "addDownload": "Add Download Item",
-            "selectId": "Select an existing ID...",
-            "urlPlaceholder": "Paste the download URL here...",
-            "promptTitle": "Download Buttons",
-            "promptInstruction": "Please replace the [DOWNLOAD_X] placeholders in the draft with <DownloadButton> components using the corresponding settings below:"
-        },
-        "imageGrid": {
-            "title": "Image Grids (Sequential)",
-            "description": "Enter grid data one per line (format: cols | path1, path2...).",
-            "placeholder": "3 | /img1.webp, /img2.webp, /img3.webp",
-            "promptTitle": "Image Grids",
-            "promptInstruction": "Please group the following images using the <ImageGrid> component:"
-        },
-        "imagesTitle": "Image Details",
-        "imagesDescription": "The first line is ALWAYS for the hero image, separated by a `|` for the alt text.",
-        "imagesPlaceholder": "/images/blank/blank.webp | Hero alt text\n/images/articles/sub.webp | Sub alt text",
-        "imagesTitleNote": "Supporting Images (Optional)",
-        "imagesDescriptionNote": "Insert path and alt text for images to be embedded within the note's content.",
-        "imagesPlaceholderNote": "/images/notes/img.webp | Alt text",
-        "metadataTitle": "Metadata & Linking",
-        "articleTitleLabel": "Content Title",
-        "articleTitleDescription": "An English title is recommended. For best SEO, MUST be between 50-60 characters.",
-        "slugLabel": "URL Slug (English, Kebab-case)",
-        "slugPlaceholder": "how-to-install-rufus",
-        "publishDateLabel": "Publish Date",
-        "publishDateLabelModify": "Original Publish Date",
-        "statusLabel": "Status",
-        "publishSwitchLabel": "Publish Immediately",
-        "featuredSwitchLabel": "Mark as Featured",
-        "idOnlySwitchLabel": "ID Only",
-        "tagsLabel": "Tags",
-        "generatedPromptTitle": "Generated Prompt",
-        "copyButton": "Copy Prompt",
-        "copiedButton": "Copied!",
-        "promptBaseBlog": "Please create and publish a new blog article for me based on the following details. The English version must use the slug specified, and the Indonesian version must also use the EXACT SAME SLUG.",
-        "modifyPromptBase": "Please MODIFY an existing content for me. IMPORTANT: You MUST keep the ORIGINAL SLUG AND ORIGINAL PUBLISH DATE. ONLY change what is requested in the instructions. DO NOT rewrite sections that are not related to the request. Keep all existing technical steps, code blocks, and images intact unless specified.",
-        "frontmatterDetails": "Frontmatter Details",
-        "titleLabel": "Title",
-        "titlePlaceholder": "SEO-friendly title (50-60 chars)",
-        "dateLabel": "Original Publish Date",
-        "supportingImagesLabel": "Supporting Images",
-        "supportingImagesLabelNote": "Images to insert",
-        "draftContentLabel": "Main Content/Draft",
-        "originalContentLabel": "Original Content to Modify",
-        "modInstructionsLabel": "Points of Change",
-        "finalInstruction": "Additional Instruction: 1. Confirm translationKey and English slug. 2. Title length MUST BE 50-60 characters. 3. STRICT MDX ADHERENCE: Use only supported components (<DownloadButton />, <ImageGrid />, standard Markdown tables). 4. React Compliance: ALWAYS use 'className'. 5. Image Alt Text: Generate high-quality SEO alt text if missing.",
-        "tooltips": {
-            "backToTop": "Back to Top",
-            "theme": "Switch Theme"
-        }
-    },
-    "notifications": {
-        "themeLight": "Theme: Light",
-        "themeDark": "Theme: Dark",
-        "themeSystem": "Theme: System",
-        "langEn": "Language: English",
-        "langId": "Language: Indonesia",
-        "readingListAdded": "Saved to Reading List",
-        "readingListRemoved": "Removed from Reading List",
-        "copied": "Copied to Clipboard",
-        "stockInsufficient": "Stock insufficient for {type}",
-        "stockEmpty": "Selected period is out of stock",
-        "stockGenerated": "Successfully generated {count} numbers"
+    "softwareUpdateSlider": {
+      "title": "New software updates?",
+      "viewMore": "check updates"
     }
+  },
+  "blog": {
+    "title": "Blog",
+    "description": "Deep dives into tech, tutorials, and development insights."
+  },
+  "notes": {
+    "title": "Notes",
+    "description": "Personal technical snippets and quick references."
+  },
+  "projects": {
+    "title": "Projects",
+    "description": "A showcase of my projects.",
+    "wip": "This page is under construction."
+  },
+  "about": {
+    "title": "About Me",
+    "description": "My journey from field technician to digital optimizer.",
+    "experience": "Professional Experience",
+    "skills": "Technical Expertise",
+    "education": "Education",
+    "certifications": "Licenses & Certs",
+    "downloadResume": "Download My Full Resume",
+    "getInTouch": "Let's Connect",
+    "summary": "Professional Summary"
+  },
+  "tools": {
+    "title": "Tools",
+    "description": "A collection of helper tools for my workflow.",
+    "public_section": "Public Tools",
+    "internal_section": "Internal Tools",
+    "wip": "This page is under construction.",
+    "internal": "Internal",
+    "open_tool": "Open Tool",
+    "coming_soon": "Coming Soon",
+    "new_badge": "New",
+    "tool_list": {
+      "ai_prompt_generator": {
+        "title": "AI Article Prompt Generator",
+        "description": "Create a structured prompt to request a new article with complete details."
+      },
+      "number_to_words": {
+        "title": "Number to Words Generator",
+        "description": "Convert numbers into their written-out form in Indonesian."
+      },
+      "random_name": {
+        "title": "Random Name Picker",
+        "description": "Randomly select a name from a list, perfect for giveaways."
+      },
+      "employee_history": {
+        "title": "Employee History",
+        "description": "A private log for tracking employee work history and performance."
+      },
+      "number_generator": {
+        "title": "Number Generator",
+        "description": "Generate unique sequential numbers for internal tracking purposes."
+      }
+    },
+    "systemNotReady": {
+      "title": "System Not Ready",
+      "description": "The application cannot detect the Firebase API Key from your dashboard.",
+      "step1": "Step 1: Connect & Save",
+      "step1Desc": "Select the SnipGeek repository in the Deployment tab and click Save.",
+      "step2": "Step 2: Start Rollout (Required)",
+      "step2Desc": "Go to the Rollouts tab and click Start Rollout to inject the latest variables.",
+      "step3": "Step 3: Check Prefix",
+      "step3Desc": "Ensure variable names in the Environment tab start with NEXT_PUBLIC_.",
+      "footer": "Without a 'Start Rollout' process, the browser is not authorized to read secret keys for security reasons.",
+      "authorized": "Authorized",
+      "logout": "Sign Out",
+      "connecting": "Connecting to Cloud...",
+      "restrictedAccess": "Restricted Access",
+      "restrictedDesc": "The {tool} tool requires a registered Google account login to maintain system integrity.",
+      "loginWithGoogle": "Login with Google"
+    }
+  },
+  "employeeHistory": {
+    "searchTitle": "Search Employee Records",
+    "searchDescription": "Search by name, position, or group. You can also type a date (e.g., 20/05/2023) to see who was active on that day.",
+    "searchPlaceholder": "Enter name or date...",
+    "groupPlaceholder": "Filter by Group",
+    "allGroups": "All Groups",
+    "nameHeader": "Name",
+    "positionHeader": "Position",
+    "groupHeader": "Group",
+    "nikHeader": "NIK",
+    "startDateHeader": "Start Date",
+    "endDateHeader": "End Date",
+    "present": "Present",
+    "generatorTitle": "Document Signer Generator",
+    "generatorDescription": "Quickly identify the correct signers for specific document types based on a target date.",
+    "docTypePlaceholder": "Select Document Type",
+    "projectValuePlaceholder": "Project Value (IDR)"
+  },
+  "archive": {
+    "title": "Archive",
+    "description": "Browse all posts and notes.",
+    "wip": "This page is under construction."
+  },
+  "contact": {
+    "title": "Contact",
+    "description": "Get in touch with me. The best way to reach me is by email.",
+    "intro": "Feel free to reach out. The best way to get in touch is by email.",
+    "wip": "This page is under construction."
+  },
+  "tags": {
+    "title": "Tag: {tag}",
+    "description": "All articles and notes tagged with {tag}.",
+    "noItems": "No articles found for this tag."
+  },
+  "search": {
+    "placeholder": "Search posts and notes...",
+    "prompt": "Search for articles by title or description.",
+    "noResults": "No results found for",
+    "resultsFound": "results found"
+  },
+  "post": {
+    "by": "By",
+    "readingTime": "{minutes} min read",
+    "share": "Share",
+    "shareArticle": "Share this article",
+    "relatedContent": "You Might Also Like",
+    "toc": "On this page"
+  },
+  "readingList": {
+    "add": "Save to List",
+    "remove": "Remove from List",
+    "added": {
+      "title": "Saved to Reading List",
+      "description": "has been added."
+    },
+    "removed": {
+      "title": "Removed from Reading List",
+      "description": "has been removed."
+    },
+    "item": "item",
+    "items": "items",
+    "inYourList": "in your reading list",
+    "empty": "Your reading list is empty. Save articles to read them later."
+  },
+  "drafts": {
+    "title": "Drafts",
+    "noDrafts": "No drafts in this category."
+  },
+  "downloadGate": {
+    "title": "Preparing Your Download",
+    "fileSizeLabel": "Size:",
+    "continueButton": "Continue to Download",
+    "redirecting": "or your download will begin automatically..."
+  },
+  "notFound": {
+    "title": "Page Not Found",
+    "description": "The page you are looking for might have been moved or deleted.",
+    "backHome": "Back to Home",
+    "popularLinks": "Try these instead:"
+  },
+  "promptGenerator": {
+    "title": "AI Content Prompt Generator",
+    "description": "Use this form to generate a structured prompt for requesting new or modified content.",
+    "modes": {
+      "create": "Create New",
+      "modify": "Modify Existing"
+    },
+    "contentTypeLabel": "Content Type",
+    "contentTypeBlog": "Blog Article",
+    "contentTypeNote": "Note",
+    "selectArticleLabel": "Target Article to Modify",
+    "selectArticlePlaceholder": "Select an existing article...",
+    "searchArticlePlaceholder": "Type to search articles by title or slug...",
+    "features": {
+      "title": "Optional Features",
+      "downloads": "Download Buttons",
+      "grids": "Image Grids",
+      "images": "Supporting Images"
+    },
+    "draftTitle": "Content Draft / Main Points",
+    "draftPlaceholder": "Paste your full content draft here...",
+    "originalContentTitle": "Original Content (The file you want to edit)",
+    "originalContentPlaceholder": "Paste the current full MDX content of the file here...",
+    "modInstructionsTitle": "Modification Instructions",
+    "modInstructionsPlaceholder": "What exactly do you want to change? (e.g., Update the intro, add a conclusion about design updates...)",
+    "quickActions": {
+      "label": "Quick Instructions:",
+      "narrative": "Update narrative only",
+      "images": "Update images only",
+      "metadata": "Add update date only"
+    },
+    "downloadLinks": {
+      "title": "Download Links",
+      "description": "Map [DOWNLOAD_X] placeholders to existing IDs from our database or enter new URLs.",
+      "addDownload": "Add Download Item",
+      "selectId": "Select an existing ID...",
+      "urlPlaceholder": "Paste the download URL here...",
+      "promptTitle": "Download Buttons",
+      "promptInstruction": "Please replace the [DOWNLOAD_X] placeholders in the draft with <DownloadButton> components using the corresponding settings below:"
+    },
+    "imageGrid": {
+      "title": "Image Grids (Sequential)",
+      "description": "Enter grid data one per line (format: cols | path1, path2...).",
+      "placeholder": "3 | /img1.webp, /img2.webp, /img3.webp",
+      "promptTitle": "Image Grids",
+      "promptInstruction": "Please group the following images using the <ImageGrid> component:"
+    },
+    "imagesTitle": "Image Details",
+    "imagesDescription": "The first line is ALWAYS for the hero image, separated by a `|` for the alt text.",
+    "imagesPlaceholder": "/images/blank/blank.webp | Hero alt text\n/images/articles/sub.webp | Sub alt text",
+    "imagesTitleNote": "Supporting Images (Optional)",
+    "imagesDescriptionNote": "Insert path and alt text for images to be embedded within the note's content.",
+    "imagesPlaceholderNote": "/images/notes/img.webp | Alt text",
+    "metadataTitle": "Metadata & Linking",
+    "articleTitleLabel": "Content Title",
+    "articleTitleDescription": "An English title is recommended. For best SEO, MUST be between 50-60 characters.",
+    "slugLabel": "URL Slug (English, Kebab-case)",
+    "slugPlaceholder": "how-to-install-rufus",
+    "publishDateLabel": "Publish Date",
+    "publishDateLabelModify": "Original Publish Date",
+    "statusLabel": "Status",
+    "publishSwitchLabel": "Publish Immediately",
+    "featuredSwitchLabel": "Mark as Featured",
+    "idOnlySwitchLabel": "ID Only",
+    "tagsLabel": "Tags",
+    "generatedPromptTitle": "Generated Prompt",
+    "copyButton": "Copy Prompt",
+    "copiedButton": "Copied!",
+    "promptBaseBlog": "Please create and publish a new blog article for me based on the following details. The English version must use the slug specified, and the Indonesian version must also use the EXACT SAME SLUG.",
+    "modifyPromptBase": "Please MODIFY an existing content for me. IMPORTANT: You MUST keep the ORIGINAL SLUG AND ORIGINAL PUBLISH DATE. ONLY change what is requested in the instructions. DO NOT rewrite sections that are not related to the request. Keep all existing technical steps, code blocks, and images intact unless specified.",
+    "frontmatterDetails": "Frontmatter Details",
+    "titleLabel": "Title",
+    "titlePlaceholder": "SEO-friendly title (50-60 chars)",
+    "dateLabel": "Original Publish Date",
+    "supportingImagesLabel": "Supporting Images",
+    "supportingImagesLabelNote": "Images to insert",
+    "draftContentLabel": "Main Content/Draft",
+    "originalContentLabel": "Original Content to Modify",
+    "modInstructionsLabel": "Points of Change",
+    "finalInstruction": "Additional Instruction: 1. Confirm translationKey and English slug. 2. Title length MUST BE 50-60 characters. 3. STRICT MDX ADHERENCE: Use only supported components (<DownloadButton />, <ImageGrid />, standard Markdown tables). 4. React Compliance: ALWAYS use 'className'. 5. Image Alt Text: Generate high-quality SEO alt text if missing.",
+    "tooltips": {
+      "backToTop": "Back to Top",
+      "theme": "Switch Theme"
+    }
+  },
+  "notifications": {
+    "themeLight": "Theme: Light",
+    "themeDark": "Theme: Dark",
+    "themeSystem": "Theme: System",
+    "langEn": "Language: English",
+    "langId": "Language: Indonesia",
+    "readingListAdded": "Saved to Reading List",
+    "readingListRemoved": "Removed from Reading List",
+    "copied": "Copied to Clipboard",
+    "stockInsufficient": "Stock insufficient for {type}",
+    "stockEmpty": "Selected period is out of stock",
+    "stockGenerated": "Successfully generated {count} numbers",
+    "logoutSuccess": "Signed out successfully"
+  }
 }

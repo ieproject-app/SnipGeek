@@ -1,19 +1,23 @@
+import type { Metadata } from "next";
+import { downloadLinks } from "@/lib/data-downloads";
+import { notFound } from "next/navigation";
+import { DownloadClient } from "./download-client";
+import { i18n } from "@/i18n-config";
+import type { Locale } from "@/i18n-config";
+import { getDictionary } from "@/lib/get-dictionary";
 
-import type { Metadata } from 'next';
-import { downloadLinks } from '@/lib/data-downloads';
-import { notFound } from 'next/navigation';
-import { DownloadClient } from './download-client';
-import { i18n } from '@/i18n-config';
-import { getDictionary } from '@/lib/get-dictionary';
-
-export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
   const { slug } = await params;
   const downloadInfo = downloadLinks[slug];
-  
+
   if (!downloadInfo) {
     return {
-      title: 'File Not Found',
-    }
+      title: "File Not Found",
+    };
   }
 
   return {
@@ -26,12 +30,16 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 }
 
 export async function generateStaticParams() {
-    return i18n.locales.flatMap((locale) => {
-        return Object.keys(downloadLinks).map(slug => ({ slug, locale }));
-    });
+  return i18n.locales.flatMap((locale) => {
+    return Object.keys(downloadLinks).map((slug) => ({ slug, locale }));
+  });
 }
 
-export default async function DownloadPage({ params }: { params: Promise<{ slug: string, locale: string }> }) {
+export default async function DownloadPage({
+  params,
+}: {
+  params: Promise<{ slug: string; locale: Locale }>;
+}) {
   const { slug, locale } = await params;
   const downloadInfo = downloadLinks[slug];
 
@@ -41,7 +49,12 @@ export default async function DownloadPage({ params }: { params: Promise<{ slug:
 
   const dictionary = await getDictionary(locale);
   // You might want to replace this with your actual site name from a config or env var
-  const siteName = "SnipGeek"; 
+  const siteName = "SnipGeek";
 
-  return <DownloadClient downloadInfo={downloadInfo} dictionary={dictionary.downloadGate} />;
+  return (
+    <DownloadClient
+      downloadInfo={downloadInfo}
+      dictionary={dictionary.downloadGate}
+    />
+  );
 }
