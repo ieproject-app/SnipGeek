@@ -1,4 +1,4 @@
-import type {Config} from 'tailwindcss';
+import type { Config } from 'tailwindcss';
 
 export default {
   darkMode: ['class'],
@@ -23,18 +23,18 @@ export default {
         'ui-base': ['0.75rem', { lineHeight: '1.25rem', letterSpacing: '0.02em' }],
         'ui-md': ['0.875rem', { lineHeight: '1.25rem', letterSpacing: '0.01em' }],
         'ui-lg': ['1rem', { lineHeight: '1.5rem', letterSpacing: '0' }],
-        'h6': ['0.875rem', { lineHeight: '1.4', letterSpacing: '0.01em', fontWeight: '700' }],
-        'h5': ['1rem', { lineHeight: '1.4', letterSpacing: '0.005em', fontWeight: '700' }],
-        'h4': ['1.125rem', { lineHeight: '1.35', letterSpacing: '0', fontWeight: '700' }],
-        'h3': ['1.375rem', { lineHeight: '1.3', letterSpacing: '-0.01em', fontWeight: '800' }],
-        'h2': ['1.75rem', { lineHeight: '1.25', letterSpacing: '-0.02em', fontWeight: '800' }],
-        'h1': ['2.25rem', { lineHeight: '1.15', letterSpacing: '-0.03em', fontWeight: '900' }],
-        'display-sm': ['2.75rem', { lineHeight: '1.1', letterSpacing: '-0.03em', fontWeight: '900' }],
-        'display-md': ['3.5rem', { lineHeight: '1.05', letterSpacing: '-0.04em', fontWeight: '900' }],
-        'display-lg': ['4.5rem', { lineHeight: '1.0', letterSpacing: '-0.05em', fontWeight: '900' }],
-        'article-sm': ['0.9375rem', { lineHeight: '1.75', letterSpacing: '0.01em' }],
-        'article-base': ['1.0625rem', { lineHeight: '1.8', letterSpacing: '0.005em' }],
-        'article-lg': ['1.125rem', { lineHeight: '1.85', letterSpacing: '0' }],
+        'h6': ['clamp(0.875rem, 0.8rem + 0.375vw, 1.125rem)', { lineHeight: '1.4', letterSpacing: '0.01em', fontWeight: '700' }], // Min: 14px, Max: 18px
+        'h5': ['clamp(1rem, 0.95rem + 0.25vw, 1.25rem)', { lineHeight: '1.4', letterSpacing: '0.005em', fontWeight: '700' }], // Min: 16px, Max: 20px
+        'h4': ['clamp(1.125rem, 1.05rem + 0.375vw, 1.5rem)', { lineHeight: '1.35', letterSpacing: '0', fontWeight: '700' }], // Min: 18px, Max: 24px
+        'h3': ['clamp(1.25rem, 1.15rem + 0.5vw, 1.75rem)', { lineHeight: '1.3', letterSpacing: '-0.01em', fontWeight: '800' }], // Min: 20px, Max: 28px
+        'h2': ['clamp(1.5rem, 1.35rem + 0.75vw, 2.25rem)', { lineHeight: '1.25', letterSpacing: '-0.02em', fontWeight: '800' }], // Min: 24px, Max: 36px
+        'h1': ['clamp(1.875rem, 1.6rem + 1.375vw, 3.25rem)', { lineHeight: '1.15', letterSpacing: '-0.03em', fontWeight: '900' }], // Min: 30px, Max: 52px
+        'display-sm': ['clamp(2.25rem, 1.85rem + 2vw, 4.25rem)', { lineHeight: '1.1', letterSpacing: '-0.03em', fontWeight: '900' }], // Min: 36px, Max: 68px
+        'display-md': ['clamp(2.5rem, 2.05rem + 2.25vw, 4.75rem)', { lineHeight: '1.05', letterSpacing: '-0.04em', fontWeight: '900' }], // Min: 40px, Max: 76px
+        'display-lg': ['clamp(3rem, 2.4rem + 3vw, 6rem)', { lineHeight: '1.0', letterSpacing: '-0.05em', fontWeight: '900' }], // Min: 48px, Max: 96px
+        'article-sm': ['clamp(0.9375rem, 0.9rem + 0.1875vw, 1.125rem)', { lineHeight: '1.75', letterSpacing: '0.01em' }], // Min: 15px, Max: 18px
+        'article-base': ['clamp(1.0625rem, 1rem + 0.3125vw, 1.25rem)', { lineHeight: '1.8', letterSpacing: '0.005em' }], // Min: 17px, Max: 20px
+        'article-lg': ['clamp(1.125rem, 1.05rem + 0.375vw, 1.5rem)', { lineHeight: '1.85', letterSpacing: '0' }], // Min: 18px, Max: 24px
       },
       spacing: {
         'px-component': '1rem',

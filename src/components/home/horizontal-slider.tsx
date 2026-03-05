@@ -3,11 +3,11 @@
 import * as React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { 
-  Carousel, 
-  CarouselContent, 
-  CarouselItem, 
-  type CarouselApi 
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  type CarouselApi
 } from '@/components/ui/carousel';
 import { ChevronRight } from 'lucide-react';
 import { cn, formatRelativeTime } from '@/lib/utils';
@@ -72,7 +72,7 @@ export function HorizontalSlider({ posts, title, viewMoreText, dictionary, local
           setApi={setApi}
           opts={{
             align: 'start',
-            loop: false, 
+            loop: false,
           }}
           className="w-full"
         >
@@ -105,8 +105,8 @@ export function HorizontalSlider({ posts, title, viewMoreText, dictionary, local
               return (
                 <CarouselItem key={post.slug} className="pl-4 sm:pl-6 md:basis-1/2 py-2">
                   <article className={cn(
-                      "bg-card/50 rounded-lg overflow-hidden border border-primary/5 p-3 transition-all duration-500 h-full flex gap-4 shadow-sm group",
-                      "hover:-translate-y-1 hover:bg-card hover:border-primary/10"
+                    "bg-card/50 rounded-lg overflow-hidden border border-primary/5 p-3 transition-all duration-500 h-full flex gap-4 shadow-sm group",
+                    "hover:-translate-y-1 hover:bg-card hover:border-primary/10"
                   )}>
                     <Link href={`${linkPrefix}/blog/${post.slug}`} className="contents">
                       {/* Thumbnail Container - Updated to 4:3 (120x90) */}
@@ -119,20 +119,20 @@ export function HorizontalSlider({ posts, title, viewMoreText, dictionary, local
                           sizes="120px"
                           data-ai-hint={heroImageHint}
                         />
-                        <AddToReadingListButton 
+                        <AddToReadingListButton
                           item={item}
                           dictionary={dictionary}
                           showText={false}
                           className="absolute top-1 right-1 z-20 text-white bg-black/30 hover:bg-black/50 hover:text-white opacity-0 group-hover:opacity-100 transition-opacity h-6 w-6"
                         />
                       </div>
-                      
+
                       {/* Content Area */}
                       <div className="flex-1 min-w-0 py-1">
                         <div className="mb-1">
-                            <CategoryBadge category={post.frontmatter.category || 'Update'} />
+                          <CategoryBadge category={post.frontmatter.category || 'Update'} />
                         </div>
-                        <h3 className="font-headline text-[13px] md:text-sm font-medium text-primary leading-snug line-clamp-2 transition-colors group-hover:text-accent">
+                        <h3 className="font-headline text-h6 font-medium text-primary leading-snug line-clamp-2 transition-colors group-hover:text-accent">
                           {post.frontmatter.title}
                         </h3>
                         <time className="text-[10px] text-muted-foreground mt-2 block font-medium opacity-60">
@@ -148,8 +148,8 @@ export function HorizontalSlider({ posts, title, viewMoreText, dictionary, local
 
           {/* Controls - Redesigned Style */}
           <div className="mt-6 flex justify-center">
-            <Link 
-              href={viewMoreHref} 
+            <Link
+              href={viewMoreHref}
               className="flex items-center gap-6 bg-muted/30 px-5 py-2.5 rounded-full border border-primary/5 hover:bg-muted/50 transition-all group"
             >
               <div className="flex items-center gap-2 pr-4 border-r border-primary/10">

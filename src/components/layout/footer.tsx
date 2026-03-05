@@ -12,10 +12,10 @@ import { TikTokLogo } from '@/components/icons/tiktok-logo';
 
 export function Footer({ dictionary, translationsMap }: { dictionary: Dictionary, translationsMap: TranslationsMap }) {
     const footerNavItems = [
-      { id: 'footer-about', title: dictionary.navigation.about, href: '/about', icon: <User2 className="h-5 w-5" /> },
-      { id: 'footer-notes', title: dictionary.navigation.notes, href: '/notes', icon: <StickyNote className="h-5 w-5" /> },
-      { id: 'footer-tools', title: dictionary.navigation.tools, href: '/tools', icon: <LayoutGrid className="h-5 w-5" /> },
-      { id: 'footer-contact', title: dictionary.navigation.contact, href: '/contact', icon: <Mail className="h-5 w-5" /> },
+        { id: 'footer-about', title: dictionary.navigation.about, href: '/about', icon: <User2 className="h-5 w-5" /> },
+        { id: 'footer-notes', title: dictionary.navigation.notes, href: '/notes', icon: <StickyNote className="h-5 w-5" /> },
+        { id: 'footer-tools', title: dictionary.navigation.tools, href: '/tools', icon: <LayoutGrid className="h-5 w-5" /> },
+        { id: 'footer-contact', title: dictionary.navigation.contact, href: '/contact', icon: <Mail className="h-5 w-5" /> },
     ];
 
     const authorName = "Iwan Efendi";
@@ -31,7 +31,7 @@ export function Footer({ dictionary, translationsMap }: { dictionary: Dictionary
     return (
         <footer className="relative w-full mt-16 sm:mt-24">
             {/* Top Navigation Section - Links Cards */}
-            <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
+            <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-24 sm:pt-16 sm:pb-32">
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
                     {footerNavItems.map((item, index) => {
                         const image = PlaceHolderImages.find(p => p.id === item.id);
@@ -95,7 +95,7 @@ export function Footer({ dictionary, translationsMap }: { dictionary: Dictionary
                         <p className="mt-4 text-muted-foreground max-w-md mx-auto text-lg leading-relaxed font-medium animate-in fade-in duration-700">
                             {dictionary.footer.authorBio}
                         </p>
-                        
+
                         {/* Social Links */}
                         <div className="flex items-center justify-center gap-4 mt-8">
                             {socialLinks.map((social) => {
@@ -108,10 +108,10 @@ export function Footer({ dictionary, translationsMap }: { dictionary: Dictionary
                                 const brandStyle = brandStyles[social.label] || "hover:bg-accent hover:text-primary";
 
                                 return (
-                                    <a 
-                                        key={social.label} 
-                                        href={social.href} 
-                                        target="_blank" 
+                                    <a
+                                        key={social.label}
+                                        href={social.href}
+                                        target="_blank"
                                         rel="noopener noreferrer"
                                         className={cn(
                                             "group relative p-3 rounded-full bg-primary/90 text-primary-foreground shadow-md transition-all duration-300 ease-in-out",

@@ -26,18 +26,18 @@ export function HomeClient({ initialPosts, dictionary, locale }: { initialPosts:
   const latestPosts = allPosts
     .filter(post => post.frontmatter.published && !featuredSlugs.has(post.slug))
     .slice(0, 6);
-  
+
   const sliderCategory = "Tutorial";
   const sliderPosts = allPosts
-    .filter(post => 
-      post.frontmatter.published && 
+    .filter(post =>
+      post.frontmatter.published &&
       post.frontmatter.category?.toLowerCase() === sliderCategory.toLowerCase()
     )
-    .slice(0, 6); 
+    .slice(0, 6);
 
-  const topicTag = "Windows"; 
+  const topicTag = "Windows";
   const topicPosts = allPosts
-    .filter(post => 
+    .filter(post =>
       post.frontmatter.published &&
       post.frontmatter.tags?.some((tag: string) => tag.toLowerCase() === "windows")
     )
@@ -45,7 +45,7 @@ export function HomeClient({ initialPosts, dictionary, locale }: { initialPosts:
 
   const updateTag = "Android";
   const updatePosts = allPosts
-    .filter(post => 
+    .filter(post =>
       post.frontmatter.published &&
       post.frontmatter.tags?.some((tag: string) => tag.toLowerCase() === updateTag.toLowerCase())
     )
@@ -57,59 +57,59 @@ export function HomeClient({ initialPosts, dictionary, locale }: { initialPosts:
     let heroImageHint: string | undefined;
 
     if (heroImageValue) {
-        if (heroImageValue.startsWith('http') || heroImageValue.startsWith('/')) {
-            heroImageSrc = heroImageValue;
-            heroImageHint = post.frontmatter.imageAlt || post.frontmatter.title;
-        } else {
-            const placeholder = PlaceHolderImages.find(p => p.id === heroImageValue);
-            if (placeholder) {
-                heroImageSrc = placeholder.imageUrl;
-                heroImageHint = placeholder.imageHint;
-            }
+      if (heroImageValue.startsWith('http') || heroImageValue.startsWith('/')) {
+        heroImageSrc = heroImageValue;
+        heroImageHint = post.frontmatter.imageAlt || post.frontmatter.title;
+      } else {
+        const placeholder = PlaceHolderImages.find(p => p.id === heroImageValue);
+        if (placeholder) {
+          heroImageSrc = placeholder.imageUrl;
+          heroImageHint = placeholder.imageHint;
         }
+      }
     }
 
     const item = {
-        slug: post.slug,
-        title: post.frontmatter.title,
-        description: post.frontmatter.description,
-        href: `${linkPrefix}/blog/${post.slug}`,
-        type: 'blog' as const,
+      slug: post.slug,
+      title: post.frontmatter.title,
+      description: post.frontmatter.description,
+      href: `${linkPrefix}/blog/${post.slug}`,
+      type: 'blog' as const,
     };
 
     return (
-        <div key={post.slug} className="group relative transition-all duration-500 hover:-translate-y-1">
-            <Link href={`${linkPrefix}/blog/${post.slug}`} className="block" aria-label={`Read more about ${post.frontmatter.title}`}>
-                <div className="relative w-full aspect-[4/3] overflow-hidden rounded-xl mb-4 shadow-sm transition-all duration-500 border border-primary/5">
-                    {heroImageSrc && (
-                        <Image
-                            src={heroImageSrc}
-                            alt={post.frontmatter.imageAlt || post.frontmatter.title}
-                            fill
-                            className="object-cover transition-transform duration-700 group-hover:scale-110"
-                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 33vw, 300px"
-                            data-ai-hint={heroImageHint}
-                        />
-                    )}
-                    <AddToReadingListButton 
-                        item={item}
-                        dictionary={dictionary}
-                        showText={false}
-                        className="absolute top-3 right-3 z-10 text-white bg-black/30 hover:bg-black/50 hover:text-white opacity-0 group-hover:opacity-100 transition-opacity"
-                    />
-                </div>
+      <div key={post.slug} className="group relative transition-all duration-500 hover:-translate-y-1">
+        <Link href={`${linkPrefix}/blog/${post.slug}`} className="block" aria-label={`Read more about ${post.frontmatter.title}`}>
+          <div className="relative w-full aspect-[4/3] overflow-hidden rounded-xl mb-4 shadow-sm transition-all duration-500 border border-primary/5">
+            {heroImageSrc && (
+              <Image
+                src={heroImageSrc}
+                alt={post.frontmatter.imageAlt || post.frontmatter.title}
+                fill
+                className="object-cover transition-transform duration-700 group-hover:scale-110"
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 33vw, 300px"
+                data-ai-hint={heroImageHint}
+              />
+            )}
+            <AddToReadingListButton
+              item={item}
+              dictionary={dictionary}
+              showText={false}
+              className="absolute top-3 right-3 z-10 text-white bg-black/30 hover:bg-black/50 hover:text-white opacity-0 group-hover:opacity-100 transition-opacity"
+            />
+          </div>
 
-                <div className="mb-2">
-                    <CategoryBadge category={post.frontmatter.category} />
-                </div>
-                <h3 className="font-headline text-base font-bold tracking-tight text-primary transition-colors group-hover:text-accent leading-tight">
-                    {post.frontmatter.title}
-                </h3>
-                <time className="text-[10px] font-medium text-muted-foreground mt-2 block opacity-60">
-                    {formatRelativeTime(new Date(post.frontmatter.date), locale)}
-                </time>
-            </Link>
-        </div>
+          <div className="mb-2">
+            <CategoryBadge category={post.frontmatter.category} />
+          </div>
+          <h3 className="font-headline text-h5 font-bold tracking-tight text-primary transition-colors group-hover:text-accent leading-tight">
+            {post.frontmatter.title}
+          </h3>
+          <time className="text-[10px] font-medium text-muted-foreground mt-2 block opacity-60">
+            {formatRelativeTime(new Date(post.frontmatter.date), locale)}
+          </time>
+        </Link>
+      </div>
     );
   }
 
@@ -126,19 +126,19 @@ export function HomeClient({ initialPosts, dictionary, locale }: { initialPosts:
             {latestPosts.map((post) => renderLatestCard(post))}
           </div>
           <div className="flex justify-center">
-            <Link 
-              href={`${linkPrefix}/blog`} 
+            <Link
+              href={`${linkPrefix}/blog`}
               className="flex items-center gap-6 bg-muted/30 px-5 py-2.5 rounded-full border border-primary/5 hover:bg-muted/50 transition-all group"
             >
-                <div className="flex items-center gap-2 pr-4 border-r border-primary/10">
-                    <div className="h-1.5 w-8 bg-accent rounded-full" />
-                    <div className="h-1.5 w-1.5 bg-primary/20 rounded-full" />
-                    <div className="h-1.5 w-1.5 bg-primary/20 rounded-full" />
-                </div>
-                <span className="text-[11px] font-black uppercase tracking-widest text-primary/80 group-hover:text-primary transition-all flex items-center gap-2">
-                    {dictionary.home.viewAllPosts}
-                    <ChevronRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
-                </span>
+              <div className="flex items-center gap-2 pr-4 border-r border-primary/10">
+                <div className="h-1.5 w-8 bg-accent rounded-full" />
+                <div className="h-1.5 w-1.5 bg-primary/20 rounded-full" />
+                <div className="h-1.5 w-1.5 bg-primary/20 rounded-full" />
+              </div>
+              <span className="text-[11px] font-black uppercase tracking-widest text-primary/80 group-hover:text-primary transition-all flex items-center gap-2">
+                {dictionary.home.viewAllPosts}
+                <ChevronRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
+              </span>
             </Link>
           </div>
         </section>
