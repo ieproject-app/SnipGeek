@@ -154,7 +154,7 @@ export default async function LocaleLayout({
   
   return (
     <html lang={locale} className={cn(fontDisplay.variable, fontSans.variable, fontSerif.variable, fontMono.variable, "scroll-smooth")} suppressHydrationWarning>
-      <head>
+      <head suppressHydrationWarning>
         <Script
           async
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6235611333449307"

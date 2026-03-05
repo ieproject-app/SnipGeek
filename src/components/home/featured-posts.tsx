@@ -11,10 +11,10 @@ import { ArrowRight } from 'lucide-react';
 import { CategoryBadge, getBadgeStyle, simplifyCategoryLabel } from '@/components/layout/category-badge';
 
 interface FeaturedPostsProps {
-  posts: Post<PostFrontmatter>[];
-  dictionary: Dictionary;
-  locale: string;
-  linkPrefix: string;
+    posts: Post<PostFrontmatter>[];
+    dictionary: Dictionary;
+    locale: string;
+    linkPrefix: string;
 }
 
 /**
@@ -22,116 +22,116 @@ interface FeaturedPostsProps {
  * Updated: Category badge moved to Caption Block (Option 1) and minimalist labels implemented.
  */
 export function FeaturedPosts({ posts, dictionary, locale, linkPrefix }: FeaturedPostsProps) {
-  if (posts.length === 0) return null;
+    if (posts.length === 0) return null;
 
-  return (
-    <section className="py-12 sm:py-16 bg-primary/[0.03] border-y border-primary/5">
-      <div className="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 items-start">
-          {posts.map((post, index) => {
-            const heroImageValue = post.frontmatter.heroImage;
-            let heroImageSrc: string | undefined;
-            let heroImageHint: string | undefined;
+    return (
+        <section className="py-12 sm:py-16 bg-primary/[0.03] border-y border-primary/5">
+            <div className="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 items-start">
+                    {posts.map((post, index) => {
+                        const heroImageValue = post.frontmatter.heroImage;
+                        let heroImageSrc: string | undefined;
+                        let heroImageHint: string | undefined;
 
-            if (heroImageValue) {
-                if (heroImageValue.startsWith('http') || heroImageValue.startsWith('/')) {
-                    heroImageSrc = heroImageValue;
-                    heroImageHint = post.frontmatter.imageAlt || post.frontmatter.title;
-                } else {
-                    const placeholder = PlaceHolderImages.find(p => p.id === heroImageValue);
-                    if (placeholder) {
-                        heroImageSrc = placeholder.imageUrl;
-                        heroImageHint = placeholder.imageHint;
-                    }
-                }
-            }
+                        if (heroImageValue) {
+                            if (heroImageValue.startsWith('http') || heroImageValue.startsWith('/')) {
+                                heroImageSrc = heroImageValue;
+                                heroImageHint = post.frontmatter.imageAlt || post.frontmatter.title;
+                            } else {
+                                const placeholder = PlaceHolderImages.find(p => p.id === heroImageValue);
+                                if (placeholder) {
+                                    heroImageSrc = placeholder.imageUrl;
+                                    heroImageHint = placeholder.imageHint;
+                                }
+                            }
+                        }
 
-            const rawCategory = post.frontmatter.category || 'Tutorial';
-            const simplifiedCategory = simplifyCategoryLabel(rawCategory);
-            const badgeStyle = getBadgeStyle(simplifiedCategory);
-            const isStaggered = index % 2 !== 0;
-            
-            const item = {
-                slug: post.slug,
-                title: post.frontmatter.title,
-                description: post.frontmatter.description,
-                href: `${linkPrefix}/blog/${post.slug}`,
-                type: 'blog' as const,
-            };
+                        const rawCategory = post.frontmatter.category || 'Tutorial';
+                        const simplifiedCategory = simplifyCategoryLabel(rawCategory);
+                        const badgeStyle = getBadgeStyle(simplifiedCategory);
+                        const isStaggered = index % 2 !== 0;
 
-            return (
-              <div 
-                key={post.slug} 
-                className={cn(
-                    "group relative transition-all duration-500 ease-out",
-                    isStaggered && "lg:mt-10"
-                )}
-              >
-                <Link href={`${linkPrefix}/blog/${post.slug}`} className="block" aria-label={`Read ${post.frontmatter.title}`}>
-                    <article className="space-y-5">
-                        {/* Image Block */}
-                        <div className="relative aspect-[4/3] rounded-xl overflow-hidden bg-muted shadow-md group-hover:shadow-xl group-hover:-translate-y-2 transition-all duration-500">
-                            {/* Accent Bar (Bottom) - Color matches category */}
-                            <div 
-                                className={cn("absolute bottom-0 left-0 right-0 h-[3px] z-30 transition-opacity duration-500 opacity-0 group-hover:opacity-100", badgeStyle.dot)}
-                            />
+                        const item = {
+                            slug: post.slug,
+                            title: post.frontmatter.title,
+                            description: post.frontmatter.description,
+                            href: `${linkPrefix}/blog/${post.slug}`,
+                            type: 'blog' as const,
+                        };
 
-                            {/* Hero Image */}
-                            {heroImageSrc && (
-                                <Image
-                                    src={heroImageSrc}
-                                    alt={post.frontmatter.imageAlt || post.frontmatter.title}
-                                    fill
-                                    className="object-cover transition-transform duration-1000 ease-out group-hover:scale-[1.06]"
-                                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
-                                    priority={index < 4}
-                                    data-ai-hint={heroImageHint}
-                                />
-                            )}
-                        </div>
+                        return (
+                            <div
+                                key={post.slug}
+                                className={cn(
+                                    "group relative transition-all duration-500 ease-out",
+                                    isStaggered && "lg:mt-10"
+                                )}
+                            >
+                                <Link href={`${linkPrefix}/blog/${post.slug}`} className="block" aria-label={`Read ${post.frontmatter.title}`}>
+                                    <article className="space-y-5">
+                                        {/* Image Block */}
+                                        <div className="relative aspect-[4/3] rounded-xl overflow-hidden bg-muted shadow-md group-hover:shadow-xl group-hover:-translate-y-2 transition-all duration-500">
+                                            {/* Accent Bar (Bottom) - Color matches category */}
+                                            <div
+                                                className={cn("absolute bottom-0 left-0 right-0 h-[3px] z-30 transition-opacity duration-500 opacity-0 group-hover:opacity-100", badgeStyle.dot)}
+                                            />
 
-                        {/* Caption Block */}
-                        <div className="px-1 space-y-3">
-                            {/* Option 1: Category Badge inside text block, above title */}
-                            <div>
-                                <CategoryBadge 
-                                    category={rawCategory} 
-                                    size="sm" 
-                                    className="shadow-sm"
-                                />
+                                            {/* Hero Image */}
+                                            {heroImageSrc && (
+                                                <Image
+                                                    src={heroImageSrc}
+                                                    alt={post.frontmatter.imageAlt || post.frontmatter.title}
+                                                    fill
+                                                    className="object-cover transition-transform duration-1000 ease-out group-hover:scale-[1.06]"
+                                                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+                                                    priority={index < 4}
+                                                    data-ai-hint={heroImageHint}
+                                                />
+                                            )}
+                                        </div>
+
+                                        {/* Caption Block */}
+                                        <div className="px-1 space-y-3">
+                                            {/* Option 1: Category Badge inside text block, above title */}
+                                            <div>
+                                                <CategoryBadge
+                                                    category={rawCategory}
+                                                    size="sm"
+                                                    className="shadow-sm"
+                                                />
+                                            </div>
+
+                                            <h3 className="font-headline text-h4 font-bold leading-snug text-primary group-hover:text-accent transition-colors duration-300">
+                                                {post.frontmatter.title}
+                                            </h3>
+
+                                            <div className="flex items-center justify-between">
+                                                <div className="text-[10px] font-bold uppercase tracking-tighter text-muted-foreground/60">
+                                                    {formatRelativeTime(new Date(post.frontmatter.date), locale)}
+                                                </div>
+
+                                                <div className="flex items-center gap-3">
+                                                    <AddToReadingListButton
+                                                        item={item}
+                                                        dictionary={dictionary}
+                                                        showText={false}
+                                                        className="h-8 w-8 rounded-full border-none bg-primary/[0.03] text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all"
+                                                    />
+                                                    <div
+                                                        className={cn("flex items-center gap-1 text-[10px] font-black uppercase tracking-widest transition-transform duration-300 group-hover:translate-x-1", badgeStyle.text)}
+                                                    >
+                                                        READ <ArrowRight className="h-3.5 w-3.5" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </article>
+                                </Link>
                             </div>
-
-                            <h3 className="font-headline text-lg font-bold leading-snug text-primary group-hover:text-accent transition-colors duration-300">
-                                {post.frontmatter.title}
-                            </h3>
-
-                            <div className="flex items-center justify-between">
-                                <div className="text-[10px] font-bold uppercase tracking-tighter text-muted-foreground/60">
-                                    {formatRelativeTime(new Date(post.frontmatter.date), locale)}
-                                </div>
-                                
-                                <div className="flex items-center gap-3">
-                                    <AddToReadingListButton 
-                                        item={item}
-                                        dictionary={dictionary}
-                                        showText={false}
-                                        className="h-8 w-8 rounded-full border-none bg-primary/[0.03] text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all"
-                                    />
-                                    <div 
-                                        className={cn("flex items-center gap-1 text-[10px] font-black uppercase tracking-widest transition-transform duration-300 group-hover:translate-x-1", badgeStyle.text)}
-                                    >
-                                        READ <ArrowRight className="h-3.5 w-3.5" />
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </article>
-                </Link>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-    </section>
-  );
+                        );
+                    })}
+                </div>
+            </div>
+        </section>
+    );
 }

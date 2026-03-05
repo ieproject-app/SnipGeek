@@ -3,11 +3,11 @@
 import * as React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { 
-  Carousel, 
-  CarouselContent, 
-  CarouselItem, 
-  type CarouselApi 
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  type CarouselApi
 } from '@/components/ui/carousel';
 import { ChevronRight } from 'lucide-react';
 import { cn, formatRelativeTime } from '@/lib/utils';
@@ -72,7 +72,7 @@ export function FeatureSlider({ posts, title, viewMoreText, dictionary, locale, 
           setApi={setApi}
           opts={{
             align: 'start',
-            loop: false, 
+            loop: false,
           }}
           className="w-full"
         >
@@ -105,9 +105,9 @@ export function FeatureSlider({ posts, title, viewMoreText, dictionary, locale, 
               return (
                 <CarouselItem key={post.slug} className="pl-4 sm:pl-6 md:basis-1/2 lg:basis-1/3 pb-6 pt-2">
                   <article className={cn(
-                      "relative bg-card rounded-lg border border-primary/5 transition-all duration-500 h-full flex flex-col group/card overflow-hidden shadow-md",
-                      "hover:-translate-y-1.5 hover:border-primary/10",
-                      "dark:shadow-black/40"
+                    "relative bg-card rounded-lg border border-primary/5 transition-all duration-500 h-full flex flex-col group/card overflow-hidden shadow-md",
+                    "hover:-translate-y-1.5 hover:border-primary/10",
+                    "dark:shadow-black/40"
                   )}>
                     <Link href={`${linkPrefix}/blog/${post.slug}`} className="block h-full group">
                       {/* Image container - Changed to aspect 4:3 */}
@@ -120,7 +120,7 @@ export function FeatureSlider({ posts, title, viewMoreText, dictionary, locale, 
                           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 33vw, 300px"
                           data-ai-hint={heroImageHint}
                         />
-                        <AddToReadingListButton 
+                        <AddToReadingListButton
                           item={item}
                           dictionary={dictionary}
                           showText={false}
@@ -129,9 +129,9 @@ export function FeatureSlider({ posts, title, viewMoreText, dictionary, locale, 
                       </div>
                       <div className="p-5 flex-1 flex flex-col z-10">
                         <div className="mb-2">
-                            <CategoryBadge category={post.frontmatter.category || 'Featured'} />
+                          <CategoryBadge category={post.frontmatter.category || 'Featured'} />
                         </div>
-                        <h3 className="font-headline text-base font-semibold text-primary leading-snug group-hover:text-accent transition-colors">
+                        <h3 className="font-headline text-h6 font-semibold text-primary leading-snug group-hover:text-accent transition-colors">
                           {post.frontmatter.title}
                         </h3>
                         <time className="text-[10px] text-muted-foreground mt-3 block font-medium opacity-60">
@@ -147,8 +147,8 @@ export function FeatureSlider({ posts, title, viewMoreText, dictionary, locale, 
 
           {/* Controls & Custom "View More" Style */}
           <div className="mt-6 flex justify-center">
-            <Link 
-              href={viewMoreHref} 
+            <Link
+              href={viewMoreHref}
               className="flex items-center gap-6 bg-muted/30 px-5 py-2.5 rounded-full border border-primary/5 hover:bg-muted/50 transition-all group"
             >
               <div className="flex items-center gap-2 pr-4 border-r border-primary/10">
