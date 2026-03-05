@@ -55,6 +55,40 @@ AI must recognize these built-in features of SnipGeek:
 - Uses `/[locale]/` folder structure
 - Whenever content or components are changed in one language, **ALWAYS check** if the changes need to be applied to the other language as well
 
+### 🔴 Locale Casting Pattern — MANDATORY
+When accessing `params.locale` in Next.js page files, the value comes in as `string` by default.
+You MUST cast it to the `Locale` type before passing to `getDictionary()` or any locale-aware function.
+
+**CORRECT pattern:**
+```typescript
+import type { Locale } from '@/i18n-config';
+
+export default async function Page({ params }: { params: Promise<{ locale: Locale }> }) {
+  const { locale } = await params;
+  const dictionary = await getDictionary(locale); // ✅ no error
+}
+```
+
+**WRONG pattern (causes TypeScript error):**
+```typescript
+export default async function Page({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+  const dictionary = await getDictionary(locale); // ❌ TS2345 error
+}
+```
+
+This applies to ALL page files under `src/app/[locale]/`.
+
+### i18n Locales — Readonly Array
+`i18n.locales` is `readonly ["en", "id"]`. When passing it to functions that expect a mutable `string[]`, use spread:
+```typescript
+// ✅ Correct
+matchLocale(languages, [...i18n.locales], i18n.defaultLocale)
+
+// ❌ Wrong — causes TS2352 error
+matchLocale(languages, i18n.locales as string[], i18n.defaultLocale)
+```
+
 ### Category Badge
 - Badge color system is strictly defined in `category-badge.tsx`
 - **DO NOT** arbitrarily change Tailwind colors in UI components
@@ -77,7 +111,7 @@ To ensure 100% accuracy when modifying the UI, follow this protocol:
 
 ---
 
-## 4. Development Rules in Antigravity IDE
+## 4. Development Rules
 
 These are the most critical rules to prevent Build Errors:
 
@@ -93,6 +127,32 @@ This is a **Secret Manager bypass** and the only way to prevent build failures o
 - Always use `memoizedServices` in `config.ts`
 - **NEVER** call `getAuth()` or `getFirestore()` directly outside the main provider
 - Reason: prevents login popup from closing itself unexpectedly
+
+### 🔴 Firebase Null-Safety — Admin Components
+`useFirestore()` and `useAuth()` return `Firestore | null` and `Auth | null`.
+Before performing ANY Firestore or Auth operation inside a handler function, you MUST guard against null:
+
+```typescript
+const handleSubmit = async () => {
+  if (!db) return; // ✅ MANDATORY guard
+  // safe to use db below
+  setDocumentNonBlocking(doc(db, 'collection', id), data);
+};
+```
+
+Apply this guard at the **top of every async handler** that uses `db` or `auth` — including `handleSubmit`, `handleMediaUpload`, `deleteMedia`, etc.
+
+### 🔴 Firebase Storage — null vs undefined
+`getStorage()` accepts `FirebaseApp | undefined`, NOT `FirebaseApp | null`.
+When `firebaseApp` can be null, use nullish coalescing to convert:
+
+```typescript
+// ✅ Correct
+const storage = getStorage(firebaseApp ?? undefined);
+
+// ❌ Wrong — causes TS2345 error
+const storage = getStorage(firebaseApp);
+```
 
 ### 🔴 Export Sync — "Single Entry Point" Rule
 - Everything inside `src/firebase/` **MUST** be exported through `src/firebase/index.ts`
@@ -114,7 +174,103 @@ This is a **Secret Manager bypass** and the only way to prevent build failures o
 
 ---
 
-## 4. Design & UI System
+## 5. Dictionary & Notification Rules
+
+### 🔴 Dictionary Sync — Always Update Both Languages
+When adding a new key to `notifications` or any section of the dictionary, you MUST update **both** files simultaneously:
+- `src/dictionaries/en.json`
+- `src/dictionaries/id.json`
+
+Failing to sync both files will cause runtime `undefined` values in one of the languages.
+
+### 🔴 Adding New Notification Keys
+When a component needs a new notification string (e.g., `logoutSuccess`), the full chain must be updated:
+
+1. Add the key to `src/dictionaries/en.json` under `notifications`
+2. Add the translated key to `src/dictionaries/id.json` under `notifications`
+3. The `Dictionary` type in `src/lib/get-dictionary.ts` is automatically inferred — no manual type update needed
+
+### 🔔 Notification System — useNotification() API
+SnipGeek uses a **custom Status Bar Notification** system. Always use `useNotification()`, never Shadcn's `useToast()` for short feedback messages.
+
+**Correct usage:**
+```typescript
+const { notify } = useNotification();
+
+// Message only
+notify("Tersalin ke Clipboard");
+
+// Message with icon
+notify("Berhasil keluar.", <LogOut className="h-4 w-4" />);
+
+// Using dictionary key (preferred)
+notify(dictionary?.notifications?.logoutSuccess || "Berhasil keluar.", <LogOut className="h-4 w-4" />);
+```
+
+**Signature:** `notify(message: React.ReactNode, icon?: React.ReactNode) => void`
+
+Use `useNotification()` for: theme changes, language switches, copy actions, reading list updates, logout success.
+Use `useToast()` (Shadcn) ONLY inside admin panel components (`post-editor.tsx`, `note-editor.tsx`) where it is already established.
+
+---
+
+## 6. Library Version Notes
+
+These notes exist to prevent introducing code that is incompatible with the installed versions.
+
+### react-day-picker — v9 API
+The project uses `react-day-picker@9.x`. The v8 API is **incompatible**.
+
+| v8 (OLD — DO NOT USE) | v9 (CORRECT) |
+|---|---|
+| `IconLeft` component | `Chevron` component with `orientation` prop |
+| `IconRight` component | `Chevron` component with `orientation` prop |
+
+**Correct `Chevron` implementation:**
+```typescript
+components={{
+  Chevron: ({ orientation }: { orientation?: string }) =>
+    orientation === 'left' || orientation === 'up'
+      ? <ChevronLeft className="h-4 w-4" />
+      : <ChevronRight className="h-4 w-4" />,
+}}
+```
+
+### next-mdx-remote — v6 (No RSC Types Export)
+The project uses `next-mdx-remote@6.x`. This version does **NOT** export `MDXComponents` from `next-mdx-remote/rsc/types` — that path does not exist.
+
+**DO NOT write:**
+```typescript
+import type { MDXComponents } from 'next-mdx-remote/rsc/types' // ❌ module not found
+```
+
+**Instead, let TypeScript infer the type:**
+```typescript
+// ✅ No import needed — TypeScript infers the type from the object shape
+export const mdxComponents = {
+  h1: MdxH1,
+  h2: MdxH2,
+  // ...
+};
+```
+
+### Progress Component — Custom Pure CSS (No Radix)
+`@radix-ui/react-progress` is **NOT installed**. The project uses a custom `Progress` component in `src/components/ui/progress.tsx`.
+
+**Accepted props:**
+```typescript
+interface ProgressProps {
+  value?: number;        // 0–100
+  className?: string;    // outer container classes
+  indicatorClassName?: string; // inner fill bar classes
+}
+```
+
+Do NOT attempt to install `@radix-ui/react-progress` or use any external progress library.
+
+---
+
+## 7. Design & UI System
 
 ### 🎨 Color Philosophy (Theme Protocol)
 - **NEVER** use hardcoded Tailwind color classes like `text-blue-500` or `bg-red-200`
@@ -153,3 +309,4 @@ These are the design "fingerprints" and asset rules that must be preserved:
 - SnipGeek has a custom **Status Bar Notification** system in the Header (toast bar from bottom)
 - Always use `useNotification()` instead of Shadcn's built-in `useToast()`
 - This applies for short success messages like "Link Copied" or "Theme Changed"
+- Full API and usage guide is documented in **Section 5** above
