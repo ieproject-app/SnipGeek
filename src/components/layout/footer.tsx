@@ -104,15 +104,15 @@ export function Footer({
             const image = PlaceHolderImages.find((p) => p.id === item.id);
             const isTiltRight = index % 2 === 0; // 0,2 miring kanan; 1,3 miring kiri
             const tiltClass = isTiltRight ? "rotate-2" : "-rotate-2";
-            
+
             return (
               <li key={item.id} className="list-none">
                 <div className="transition-all duration-300 hover:-translate-y-1">
-                    <SnipTooltip label={item.title} side="top" wrapperClassName="block w-full">
-                      <Link
-                        href={item.href}
-                        className="block group relative"
-                      >
+                  <SnipTooltip label={item.title} side="top" wrapperClassName="block w-full">
+                    <Link
+                      href={item.href}
+                      className="block group relative"
+                    >
                       <article className={cn(
                         "relative w-full aspect-[4/3] rounded-xl overflow-hidden shadow-lg border border-white/10 bg-zinc-900/50 backdrop-blur-sm transition-all duration-300 ease-out group-hover:shadow-2xl",
                         "transform-gpu",
@@ -134,7 +134,7 @@ export function Footer({
                           "absolute inset-0 bg-gradient-to-b opacity-0 group-hover:opacity-100 transition-opacity duration-300",
                           item.colorClass
                         )} />
-                        
+
                         <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent p-4 flex flex-col items-center justify-center gap-2">
                           <span className="text-accent text-6xl sm:text-8xl transition-transform duration-300 group-hover:scale-125 drop-shadow-lg">
                             {item.icon}
