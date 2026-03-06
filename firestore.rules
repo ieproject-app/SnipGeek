@@ -8,12 +8,15 @@ service cloud.firestore {
     }
 
     function isAdmin() {
-      return isSignedIn() && request.auth.token.email == 'iwan.efndi@gmail.com';
+      return isSignedIn() && 
+        exists(/databases/$(database)/documents/roles_admin/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/roles_admin/$(request.auth.uid)).data.role == 'admin';
     }
 
     // Allow users to check their own admin role
     match /roles_admin/{userId} {
       allow read: if isSignedIn() && request.auth.uid == userId;
+      allow write: if isAdmin(); // Only admins can modify roles
     }
 
     // Number Generator Rules
@@ -25,7 +28,7 @@ service cloud.firestore {
         isAdmin()
       );
       
-      // Admin (Iwan) can populate/delete data
+      // Admin can populate/delete data
       allow create, delete: if isAdmin();
       
       // Users can only mark a number as used if it's currently free
@@ -44,6 +47,12 @@ service cloud.firestore {
     match /media_library/{id} {
       allow read: if true;
       allow write, delete: if isAdmin();
+    }
+
+    // Audit logs
+    match /audit_logs/{logId} {
+      allow write: if isSignedIn();
+      allow read: if isAdmin();
     }
 
     // Default deny
