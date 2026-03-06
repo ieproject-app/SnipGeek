@@ -1,0 +1,163 @@
+---
+title: "Git Versioning: Safe Commit, Push, Tag & Rollback"
+date: "2026-03-06"
+updated: "2026-03-06"
+description: "A personal note on the worry of losing code and how Git versioning became the answer — from first commit to safe rollback."
+translationKey: "git-versioning-commit-push-rollback-guide"
+heroImage: "footer-contact"
+published: true
+tags: ["Git", "GitHub", "Version Control", "Terminal", "Workflow"]
+---
+
+I'll be honest — I was worried.
+
+That day, my AI and I had just finished a big round of changes: refactoring the theme hook, adding new utilities, fixing SEO metadata, adding security headers, and deleting some files. Everything felt right. TypeScript was clean, no errors. But one question suddenly surfaced:
+
+> *"If something turns out to be wrong after committing... can we actually go back to the previous version?"*
+
+That question turned out to be the doorway to a much better understanding of how Git works as a time machine for code.
+
+---
+
+## What Is Versioning in Git?
+
+Every time we run `git commit`, Git doesn't just "save files" — it takes a **complete snapshot** of the entire project at that point in time.
+
+Think of it this way: each commit is a photograph. The collection of those photos forms a travel album of your project's journey.
+
+```bash
+git log --oneline -5
+```
+
+The output looks something like this:
+
+```
+fcb9e5f refactor: audit & hardening — theme hook, utils, security headers
+7dbb190 feat: add cross-env dependency and improve code formatting
+5c48cab Improve language switcher visibility and styling
+374bd29 fix: correct apphosting.yaml secret variable syntax
+d04d9bb feat: enhance security & refactor admin role management
+```
+
+Each line is one "photo". The short hash at the front (`fcb9e5f`, `7dbb190`, etc.) is the unique ID of that snapshot. Whenever I want, I can return to any one of them.
+
+---
+
+## Three Core Actions to Master
+
+### `git add` + `git commit` — Take the Photo
+
+Before the photo can be taken, we need to decide what goes into the frame:
+
+```bash
+# Stage all changes
+git add -A
+
+# Take the photo with a caption
+git commit -m "feat: clear description of what changed"
+```
+
+A good commit message is an investment. Three months from now, `"fix: add passive: true to scroll listener in BackToTop"` is far more useful than `"update"`.
+
+### `git push` — Send the Photo to the Online Album
+
+A commit that only exists on your local machine is vulnerable — if your laptop dies or gets damaged, that history is gone. `git push` sends all those snapshots to GitHub:
+
+```bash
+git push origin main
+```
+
+Now the project history exists in two places: locally and on GitHub. This is automatic backup.
+
+### `git tag` — Name an Important Milestone
+
+Hashes like `fcb9e5f` are hard to remember. A tag is a way to give a human-friendly name to an important commit:
+
+```bash
+# Create a tag at the current commit
+git tag v1.1-audit-hardening
+
+# Send the tag to GitHub
+git push origin --tags
+```
+
+After this, I don't need to remember the hash. I just need to remember the tag name.
+
+---
+
+## Three Rollback Scenarios
+
+This is the heart of my earlier worry. It turns out there are several ways to "go back", depending on how serious the situation is.
+
+### Scenario 1 — Peek at an Old Version Without Changing Anything
+
+If you just want to see what a file looked like at a certain version without changing anything:
+
+```bash
+# View a specific file from a specific commit
+git show 7dbb190:src/components/layout/header.tsx
+```
+
+Safe. Nothing in the project changes.
+
+### Scenario 2 — Undo the Last Commit, Keep the Code
+
+The commit was made but the message was wrong, or you want to edit the code before recommitting:
+
+```bash
+# Undo the commit, but keep file changes intact
+git reset --soft HEAD~1
+```
+
+Files are unchanged, but the commit is gone. You're free to edit again and recommit.
+
+### Scenario 3 — Safe Rollback to a Specific Version or Tag
+
+This is the correct approach when you genuinely want to return to a previous state, but **without deleting history**:
+
+```bash
+# Reverse all changes since a specific tag
+git revert --no-commit v1.1-audit-hardening..HEAD
+git commit -m "revert: back to v1.1 state"
+git push origin main
+```
+
+`git revert` doesn't delete old commits — it adds a new commit that reverses the changes. History stays intact, and this is the best choice for projects already pushed to a shared GitHub repository.
+
+---
+
+## The Workflow I Use Now
+
+After understanding all of this, my workflow became much calmer:
+
+**Before starting a big change** — create a tag as a checkpoint:
+```bash
+git tag v1.2-before-new-feature
+git push origin --tags
+```
+
+**After finishing** — commit with a clear message, then push:
+```bash
+git add -A
+git commit -m "feat: name of the feature worked on"
+git push origin main
+```
+
+**If something goes wrong** — rollback to the nearest tag:
+```bash
+git revert --no-commit v1.2-before-new-feature..HEAD
+git commit -m "revert: issue found, rolling back to v1.2"
+git push origin main
+```
+
+---
+
+## What I Took Away From This
+
+My earlier worry wasn't unfounded. Losing code you worked hard to write is a real risk — especially when you're still learning and not yet comfortable with Git.
+
+But it turns out Git was designed specifically to eliminate that worry. Every `commit` is a safety net. Every `tag` is a checkpoint you can use as a lifeline. And `git revert` is an undo button that doesn't destroy history.
+
+Now I commit more often, write more descriptive commit messages, and every time I'm about to start something big — I create a tag first.
+
+A small habit that makes for a much better night's sleep.

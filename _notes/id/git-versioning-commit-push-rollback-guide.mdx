@@ -1,0 +1,163 @@
+---
+title: "Panduan Git: Commit, Push, Tag, dan Rollback Aman"
+date: "2026-03-06"
+updated: "2026-03-06"
+description: "Catatan personal tentang kekhawatiran kehilangan kode dan bagaimana Git versioning menjadi jawabannya — dari commit pertama sampai rollback aman."
+translationKey: "git-versioning-commit-push-rollback-guide"
+heroImage: "footer-contact"
+published: true
+tags: ["Git", "GitHub", "Version Control", "Terminal", "Workflow"]
+---
+
+Jujur, saya sempat khawatir.
+
+Hari itu saya dan AI baru saja selesai mengerjakan banyak perubahan besar — refactor theme hook, utilitas baru, perbaikan SEO, security headers, dan beberapa file yang dihapus. Semuanya terasa benar. TypeScript clean, tidak ada error. Tapi ada satu pertanyaan yang tiba-tiba muncul di kepala saya:
+
+> *"Kalau ternyata ada yang salah setelah commit... bisa balik ke versi sebelumnya gak?"*
+
+Pertanyaan itu ternyata jadi pintu masuk ke pemahaman yang lebih baik tentang bagaimana Git bekerja sebagai mesin waktu untuk kode.
+
+---
+
+## Apa Itu Versioning di Git?
+
+Setiap kali kita menjalankan `git commit`, Git tidak hanya "menyimpan file" — ia mengambil **snapshot lengkap** dari seluruh kondisi project di titik waktu itu.
+
+Bayangkan seperti ini: setiap commit adalah foto. Kumpulan foto itu membentuk album perjalanan project kita.
+
+```bash
+git log --oneline -5
+```
+
+Output-nya kira-kira seperti ini:
+
+```
+fcb9e5f refactor: audit & hardening — theme hook, utils, security headers
+7dbb190 feat: add cross-env dependency and improve code formatting
+5c48cab Improve language switcher visibility and styling
+374bd29 fix: correct apphosting.yaml secret variable syntax
+d04d9bb feat: enhance security & refactor admin role management
+```
+
+Setiap baris adalah satu "foto". Hash pendek di depan (`fcb9e5f`, `7dbb190`, dst.) adalah ID unik snapshot tersebut. Kapan pun saya mau, saya bisa kembali ke salah satu dari mereka.
+
+---
+
+## Tiga Aksi Dasar yang Harus Dikuasai
+
+### `git add` + `git commit` — Ambil Foto
+
+Sebelum foto bisa diambil, kita perlu memilih dulu apa yang ingin masuk ke frame:
+
+```bash
+# Masukkan semua perubahan ke "frame"
+git add -A
+
+# Ambil fotonya dengan keterangan
+git commit -m "feat: deskripsi perubahan yang jelas"
+```
+
+Pesan commit yang baik itu investasi. Tiga bulan ke depan, kalimat `"fix: add passive: true to scroll listener in BackToTop"` jauh lebih berguna daripada `"update"`.
+
+### `git push` — Kirim Foto ke Album Online
+
+Commit yang hanya ada di komputer lokal itu rentan — kalau laptop mati atau rusak, riwayatnya hilang. `git push` mengirim semua snapshot tadi ke GitHub:
+
+```bash
+git push origin main
+```
+
+Sekarang riwayat project ada di dua tempat: lokal dan GitHub. Ini backup otomatis.
+
+### `git tag` — Beri Nama pada Titik Penting
+
+Hash seperti `fcb9e5f` susah diingat. Tag adalah cara memberi nama yang manusiawi pada sebuah commit penting:
+
+```bash
+# Buat tag di commit saat ini
+git tag v1.1-audit-hardening
+
+# Kirim tag ke GitHub
+git push origin --tags
+```
+
+Setelah ini, saya tidak perlu ingat hash-nya. Cukup ingat nama tagnya.
+
+---
+
+## Tiga Skenario Rollback
+
+Ini inti dari kekhawatiran saya tadi. Ternyata ada beberapa cara untuk "mundur", tergantung seberapa parah situasinya.
+
+### Skenario 1 — Intip Versi Lama Tanpa Mengubah Apapun
+
+Kalau hanya ingin lihat isi file di versi tertentu tanpa mengubah apapun:
+
+```bash
+# Lihat isi satu file dari commit tertentu
+git show 7dbb190:src/components/layout/header.tsx
+```
+
+Aman. Tidak ada yang berubah di project.
+
+### Skenario 2 — Batalkan Commit Terakhir, Kode Tetap Ada
+
+Commit sudah dibuat tapi ternyata pesannya salah, atau mau edit dulu sebelum commit ulang:
+
+```bash
+# Batalkan commit, tapi perubahan file tetap ada
+git reset --soft HEAD~1
+```
+
+File tidak berubah, tapi commit-nya hilang. Saya bebas edit lagi lalu commit ulang.
+
+### Skenario 3 — Rollback Aman ke Versi/Tag Tertentu
+
+Ini cara paling benar kalau ingin benar-benar kembali ke kondisi sebelumnya, tapi **tanpa menghapus riwayat**:
+
+```bash
+# Balik semua perubahan sejak tag tertentu
+git revert --no-commit v1.1-audit-hardening..HEAD
+git commit -m "revert: kembali ke kondisi v1.1"
+git push origin main
+```
+
+`git revert` tidak menghapus commit lama — ia menambah commit baru yang membalik perubahan. Riwayat tetap utuh, dan ini pilihan terbaik untuk project yang sudah di-push ke GitHub bersama orang lain.
+
+---
+
+## Alur Kerja yang Saya Pakai Sekarang
+
+Setelah memahami semua ini, alur kerja saya jadi lebih tenang:
+
+**Sebelum mulai perubahan besar** — buat tag dulu sebagai checkpoint:
+```bash
+git tag v1.2-sebelum-fitur-baru
+git push origin --tags
+```
+
+**Setelah selesai** — commit dengan pesan yang jelas, lalu push:
+```bash
+git add -A
+git commit -m "feat: nama fitur yang dikerjakan"
+git push origin main
+```
+
+**Kalau ada masalah** — rollback ke tag terdekat:
+```bash
+git revert --no-commit v1.2-sebelum-fitur-baru..HEAD
+git commit -m "revert: ada masalah, kembali ke v1.2"
+git push origin main
+```
+
+---
+
+## Pelajaran yang Saya Ambil
+
+Kekhawatiran saya tadi bukan tidak beralasan. Kehilangan kode yang sudah susah payah ditulis itu nyata risikonya — terutama kalau baru belajar dan belum terbiasa dengan Git.
+
+Tapi ternyata Git dirancang memang untuk menghilangkan rasa khawatir itu. Setiap `commit` adalah jaring pengaman. Setiap `tag` adalah checkpoint yang bisa kita jadikan pelampung. Dan `git revert` adalah tombol "undo" yang tidak merusak riwayat.
+
+Sekarang saya commit lebih sering, pesan commit lebih deskriptif, dan setiap kali mau mulai sesuatu yang besar — saya buat tag dulu.
+
+Kebiasaan kecil yang bikin tidur lebih nyenyak.
