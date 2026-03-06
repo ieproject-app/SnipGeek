@@ -90,7 +90,7 @@ export default async function PrivacyPage({
   const isId = locale === "id";
   const lastUpdated = "2025-07-01";
   const siteUrl = "https://snipgeek.com";
-  const contactEmail = "hello@snipgeek.com";
+  const contactEmail = "iwan.efndi@gmail.com";
 
   return (
     <div className="w-full">

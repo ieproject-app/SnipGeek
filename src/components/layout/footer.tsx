@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { i18n } from "@/i18n-config";
+
 import { cn } from "@/lib/utils";
 import type { Dictionary } from "@/lib/get-dictionary";
 import { LanguageSwitcher } from "./language-switcher";
@@ -12,12 +12,13 @@ import {
   Youtube,
   Instagram,
   User2,
-  StickyNote,
-  LayoutGrid,
+  ShieldCheck,
+  ShieldAlert,
   Mail,
 } from "lucide-react";
 import { TikTokLogo } from "@/components/icons/tiktok-logo";
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
+import { SnipTooltip } from "@/components/ui/snip-tooltip";
 
 export function Footer({
   dictionary,
@@ -32,24 +33,36 @@ export function Footer({
       title: dictionary.navigation.about,
       href: "/about",
       icon: <User2 className="h-5 w-5" />,
+      colorClass: "from-blue-600/40 to-blue-900/40",
+      borderClass: "group-hover:border-blue-500/50",
+      glowClass: "group-hover:shadow-[0_0_30px_rgba(59,130,246,0.3)]",
     },
     {
-      id: "footer-notes",
-      title: dictionary.navigation.notes,
-      href: "/notes",
-      icon: <StickyNote className="h-5 w-5" />,
+      id: "footer-privacy",
+      title: dictionary.navigation.privacy,
+      href: "/privacy",
+      icon: <ShieldCheck className="h-5 w-5" />,
+      colorClass: "from-green-600/40 to-green-900/40",
+      borderClass: "group-hover:border-green-500/50",
+      glowClass: "group-hover:shadow-[0_0_30px_rgba(34,197,94,0.3)]",
     },
     {
-      id: "footer-tools",
-      title: dictionary.navigation.tools,
-      href: "/tools",
-      icon: <LayoutGrid className="h-5 w-5" />,
+      id: "footer-disclaimer",
+      title: dictionary.navigation.disclaimer,
+      href: "/disclaimer",
+      icon: <ShieldAlert className="h-5 w-5" />,
+      colorClass: "from-orange-600/40 to-orange-900/40",
+      borderClass: "group-hover:border-orange-500/50",
+      glowClass: "group-hover:shadow-[0_0_30px_rgba(249,115,22,0.3)]",
     },
     {
       id: "footer-contact",
       title: dictionary.navigation.contact,
       href: "/contact",
       icon: <Mail className="h-5 w-5" />,
+      colorClass: "from-purple-600/40 to-purple-900/40",
+      borderClass: "group-hover:border-purple-500/50",
+      glowClass: "group-hover:shadow-[0_0_30px_rgba(168,85,247,0.3)]",
     },
   ];
 
@@ -80,51 +93,72 @@ export function Footer({
   ];
 
   return (
-    <footer className="relative w-full mt-16 sm:mt-24 overflow-hidden">
+    <footer className="relative w-full mt-16 sm:mt-24">
       {/* Top Navigation Section - Links Cards */}
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-24 sm:pt-16 sm:pb-32">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
+      <nav
+        aria-label="Footer navigation"
+        className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-24 sm:pt-16 sm:pb-32"
+      >
+        <ul className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
           {footerNavItems.map((item, index) => {
             const image = PlaceHolderImages.find((p) => p.id === item.id);
+            const isTiltRight = index % 2 === 0; // 0,2 miring kanan; 1,3 miring kiri
+            const tiltClass = isTiltRight ? "rotate-2" : "-rotate-2";
+            
             return (
-              <ScrollReveal key={item.id} direction="up" delay={index * 0.1}>
-                <div
-                  className={cn(
-                    "transform transition-all duration-300 ease-in-out hover:-translate-y-2 will-change-transform",
-                    (index === 0 || index === 2) && "rotate-2",
-                    (index === 1 || index === 3) && "-rotate-2",
-                  )}
-                >
-                  <Link href={item.href} className="block group">
-                    <article className="relative w-full aspect-[4/3] rounded-xl overflow-hidden shadow-lg transition-shadow group-hover:shadow-2xl">
-                      {image && (
-                        <Image
-                          src={image.imageUrl}
-                          alt={image.description}
-                          fill
-                          className="object-cover"
-                          sizes="(max-width: 768px) 50vw, 200px"
-                          data-ai-hint={image.imageHint}
-                        />
-                      )}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
-                      <div className="absolute bottom-0 left-0 p-4 text-white">
-                        <h3 className="font-headline text-lg font-bold flex items-center gap-2">
-                          {item.icon}
-                          <span>{item.title}</span>
-                        </h3>
-                      </div>
-                    </article>
-                  </Link>
+              <li key={item.id} className="list-none">
+                <div className="transition-all duration-300 hover:-translate-y-1">
+                    <SnipTooltip label={item.title} side="top" wrapperClassName="block w-full">
+                      <Link
+                        href={item.href}
+                        className="block group relative"
+                      >
+                      <article className={cn(
+                        "relative w-full aspect-[4/3] rounded-xl overflow-hidden shadow-lg border border-white/10 bg-zinc-900/50 backdrop-blur-sm transition-all duration-300 ease-out group-hover:shadow-2xl",
+                        "transform-gpu",
+                        tiltClass,
+                        item.borderClass,
+                        item.glowClass
+                      )}>
+                        {image && (
+                          <Image
+                            src={image.imageUrl}
+                            alt={image.description}
+                            fill
+                            className="object-cover opacity-50 group-hover:opacity-70 transition-opacity duration-300"
+                            sizes="(max-width: 768px) 50vw, 200px"
+                          />
+                        )}
+                        {/* Color Tint Overlay */}
+                        <div className={cn(
+                          "absolute inset-0 bg-gradient-to-b opacity-0 group-hover:opacity-100 transition-opacity duration-300",
+                          item.colorClass
+                        )} />
+                        
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent p-4 flex flex-col items-center justify-center gap-2">
+                          <span className="text-accent text-6xl sm:text-8xl transition-transform duration-300 group-hover:scale-125 drop-shadow-lg">
+                            {item.icon}
+                          </span>
+                          {/* Mobile Label - Hidden on larger screens */}
+                          <span className="md:hidden text-xs font-medium text-white/80 text-center mt-1">
+                            {item.title}
+                          </span>
+                        </div>
+                      </article>
+                    </Link>
+                  </SnipTooltip>
                 </div>
-              </ScrollReveal>
+              </li>
             );
           })}
-        </div>
-      </div>
+        </ul>
+      </nav>
 
       {/* Sub-Footer Section */}
-      <div className="relative w-full pt-16 pb-12 bg-gradient-to-br from-muted/40 via-background to-muted/20 border-t border-primary/5 transition-all duration-300 ease-in-out">
+      <section
+        aria-label="Footer details"
+        className="relative w-full pt-16 pb-12 bg-gradient-to-br from-muted/40 via-background to-muted/20 border-t border-primary/5 transition-all duration-300 ease-in-out"
+      >
         {/* Decorative Ambient Light Circles */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute top-0 left-0 w-96 h-96 rounded-full blur-3xl opacity-10 bg-primary -translate-x-1/2 -translate-y-1/2" />
@@ -164,7 +198,10 @@ export function Footer({
             </p>
 
             {/* Social Links */}
-            <div className="flex items-center justify-center gap-4 mt-8">
+            <ul
+              className="flex items-center justify-center gap-4 mt-8"
+              aria-label="Social links"
+            >
               {socialLinks.map((social, index) => {
                 const brandStyles: Record<string, string> = {
                   Facebook:
@@ -181,31 +218,29 @@ export function Footer({
                   "hover:bg-accent hover:text-primary";
 
                 return (
-                  <ScrollReveal
-                    key={social.label}
-                    direction="up"
-                    delay={0.4 + index * 0.1}
-                  >
-                    <a
-                      href={social.href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className={cn(
-                        "group relative p-3 rounded-full bg-primary/90 text-primary-foreground shadow-md transition-all duration-300 ease-in-out block",
-                        "hover:-translate-y-1 hover:scale-115",
-                        brandStyle,
-                      )}
-                      aria-label={social.label}
-                    >
-                      <span className="absolute -top-8 left-1/2 -translate-x-1/2 px-2 py-1 rounded bg-primary text-primary-foreground text-[10px] font-bold uppercase tracking-widest opacity-0 group-hover:opacity-100 -translate-y-1 group-hover:-translate-y-3 transition-all duration-300 pointer-events-none whitespace-nowrap z-20">
-                        {social.label}
-                      </span>
-                      {social.icon}
-                    </a>
-                  </ScrollReveal>
+                  <li key={social.label}>
+                    <ScrollReveal direction="up" delay={0.4 + index * 0.1}>
+                      <SnipTooltip label={social.label} side="top">
+                        <a
+                          href={social.href}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          title={social.label}
+                          className={cn(
+                            "relative inline-flex p-3 rounded-full bg-primary/90 text-primary-foreground shadow-md transition-all duration-300 ease-in-out",
+                            "hover:-translate-y-1 hover:scale-105",
+                            brandStyle,
+                          )}
+                          aria-label={social.label}
+                        >
+                          {social.icon}
+                        </a>
+                      </SnipTooltip>
+                    </ScrollReveal>
+                  </li>
                 );
               })}
-            </div>
+            </ul>
           </ScrollReveal>
 
           <ScrollReveal direction="up" delay={0.6}>
@@ -218,22 +253,33 @@ export function Footer({
                   />
                 </div>
               </div>
-              <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
-                <p className="font-semibold tracking-wider text-primary/60 hover:text-primary transition-colors duration-300">
+              <div className="flex flex-col items-center justify-center gap-3">
+                <div className="flex items-center gap-4">
+                  <Link
+                    href="/terms"
+                    className="text-sm text-primary/40 hover:text-primary transition-colors duration-300 underline-offset-4 hover:underline"
+                    aria-label={`Go to ${dictionary.navigation.terms}`}
+                  >
+                    {dictionary.navigation.terms}
+                  </Link>
+                  <span className="text-primary/20">·</span>
+                  <Link
+                    href="/privacy"
+                    className="text-sm text-primary/40 hover:text-primary transition-colors duration-300 underline-offset-4 hover:underline"
+                    aria-label={`Go to ${dictionary.navigation.privacy}`}
+                  >
+                    {dictionary.navigation.privacy}
+                  </Link>
+                </div>
+                <small className="font-semibold tracking-wider text-primary/60 hover:text-primary transition-colors duration-300">
                   &copy; {new Date().getFullYear()} SnipGeek. All Rights
                   Reserved.
-                </p>
-                <a
-                  href="/privacy"
-                  className="text-sm text-primary/40 hover:text-primary transition-colors duration-300 underline-offset-4 hover:underline"
-                >
-                  Privacy Policy
-                </a>
+                </small>
               </div>
             </div>
           </ScrollReveal>
         </div>
-      </div>
+      </section>
     </footer>
   );
 }

@@ -12,6 +12,8 @@ Blog minimalis dengan dukungan MDX untuk artikel teknis yang kaya akan komponen 
 - **🧑‍💼 Riwayat Karyawan (Public Access):** Pencarian data pejabat dan generator penandatangan dokumen (BAUT, BAST, dll).
 - **🤖 AI Article Prompt Generator (Public Access):** Pembuat prompt AI terstruktur untuk konten artikel baru atau modifikasi.
 - **🔐 Nomor Generator (Restricted):** Generator nomor urut dokumen resmi (Memerlukan Login Google).
+- **🏠 Dynamic Header (Back to Site):** Header cerdas yang mengenali posisi halaman dan memberikan navigasi cepat kembali ke beranda.
+- **🌓 Smart Theme Management:** Mengikuti preferensi sistem secara otomatis, dengan dukungan penyimpanan pilihan manual selama 1 minggu.
 
 ## 🚀 Panduan Konfigurasi Firebase (PENTING)
 

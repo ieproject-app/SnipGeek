@@ -6,7 +6,10 @@
     "archive": "Archive",
     "contact": "Contact",
     "notes": "Notes",
-    "tools": "Tools"
+    "tools": "Tools",
+    "privacy": "Privacy Policy",
+    "disclaimer": "Disclaimer",
+    "terms": "Terms"
   },
   "footer": {
     "authorBio": "A passionate developer exploring the web and sharing findings along the way."
@@ -264,7 +267,12 @@
     "finalInstruction": "Additional Instruction: 1. Confirm translationKey and English slug. 2. Title length MUST BE 50-60 characters. 3. STRICT MDX ADHERENCE: Use only supported components (<DownloadButton />, <ImageGrid />, standard Markdown tables). 4. React Compliance: ALWAYS use 'className'. 5. Image Alt Text: Generate high-quality SEO alt text if missing.",
     "tooltips": {
       "backToTop": "Back to Top",
-      "theme": "Switch Theme"
+      "theme": "Switch Theme",
+      "moreMenu": "More Menu",
+      "readingList": "Reading List",
+      "search": "Search",
+      "languageEn": "English",
+      "languageId": "Indonesia"
     }
   },
   "notifications": {

@@ -7,6 +7,7 @@ import { type TranslationsMap } from '@/lib/posts'
 import { cn } from '@/lib/utils'
 import { useEffect, useState } from 'react'
 import type { Dictionary } from '@/lib/get-dictionary'
+import { SnipTooltip } from '@/components/ui/snip-tooltip'
 
 export function LanguageSwitcher({ translationsMap, dictionary }: { translationsMap: TranslationsMap, dictionary: Dictionary }) {
   const pathName = usePathname()
@@ -31,7 +32,7 @@ export function LanguageSwitcher({ translationsMap, dictionary }: { translations
     if (currentLocale && params.slug && translationsMap) {
       const currentSlug = params.slug as string;
       const pageType = pathName.includes('/notes/') ? 'notes' : 'blog';
-      
+
       let translationKey: string | null = null;
       for (const key in translationsMap) {
         const found = translationsMap[key].find(t => t.locale === currentLocale && t.slug === currentSlug);
@@ -70,36 +71,47 @@ export function LanguageSwitcher({ translationsMap, dictionary }: { translations
   }
 
   return (
-    <div 
-      className="relative flex items-center bg-black/20 rounded-full p-1 text-[10px] min-h-[28px] min-w-[70px] shadow-inner"
+    <div
+      className="relative flex items-center bg-white/5 dark:bg-black/20 backdrop-blur-md rounded-full p-1 text-[10px] min-h-[32px] min-w-[80px] shadow-sm border border-white/10 dark:border-white/5 transition-all duration-300 hover:border-white/20 dark:hover:border-white/10"
       suppressHydrationWarning
     >
-        {!mounted ? (
-          <div className="w-full h-full animate-pulse bg-white/10 rounded-full" />
-        ) : (
-          <>
-            <div 
-                className={cn(
-                    "absolute h-5 w-8 bg-accent shadow-sm rounded-full transition-transform duration-300 ease-in-out",
-                    currentLocale === 'en' ? 'translate-x-0' : 'translate-x-full'
-                )}
-            />
-            {i18n.locales.map(locale => (
-                <a
-                    key={locale} 
-                    href={redirectedPathName(locale)} 
+      {!mounted ? (
+        <div className="w-full h-full animate-pulse bg-white/5 rounded-full" />
+      ) : (
+        <>
+          <div
+            className={cn(
+              "absolute h-6 w-9 bg-accent/90 dark:bg-accent/80 shadow-[0_2px_10px_-3px_rgba(0,0,0,0.3)] backdrop-blur-sm rounded-full transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)]",
+              currentLocale === 'en' ? 'translate-x-0' : 'translate-x-[calc(100%+4px)]'
+            )}
+          />
+          <div className="flex items-center gap-1 w-full justify-between px-0.5">
+            {i18n.locales.map(locale => {
+              const tooltipKey = locale === 'en' ? 'languageEn' : 'languageId'
+              const label = (dictionary?.promptGenerator as any)?.tooltips?.[tooltipKey] ?? (locale === 'en' ? 'English' : 'Indonesia')
+              const isActive = currentLocale === locale
+
+              return (
+                <SnipTooltip key={locale} label={label} side="top">
+                  <a
+                    href={redirectedPathName(locale)}
                     className={cn(
-                        "relative z-10 w-8 h-5 flex items-center justify-center font-bold transition-colors",
-                        currentLocale === locale ? "text-primary" : "text-primary-foreground/60 hover:text-primary-foreground"
+                      "relative z-10 w-9 h-6 flex items-center justify-center font-black tracking-wider transition-all duration-300 rounded-full",
+                      isActive
+                        ? "text-accent-foreground scale-100"
+                        : "text-foreground/40 hover:text-foreground/70 hover:scale-105 active:scale-95"
                     )}
-                    aria-current={currentLocale === locale ? 'page' : undefined}
+                    aria-current={isActive ? 'page' : undefined}
                     onClick={() => handleLocaleChange(locale as Locale)}
-                >
+                  >
                     {locale.toUpperCase()}
-                </a>
-            ))}
-          </>
-        )}
+                  </a>
+                </SnipTooltip>
+              )
+            })}
+          </div>
+        </>
+      )}
     </div>
   )
 }
