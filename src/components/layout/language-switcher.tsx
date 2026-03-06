@@ -72,7 +72,7 @@ export function LanguageSwitcher({ translationsMap, dictionary }: { translations
 
   return (
     <div
-      className="relative flex items-center bg-white/5 dark:bg-black/20 backdrop-blur-md rounded-full p-1 text-[10px] min-h-[32px] min-w-[80px] shadow-sm border border-white/10 dark:border-white/5 transition-all duration-300 hover:border-white/20 dark:hover:border-white/10"
+      className="relative flex items-center bg-white/10 dark:bg-black/30 backdrop-blur-md rounded-full p-1 text-xs min-h-[36px] min-w-[90px] shadow-lg border border-white/20 dark:border-white/10 transition-all duration-300 hover:border-white/30 dark:hover:border-white/15 hover:shadow-xl"
       suppressHydrationWarning
     >
       {!mounted ? (
@@ -81,7 +81,7 @@ export function LanguageSwitcher({ translationsMap, dictionary }: { translations
         <>
           <div
             className={cn(
-              "absolute h-6 w-9 bg-accent/90 dark:bg-accent/80 shadow-[0_2px_10px_-3px_rgba(0,0,0,0.3)] backdrop-blur-sm rounded-full transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)]",
+              "absolute h-7 w-10 bg-gradient-to-r from-accent to-accent/90 dark:from-accent dark:to-accent/80 shadow-[0_4px_15px_-3px_rgba(0,0,0,0.4)] backdrop-blur-sm rounded-full transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] border border-white/20 dark:border-white/10",
               currentLocale === 'en' ? 'translate-x-0' : 'translate-x-[calc(100%+4px)]'
             )}
           />
@@ -96,10 +96,10 @@ export function LanguageSwitcher({ translationsMap, dictionary }: { translations
                   <a
                     href={redirectedPathName(locale)}
                     className={cn(
-                      "relative z-10 w-9 h-6 flex items-center justify-center font-black tracking-wider transition-all duration-300 rounded-full",
+                      "relative z-10 w-10 h-7 flex items-center justify-center font-black tracking-wider transition-all duration-300 rounded-full",
                       isActive
-                        ? "text-accent-foreground scale-100"
-                        : "text-foreground/40 hover:text-foreground/70 hover:scale-105 active:scale-95"
+                        ? "text-accent-foreground scale-100 drop-shadow-sm"
+                        : "text-foreground/60 hover:text-foreground/80 hover:scale-105 active:scale-95 hover:drop-shadow-md"
                     )}
                     aria-current={isActive ? 'page' : undefined}
                     onClick={() => handleLocaleChange(locale as Locale)}
