@@ -13,16 +13,16 @@
       "imageHint": "person portrait"
     },
     {
-      "id": "footer-notes",
-      "description": "A minimalist notebook and pen",
+      "id": "footer-privacy",
+      "description": "Privacy and security shield illustration",
       "imageUrl": "/images/footer/notebook.webp",
-      "imageHint": "notebook writing"
+      "imageHint": "privacy security"
     },
     {
-      "id": "footer-tools",
-      "description": "A collection of useful digital tools or code",
+      "id": "footer-disclaimer",
+      "description": "Legal disclaimer and information icon",
       "imageUrl": "/images/footer/tools.webp",
-      "imageHint": "digital tools"
+      "imageHint": "legal disclaimer"
     },
     {
       "id": "footer-contact",

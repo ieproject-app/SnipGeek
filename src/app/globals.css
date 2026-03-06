@@ -70,8 +70,16 @@
         transition-timing-function: ease-in-out;
     }
 
+    /* Smoother theme switch: root and body transition when .dark toggles */
+    html {
+        transition: background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                    color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
     body {
         @apply bg-background text-foreground font-sans antialiased;
+        transition: background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                    color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 
         /* ─── Typography Scale ─────────────────────────────────── */
         --sz-xlarge: 1.5rem;
@@ -134,22 +142,14 @@
 
     /* ─── View Transitions API — Smooth Theme Toggle ──────────
    *
-   *  Strategy:
-   *  • Old snapshot fades OUT (300 ms ease-in)
-   *  • New snapshot fades IN  (300 ms ease-out)
-   *  This captures the entire page — including CSS gradients —
-   *  as pixel snapshots, so every background transitions smoothly
-   *  regardless of whether CSS `transition-colors` supports it.
-   *
-   *  The z-index layering ensures:
-   *  Light → Dark : dark layer slides in ON TOP  (curtain closes)
-   *  Dark → Light : dark layer fades OUT on top (curtain lifts)
+   *  Longer duration + smooth easing for a less jarring switch.
+   *  Old snapshot fades OUT, new fades IN (crossfade).
    * ─────────────────────────────────────────────────────── */
 
     ::view-transition-old(root),
     ::view-transition-new(root) {
-        animation-duration: 300ms;
-        animation-timing-function: ease-in-out;
+        animation-duration: 450ms;
+        animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
         animation-fill-mode: both;
         mix-blend-mode: normal;
     }
