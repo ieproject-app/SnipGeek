@@ -264,6 +264,8 @@
     "draftContentLabel": "Main Content/Draft",
     "originalContentLabel": "Original Content to Modify",
     "modInstructionsLabel": "Points of Change",
+    "categoryHintLabel": "Category Hint",
+    "categoryHintPlaceholder": "AI creates category…",
     "finalInstruction": "Additional Instruction: 1. Confirm translationKey and English slug. 2. Title length MUST BE 50-60 characters. 3. STRICT MDX ADHERENCE: Use only supported components (<DownloadButton />, <ImageGrid />, standard Markdown tables). 4. React Compliance: ALWAYS use 'className'. 5. Image Alt Text: Generate high-quality SEO alt text if missing.",
     "tooltips": {
       "backToTop": "Back to Top",
