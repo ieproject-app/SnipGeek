@@ -22,6 +22,7 @@ import { PostComments } from "@/components/blog/post-comments";
 import Link from "next/link";
 import remarkGfm from "remark-gfm";
 import rehypeShiki from "@shikijs/rehype";
+import { resolveHeroImage, getLinkPrefix } from "@/lib/utils";
 
 export async function generateMetadata({
   params,
@@ -33,14 +34,14 @@ export async function generateMetadata({
 
   if (!note) return {};
 
-  const linkPrefix = locale === i18n.defaultLocale ? "" : `/${locale}`;
+  const linkPrefix = getLinkPrefix(locale);
   const canonicalPath = `${linkPrefix}/notes/${slug}`;
 
   // Build hreflang alternates by checking if translations exist for each locale
   const languages: Record<string, string> = {};
   await Promise.all(
     i18n.locales.map(async (loc) => {
-      const prefix = loc === i18n.defaultLocale ? "" : `/${loc}`;
+      const prefix = getLinkPrefix(loc);
       if (loc === locale) {
         languages[loc] = `${prefix}/notes/${slug}`;
       } else {
@@ -55,6 +56,18 @@ export async function generateMetadata({
     }),
   );
 
+  // Notes don't have heroImages but use a generic OG image
+  const heroSource = resolveHeroImage(
+    note.frontmatter.heroImage,
+    undefined,
+    note.frontmatter.title,
+  );
+  const ogImageUrl = heroSource
+    ? heroSource.src.startsWith("http")
+      ? heroSource.src
+      : `https://snipgeek.com${heroSource.src}`
+    : "https://snipgeek.com/images/footer/about.webp";
+
   return {
     title: note.frontmatter.title,
     description: note.frontmatter.description,
@@ -64,6 +77,28 @@ export async function generateMetadata({
         ...languages,
         "x-default": languages[i18n.defaultLocale] || canonicalPath,
       },
+    },
+    openGraph: {
+      type: "article",
+      url: `https://snipgeek.com${canonicalPath}`,
+      title: note.frontmatter.title,
+      description: note.frontmatter.description,
+      images: [
+        {
+          url: ogImageUrl,
+          width: 1200,
+          height: 630,
+          alt: note.frontmatter.title,
+        },
+      ],
+      publishedTime: note.frontmatter.date,
+      modifiedTime: note.frontmatter.updated ?? note.frontmatter.date,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: note.frontmatter.title,
+      description: note.frontmatter.description,
+      images: [ogImageUrl],
     },
   };
 }
@@ -92,7 +127,7 @@ export default async function Page({
     notFound();
   }
 
-  const linkPrefix = locale === "en" ? "" : `/${locale}`;
+  const linkPrefix = getLinkPrefix(locale);
   const headings = extractHeadings(initialNote.content);
   const wordCount = initialNote.content.trim().split(/\s+/).length;
   const readingTime = Math.ceil(wordCount / 200);

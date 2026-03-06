@@ -14,7 +14,6 @@ import { MDXRemote } from "next-mdx-remote/rsc";
 import Image from "next/image";
 import Link from "next/link";
 import { mdxComponents } from "@/components/mdx-components";
-import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { PostComments } from "@/components/blog/post-comments";
 import { PostMeta } from "@/components/blog/post-meta";
 import { ShareButtons } from "@/components/blog/share-buttons";
@@ -22,6 +21,7 @@ import { RelatedPosts } from "@/components/blog/related-posts";
 import { TableOfContents } from "@/components/blog/table-of-contents";
 import { extractHeadings } from "@/lib/mdx-utils";
 import { Breadcrumbs } from "@/components/layout/breadcrumbs";
+import { resolveHeroImage, getLinkPrefix } from "@/lib/utils";
 import remarkGfm from "remark-gfm";
 import rehypeShiki from "@shikijs/rehype";
 
@@ -35,18 +35,17 @@ export async function generateMetadata({
 
   if (!post) return {};
 
-  const linkPrefix = locale === i18n.defaultLocale ? "" : `/${locale}`;
+  const linkPrefix = getLinkPrefix(locale);
   const canonicalPath = `${linkPrefix}/blog/${slug}`;
 
   // Build hreflang alternates by checking if translations exist for each locale
   const languages: Record<string, string> = {};
   await Promise.all(
     i18n.locales.map(async (loc) => {
-      const prefix = loc === i18n.defaultLocale ? "" : `/${loc}`;
+      const prefix = getLinkPrefix(loc);
       if (loc === locale) {
         languages[loc] = `${prefix}/blog/${slug}`;
       } else {
-        // Check if the same slug exists in the other locale
         const translation = await getPostTranslation(
           post.frontmatter.translationKey,
           loc,
@@ -58,6 +57,18 @@ export async function generateMetadata({
     }),
   );
 
+  // Resolve hero image for OpenGraph social preview
+  const heroSource = resolveHeroImage(
+    post.frontmatter.heroImage,
+    post.frontmatter.imageAlt,
+    post.frontmatter.title,
+  );
+  const ogImageUrl = heroSource
+    ? heroSource.src.startsWith("http")
+      ? heroSource.src
+      : `https://snipgeek.com${heroSource.src}`
+    : "https://snipgeek.com/images/footer/about.webp";
+
   return {
     title: post.frontmatter.title,
     description: post.frontmatter.description,
@@ -67,6 +78,28 @@ export async function generateMetadata({
         ...languages,
         "x-default": languages[i18n.defaultLocale] || canonicalPath,
       },
+    },
+    openGraph: {
+      type: "article",
+      url: `https://snipgeek.com${canonicalPath}`,
+      title: post.frontmatter.title,
+      description: post.frontmatter.description,
+      images: [
+        {
+          url: ogImageUrl,
+          width: 1200,
+          height: 630,
+          alt: post.frontmatter.title,
+        },
+      ],
+      publishedTime: post.frontmatter.date,
+      modifiedTime: post.frontmatter.updated ?? post.frontmatter.date,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: post.frontmatter.title,
+      description: post.frontmatter.description,
+      images: [ogImageUrl],
     },
   };
 }
@@ -95,33 +128,17 @@ export default async function Page({
     notFound();
   }
 
-  const linkPrefix = locale === "en" ? "" : `/${locale}`;
+  const linkPrefix = getLinkPrefix(locale);
   const {
     heroImage: heroImageValue,
     imageAlt,
     title,
   } = initialPost.frontmatter;
-  let heroSource: { url: string; hint?: string } | undefined;
 
-  if (heroImageValue) {
-    if (heroImageValue.startsWith("http") || heroImageValue.startsWith("/")) {
-      const imageHint = (imageAlt || title || "article")
-        .toString()
-        .toLowerCase()
-        .split(/\s+/)
-        .slice(0, 2)
-        .join(" ");
-
-      heroSource = { url: heroImageValue, hint: imageHint };
-    } else {
-      const placeholder = PlaceHolderImages.find(
-        (p) => p.id === heroImageValue,
-      );
-      if (placeholder) {
-        heroSource = { url: placeholder.imageUrl, hint: placeholder.imageHint };
-      }
-    }
-  }
+  const resolved = resolveHeroImage(heroImageValue, imageAlt, title);
+  const heroSource = resolved
+    ? { url: resolved.src, hint: resolved.hint }
+    : undefined;
 
   const headings = extractHeadings(initialPost.content || "");
   const wordCount = (initialPost.content || "").trim().split(/\s+/).length || 0;

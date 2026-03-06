@@ -1,67 +1,35 @@
 "use client";
 
-import { useTheme } from "next-themes";
-import { Sun, Moon } from "lucide-react";
+import { Sun, Moon, SunMoon } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { Dictionary } from "@/lib/get-dictionary";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { SnipTooltip } from "@/components/ui/snip-tooltip";
+import { useThemeMode } from "@/hooks/use-theme-mode";
 
 export function ThemeSwitcher({ dictionary }: { dictionary: Dictionary }) {
-  const { setTheme, resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
+  const { currentMode, cycleTheme, tooltipLabel } = useThemeMode();
 
   useEffect(() => {
     setMounted(true);
 
     const toggleVisibility = () => {
-      if (window.scrollY > 300) {
-        setIsVisible(true);
-      } else {
-        setIsVisible(false);
-      }
+      setIsVisible(window.scrollY > 300);
     };
 
-    window.addEventListener("scroll", toggleVisibility);
+    toggleVisibility();
+    window.addEventListener("scroll", toggleVisibility, { passive: true });
     return () => window.removeEventListener("scroll", toggleVisibility);
   }, []);
 
-  if (!mounted) {
-    return null;
-  }
+  if (!mounted) return null;
 
-  const toggleTheme = () => {
-    const nextTheme = resolvedTheme === "dark" ? "light" : "dark";
-
-    const applyThemeChange = () => {
-      setTheme(nextTheme);
-      // Set 1 week persistence for manual override
-      const oneWeek = 7 * 24 * 60 * 60 * 1000;
-      localStorage.setItem('snipgeek-theme-manual-expire', (Date.now() + oneWeek).toString());
-    };
-
-    if (
-      typeof document !== "undefined" &&
-      "startViewTransition" in document &&
-      !window.matchMedia("(prefers-reduced-motion: reduce)").matches
-    ) {
-      // @ts-ignore — startViewTransition is a modern API not yet in all TS libs
-      document.startViewTransition(() => {
-        applyThemeChange();
-      });
-    } else {
-      applyThemeChange();
-    }
-  };
-
-  const getIcon = () => {
-    if (resolvedTheme === "dark") {
-      return <Moon className="h-5 w-5" />;
-    }
-    return <Sun className="h-5 w-5" />;
-  };
+  const showSun = currentMode === "light";
+  const showMoon = currentMode === "dark";
+  const showMonitor = currentMode === "system";
 
   return (
     <div
@@ -72,19 +40,39 @@ export function ThemeSwitcher({ dictionary }: { dictionary: Dictionary }) {
           : "opacity-0 translate-y-4 pointer-events-none",
       )}
     >
-      <SnipTooltip
-        label={dictionary?.promptGenerator?.tooltips?.theme || "Switch Theme"}
-        side="left"
-      >
+      <SnipTooltip label={tooltipLabel} side="left">
         <Button
           variant="default"
           size="icon"
-          onClick={toggleTheme}
-          className="relative inline-flex h-10 w-10 rounded-full shadow-2xl transition-all duration-300 hover:scale-110 active:scale-95 bg-primary/90 text-primary-foreground border-none"
-          aria-label="Toggle theme mode"
+          onClick={cycleTheme}
+          className="relative inline-flex h-10 w-10 rounded-full shadow-2xl transition-all duration-300 hover:scale-110 active:scale-95 bg-background text-foreground border border-border"
+          aria-label="Toggle theme mode (light, dark, system)"
         >
-          <div className="transition-transform duration-500 ease-in-out group-hover:rotate-[12deg]">
-            {getIcon()}
+          <div className="relative h-5 w-5">
+            <Sun
+              className={cn(
+                "absolute inset-0 h-5 w-5 transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] origin-center",
+                showSun
+                  ? "opacity-100 scale-100 rotate-0"
+                  : "opacity-0 scale-0 rotate-180",
+              )}
+            />
+            <Moon
+              className={cn(
+                "absolute inset-0 h-5 w-5 transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] origin-center",
+                showMoon
+                  ? "opacity-100 scale-100 rotate-0"
+                  : "opacity-0 scale-0 -rotate-180",
+              )}
+            />
+            <SunMoon
+              className={cn(
+                "absolute inset-0 h-5 w-5 transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] origin-center",
+                showMonitor
+                  ? "opacity-100 scale-100 rotate-0"
+                  : "opacity-0 scale-0 rotate-180",
+              )}
+            />
           </div>
         </Button>
       </SnipTooltip>

@@ -1,8 +1,10 @@
-'use client';
+"use client";
 
-import * as React from 'react';
-import { ThemeProvider as NextThemesProvider } from 'next-themes';
-import { type ThemeProviderProps } from 'next-themes/dist/types';
+import * as React from "react";
+import { ThemeProvider as NextThemesProvider } from "next-themes";
+
+type ThemeProviderProps = React.ComponentProps<typeof NextThemesProvider>;
+import { STORAGE_KEYS } from "@/lib/constants";
 
 export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
   const [mounted, setMounted] = React.useState(false);
@@ -11,19 +13,19 @@ export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
     setMounted(true);
 
     // Check for manual theme override expiration
-    const manualExpire = localStorage.getItem('snipgeek-theme-manual-expire');
+    const manualExpire = localStorage.getItem(STORAGE_KEYS.THEME_MANUAL_EXPIRE);
     if (manualExpire) {
       const expireTime = parseInt(manualExpire, 10);
       if (Date.now() > expireTime) {
         // Override expired, revert to system
-        localStorage.removeItem('snipgeek-theme-manual-expire');
+        localStorage.removeItem(STORAGE_KEYS.THEME_MANUAL_EXPIRE);
         // We set it to system so next-themes will use the system preference
-        localStorage.setItem('theme', 'system');
+        localStorage.setItem(STORAGE_KEYS.THEME, "system");
       }
     } else {
       // No manual override, ensure it's system if not already set
-      if (!localStorage.getItem('theme')) {
-        localStorage.setItem('theme', 'system');
+      if (!localStorage.getItem(STORAGE_KEYS.THEME)) {
+        localStorage.setItem(STORAGE_KEYS.THEME, "system");
       }
     }
   }, []);
