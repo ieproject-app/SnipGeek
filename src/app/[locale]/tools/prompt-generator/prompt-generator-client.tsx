@@ -44,6 +44,7 @@ import {
   BookOpen,
   ChevronsUpDown,
   CheckCircle2,
+  Tag,
 } from "lucide-react";
 import { downloadLinks } from "@/lib/data-downloads";
 import { useNotification } from "@/hooks/use-notification";
@@ -271,6 +272,9 @@ export function PromptGeneratorClient({
   const [isPublished, setIsPublished] = useState(true);
   const [isFeatured, setIsFeatured] = useState(false);
 
+  // ── Category hint (optional — AI is free to create a new one) ──
+  const [categoryHint, setCategoryHint] = useState("");
+
   // ── Media / technical ──
   const [isTechnicalExpanded, setIsTechnicalExpanded] = useState(true);
   const [downloadItems, setDownloadItems] = useState<DownloadItem[]>([]);
@@ -388,7 +392,18 @@ export function PromptGeneratorClient({
       prompt += `- imageAlt: "${heroAlt || "[AI: GENERATE DESCRIPTIVE ALT]"}"\n`;
     }
 
-    if (!isModify) prompt += `- tags: [AI: Generate 3-5 relevant tags]\n\n`;
+    if (isModify) {
+      const catModifyInstruction = categoryHint.trim()
+        ? `"${categoryHint.trim()}" (override original)`
+        : `[KEEP ORIGINAL]`;
+      prompt += `- category: ${catModifyInstruction}\n`;
+    } else {
+      const catInstruction = categoryHint.trim()
+        ? `"${categoryHint.trim()}" — [AI: use this as a hint, or invent a better category name if more appropriate]`
+        : `[AI: FREELY CREATE a new category name. You are NOT limited to existing ones. Current examples: Tutorial, Windows, Hardware, Linux, Software Updates — but feel absolutely free to invent something more fitting for this content]`;
+      prompt += `- tags: [AI: Generate 3-5 relevant tags]\n`;
+      prompt += `- category: ${catInstruction}\n\n`;
+    }
 
     const sliceIndex = isBlog && !isModify ? 1 : 0;
     if (showImages && imageLines.length > sliceIndex) {
@@ -445,6 +460,7 @@ export function PromptGeneratorClient({
     showGrids,
     showImages,
     selectedSlug,
+    categoryHint,
   ]);
 
   // ── Handlers ──
@@ -569,6 +585,20 @@ export function PromptGeneratorClient({
 
               {/* Right group */}
               <div className="flex flex-wrap items-center gap-2">
+                {/* Category hint */}
+                <div className="flex items-center gap-2 bg-muted/20 px-3 h-9 rounded-lg border border-primary/5">
+                  <Tag className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                  <Input
+                    value={categoryHint}
+                    onChange={(e) => setCategoryHint(e.target.value)}
+                    placeholder={
+                      dictionary.categoryHintPlaceholder ||
+                      "AI creates category…"
+                    }
+                    className="h-7 w-36 border-none bg-transparent text-[10px] font-mono px-0 focus-visible:ring-0"
+                  />
+                </div>
+
                 {/* Date input */}
                 <div className="flex items-center gap-2 bg-muted/20 px-3 h-9 rounded-lg border border-primary/5">
                   <Calendar className="h-3.5 w-3.5 text-muted-foreground shrink-0" />

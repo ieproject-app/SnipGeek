@@ -264,6 +264,8 @@
     "draftContentLabel": "Konten/Draf Utama",
     "originalContentLabel": "Konten Asli untuk Dimodifikasi",
     "modInstructionsLabel": "Poin Perubahan",
+    "categoryHintLabel": "Petunjuk Kategori",
+    "categoryHintPlaceholder": "AI akan buat kategori...",
     "finalInstruction": "Instruksi Tambahan: 1. Konfirmasi translationKey dan slug Inggris. 2. Panjang judul HARUS 50-60 karakter. 3. KEPATUHAN MDX KETAT: Gunakan hanya komponen yang didukung (<DownloadButton />, <ImageGrid />, tabel Markdown standar). 4. Kepatuhan React: SELALU gunakan 'className'. 5. Teks Alt Gambar: Buat teks alt SEO yang berkualitas jika kosong.",
     "tooltips": {
       "backToTop": "Ke Atas",
