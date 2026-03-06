@@ -52,7 +52,6 @@ import { InternalToolWrapper } from '@/components/tools/internal-tool-wrapper';
 import { Dictionary } from '@/lib/get-dictionary';
 
 const DAILY_LIMIT = 10;
-const ADMIN_EMAIL = 'iwan.efndi@gmail.com';
 
 const documentCategories: Record<string, { name: string; types: string[] }> = {
   'UM.000': { name: 'Umum', types: ['ND UT'] },
@@ -134,6 +133,8 @@ export function NomorGeneratorClient({ dictionary }: { dictionary: Dictionary })
     
     const [userLimit, setUserLimit] = useState<UserLimit>({ count: 0, isLimited: false });
     const [isLimitLoading, setIsLimitLoading] = useState(true);
+    const [isAdminUser, setIsAdminUser] = useState(false);
+    const [isAdminLoading, setIsAdminLoading] = useState(true);
 
     const { toast } = useToast();
     const { notify } = useNotification();
@@ -141,10 +142,35 @@ export function NomorGeneratorClient({ dictionary }: { dictionary: Dictionary })
     const { user } = useUser();
 
     const toolMeta = dictionary.tools.tool_list.number_generator;
-    const isAdmin = useMemo(() => user?.email === ADMIN_EMAIL, [user]);
+
+    const fetchAdminStatus = useCallback(async () => {
+        if (!firestore || !user) {
+            setIsAdminLoading(false);
+            setIsAdminUser(false);
+            return;
+        }
+
+        setIsAdminLoading(true);
+        try {
+            const adminDocRef = doc(firestore, 'roles_admin', user.uid);
+            const adminDocSnap = await getDoc(adminDocRef);
+            setIsAdminUser(adminDocSnap.exists() && adminDocSnap.data()?.role === 'admin');
+        } catch (error) {
+            console.error("Error fetching admin status:", error);
+            setIsAdminUser(false);
+        } finally {
+            setIsAdminLoading(false);
+        }
+    }, [firestore, user]);
+
+    useEffect(() => {
+        if (user) {
+            fetchAdminStatus();
+        }
+    }, [user, fetchAdminStatus]);
 
     const fetchUserLimit = useCallback(async () => {
-        if (!firestore || !user || isAdmin) {
+        if (!firestore || !user || isAdminUser) {
             setIsLimitLoading(false);
             return;
         }
@@ -173,7 +199,7 @@ export function NomorGeneratorClient({ dictionary }: { dictionary: Dictionary })
         } finally {
             setIsLimitLoading(false);
         }
-    }, [firestore, user, isAdmin]);
+    }, [firestore, user, isAdminUser]);
 
     const fetchMyHistory = useCallback(async () => {
         if (!firestore || !user) return;
@@ -325,7 +351,7 @@ export function NomorGeneratorClient({ dictionary }: { dictionary: Dictionary })
                 let currentCount = 0;
                 let newDailyCount = 0;
 
-                if (!isAdmin) {
+                if (!isAdminUser) {
                     const limitDoc = await transaction.get(limitRef);
                     if (limitDoc.exists()) {
                         const limitData = limitDoc.data();
@@ -346,10 +372,10 @@ export function NomorGeneratorClient({ dictionary }: { dictionary: Dictionary })
                     const year = req.docDate!.getFullYear();
                     const month = req.docDate!.getMonth() + 1;
                     
-                    const remainingQuota = isAdmin ? 999 : (DAILY_LIMIT - currentCount - actualGeneratedCount);
+                    const remainingQuota = isAdminUser ? 999 : (DAILY_LIMIT - currentCount - actualGeneratedCount);
                     const processQuantity = Math.min(req.quantity, remainingQuota);
 
-                    if (processQuantity <= 0 && !isAdmin) {
+                    if (processQuantity <= 0 && !isAdminUser) {
                         for(let i = 0; i < req.quantity; i++) {
                             results.push({ text: 'KUOTA HABIS', docType: req.docType, date: req.docDate!, isError: true });
                         }
@@ -398,7 +424,7 @@ export function NomorGeneratorClient({ dictionary }: { dictionary: Dictionary })
                     }
                 }
 
-                if (!isAdmin) {
+                if (!isAdminUser) {
                     newDailyCount = currentCount + actualGeneratedCount;
                     transaction.set(limitRef, { dailyCount: newDailyCount, lastGeneratedDate: todayStr }, { merge: true });
                 }
@@ -554,7 +580,7 @@ export function NomorGeneratorClient({ dictionary }: { dictionary: Dictionary })
                                     <CardDescription>Tentukan kategori dan periode dokumen yang ingin dibuat.</CardDescription>
                                 </div>
                                 
-                                {!isAdmin && (
+                                {!isAdminUser && (
                                     <div className="shrink-0">
                                         {isLimitLoading ? (
                                             <Skeleton className="h-16 w-40 rounded-xl" />
@@ -838,7 +864,7 @@ export function NomorGeneratorClient({ dictionary }: { dictionary: Dictionary })
                                 </div>
                             </div>
                             
-                            {!isAdmin && userLimit.isLimited && (
+                            {!isAdminUser && userLimit.isLimited && (
                                 <div className="mt-4 flex items-center gap-4 rounded-xl border border-destructive/20 bg-gradient-to-r from-destructive/10 to-destructive/5 p-5 border-l-4 border-l-destructive animate-in slide-in-from-top-2">
                                     <AlertTriangle className="h-6 w-6 flex-shrink-0 text-destructive" />
                                     <div className="space-y-0.5">
