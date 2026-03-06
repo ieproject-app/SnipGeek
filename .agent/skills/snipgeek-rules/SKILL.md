@@ -189,6 +189,63 @@ matchLocale(languages, i18n.locales as string[], i18n.defaultLocale)
 - Only active on the production domain (`snipgeek.com`)
 - It is normal for the comment section to not appear in development mode (IDE) — this is not a bug
 
+### 🔴 Theme Mode — Use `useThemeMode()` Hook (MANDATORY)
+All theme cycling, persistence, and tooltip logic is centralised in `src/hooks/use-theme-mode.ts`.
+
+**NEVER** duplicate this logic in any component. Do NOT write raw `setTheme()` calls, manual `localStorage` writes for theme expiry, or inline `themeOrder` arrays outside this hook.
+
+```typescript
+import { useThemeMode } from "@/hooks/use-theme-mode";
+
+// Inside a component:
+const { currentMode, nextMode, cycleTheme, tooltipLabel, resolvedTheme } = useThemeMode();
+```
+
+**What the hook provides:**
+| Value | Type | Description |
+|---|---|---|
+| `currentMode` | `"light" \| "dark" \| "system"` | The mode the user has actively chosen |
+| `nextMode` | `"light" \| "dark" \| "system"` | Next mode in the cycle |
+| `cycleTheme()` | `() => void` | Advances to next mode with View Transition |
+| `applyTheme(mode)` | `(mode) => void` | Apply a specific mode directly |
+| `tooltipLabel` | `string` | Pre-formatted tooltip text for the next action |
+| `resolvedTheme` | `"light" \| "dark"` | The actual rendered theme (OS-resolved) |
+
+The hook handles:
+- 3-mode cycle: `light → dark → system → light …`
+- 1-week localStorage expiry for manual overrides (light/dark)
+- Automatic expiry removal when switching to "system"
+- `document.startViewTransition` with `prefers-reduced-motion` fallback
+
+### 🔵 Utility Functions — Always Use, Never Duplicate
+
+Two utility functions in `src/lib/utils.ts` replace repetitive inline code:
+
+**`getLinkPrefix(locale: string): string`**
+Returns `""` for the default locale (`en`) and `"/{locale}"` for others.
+```typescript
+// ✅ Correct
+import { getLinkPrefix } from "@/lib/utils";
+const linkPrefix = getLinkPrefix(locale);
+
+// ❌ Wrong — duplicate logic, prone to typos
+const linkPrefix = locale === "en" ? "" : `/${locale}`;
+```
+
+**`resolveHeroImage(heroImageValue, imageAlt?, title?)`**
+Resolves a frontmatter `heroImage` value (either a placeholder ID from `placeholder-images.json` or a direct URL/path) into a `{ src, hint }` object ready for `<Image>`.
+```typescript
+import { resolveHeroImage } from "@/lib/utils";
+
+const resolved = resolveHeroImage(
+  post.frontmatter.heroImage,
+  post.frontmatter.imageAlt,
+  post.frontmatter.title,
+);
+// resolved is { src: string; hint: string } | undefined
+```
+Use this everywhere a hero image needs to be displayed — **never** write the inline `if (starts with http) … else find placeholder` pattern again.
+
 ---
 
 ## 3. Communication & UI Modification Protocol
@@ -262,6 +319,92 @@ const storage = getStorage(firebaseApp);
 | `apphosting.yaml` | Production keys (Google Cloud) |
 
 **DO NOT** remove keys from either file just because they appear duplicated — both are required for their respective environments.
+
+### 🔴 localStorage Keys — Always Use `STORAGE_KEYS` Constants
+All `localStorage` key strings are defined in `src/lib/constants.ts`. **NEVER** use raw string literals when reading or writing to `localStorage`.
+
+```typescript
+import { STORAGE_KEYS } from "@/lib/constants";
+
+// ✅ Correct
+localStorage.getItem(STORAGE_KEYS.THEME_MANUAL_EXPIRE);
+localStorage.setItem(STORAGE_KEYS.READING_LIST, JSON.stringify(items));
+
+// ❌ Wrong — raw strings are fragile and hard to trace
+localStorage.getItem("snipgeek-theme-manual-expire");
+```
+
+| Constant | Key String | Purpose |
+|---|---|---|
+| `STORAGE_KEYS.READING_LIST` | `readingList` | Saved reading list items (JSON array) |
+| `STORAGE_KEYS.THEME_MANUAL_EXPIRE` | `snipgeek-theme-manual-expire` | Unix ms timestamp for manual theme expiry |
+| `STORAGE_KEYS.THEME` | `theme` | Active next-themes value (`light`/`dark`/`system`) |
+| `STORAGE_KEYS.LOCALE` | `NEXT_LOCALE` | User's chosen language cookie |
+
+### 🔴 OpenGraph Images — MANDATORY on Blog & Notes Post Pages
+Every `blog/[slug]/page.tsx` and `notes/[slug]/page.tsx` **MUST** include per-article `openGraph` and `twitter` metadata so the article's hero image is shown when shared on social media.
+
+```typescript
+// In generateMetadata():
+const heroSource = resolveHeroImage(
+  post.frontmatter.heroImage,
+  post.frontmatter.imageAlt,
+  post.frontmatter.title,
+);
+const ogImageUrl = heroSource
+  ? heroSource.src.startsWith("http")
+    ? heroSource.src
+    : `https://snipgeek.com${heroSource.src}`
+  : "https://snipgeek.com/images/footer/about.webp";
+
+return {
+  // …title, description, alternates…
+  openGraph: {
+    type: "article",
+    url: `https://snipgeek.com${canonicalPath}`,
+    title: post.frontmatter.title,
+    description: post.frontmatter.description,
+    images: [{ url: ogImageUrl, width: 1200, height: 630, alt: post.frontmatter.title }],
+    publishedTime: post.frontmatter.date,
+    modifiedTime: post.frontmatter.updated ?? post.frontmatter.date,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: post.frontmatter.title,
+    description: post.frontmatter.description,
+    images: [ogImageUrl],
+  },
+};
+```
+
+### 🟡 Sitemap — Keep Static Routes In Sync
+`src/app/sitemap.ts` must be updated whenever a new public static page is added.
+
+Current static routes in the sitemap:
+`""`, `/blog`, `/notes`, `/tools`, `/about`, `/contact`, `/archive`, `/projects`, `/privacy`, `/terms`, `/disclaimer`
+
+**Do NOT add** `/login` or `/download` — these are internal/non-indexable pages.
+
+### 🟡 Dead Code — `post-page-client.tsx` Removed
+The file `src/app/[locale]/blog/[slug]/post-page-client.tsx` was deleted (it was never imported by `page.tsx` and imported a server module inside a client component). **Do not recreate it.** The canonical post rendering lives entirely in `page.tsx` as a Server Component.
+
+### 🟡 Security Headers
+HTTP security headers are configured in `next.config.ts` and applied to all routes. Do NOT remove them.
+
+Current headers: `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy`, `Strict-Transport-Security`.
+
+If a new page or API route has a legitimate reason to relax a header (e.g., embedding via iframe), add a targeted override in `next.config.ts` rather than removing the global rule.
+
+### 🟡 Scroll Listeners — Always Use `{ passive: true }`
+Any `window.addEventListener("scroll", handler)` call **must** include `{ passive: true }` to avoid blocking the main thread.
+
+```typescript
+// ✅ Correct
+window.addEventListener("scroll", handler, { passive: true });
+
+// ❌ Wrong — blocks scroll performance
+window.addEventListener("scroll", handler);
+```
 
 ---
 

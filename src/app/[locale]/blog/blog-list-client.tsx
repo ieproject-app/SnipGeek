@@ -91,6 +91,7 @@ export function BlogListClient({
                           fill
                           className="object-cover transition-transform duration-700 group-hover:scale-110"
                           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 33vw, 300px"
+                          priority={index < 3}
                           data-ai-hint={heroImageHint}
                         />
                       )}

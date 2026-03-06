@@ -13,11 +13,11 @@ import {
   LayoutGrid,
   User,
   Mail,
-  Languages,
   ChevronRight,
   ArrowRight,
   Sun,
   Moon,
+  SunMoon,
   ScrollText,
   ShieldAlert,
 } from "lucide-react";
@@ -37,7 +37,8 @@ import {
   CategoryBadge,
   getBadgeStyle,
 } from "@/components/layout/category-badge";
-import { useTheme } from "next-themes";
+import { useThemeMode } from "@/hooks/use-theme-mode";
+import { getLinkPrefix } from "@/lib/utils";
 import { SnipTooltip } from "@/components/ui/snip-tooltip";
 
 type SearchableItem = {
@@ -111,8 +112,13 @@ export function Header({
 
   const { items: readingListItems, removeItem: removeReadingListItem } =
     useReadingList();
-  const { message, icon, progress, notify, clear } = useNotification();
-  const { setTheme, resolvedTheme } = useTheme();
+  const { message, icon, progress, clear } = useNotification();
+  const {
+    currentMode,
+    cycleTheme,
+    tooltipLabel: themeTooltipLabel,
+    resolvedTheme,
+  } = useThemeMode();
 
   const lastScrollY = useRef(0);
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -126,26 +132,12 @@ export function Header({
   const isReadingListOpen = activeView === "readingList";
 
   const currentLocale = (params.locale as string) || "en";
-  const linkPrefix = currentLocale === "en" ? "" : `/${currentLocale}`;
+  const linkPrefix = getLinkPrefix(currentLocale);
 
   useEffect(() => {
     setMounted(true);
     setTimeLabel(getTimeLabel());
   }, []);
-
-  useEffect(() => {
-    if (mounted) {
-      const pendingKey =
-        typeof window !== "undefined"
-          ? localStorage.getItem("snipgeek-pending-notify")
-          : null;
-      if (pendingKey) {
-        const msg = (dictionary?.notifications as any)?.[pendingKey];
-        if (msg) notify(msg, <Languages className="h-4 w-4" />);
-        localStorage.removeItem("snipgeek-pending-notify");
-      }
-    }
-  }, [mounted, notify, dictionary]);
 
   useEffect(() => {
     if (mounted && readingListItems.length > prevCount.current) {
@@ -233,31 +225,6 @@ export function Header({
     }
   };
 
-  const toggleTheme = () => {
-    const nextTheme = resolvedTheme === "dark" ? "light" : "dark";
-
-    const applyThemeChange = () => {
-      setTheme(nextTheme);
-      // Set 1 week persistence for manual override
-      const oneWeek = 7 * 24 * 60 * 60 * 1000;
-      localStorage.setItem('snipgeek-theme-manual-expire', (Date.now() + oneWeek).toString());
-    };
-
-    if (
-      typeof document !== "undefined" &&
-      "startViewTransition" in document &&
-      // Opsional: Cek apakah user prefers-reduced-motion
-      !window.matchMedia("(prefers-reduced-motion: reduce)").matches
-    ) {
-      // @ts-ignore - startViewTransition is a modern API
-      document.startViewTransition(() => {
-        applyThemeChange();
-      });
-    } else {
-      applyThemeChange();
-    }
-  };
-
   const handleRemoveReadingListItem = (slug: string) => {
     setRemovingSlug(slug);
     setTimeout(() => {
@@ -304,11 +271,11 @@ export function Header({
       ref={headerRef}
       data-scrolled={isScrolled}
       className={cn(
-        "fixed top-0 left-0 right-0 z-50 w-full bg-background/80 backdrop-blur-md border-b border-border/50 transition-all [transition-timing-function:cubic-bezier(0.4,0,0.2,1)] will-change-transform overflow-visible",
+        "fixed top-0 left-0 right-0 z-50 w-full bg-background border-b border-border transition-all [transition-timing-function:cubic-bezier(0.4,0,0.2,1)] will-change-transform overflow-visible",
         isVisible
           ? "translate-y-0 duration-500"
           : "-translate-y-full duration-300",
-        isScrolled && "shadow-sm border-border/80",
+        isScrolled && "shadow-sm border-border/90",
       )}
     >
       <div className="max-w-4xl mx-auto h-16 min-h-[64px] px-4 md:px-6 flex items-center justify-between relative overflow-visible">
@@ -338,10 +305,12 @@ export function Header({
               </div>
               <div className="flex flex-col">
                 <span className="font-display text-base font-black tracking-tight leading-tight">
-                  Back to Site
+                  Back to Home
                 </span>
                 <span className="font-sans text-[9px] font-bold uppercase tracking-[0.12em] text-muted-foreground/50 mt-0.5 group-hover:text-accent/70 transition-colors">
-                  {(params.locale as string) === 'en' ? 'Return Home' : 'Kembali'}
+                  {(params.locale as string) === "en"
+                    ? "Return Home"
+                    : "Kembali"}
                 </span>
               </div>
             </NextLink>
@@ -408,7 +377,9 @@ export function Header({
           {/* 1. More Menu Toggle */}
           <div className="relative">
             <SnipTooltip
-              label={dictionary?.promptGenerator?.tooltips?.moreMenu ?? "More Menu"}
+              label={
+                dictionary?.promptGenerator?.tooltips?.moreMenu ?? "More Menu"
+              }
               side="bottom"
             >
               <Button
@@ -440,7 +411,7 @@ export function Header({
             {/* FLOATING MORE MENU DROPDOWN */}
             <div
               className={cn(
-                "absolute top-full right-0 mt-5 min-w-[220px] bg-background/95 backdrop-blur-xl border border-border shadow-2xl rounded-2xl overflow-hidden origin-top-right transition-all duration-300 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] z-[100] ring-1 ring-black/[0.03]",
+                "absolute top-full right-0 mt-5 min-w-[220px] bg-background border border-border shadow-2xl rounded-2xl overflow-hidden origin-top-right transition-all duration-300 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] z-[100] ring-1 ring-black/[0.03]",
                 isMenuOpen
                   ? "opacity-100 scale-100 translate-y-0"
                   : "opacity-0 scale-[0.95] -translate-y-2 pointer-events-none",
@@ -496,7 +467,10 @@ export function Header({
 
           {/* 2. Bookmark Icon */}
           <SnipTooltip
-            label={dictionary?.promptGenerator?.tooltips?.readingList ?? "Reading List"}
+            label={
+              dictionary?.promptGenerator?.tooltips?.readingList ??
+              "Reading List"
+            }
             side="bottom"
           >
             <Button
@@ -520,38 +494,51 @@ export function Header({
             </Button>
           </SnipTooltip>
 
-          {/* 3. Theme Toggle */}
-          <SnipTooltip
-            label={dictionary?.promptGenerator?.tooltips?.theme ?? "Toggle Theme"}
-            side="bottom"
-          >
+          {/* 3. Theme Toggle (light → dark → system) */}
+          <SnipTooltip label={themeTooltipLabel} side="bottom">
             <button
               type="button"
               className={cn(navItemClass, "group/theme relative inline-flex")}
-              onClick={toggleTheme}
+              onClick={cycleTheme}
               aria-label="Toggle Theme"
             >
               <div className="relative h-5 w-5">
-                {/* Sun — visible in light mode */}
-                <Sun
-                  className={cn(
-                    "absolute inset-0 h-5 w-5 transition-all duration-500",
-                    "ease-[cubic-bezier(0.34,1.56,0.64,1)] origin-center",
-                    mounted && resolvedTheme === "dark"
-                      ? "opacity-0 scale-0 rotate-180"
-                      : "opacity-100 scale-100 rotate-0",
-                  )}
-                />
-                {/* Moon — visible in dark mode */}
-                <Moon
-                  className={cn(
-                    "absolute inset-0 h-5 w-5 transition-all duration-500",
-                    "ease-[cubic-bezier(0.34,1.56,0.64,1)] origin-center",
-                    mounted && resolvedTheme === "dark"
-                      ? "opacity-100 scale-100 rotate-0"
-                      : "opacity-0 scale-0 -rotate-180",
-                  )}
-                />
+                {(() => {
+                  return (
+                    <>
+                      {/* Sun — visible in light mode */}
+                      <Sun
+                        className={cn(
+                          "absolute inset-0 h-5 w-5 transition-all duration-500",
+                          "ease-[cubic-bezier(0.34,1.56,0.64,1)] origin-center",
+                          mounted && currentMode === "light"
+                            ? "opacity-100 scale-100 rotate-0"
+                            : "opacity-0 scale-0 rotate-180",
+                        )}
+                      />
+                      {/* Moon — visible in dark mode */}
+                      <Moon
+                        className={cn(
+                          "absolute inset-0 h-5 w-5 transition-all duration-500",
+                          "ease-[cubic-bezier(0.34,1.56,0.64,1)] origin-center",
+                          mounted && currentMode === "dark"
+                            ? "opacity-100 scale-100 rotate-0"
+                            : "opacity-0 scale-0 -rotate-180",
+                        )}
+                      />
+                      {/* SunMoon — visible in system mode */}
+                      <SunMoon
+                        className={cn(
+                          "absolute inset-0 h-5 w-5 transition-all duration-500",
+                          "ease-[cubic-bezier(0.34,1.56,0.64,1)] origin-center",
+                          mounted && currentMode === "system"
+                            ? "opacity-100 scale-100 rotate-0"
+                            : "opacity-0 scale-0 rotate-180",
+                        )}
+                      />
+                    </>
+                  );
+                })()}
               </div>
             </button>
           </SnipTooltip>
@@ -675,7 +662,7 @@ export function Header({
                       className={cn(
                         "group flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-[320ms] hover:bg-muted/50",
                         removingSlug === item.slug &&
-                        "opacity-0 -translate-x-2 scale-[0.96] ease-in",
+                          "opacity-0 -translate-x-2 scale-[0.96] ease-in",
                       )}
                     >
                       <NextLink
@@ -931,7 +918,7 @@ export function Header({
             : "opacity-0 -translate-y-8 scale-95",
         )}
       >
-        <div className="relative flex items-center justify-center gap-2.5 h-10 px-6 bg-background/90 backdrop-blur-xl border border-border/60 shadow-2xl rounded-full overflow-hidden pointer-events-auto ring-1 ring-black/[0.03]">
+        <div className="relative flex items-center justify-center gap-2.5 h-10 px-6 bg-background border border-border shadow-2xl rounded-full overflow-hidden pointer-events-auto ring-1 ring-black/[0.03]">
           {/* Icon */}
           <span
             className={cn(
