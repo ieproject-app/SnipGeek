@@ -20,6 +20,11 @@ import {
   Settings,
   FileText,
   Maximize2,
+  ExternalLink,
+  Info,
+  Lightbulb,
+  TriangleAlert,
+  ShieldAlert,
 } from "lucide-react";
 import { WindowsStoreLogo } from "@/components/icons/windows-store-logo";
 import { downloadLinks } from "@/lib/data-downloads";
@@ -31,11 +36,27 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 
-// Helper to generate IDs for TOC
-const generateId = (children: any) => {
-  const text = React.Children.toArray(children)
-    .map((child) => (typeof child === "string" ? child : ""))
+const extractText = (children: React.ReactNode): string => {
+  return React.Children.toArray(children)
+    .map((child) => {
+      if (typeof child === "string" || typeof child === "number") {
+        return String(child);
+      }
+
+      if (React.isValidElement(child)) {
+        return extractText(
+          (child.props as { children?: React.ReactNode }).children,
+        );
+      }
+
+      return "";
+    })
     .join("");
+};
+
+// Helper to generate IDs for TOC
+const generateId = (children: React.ReactNode) => {
+  const text = extractText(children);
 
   if (!text) return undefined;
 
@@ -379,26 +400,57 @@ const MdxA = ({
   class: _class,
   className,
   parentName,
+  href,
+  children,
   ...props
 }: React.AnchorHTMLAttributes<HTMLAnchorElement> & {
   class?: string;
   parentName?: string;
 }) => {
-  if (props.href) {
+  if (!href) {
     return (
-      <Link
-        href={props.href}
+      <a className={cn(_class, className)} {...props}>
+        {children}
+      </a>
+    );
+  }
+
+  const isExternal =
+    href.startsWith("http://") ||
+    href.startsWith("https://") ||
+    href.startsWith("//");
+
+  if (isExternal) {
+    return (
+      <a
+        href={href}
+        target="_blank"
+        rel="noopener noreferrer"
         className={cn(
-          "font-medium text-accent underline hover:no-underline",
+          "inline-flex items-center gap-1 font-medium text-accent underline underline-offset-4 transition-colors hover:text-primary hover:no-underline",
           _class,
           className,
         )}
+        {...props}
       >
-        {props.children}
-      </Link>
+        <span>{children}</span>
+        <ExternalLink className="h-3.5 w-3.5 shrink-0" />
+      </a>
     );
   }
-  return <a className={cn(_class, className)} {...props} />;
+
+  return (
+    <Link
+      href={href}
+      className={cn(
+        "font-medium text-accent underline underline-offset-4 transition-colors hover:text-primary hover:no-underline",
+        _class,
+        className,
+      )}
+    >
+      {children}
+    </Link>
+  );
 };
 
 const MdxUl = ({
@@ -460,7 +512,7 @@ const MdxBlockquote = ({
 }: any) => (
   <blockquote
     className={cn(
-      "mt-6 border-l-2 border-primary/20 pl-6 italic text-muted-foreground",
+      "my-8 rounded-r-2xl border-l-4 border-primary/30 bg-primary/5 px-5 py-4 italic text-foreground/75 [&>*:first-child]:mt-0 [&>*:last-child]:mb-0",
       _class,
       className,
     )}
@@ -491,6 +543,203 @@ const MdxPre = ({
   </pre>
 );
 
+const MdxHr = ({ class: _class, className, parentName, ...props }: any) => (
+  <hr
+    className={cn(
+      "my-10 border-0 h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent",
+      _class,
+      className,
+    )}
+    {...props}
+  />
+);
+
+const MdxStrong = ({
+  children,
+  class: _class,
+  className,
+  parentName,
+  ...props
+}: any) => (
+  <strong
+    className={cn("font-extrabold text-foreground", _class, className)}
+    {...props}
+  >
+    {children}
+  </strong>
+);
+
+const MdxEm = ({
+  children,
+  class: _class,
+  className,
+  parentName,
+  ...props
+}: any) => (
+  <em className={cn("italic text-foreground/85", _class, className)} {...props}>
+    {children}
+  </em>
+);
+
+const MdxCode = ({
+  children,
+  class: _class,
+  className,
+  parentName,
+  ...props
+}: any) => (
+  <code
+    className={cn(
+      "rounded-md bg-muted px-1.5 py-0.5 font-mono text-[0.85em] font-semibold text-foreground/85",
+      _class,
+      className,
+    )}
+    {...props}
+  >
+    {children}
+  </code>
+);
+
+export const Kbd = ({
+  children,
+  class: _class,
+  className,
+  parentName,
+  ...props
+}: any) => (
+  <kbd
+    className={cn(
+      "inline-flex min-h-6 items-center rounded-md border border-border bg-background px-2 py-0.5 font-mono text-[0.78rem] font-bold text-foreground shadow-sm",
+      _class,
+      className,
+    )}
+    {...props}
+  >
+    {children}
+  </kbd>
+);
+
+type CalloutVariant = "info" | "tip" | "warning" | "danger";
+
+const calloutConfig: Record<
+  CalloutVariant,
+  {
+    icon: React.ElementType;
+    className: string;
+    iconClassName: string;
+    label: string;
+  }
+> = {
+  info: {
+    icon: Info,
+    className: "border-sky-500/30 bg-sky-500/8",
+    iconClassName: "text-sky-500",
+    label: "Info",
+  },
+  tip: {
+    icon: Lightbulb,
+    className: "border-emerald-500/30 bg-emerald-500/8",
+    iconClassName: "text-emerald-500",
+    label: "Tip",
+  },
+  warning: {
+    icon: TriangleAlert,
+    className: "border-amber-500/30 bg-amber-500/8",
+    iconClassName: "text-amber-500",
+    label: "Warning",
+  },
+  danger: {
+    icon: ShieldAlert,
+    className: "border-rose-500/30 bg-rose-500/8",
+    iconClassName: "text-rose-500",
+    label: "Important",
+  },
+};
+
+export const Callout = ({
+  children,
+  title,
+  variant = "info",
+  class: _class,
+  className,
+  parentName,
+  ...props
+}: any) => {
+  const config = calloutConfig[variant as CalloutVariant] ?? calloutConfig.info;
+  const Icon = config.icon;
+
+  return (
+    <div
+      className={cn(
+        "my-7 rounded-2xl border p-4 sm:p-5",
+        config.className,
+        _class,
+        className,
+      )}
+      {...props}
+    >
+      <div className="mb-3 flex items-center gap-2">
+        <Icon className={cn("h-4 w-4 shrink-0", config.iconClassName)} />
+        <span className="text-[11px] font-black uppercase tracking-widest text-foreground/70">
+          {title || config.label}
+        </span>
+      </div>
+      <div className="text-sm leading-7 text-foreground/80 [&>*:first-child]:mt-0 [&>*:last-child]:mb-0">
+        {children}
+      </div>
+    </div>
+  );
+};
+
+export const Steps = ({
+  children,
+  class: _class,
+  className,
+  parentName,
+  ...props
+}: any) => {
+  const items = React.Children.toArray(children);
+
+  return (
+    <div className={cn("my-8 space-y-4", _class, className)} {...props}>
+      {items.map((child, index) => {
+        if (!React.isValidElement(child)) {
+          return child;
+        }
+
+        return React.cloneElement(child as React.ReactElement<any>, {
+          stepNumber: index + 1,
+        });
+      })}
+    </div>
+  );
+};
+
+export const Step = ({
+  children,
+  stepNumber,
+  class: _class,
+  className,
+  parentName,
+  ...props
+}: any) => (
+  <div
+    className={cn(
+      "grid grid-cols-[auto_1fr] gap-4 rounded-2xl border border-primary/10 bg-card/50 p-4 sm:p-5",
+      _class,
+      className,
+    )}
+    {...props}
+  >
+    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-xs font-black text-primary-foreground shadow-sm">
+      {stepNumber}
+    </div>
+    <div className="min-w-0 text-sm leading-7 text-foreground/80 [&>*:first-child]:mt-0 [&>*:last-child]:mb-0">
+      {children}
+    </div>
+  </div>
+);
+
 export const mdxComponents = {
   h1: MdxH1,
   h2: MdxH2,
@@ -506,7 +755,7 @@ export const mdxComponents = {
   table: (props: any) => {
     const { class: _class, parentName, ...rest } = props;
     return (
-      <span className="block my-6">
+      <span className="block my-6 overflow-x-auto">
         <Table {...rest} />
       </span>
     );
@@ -517,6 +766,11 @@ export const mdxComponents = {
   th: TableHead,
   td: TableCell,
   pre: MdxPre,
+  hr: MdxHr,
+  strong: MdxStrong,
+  em: MdxEm,
+  code: MdxCode,
+  kbd: Kbd,
   details: ({
     children,
     class: _class,
@@ -526,7 +780,7 @@ export const mdxComponents = {
   }: any) => (
     <details
       className={cn(
-        "my-6 p-4 rounded-lg border bg-muted/20",
+        "my-6 rounded-xl border border-primary/10 bg-muted/20 p-4",
         _class,
         className,
       )}
@@ -544,7 +798,7 @@ export const mdxComponents = {
   }: any) => (
     <summary
       className={cn(
-        "font-headline font-bold cursor-pointer hover:text-accent transition-colors",
+        "font-headline cursor-pointer font-bold transition-colors hover:text-accent",
         _class,
         className,
       )}
@@ -555,4 +809,7 @@ export const mdxComponents = {
   ),
   DownloadButton,
   ImageGrid,
+  Callout,
+  Steps,
+  Step,
 };
