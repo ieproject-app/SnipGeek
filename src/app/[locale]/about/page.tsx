@@ -26,6 +26,7 @@ import {
 import { DownloadButton } from "@/components/mdx-components";
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { MotionDiv, MotionSpan } from "@/components/ui/client-motion";
 
 export async function generateMetadata({
   params,
@@ -75,6 +76,10 @@ export default async function AboutPage({
   const dictionary = await getDictionary(locale);
   const data = cvData[locale] || cvData.en;
   const authorAvatar = "/images/profile/profile.png";
+  const learningRole =
+    locale === "id"
+      ? "Terus belajar, merapikan proses, dan membangun hal-hal yang berguna."
+      : "Always learning, refining workflows, and building useful things.";
 
   return (
     <div className="w-full">
@@ -124,30 +129,85 @@ export default async function AboutPage({
                 </div>
               </div>
 
-              <div className="flex flex-col items-center lg:items-end">
-                <div className="relative mb-5">
-                  <Avatar className="h-32 w-32 shadow-2xl ring-4 ring-primary/20 ring-offset-4 ring-offset-background sm:h-36 sm:w-36">
-                    <AvatarImage src={authorAvatar} alt={data.name} />
-                    <AvatarFallback className="text-2xl font-bold">
-                      IE
-                    </AvatarFallback>
-                  </Avatar>
-                  <span className="absolute right-1 bottom-1 h-4 w-4 rounded-full bg-green-500 ring-2 ring-background" />
-                </div>
+              <div className="flex w-full justify-center lg:justify-end">
+                <div className="w-full max-w-md">
+                  <div className="relative rounded-[28px] border border-primary/10 bg-card/70 px-5 pb-6 pt-5 shadow-xl backdrop-blur-sm sm:px-6 sm:pb-7 sm:pt-6">
+                    <div className="absolute top-0 right-0 h-[3.75rem] w-[3.75rem] rounded-tr-[28px] rounded-bl-[24px] bg-background/92 sm:h-[4.5rem] sm:w-[4.5rem]" />
+                    <MotionDiv
+                      initial={{
+                        opacity: 0,
+                        x: 22,
+                        y: -18,
+                        scale: 0.88,
+                        rotate: 4,
+                      }}
+                      whileInView={{
+                        opacity: 1,
+                        x: 0,
+                        y: 0,
+                        scale: 1,
+                        rotate: 0,
+                      }}
+                      viewport={{ once: true, amount: 0.55 }}
+                      transition={{
+                        duration: 0.7,
+                        delay: 0.12,
+                        ease: [0.21, 0.47, 0.32, 0.98],
+                      }}
+                      className="absolute -top-8 right-4 sm:-top-10 sm:right-5"
+                    >
+                      <div className="relative">
+                        <MotionSpan
+                          aria-hidden="true"
+                          className="absolute inset-0 rounded-full border border-primary/25"
+                          whileInView={{
+                            scale: [1, 1.16, 1],
+                            opacity: [0.45, 0.12, 0.45],
+                          }}
+                          transition={{
+                            duration: 2.8,
+                            repeat: Infinity,
+                            ease: "easeInOut",
+                          }}
+                        />
+                        <MotionSpan
+                          aria-hidden="true"
+                          className="absolute inset-[-8px] rounded-full border border-primary/12"
+                          whileInView={{
+                            scale: [0.96, 1.1, 0.96],
+                            opacity: [0.22, 0.05, 0.22],
+                          }}
+                          transition={{
+                            duration: 3.2,
+                            repeat: Infinity,
+                            ease: "easeInOut",
+                            delay: 0.35,
+                          }}
+                        />
+                        <Avatar className="relative h-20 w-20 shadow-2xl ring-4 ring-primary/20 ring-offset-4 ring-offset-background sm:h-24 sm:w-24">
+                          <AvatarImage src={authorAvatar} alt={data.name} />
+                          <AvatarFallback className="text-xl font-bold">
+                            IE
+                          </AvatarFallback>
+                        </Avatar>
+                      </div>
+                    </MotionDiv>
 
-                <div className="w-full max-w-md rounded-2xl border border-primary/10 bg-card/60 p-5 backdrop-blur-sm">
-                  <p className="text-[11px] font-black uppercase tracking-widest text-accent">
-                    {data.profile.panelLabel}
-                  </p>
-                  <h2 className="mt-2 font-headline text-h3 font-black tracking-tight text-primary">
-                    {data.name}
-                  </h2>
-                  <p className="mt-2 text-sm font-semibold text-muted-foreground">
-                    {data.role}
-                  </p>
-                  <p className="mt-4 text-sm leading-relaxed text-foreground/70">
-                    {data.profile.statement}
-                  </p>
+                    <div className="text-left">
+                      <p className="text-[11px] font-black uppercase tracking-widest text-accent">
+                        {data.profile.panelLabel}
+                      </p>
+                      <h2 className="mt-2 font-headline text-h3 font-black tracking-tight text-primary">
+                        {data.name}
+                      </h2>
+                      <p className="mt-2 text-sm font-semibold leading-relaxed text-muted-foreground">
+                        {learningRole}
+                      </p>
+                      <p className="mt-4 text-sm leading-relaxed text-foreground/70">
+                        {data.profile.statement}
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -213,7 +273,7 @@ export default async function AboutPage({
         <ScrollReveal direction="up" delay={0.1}>
           <section className="mb-20">
             <SectionHeading title={dictionary.about.story} />
-            <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-[1fr_280px] lg:items-start">
+            <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_300px] lg:items-start">
               <div className="min-w-0">
                 <div className="rounded-[28px] border border-primary/10 bg-card/20 p-6 shadow-sm backdrop-blur-sm sm:p-8">
                   <div className="prose-content text-lg text-foreground/80 [&>h2:first-child]:mt-0 [&>p:first-child]:mt-0">
@@ -234,19 +294,82 @@ export default async function AboutPage({
               </div>
 
               <aside className="lg:sticky lg:top-24">
-                <div className="rounded-[24px] border border-primary/10 bg-gradient-to-br from-primary/6 via-background to-accent/6 p-5 shadow-sm">
-                  <p className="text-[11px] font-black uppercase tracking-[0.22em] text-accent">
-                    {data.profile.panelLabel}
-                  </p>
-                  <h3 className="mt-3 font-headline text-lg font-black tracking-tight text-primary">
-                    {data.name}
-                  </h3>
-                  <p className="mt-1 text-sm font-semibold text-muted-foreground">
-                    {data.role}
-                  </p>
-                  <p className="mt-4 text-sm leading-relaxed text-foreground/70">
-                    {data.profile.statement}
-                  </p>
+                <div className="relative rounded-[24px] border border-primary/10 bg-gradient-to-br from-primary/6 via-background to-accent/6 p-5 shadow-sm">
+                  <div className="absolute top-0 right-0 h-[3.5rem] w-[3.5rem] rounded-tr-[24px] rounded-bl-[20px] bg-background/92 sm:h-[4rem] sm:w-[4rem]" />
+                  <MotionDiv
+                    initial={{
+                      opacity: 0,
+                      x: 18,
+                      y: -14,
+                      scale: 0.9,
+                      rotate: 4,
+                    }}
+                    whileInView={{
+                      opacity: 1,
+                      x: 0,
+                      y: 0,
+                      scale: 1,
+                      rotate: 0,
+                    }}
+                    viewport={{ once: true, amount: 0.6 }}
+                    transition={{
+                      duration: 0.65,
+                      delay: 0.1,
+                      ease: [0.21, 0.47, 0.32, 0.98],
+                    }}
+                    className="absolute -top-7 right-3 sm:-top-8 sm:right-4"
+                  >
+                    <div className="relative">
+                      <MotionSpan
+                        aria-hidden="true"
+                        className="absolute inset-0 rounded-full border border-primary/25"
+                        whileInView={{
+                          scale: [1, 1.15, 1],
+                          opacity: [0.42, 0.12, 0.42],
+                        }}
+                        transition={{
+                          duration: 2.8,
+                          repeat: Infinity,
+                          ease: "easeInOut",
+                        }}
+                      />
+                      <MotionSpan
+                        aria-hidden="true"
+                        className="absolute inset-[-6px] rounded-full border border-primary/12"
+                        whileInView={{
+                          scale: [0.96, 1.08, 0.96],
+                          opacity: [0.22, 0.05, 0.22],
+                        }}
+                        transition={{
+                          duration: 3.2,
+                          repeat: Infinity,
+                          ease: "easeInOut",
+                          delay: 0.35,
+                        }}
+                      />
+                      <Avatar className="relative h-16 w-16 shadow-xl ring-4 ring-primary/20 ring-offset-4 ring-offset-background sm:h-20 sm:w-20">
+                        <AvatarImage src={authorAvatar} alt={data.name} />
+                        <AvatarFallback className="text-lg font-bold">
+                          IE
+                        </AvatarFallback>
+                      </Avatar>
+                    </div>
+                  </MotionDiv>
+
+                  <div className="text-left">
+                    <p className="text-[11px] font-black uppercase tracking-[0.22em] text-accent">
+                      {data.profile.panelLabel}
+                    </p>
+                    <h3 className="mt-3 font-headline text-lg font-black tracking-tight text-primary">
+                      {data.name}
+                    </h3>
+                    <p className="mt-1 text-sm font-semibold text-muted-foreground">
+                      {learningRole}
+                    </p>
+                    <p className="mt-4 text-sm leading-relaxed text-foreground/70">
+                      {data.profile.statement}
+                    </p>
+                  </div>
                 </div>
               </aside>
             </div>

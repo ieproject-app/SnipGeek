@@ -533,6 +533,7 @@ const MdxPre = ({
   <pre
     className={cn(
       "rounded-lg p-6 my-6 overflow-x-auto border border-primary/5 text-[13px] leading-relaxed font-mono",
+      "[&>code]:bg-transparent [&>code]:p-0 [&>code]:text-inherit [&>code]:font-normal",
       _class,
       className,
     )}

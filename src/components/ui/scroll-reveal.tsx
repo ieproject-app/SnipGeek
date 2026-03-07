@@ -54,7 +54,7 @@ export function ScrollReveal({
                 delay: delay,
                 ease: [0.21, 0.47, 0.32, 0.98], // cubic-bezier smooth out
             }}
-            className={cn("will-change-transform will-change-opacity", className)}
+            className={cn(className)}
         >
             {children}
         </motion.div>
