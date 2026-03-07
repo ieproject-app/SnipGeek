@@ -66,6 +66,55 @@ type ArticleSummary = {
   type: "blog" | "note";
 };
 
+// ──────────────────────────────────────────────────────────────────────────────
+// Utility: Parse natural date strings (id/en) into YYYY-MM-DD
+// Examples to handle: "07 Maret 2026", "2 Jan 25", "2024/05/12", etc.
+// ──────────────────────────────────────────────────────────────────────────────
+const parseNaturalDate = (input: string): string => {
+  if (!input || input.trim() === "") return "";
+  const cleaned = input.trim();
+
+  // If it already looks like YYYY-MM-DD, keep it.
+  if (/^\d{4}-\d{2}-\d{2}$/.test(cleaned)) return cleaned;
+
+  // Replace Indonesian months with English ones to help the JS Date parser
+  const idMonths: Record<string, string> = {
+    januari: "January", jan: "Jan",
+    februari: "February", pebruari: "February", feb: "Feb",
+    maret: "March", mar: "Mar",
+    april: "April", apr: "Apr",
+    mei: "May",
+    juni: "June", jun: "Jun",
+    juli: "July", jul: "Jul",
+    agustus: "August", agu: "Aug",
+    september: "September", sep: "Sep",
+    oktober: "October", okt: "Oct",
+    november: "November", nopember: "November", nov: "Nov",
+    desember: "December", des: "Dec"
+  };
+
+  let translated = cleaned.toLowerCase();
+  for (const [id, en] of Object.entries(idMonths)) {
+    // Replace word boundaries
+    const regex = new RegExp(`\\b${id}\\b`, "g");
+    translated = translated.replace(regex, en);
+  }
+
+  const date = new Date(translated);
+
+  // If invalid date, just return the raw user input
+  if (isNaN(date.getTime())) {
+    return cleaned;
+  }
+
+  // Format as YYYY-MM-DD
+  const yyyy = date.getFullYear();
+  const mm = String(date.getMonth() + 1).padStart(2, "0");
+  const dd = String(date.getDate()).padStart(2, "0");
+
+  return `${yyyy}-${mm}-${dd}`;
+};
+
 // Safe UUID v4 generator — works in HTTP, HTTPS, and all browsers
 const generateUUID = (): string => {
   if (
@@ -375,7 +424,12 @@ export function PromptGeneratorClient({
       prompt += `- translationKey: [AI: Generate unique kebab-case key]\n`;
     }
 
-    prompt += `- ${dictionary.dateLabel}: ${publishDate || (isModify ? "[KEEP ORIGINAL]" : new Date().toISOString().split("T")[0])}\n`;
+    // Parse the date if exists, otherwise fallback
+    const finalDate = publishDate
+      ? parseNaturalDate(publishDate)
+      : (isModify ? "[KEEP ORIGINAL]" : new Date().toISOString().split("T")[0]);
+
+    prompt += `- ${dictionary.dateLabel}: ${finalDate}\n`;
     if (isModify)
       prompt += `- updated: ${new Date().toISOString().split("T")[0]}\n`;
 
@@ -536,9 +590,8 @@ export function PromptGeneratorClient({
         {/* ── TOOLBAR ── */}
         <ScrollReveal direction="down" delay={0.05} duration={0.4}>
           <Card className="bg-background/80 backdrop-blur-xl border-primary/10 shadow-lg overflow-hidden rounded-xl">
-            {/* Row 1 — mode / content-type / status */}
-            <div className="px-4 py-3 flex flex-wrap items-center justify-between gap-4 border-b border-primary/5">
-              {/* Left group */}
+            <div className="px-4 py-3 flex flex-wrap lg:flex-nowrap items-center justify-between gap-4">
+              {/* Left group - Core Selectors */}
               <div className="flex flex-wrap items-center gap-3">
                 {/* Mode slider */}
                 <div className="relative flex bg-muted/50 p-1 rounded-lg border border-primary/5">
@@ -604,7 +657,7 @@ export function PromptGeneratorClient({
                 </div>
               </div>
 
-              {/* Right group */}
+              {/* Middle group - Inputs & Status */}
               <div className="flex flex-wrap items-center gap-2">
                 {/* Category hint */}
                 <div className="flex items-center gap-2 bg-muted/20 px-3 h-9 rounded-lg border border-primary/5">
@@ -616,7 +669,7 @@ export function PromptGeneratorClient({
                       dictionary.categoryHintPlaceholder ||
                       "AI creates category…"
                     }
-                    className="h-7 w-36 border-none bg-transparent text-[10px] font-mono px-0 focus-visible:ring-0"
+                    className="h-7 w-[100px] xl:w-[130px] border-none bg-transparent text-[10px] font-mono px-0 focus-visible:ring-0"
                   />
                 </div>
 
@@ -629,90 +682,87 @@ export function PromptGeneratorClient({
                     placeholder={
                       mode === "modify" ? "ORIGINAL DATE" : "YYYY-MM-DD"
                     }
-                    className="h-7 w-28 border-none bg-transparent text-[10px] font-mono px-0 focus-visible:ring-0"
+                    className="h-7 w-[110px] xl:w-[125px] border-none bg-transparent text-[10px] font-mono px-0 focus-visible:ring-0"
                   />
                 </div>
 
-                {/* Published */}
-                <div className="flex items-center gap-2 bg-muted/20 px-3 h-9 rounded-lg border border-primary/5">
-                  <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground">
-                    Live
-                  </span>
-                  <Switch
-                    checked={isPublished}
-                    onCheckedChange={setIsPublished}
-                    className="scale-75 origin-right"
-                  />
-                </div>
-
-                {/* Featured (blog only) */}
-                {contentType === "blog" && (
-                  <div className="flex items-center gap-2 bg-muted/20 px-3 h-9 rounded-lg border border-primary/5">
-                    <Star
-                      className={cn(
-                        "h-3.5 w-3.5 shrink-0 transition-colors",
-                        isFeatured
-                          ? "text-amber-500 fill-amber-500"
-                          : "text-muted-foreground",
-                      )}
-                    />
+                {/* Published & Featured */}
+                <div className="flex items-center gap-3 bg-muted/20 px-3 h-9 rounded-lg border border-primary/5">
+                  <div className="flex items-center gap-1.5">
                     <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground">
-                      Featured
+                      Live
                     </span>
                     <Switch
-                      checked={isFeatured}
-                      onCheckedChange={setIsFeatured}
-                      className="scale-75 origin-right"
+                      checked={isPublished}
+                      onCheckedChange={setIsPublished}
+                      className="scale-75 origin-left"
                     />
                   </div>
-                )}
-              </div>
-            </div>
 
-            {/* Row 2 — feature flags */}
-            <div className="px-4 py-2.5 flex flex-wrap items-center gap-2 bg-muted/[0.025]">
-              <div className="flex items-center gap-1.5 pr-2 text-muted-foreground/40">
-                <Settings2 className="h-3 w-3" />
-                <span className="text-[9px] font-black uppercase tracking-[0.25em]">
-                  Features:
-                </span>
+                  {contentType === "blog" && (
+                    <>
+                      <div className="w-px h-4 bg-primary/10" />
+                      <div className="flex items-center gap-1.5">
+                        <Star
+                          className={cn(
+                            "h-3 w-3 shrink-0 transition-colors",
+                            isFeatured
+                              ? "text-amber-500 fill-amber-500"
+                              : "text-muted-foreground",
+                          )}
+                        />
+                        <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground">
+                          Feat
+                        </span>
+                        <Switch
+                          checked={isFeatured}
+                          onCheckedChange={setIsFeatured}
+                          className="scale-75 origin-left"
+                        />
+                      </div>
+                    </>
+                  )}
+                </div>
               </div>
 
-              <FeaturePill
-                active={showImages}
-                onClick={() => setShowImages(!showImages)}
-                icon={ImageIcon}
-                label="Images"
-                activeClass="bg-emerald-500/10 text-emerald-600 border-emerald-500/20 dark:text-emerald-400"
-              />
-              <FeaturePill
-                active={showDownloads}
-                onClick={() => setShowDownloads(!showDownloads)}
-                icon={Download}
-                label="Downloads"
-                activeClass="bg-blue-500/10 text-blue-600 border-blue-500/20 dark:text-blue-400"
-              />
-              <FeaturePill
-                active={showGrids}
-                onClick={() => setShowGrids(!showGrids)}
-                icon={Grid3X3}
-                label="Grids"
-                activeClass="bg-violet-500/10 text-violet-600 border-violet-500/20 dark:text-violet-400"
-              />
-              <FeaturePill
-                active={isIdOnly}
-                onClick={() => setIsIdOnly(!isIdOnly)}
-                icon={Hash}
-                label="ID-Only"
-                activeClass="bg-rose-500/10 text-rose-600 border-rose-500/20 dark:text-rose-400"
-              />
-              <FeaturePill
-                active={useMdxRules}
-                onClick={() => setUseMdxRules(!useMdxRules)}
-                icon={Sparkles}
-                label="MDX Rules"
-                activeClass="bg-amber-500/10 text-amber-600 border-amber-500/20 dark:text-amber-400"
-              />
+              {/* Right group - Features */}
+              <div className="flex flex-wrap items-center gap-1.5 p-1 rounded-lg border border-primary/5 bg-background shadow-sm">
+                <FeaturePill
+                  active={showImages}
+                  onClick={() => setShowImages(!showImages)}
+                  icon={ImageIcon}
+                  label="Images"
+                  activeClass="bg-emerald-500/10 text-emerald-600 border-emerald-500/20 dark:text-emerald-400"
+                />
+                <FeaturePill
+                  active={showDownloads}
+                  onClick={() => setShowDownloads(!showDownloads)}
+                  icon={Download}
+                  label="Downs"
+                  activeClass="bg-blue-500/10 text-blue-600 border-blue-500/20 dark:text-blue-400"
+                />
+                <FeaturePill
+                  active={showGrids}
+                  onClick={() => setShowGrids(!showGrids)}
+                  icon={Grid3X3}
+                  label="Grids"
+                  activeClass="bg-violet-500/10 text-violet-600 border-violet-500/20 dark:text-violet-400"
+                />
+                <FeaturePill
+                  active={isIdOnly}
+                  onClick={() => setIsIdOnly(!isIdOnly)}
+                  icon={Hash}
+                  label="ID-Only"
+                  activeClass="bg-rose-500/10 text-rose-600 border-rose-500/20 dark:text-rose-400"
+                />
+                <FeaturePill
+                  active={useMdxRules}
+                  onClick={() => setUseMdxRules(!useMdxRules)}
+                  icon={Sparkles}
+                  label="MDX Rules"
+                  activeClass="bg-amber-500/10 text-amber-600 border-amber-500/20 dark:text-amber-400"
+                />
+              </div>
             </div>
           </Card>
         </ScrollReveal>
