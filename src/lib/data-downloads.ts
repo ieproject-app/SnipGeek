@@ -73,6 +73,12 @@ export const downloadLinks: Record<string, DownloadInfo> = {
     externalUrl: 'https://www.mediafire.com/file/c79msd2spof3nqt/L310_x64_224JAUsHomeExportAsiaML.exe/file',
     platform: 'driver'
   },
+  'driver-epson-l310-official': {
+    fileName: 'Epson L310 Official Service Driver',
+    fileSize: '2.4 MB',
+    externalUrl: 'https://download3.ebz.epson.net/dsc/f/03/00/13/67/35/0b63dffe1d336a82a4802e211ee3eb54e02d2ba2/L310_x64_224JAUsHomeExportAsiaML.exe',
+    platform: 'driver'
+  },
   'driver-fuji-xerox-v2060': {
     fileName: 'Fuji Xerox DocuCentre-V 2060 PCL 6 Driver',
     fileSize: '13.5 MB',

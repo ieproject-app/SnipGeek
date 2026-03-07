@@ -1,0 +1,59 @@
+---
+translationKey: "firebase-auth-localhost-ip-error"
+title: "Solusi Error Firebase Auth di IP Localhost Jaringan"
+seoTitle: "Cara Mengatasi Error Domain Firebase Auth di IP Localhost"
+description: "Panduan teknis mengatasi pesan error Firebase Auth domain belum didaftarkan saat testing aplikasi lokal menggunakan IP Localhost jaringan (172.16.x.x)."
+heroImage: "/images/_notes/localhost-ip/localhost-ip-error.png"
+imageAlt: "Pesan Error Domain Firebase Console Authentication"
+date: "2026-03-07"
+published: true
+tags: 
+  - Firebase
+  - Authentication
+  - Localhost
+  - Bug Fix
+category: "Firebase"
+---
+
+Pernahkah Anda mencoba mengetes aplikasi web lokal Anda dari perangkat lain di jaringan yang sama, lalu tiba-tiba fitur login rusak? Saya baru saja mengalaminya hari ini. 
+
+Saat mengembangkan dan mengintegrasikan fitur *Admin Injector* untuk tool generator nomor ke Firebase Firestore, aplikasi berjalan sangat lancar ketika dibuka melalui `localhost:9003`. Namun, karena ingin memastikan semuanya responsif, saya mencoba mengakses *environment* lokal tersebut melalui alamat IP jaringan (*local network IP*), yaitu `172.16.0.2:9003`.
+
+Di sinilah masalah muncul. Saat menekan tombol login, layar tiba-tiba menampilkan pesan:
+
+<Callout variant="danger" title="Firebase Console Error">
+Domain ini belum didaftarkan di Firebase Console. Silakan tambahkan domain situs Anda ke: Auth > Settings > Authorized Domains.
+</Callout>
+
+![Screenshot Error Domain Belum Didaftarkan Firebase Auth](/images/_notes/localhost-ip/localhost-ip-error.png)
+
+## Kenapa Ini Terjadi?
+
+Secara *default*, ketika kita membuat *project* baru di Firebase, sistem membaca `localhost` dan `127.0.0.1` sebagai domain yang aman (terotorisasi) untuk *redirect testing* OAuth. Namun, bagi Firebase, alamat IP jaringan seperti `192.168.x.x` atau `172.16.x.x` itu dianggap sebagai **domain eksternal yang sama sekali berbeda**. 
+
+Hal ini murni terkait keamanan. Firebase mengunci domain *redirect* agar penyerang tidak bisa menggunakan kredensial API Anda di website *phishing* yang tidak sah.
+
+## Cara Mengatasinya
+
+Ada dua cara untuk mengatasi masalah ini, tergantung pada seberapa lama dan rumit proses *testing* Anda:
+
+### 1. Tambahkan IP ke Authorized Domains (Rekomendasi untuk Device Testing)
+
+Jika Anda harus mengetes aplikasi menggunakan *smartphone* atau *device* fisik lain, Anda harus meregistrasikan IP tersebut secara manual ke daftar putih Firebase.
+
+<Steps>
+    <Step>Buka dasbor **Firebase Console** Anda.</Step>
+    <Step>Pilih menu **Authentication**, lalu masuk ke tab **Settings**.</Step>
+    <Step>Pilih menu **Authorized domains** di panel sebelah kiri.</Step>
+    <Step>Klik tombol **Add domain**.</Step>
+    <Step>Masukkan alamat IP *localhost* Anda yang bermasalah (contoh: `172.16.0.2`) dan ingat, **tanpa memuat `http://` atau port**. ![Input IP ke Authorized Domains Firebase](/images/_notes/localhost-ip/firebase-auth.webp)</Step>
+    <Step>Tekan tombol Add/Save.</Step>
+</Steps>
+
+Setelah IP tersebut masuk di daftar terotorisasi, semua *device* yang mengakses lewat IP tersebut sudah bisa melakukan login dengan normal.
+
+### 2. Gunakan Nama `localhost` Secara Eksplisit (Paling Praktis)
+
+Jika Anda sebenarnya ngetes dari PC/Laptop developer Anda sendiri namun tidak sadar membuka URL via IP (biasanya terjadi jika kita klik link dari terminal bawaan), kembali saja ke jalan yang lurus. Cukup ubah URL di bar atas *browser* Anda.
+
+Ubah dari `http://172.16.0.2:9003` kembali menjadi murni `http://localhost:9003`. Ini adalah cara paling efisien karena IP jaringan lokal sangat mungkin berubah drastis saat Anda pindah router WiFi ke kafe, sedangkan `localhost` akan selalu diizinkan oleh Firebase di mana pun Anda memprogram.

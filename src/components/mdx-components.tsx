@@ -702,7 +702,7 @@ export const Steps = ({
   const items = React.Children.toArray(children);
 
   return (
-    <div className={cn("my-8 space-y-4", _class, className)} {...props}>
+    <div className={cn("my-10 ml-4 space-y-0", _class, className)} {...props}>
       {items.map((child, index) => {
         if (!React.isValidElement(child)) {
           return child;
@@ -710,6 +710,7 @@ export const Steps = ({
 
         return React.cloneElement(child as React.ReactElement<any>, {
           stepNumber: index + 1,
+          isLast: index === items.length - 1,
         });
       })}
     </div>
@@ -719,6 +720,7 @@ export const Steps = ({
 export const Step = ({
   children,
   stepNumber,
+  isLast,
   class: _class,
   className,
   parentName,
@@ -726,17 +728,34 @@ export const Step = ({
 }: any) => (
   <div
     className={cn(
-      "grid grid-cols-[auto_1fr] gap-4 rounded-2xl border border-primary/10 bg-card/50 p-4 sm:p-5",
+      "relative grid grid-cols-[auto_1fr] gap-x-6 gap-y-0 pb-6",
+      isLast && "pb-0",
       _class,
       className,
     )}
     {...props}
   >
-    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-xs font-black text-primary-foreground shadow-sm">
-      {stepNumber}
+    {/* Vertical line and Number container */}
+    <div className="flex flex-col items-center">
+      {/* Circle Number */}
+      <div className="z-10 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-2 border-primary bg-background text-[11px] font-black text-primary shadow-sm">
+        {stepNumber}
+      </div>
+
+      {/* Connector Line */}
+      <div
+        className={cn(
+          "mt-2 h-full w-0.5 bg-gradient-to-b from-primary/30 via-primary/10 to-transparent",
+          isLast && "opacity-50",
+        )}
+      />
     </div>
-    <div className="min-w-0 text-sm leading-7 text-foreground/80 [&>*:first-child]:mt-0 [&>*:last-child]:mb-0">
-      {children}
+
+    {/* Content Container */}
+    <div className="min-w-0 pt-0.5">
+      <div className="text-[15px] leading-7 text-foreground/80 [&>*:first-child]:mt-0 [&>*:last-child]:mb-0">
+        {children}
+      </div>
     </div>
   </div>
 );
