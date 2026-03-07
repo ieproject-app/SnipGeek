@@ -148,16 +148,6 @@ export default async function AboutPage({
                   <p className="mt-4 text-sm leading-relaxed text-foreground/70">
                     {data.profile.statement}
                   </p>
-
-                  <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2">
-                    {data.profile.stats.map((stat) => (
-                      <MiniStat
-                        key={`${stat.label}-${stat.value}`}
-                        label={stat.label}
-                        value={stat.value}
-                      />
-                    ))}
-                  </div>
                 </div>
               </div>
             </div>
@@ -166,22 +156,36 @@ export default async function AboutPage({
 
         <ScrollReveal direction="up" delay={0.06}>
           <section className="mt-8 mb-16">
-            <div className="max-w-3xl rounded-3xl border border-primary/10 bg-card/45 p-6 shadow-sm backdrop-blur-sm sm:p-7">
-              <div className="mb-3 flex items-center gap-2">
-                <PenLine className="h-4 w-4 text-accent" />
-                <p className="text-[11px] font-black uppercase tracking-widest text-accent">
-                  {dictionary.about.summary}
-                </p>
+            <div className="mx-auto max-w-4xl rounded-[28px] border border-primary/10 bg-gradient-to-br from-card/85 via-card/70 to-background/90 p-6 shadow-sm backdrop-blur-sm sm:p-8">
+              <div className="flex flex-col gap-8 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex-1 sm:pr-8">
+                  <div className="mb-3 flex items-center gap-2">
+                    <PenLine className="h-4 w-4 text-accent" />
+                    <p className="text-[11px] font-black uppercase tracking-[0.22em] text-accent">
+                      {dictionary.about.summary}
+                    </p>
+                  </div>
+                  <p className="text-base leading-relaxed text-foreground/75 sm:text-lg">
+                    {data.summary}
+                  </p>
+                </div>
+
+                <div className="grid w-full grid-cols-2 gap-3 sm:w-auto sm:min-w-[280px]">
+                  {data.profile.stats.map((stat) => (
+                    <MiniStat
+                      key={`${stat.label}-${stat.value}`}
+                      label={stat.label}
+                      value={stat.value}
+                    />
+                  ))}
+                </div>
               </div>
-              <p className="text-base leading-relaxed text-foreground/75 sm:text-lg">
-                {data.summary}
-              </p>
             </div>
           </section>
         </ScrollReveal>
 
-        <section className="mb-16 grid grid-cols-1 gap-6 md:grid-cols-3">
-          <ScrollReveal direction="up" delay={0.05}>
+        <section className="mb-16 grid grid-cols-1 gap-6 md:grid-cols-3 md:items-stretch">
+          <ScrollReveal direction="up" delay={0.05} className="h-full min-h-0">
             <IdentityCard
               icon={Sparkles}
               title={dictionary.about.story}
@@ -189,7 +193,7 @@ export default async function AboutPage({
             />
           </ScrollReveal>
 
-          <ScrollReveal direction="up" delay={0.1}>
+          <ScrollReveal direction="up" delay={0.1} className="h-full min-h-0">
             <IdentityCard
               icon={Laptop}
               title={dictionary.about.workflow}
@@ -197,7 +201,7 @@ export default async function AboutPage({
             />
           </ScrollReveal>
 
-          <ScrollReveal direction="up" delay={0.15}>
+          <ScrollReveal direction="up" delay={0.15} className="h-full min-h-0">
             <IdentityCard
               icon={PenLine}
               title={dictionary.about.philosophy}
@@ -209,19 +213,42 @@ export default async function AboutPage({
         <ScrollReveal direction="up" delay={0.1}>
           <section className="mb-20">
             <SectionHeading title={dictionary.about.story} />
-            <div className="mt-8 rounded-3xl border border-primary/10 bg-card/35 p-6 shadow-sm backdrop-blur-sm sm:p-8">
-              <div className="prose-content text-lg text-foreground/80">
-                <MDXRemote
-                  source={content}
-                  components={mdxComponents}
-                  options={{
-                    mdxOptions: {
-                      remarkPlugins: [remarkGfm],
-                      rehypePlugins: [[rehypeShiki, { theme: "github-dark" }]],
-                    },
-                  }}
-                />
+            <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-[1fr_280px] lg:items-start">
+              <div className="min-w-0">
+                <div className="rounded-[28px] border border-primary/10 bg-card/20 p-6 shadow-sm backdrop-blur-sm sm:p-8">
+                  <div className="prose-content text-lg text-foreground/80 [&>h2:first-child]:mt-0 [&>p:first-child]:mt-0">
+                    <MDXRemote
+                      source={content}
+                      components={mdxComponents}
+                      options={{
+                        mdxOptions: {
+                          remarkPlugins: [remarkGfm],
+                          rehypePlugins: [
+                            [rehypeShiki, { theme: "github-dark" }],
+                          ],
+                        },
+                      }}
+                    />
+                  </div>
+                </div>
               </div>
+
+              <aside className="lg:sticky lg:top-24">
+                <div className="rounded-[24px] border border-primary/10 bg-gradient-to-br from-primary/6 via-background to-accent/6 p-5 shadow-sm">
+                  <p className="text-[11px] font-black uppercase tracking-[0.22em] text-accent">
+                    {data.profile.panelLabel}
+                  </p>
+                  <h3 className="mt-3 font-headline text-lg font-black tracking-tight text-primary">
+                    {data.name}
+                  </h3>
+                  <p className="mt-1 text-sm font-semibold text-muted-foreground">
+                    {data.role}
+                  </p>
+                  <p className="mt-4 text-sm leading-relaxed text-foreground/70">
+                    {data.profile.statement}
+                  </p>
+                </div>
+              </aside>
             </div>
           </section>
         </ScrollReveal>
@@ -254,14 +281,14 @@ export default async function AboutPage({
                         delay={index * 0.08}
                         direction={isLeft ? "left" : "right"}
                       >
-                        <div className="flex flex-col items-center sm:flex-row">
-                          <div className="hidden sm:flex sm:w-1/2 sm:justify-end sm:pr-10">
+                        <div className="flex w-full flex-col sm:flex-row sm:items-center">
+                          <div className="hidden sm:block sm:w-1/2 sm:pr-10">
                             {isLeft && (
                               <ExperienceCard exp={exp} align="right" />
                             )}
                           </div>
 
-                          <div className="absolute top-[30px] left-[20px] z-10 flex -translate-x-1/2 -translate-y-1/2 items-center justify-center sm:top-1/2 sm:left-1/2">
+                          <div className="absolute top-8 left-[20px] z-10 flex -translate-x-1/2 -translate-y-1/2 items-center justify-center sm:top-1/2 sm:left-1/2">
                             <div className="relative">
                               <div className="absolute inset-0 scale-150 rounded-full bg-primary/10 group-hover:bg-primary/20" />
                               <div className="relative flex h-10 w-10 items-center justify-center rounded-full border-2 border-primary/40 bg-background shadow-xl transition-all duration-300 group-hover:scale-110 group-hover:border-primary">
@@ -270,14 +297,14 @@ export default async function AboutPage({
                             </div>
                           </div>
 
-                          <div className="ml-14 flex-1 sm:ml-0 sm:w-1/2 sm:pl-10">
+                          <div className="w-full pl-14 sm:w-1/2 sm:pl-10">
                             {!isLeft && (
-                              <ExperienceCard exp={exp} align="left" />
-                            )}
-                            <div className="sm:hidden">
-                              {isLeft && (
+                              <div className="hidden sm:block">
                                 <ExperienceCard exp={exp} align="left" />
-                              )}
+                              </div>
+                            )}
+                            <div className="block sm:hidden">
+                              <ExperienceCard exp={exp} align="left" />
                             </div>
                           </div>
                         </div>
@@ -290,7 +317,7 @@ export default async function AboutPage({
           </div>
         </section>
 
-        <section className="mb-18">
+        <section className="mb-16">
           <ScrollReveal direction="right">
             <SectionHeading title={dictionary.about.skills} />
           </ScrollReveal>
@@ -448,8 +475,8 @@ function IdentityCard({
   description: string;
 }) {
   return (
-    <Card className="h-full rounded-2xl border-primary/10 bg-card/45 transition-all duration-300 hover:border-primary/20 hover:shadow-md">
-      <CardHeader>
+    <Card className="flex h-full flex-col rounded-2xl border-primary/10 bg-card/45 transition-all duration-300 hover:border-primary/20 hover:shadow-md">
+      <CardHeader className="shrink-0">
         <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-2xl border border-primary/10 bg-primary/10">
           <Icon className="h-5 w-5 text-primary" />
         </div>
@@ -457,7 +484,7 @@ function IdentityCard({
           {title}
         </CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="flex-1 pt-0">
         <p className="text-sm leading-relaxed text-muted-foreground">
           {description}
         </p>

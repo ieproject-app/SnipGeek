@@ -128,9 +128,9 @@ export default async function Page({
   }
 
   const linkPrefix = getLinkPrefix(locale);
-  const headings = extractHeadings(initialNote.content);
-  const wordCount = initialNote.content.trim().split(/\s+/).length;
-  const readingTime = Math.ceil(wordCount / 200);
+  const headings = extractHeadings(initialNote.content || "");
+  const wordCount = (initialNote.content || "").trim().split(/\s+/).length || 0;
+  const readingTime = Math.max(1, Math.ceil(wordCount / 200));
 
   const itemForMeta = {
     slug: initialNote.slug,
@@ -177,7 +177,7 @@ export default async function Page({
             <TableOfContents headings={headings} title={dictionary.post.toc} />
             <div className="text-lg text-foreground/80 prose-content">
               <MDXRemote
-                source={initialNote.content}
+                source={initialNote.content || ""}
                 components={mdxComponents}
                 options={{
                   mdxOptions: {

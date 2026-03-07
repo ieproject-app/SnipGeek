@@ -134,6 +134,7 @@ export type NoteData = {
   frontmatter: NoteFrontmatter;
   content: string;
   locale: string;
+  isFallback?: boolean;
 };
 
 export async function getNoteData(
@@ -145,19 +146,31 @@ export async function getNoteData(
     : i18n.defaultLocale;
   const fullPath = path.join(notesDirectory, targetLocale!, `${slug}.mdx`);
 
-  if (!fs.existsSync(fullPath)) {
+  const fallbackPath = path.join(
+    notesDirectory,
+    i18n.defaultLocale,
+    `${slug}.mdx`,
+  );
+  const resolvedPath = fs.existsSync(fullPath)
+    ? { path: fullPath, locale: targetLocale! }
+    : fs.existsSync(fallbackPath)
+      ? { path: fallbackPath, locale: i18n.defaultLocale }
+      : null;
+
+  if (!resolvedPath) {
     return null;
   }
 
   try {
-    const fileContents = fs.readFileSync(fullPath, "utf8");
+    const fileContents = fs.readFileSync(resolvedPath.path, "utf8");
     const { data, content } = matter(fileContents);
 
     return {
       slug,
       frontmatter: data as NoteFrontmatter,
       content,
-      locale: targetLocale!,
+      locale: resolvedPath.locale,
+      isFallback: resolvedPath.locale !== targetLocale,
     };
   } catch (e) {
     return null;
