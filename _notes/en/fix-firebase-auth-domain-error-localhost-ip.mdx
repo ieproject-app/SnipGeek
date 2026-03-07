@@ -1,0 +1,59 @@
+---
+translationKey: "firebase-auth-localhost-ip-error"
+title: "Fixing Firebase Auth Domain Errors on Localhost IP"
+seoTitle: "How to Fix Firebase Auth Domain Not Authorized Error on Localhost IP"
+description: "A technical guide on fixing the Firebase Localhost Authentication error when testing applications on a local network IP address (e.g., 172.16.x.x)."
+heroImage: "/images/_notes/localhost-ip/localhost-ip-error.png"
+imageAlt: "Firebase Console Authentication Domain Error Message"
+date: "2026-03-07"
+published: true
+tags: 
+  - Firebase
+  - Authentication
+  - Localhost
+  - Bug Fix
+category: "Firebase"
+---
+
+Have you ever tried to test your local web application from another device on the same network, only to find that the login features suddenly broke? I just experienced it today.
+
+While developing and integrating an *Admin Injector* feature for a number generator tool into Firebase Firestore, the app was running flawlessly on `localhost:9003`. However, wanting to ensure everything was properly responsive, I attempted to access this local environment via my local network IP address, specifically `172.16.0.2:9003`.
+
+This is where the trouble started. Upon hitting the login button, the screen threw a rather explicit message:
+
+<Callout variant="danger" title="Firebase Console Error">
+This domain is not authorized for OAuth operations for your Firebase project. Edit the list of authorized domains from the Firebase console.
+</Callout>
+
+![Screenshot resulting from an unauthorized Firebase Auth Domain](/images/_notes/localhost-ip/localhost-ip-error.png)
+
+## Why Does This Happen?
+
+By default, when you construct a new project in Firebase, the system considers `localhost` and `127.0.0.1` as presumed, fully-authorized domains tailored for safe OAuth redirect testing. However, from Firebase's perspective, local network IPs like `192.168.x.x` or `172.16.x.x` are viewed as **entirely separate and external domains**.
+
+This stringent measure is strictly security-bound. Firebase locks down redirect domains so that malicious operators cannot seamlessly plug your API credentials into unauthorized phishing portals.
+
+## How to Resolve It
+
+There are two distinct methods for fixing this issue, depending largely on how extensive your local testing scope needs to be:
+
+### 1. Add the IP to Authorized Domains (Recommended for Cross-Device Testing)
+
+If you absolutely must test the application fluidly on a physical smartphone or secondary device, you must manually log this IP into Firebase's whitelist.
+
+<Steps>
+    <Step>Navigate straight to your **Firebase Console** dashboard.</Step>
+    <Step>Select the **Authentication** tab, then tap on **Settings**.</Step>
+    <Step>Search for the **Authorized domains** panel securely on the left sidebar.</Step>
+    <Step>Click the unmistakable **Add domain** button.</Step>
+    <Step>Enter the precise localhost IP address causing the glitch (e.g., `172.16.0.2`), bearing in mind to enter it **completely bare—without any `http://` prefixes or port numbers**. ![Adding IP to Firebase Authorized Domains](/images/_notes/localhost-ip/firebase-auth.webp)</Step>
+    <Step>Press Add/Save to finalize.</Step>
+</Steps>
+
+Once that IP is neatly registered on your authorized roster, any device linking in through that specific IP will sail through the login authentication process completely unimpeded.
+
+### 2. Explicitly Use the `localhost` Hostname (The Pragmatic Approach)
+
+If you are just casually testing from your primary developer rigorous PC/Laptop and inadvertently launched the URL natively from an open CLI prompt, simply correct your trajectory. All you need to do is modify the URL displayed in your browser's top bar.
+
+Switch strictly from `http://172.16.0.2:9003` back over to standard `http://localhost:9003`. This happens to be the most efficient and scalable methodology because local network IP addresses are highly prone to shift dramatically when you jump router connections (like heading to a local cafe), whereas `localhost` remains a securely authorized Firebase safe haven no matter where your keyboard takes you.
