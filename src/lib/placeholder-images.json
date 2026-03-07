@@ -29,12 +29,6 @@
       "description": "A person typing on a laptop, representing contact via email.",
       "imageUrl": "/images/footer/email.webp",
       "imageHint": "laptop contact"
-    },
-    {
-      "id": "epson-l310-banner",
-      "description": "Epson L310 Printer hero banner with professional presentation.",
-      "imageUrl": "/images/_posts/printer/epson/driver-epson-l310/epson-l310-banner.webp",
-      "imageHint": "epson l310 printer"
     }
   ]
 }
