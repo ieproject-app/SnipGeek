@@ -45,15 +45,18 @@
     "wip": "Halaman ini sedang dalam tahap pembuatan."
   },
   "about": {
-    "title": "Tentang Saya",
-    "description": "Perjalanan saya dari teknisi lapangan hingga pengoptimal digital.",
-    "experience": "Pengalaman Profesional",
-    "skills": "Keahlian Teknis",
+    "title": "Tentang SnipGeek",
+    "description": "Cerita di balik SnipGeek, alasan blog ini dibangun, dan cara saya bekerja di baliknya.",
+    "experience": "Sorotan Pengalaman",
+    "skills": "Kekuatan Inti",
     "education": "Pendidikan",
     "certifications": "Lisensi & Sertifikasi",
-    "downloadResume": "Unduh Resume Lengkap Saya",
-    "getInTouch": "Ayo Terhubung",
-    "summary": "Ringkasan Profesional"
+    "downloadResume": "Unduh Resume Lengkap",
+    "getInTouch": "Mari Terhubung",
+    "summary": "Catatan Founder",
+    "story": "Cerita dan Identitas Blog",
+    "workflow": "Perangkat & Alur Kerja",
+    "philosophy": "Filosofi Menulis"
   },
   "tools": {
     "title": "Alat",

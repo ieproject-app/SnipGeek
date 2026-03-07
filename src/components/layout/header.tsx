@@ -509,8 +509,7 @@ export function Header({
                       {/* Sun — visible in light mode */}
                       <Sun
                         className={cn(
-                          "absolute inset-0 h-5 w-5 transition-all duration-500",
-                          "ease-[cubic-bezier(0.34,1.56,0.64,1)] origin-center",
+                          "absolute inset-0 h-5 w-5 origin-center transition-all duration-500 [transition-timing-function:cubic-bezier(0.34,1.56,0.64,1)]",
                           mounted && currentMode === "light"
                             ? "opacity-100 scale-100 rotate-0"
                             : "opacity-0 scale-0 rotate-180",
@@ -519,8 +518,7 @@ export function Header({
                       {/* Moon — visible in dark mode */}
                       <Moon
                         className={cn(
-                          "absolute inset-0 h-5 w-5 transition-all duration-500",
-                          "ease-[cubic-bezier(0.34,1.56,0.64,1)] origin-center",
+                          "absolute inset-0 h-5 w-5 origin-center transition-all duration-500 [transition-timing-function:cubic-bezier(0.34,1.56,0.64,1)]",
                           mounted && currentMode === "dark"
                             ? "opacity-100 scale-100 rotate-0"
                             : "opacity-0 scale-0 -rotate-180",
@@ -529,8 +527,7 @@ export function Header({
                       {/* SunMoon — visible in system mode */}
                       <SunMoon
                         className={cn(
-                          "absolute inset-0 h-5 w-5 transition-all duration-500",
-                          "ease-[cubic-bezier(0.34,1.56,0.64,1)] origin-center",
+                          "absolute inset-0 h-5 w-5 origin-center transition-all duration-500 [transition-timing-function:cubic-bezier(0.34,1.56,0.64,1)]",
                           mounted && currentMode === "system"
                             ? "opacity-100 scale-100 rotate-0"
                             : "opacity-0 scale-0 rotate-180",
@@ -563,7 +560,7 @@ export function Header({
         {/* BAR OVERLAYS (Only for Search and Reading List) */}
         <div
           className={cn(
-            "absolute inset-0 w-full h-16 flex items-center transition-all duration-[280ms] [transition-timing-function:cubic-bezier(0.34,1.56,0.64,1)] z-10 px-6 bg-background",
+            "absolute inset-0 z-10 flex h-16 w-full items-center bg-background px-6 transition-all [transition-duration:280ms] [transition-timing-function:cubic-bezier(0.34,1.56,0.64,1)]",
             isSearchOpen
               ? "opacity-100 translate-y-0"
               : "opacity-0 -translate-y-full pointer-events-none",
@@ -592,7 +589,7 @@ export function Header({
 
         <div
           className={cn(
-            "absolute inset-0 w-full h-16 flex items-center justify-between transition-all duration-[280ms] [transition-timing-function:cubic-bezier(0.34,1.56,0.64,1)] z-10 px-6 bg-background",
+            "absolute inset-0 z-10 flex h-16 w-full items-center justify-between bg-background px-6 transition-all [transition-duration:280ms] [transition-timing-function:cubic-bezier(0.34,1.56,0.64,1)]",
             isReadingListOpen
               ? "opacity-100 translate-y-0"
               : "opacity-0 -translate-y-full pointer-events-none",
@@ -660,7 +657,7 @@ export function Header({
                     <div
                       key={`${item.type}-${item.slug}`}
                       className={cn(
-                        "group flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-[320ms] hover:bg-muted/50",
+                        "group flex items-center gap-3 rounded-xl px-3 py-2.5 transition-all [transition-duration:320ms] hover:bg-muted/50",
                         removingSlug === item.slug &&
                           "opacity-0 -translate-x-2 scale-[0.96] ease-in",
                       )}
@@ -912,7 +909,7 @@ export function Header({
       {/* ── Notification Toast Pill (Floating Center) ── */}
       <div
         className={cn(
-          "fixed z-[100] top-3 left-1/2 -translate-x-1/2 pointer-events-none transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)]",
+          "fixed top-3 left-1/2 z-[100] -translate-x-1/2 pointer-events-none transition-all duration-500 [transition-timing-function:cubic-bezier(0.34,1.56,0.64,1)]",
           mounted && message
             ? "opacity-100 translate-y-0 scale-100"
             : "opacity-0 -translate-y-8 scale-95",

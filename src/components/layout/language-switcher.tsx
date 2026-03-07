@@ -92,7 +92,7 @@ export function LanguageSwitcher({
         <>
           <div
             className={cn(
-              "absolute h-6 w-9 bg-accent/90 rounded-full transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)]",
+              "absolute h-6 w-9 bg-accent/90 rounded-full transition-all duration-500 [transition-timing-function:cubic-bezier(0.34,1.56,0.64,1)]",
               currentLocale === "en"
                 ? "translate-x-0"
                 : "translate-x-[calc(100%+2px)]",

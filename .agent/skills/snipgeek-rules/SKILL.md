@@ -1,11 +1,19 @@
 ---
 name: snipgeek_rules
-description: Mandatory rules for the SnipGeek project — MDX content standards, custom features, development rules, and UI/design system to prevent build errors, crashes, and visual inconsistencies.
+description: Mandatory rules for the SnipGeek project — MDX content standards, content placement, static page workflow, development rules, and UI/design system to prevent build errors, crashes, and structural inconsistency.
 ---
 
 # SnipGeek Project Rules
 
 These are permanent instructions that MUST be followed at all times when working on the SnipGeek project. All rules are based on real experience and agreed-upon architectural decisions.
+
+## Canonical Documentation First
+Before making structural decisions, always align with the canonical project documentation in:
+
+- `docs/project-structure.md`
+- `docs/ai-contributor-guide.md`
+
+If this skill file and those docs ever diverge, treat the docs as the canonical source of truth for repository structure, content placement, and static page workflow.
 
 ---
 
@@ -27,6 +35,10 @@ published: true                        # REQUIRED: Must be true to appear in lis
 2. **Add Entry**: If no suitable image exists, create a new entry in `placeholder-images.json` first.
 3. **Use Standard Paths**: For both `heroImage` and article images (`![alt](/images/...)`), always use the standard `/images/` path relative to `public/`.
 4. **Create MDX**: Link the `heroImage` using the ID and ensure `translationKey` is descriptive English kebab-case.
+5. **Place Content in the Correct Collection**:
+   - Blog posts go in `_posts/<locale>/`
+   - Notes go in `_notes/<locale>/`
+   - Static text-heavy pages go in `_pages/<slug>/<locale>.mdx`
 
 ### Custom Components — NEVER use raw HTML for:
 
@@ -56,6 +68,7 @@ AI must recognize these built-in features of SnipGeek:
 - Whenever content or components are changed in one language, **ALWAYS check** if the changes need to be applied to the other language as well
 - English (`en`) is the **default locale** — no prefix in URLs (e.g., `/blog/my-post`)
 - Indonesian (`id`) uses `/id/` prefix (e.g., `/id/blog/my-post`)
+- For public static pages, prefer keeping both locales as parallel MDX files under `_pages/<slug>/`
 
 ### 🔴 hreflang — MANDATORY on ALL Public Pages
 Every public-facing `page.tsx` **MUST** export `generateMetadata` with `alternates.languages` for SEO. This tells Google which language version belongs to which URL.
@@ -248,7 +261,67 @@ Use this everywhere a hero image needs to be displayed — **never** write the i
 
 ---
 
-## 3. Communication & UI Modification Protocol
+## 3. Content Placement & Static Page Workflow
+
+### Canonical Structure Rules
+- `src/` is for runtime application code
+- `docs/` is for internal project documentation
+- `_posts/`, `_notes/`, and `_pages/` are public site content sources
+- Do **NOT** place public site content in `docs/`
+- Do **NOT** place temporary logs, downloaded JSON, scratch exports, or debug artifacts in `src/`
+
+### Static Page Rule
+If a page is mostly text-heavy, informational, legal, or editorial, its content should live in `_pages/`, not be hardcoded entirely inside a route file.
+
+Examples include:
+- `privacy`
+- `terms`
+- `disclaimer`
+- `contact`
+- `about` body content
+
+### Static Page Pattern
+Use the **content source + route shell** model:
+
+- Content source:
+  - `_pages/<slug>/en.mdx`
+  - `_pages/<slug>/id.mdx`
+
+- Route shell:
+  - `src/app/[locale]/<slug>/page.tsx`
+
+### Route Shell Responsibilities
+A static page route file may:
+- load MDX content
+- load frontmatter
+- build metadata
+- apply a shared template/layout
+- render the page consistently
+
+A static page route file should **NOT**:
+- store the full long-form legal/informational body if that body belongs in `_pages`
+- duplicate content that should be maintained in MDX
+- invent a one-off structure when a shared static page template already exists
+
+### Hybrid Page Rule
+The `about` page is intentionally hybrid:
+- structured/profile UI may live in the route component
+- editorial narrative content should stay in `_pages/about/<locale>.mdx`
+
+Do not flatten `about` into one giant file unless explicitly instructed.
+
+### Static Page Frontmatter
+For `_pages/<slug>/<locale>.mdx`, prefer these fields when relevant:
+- `title`
+- `seoTitle`
+- `description`
+- `lastUpdated`
+- `badgeLabel`
+- `icon`
+
+Do not invent arbitrary frontmatter unless there is a clear implementation need.
+
+## 4. Communication & UI Modification Protocol
 
 To ensure 100% accuracy when modifying the UI, follow this protocol:
 

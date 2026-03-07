@@ -1,9 +1,16 @@
-import { i18n } from "@/i18n-config";
-import type { Locale } from "@/i18n-config";
 import type { Metadata } from "next";
-import { getDictionary } from "@/lib/get-dictionary";
-import { Button } from "@/components/ui/button";
-import { Mail } from "lucide-react";
+import type { Locale } from "@/i18n-config";
+import {
+  generateStaticPageMetadata,
+  getStaticPageData,
+  getStaticPageDescription,
+  getStaticPageLastUpdated,
+  getStaticPageTitle,
+} from "@/lib/static-pages";
+import {
+  StaticPageTemplate,
+  resolveStaticPageIcon,
+} from "@/components/layout/static-page-template";
 
 export async function generateMetadata({
   params,
@@ -11,66 +18,53 @@ export async function generateMetadata({
   params: Promise<{ locale: Locale }>;
 }): Promise<Metadata> {
   const { locale } = await params;
-  const dictionary = await getDictionary(locale);
-  const currentPrefix = locale === i18n.defaultLocale ? "" : `/${locale}`;
-  const canonicalPath = `${currentPrefix}/contact`;
 
-  const languages: Record<string, string> = {};
-  i18n.locales.forEach((loc) => {
-    const prefix = loc === i18n.defaultLocale ? "" : `/${loc}`;
-    languages[loc] = `${prefix}/contact`;
+  return generateStaticPageMetadata({
+    slug: "contact",
+    locale,
+    fallbackTitle: locale === "id" ? "Kontak" : "Contact",
+    fallbackDescription:
+      locale === "id"
+        ? "Hubungi SnipGeek untuk pertanyaan, masukan, kolaborasi, atau hal lain terkait konten."
+        : "Get in touch with SnipGeek for questions, feedback, collaboration, or content-related inquiries.",
   });
-
-  return {
-    title: dictionary.contact.title,
-    description: dictionary.contact.description,
-    alternates: {
-      canonical: canonicalPath,
-      languages: {
-        ...languages,
-        "x-default": languages[i18n.defaultLocale] || canonicalPath,
-      },
-    },
-  };
 }
 
 export async function generateStaticParams() {
-  return i18n.locales.map((locale) => ({ locale }));
+  return [{ locale: "en" }, { locale: "id" }];
 }
 
-export default async function Page({
+export default async function ContactPage({
   params,
 }: {
   params: Promise<{ locale: Locale }>;
 }) {
   const { locale } = await params;
-  const dictionary = await getDictionary(locale);
-  const pageContent = dictionary.contact;
-  const email = "iwan.efndi@gmail.com";
+  const { frontmatter, content } = await getStaticPageData("contact", locale);
+
+  const fallbackTitle = locale === "id" ? "Kontak" : "Contact";
+
+  const title = getStaticPageTitle(frontmatter, fallbackTitle) || fallbackTitle;
+  const description = getStaticPageDescription(frontmatter);
+  const lastUpdated = getStaticPageLastUpdated(frontmatter);
 
   return (
-    <div className="w-full">
-      <main className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-16">
-        <header className="mb-12 text-center">
-          <h1 className="font-headline text-display-sm font-extrabold tracking-tighter text-primary mb-3">
-            {pageContent.title}
-          </h1>
-          <p className="text-muted-foreground max-w-xl mx-auto">
-            {pageContent.description}
-          </p>
-        </header>
-        <div className="text-center bg-card border rounded-lg p-8 sm:p-12">
-          <p className="text-lg text-muted-foreground mb-6">
-            {pageContent.intro}
-          </p>
-          <Button asChild size="lg">
-            <a href={`mailto:${email}`}>
-              <Mail className="mr-2 h-5 w-5" />
-              {email}
-            </a>
-          </Button>
-        </div>
-      </main>
-    </div>
+    <StaticPageTemplate
+      title={title}
+      description={description}
+      lastUpdated={lastUpdated}
+      content={content}
+      badgeLabel={
+        frontmatter.badgeLabel ||
+        (locale === "id" ? "Kontak Resmi" : "Official Contact")
+      }
+      icon={resolveStaticPageIcon(frontmatter.icon)}
+      maxWidthClassName="max-w-3xl"
+      footerNote={
+        locale === "id"
+          ? "Untuk pertanyaan terkait halaman tertentu, sertakan tautan agar kami bisa meninjaunya lebih cepat."
+          : "If your message is about a specific page, include the link so we can review it more quickly."
+      }
+    />
   );
 }

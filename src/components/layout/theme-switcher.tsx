@@ -51,7 +51,7 @@ export function ThemeSwitcher({ dictionary }: { dictionary: Dictionary }) {
           <div className="relative h-5 w-5">
             <Sun
               className={cn(
-                "absolute inset-0 h-5 w-5 transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] origin-center",
+                "absolute inset-0 h-5 w-5 origin-center transition-all duration-500 [transition-timing-function:cubic-bezier(0.34,1.56,0.64,1)]",
                 showSun
                   ? "opacity-100 scale-100 rotate-0"
                   : "opacity-0 scale-0 rotate-180",
@@ -59,7 +59,7 @@ export function ThemeSwitcher({ dictionary }: { dictionary: Dictionary }) {
             />
             <Moon
               className={cn(
-                "absolute inset-0 h-5 w-5 transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] origin-center",
+                "absolute inset-0 h-5 w-5 origin-center transition-all duration-500 [transition-timing-function:cubic-bezier(0.34,1.56,0.64,1)]",
                 showMoon
                   ? "opacity-100 scale-100 rotate-0"
                   : "opacity-0 scale-0 -rotate-180",
@@ -67,7 +67,7 @@ export function ThemeSwitcher({ dictionary }: { dictionary: Dictionary }) {
             />
             <SunMoon
               className={cn(
-                "absolute inset-0 h-5 w-5 transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] origin-center",
+                "absolute inset-0 h-5 w-5 origin-center transition-all duration-500 [transition-timing-function:cubic-bezier(0.34,1.56,0.64,1)]",
                 showMonitor
                   ? "opacity-100 scale-100 rotate-0"
                   : "opacity-0 scale-0 rotate-180",

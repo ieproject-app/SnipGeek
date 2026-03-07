@@ -45,15 +45,18 @@
     "wip": "This page is under construction."
   },
   "about": {
-    "title": "About Me",
-    "description": "My journey from field technician to digital optimizer.",
-    "experience": "Professional Experience",
-    "skills": "Technical Expertise",
+    "title": "About Iwan & SnipGeek",
+    "description": "The story behind SnipGeek, why it exists, and the practical mindset behind the work.",
+    "experience": "Experience Highlights",
+    "skills": "Core Strengths",
     "education": "Education",
-    "certifications": "Licenses & Certs",
-    "downloadResume": "Download My Full Resume",
+    "certifications": "Licenses & Certifications",
+    "downloadResume": "Download Full Resume",
     "getInTouch": "Let's Connect",
-    "summary": "Professional Summary"
+    "summary": "Signature Summary",
+    "story": "About SnipGeek",
+    "workflow": "Device & Workflow",
+    "philosophy": "Writing Philosophy"
   },
   "tools": {
     "title": "Tools",
