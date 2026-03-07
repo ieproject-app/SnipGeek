@@ -19,6 +19,7 @@ import { PostMeta } from "@/components/blog/post-meta";
 import { ShareButtons } from "@/components/blog/share-buttons";
 import { RelatedPosts } from "@/components/blog/related-posts";
 import { TableOfContents } from "@/components/blog/table-of-contents";
+import { ArticleTopics } from "@/components/blog/article-topics";
 import { extractHeadings } from "@/lib/mdx-utils";
 import { Breadcrumbs } from "@/components/layout/breadcrumbs";
 import { resolveHeroImage, getLinkPrefix } from "@/lib/utils";
@@ -222,7 +223,11 @@ export default async function Page({
           </header>
 
           <div className="max-w-3xl mx-auto">
-            <TableOfContents headings={headings} title={dictionary.post.toc} />
+            <TableOfContents
+              headings={headings}
+              title={dictionary.post.toc}
+              locale={locale}
+            />
 
             <div className="text-lg text-foreground/80 prose-content">
               <MDXRemote
@@ -237,21 +242,21 @@ export default async function Page({
               />
             </div>
 
-            {initialPost.frontmatter.tags &&
-              initialPost.frontmatter.tags.length > 0 && (
-                <div className="mt-12 flex flex-wrap justify-center gap-3">
-                  {initialPost.frontmatter.tags.map((tag) => (
-                    <Link
-                      key={tag}
-                      href={`${linkPrefix}/tags/${tag.toLowerCase()}`}
-                    >
-                      <span className="text-sm font-bold text-accent hover:text-primary transition-all duration-300">
-                        #{tag}
-                      </span>
-                    </Link>
-                  ))}
-                </div>
-              )}
+            <ArticleTopics
+              tags={initialPost.frontmatter.tags || []}
+              linkPrefix={linkPrefix}
+              title={
+                locale === "id"
+                  ? "Topik dalam artikel"
+                  : "Topics in this article"
+              }
+              description={
+                locale === "id"
+                  ? "Pilih topik untuk menemukan artikel lain dengan bahasan yang serupa."
+                  : "Explore related topics and continue reading similar content."
+              }
+              className="mt-14 bg-muted/20"
+            />
 
             <div className="mt-16 flex flex-col gap-4 text-center border-t pt-12">
               <h3 className="text-lg font-semibold tracking-tight text-primary">
