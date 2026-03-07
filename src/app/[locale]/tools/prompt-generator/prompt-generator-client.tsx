@@ -265,6 +265,7 @@ export function PromptGeneratorClient({
   const [showImages, setShowImages] = useState(true);
   const [showDownloads, setShowDownloads] = useState(false);
   const [showGrids, setShowGrids] = useState(false);
+  const [useMdxRules, setUseMdxRules] = useState(true);
   const [isIdOnly, setIsIdOnly] = useState(false);
 
   // ── Status flags ──
@@ -328,8 +329,9 @@ export function PromptGeneratorClient({
         setShowImages(p.showImages !== undefined ? !!p.showImages : true);
         setShowDownloads(!!p.showDownloads);
         setShowGrids(!!p.showGrids);
+        setUseMdxRules(p.useMdxRules !== undefined ? !!p.useMdxRules : true);
         setIsIdOnly(!!p.isIdOnly);
-      } catch (_) {}
+      } catch (_) { }
     }
   }, []);
 
@@ -337,9 +339,9 @@ export function PromptGeneratorClient({
     if (!mounted) return;
     localStorage.setItem(
       "snipgeek-prompt-features",
-      JSON.stringify({ showImages, showDownloads, showGrids, isIdOnly }),
+      JSON.stringify({ showImages, showDownloads, showGrids, useMdxRules, isIdOnly }),
     );
-  }, [showImages, showDownloads, showGrids, isIdOnly, mounted]);
+  }, [showImages, showDownloads, showGrids, useMdxRules, isIdOnly, mounted]);
 
   // ── Build prompt ──
   useEffect(() => {
@@ -434,6 +436,24 @@ export function PromptGeneratorClient({
         });
     }
 
+    if (useMdxRules) {
+      prompt += `\n**AVAILABLE CUSTOM MDX COMPONENTS:**\n`;
+      prompt += `Use these React components natively instead of standard markdown when the context perfectly fits. DO NOT force them into every paragraph; use them naturally to enhance the article's readability.\n`;
+      prompt += `\n1. Alerts/Callouts:\n`;
+      prompt += `   Usage: For tips, warnings, or important developer notes.\n`;
+      prompt += `   Syntax: <Callout variant="info|tip|warning|danger" title="Custom Heading">Your message here</Callout>\n`;
+      prompt += `\n2. Numbered Tutorial Steps:\n`;
+      prompt += `   Usage: When explaining a sequential process or step-by-step tutorial.\n`;
+      prompt += `   Syntax:\n`;
+      prompt += `   <Steps>\n`;
+      prompt += `     <Step>First do this...</Step>\n`;
+      prompt += `     <Step>Then do this...</Step>\n`;
+      prompt += `   </Steps>\n`;
+      prompt += `\n3. Keyboard Shortcuts:\n`;
+      prompt += `   Usage: When mentioning hotkeys or key bindings.\n`;
+      prompt += `   Syntax: <kbd>Ctrl</kbd> + <kbd>C</kbd>\n`;
+    }
+
     if (isModify) {
       prompt += `---\n\n**${dictionary.originalContentLabel}:**\n\n${originalContent || "[PASTE CONTENT]"}\n\n**${dictionary.modInstructionsLabel}:**\n\n${modInstructions || "[INSTRUCTIONS]"}`;
     } else {
@@ -458,6 +478,7 @@ export function PromptGeneratorClient({
     imageGridMappings,
     showDownloads,
     showGrids,
+    useMdxRules,
     showImages,
     selectedSlug,
     categoryHint,
@@ -684,6 +705,13 @@ export function PromptGeneratorClient({
                 icon={Hash}
                 label="ID-Only"
                 activeClass="bg-rose-500/10 text-rose-600 border-rose-500/20 dark:text-rose-400"
+              />
+              <FeaturePill
+                active={useMdxRules}
+                onClick={() => setUseMdxRules(!useMdxRules)}
+                icon={Sparkles}
+                label="MDX Rules"
+                activeClass="bg-amber-500/10 text-amber-600 border-amber-500/20 dark:text-amber-400"
               />
             </div>
           </Card>
