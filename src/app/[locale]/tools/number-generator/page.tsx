@@ -1,7 +1,6 @@
 
 import { Metadata } from 'next';
 import { NomorGeneratorClient } from './components/NomorGeneratorClient';
-import { BackToTop } from '@/components/layout/back-to-top';
 import { getDictionary } from '@/lib/get-dictionary';
 import { Locale } from '@/i18n-config';
 
@@ -28,19 +27,18 @@ export async function generateMetadata({
 }
 
 export default async function NomorGeneratorPage({
-    params,
-  }: {
-    params: Promise<{ locale: Locale }>
-  }) {
-    const { locale } = await params;
-    const dictionary = await getDictionary(locale);
+  params,
+}: {
+  params: Promise<{ locale: Locale }>
+}) {
+  const { locale } = await params;
+  const dictionary = await getDictionary(locale);
 
-    return (
-      <div className="w-full">
-        <main className="mx-auto max-w-4xl px-4 pt-10 pb-16 sm:px-6">
-            <NomorGeneratorClient dictionary={dictionary} />
-        </main>
-        <BackToTop dictionary={dictionary} />
-      </div>
-    );
+  return (
+    <div className="w-full">
+      <main className="mx-auto max-w-4xl px-4 pt-10 pb-16 sm:px-6">
+        <NomorGeneratorClient dictionary={dictionary} />
+      </main>
+    </div>
+  );
 }

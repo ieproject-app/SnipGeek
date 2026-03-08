@@ -16,7 +16,6 @@ import type { Metadata } from "next";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ReadingListProvider } from "@/hooks/use-reading-list";
 import { NotificationProvider } from "@/hooks/use-notification";
-import { BackToTop } from "@/components/layout/back-to-top";
 import { getDictionary } from "@/lib/get-dictionary";
 import { DraftList } from "@/components/layout/draft-list";
 import {
@@ -217,7 +216,6 @@ export default async function LocaleLayout({
                   dictionary={dictionary}
                   translationsMap={translationsMap}
                 />
-                <BackToTop dictionary={dictionary} />
                 <DraftList
                   draftPosts={draftPosts}
                   draftNotes={draftNotes}

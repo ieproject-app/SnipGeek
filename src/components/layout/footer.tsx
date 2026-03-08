@@ -208,10 +208,17 @@ export function Footer({
                     </Link>
                   ))}
                 </nav>
-                <div className="flex flex-col items-center gap-2">
+                <div className="flex flex-row items-center gap-2">
                   <small className="font-extrabold tracking-widest text-[10px] uppercase text-primary/30 hover:text-primary transition-colors duration-300">
                     &copy; {new Date().getFullYear()} SnipGeek. All Rights Reserved.
                   </small>
+                  <a
+                    href="#"
+                    className="text-[10px] font-black uppercase tracking-widest text-primary/30 hover:text-primary transition-colors duration-300"
+                    aria-label="Back to top"
+                  >
+                    Back to Top
+                  </a>
                 </div>
               </div>
             </div>

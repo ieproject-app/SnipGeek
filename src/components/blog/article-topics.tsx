@@ -67,8 +67,8 @@ export function ArticleTopics({
               key={tag}
               href={`${linkPrefix}/tags/${encodeURIComponent(tag.toLowerCase())}`}
               className={cn(
-                "group inline-flex items-center gap-2 rounded-full border px-3 py-1.5",
-                "text-xs font-semibold uppercase tracking-wider transition-all duration-200",
+                "group inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1",
+                "text-[10px] font-bold uppercase tracking-wider transition-all duration-200",
                 "hover:-translate-y-0.5 hover:shadow-sm",
                 style.bg,
                 style.text,
@@ -77,7 +77,7 @@ export function ArticleTopics({
             >
               <span
                 className={cn(
-                  "inline-flex h-1.5 w-1.5 rounded-full transition-colors duration-200",
+                  "inline-flex h-1 w-1 rounded-full transition-colors duration-200",
                   style.dot,
                 )}
               />
