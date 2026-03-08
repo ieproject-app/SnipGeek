@@ -196,55 +196,44 @@ export const DownloadButton = ({ id }: { id: string }) => {
     ? (platformLabelMap[linkData.platform] ?? "Download")
     : "Download";
 
-  const platformAccentClass =
-    linkData.platform === "windows"
-      ? "text-blue-500 border-blue-500/30 bg-blue-500/10"
-      : linkData.platform === "gdrive"
-        ? "text-emerald-500 border-emerald-500/30 bg-emerald-500/10"
-        : linkData.platform === "github"
-          ? "text-slate-500 dark:text-slate-300 border-slate-500/30 bg-slate-500/10"
-          : linkData.platform === "font"
-            ? "text-purple-500 border-purple-500/30 bg-purple-500/10"
-            : linkData.platform === "driver"
-              ? "text-orange-500 border-orange-500/30 bg-orange-500/10"
-              : linkData.platform === "doc"
-                ? "text-sky-500 border-sky-500/30 bg-sky-500/10"
-                : "text-indigo-500 border-indigo-500/30 bg-indigo-500/10";
-
   return (
-    <span className="block my-7">
-      <span className="group block rounded-2xl border border-border/60 bg-card/60 p-4 sm:p-5 shadow-sm transition-all duration-300 hover:shadow-lg hover:border-primary/30">
-        <span className="mb-3 flex flex-wrap items-center gap-2">
-          <span
-            className={cn(
-              "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[10px] font-black uppercase tracking-wider",
-              platformAccentClass,
-            )}
-          >
-            {getPlatformIcon(linkData.platform, "h-3.5 w-3.5")}
-            {platformLabel}
+    <span className="block my-6 text-left">
+      <span className="inline-flex max-w-full flex-wrap items-center gap-3 rounded-xl border border-border/60 bg-card/50 px-3 py-2.5 align-top shadow-sm transition-colors duration-200 hover:border-primary/20 hover:bg-card/70">
+        <span className="flex min-w-0 items-start gap-3">
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-border/60 bg-muted/40 text-muted-foreground">
+            {getPlatformIcon(linkData.platform, "h-4.5 w-4.5")}
           </span>
-          {linkData.fileSize && (
-            <span className="inline-flex items-center rounded-full border border-border/60 bg-muted/40 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-muted-foreground">
-              Size: {linkData.fileSize}
-            </span>
-          )}
-        </span>
 
-        <span className="mb-4 block text-sm sm:text-base font-semibold leading-snug text-foreground">
-          {linkData.fileName}
+          <span className="min-w-0">
+            <span className="block text-sm font-semibold leading-snug text-foreground sm:text-[15px]">
+              {linkData.fileName}
+            </span>
+
+            <span className="mt-1 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
+              <span className="inline-flex items-center gap-1.5 font-medium">
+                {getPlatformIcon(linkData.platform, "h-3.5 w-3.5")}
+                {platformLabel}
+              </span>
+              {linkData.fileSize && (
+                <>
+                  <span className="opacity-40">•</span>
+                  <span>{linkData.fileSize}</span>
+                </>
+              )}
+            </span>
+          </span>
         </span>
 
         <Link
           href={linkHref}
           rel="noopener nofollow"
           className={cn(
-            buttonVariants({ size: "lg" }),
-            "w-full justify-center font-black uppercase tracking-wide text-[11px] h-11",
+            buttonVariants({ variant: "outline", size: "sm" }),
+            "h-8 shrink-0 rounded-md border-border/60 px-3 text-xs font-semibold shadow-none",
           )}
         >
-          <Download className="mr-2 h-4 w-4" />
-          Download Now
+          <Download className="h-3.5 w-3.5" />
+          Download
         </Link>
       </span>
     </span>

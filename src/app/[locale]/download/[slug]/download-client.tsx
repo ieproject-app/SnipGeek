@@ -12,7 +12,6 @@ import {
   Settings,
   FileText,
   ShieldCheck,
-  ExternalLink,
 } from "lucide-react";
 import { WindowsStoreLogo } from "@/components/icons/windows-store-logo";
 import type { Dictionary } from "@/lib/get-dictionary";
@@ -233,18 +232,17 @@ export function DownloadClient({
               </div>
             </div>
 
-            <div className="mx-auto flex w-full max-w-xl flex-col items-center gap-3">
+            <div className="mx-auto flex w-full max-w-xl flex-col items-start gap-2">
               <Button
                 onClick={handleDownloadClick}
-                size="lg"
-                className="group h-12 w-full text-sm font-bold uppercase tracking-wide"
+                size="sm"
+                className="h-9 rounded-md px-4 text-xs font-semibold shadow-none"
               >
-                <Download className="mr-2 h-4 w-4 transition-transform group-hover:translate-y-0.5" />
+                <Download className="h-3.5 w-3.5" />
                 {dictionary.continueButton}
-                <ExternalLink className="ml-2 h-4 w-4 opacity-80" />
               </Button>
 
-              <p className="text-center text-xs text-muted-foreground">
+              <p className="text-left text-xs text-muted-foreground">
                 {dictionary.redirecting.replace(
                   "{countdown}",
                   countdown.toString(),
