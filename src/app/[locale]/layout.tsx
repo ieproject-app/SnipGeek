@@ -78,10 +78,18 @@ export const metadata: Metadata = {
   creator: "Iwan Efendi",
   publisher: "SnipGeek",
   icons: {
-    icon: "/logo.svg",
-    shortcut: "/logo.svg",
-    apple: "/logo.svg",
+    icon: [
+      {
+        url: "/images/logo/favicon-96x96.png",
+        sizes: "96x96",
+        type: "image/png",
+      },
+      { url: "/images/logo/favicon.svg", type: "image/svg+xml" },
+    ],
+    shortcut: "/images/logo/favicon.ico",
+    apple: "/images/logo/apple-touch-icon.png",
   },
+  manifest: "/images/logo/site.webmanifest",
   alternates: {
     canonical: "/",
     languages: {
