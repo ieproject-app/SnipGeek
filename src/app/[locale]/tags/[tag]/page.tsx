@@ -28,9 +28,42 @@ export async function generateMetadata({
     languages[loc] = `${prefix}/tags/${tag}`;
   });
 
+  const allPosts = await getSortedPostsData(locale);
+  const postsCount = allPosts.filter((p) =>
+    p.frontmatter.tags?.some((t) => t.toLowerCase() === decodedTag.toLowerCase()),
+  ).length;
+
+  const notes = await getRawNotes(locale);
+  const notesCount = notes.filter((n) =>
+    n.frontmatter.tags?.some((t) => t.toLowerCase() === decodedTag.toLowerCase()),
+  ).length;
+
+  const totalItems = postsCount + notesCount;
+  const highValueTags = [
+    "windows 11",
+    "epson",
+    "printer",
+    "hardware",
+    "ram",
+    "tutorial",
+    "linux",
+    "sap",
+    "telegram",
+    "android",
+    "firebase",
+  ];
+  const isHighValue = highValueTags.includes(decodedTag.toLowerCase());
+
+  // Index if it has 3+ items OR is a high-value category
+  const shouldIndex = totalItems >= 3 || isHighValue;
+
   return {
     title: dictionary.tags.title.replace("{tag}", decodedTag),
     description: dictionary.tags.description.replace("{tag}", decodedTag),
+    robots: {
+      index: shouldIndex,
+      follow: true,
+    },
     alternates: {
       canonical: canonicalPath,
       languages: {

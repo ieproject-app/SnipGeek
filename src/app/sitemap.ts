@@ -69,5 +69,52 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }),
   );
 
-  return [...staticEntries, ...blogEntries.flat(), ...noteEntries.flat()];
+  // 4. Tags (Selective indexing)
+  const highValueTags = [
+    "windows 11",
+    "epson",
+    "printer",
+    "hardware",
+    "ram",
+    "tutorial",
+    "linux",
+    "sap",
+    "telegram",
+    "android",
+    "firebase",
+  ];
+
+  const tagEntries = await Promise.all(
+    i18n.locales.map(async (locale) => {
+      const posts = await getSortedPostsData(locale);
+      const notes = await getSortedNotesData(locale);
+      const allItems = [...posts, ...notes];
+
+      const tagCounts: Record<string, number> = {};
+      allItems.forEach((item) => {
+        item.frontmatter.tags?.forEach((tag: string) => {
+          const lowerTag = tag.toLowerCase();
+          tagCounts[lowerTag] = (tagCounts[lowerTag] || 0) + 1;
+        });
+      });
+
+      const localePrefix = locale === i18n.defaultLocale ? "" : `/${locale}`;
+
+      return Object.entries(tagCounts)
+        .filter(([tag, count]) => count >= 3 || highValueTags.includes(tag))
+        .map(([tag]) => ({
+          url: `${DOMAIN}${localePrefix}/tags/${encodeURIComponent(tag)}`,
+          lastModified: new Date(),
+          changeFrequency: "weekly" as const,
+          priority: 0.4,
+        }));
+    }),
+  );
+
+  return [
+    ...staticEntries,
+    ...blogEntries.flat(),
+    ...noteEntries.flat(),
+    ...tagEntries.flat(),
+  ];
 }

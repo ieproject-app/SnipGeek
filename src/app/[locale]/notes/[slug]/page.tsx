@@ -150,6 +150,22 @@ export default async function Page({
     .filter((n) => n.slug !== slug)
     .slice(0, 10);
 
+  const heroSourceOg = resolveHeroImage(
+    initialNote.frontmatter.heroImage,
+    undefined,
+    initialNote.frontmatter.title,
+  );
+  const ogImageUrl = heroSourceOg
+    ? heroSourceOg.src.startsWith("http")
+      ? heroSourceOg.src
+      : `https://snipgeek.com${heroSourceOg.src}`
+    : "https://snipgeek.com/images/logo/logo.svg";
+
+  const canonicalPath =
+    locale === i18n.defaultLocale
+      ? `/notes/${slug}`
+      : `/${locale}/notes/${slug}`;
+
   return (
     <div className="w-full">
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-16 sm:pb-24">
@@ -222,6 +238,55 @@ export default async function Page({
           </div>
         </article>
       </main>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "TechArticle",
+            "headline": initialNote.frontmatter.title,
+            "description": initialNote.frontmatter.description,
+            "image": ogImageUrl,
+            "datePublished": initialNote.frontmatter.date,
+            "dateModified":
+              initialNote.frontmatter.updated || initialNote.frontmatter.date,
+            "author": {
+              "@type": "Person",
+              "name": "Iwan Efendi",
+              "url": "https://snipgeek.com/about",
+            },
+            "publisher": {
+              "@type": "Organization",
+              "name": "SnipGeek",
+              "logo": {
+                "@type": "ImageObject",
+                "url": "https://snipgeek.com/images/logo/logo.svg",
+              },
+            },
+            "mainEntityOfPage": {
+              "@type": "WebPage",
+              "@id": `https://snipgeek.com${canonicalPath}`,
+            },
+          }),
+        }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": breadcrumbSegments.map((segment, index) => ({
+              "@type": "ListItem",
+              "position": index + 1,
+              "name": segment.label,
+              "item": segment.href
+                ? `https://snipgeek.com${segment.href}`
+                : undefined,
+            })),
+          }),
+        }}
+      />
       <RelatedPosts
         type="note"
         locale={locale}
