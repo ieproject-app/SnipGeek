@@ -59,7 +59,7 @@ export function AdminGuard({ children }: AdminGuardProps) {
         <div className="mb-6 p-4 bg-destructive/10 rounded-full">
             <ShieldAlert className="h-12 w-12 text-destructive" />
         </div>
-        <h1 className="font-headline text-3xl font-black tracking-tighter mb-2">Access Denied</h1>
+        <h1 className="font-display text-3xl font-black tracking-tighter mb-2">Access Denied</h1>
         <p className="text-muted-foreground max-w-md mb-8">
           Your account (<strong>{user.email}</strong>) does not have administrative privileges. 
           Please contact the system owner to grant access.

@@ -92,14 +92,14 @@ export default function NotFound() {
           <div className="w-full min-h-screen flex items-center justify-center py-20">
             <main className="max-w-xl mx-auto px-6 text-center">
               <header className="mb-8">
-                <h1 className="font-headline text-display-lg font-extrabold tracking-tighter text-primary mb-4">
+                <h1 className="font-display text-6xl font-extrabold tracking-tighter text-primary mb-4">
                   404
                 </h1>
                 <div className="space-y-1">
-                  <p className="font-headline text-h2 font-bold tracking-tight text-primary">
+                  <p className="font-display text-3xl font-bold tracking-tight text-primary">
                     Lost in Space?
                   </p>
-                  <p className="font-headline text-h3 font-bold tracking-tight text-primary/60">
+                  <p className="font-display text-2xl font-bold tracking-tight text-primary/60">
                     Tersesat di Luar Angkasa?
                   </p>
                 </div>

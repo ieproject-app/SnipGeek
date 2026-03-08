@@ -103,7 +103,7 @@ export function FeaturedPosts({ posts, dictionary, locale, linkPrefix }: Feature
                                                 />
                                             </div>
 
-                                            <h3 className="font-headline text-h4 font-bold leading-snug text-primary group-hover:text-accent transition-colors duration-300">
+                                            <h3 className="font-display text-xl font-bold leading-snug text-primary group-hover:text-accent transition-colors duration-300">
                                                 {post.frontmatter.title}
                                             </h3>
 

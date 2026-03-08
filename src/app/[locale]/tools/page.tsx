@@ -97,7 +97,7 @@ export default async function ToolsPage({ params }: { params: Promise<{ locale: 
       >
         <CardHeader className="flex-row items-start justify-between gap-4 space-y-0 pb-4">
           <div className="space-y-1.5">
-            <CardTitle className="text-lg tracking-tight text-primary font-headline font-bold">
+            <CardTitle className="text-lg tracking-tight text-primary font-display font-bold">
               {toolContent.title}
             </CardTitle>
             <Badge variant={badgeVariant} className={cn(isComingSoon && "opacity-60")}>
@@ -131,7 +131,7 @@ export default async function ToolsPage({ params }: { params: Promise<{ locale: 
       <main className="mx-auto max-w-5xl px-4 pt-10 pb-16 lg:px-8">
         <ScrollReveal direction="down">
           <header className="mb-8 text-center space-y-3">
-            <h1 className="font-headline text-4xl font-extrabold tracking-tighter text-primary md:text-5xl">
+            <h1 className="font-display text-4xl font-extrabold tracking-tighter text-primary md:text-5xl">
               {pageContent.title}
             </h1>
             <p className="mx-auto max-w-2xl text-muted-foreground text-lg">
@@ -146,7 +146,7 @@ export default async function ToolsPage({ params }: { params: Promise<{ locale: 
               <div className="flex items-center gap-2 shrink-0">
                 <Globe className="h-5 w-5 text-primary" />
                 <div className="flex flex-col">
-                  <h2 className="text-xl font-bold font-headline text-primary uppercase tracking-tight">
+                  <h2 className="text-xl font-bold font-display text-primary uppercase tracking-tight">
                     {pageContent.public_section}
                   </h2>
                   <p className="text-xs text-muted-foreground mt-0.5">Accessible to everyone, no login required</p>
@@ -170,7 +170,7 @@ export default async function ToolsPage({ params }: { params: Promise<{ locale: 
               <div className="flex items-center gap-2 shrink-0">
                 <Lock className="h-5 w-5 text-primary" />
                 <div className="flex flex-col">
-                  <h2 className="text-xl font-bold font-headline text-primary uppercase tracking-tight">
+                  <h2 className="text-xl font-bold font-display text-primary uppercase tracking-tight">
                     {pageContent.internal_section}
                   </h2>
                   <p className="text-xs text-muted-foreground mt-0.5">For internal team use</p>

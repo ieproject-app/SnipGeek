@@ -72,7 +72,7 @@ export function NoteEditor({ initialData, id }: NoteEditorProps) {
           </Button>
           <div className="flex items-center gap-2">
             <StickyNote className="h-6 w-6 text-amber-500" />
-            <h1 className="font-headline text-3xl font-black tracking-tighter uppercase">
+            <h1 className="font-display text-3xl font-black tracking-tighter uppercase">
               Quick Note
             </h1>
           </div>

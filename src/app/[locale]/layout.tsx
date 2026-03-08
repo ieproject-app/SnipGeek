@@ -31,28 +31,28 @@ import { FirebaseProviderWrapper } from "@/components/layout/firebase-provider-w
 
 const fontDisplay = Bricolage_Grotesque({
   subsets: ["latin"],
-  variable: "--font-display",
+  variable: "--gf-display",
   weight: ["400", "500", "600", "700", "800"],
   display: "swap",
 });
 
 const fontSans = Plus_Jakarta_Sans({
   subsets: ["latin"],
-  variable: "--font-sans",
+  variable: "--gf-sans",
   weight: ["400", "500", "600", "700", "800"],
   display: "swap",
 });
 
 const fontSerif = Lora({
   subsets: ["latin"],
-  variable: "--font-serif",
+  variable: "--gf-serif",
   style: ["normal", "italic"],
   display: "swap",
 });
 
 const fontMono = JetBrains_Mono({
   subsets: ["latin"],
-  variable: "--font-mono",
+  variable: "--gf-mono",
   weight: ["400", "500", "700"],
   display: "swap",
 });

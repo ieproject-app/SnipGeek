@@ -142,7 +142,7 @@ export function InternalToolWrapper({
         )}
 
         <header className="text-center space-y-3">
-          <h1 className="font-headline text-display-sm font-extrabold tracking-tighter text-primary uppercase">
+          <h1 className="font-display text-4xl font-extrabold tracking-tighter text-primary uppercase">
             {title}
           </h1>
           <div className="flex items-center justify-center gap-3">
@@ -168,7 +168,7 @@ export function InternalToolWrapper({
               <ShieldX className="h-12 w-12 text-destructive" />
             </div>
             <div className="space-y-1">
-              <CardTitle className="font-headline text-3xl font-black tracking-tighter text-destructive uppercase">
+              <CardTitle className="font-display text-3xl font-black tracking-tighter text-destructive uppercase">
                 {t.title}
               </CardTitle>
               <CardDescription className="text-base">
@@ -236,7 +236,7 @@ export function InternalToolWrapper({
               <Lock className="h-8 w-8 text-primary opacity-40" />
             </div>
             <div className="space-y-1">
-              <CardTitle className="font-headline text-2xl font-black uppercase tracking-tighter">
+              <CardTitle className="font-display text-2xl font-black uppercase tracking-tighter">
                 {t.restrictedAccess}
               </CardTitle>
               <CardDescription className="text-xs uppercase font-bold tracking-widest opacity-60">
@@ -302,7 +302,7 @@ export function InternalToolWrapper({
       </div>
 
       <header className="text-center space-y-3">
-        <h1 className="font-headline text-display-sm font-extrabold tracking-tighter text-primary uppercase">
+        <h1 className="font-display text-4xl font-extrabold tracking-tighter text-primary uppercase">
           {title}
         </h1>
         <div className="flex items-center justify-center gap-3">

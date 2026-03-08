@@ -46,7 +46,7 @@ export default function LoginPage() {
                 <AlertCircle className="h-12 w-12 text-destructive" />
               </div>
             </div>
-            <CardTitle className="font-headline text-3xl font-black tracking-tighter uppercase text-destructive">
+            <CardTitle className="font-display text-3xl font-black tracking-tighter uppercase text-destructive">
               Koneksi Terputus
             </CardTitle>
             <CardDescription className="text-base px-6">
@@ -71,7 +71,7 @@ export default function LoginPage() {
           <div className="flex justify-center mb-2">
             <SnipGeekLogo className="h-16 w-16" />
           </div>
-          <CardTitle className="font-headline text-4xl font-black tracking-tighter uppercase">
+          <CardTitle className="font-display text-4xl font-black tracking-tighter uppercase">
             Masuk Akun
           </CardTitle>
           <CardDescription className="text-base px-6">

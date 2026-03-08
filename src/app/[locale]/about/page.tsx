@@ -96,7 +96,7 @@ export default async function AboutPage({
                   {data.profile.badge}
                 </div>
 
-                <h1 className="font-headline text-display-sm font-black tracking-tighter text-primary">
+                <h1 className="font-display text-4xl font-black tracking-tighter text-primary">
                   {dictionary.about.title}
                 </h1>
 
@@ -197,7 +197,7 @@ export default async function AboutPage({
                       <p className="text-[11px] font-black uppercase tracking-widest text-accent">
                         {data.profile.panelLabel}
                       </p>
-                      <h2 className="mt-2 font-headline text-h3 font-black tracking-tight text-primary">
+                      <h2 className="mt-2 font-display text-2xl font-black tracking-tight text-primary">
                         {data.name}
                       </h2>
                       <p className="mt-2 text-sm font-semibold leading-relaxed text-muted-foreground">
@@ -360,7 +360,7 @@ export default async function AboutPage({
                     <p className="text-[11px] font-black uppercase tracking-[0.22em] text-accent">
                       {data.profile.panelLabel}
                     </p>
-                    <h3 className="mt-3 font-headline text-lg font-black tracking-tight text-primary">
+                    <h3 className="mt-3 font-display text-lg font-black tracking-tight text-primary">
                       {data.name}
                     </h3>
                     <p className="mt-1 text-sm font-semibold text-muted-foreground">
@@ -451,7 +451,7 @@ export default async function AboutPage({
                 <Card className="relative h-full overflow-hidden rounded-2xl border-primary/10 bg-card/50 transition-all duration-300 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5">
                   <div className="absolute top-0 right-0 left-0 h-0.5 bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
                   <CardHeader className="pb-3">
-                    <CardTitle className="font-headline text-sm font-bold uppercase tracking-widest text-primary">
+                    <CardTitle className="font-display text-sm font-bold uppercase tracking-widest text-primary">
                       {cat.name}
                     </CardTitle>
                   </CardHeader>
@@ -494,7 +494,7 @@ export default async function AboutPage({
                           {edu.year}
                         </time>
                       </div>
-                      <CardTitle className="font-headline text-sm font-bold uppercase leading-snug">
+                      <CardTitle className="font-display text-sm font-bold uppercase leading-snug">
                         {edu.school}
                       </CardTitle>
                       <p className="mt-0.5 text-xs text-muted-foreground">
@@ -531,7 +531,7 @@ export default async function AboutPage({
                           {cert.period}
                         </Badge>
                       </div>
-                      <CardTitle className="font-headline text-sm font-bold uppercase leading-snug">
+                      <CardTitle className="font-display text-sm font-bold uppercase leading-snug">
                         {cert.name}
                       </CardTitle>
                       <p className="mt-0.5 mb-1 text-xs font-semibold text-accent">
@@ -555,7 +555,7 @@ export default async function AboutPage({
               <div className="mb-6 inline-flex h-16 w-16 items-center justify-center rounded-2xl border border-primary/20 bg-primary/10">
                 <FileText className="h-8 w-8 text-primary" />
               </div>
-              <h2 className="font-headline text-h2 font-black tracking-tight text-primary">
+              <h2 className="font-display text-3xl font-black tracking-tight text-primary">
                 {dictionary.about.downloadResume}
               </h2>
               <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
@@ -580,7 +580,7 @@ export default async function AboutPage({
 function SectionHeading({ title }: { title: string }) {
   return (
     <div className="flex items-center gap-4">
-      <h2 className="font-headline shrink-0 text-xl font-bold uppercase tracking-tight text-primary">
+      <h2 className="font-display shrink-0 text-xl font-bold uppercase tracking-tight text-primary">
         {title}
       </h2>
       <div className="h-px flex-1 bg-gradient-to-r from-primary/40 to-transparent" />
@@ -603,7 +603,7 @@ function IdentityCard({
         <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-2xl border border-primary/10 bg-primary/10">
           <Icon className="h-5 w-5 text-primary" />
         </div>
-        <CardTitle className="font-headline text-base font-bold tracking-tight text-primary">
+        <CardTitle className="font-display text-base font-bold tracking-tight text-primary">
           {title}
         </CardTitle>
       </CardHeader>
@@ -642,7 +642,7 @@ function ExperienceCard({
         <time className="mb-1 block text-[11px] font-bold uppercase tracking-widest text-muted-foreground">
           {exp.period}
         </time>
-        <CardTitle className="font-headline text-base font-bold leading-tight text-primary md:text-lg">
+        <CardTitle className="font-display text-base font-bold leading-tight text-primary md:text-lg">
           {exp.title}
         </CardTitle>
         <p className="mt-0.5 text-sm font-semibold text-accent">

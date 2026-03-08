@@ -215,7 +215,7 @@ export default function EmployeeHistoryClient({
                   <Search className="h-5 w-5 text-primary" />
                 </div>
                 <div>
-                  <CardTitle className="font-headline text-xl">{t.searchTitle}</CardTitle>
+                  <CardTitle className="font-display text-xl">{t.searchTitle}</CardTitle>
                   <CardDescription>{t.searchDescription}</CardDescription>
                 </div>
               </div>
@@ -328,7 +328,7 @@ export default function EmployeeHistoryClient({
                   <FileText className="h-5 w-5 text-primary" />
                 </div>
                 <div>
-                  <CardTitle className="font-headline text-xl">{t.generatorTitle}</CardTitle>
+                  <CardTitle className="font-display text-xl">{t.generatorTitle}</CardTitle>
                   <CardDescription>{t.generatorDescription}</CardDescription>
                 </div>
               </div>
@@ -385,7 +385,7 @@ export default function EmployeeHistoryClient({
                       <div className="p-1.5 bg-primary/10 rounded-full">
                         <UserCheck className="h-5 w-5 text-primary" />
                       </div>
-                      <h3 className="font-headline text-2xl font-bold tracking-tight">Generated Results</h3>
+                      <h3 className="font-display text-2xl font-bold tracking-tight">Generated Results</h3>
                     </div>
                   </ScrollReveal>
                   <div className="grid grid-cols-1 gap-8">

@@ -136,7 +136,7 @@ export function RelatedPosts({
               <CategoryBadge category={item.frontmatter.category} type={type} />
             </div>
             <h3
-              className="font-headline font-bold tracking-tight text-primary transition-colors group-hover:text-accent leading-tight"
+              className="font-display font-bold tracking-tight text-primary transition-colors group-hover:text-accent leading-tight"
               style={{ fontSize: "clamp(1rem, 0.95rem + 0.25vw, 1.125rem)" }}
             >
               {item.frontmatter.title}
@@ -173,7 +173,7 @@ export function RelatedPosts({
               {formatDate(new Date(item.frontmatter.date))}
             </time>
             <h3
-              className="font-headline font-bold tracking-tight text-primary transition-colors group-hover/link:text-accent mb-2 leading-tight"
+              className="font-display font-bold tracking-tight text-primary transition-colors group-hover/link:text-accent mb-2 leading-tight"
               style={{ fontSize: "clamp(1rem, 0.95rem + 0.25vw, 1.125rem)" }}
             >
               {item.frontmatter.title}
@@ -199,15 +199,10 @@ export function RelatedPosts({
   };
 
   return (
-    <section className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-section-md sm:py-section-lg border-t mt-16">
+    <section className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24 border-t mt-16">
       <ScrollReveal direction="up">
         <h2
-          className="font-black font-headline tracking-tighter text-primary mb-12 text-center"
-          style={{
-            fontSize: "clamp(1.875rem, 1.65rem + 1.125vw, 2.75rem)",
-            lineHeight: "1.2",
-            letterSpacing: "-0.025em",
-          }}
+          className="text-3xl font-black font-display tracking-tighter leading-tight text-primary mb-12 text-center"
         >
           {dictionary.post.relatedContent}
         </h2>

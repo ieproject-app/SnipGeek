@@ -134,7 +134,7 @@ export function HomeClient({
             <div className="mb-2">
               <CategoryBadge category={post.frontmatter.category} />
             </div>
-            <h3 className="font-headline text-h5 font-bold tracking-tight text-primary transition-colors group-hover:text-accent leading-tight">
+            <h3 className="font-display text-lg font-bold tracking-tight text-primary transition-colors group-hover:text-accent leading-tight">
               {post.frontmatter.title}
             </h3>
             <time className="text-[10px] font-medium text-muted-foreground mt-2 block opacity-60">
@@ -156,9 +156,9 @@ export function HomeClient({
       />
 
       {latestPosts.length > 0 && (
-        <section className="container max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-section-sm sm:py-section-md overflow-hidden">
+        <section className="container max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 overflow-hidden">
           <ScrollReveal direction="up">
-            <h2 className="text-h2 font-bold font-headline tracking-tighter text-primary mb-10 text-center">
+            <h2 className="text-3xl font-bold font-display tracking-tighter text-primary mb-10 text-center">
               {dictionary.home.latestPosts}
             </h2>
           </ScrollReveal>

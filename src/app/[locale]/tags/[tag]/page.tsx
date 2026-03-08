@@ -74,7 +74,7 @@ export default async function TagPage({
     <div className="w-full">
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-16">
         <header className="mb-16 text-center">
-          <h1 className="font-headline text-display-sm font-extrabold tracking-tighter text-primary mb-3">
+          <h1 className="font-display text-4xl font-extrabold tracking-tighter text-primary mb-3">
             {dictionary.tags.title.replace("{tag}", decodedTag.toUpperCase())}
           </h1>
           <p className="text-muted-foreground">
@@ -94,7 +94,7 @@ export default async function TagPage({
             {posts.length > 0 && (
               <section>
                 <div className="flex items-center gap-4 mb-8">
-                  <h2 className="text-h3 font-bold font-headline text-primary shrink-0 uppercase tracking-tight">
+                  <h2 className="text-2xl font-bold font-display text-primary shrink-0 uppercase tracking-tight">
                     {dictionary.navigation.blog}
                   </h2>
                   <div className="h-px bg-border flex-1" />
@@ -164,7 +164,7 @@ export default async function TagPage({
                               category={post.frontmatter.category}
                             />
                           </div>
-                          <h3 className="font-headline text-base font-bold tracking-tight text-primary transition-colors group-hover:text-accent leading-tight">
+                          <h3 className="font-display text-base font-bold tracking-tight text-primary transition-colors group-hover:text-accent leading-tight">
                             {post.frontmatter.title}
                           </h3>
                           <time className="text-[10px] font-medium text-muted-foreground mt-2 block opacity-60">
@@ -184,7 +184,7 @@ export default async function TagPage({
             {filteredNotes.length > 0 && (
               <section>
                 <div className="flex items-center gap-4 mb-8">
-                  <h2 className="text-h3 font-bold font-headline text-primary shrink-0 uppercase tracking-tight">
+                  <h2 className="text-2xl font-bold font-display text-primary shrink-0 uppercase tracking-tight">
                     {dictionary.navigation.notes}
                   </h2>
                   <div className="h-px bg-border flex-1" />
@@ -224,7 +224,7 @@ export default async function TagPage({
                             href={`${linkPrefix}/notes/${note.slug}`}
                             className="flex-1"
                           >
-                            <h2 className="font-headline text-base font-bold tracking-tight text-primary transition-colors group-hover:text-accent leading-tight mb-2">
+                            <h2 className="font-display text-base font-bold tracking-tight text-primary transition-colors group-hover:text-accent leading-tight mb-2">
                               {note.frontmatter.title}
                             </h2>
                             <p className="text-sm text-muted-foreground line-clamp-2">

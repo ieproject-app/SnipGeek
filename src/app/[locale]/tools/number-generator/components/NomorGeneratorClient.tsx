@@ -671,7 +671,7 @@ export function NomorGeneratorClient({ dictionary }: { dictionary: Dictionary })
                         <Card className="border-primary/10 bg-card/50 shadow-sm overflow-hidden transition-shadow duration-300 hover:shadow-md">
                             <CardHeader className="bg-muted/20 border-b flex flex-col md:flex-row md:items-center justify-between gap-6 p-6">
                                 <div className="space-y-1">
-                                    <CardTitle className="font-headline text-xl uppercase tracking-tight">Konfigurasi Permintaan</CardTitle>
+                                    <CardTitle className="font-display text-xl uppercase tracking-tight">Konfigurasi Permintaan</CardTitle>
                                     <CardDescription>Tentukan kategori dan periode dokumen yang ingin dibuat.</CardDescription>
                                 </div>
 
@@ -837,7 +837,7 @@ export function NomorGeneratorClient({ dictionary }: { dictionary: Dictionary })
                                                         <Database className="h-6 w-6 text-primary" />
                                                     </div>
                                                     <div>
-                                                        <DialogTitle className="font-headline text-2xl font-black uppercase tracking-tighter">
+                                                        <DialogTitle className="font-display text-2xl font-black uppercase tracking-tighter">
                                                             Matriks Stok Nomor
                                                         </DialogTitle>
                                                         <DialogDescription className="text-xs mt-0.5">
@@ -961,7 +961,7 @@ export function NomorGeneratorClient({ dictionary }: { dictionary: Dictionary })
 
                                 {!isAdminUser && userLimit.isLimited && (
                                     <div className="mt-4 flex items-center gap-4 rounded-xl border border-destructive/20 bg-gradient-to-r from-destructive/10 to-destructive/5 p-5 border-l-4 border-l-destructive animate-in slide-in-from-top-2">
-                                        <AlertTriangle className="h-6 w-6 flex-shrink-0 text-destructive" />
+                                        <AlertTriangle className="h-6 w-6 shrink-0 text-destructive" />
                                         <div className="space-y-0.5">
                                             <p className="text-sm font-black text-destructive uppercase tracking-tight">Batas Harian Tercapai</p>
                                             <p className="text-xs text-destructive/70 font-medium">Kuota akan direset otomatis esok hari pukul 00.00.</p>
@@ -979,7 +979,7 @@ export function NomorGeneratorClient({ dictionary }: { dictionary: Dictionary })
                                             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                                                 <div className="flex items-center gap-3">
                                                     <div className="p-2 bg-accent rounded-xl shadow-lg shadow-accent/30"><CheckCircle className="h-5 w-5 text-white" /></div>
-                                                    <CardTitle className="font-headline text-2xl font-black uppercase tracking-tighter">Hasil Generate</CardTitle>
+                                                    <CardTitle className="font-display text-2xl font-black uppercase tracking-tighter">Hasil Generate</CardTitle>
                                                 </div>
                                                 <div className="flex flex-wrap gap-2">
                                                     <Button variant="outline" size="sm" onClick={copyFullResults} className="rounded-full bg-background/50 h-9 text-[10px] font-black border-accent/20 hover:border-accent transition-all active:scale-95">
@@ -1044,7 +1044,7 @@ export function NomorGeneratorClient({ dictionary }: { dictionary: Dictionary })
                             <CardHeader className="bg-muted/20 border-b p-6">
                                 <div className="flex items-center justify-between">
                                     <div>
-                                        <CardTitle className="font-headline text-xl uppercase tracking-tight">Riwayat Hari Ini</CardTitle>
+                                        <CardTitle className="font-display text-xl uppercase tracking-tight">Riwayat Hari Ini</CardTitle>
                                         <CardDescription>Daftar nomor yang telah Anda ambil pada hari ini.</CardDescription>
                                     </div>
                                     <Button variant="ghost" size="sm" onClick={fetchMyHistory} disabled={isHistoryLoading} className="rounded-full gap-2">
@@ -1093,7 +1093,7 @@ export function NomorGeneratorClient({ dictionary }: { dictionary: Dictionary })
                                             <Database className="h-5 w-5 text-destructive" />
                                         </div>
                                         <div>
-                                            <CardTitle className="font-headline text-xl text-destructive uppercase tracking-tight">Admin Injector</CardTitle>
+                                            <CardTitle className="font-display text-xl text-destructive uppercase tracking-tight">Admin Injector</CardTitle>
                                             <CardDescription>Mode admin untuk menyuntikkan stok nomor secara massal langsung ke database.</CardDescription>
                                         </div>
                                     </div>

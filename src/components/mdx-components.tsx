@@ -292,15 +292,10 @@ const MdxH1 = ({
   <h1
     id={generateId(children)}
     className={cn(
-      "font-headline mt-12 mb-6 font-black tracking-tighter text-primary scroll-mt-24",
+      "font-display mt-12 mb-6 text-2xl font-black tracking-tighter leading-tight text-primary scroll-mt-24",
       _class,
       className,
     )}
-    style={{
-      fontSize: "clamp(1.3rem, 1.25rem + 0.25vw, var(--sz-h1, 1.5rem))",
-      lineHeight: "1.3",
-      letterSpacing: "-0.02em",
-    }}
     {...props}
   >
     {children}
@@ -318,15 +313,10 @@ const MdxH2 = ({
     <h2
       id={generateId(children)}
       className={cn(
-        "font-headline font-black tracking-tighter text-primary scroll-mt-24 mb-3",
+        "font-display text-xl font-black tracking-tighter leading-snug text-primary scroll-mt-24 mb-3",
         _class,
         className,
       )}
-      style={{
-        fontSize: "clamp(1.2rem, 1.15rem + 0.25vw, var(--sz-h2, 1.4rem))",
-        lineHeight: "1.35",
-        letterSpacing: "-0.015em",
-      }}
       {...props}
     >
       {children}
@@ -345,15 +335,10 @@ const MdxH3 = ({
   <h3
     id={generateId(children)}
     className={cn(
-      "font-headline mt-10 mb-3 font-bold tracking-tight text-primary scroll-mt-24",
+      "font-display mt-10 mb-3 text-lg font-bold tracking-tight leading-snug text-primary scroll-mt-24",
       _class,
       className,
     )}
-    style={{
-      fontSize: "clamp(1.1rem, 1.05rem + 0.25vw, var(--sz-h3, 1.3rem))",
-      lineHeight: "1.4",
-      letterSpacing: "-0.01em",
-    }}
     {...props}
   >
     {children}
@@ -369,15 +354,10 @@ const MdxH4 = ({
   <h4
     id={generateId(children)}
     className={cn(
-      "font-headline mt-8 mb-2 font-bold tracking-tight text-primary/90 scroll-mt-24",
+      "font-display mt-8 mb-2 text-base font-bold tracking-tight leading-normal text-primary/90 scroll-mt-24",
       _class,
       className,
     )}
-    style={{
-      fontSize: "clamp(1rem, 0.95rem + 0.2vw, var(--sz-h4, 1.2rem))",
-      lineHeight: "1.45",
-      letterSpacing: "0em",
-    }}
     {...props}
   >
     {children}
@@ -818,7 +798,7 @@ export const mdxComponents = {
   }: any) => (
     <summary
       className={cn(
-        "font-headline cursor-pointer font-bold transition-colors hover:text-accent",
+        "font-display cursor-pointer font-bold transition-colors hover:text-accent",
         _class,
         className,
       )}

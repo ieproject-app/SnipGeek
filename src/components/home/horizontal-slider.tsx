@@ -64,7 +64,7 @@ export function HorizontalSlider({ posts, title, viewMoreText, dictionary, local
         {/* Section Header */}
         <ScrollReveal direction="left">
           <div className="mb-8 text-left">
-            <h2 className="text-sm font-medium font-headline text-primary mb-2 italic">
+            <h2 className="text-sm font-medium font-display text-primary mb-2 italic">
               {title}
             </h2>
             <div className="w-12 h-1 bg-accent rounded-full" />
@@ -137,7 +137,7 @@ export function HorizontalSlider({ posts, title, viewMoreText, dictionary, local
                           <div className="mb-1">
                             <CategoryBadge category={post.frontmatter.category || 'Update'} />
                           </div>
-                          <h3 className="font-headline text-h6 font-medium text-primary leading-snug line-clamp-2 transition-colors group-hover:text-accent">
+                          <h3 className="font-display text-base font-medium text-primary leading-snug line-clamp-2 transition-colors group-hover:text-accent">
                             {post.frontmatter.title}
                           </h3>
                           <time className="text-[10px] text-muted-foreground mt-2 block font-medium opacity-60">

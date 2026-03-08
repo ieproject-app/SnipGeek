@@ -179,7 +179,7 @@ export function DownloadClient({
                 )}
               </div>
 
-              <h1 className="font-headline text-3xl font-extrabold tracking-tight text-foreground sm:text-4xl">
+              <h1 className="font-display text-3xl font-extrabold tracking-tight text-foreground sm:text-4xl">
                 {dictionary.title}
               </h1>
 

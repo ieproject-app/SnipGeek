@@ -186,7 +186,7 @@ export default async function Page({
               className="mb-6 justify-center"
             />
 
-            <h1 className="font-headline text-display-sm font-extrabold tracking-tighter text-primary mb-6 max-w-3xl mx-auto">
+            <h1 className="font-display text-4xl font-extrabold tracking-tighter text-primary mb-6 max-w-3xl mx-auto">
               {initialPost.frontmatter.title}
             </h1>
 
@@ -214,7 +214,7 @@ export default async function Page({
                 />
               ) : (
                 <div className="w-full aspect-video flex items-center justify-center bg-primary/5">
-                  <span className="text-primary/20 font-headline text-6xl font-black">
+                  <span className="text-primary/20 font-display text-6xl font-black">
                     SnipGeek
                   </span>
                 </div>

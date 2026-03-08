@@ -190,7 +190,7 @@ export function Footer({
             delay={0.3}
             className="text-center mb-12"
           >
-            <h4 className="font-headline text-h3 font-bold text-foreground tracking-tight">
+            <h4 className="font-display text-2xl font-bold text-foreground tracking-tight">
               {authorName}
             </h4>
             <p className="mt-4 text-muted-foreground max-w-md mx-auto text-lg leading-relaxed font-medium animate-in fade-in duration-700">

@@ -64,7 +64,7 @@ export function FeatureSlider({ posts, title, viewMoreText, dictionary, locale, 
         {/* Section Header - Left Aligned */}
         <ScrollReveal direction="left">
           <div className="mb-8 text-left">
-            <h2 className="text-sm font-medium font-headline text-primary mb-2 italic">
+            <h2 className="text-sm font-medium font-display text-primary mb-2 italic">
               {title}
             </h2>
             <div className="w-12 h-1 bg-accent rounded-full" />
@@ -136,7 +136,7 @@ export function FeatureSlider({ posts, title, viewMoreText, dictionary, locale, 
                           <div className="mb-2">
                             <CategoryBadge category={post.frontmatter.category || 'Featured'} />
                           </div>
-                          <h3 className="font-headline text-h6 font-semibold text-primary leading-snug group-hover:text-accent transition-colors">
+                          <h3 className="font-display text-base font-semibold text-primary leading-snug group-hover:text-accent transition-colors">
                             {post.frontmatter.title}
                           </h3>
                           <time className="text-[10px] text-muted-foreground mt-3 block font-medium opacity-60">

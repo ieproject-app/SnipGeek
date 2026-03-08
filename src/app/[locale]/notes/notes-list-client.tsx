@@ -45,7 +45,7 @@ export function NotesListClient({
     <div className="w-full">
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-12 sm:pb-16">
         <header className="mb-12 text-center">
-          <h1 className="font-headline text-display-sm font-extrabold tracking-tighter text-primary mb-3">
+          <h1 className="font-display text-4xl font-extrabold tracking-tighter text-primary mb-3">
             {dictionary.notes.title}
           </h1>
           <p className="text-muted-foreground max-w-xl mx-auto text-lg italic">
@@ -86,7 +86,7 @@ export function NotesListClient({
                       <time className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-2 block">
                         {formatDate(noteDate)}
                       </time>
-                      <h3 className="font-headline text-base font-bold tracking-tight text-primary transition-colors group-hover/link:text-accent mb-2 leading-tight">
+                      <h3 className="font-display text-base font-bold tracking-tight text-primary transition-colors group-hover/link:text-accent mb-2 leading-tight">
                         {note.frontmatter.title}
                       </h3>
                       <p className="text-sm text-muted-foreground line-clamp-2">

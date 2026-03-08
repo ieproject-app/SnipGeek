@@ -32,7 +32,7 @@ export function BlogListClient({
     <div className="w-full">
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-12 sm:pb-16">
         <header className="mb-12 text-center">
-          <h1 className="font-headline text-display-sm font-extrabold tracking-tighter text-primary mb-3">
+          <h1 className="font-display text-4xl font-extrabold tracking-tighter text-primary mb-3">
             {dictionary.navigation.blog}
           </h1>
           <p className="text-muted-foreground max-w-xl mx-auto text-lg italic">
@@ -106,7 +106,7 @@ export function BlogListClient({
                     <div className="mb-2">
                       <CategoryBadge category={post.frontmatter.category} />
                     </div>
-                    <h3 className="font-headline text-base font-bold tracking-tight text-primary transition-colors group-hover:text-accent leading-tight">
+                    <h3 className="font-display text-base font-bold tracking-tight text-primary transition-colors group-hover:text-accent leading-tight">
                       {post.frontmatter.title}
                     </h3>
                     <time className="text-[10px] font-medium text-muted-foreground mt-2 block opacity-60">

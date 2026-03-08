@@ -61,7 +61,7 @@ export function TableOfContents({
             <ListIcon className="h-5 w-5 text-primary" />
           </div>
           <div className="flex flex-col">
-            <span className="font-headline text-base font-bold tracking-wide text-primary">
+            <span className="font-display text-base font-bold tracking-wide text-primary">
               {title}
             </span>
             <span className="text-xs font-medium text-muted-foreground">

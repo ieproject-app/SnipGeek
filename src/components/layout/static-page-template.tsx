@@ -68,7 +68,7 @@ export function StaticPageTemplate({
             </div>
 
             <h1
-              className="font-headline font-black tracking-tighter text-primary"
+              className="font-display font-black tracking-tighter text-primary"
               style={{
                 fontSize: "clamp(2rem, 1.75rem + 1.25vw, 3rem)",
                 lineHeight: "1.1",

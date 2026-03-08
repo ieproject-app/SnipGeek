@@ -35,7 +35,7 @@ export function AdminSidebar() {
       <div className="p-6 border-b">
         <Link href="/admin/posts" className="flex items-center gap-3">
           <SnipGeekLogo className="h-8 w-8" />
-          <div className="font-headline text-xl font-black tracking-tighter">
+          <div className="font-display text-xl font-black tracking-tighter">
             Control<span className="text-accent">Panel</span>
           </div>
         </Link>

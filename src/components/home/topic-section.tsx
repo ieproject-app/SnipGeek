@@ -90,7 +90,7 @@ export function TopicSection({
               <div className="mb-1">
                 <CategoryBadge category={post.frontmatter.category || tag} />
               </div>
-              <h3 className="font-headline text-h6 font-medium text-primary leading-snug line-clamp-2 transition-colors group-hover:text-accent">
+              <h3 className="font-display text-base font-medium text-primary leading-snug line-clamp-2 transition-colors group-hover:text-accent">
                 {post.frontmatter.title}
               </h3>
               <time className="text-[10px] text-muted-foreground mt-2 block font-medium opacity-60">
@@ -115,10 +115,10 @@ export function TopicSection({
   ];
 
   return (
-    <section className="container max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pb-section-sm sm:pb-section-md overflow-hidden">
+    <section className="container max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pb-12 sm:pb-16 overflow-hidden">
       <ScrollReveal direction="left">
         <header className="mb-8 text-left">
-          <h2 className="text-h2 font-extrabold font-headline tracking-tight text-primary mb-2">
+          <h2 className="text-3xl font-extrabold font-display tracking-tight text-primary mb-2">
             {title}
           </h2>
           <Breadcrumbs segments={breadcrumbSegments} className="mb-4" />
