@@ -164,6 +164,20 @@ export default async function Page({
     .filter((p) => p.slug !== slug)
     .slice(0, 10);
 
+  const heroSourceOg = resolveHeroImage(
+    initialPost.frontmatter.heroImage,
+    initialPost.frontmatter.imageAlt,
+    initialPost.frontmatter.title,
+  );
+  const ogImageUrl = heroSourceOg
+    ? heroSourceOg.src.startsWith("http")
+      ? heroSourceOg.src
+      : `https://snipgeek.com${heroSourceOg.src}`
+    : "https://snipgeek.com/images/logo/logo.svg";
+
+  const canonicalPath =
+    locale === i18n.defaultLocale ? `/blog/${slug}` : `/${locale}/blog/${slug}`;
+
   return (
     <div className="w-full">
       {initialPost.isFallback && (
@@ -279,6 +293,55 @@ export default async function Page({
           </div>
         </article>
       </main>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Article",
+            "headline": initialPost.frontmatter.title,
+            "description": initialPost.frontmatter.description,
+            "image": ogImageUrl,
+            "datePublished": initialPost.frontmatter.date,
+            "dateModified":
+              initialPost.frontmatter.updated || initialPost.frontmatter.date,
+            "author": {
+              "@type": "Person",
+              "name": "Iwan Efendi",
+              "url": "https://snipgeek.com/about",
+            },
+            "publisher": {
+              "@type": "Organization",
+              "name": "SnipGeek",
+              "logo": {
+                "@type": "ImageObject",
+                "url": "https://snipgeek.com/images/logo/logo.svg",
+              },
+            },
+            "mainEntityOfPage": {
+              "@type": "WebPage",
+              "@id": `https://snipgeek.com${canonicalPath}`,
+            },
+          }),
+        }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": breadcrumbSegments.map((segment, index) => ({
+              "@type": "ListItem",
+              "position": index + 1,
+              "name": segment.label,
+              "item": segment.href
+                ? `https://snipgeek.com${segment.href}`
+                : undefined,
+            })),
+          }),
+        }}
+      />
       <RelatedPosts
         type="blog"
         locale={locale}
