@@ -25,7 +25,7 @@ export function HeroFeatured({ posts, dictionary, locale, linkPrefix }: HeroFeat
     if (posts.length === 0) return null;
 
     return (
-        <section className="py-12 sm:py-16 bg-primary/[0.03] border-y border-primary/5">
+        <section className="py-12 sm:py-16 bg-card border-b border-primary/5">
             <div className="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 items-start">
                     {posts.map((post, index) => {

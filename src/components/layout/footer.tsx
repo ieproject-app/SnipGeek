@@ -90,13 +90,8 @@ export function Footer({
       {/* Sub-Footer Section */}
       <section
         aria-label="Footer details"
-        className="relative w-full pt-20 pb-12 bg-gradient-to-br from-muted/40 via-background to-muted/20 border-t border-primary/5 transition-all duration-300 ease-in-out"
+        className="relative w-full pt-20 pb-12 bg-card border-t border-primary/5 transition-all duration-300 ease-in-out"
       >
-        {/* Decorative Ambient Light Circles */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-0 left-0 w-96 h-96 rounded-full blur-3xl opacity-10 bg-primary -translate-x-1/2 -translate-y-1/2" />
-          <div className="absolute bottom-0 right-0 w-96 h-96 rounded-full blur-3xl opacity-10 bg-primary translate-x-1/2 translate-y-1/2" />
-        </div>
 
         {/* Bisected Avatar */}
         <div className="absolute left-1/2 -translate-x-1/2 top-0 -translate-y-1/2 z-20">

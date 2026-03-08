@@ -659,7 +659,7 @@ export function Header({
                       className={cn(
                         "group flex items-center gap-3 rounded-xl px-3 py-2.5 transition-all [transition-duration:320ms] hover:bg-muted/50",
                         removingSlug === item.slug &&
-                          "opacity-0 -translate-x-2 scale-[0.96] ease-in",
+                        "opacity-0 -translate-x-2 scale-[0.96] ease-in",
                       )}
                     >
                       <NextLink
