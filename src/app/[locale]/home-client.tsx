@@ -7,10 +7,10 @@ import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { formatRelativeTime } from "@/lib/utils";
 import { AddToReadingListButton } from "@/components/layout/add-to-reading-list-button";
 import { ChevronRight } from "lucide-react";
-import { FeatureSlider } from "@/components/home/feature-slider";
-import { TopicSection } from "@/components/home/topic-section";
-import { HorizontalSlider } from "@/components/home/horizontal-slider";
-import { FeaturedPosts } from "@/components/home/featured-posts";
+import { TutorialSlider } from "@/components/home/tutorial-slider";
+import { TopicHighlight } from "@/components/home/topic-highlight";
+import { UpdateSlider } from "@/components/home/update-slider";
+import { HeroFeatured } from "@/components/home/hero-featured";
 import { CategoryBadge } from "@/components/layout/category-badge";
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
 
@@ -50,7 +50,7 @@ export function HomeClient({
       (post) =>
         post.frontmatter.published &&
         post.frontmatter.category?.toLowerCase() ===
-          sliderCategory.toLowerCase(),
+        sliderCategory.toLowerCase(),
     )
     .slice(0, 6);
 
@@ -148,7 +148,7 @@ export function HomeClient({
 
   return (
     <div className="w-full">
-      <FeaturedPosts
+      <HeroFeatured
         posts={featuredPosts as any}
         dictionary={dictionary}
         locale={locale}
@@ -189,7 +189,7 @@ export function HomeClient({
       )}
 
       {sliderPosts.length > 0 && (
-        <FeatureSlider
+        <TutorialSlider
           posts={sliderPosts as any}
           title={dictionary.home.sliderAndShadow.title}
           viewMoreText={dictionary.home.sliderAndShadow.viewMore}
@@ -200,7 +200,7 @@ export function HomeClient({
       )}
 
       {topicPosts.length > 0 && (
-        <TopicSection
+        <TopicHighlight
           posts={topicPosts as any}
           title={dictionary.home.specialTagSectionTitle}
           breadcrumbHome={dictionary.home.breadcrumbHome}
@@ -213,7 +213,7 @@ export function HomeClient({
       )}
 
       {updatePosts.length > 0 && (
-        <HorizontalSlider
+        <UpdateSlider
           posts={updatePosts as any}
           title={dictionary.home.softwareUpdateSlider.title}
           viewMoreText={dictionary.home.softwareUpdateSlider.viewMore}

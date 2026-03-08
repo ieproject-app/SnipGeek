@@ -1,0 +1,96 @@
+---
+title: "Mengatasi Fragmentasi Komentar Disqus dengan Isolasi Domain"
+date: "2026-03-09"
+description: "Studi kasus pengembang dalam mencegah fragmentasi komentar dengan mengisolasi layanan pihak ketiga secara ketat ke domain produksi."
+translationKey: "disqus-production-isolation"
+published: true
+tags: ["Disqus", "Next.js", "Vercel", "Keandalan Situs", "Debugging"]
+category: "Dev Chronicles"
+---
+
+Ini adalah momen yang akrab bagi setiap pemilik situs: Anda mendapatkan notifikasi email yang sudah lama ditunggu-tunggu, "Seseorang baru saja mengomentari artikel Anda!" Anda dengan penuh semangat mengklik tautan "Lihat Komentar", tetapi browser Anda membuka URL yang aneh dan panjang seperti `https://...cloudworkstations.dev/...` atau `https://snipgeek.com.vercel.app/...`, bukan domain produksi Anda `https://snipgeek.com`.
+
+Ini bukan hanya mengganggu; ini adalah gejala dari masalah teknis yang lebih dalam yang dapat memecah basis komentar Anda dan merusak pengalaman pengguna. Ini adalah studi kasus transparan mengenai penyebabnya, berbagai upaya perbaikan kami, dan solusi akhir yang diterapkan.
+
+## Masalah Utama: Fragmentasi URL
+
+Masalah ini berakar pada cara Disqus mengidentifikasi sebuah halaman. Layanan komentar mengunci utas diskusi ke **URL pertama** tempat ia dirender.
+
+- **Development**: `http://localhost:3000` atau `https://...cloudworkstations.dev`
+- **Preview**: `https://snipgeek.com.vercel.app`
+- **Production**: `https://snipgeek.com`
+
+Karena Disqus melihat ketiga URL ini sebagai halaman yang berbeda, utas komentar menjadi terfragmentasi. Notifikasi email akan selalu menunjuk ke URL tempat komentar pertama kali "dilihat".
+
+---
+
+## Trial and Error: Mencari Solusi Terbaik
+
+Kami mencoba beberapa perbaikan, masing-masing memberikan pelajaran berharga.
+
+<Steps>
+  <Step>
+    **Upaya Awal: Memeriksa NODE_ENV**
+    Ide awalnya adalah memuat Disqus hanya jika `NODE_ENV` adalah `"production"`.
+    <Callout variant="danger" title="Mengapa Gagal">
+      Kami menyadari bahwa *preview deployments* di Vercel juga berjalan dalam mode `production`, sehingga fragmentasi tetap terjadi di lingkungan staging.
+    </Callout>
+  </Step>
+
+  <Step>
+    **Solusi Akhir: Isolasi Berdasarkan Nama Domain**
+    Kami memutuskan untuk mencegah Disqus dimuat sama sekali kecuali diakses dari domain produksi akhir. Ini menyelesaikan masalah langsung pada akarnya.
+  </Step>
+</Steps>
+
+### Detail Implementasi
+
+Kami menerapkan ini langsung di dalam komponen dengan memeriksa `window.location.hostname`.
+
+```javascript
+'use client';
+
+const productionHostname = 'snipgeek.com'; 
+
+export function PostComments({ article }) {
+  const [shouldLoad, setShouldLoad] = useState(false);
+
+  useEffect(() => {
+    // Periksa apakah hostname saat ini cocok dengan domain produksi
+    if (window.location.hostname === productionHostname) {
+        setShouldLoad(true);
+    }
+  }, []);
+
+  if (!shouldLoad) {
+    return (
+      <div className="text-center py-10 border border-dashed rounded-xl">
+        <p>Komentar hanya tersedia di situs produksi (snipgeek.com).</p>
+      </div>
+    );
+  }
+
+  const canonicalUrl = `https://${productionHostname}/blog/${article.slug}`;
+
+  return (
+    <DiscussionEmbed
+      shortname="snipgeek-com"
+      config={{ url: canonicalUrl }}
+    />
+  );
+}
+```
+
+---
+
+## Awal Baru dengan Shortname Bersih
+
+Setelah perbaikan kode, kami mengambil satu langkah ekstra untuk menjamin stabilitas: **menggunakan shortname Disqus yang sama sekali baru**.
+
+<Callout variant="tip" title="Praktik Terpuji">
+  Shortname lama sudah "terkontaminasi" dengan URL pengembangan. Memulai dengan ID baru seperti `snipgeek-com` yang hanya mengenali URL produksi adalah jaminan terbaik untuk integritas data jangka panjang.
+</Callout>
+
+## Kesimpulan
+
+Perjalanan debugging ini mengajarkan bahwa saat berurusan dengan layanan pihak ketiga yang sensitif terhadap URL, solusi teraman adalah mengisolasinya secara ketat ke **domain produksi akhir**. Ini mencegah "kebocoran" konfigurasi dari lingkungan pratinjau dan memastikan data Anda tetap terpusat.

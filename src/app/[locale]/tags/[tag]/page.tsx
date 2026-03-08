@@ -130,7 +130,7 @@ export default async function TagPage({
                   <h2 className="text-2xl font-bold font-display text-primary shrink-0 uppercase tracking-tight">
                     {dictionary.navigation.blog}
                   </h2>
-                  <div className="h-px bg-border flex-1" />
+                  <div className="w-full h-0.5 bg-gradient-to-r from-accent via-accent/50 to-transparent flex-1" />
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-10">
                   {posts.map((post) => {
@@ -220,7 +220,7 @@ export default async function TagPage({
                   <h2 className="text-2xl font-bold font-display text-primary shrink-0 uppercase tracking-tight">
                     {dictionary.navigation.notes}
                   </h2>
-                  <div className="h-px bg-border flex-1" />
+                  <div className="w-full h-0.5 bg-gradient-to-r from-accent via-accent/50 to-transparent flex-1" />
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
                   {filteredNotes.map((note) => {
@@ -265,16 +265,7 @@ export default async function TagPage({
                             </p>
                           </Link>
                         </div>
-                        <CardFooter className="flex items-center gap-4 border-t px-6 py-4 bg-muted/5">
-                          <div className="flex flex-wrap gap-2">
-                            {note.frontmatter.tags &&
-                              note.frontmatter.tags
-                                .slice(0, 2)
-                                .map((t) => (
-                                  <CategoryBadge key={t} category={t} />
-                                ))}
-                          </div>
-                        </CardFooter>
+                        <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-primary/5 to-transparent" />
                       </Card>
                     );
                   })}
@@ -282,8 +273,9 @@ export default async function TagPage({
               </section>
             )}
           </div>
-        )}
-      </main>
-    </div>
+        )
+        }
+      </main >
+    </div >
   );
 }

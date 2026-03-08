@@ -15,54 +15,47 @@ import {
   ShieldCheck,
   ShieldAlert,
   Mail,
+  FileText,
 } from "lucide-react";
 import { TikTokLogo } from "@/components/icons/tiktok-logo";
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
 import { SnipTooltip } from "@/components/ui/snip-tooltip";
+import { getLinkPrefix } from "@/lib/utils";
 
 export function Footer({
+  locale,
   dictionary,
   translationsMap,
 }: {
+  locale: string;
   dictionary: Dictionary;
   translationsMap: TranslationsMap;
 }) {
+  const linkPrefix = getLinkPrefix(locale);
   const footerNavItems = [
     {
-      id: "footer-about",
-      title: dictionary.navigation.about,
-      href: "/about",
-      icon: <User2 className="h-5 w-5" />,
-      colorClass: "from-blue-600/40 to-blue-900/40",
-      borderClass: "group-hover:border-blue-500/50",
-      glowClass: "group-hover:shadow-[0_0_30px_rgba(59,130,246,0.3)]",
+      id: "footer-terms",
+      title: dictionary.navigation.terms,
+      href: `${linkPrefix}/terms`,
+      icon: <FileText className="h-5 w-5" />,
     },
     {
       id: "footer-privacy",
       title: dictionary.navigation.privacy,
-      href: "/privacy",
+      href: `${linkPrefix}/privacy`,
       icon: <ShieldCheck className="h-5 w-5" />,
-      colorClass: "from-green-600/40 to-green-900/40",
-      borderClass: "group-hover:border-green-500/50",
-      glowClass: "group-hover:shadow-[0_0_30px_rgba(34,197,94,0.3)]",
     },
     {
       id: "footer-disclaimer",
       title: dictionary.navigation.disclaimer,
-      href: "/disclaimer",
+      href: `${linkPrefix}/disclaimer`,
       icon: <ShieldAlert className="h-5 w-5" />,
-      colorClass: "from-orange-600/40 to-orange-900/40",
-      borderClass: "group-hover:border-orange-500/50",
-      glowClass: "group-hover:shadow-[0_0_30px_rgba(249,115,22,0.3)]",
     },
     {
       id: "footer-contact",
       title: dictionary.navigation.contact,
-      href: "/contact",
+      href: `${linkPrefix}/contact`,
       icon: <Mail className="h-5 w-5" />,
-      colorClass: "from-purple-600/40 to-purple-900/40",
-      borderClass: "group-hover:border-purple-500/50",
-      glowClass: "group-hover:shadow-[0_0_30px_rgba(168,85,247,0.3)]",
     },
   ];
 
@@ -94,70 +87,10 @@ export function Footer({
 
   return (
     <footer className="relative w-full mt-16 sm:mt-24">
-      {/* Top Navigation Section - Links Cards */}
-      <nav
-        aria-label="Footer navigation"
-        className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-24 sm:pt-16 sm:pb-32"
-      >
-        <ul className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
-          {footerNavItems.map((item, index) => {
-            const image = PlaceHolderImages.find((p) => p.id === item.id);
-            const isTiltRight = index % 2 === 0; // 0,2 miring kanan; 1,3 miring kiri
-            const tiltClass = isTiltRight ? "rotate-2" : "-rotate-2";
-
-            return (
-              <li key={item.id} className="list-none">
-                <div className="transition-all duration-300 hover:-translate-y-1">
-                  <SnipTooltip label={item.title} side="top" wrapperClassName="block w-full">
-                    <Link
-                      href={item.href}
-                      className="block group relative"
-                    >
-                      <article className={cn(
-                        "relative w-full aspect-[4/3] rounded-xl overflow-hidden shadow-lg border border-white/10 bg-zinc-900/50 backdrop-blur-sm transition-all duration-300 ease-out group-hover:shadow-2xl",
-                        "transform-gpu",
-                        tiltClass,
-                        item.borderClass,
-                        item.glowClass
-                      )}>
-                        {image && (
-                          <Image
-                            src={image.imageUrl}
-                            alt={image.description}
-                            fill
-                            className="object-cover opacity-50 group-hover:opacity-70 transition-opacity duration-300"
-                            sizes="(max-width: 768px) 50vw, 200px"
-                          />
-                        )}
-                        {/* Color Tint Overlay */}
-                        <div className={cn(
-                          "absolute inset-0 bg-gradient-to-b opacity-0 group-hover:opacity-100 transition-opacity duration-300",
-                          item.colorClass
-                        )} />
-
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent p-4 flex flex-col items-center justify-center gap-2">
-                          <span className="text-accent text-6xl sm:text-8xl transition-transform duration-300 group-hover:scale-125 drop-shadow-lg">
-                            {item.icon}
-                          </span>
-                          {/* Mobile Label - Hidden on larger screens */}
-                          <span className="md:hidden text-xs font-medium text-white/80 text-center mt-1">
-                            {item.title}
-                          </span>
-                        </div>
-                      </article>
-                    </Link>
-                  </SnipTooltip>
-                </div>
-              </li>
-            );
-          })}
-        </ul>
-      </nav>
-
       {/* Sub-Footer Section */}
       <section
         aria-label="Footer details"
-        className="relative w-full pt-16 pb-12 bg-gradient-to-br from-muted/40 via-background to-muted/20 border-t border-primary/5 transition-all duration-300 ease-in-out"
+        className="relative w-full pt-20 pb-12 bg-gradient-to-br from-muted/40 via-background to-muted/20 border-t border-primary/5 transition-all duration-300 ease-in-out"
       >
         {/* Decorative Ambient Light Circles */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -193,9 +126,19 @@ export function Footer({
             <h4 className="font-display text-2xl font-bold text-foreground tracking-tight">
               {authorName}
             </h4>
-            <p className="mt-4 text-muted-foreground max-w-md mx-auto text-lg leading-relaxed font-medium animate-in fade-in duration-700">
+            <p className="mt-2 text-muted-foreground max-w-sm mx-auto text-sm leading-relaxed font-medium animate-in fade-in duration-700">
               {dictionary.footer.authorBio}
             </p>
+
+            <div className="mt-6 flex justify-center">
+              <Link
+                href={`${linkPrefix}/about`}
+                className="group/btn relative inline-flex items-center gap-2 px-6 py-2 rounded-full bg-primary/10 border border-primary/10 text-primary text-[13px] font-bold transition-all duration-300 hover:bg-primary hover:text-primary-foreground hover:scale-105 active:scale-95 shadow-sm"
+              >
+                <User2 className="h-4 w-4" />
+                <span>{dictionary.footer.viewProfile}</span>
+              </Link>
+            </div>
 
             {/* Social Links */}
             <ul
@@ -253,28 +196,23 @@ export function Footer({
                   />
                 </div>
               </div>
-              <div className="flex flex-col items-center justify-center gap-3">
-                <div className="flex items-center gap-4">
-                  <Link
-                    href="/terms"
-                    className="text-sm text-primary/40 hover:text-primary transition-colors duration-300 underline-offset-4 hover:underline"
-                    aria-label={`Go to ${dictionary.navigation.terms}`}
-                  >
-                    {dictionary.navigation.terms}
-                  </Link>
-                  <span className="text-primary/20">·</span>
-                  <Link
-                    href="/privacy"
-                    className="text-sm text-primary/40 hover:text-primary transition-colors duration-300 underline-offset-4 hover:underline"
-                    aria-label={`Go to ${dictionary.navigation.privacy}`}
-                  >
-                    {dictionary.navigation.privacy}
-                  </Link>
+              <div className="flex flex-col items-center justify-center gap-5 text-center">
+                <nav className="flex flex-wrap items-center justify-center gap-x-6 gap-y-3 px-6 py-2.5 rounded-full bg-muted/20 border border-primary/5 backdrop-blur-sm">
+                  {footerNavItems.map((item) => (
+                    <Link
+                      key={item.id}
+                      href={item.href}
+                      className="text-[10px] font-black uppercase tracking-widest text-primary/40 hover:text-accent transition-all duration-300"
+                    >
+                      {item.title}
+                    </Link>
+                  ))}
+                </nav>
+                <div className="flex flex-col items-center gap-2">
+                  <small className="font-extrabold tracking-widest text-[10px] uppercase text-primary/30 hover:text-primary transition-colors duration-300">
+                    &copy; {new Date().getFullYear()} SnipGeek. All Rights Reserved.
+                  </small>
                 </div>
-                <small className="font-semibold tracking-wider text-primary/60 hover:text-primary transition-colors duration-300">
-                  &copy; {new Date().getFullYear()} SnipGeek. All Rights
-                  Reserved.
-                </small>
               </div>
             </div>
           </ScrollReveal>

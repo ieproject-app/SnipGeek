@@ -24,7 +24,7 @@ interface TopicPost {
   };
 }
 
-interface TopicSectionProps {
+interface TopicHighlightProps {
   posts: TopicPost[];
   title: string;
   breadcrumbHome: string;
@@ -36,9 +36,9 @@ interface TopicSectionProps {
 }
 
 /**
- * TopicSection - Standardized with pb-12 sm:pb-16 to prevent padding stacking.
+ * TopicHighlight - Standardized with pb-12 sm:pb-16 to prevent padding stacking.
  */
-export function TopicSection({
+export function TopicHighlight({
   posts,
   title,
   breadcrumbHome,
@@ -47,7 +47,7 @@ export function TopicSection({
   locale,
   linkPrefix,
   tag,
-}: TopicSectionProps) {
+}: TopicHighlightProps) {
   const renderHorizontalCard = (post: TopicPost, index: number) => {
     const heroImageValue = post.frontmatter.heroImage;
     let heroImageSrc = "/images/blank/blank.webp";
@@ -122,7 +122,7 @@ export function TopicSection({
             {title}
           </h2>
           <Breadcrumbs segments={breadcrumbSegments} className="mb-4" />
-          <div className="w-12 h-1 bg-accent rounded-full" />
+          <div className="w-full h-0.5 bg-gradient-to-r from-accent via-accent/50 to-transparent" />
         </header>
       </ScrollReveal>
 

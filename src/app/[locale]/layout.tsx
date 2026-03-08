@@ -213,6 +213,7 @@ export default async function LocaleLayout({
                 />
                 <main className="pt-16">{children}</main>
                 <Footer
+                  locale={locale}
                   dictionary={dictionary}
                   translationsMap={translationsMap}
                 />

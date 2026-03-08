@@ -95,19 +95,7 @@ export function NotesListClient({
                     </Link>
                   </CardContent>
 
-                  <CardFooter className="px-6 py-4 border-t bg-muted/5">
-                    <div className="flex flex-wrap gap-2">
-                      {note.frontmatter.tags &&
-                        note.frontmatter.tags.slice(0, 2).map((tag: string) => (
-                          <Link
-                            key={tag}
-                            href={`${linkPrefix}/tags/${tag.toLowerCase()}`}
-                          >
-                            <CategoryBadge category={tag} />
-                          </Link>
-                        ))}
-                    </div>
-                  </CardFooter>
+                  <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-primary/5 to-transparent" />
                 </Card>
               </ScrollReveal>
             );

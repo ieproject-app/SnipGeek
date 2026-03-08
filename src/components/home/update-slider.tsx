@@ -30,7 +30,7 @@ interface SliderPost {
   };
 }
 
-interface HorizontalSliderProps {
+interface UpdateSliderProps {
   posts: SliderPost[];
   title: string;
   viewMoreText: string;
@@ -39,7 +39,7 @@ interface HorizontalSliderProps {
   tag?: string;
 }
 
-export function HorizontalSlider({ posts, title, viewMoreText, dictionary, locale, tag }: HorizontalSliderProps) {
+export function UpdateSlider({ posts, title, viewMoreText, dictionary, locale, tag }: UpdateSliderProps) {
   const [api, setApi] = React.useState<CarouselApi>();
   const [current, setCurrent] = React.useState(0);
   const [count, setCount] = React.useState(0);
@@ -67,7 +67,7 @@ export function HorizontalSlider({ posts, title, viewMoreText, dictionary, local
             <h2 className="text-sm font-medium font-display text-primary mb-2 italic">
               {title}
             </h2>
-            <div className="w-12 h-1 bg-accent rounded-full" />
+            <div className="w-full h-0.5 bg-gradient-to-r from-accent via-accent/50 to-transparent" />
           </div>
         </ScrollReveal>
 

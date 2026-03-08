@@ -12,7 +12,8 @@
     "terms": "Terms"
   },
   "footer": {
-    "authorBio": "A passionate developer exploring the web and sharing findings along the way."
+    "authorBio": "A passionate developer exploring the web and sharing findings along the way.",
+    "viewProfile": "View My Profile"
   },
   "home": {
     "title": "SnipGeek - A Modern Minimalist Tech Blog",

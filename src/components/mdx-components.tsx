@@ -321,7 +321,7 @@ const MdxH2 = ({
     >
       {children}
     </h2>
-    <div className="w-14 h-[3px] bg-accent rounded-full" />
+    <div className="w-full h-0.5 bg-gradient-to-r from-accent via-accent/50 to-transparent" />
   </div>
 );
 
@@ -527,7 +527,7 @@ const MdxPre = ({
 const MdxHr = ({ class: _class, className, parentName, ...props }: any) => (
   <hr
     className={cn(
-      "my-10 border-0 h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent",
+      "my-10 border-0 h-px bg-gradient-to-r from-transparent via-accent/40 to-transparent",
       _class,
       className,
     )}

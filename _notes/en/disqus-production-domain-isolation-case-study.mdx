@@ -1,0 +1,96 @@
+---
+title: "Fixing Fragmented Disqus Comments via Domain Isolation"
+date: "2026-03-09"
+description: "A developer's case study on preventing comment fragmentation by strictly isolating third-party services like Disqus to the production domain."
+translationKey: "disqus-production-isolation"
+published: true
+tags: ["Disqus", "Next.js", "Vercel", "Site Reliability", "Debugging"]
+category: "Dev Chronicles"
+---
+
+It's a familiar moment for every site owner: you get that long-awaited email notification, "Someone just commented on your article!" You eagerly click the "View Comment" link, but your browser opens a strange, long URL like `https://...cloudworkstations.dev/...` or `https://snipgeek.com.vercel.app/...`, not your production domain `https://snipgeek.com`.
+
+This isn't just annoying; it's a symptom of a deeper technical problem that can fragment your comment base and ruin the user experience. This is a transparent case study of its cause, our various repair attempts, and the final solution.
+
+## The Root Problem: URL Fragmentation
+
+The problem is rooted in how Disqus identifies a page. The comment service locks a discussion thread to the **first URL** where it is rendered.
+
+- **Development**: `http://localhost:3000` or `https://...cloudworkstations.dev`
+- **Preview**: `https://snipgeek.com.vercel.app`
+- **Production**: `https://snipgeek.com`
+
+Because Disqus sees these as three completely different pages, the comment threads become fragmented. The email notification will always point to the URL where the comment was first "seen".
+
+---
+
+## Trial and Error: The Hunt for a Solution
+
+We tried several fixes, each with its own lesson.
+
+<Steps>
+  <Step>
+    **Initial Attempt: Checking NODE_ENV**
+    The first idea was to load Disqus only if `NODE_ENV` was `"production"`.
+    <Callout variant="danger" title="Why it Failed">
+      We quickly realized that *preview deployments* on Vercel also run in `production` mode, so the fragmentation persisted in staging environments.
+    </Callout>
+  </Step>
+
+  <Step>
+    **The Final Solution: Isolation by Domain Name**
+    We decided to prevent Disqus from loading at all unless it is accessed from the final production domain. This solves the problem at its root.
+  </Step>
+</Steps>
+
+### Implementation Details
+
+We implemented this directly within the component by checking `window.location.hostname`.
+
+```javascript
+'use client';
+
+const productionHostname = 'snipgeek.com'; 
+
+export function PostComments({ article }) {
+  const [shouldLoad, setShouldLoad] = useState(false);
+
+  useEffect(() => {
+    // Check if the current hostname matches the production domain
+    if (window.location.hostname === productionHostname) {
+        setShouldLoad(true);
+    }
+  }, []);
+
+  if (!shouldLoad) {
+    return (
+      <div className="text-center py-10 border border-dashed rounded-xl">
+        <p>Comments are only available on the production site (snipgeek.com).</p>
+      </div>
+    );
+  }
+
+  const canonicalUrl = `https://${productionHostname}/blog/${article.slug}`;
+
+  return (
+    <DiscussionEmbed
+      shortname="snipgeek-com"
+      config={{ url: canonicalUrl }}
+    />
+  );
+}
+```
+
+---
+
+## A Fresh Start with a Clean Shortname
+
+Even after the code fix, we took one extra step to ensure stability: **using a completely new Disqus shortname**.
+
+<Callout variant="tip" title="Best Practice">
+  The old shortname was already "contaminated" with development and preview URLs. Starting with a "clean" ID like `snipgeek-com` that only ever sees production URLs is the best guarantee for long-term data integrity.
+</Callout>
+
+## Conclusion
+
+This debugging journey taught us that when dealing with third-party services sensitive to URLs, the safest solution is to strictly isolate them to the **final production domain**. This prevents configuration "leaks" from preview environments and ensures your data remains centralized.
