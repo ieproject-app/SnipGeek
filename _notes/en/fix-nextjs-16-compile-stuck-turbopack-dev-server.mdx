@@ -1,0 +1,143 @@
+---
+title: "Fix Next.js 16 Compile Stuck on Turbopack Dev Server"
+date: "2026-03-08"
+description: "How I debugged and fixed the Next.js 16 Turbopack dev server that kept crashing at 'Compiling /[locale]' after migrating to Tailwind CSS v4."
+translationKey: "fix-nextjs-16-compile-stuck-turbopack"
+published: true
+tags: ["Next.js", "Turbopack", "Debugging", "Node.js", "Tailwind CSS"]
+category: "Debugging"
+---
+
+After successfully migrating SnipGeek from Tailwind CSS v3.4.1 to v4 and Next.js 15 to 16, I hit a frustrating wall: the dev server kept dying silently at `○ Compiling /[locale] ...` with exit code 1. No error message. No stack trace. Just... dead.
+
+This note documents the full debugging journey—every wrong turn and the final fix—so you don't have to waste hours on the same problem.
+
+## The Symptom
+
+Every time I ran `npm run dev`, the Turbopack server would start fine:
+
+```bash
+▲ Next.js 16.1.6 (Turbopack)
+- Local: http://localhost:9003
+
+✓ Starting...
+✓ Ready in 1552ms
+○ Compiling /[locale] ...
+# ← process dies here, exit code 1
+```
+
+No compilation error. No helpful log. The process simply vanished.
+
+## The Wrong Turns
+
+Before finding the root cause, I went through several failed attempts that are worth documenting.
+
+### Attempt 1: Restarting the Server
+
+The most obvious first step. Kill the process, restart. Same result every time—stuck at the same point.
+
+### Attempt 2: Checking Port Conflicts
+
+I suspected port `9003` was already in use:
+
+```bash
+netstat -ano | findstr :9003
+```
+
+Sometimes it was, sometimes it wasn't. Killing the orphan process and restarting didn't help. The server would start, then crash again at compilation.
+
+### Attempt 3: Reverting Git Commits
+
+I even rolled back to an older commit (`c640944` — the pre-migration backup) to rule out code changes. The older Tailwind v3 codebase had its own issues with the newer dependencies, so this wasn't a viable path either.
+
+<Callout variant="warning" title="Don't Panic-Revert">
+Rolling back multiple commits without understanding the root cause can create more problems than it solves. Always diagnose first.
+</Callout>
+
+## Finding the Root Cause
+
+The breakthrough came when I took a more systematic approach:
+
+<Steps>
+<Step>
+
+**Cleared the `.next` cache completely.**
+
+```bash
+Remove-Item -Recurse -Force .next
+```
+
+Stale Turbopack cache from the migration could have been causing compilation to choke.
+
+</Step>
+<Step>
+
+**Increased Node.js memory allocation.**
+
+The `/[locale]` route in SnipGeek is heavy—it imports Firebase, Radix UI, Framer Motion, Recharts, and many other dependencies. The default Node.js heap size (~1.7 GB) was not enough for Turbopack to compile everything.
+
+```bash
+$env:NODE_OPTIONS="--max-old-space-size=4096"
+npx next dev --turbopack -p 9003
+```
+
+</Step>
+<Step>
+
+**Fixed the proxy export name.**
+
+Next.js 16 renamed `middleware` to `proxy`. The file was already renamed to `src/proxy.ts`, but the exported function was still called `middleware`:
+
+```typescript
+// ❌ Before (crashes silently)
+export function middleware(request: NextRequest) { ... }
+
+// ✅ After
+export function proxy(request: NextRequest) { ... }
+```
+
+</Step>
+</Steps>
+
+After all three fixes, the server compiled successfully:
+
+```bash
+✓ Ready in 2.3s
+○ Compiling /[locale] ...
+ GET / 200 in 9.2s (compile: 7.8s, proxy.ts: 82ms, render: 1249ms)
+```
+
+The compilation took **7.8 seconds**—which is why it *appeared* to be stuck. It was actually working, but running out of memory before it could finish.
+
+## The Permanent Fix
+
+I updated the `dev` script in `package.json` to always allocate sufficient memory:
+
+```json
+{
+  "scripts": {
+    "dev": "cross-env NODE_OPTIONS=--max-old-space-size=4096 next dev --turbopack -p 9003"
+  }
+}
+```
+
+## Why This Happened
+
+Three factors combined to create the silent crash:
+
+| Factor | Detail |
+|---|---|
+| **Turbopack + large route** | The `/[locale]` layout imports 15+ heavy packages (Firebase, Radix UI, Framer Motion, etc.) |
+| **Default memory limit** | Node.js defaults to ~1.7 GB heap, insufficient for bundling all dependencies |
+| **Silent OOM** | Turbopack doesn't surface out-of-memory errors clearly—the process just exits with code 1 |
+
+<Callout variant="tip" title="Quick Diagnostic">
+If your Next.js 16 dev server dies silently during compilation, the first thing to try is increasing memory: `NODE_OPTIONS=--max-old-space-size=4096`. This alone solves many Turbopack compilation crashes.
+</Callout>
+
+## Key Takeaways
+
+1. **Silent exit code 1 during Turbopack compilation is often an OOM issue.** Always check memory allocation first.
+2. **Clear `.next` cache after major migrations.** Stale cache can cause unpredictable compilation failures.
+3. **Next.js 16 requires `proxy` export, not `middleware`.** The error message for this is clear, but it can get buried if other issues crash the server first.
+4. **Don't panic-revert.** Diagnose systematically before rolling back commits.

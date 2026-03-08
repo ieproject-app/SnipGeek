@@ -1,0 +1,143 @@
+---
+title: "Mengatasi Compile Stuck Next.js 16 di Turbopack Server"
+date: "2026-03-08"
+description: "Cara saya men-debug dan memperbaiki dev server Next.js 16 Turbopack yang terus crash di 'Compiling /[locale]' setelah migrasi ke Tailwind CSS v4."
+translationKey: "fix-nextjs-16-compile-stuck-turbopack"
+published: true
+tags: ["Next.js", "Turbopack", "Debugging", "Node.js", "Tailwind CSS"]
+category: "Debugging"
+---
+
+Setelah berhasil migrasi SnipGeek dari Tailwind CSS v3.4.1 ke v4 dan Next.js 15 ke 16, saya menabrak tembok yang sangat membuat frustrasi: dev server terus mati secara diam-diam di `○ Compiling /[locale] ...` dengan exit code 1. Tidak ada pesan error. Tidak ada stack trace. Hanya... mati.
+
+Catatan ini mendokumentasikan perjalanan debugging lengkap—setiap langkah yang salah dan solusi akhirnya—agar Anda tidak perlu membuang waktu berjam-jam untuk masalah yang sama.
+
+## Gejalanya
+
+Setiap kali saya menjalankan `npm run dev`, server Turbopack akan mulai dengan baik:
+
+```bash
+▲ Next.js 16.1.6 (Turbopack)
+- Local: http://localhost:9003
+
+✓ Starting...
+✓ Ready in 1552ms
+○ Compiling /[locale] ...
+# ← proses mati di sini, exit code 1
+```
+
+Tidak ada error kompilasi. Tidak ada log yang membantu. Prosesnya langsung hilang begitu saja.
+
+## Langkah yang Salah
+
+Sebelum menemukan akar masalahnya, saya melewati beberapa percobaan gagal yang layak didokumentasikan.
+
+### Percobaan 1: Restart Server
+
+Langkah pertama yang paling jelas. Kill prosesnya, restart. Hasil yang sama setiap kali—stuck di titik yang sama.
+
+### Percobaan 2: Cek Konflik Port
+
+Saya curiga port `9003` sudah digunakan:
+
+```bash
+netstat -ano | findstr :9003
+```
+
+Kadang memang digunakan, kadang tidak. Mematikan proses yang tersisa dan restart tidak membantu. Server akan mulai, lalu crash lagi saat kompilasi.
+
+### Percobaan 3: Revert Git Commit
+
+Saya bahkan melakukan rollback ke commit lama (`c640944` — backup sebelum migrasi) untuk menyingkirkan kemungkinan perubahan kode. Kode Tailwind v3 yang lama punya masalahnya sendiri dengan dependensi yang lebih baru, jadi ini bukan jalan yang tepat.
+
+<Callout variant="warning" title="Jangan Panik Revert">
+Melakukan rollback beberapa commit tanpa memahami akar masalahnya bisa menciptakan lebih banyak masalah. Selalu diagnosis dulu sebelum revert.
+</Callout>
+
+## Menemukan Akar Masalah
+
+Terobosan datang ketika saya mengambil pendekatan yang lebih sistematis:
+
+<Steps>
+<Step>
+
+**Hapus cache `.next` sepenuhnya.**
+
+```bash
+Remove-Item -Recurse -Force .next
+```
+
+Cache Turbopack yang usang dari proses migrasi bisa menyebabkan kompilasi gagal.
+
+</Step>
+<Step>
+
+**Tingkatkan alokasi memori Node.js.**
+
+Route `/[locale]` di SnipGeek sangat berat—mengimpor Firebase, Radix UI, Framer Motion, Recharts, dan banyak dependensi lainnya. Ukuran heap default Node.js (~1.7 GB) tidak cukup untuk Turbopack mengompilasi semuanya.
+
+```bash
+$env:NODE_OPTIONS="--max-old-space-size=4096"
+npx next dev --turbopack -p 9003
+```
+
+</Step>
+<Step>
+
+**Perbaiki nama export proxy.**
+
+Next.js 16 mengganti nama `middleware` menjadi `proxy`. File sudah di-rename ke `src/proxy.ts`, tetapi fungsi yang di-export masih bernama `middleware`:
+
+```typescript
+// ❌ Sebelum (crash diam-diam)
+export function middleware(request: NextRequest) { ... }
+
+// ✅ Sesudah
+export function proxy(request: NextRequest) { ... }
+```
+
+</Step>
+</Steps>
+
+Setelah ketiga perbaikan diterapkan, server berhasil mengompilasi:
+
+```bash
+✓ Ready in 2.3s
+○ Compiling /[locale] ...
+ GET / 200 in 9.2s (compile: 7.8s, proxy.ts: 82ms, render: 1249ms)
+```
+
+Kompilasi memakan waktu **7.8 detik**—itulah mengapa *terlihat* seperti stuck. Sebenarnya sedang bekerja, tetapi kehabisan memori sebelum selesai.
+
+## Perbaikan Permanen
+
+Saya memperbarui script `dev` di `package.json` agar selalu mengalokasikan memori yang cukup:
+
+```json
+{
+  "scripts": {
+    "dev": "cross-env NODE_OPTIONS=--max-old-space-size=4096 next dev --turbopack -p 9003"
+  }
+}
+```
+
+## Mengapa Ini Terjadi
+
+Tiga faktor bergabung menciptakan crash yang diam-diam:
+
+| Faktor | Detail |
+|---|---|
+| **Turbopack + route besar** | Layout `/[locale]` mengimpor 15+ paket berat (Firebase, Radix UI, Framer Motion, dll.) |
+| **Batas memori default** | Node.js default ~1.7 GB heap, tidak cukup untuk bundling semua dependensi |
+| **OOM diam-diam** | Turbopack tidak menampilkan error kehabisan memori secara jelas—proses langsung keluar dengan kode 1 |
+
+<Callout variant="tip" title="Diagnostik Cepat">
+Jika dev server Next.js 16 Anda mati diam-diam saat kompilasi, hal pertama yang harus dicoba adalah menaikkan memori: `NODE_OPTIONS=--max-old-space-size=4096`. Ini saja sudah menyelesaikan banyak crash kompilasi Turbopack.
+</Callout>
+
+## Poin Penting
+
+1. **Exit code 1 diam-diam saat kompilasi Turbopack sering kali masalah OOM.** Selalu cek alokasi memori terlebih dahulu.
+2. **Hapus cache `.next` setelah migrasi besar.** Cache usang bisa menyebabkan kegagalan kompilasi yang tidak terduga.
+3. **Next.js 16 membutuhkan export `proxy`, bukan `middleware`.** Pesan errornya jelas, tapi bisa tenggelam jika masalah lain membuat server crash duluan.
+4. **Jangan panik revert.** Diagnosis secara sistematis sebelum rollback commit.
