@@ -561,7 +561,7 @@ export default async function AboutPage({
               <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
                 {data.profile.resumeDescription}
               </p>
-              <div className="mt-6 flex justify-center">
+              <div className="mt-6 flex justify-start">
                 <DownloadButton id="cv-iwan-efendi" />
               </div>
               <div className="mt-6 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
