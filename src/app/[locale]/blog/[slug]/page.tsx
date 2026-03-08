@@ -68,7 +68,7 @@ export async function generateMetadata({
     ? heroSource.src.startsWith("http")
       ? heroSource.src
       : `https://snipgeek.com${heroSource.src}`
-    : "https://snipgeek.com/images/footer/about.webp";
+    : "https://snipgeek.com/images/blank/blank.webp";
 
   return {
     title: post.frontmatter.title,
@@ -139,7 +139,10 @@ export default async function Page({
   const resolved = resolveHeroImage(heroImageValue, imageAlt, title);
   const heroSource = resolved
     ? { url: resolved.src, hint: resolved.hint }
-    : undefined;
+    : {
+        url: "/images/blank/blank.webp",
+        hint: "snipgeek default image",
+      };
 
   const headings = extractHeadings(initialPost.content || "");
   const wordCount = (initialPost.content || "").trim().split(/\s+/).length || 0;
@@ -173,7 +176,7 @@ export default async function Page({
     ? heroSourceOg.src.startsWith("http")
       ? heroSourceOg.src
       : `https://snipgeek.com${heroSourceOg.src}`
-    : "https://snipgeek.com/images/logo/logo.svg";
+    : "https://snipgeek.com/images/blank/blank.webp";
 
   const canonicalPath =
     locale === i18n.defaultLocale ? `/blog/${slug}` : `/${locale}/blog/${slug}`;
