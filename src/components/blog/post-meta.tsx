@@ -7,7 +7,6 @@ import type { ReadingListItem } from '@/hooks/use-reading-list';
 import Link from 'next/link';
 import { i18n } from '@/i18n-config';
 import { cn, formatRelativeTime } from '@/lib/utils';
-import { CategoryBadge } from '@/components/layout/category-badge';
 
 interface PostMetaProps {
   frontmatter: PostFrontmatter | NoteFrontmatter;
@@ -42,7 +41,7 @@ export function PostMeta({ frontmatter, item, locale, dictionary, readingTime, i
               </Link>
             ))}
           </div>
-          <AddToReadingListButton 
+          <AddToReadingListButton
             item={item}
             dictionary={dictionary}
             showText={false}
@@ -73,11 +72,10 @@ export function PostMeta({ frontmatter, item, locale, dictionary, readingTime, i
   // Standalone Style (Normal page header)
   return (
     <div className={cn(
-        "flex flex-wrap items-center gap-6 py-4 mb-8 border-b border-primary/5",
-        isCentered ? "justify-center" : "justify-start"
+      "flex flex-wrap items-center gap-6 py-4 mb-8 border-b border-primary/5",
+      isCentered ? "justify-center" : "justify-start"
     )}>
       <div className="flex items-center gap-3 text-sm font-medium text-muted-foreground">
-        <CategoryBadge category={frontmatter.category} type={item.type} className="mr-2" />
         <span className="text-primary font-bold">{authorName}</span>
         <span className="opacity-30">•</span>
         <time>{timeLabel}{relativeTimeStr}</time>
@@ -88,15 +86,15 @@ export function PostMeta({ frontmatter, item, locale, dictionary, readingTime, i
           </>
         )}
       </div>
-      
+
       {!isCentered && (
         <div className="flex items-center gap-2 ml-auto sm:ml-0">
-            <AddToReadingListButton 
+          <AddToReadingListButton
             item={item}
             dictionary={dictionary}
             showText={false}
             className="h-8 w-8 rounded-full border-none bg-muted/50 text-primary shadow-none hover:text-primary"
-            />
+          />
         </div>
       )}
     </div>

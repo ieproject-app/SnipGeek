@@ -141,7 +141,9 @@
   "tags": {
     "title": "Tag: {tag}",
     "description": "Semua artikel dan catatan dengan tag {tag}.",
-    "noItems": "Tidak ada artikel yang ditemukan untuk tag ini."
+    "noItems": "Tidak ada artikel yang ditemukan untuk tag ini.",
+    "allTagsTitle": "Semua Topik",
+    "allTagsDescription": "Telusuri koleksi artikel dan catatan teknis kami yang dikategorikan berdasarkan topik."
   },
   "search": {
     "placeholder": "Cari postingan dan catatan...",

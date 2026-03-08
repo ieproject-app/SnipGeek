@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { Hash, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { getBadgeStyle } from "@/components/layout/category-badge";
 
 interface ArticleTopicsProps {
   tags: string[];
@@ -48,28 +49,42 @@ export function ArticleTopics({
           </p>
         </div>
 
-        <div className="hidden items-center gap-2 rounded-full border border-primary/10 bg-background/70 px-3 py-1.5 text-xs font-medium text-muted-foreground sm:inline-flex">
+        <Link
+          href={`${linkPrefix}/tags`}
+          className="hidden items-center gap-2 rounded-full border border-primary/10 bg-background/70 px-3 py-1.5 text-xs font-medium text-muted-foreground transition-all duration-200 hover:border-primary/30 hover:bg-primary/5 hover:text-primary sm:inline-flex"
+        >
           <span>{tags.length}</span>
           <span>{tags.length === 1 ? "topic" : "topics"}</span>
           <ArrowRight className="h-3.5 w-3.5 text-primary" />
-        </div>
+        </Link>
       </div>
 
       <div className="mt-5 flex flex-wrap gap-2.5">
-        {tags.map((tag) => (
-          <Link
-            key={tag}
-            href={`${linkPrefix}/tags/${encodeURIComponent(tag.toLowerCase())}`}
-            className={cn(
-              "group inline-flex items-center gap-2 rounded-full border border-primary/10 bg-background px-3.5 py-2",
-              "text-sm font-semibold text-foreground/80 transition-all duration-200",
-              "hover:-translate-y-0.5 hover:border-primary/25 hover:bg-primary/5 hover:text-primary hover:shadow-sm",
-            )}
-          >
-            <span className="inline-flex h-1.5 w-1.5 rounded-full bg-primary/60 transition-colors duration-200 group-hover:bg-primary" />
-            <span>{tag}</span>
-          </Link>
-        ))}
+        {tags.map((tag) => {
+          const style = getBadgeStyle(tag);
+          return (
+            <Link
+              key={tag}
+              href={`${linkPrefix}/tags/${encodeURIComponent(tag.toLowerCase())}`}
+              className={cn(
+                "group inline-flex items-center gap-2 rounded-full border px-3 py-1.5",
+                "text-xs font-semibold uppercase tracking-wider transition-all duration-200",
+                "hover:-translate-y-0.5 hover:shadow-sm",
+                style.bg,
+                style.text,
+                style.border,
+              )}
+            >
+              <span
+                className={cn(
+                  "inline-flex h-1.5 w-1.5 rounded-full transition-colors duration-200",
+                  style.dot,
+                )}
+              />
+              <span>{tag}</span>
+            </Link>
+          );
+        })}
       </div>
     </section>
   );

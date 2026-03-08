@@ -141,7 +141,9 @@
   "tags": {
     "title": "Tag: {tag}",
     "description": "All articles and notes tagged with {tag}.",
-    "noItems": "No articles found for this tag."
+    "noItems": "No articles found for this tag.",
+    "allTagsTitle": "All Topics",
+    "allTagsDescription": "Explore our collection of articles and technical notes categorized by topic."
   },
   "search": {
     "placeholder": "Search posts and notes...",
