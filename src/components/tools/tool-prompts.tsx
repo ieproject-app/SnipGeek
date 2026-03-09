@@ -28,6 +28,7 @@ import {
   ChevronDown,
   Download,
   Grid3X3,
+  GalleryHorizontal,
   ImageIcon,
   Calendar,
   Zap,
@@ -318,6 +319,7 @@ export function ToolPrompts({
   const [showImages, setShowImages] = useState(true);
   const [showDownloads, setShowDownloads] = useState(false);
   const [showGrids, setShowGrids] = useState(false);
+  const [showGallery, setShowGallery] = useState(false);
   const [isIdOnly, setIsIdOnly] = useState(false);
 
   // ── Status flags ──
@@ -333,6 +335,7 @@ export function ToolPrompts({
   const [isTechnicalExpanded, setIsTechnicalExpanded] = useState(true);
   const [downloadItems, setDownloadItems] = useState<DownloadItem[]>([]);
   const [imageGridMappings, setImageGridMappings] = useState("");
+  const [galleryMappings, setGalleryMappings] = useState("");
   const [images, setImages] = useState("");
 
   // ── Output ──
@@ -382,6 +385,7 @@ export function ToolPrompts({
         setShowImages(p.showImages !== undefined ? !!p.showImages : true);
         setShowDownloads(!!p.showDownloads);
         setShowGrids(!!p.showGrids);
+        setShowGallery(!!p.showGallery);
         setIsIdOnly(!!p.isIdOnly);
       } catch (_) { }
     }
@@ -391,9 +395,9 @@ export function ToolPrompts({
     if (!mounted) return;
     localStorage.setItem(
       "snipgeek-prompt-features",
-      JSON.stringify({ showImages, showDownloads, showGrids, isIdOnly }),
+      JSON.stringify({ showImages, showDownloads, showGrids, showGallery, isIdOnly }),
     );
-  }, [showImages, showDownloads, showGrids, isIdOnly, mounted]);
+  }, [showImages, showDownloads, showGrids, showGallery, isIdOnly, mounted]);
 
   // ── Build prompt ──
   useEffect(() => {
@@ -447,6 +451,13 @@ export function ToolPrompts({
       });
     }
 
+    if (showGallery && galleryMappings) {
+      prompt += `\n**6. HERO GALLERIES**\n`;
+      galleryMappings.split("\n").filter(l => l.trim()).forEach((line, i) => {
+        prompt += `- Gallery ${i + 1}: ${line} (use {{Gallery ${i + 1}}} in draft)\n`;
+      });
+    }
+
     prompt += `\n---\n\n`;
     if (isModify) {
       prompt += `**ORIGINAL CONTENT:**\n${originalContent || "[MISSING]"}\n\n`;
@@ -475,8 +486,10 @@ export function ToolPrompts({
     contentType,
     downloadItems,
     imageGridMappings,
+    galleryMappings,
     showDownloads,
     showGrids,
+    showGallery,
     showImages,
     selectedSlug,
     categoryHint,
@@ -530,6 +543,14 @@ export function ToolPrompts({
     notify(
       `Grid ${index + 1} caller copied`,
       <Copy className="h-4 w-4 text-violet-400" />,
+    );
+  }, [notify]);
+
+  const copyGalleryCaller = useCallback((index: number) => {
+    navigator.clipboard.writeText(`{{Gallery ${index + 1}}}`);
+    notify(
+      `Gallery ${index + 1} caller copied`,
+      <Copy className="h-4 w-4 text-fuchsia-400" />,
     );
   }, [notify]);
 
@@ -693,6 +714,13 @@ export function ToolPrompts({
                 icon={Grid3X3}
                 label="Grids"
                 activeClass="bg-violet-500 text-white border-violet-400 shadow-[0_0_15px_rgba(139,92,246,0.3)]"
+              />
+              <FeaturePill
+                active={showGallery}
+                onClick={() => setShowGallery(!showGallery)}
+                icon={GalleryHorizontal}
+                label="Gallery"
+                activeClass="bg-fuchsia-500 text-white border-fuchsia-400 shadow-[0_0_15px_rgba(217,70,239,0.3)]"
               />
               <FeaturePill
                 active={isIdOnly}
@@ -959,8 +987,8 @@ export function ToolPrompts({
                         </Card>
                       )}
 
-                      {/* Downloads & Grids side by side */}
-                      {(showDownloads || showGrids) && (
+                      {/* Downloads, Grids & Galleries */}
+                      {(showDownloads || showGrids || showGallery) && (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           {showDownloads && (
                             <Card className="bg-card/50 border-primary/10 shadow-sm border-l-4 border-l-blue-400 rounded-xl">
@@ -1088,11 +1116,56 @@ export function ToolPrompts({
                               </CardContent>
                             </Card>
                           )}
+
+                          {showGallery && (
+                            <Card className="bg-card/50 border-primary/10 shadow-sm border-l-4 border-l-fuchsia-400 rounded-xl">
+                              <CardHeader className="border-b bg-muted/5 py-3 px-5 flex flex-row items-center gap-2">
+                                <GalleryHorizontal className="h-3.5 w-3.5 text-fuchsia-500 shrink-0" />
+                                <CardTitle className="text-[10px] font-black uppercase tracking-widest">
+                                  Galleries
+                                </CardTitle>
+                                <span className="ml-auto text-[9px] text-muted-foreground/50 font-mono">
+                                  caption | img1, img2, img3
+                                </span>
+                              </CardHeader>
+                              <CardContent className="p-5 space-y-3">
+                                <Textarea
+                                  placeholder={"Optional caption | path1.webp, path2.webp, path3.webp"}
+                                  value={galleryMappings}
+                                  onChange={(e) =>
+                                    setGalleryMappings(e.target.value)
+                                  }
+                                  className={cn(
+                                    "min-h-[90px] font-mono text-[11px] bg-background/50 p-4",
+                                    focusRing,
+                                  )}
+                                />
+                                {/* Gallery caller references */}
+                                {galleryMappings.trim() && (
+                                  <div className="space-y-1">
+                                    <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/50">Callers</span>
+                                    <div className="flex flex-wrap gap-1">
+                                      {galleryMappings.split("\n").filter(l => l.trim()).map((_, i) => (
+                                        <button
+                                          key={i}
+                                          onClick={() => copyGalleryCaller(i)}
+                                          className="flex items-center gap-1 px-2 py-1 rounded-md text-[9px] font-mono bg-fuchsia-500/10 text-fuchsia-500 hover:bg-fuchsia-500/20 border border-fuchsia-500/20 transition-colors"
+                                        >
+                                          <Copy className="h-2.5 w-2.5" />
+                                          {`{{Gallery ${i + 1}}}`}
+                                        </button>
+                                      ))}
+                                    </div>
+                                  </div>
+                                )}
+                              </CardContent>
+                            </Card>
+                          )}
                         </div>
                       )}
 
                       {/* Empty state when all features are off */}
-                      {!showImages && !showDownloads && !showGrids && (
+                      {!showImages && !showDownloads && !showGrids && !showGallery && (
                         <div className="py-8 flex flex-col items-center gap-3 text-center border border-dashed border-primary/10 rounded-xl bg-muted/[0.02]">
                           <Settings2 className="h-6 w-6 text-muted-foreground/20" />
                           <p className="text-[10px] text-muted-foreground/40 font-medium">
