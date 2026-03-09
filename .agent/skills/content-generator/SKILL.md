@@ -62,7 +62,8 @@ Use `<kbd>Key</kbd>` for hotkeys: `<kbd>Ctrl</kbd> + <kbd>C</kbd>`.
 
 - **Location**: Store images in `public/images/_posts/{category}/{slug}/`.
 - **Format**: Prefer WebP with optimized file size.
-- **Grids**: Use `<ImageGrid count={2} images={["path1", "path2"]} />` for multiple images.
+- **Galleries**: Use `<Gallery caption="Optional caption or source">\n  ![Img 1](path1)\n  ![Img 2](path2)\n  ![Img 3](path3)\n</Gallery>` for a full-width 3-image hero-style gallery.
+- **Grids**: Use `<ImageGrid columns="2">\n  ![Img 1](path1)\n  ![Img 2](path2)\n</ImageGrid>` for inline image grouping. **CRITICAL:** `ImageGrid` is STRICTLY INCOMPATIBLE with `<Steps>`. Inside `<Steps>`, you MUST only use single standard images, never grids.
 
 ## 5. Automation Logic for AI
 

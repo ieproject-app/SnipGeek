@@ -222,6 +222,35 @@ export const ImageGrid = ({
   );
 };
 
+export const Gallery = ({
+  children,
+  caption,
+  class: _class,
+  className,
+  parentName,
+  ...props
+}: any) => {
+  return (
+    <div
+      className={cn(
+        "my-12 w-full relative sm:-mx-8 lg:-mx-16 sm:w-[calc(100%+4rem)] lg:w-[calc(100%+8rem)]",
+        _class,
+        className,
+      )}
+      {...props}
+    >
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 [&>p]:contents [&>span]:contents [&_span.block]:!my-0 [&_span.block]:w-full [&_img]:!my-0 [&_img]:rounded-xl [&_img]:w-full [&_img]:aspect-[4/3] [&_img]:object-cover hover:[&_img]:shadow-md transition-shadow">
+        {children}
+      </div>
+      {caption && (
+        <p className="mt-5 text-center text-[13px] text-muted-foreground/85 font-medium italic">
+          {caption}
+        </p>
+      )}
+    </div>
+  );
+};
+
 const MdxH1 = ({
   children,
   class: _class,
@@ -749,6 +778,7 @@ export const mdxComponents = {
   ),
   DownloadButton,
   ImageGrid,
+  Gallery,
   Callout,
   Steps,
   Step,
