@@ -94,7 +94,7 @@ const HighlightMatch = ({ text, query }: { text: string; query: string }) => {
   }
 };
 
-export function Header({
+export function LayoutHeader({
   searchableData,
   dictionary,
 }: {

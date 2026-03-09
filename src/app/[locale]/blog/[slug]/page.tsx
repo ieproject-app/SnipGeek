@@ -14,14 +14,14 @@ import { MDXRemote } from "next-mdx-remote/rsc";
 import Image from "next/image";
 import Link from "next/link";
 import { mdxComponents } from "@/components/mdx-components";
-import { PostComments } from "@/components/blog/post-comments";
-import { PostMeta } from "@/components/blog/post-meta";
-import { ShareButtons } from "@/components/blog/share-buttons";
-import { RelatedPosts } from "@/components/blog/related-posts";
-import { TableOfContents } from "@/components/blog/table-of-contents";
-import { ArticleTopics } from "@/components/blog/article-topics";
+import { ArticleComments } from "@/components/blog/article-comments";
+import { ArticleMeta } from "@/components/blog/article-meta";
+import { ArticleShare } from "@/components/blog/article-share";
+import { ArticleRelated } from "@/components/blog/article-related";
+import { ArticleTOC } from "@/components/blog/article-toc";
+import { ArticleTags } from "@/components/blog/article-tags";
 import { extractHeadings } from "@/lib/mdx-utils";
-import { Breadcrumbs } from "@/components/layout/breadcrumbs";
+import { LayoutBreadcrumbs } from "@/components/layout/layout-breadcrumbs";
 import { resolveHeroImage, getLinkPrefix } from "@/lib/utils";
 import remarkGfm from "remark-gfm";
 import rehypeShiki from "@shikijs/rehype";
@@ -140,9 +140,9 @@ export default async function Page({
   const heroSource = resolved
     ? { url: resolved.src, hint: resolved.hint }
     : {
-        url: "/images/blank/blank.webp",
-        hint: "snipgeek default image",
-      };
+      url: "/images/blank/blank.webp",
+      hint: "snipgeek default image",
+    };
 
   const headings = extractHeadings(initialPost.content || "");
   const wordCount = (initialPost.content || "").trim().split(/\s+/).length || 0;
@@ -198,7 +198,7 @@ export default async function Page({
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-16 sm:pb-24">
         <article>
           <header className="mb-12 text-center">
-            <Breadcrumbs
+            <LayoutBreadcrumbs
               segments={breadcrumbSegments}
               className="mb-6 justify-center"
             />
@@ -207,7 +207,7 @@ export default async function Page({
               {initialPost.frontmatter.title}
             </h1>
 
-            <PostMeta
+            <ArticleMeta
               frontmatter={initialPost.frontmatter}
               item={itemForMeta}
               locale={locale}
@@ -240,7 +240,7 @@ export default async function Page({
           </header>
 
           <div className="max-w-3xl mx-auto">
-            <TableOfContents
+            <ArticleTOC
               headings={headings}
               title={dictionary.post.toc}
               locale={locale}
@@ -259,7 +259,7 @@ export default async function Page({
               />
             </div>
 
-            <ArticleTopics
+            <ArticleTags
               tags={initialPost.frontmatter.tags || []}
               linkPrefix={linkPrefix}
               title={
@@ -279,13 +279,13 @@ export default async function Page({
               <h3 className="text-lg font-semibold tracking-tight text-primary">
                 {dictionary.post.shareArticle}
               </h3>
-              <ShareButtons
+              <ArticleShare
                 title={initialPost.frontmatter.title}
                 imageUrl={heroSource?.url}
               />
             </div>
 
-            <PostComments
+            <ArticleComments
               article={{
                 slug: initialPost.slug,
                 title: initialPost.frontmatter.title,
@@ -345,7 +345,7 @@ export default async function Page({
           }),
         }}
       />
-      <RelatedPosts
+      <ArticleRelated
         type="blog"
         locale={locale}
         currentSlug={initialPost.slug}

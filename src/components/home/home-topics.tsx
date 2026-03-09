@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { ChevronRight } from "lucide-react";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
-import { Breadcrumbs } from "@/components/layout/breadcrumbs";
+import { LayoutBreadcrumbs } from "@/components/layout/layout-breadcrumbs";
 import { formatRelativeTime } from "@/lib/utils";
 import { AddToReadingListButton } from "@/components/layout/add-to-reading-list-button";
 import type { Dictionary } from "@/lib/get-dictionary";
@@ -24,7 +24,7 @@ interface TopicPost {
   };
 }
 
-interface TopicHighlightProps {
+interface HomeTopicsProps {
   posts: TopicPost[];
   title: string;
   breadcrumbHome: string;
@@ -36,9 +36,9 @@ interface TopicHighlightProps {
 }
 
 /**
- * TopicHighlight - Standardized with pb-12 sm:pb-16 to prevent padding stacking.
+ * HomeTopics - Standardized with pb-12 sm:pb-16 to prevent padding stacking.
  */
-export function TopicHighlight({
+export function HomeTopics({
   posts,
   title,
   breadcrumbHome,
@@ -47,7 +47,7 @@ export function TopicHighlight({
   locale,
   linkPrefix,
   tag,
-}: TopicHighlightProps) {
+}: HomeTopicsProps) {
   const renderHorizontalCard = (post: TopicPost, index: number) => {
     const heroImageValue = post.frontmatter.heroImage;
     let heroImageSrc = "/images/blank/blank.webp";
@@ -121,7 +121,7 @@ export function TopicHighlight({
           <h2 className="text-3xl font-extrabold font-display tracking-tight text-primary mb-2">
             {title}
           </h2>
-          <Breadcrumbs segments={breadcrumbSegments} className="mb-4" />
+          <LayoutBreadcrumbs segments={breadcrumbSegments} className="mb-4" />
           <div className="w-full h-0.5 bg-gradient-to-r from-accent via-accent/50 to-transparent" />
         </header>
       </ScrollReveal>

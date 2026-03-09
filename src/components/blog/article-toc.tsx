@@ -5,17 +5,17 @@ import { cn } from "@/lib/utils";
 import type { Heading } from "@/lib/mdx-utils";
 import { ChevronRight, ListIcon } from "lucide-react";
 
-interface TableOfContentsProps {
+interface ArticleTOCProps {
   headings: Heading[];
   title: string;
   locale?: string;
 }
 
-export function TableOfContents({
+export function ArticleTOC({
   headings,
   title,
   locale = "en",
-}: TableOfContentsProps) {
+}: ArticleTOCProps) {
   const [isOpen, setIsOpen] = useState(false);
 
   const handleHeadingClick = (

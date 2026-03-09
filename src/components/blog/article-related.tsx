@@ -10,7 +10,7 @@ import { formatRelativeTime, cn } from "@/lib/utils";
 import { CategoryBadge } from "@/components/layout/category-badge";
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
 
-type RelatedPostsProps = {
+type ArticleRelatedProps = {
   type: "blog" | "note";
   locale: string;
   currentSlug: string;
@@ -24,7 +24,7 @@ type RelatedPostsProps = {
  * RelatedPosts - Shows suggested content at the bottom of post pages.
  * Handles both Blog and Note styles to match their respective listing pages.
  */
-export function RelatedPosts({
+export function ArticleRelated({
   type,
   locale,
   currentSlug,
@@ -32,7 +32,7 @@ export function RelatedPosts({
   currentCategory,
   initialRelatedContent,
   dictionary,
-}: RelatedPostsProps) {
+}: ArticleRelatedProps) {
   const linkPrefix = locale === "en" ? "" : `/${locale}`;
 
   const formatDate = (date: Date) => {

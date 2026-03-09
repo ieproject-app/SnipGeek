@@ -1,5 +1,5 @@
-import { Header } from "@/components/layout/header";
-import { Footer } from "@/components/layout/footer";
+import { LayoutHeader } from "@/components/layout/layout-header";
+import { LayoutFooter } from "@/components/layout/layout-footer";
 import { i18n } from "@/i18n-config";
 import {
   getAllTranslationsMap as getAllPostTranslationsMap,
@@ -206,12 +206,12 @@ export default async function LocaleLayout({
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
             <NotificationProvider>
               <ReadingListProvider>
-                <Header
+                <LayoutHeader
                   searchableData={searchableData}
                   dictionary={dictionary}
                 />
                 <main className="pt-16">{children}</main>
-                <Footer
+                <LayoutFooter
                   locale={locale}
                   dictionary={dictionary}
                   translationsMap={translationsMap}

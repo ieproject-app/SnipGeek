@@ -8,7 +8,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 const productionHostname = "snipgeek.com";
 const disqusShortname = "snipgeek-com";
 
-interface PostCommentsProps {
+interface ArticleCommentsProps {
   article: {
     slug: string;
     title: string;
@@ -17,7 +17,7 @@ interface PostCommentsProps {
   locale: string;
 }
 
-export function PostComments({ article, type, locale }: PostCommentsProps) {
+export function ArticleComments({ article, type, locale }: ArticleCommentsProps) {
   const [shouldLoad, setShouldLoad] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [isProductionDomain, setIsProductionDomain] = useState(false);

@@ -22,7 +22,7 @@ import { ScrollReveal } from "@/components/ui/scroll-reveal";
 import { SnipTooltip } from "@/components/ui/snip-tooltip";
 import { getLinkPrefix } from "@/lib/utils";
 
-export function Footer({
+export function LayoutFooter({
   locale,
   dictionary,
   translationsMap,

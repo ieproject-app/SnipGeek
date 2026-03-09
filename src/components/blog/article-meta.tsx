@@ -8,7 +8,7 @@ import Link from 'next/link';
 import { i18n } from '@/i18n-config';
 import { cn, formatRelativeTime } from '@/lib/utils';
 
-interface PostMetaProps {
+interface ArticleMetaProps {
   frontmatter: PostFrontmatter | NoteFrontmatter;
   item: ReadingListItem;
   locale: string;
@@ -18,7 +18,7 @@ interface PostMetaProps {
   isCentered?: boolean;
 }
 
-export function PostMeta({ frontmatter, item, locale, dictionary, readingTime, isOverlay = false, isCentered = false }: PostMetaProps) {
+export function ArticleMeta({ frontmatter, item, locale, dictionary, readingTime, isOverlay = false, isCentered = false }: ArticleMetaProps) {
   const authorName = "Iwan Efendi";
   const displayDate = frontmatter.updated || frontmatter.date;
   const isUpdated = !!frontmatter.updated;

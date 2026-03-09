@@ -5,7 +5,7 @@ import { Hash, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getBadgeStyle } from "@/components/layout/category-badge";
 
-interface ArticleTopicsProps {
+interface ArticleTagsProps {
   tags: string[];
   linkPrefix: string;
   title?: string;
@@ -13,13 +13,13 @@ interface ArticleTopicsProps {
   className?: string;
 }
 
-export function ArticleTopics({
+export function ArticleTags({
   tags,
   linkPrefix,
   title = "Topics in this article",
   description = "Explore related topics and continue reading similar content.",
   className,
-}: ArticleTopicsProps) {
+}: ArticleTagsProps) {
   if (!tags || tags.length === 0) return null;
 
   return (

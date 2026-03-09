@@ -14,7 +14,7 @@ import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { SnipTooltip } from "@/components/ui/snip-tooltip";
 
-interface ShareButtonsProps {
+interface ArticleShareProps {
   title: string;
   imageUrl?: string;
 }
@@ -22,7 +22,7 @@ interface ShareButtonsProps {
 // TODO: Replace with your actual production domain
 const productionUrl = "https://snipgeek.com";
 
-export function ShareButtons({ title, imageUrl }: ShareButtonsProps) {
+export function ArticleShare({ title, imageUrl }: ArticleShareProps) {
   const pathname = usePathname();
   const [currentUrl, setCurrentUrl] = useState("");
   const [copied, setCopied] = useState(false);

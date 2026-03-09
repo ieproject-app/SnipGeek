@@ -30,7 +30,7 @@ interface SliderPost {
   };
 }
 
-interface TutorialSliderProps {
+interface HomeUpdatesProps {
   posts: SliderPost[];
   title: string;
   viewMoreText: string;
@@ -39,7 +39,7 @@ interface TutorialSliderProps {
   tag?: string;
 }
 
-export function TutorialSlider({ posts, title, viewMoreText, dictionary, locale, tag }: TutorialSliderProps) {
+export function HomeUpdates({ posts, title, viewMoreText, dictionary, locale, tag }: HomeUpdatesProps) {
   const [api, setApi] = React.useState<CarouselApi>();
   const [current, setCurrent] = React.useState(0);
   const [count, setCount] = React.useState(0);
@@ -61,7 +61,7 @@ export function TutorialSlider({ posts, title, viewMoreText, dictionary, locale,
   return (
     <section className="pb-12 sm:pb-16 overflow-hidden">
       <div className="container max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Section Header - Left Aligned */}
+        {/* Section Header */}
         <ScrollReveal direction="left">
           <div className="mb-8 text-left">
             <h2 className="text-sm font-medium font-display text-primary mb-2 italic">
@@ -71,7 +71,7 @@ export function TutorialSlider({ posts, title, viewMoreText, dictionary, locale,
           </div>
         </ScrollReveal>
 
-        {/* Slider */}
+        {/* Carousel */}
         <ScrollReveal direction="up" delay={0.2}>
           <Carousel
             setApi={setApi}
@@ -108,38 +108,39 @@ export function TutorialSlider({ posts, title, viewMoreText, dictionary, locale,
                 };
 
                 return (
-                  <CarouselItem key={post.slug} className="pl-4 sm:pl-6 md:basis-1/2 lg:basis-1/3 pb-6 pt-2">
+                  <CarouselItem key={post.slug} className="pl-4 sm:pl-6 md:basis-1/2 py-2">
                     <article className={cn(
-                      "relative bg-card rounded-lg border border-primary/5 transition-all duration-500 h-full flex flex-col group/card overflow-hidden shadow-md",
-                      "hover:-translate-y-1.5 hover:border-primary/10",
-                      "dark:shadow-black/40"
+                      "bg-card/50 rounded-lg overflow-hidden border border-primary/5 p-3 transition-all duration-500 h-full flex gap-4 shadow-sm group",
+                      "hover:-translate-y-1 hover:bg-card hover:border-primary/10"
                     )}>
-                      <Link href={`${linkPrefix}/blog/${post.slug}`} className="block h-full group">
-                        {/* Image container - Changed to aspect 4:3 */}
-                        <div className="relative aspect-[4/3] overflow-hidden z-10 rounded-t-lg">
+                      <Link href={`${linkPrefix}/blog/${post.slug}`} className="contents">
+                        {/* Thumbnail Container - Updated to 4:3 (120x90) */}
+                        <div className="relative w-[120px] h-[90px] shrink-0 overflow-hidden rounded-lg shadow-sm border border-primary/5">
                           <Image
                             src={heroImageSrc}
                             alt={post.frontmatter.imageAlt || post.frontmatter.title}
                             fill
                             className="object-cover transition-transform duration-700 group-hover:scale-110"
-                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 33vw, 300px"
+                            sizes="120px"
                             data-ai-hint={heroImageHint}
                           />
                           <AddToReadingListButton
                             item={item}
                             dictionary={dictionary}
                             showText={false}
-                            className="absolute top-2 right-2 z-20 text-white bg-black/30 hover:bg-black/50 hover:text-white opacity-0 group-hover/card:opacity-100 transition-opacity"
+                            className="absolute top-1 right-1 z-20 text-white bg-black/30 hover:bg-black/50 hover:text-white opacity-0 group-hover:opacity-100 transition-opacity h-6 w-6"
                           />
                         </div>
-                        <div className="p-5 flex-1 flex flex-col z-10">
-                          <div className="mb-2">
-                            <CategoryBadge category={post.frontmatter.category || 'Featured'} />
+
+                        {/* Content Area */}
+                        <div className="flex-1 min-w-0 py-1">
+                          <div className="mb-1">
+                            <CategoryBadge category={post.frontmatter.category || 'Update'} />
                           </div>
-                          <h3 className="font-display text-base font-semibold text-primary leading-snug group-hover:text-accent transition-colors">
+                          <h3 className="font-display text-base font-medium text-primary leading-snug line-clamp-2 transition-colors group-hover:text-accent">
                             {post.frontmatter.title}
                           </h3>
-                          <time className="text-[10px] text-muted-foreground mt-3 block font-medium opacity-60">
+                          <time className="text-[10px] text-muted-foreground mt-2 block font-medium opacity-60">
                             {formatRelativeTime(new Date(post.frontmatter.date), locale)}
                           </time>
                         </div>
@@ -150,7 +151,7 @@ export function TutorialSlider({ posts, title, viewMoreText, dictionary, locale,
               })}
             </CarouselContent>
 
-            {/* Controls & Custom "View More" Style */}
+            {/* Controls - Redesigned Style */}
             <div className="mt-6 flex justify-center">
               <Link
                 href={viewMoreHref}

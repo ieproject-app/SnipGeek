@@ -5,7 +5,7 @@ import { cn, getLinkPrefix } from "@/lib/utils";
 import Link from "next/link";
 import { Hash, ArrowRight } from "lucide-react";
 import { CategoryBadge, getBadgeStyle } from "@/components/layout/category-badge";
-import { Breadcrumbs } from "@/components/layout/breadcrumbs";
+import { LayoutBreadcrumbs } from "@/components/layout/layout-breadcrumbs";
 import type { Metadata } from "next";
 
 export async function generateStaticParams() {
@@ -50,7 +50,7 @@ export default async function TagsPage({
         <div className="w-full">
             <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-16 sm:pb-24">
                 <header className="mb-12 text-center">
-                    <Breadcrumbs
+                    <LayoutBreadcrumbs
                         segments={breadcrumbSegments}
                         className="mb-6 justify-center"
                     />

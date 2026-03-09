@@ -12,14 +12,14 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { MDXRemote } from "next-mdx-remote/rsc";
 import { mdxComponents } from "@/components/mdx-components";
-import { PostMeta } from "@/components/blog/post-meta";
-import { ShareButtons } from "@/components/blog/share-buttons";
-import { RelatedPosts } from "@/components/blog/related-posts";
-import { TableOfContents } from "@/components/blog/table-of-contents";
-import { ArticleTopics } from "@/components/blog/article-topics";
+import { ArticleMeta } from "@/components/blog/article-meta";
+import { ArticleShare } from "@/components/blog/article-share";
+import { ArticleRelated } from "@/components/blog/article-related";
+import { ArticleTOC } from "@/components/blog/article-toc";
+import { ArticleTags } from "@/components/blog/article-tags";
 import { extractHeadings } from "@/lib/mdx-utils";
-import { Breadcrumbs } from "@/components/layout/breadcrumbs";
-import { PostComments } from "@/components/blog/post-comments";
+import { LayoutBreadcrumbs } from "@/components/layout/layout-breadcrumbs";
+import { ArticleComments } from "@/components/blog/article-comments";
 import remarkGfm from "remark-gfm";
 import rehypeShiki from "@shikijs/rehype";
 import { resolveHeroImage, getLinkPrefix } from "@/lib/utils";
@@ -171,14 +171,14 @@ export default async function Page({
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-16 sm:pb-24">
         <article>
           <header className="mb-12 text-center">
-            <Breadcrumbs
+            <LayoutBreadcrumbs
               segments={breadcrumbSegments}
               className="mb-6 justify-center"
             />
             <h1 className="font-display text-4xl font-extrabold tracking-tighter text-primary mb-6 max-w-3xl mx-auto">
               {initialNote.frontmatter.title}
             </h1>
-            <PostMeta
+            <ArticleMeta
               frontmatter={initialNote.frontmatter}
               item={itemForMeta}
               locale={locale}
@@ -190,7 +190,7 @@ export default async function Page({
           </header>
 
           <div className="max-w-3xl mx-auto">
-            <TableOfContents
+            <ArticleTOC
               headings={headings}
               title={dictionary.post.toc}
               locale={locale}
@@ -208,7 +208,7 @@ export default async function Page({
               />
             </div>
 
-            <ArticleTopics
+            <ArticleTags
               tags={initialNote.frontmatter.tags ?? []}
               linkPrefix={linkPrefix}
               title={
@@ -225,9 +225,9 @@ export default async function Page({
               <h3 className="text-lg font-semibold tracking-tight text-primary">
                 {dictionary.post.shareArticle}
               </h3>
-              <ShareButtons title={initialNote.frontmatter.title} />
+              <ArticleShare title={initialNote.frontmatter.title} />
             </div>
-            <PostComments
+            <ArticleComments
               article={{
                 slug: initialNote.slug,
                 title: initialNote.frontmatter.title,
@@ -287,7 +287,7 @@ export default async function Page({
           }),
         }}
       />
-      <RelatedPosts
+      <ArticleRelated
         type="note"
         locale={locale}
         currentSlug={initialNote.slug}

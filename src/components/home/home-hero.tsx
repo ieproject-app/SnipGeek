@@ -10,7 +10,7 @@ import { AddToReadingListButton } from '@/components/layout/add-to-reading-list-
 import { ArrowRight } from 'lucide-react';
 import { CategoryBadge, getBadgeStyle, simplifyCategoryLabel } from '@/components/layout/category-badge';
 
-interface HeroFeaturedProps {
+interface HomeHeroProps {
     posts: Post<PostFrontmatter>[];
     dictionary: Dictionary;
     locale: string;
@@ -18,10 +18,10 @@ interface HeroFeaturedProps {
 }
 
 /**
- * HeroFeatured - A sophisticated 4-column staggered gallery grid using the colorful badge system.
+ * HomeHero - A sophisticated 4-column staggered gallery grid using the colorful badge system.
  * Updated: Category badge moved to Caption Block (Option 1) and minimalist labels implemented.
  */
-export function HeroFeatured({ posts, dictionary, locale, linkPrefix }: HeroFeaturedProps) {
+export function HomeHero({ posts, dictionary, locale, linkPrefix }: HomeHeroProps) {
     if (posts.length === 0) return null;
 
     return (

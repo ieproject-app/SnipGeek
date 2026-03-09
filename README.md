@@ -1,6 +1,6 @@
 # SnipGeek
 
-> A modern, minimalist tech blog and internal toolkit — built with Next.js 15, React 19, and Firebase.
+> A modern, minimalist tech blog and internal toolkit — built with Next.js 16, React 19, and Tailwind CSS v4.
 
 SnipGeek is a bilingual (EN/ID) content platform for publishing technical articles, short notes, and running internal web-based tools. It uses the Next.js App Router with a `[locale]` dynamic segment for full i18n support, MDX for rich content, and Firebase for authentication and data storage.
 
@@ -10,6 +10,8 @@ SnipGeek is a bilingual (EN/ID) content platform for publishing technical articl
 
 ### 📝 Blog & Notes
 - MDX-powered articles and short-form notes with full syntax highlighting (via Shiki, `github-dark` theme)
+- **Zoomable Images**: Interactive image previews with click-to-exit functionality.
+- **Download Buttons**: Custom MDX components for software/file downloads.
 - Table of Contents auto-generated from `##` and `###` headings
 - Reading time estimation
 - Fallback to EN when a locale-specific translation does not exist
@@ -117,14 +119,14 @@ src/
 │   │   │   └── [slug]/         # Individual note page
 │   │   ├── tools/              # Tool pages (prompt-generator, employee-history, …)
 │   │   └── layout.tsx          # Locale layout — fonts, ThemeProvider, Header, Footer
-│   ├── globals.css             # Tailwind base + CSS variables (HSL tokens for light/dark)
+│   ├── globals.css             # Tailwind 4 CSS (CSS variables for light/dark)
 │   ├── not-found.tsx           # 404 page (ThemeProvider-aware, correct fonts)
 │   ├── robots.ts
 │   └── sitemap.ts
 ├── components/
-│   ├── layout/                 # Header, Footer, ThemeSwitcher, LanguageSwitcher, …
-│   ├── blog/                   # PostMeta, ShareButtons, RelatedPosts, TableOfContents
-│   ├── home/                   # FeaturedPosts, FeatureSlider, TopicSection, …
+│   ├── layout/                 # layout-header.tsx, layout-footer.tsx, layout-breadcrumbs.tsx
+│   ├── blog/                   # article-meta.tsx, article-share.tsx, article-related.tsx, article-toc.tsx, article-tags.tsx
+│   ├── home/                   # home-hero.tsx, home-latest.tsx, home-topics.tsx, home-tutorials.tsx, home-updates.tsx
 │   ├── ui/                     # Shadcn/UI primitives + custom (SnipTooltip, Skeleton, …)
 │   └── icons/                  # Custom SVG icons (XLogo, TikTokLogo, SnipGeekLogo)
 ├── dictionaries/
@@ -178,7 +180,7 @@ translationKey: "english-kebab-case-slug"  # REQUIRED — same in EN and ID vers
 heroImage: "img-id-from-json"              # Use an ID from placeholder-images.json
 # heroImage: "/images/blog/custom.webp"   # or a /images/ path for a custom image
 published: true                            # false = draft (visible only in dev)
-featured: false                            # true = shown in FeaturedPosts carousel
+featured: false                            # true = shown in HomeHero carousel
 category: "Tutorial"                       # drives the colour-coded badge
 tags: ["Windows", "PowerShell"]
 ---
@@ -273,9 +275,9 @@ The following HTTP headers are applied to all routes via `next.config.ts`:
 
 | Layer | Technology |
 |---|---|
-| Framework | Next.js 15 (App Router, Turbopack) |
+| Framework | Next.js 16 (App Router, Turbopack) |
 | Language | TypeScript 5 |
-| Styling | Tailwind CSS 3 + Shadcn/UI |
+| Styling | Tailwind CSS 4 + Shadcn/UI |
 | Icons | Lucide React |
 | Fonts | Bricolage Grotesque, Plus Jakarta Sans, Lora, JetBrains Mono |
 | Content | MDX via `next-mdx-remote` v6 |
