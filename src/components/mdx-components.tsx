@@ -198,18 +198,19 @@ export const ImageGrid = ({
   parentName,
   ...props
 }: any) => {
+  const cols = Number(columns);
   const gridCols =
     {
       1: "grid-cols-1",
       2: "grid-cols-1 sm:grid-cols-2",
       3: "grid-cols-1 sm:grid-cols-2 md:grid-cols-3",
       4: "grid-cols-1 sm:grid-cols-2 lg:grid-cols-4",
-    }[columns as 1 | 2 | 3 | 4] || "grid-cols-1 sm:grid-cols-2";
+    }[cols as 1 | 2 | 3 | 4] || "grid-cols-1 sm:grid-cols-2";
 
   return (
     <div
       className={cn(
-        "grid gap-4 my-8 [&>p]:m-0 [&>span]:m-0",
+        "grid gap-4 my-8 [&>p]:contents [&>p]:m-0 [&>span]:m-0",
         gridCols,
         _class,
         className,
