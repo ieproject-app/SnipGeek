@@ -64,6 +64,18 @@ type DownloadItem = {
   value: string;
 };
 
+type SpecItemRow = {
+  id: string;
+  label: string;
+  value: string;
+};
+
+type SpecGroup = {
+  id: string;
+  title: string;
+  items: SpecItemRow[];
+};
+
 type ArticleSummary = {
   slug: string;
   title: string;
@@ -320,6 +332,7 @@ export function ToolPrompts({
   const [showDownloads, setShowDownloads] = useState(false);
   const [showGrids, setShowGrids] = useState(false);
   const [showGallery, setShowGallery] = useState(false);
+  const [showSpecs, setShowSpecs] = useState(false);
   const [isIdOnly, setIsIdOnly] = useState(false);
 
   // ── Status flags ──
@@ -337,6 +350,7 @@ export function ToolPrompts({
   const [imageGridMappings, setImageGridMappings] = useState("");
   const [galleryMappings, setGalleryMappings] = useState("");
   const [images, setImages] = useState("");
+  const [specsData, setSpecsData] = useState<SpecGroup[]>([]);
 
   // ── Output ──
   const [generatedPrompt, setGeneratedPrompt] = useState("");
@@ -386,6 +400,7 @@ export function ToolPrompts({
         setShowDownloads(!!p.showDownloads);
         setShowGrids(!!p.showGrids);
         setShowGallery(!!p.showGallery);
+        setShowSpecs(!!p.showSpecs);
         setIsIdOnly(!!p.isIdOnly);
       } catch (_) { }
     }
@@ -395,9 +410,9 @@ export function ToolPrompts({
     if (!mounted) return;
     localStorage.setItem(
       "snipgeek-prompt-features",
-      JSON.stringify({ showImages, showDownloads, showGrids, showGallery, isIdOnly }),
+      JSON.stringify({ showImages, showDownloads, showGrids, showGallery, showSpecs, isIdOnly }),
     );
-  }, [showImages, showDownloads, showGrids, showGallery, isIdOnly, mounted]);
+  }, [showImages, showDownloads, showGrids, showGallery, showSpecs, isIdOnly, mounted]);
 
   // ── Build prompt ──
   useEffect(() => {
@@ -456,6 +471,16 @@ export function ToolPrompts({
       prompt += `\n**6. HERO GALLERIES**\n`;
       galleryMappings.split("\n").filter(l => l.trim()).forEach((line, i) => {
         prompt += `- Gallery ${i + 1}: ${line} (use {{Gallery ${i + 1}}} in draft)\n`;
+      });
+    }
+
+    if (showSpecs && specsData.length > 0) {
+      prompt += `\n**7. SYSTEM REQUIREMENTS**\n`;
+      specsData.forEach((group, i) => {
+        prompt += `- Group ${i + 1}: "${group.title || "Spesifikasi"}" (use {{Specs ${i + 1}}} in draft)\n`;
+        group.items.forEach((item) => {
+          prompt += `  - ${item.label}: ${item.value}\n`;
+        });
       });
     }
 
@@ -564,6 +589,71 @@ export function ToolPrompts({
     notify(
       `Gallery ${index + 1} caller copied`,
       <Copy className="h-4 w-4 text-fuchsia-400" />,
+    );
+  }, [notify]);
+
+  const addSpecGroup = () =>
+    setSpecsData([
+      ...specsData,
+      { id: generateUUID(), title: "", items: [] },
+    ]);
+
+  const removeSpecGroup = (id: string) =>
+    setSpecsData(specsData.filter((g) => g.id !== id));
+
+  const updateSpecGroup = (id: string, updates: Partial<SpecGroup>) =>
+    setSpecsData(
+      specsData.map((g) =>
+        g.id === id ? { ...g, ...updates } : g
+      ),
+    );
+
+  const addSpecItem = (groupId: string) =>
+    setSpecsData(
+      specsData.map((g) =>
+        g.id === groupId
+          ? {
+            ...g,
+            items: [
+              ...g.items,
+              { id: generateUUID(), label: "", value: "" },
+            ],
+          }
+          : g
+      ),
+    );
+
+  const removeSpecItem = (groupId: string, itemId: string) =>
+    setSpecsData(
+      specsData.map((g) =>
+        g.id === groupId
+          ? {
+            ...g,
+            items: g.items.filter((i) => i.id !== itemId),
+          }
+          : g
+      ),
+    );
+
+  const updateSpecItem = (groupId: string, itemId: string, updates: Partial<SpecItemRow>) =>
+    setSpecsData(
+      specsData.map((g) =>
+        g.id === groupId
+          ? {
+            ...g,
+            items: g.items.map((i) =>
+              i.id === itemId ? { ...i, ...updates } : i
+            ),
+          }
+          : g
+      ),
+    );
+
+  const copySpecCaller = useCallback((index: number) => {
+    navigator.clipboard.writeText(`{{Specs ${index + 1}}}`);
+    notify(
+      `Specs ${index + 1} caller copied`,
+      <Copy className="h-4 w-4 text-orange-400" />,
     );
   }, [notify]);
 
@@ -734,6 +824,13 @@ export function ToolPrompts({
                 icon={GalleryHorizontal}
                 label="Gallery"
                 activeClass="bg-fuchsia-500 text-white border-fuchsia-400 shadow-[0_0_15px_rgba(217,70,239,0.3)]"
+              />
+              <FeaturePill
+                active={showSpecs}
+                onClick={() => setShowSpecs(!showSpecs)}
+                icon={Settings2}
+                label="Specs"
+                activeClass="bg-orange-500 text-white border-orange-400 shadow-[0_0_15px_rgba(249,115,22,0.3)]"
               />
               <FeaturePill
                 active={isIdOnly}
@@ -1179,11 +1276,88 @@ export function ToolPrompts({
                               </CardContent>
                             </Card>
                           )}
+
+                          {showSpecs && (
+                            <Card className="bg-card/50 border-primary/10 shadow-sm border-l-4 border-l-orange-400 rounded-xl">
+                              <CardHeader className="border-b bg-muted/5 py-3 px-5 flex flex-row items-center gap-2">
+                                <Settings2 className="h-3.5 w-3.5 text-orange-500 shrink-0" />
+                                <CardTitle className="text-[10px] font-black uppercase tracking-widest">
+                                  System Specs
+                                </CardTitle>
+                              </CardHeader>
+                              <CardContent className="p-5 space-y-4">
+                                {specsData.map((group, groupIdx) => (
+                                  <div key={group.id} className="space-y-3 p-3 border border-primary/5 rounded-xl bg-background/30">
+                                    <div className="flex items-center gap-2">
+                                      <Input
+                                        value={group.title}
+                                        onChange={(e) => updateSpecGroup(group.id, { title: e.target.value })}
+                                        placeholder="Group Title (e.g. Minimum Specs)"
+                                        className="h-7 text-[10px] font-bold border-primary/10"
+                                      />
+                                      <button
+                                        onClick={() => removeSpecGroup(group.id)}
+                                        className="h-7 w-7 flex items-center justify-center rounded-md text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors shrink-0"
+                                      >
+                                        <Trash2 className="h-3 w-3" />
+                                      </button>
+                                      <SnipTooltip label={`Copy {{Specs ${groupIdx + 1}}}`} side="top">
+                                        <button
+                                          onClick={() => copySpecCaller(groupIdx)}
+                                          className="h-7 w-7 flex items-center justify-center rounded-md text-muted-foreground hover:text-orange-500 hover:bg-orange-500/10 transition-colors shrink-0"
+                                        >
+                                          <Copy className="h-3 w-3" />
+                                        </button>
+                                      </SnipTooltip>
+                                    </div>
+
+                                    <div className="space-y-2 pl-4 border-l-2 border-primary/5">
+                                      {group.items.map((item) => (
+                                        <div key={item.id} className="flex items-center gap-2">
+                                          <Input
+                                            value={item.label}
+                                            onChange={(e) => updateSpecItem(group.id, item.id, { label: e.target.value })}
+                                            placeholder="Label (e.g. CPU)"
+                                            className="h-7 flex-1 text-[10px] border-primary/10"
+                                          />
+                                          <Input
+                                            value={item.value}
+                                            onChange={(e) => updateSpecItem(group.id, item.id, { value: e.target.value })}
+                                            placeholder="Value (e.g. Core i5)"
+                                            className="h-7 flex-1 text-[10px] border-primary/10"
+                                          />
+                                          <button
+                                            onClick={() => removeSpecItem(group.id, item.id)}
+                                            className="h-7 w-7 flex items-center justify-center rounded-md text-muted-foreground hover:text-destructive transition-colors shrink-0"
+                                          >
+                                            <Trash2 className="h-3 w-3" />
+                                          </button>
+                                        </div>
+                                      ))}
+                                      <button
+                                        onClick={() => addSpecItem(group.id)}
+                                        className="flex items-center gap-1.5 text-[9px] font-bold text-primary hover:text-primary/70 transition-colors"
+                                      >
+                                        <Plus className="h-3 w-3" /> Add Item
+                                      </button>
+                                    </div>
+                                  </div>
+                                ))}
+                                <button
+                                  onClick={addSpecGroup}
+                                  className="w-full h-9 rounded-lg border border-dashed border-primary/20 text-[10px] font-black uppercase tracking-wide text-muted-foreground hover:text-primary hover:border-primary/40 transition-all flex items-center justify-center gap-1.5"
+                                >
+                                  <Plus className="h-3 w-3" />
+                                  Add Spec Group
+                                </button>
+                              </CardContent>
+                            </Card>
+                          )}
                         </div>
                       )}
 
                       {/* Empty state when all features are off */}
-                      {!showImages && !showDownloads && !showGrids && !showGallery && (
+                      {!showImages && !showDownloads && !showGrids && !showGallery && !showSpecs && (
                         <div className="py-8 flex flex-col items-center gap-3 text-center border border-dashed border-primary/10 rounded-xl bg-muted/[0.02]">
                           <Settings2 className="h-6 w-6 text-muted-foreground/20" />
                           <p className="text-[10px] text-muted-foreground/40 font-medium">
