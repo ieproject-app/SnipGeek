@@ -64,18 +64,6 @@ type DownloadItem = {
   value: string;
 };
 
-type SpecItemRow = {
-  id: string;
-  label: string;
-  value: string;
-};
-
-type SpecGroup = {
-  id: string;
-  title: string;
-  items: SpecItemRow[];
-};
-
 type ArticleSummary = {
   slug: string;
   title: string;
@@ -349,8 +337,8 @@ export function ToolPrompts({
   const [downloadItems, setDownloadItems] = useState<DownloadItem[]>([]);
   const [imageGridMappings, setImageGridMappings] = useState("");
   const [galleryMappings, setGalleryMappings] = useState("");
+  const [specsMappings, setSpecsMappings] = useState("");
   const [images, setImages] = useState("");
-  const [specsData, setSpecsData] = useState<SpecGroup[]>([]);
 
   // ── Output ──
   const [generatedPrompt, setGeneratedPrompt] = useState("");
@@ -474,14 +462,11 @@ export function ToolPrompts({
       });
     }
 
-    if (showSpecs && specsData.length > 0) {
-      prompt += `\n**7. SYSTEM REQUIREMENTS**\n`;
-      specsData.forEach((group, i) => {
-        prompt += `- Group ${i + 1}: "${group.title || "Spesifikasi"}" (use {{Specs ${i + 1}}} in draft)\n`;
-        group.items.forEach((item) => {
-          prompt += `  - ${item.label}: ${item.value}\n`;
-        });
-      });
+    if (showSpecs && specsMappings.trim()) {
+      prompt += `\n**7. SYSTEM REQUIREMENTS (RAW DATA)**\n`;
+      prompt += `Parse the following raw text into <SpecList> and <SpecItem> blocks. Each line or block represents a spec group.\n`;
+      prompt += `${specsMappings}\n`;
+      prompt += `(Use {{Specs 1}}, {{Specs 2}}, etc. placeholders from the draft to place these spec sheets)\n`;
     }
 
     prompt += `\n---\n\n`;
@@ -592,62 +577,6 @@ export function ToolPrompts({
     );
   }, [notify]);
 
-  const addSpecGroup = () =>
-    setSpecsData([
-      ...specsData,
-      { id: generateUUID(), title: "", items: [] },
-    ]);
-
-  const removeSpecGroup = (id: string) =>
-    setSpecsData(specsData.filter((g) => g.id !== id));
-
-  const updateSpecGroup = (id: string, updates: Partial<SpecGroup>) =>
-    setSpecsData(
-      specsData.map((g) =>
-        g.id === id ? { ...g, ...updates } : g
-      ),
-    );
-
-  const addSpecItem = (groupId: string) =>
-    setSpecsData(
-      specsData.map((g) =>
-        g.id === groupId
-          ? {
-            ...g,
-            items: [
-              ...g.items,
-              { id: generateUUID(), label: "", value: "" },
-            ],
-          }
-          : g
-      ),
-    );
-
-  const removeSpecItem = (groupId: string, itemId: string) =>
-    setSpecsData(
-      specsData.map((g) =>
-        g.id === groupId
-          ? {
-            ...g,
-            items: g.items.filter((i) => i.id !== itemId),
-          }
-          : g
-      ),
-    );
-
-  const updateSpecItem = (groupId: string, itemId: string, updates: Partial<SpecItemRow>) =>
-    setSpecsData(
-      specsData.map((g) =>
-        g.id === groupId
-          ? {
-            ...g,
-            items: g.items.map((i) =>
-              i.id === itemId ? { ...i, ...updates } : i
-            ),
-          }
-          : g
-      ),
-    );
 
   const copySpecCaller = useCallback((index: number) => {
     navigator.clipboard.writeText(`{{Specs ${index + 1}}}`);
@@ -1284,72 +1213,38 @@ export function ToolPrompts({
                                 <CardTitle className="text-[10px] font-black uppercase tracking-widest">
                                   System Specs
                                 </CardTitle>
+                                <span className="ml-auto text-[9px] text-muted-foreground/50 font-mono">
+                                  JSON or Raw Text
+                                </span>
                               </CardHeader>
-                              <CardContent className="p-5 space-y-4">
-                                {specsData.map((group, groupIdx) => (
-                                  <div key={group.id} className="space-y-3 p-3 border border-primary/5 rounded-xl bg-background/30">
-                                    <div className="flex items-center gap-2">
-                                      <Input
-                                        value={group.title}
-                                        onChange={(e) => updateSpecGroup(group.id, { title: e.target.value })}
-                                        placeholder="Group Title (e.g. Minimum Specs)"
-                                        className="h-7 text-[10px] font-bold border-primary/10"
-                                      />
-                                      <button
-                                        onClick={() => removeSpecGroup(group.id)}
-                                        className="h-7 w-7 flex items-center justify-center rounded-md text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors shrink-0"
-                                      >
-                                        <Trash2 className="h-3 w-3" />
-                                      </button>
-                                      <SnipTooltip label={`Copy {{Specs ${groupIdx + 1}}}`} side="top">
+                              <CardContent className="p-5 space-y-3">
+                                <Textarea
+                                  placeholder={"Min specs: CPU i3, RAM 4GB...\nRec specs: CPU i5, RAM 8GB..."}
+                                  value={specsMappings}
+                                  onChange={(e) => setSpecsMappings(e.target.value)}
+                                  className={cn(
+                                    "min-h-[120px] font-mono text-[11px] bg-background/50 p-4",
+                                    focusRing,
+                                  )}
+                                />
+                                {/* Specs caller references */}
+                                {specsMappings.trim() && (
+                                  <div className="space-y-1">
+                                    <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/50">Callers</span>
+                                    <div className="flex flex-wrap gap-1">
+                                      {specsMappings.split("\n").filter(l => l.trim()).map((_, i) => (
                                         <button
-                                          onClick={() => copySpecCaller(groupIdx)}
-                                          className="h-7 w-7 flex items-center justify-center rounded-md text-muted-foreground hover:text-orange-500 hover:bg-orange-500/10 transition-colors shrink-0"
+                                          key={i}
+                                          onClick={() => copySpecCaller(i)}
+                                          className="flex items-center gap-1 px-2 py-1 rounded-md text-[9px] font-mono bg-orange-500/10 text-orange-500 hover:bg-orange-500/20 border border-orange-500/20 transition-colors"
                                         >
-                                          <Copy className="h-3 w-3" />
+                                          <Copy className="h-2.5 w-2.5" />
+                                          {`{{Specs ${i + 1}}}`}
                                         </button>
-                                      </SnipTooltip>
-                                    </div>
-
-                                    <div className="space-y-2 pl-4 border-l-2 border-primary/5">
-                                      {group.items.map((item) => (
-                                        <div key={item.id} className="flex items-center gap-2">
-                                          <Input
-                                            value={item.label}
-                                            onChange={(e) => updateSpecItem(group.id, item.id, { label: e.target.value })}
-                                            placeholder="Label (e.g. CPU)"
-                                            className="h-7 flex-1 text-[10px] border-primary/10"
-                                          />
-                                          <Input
-                                            value={item.value}
-                                            onChange={(e) => updateSpecItem(group.id, item.id, { value: e.target.value })}
-                                            placeholder="Value (e.g. Core i5)"
-                                            className="h-7 flex-1 text-[10px] border-primary/10"
-                                          />
-                                          <button
-                                            onClick={() => removeSpecItem(group.id, item.id)}
-                                            className="h-7 w-7 flex items-center justify-center rounded-md text-muted-foreground hover:text-destructive transition-colors shrink-0"
-                                          >
-                                            <Trash2 className="h-3 w-3" />
-                                          </button>
-                                        </div>
                                       ))}
-                                      <button
-                                        onClick={() => addSpecItem(group.id)}
-                                        className="flex items-center gap-1.5 text-[9px] font-bold text-primary hover:text-primary/70 transition-colors"
-                                      >
-                                        <Plus className="h-3 w-3" /> Add Item
-                                      </button>
                                     </div>
                                   </div>
-                                ))}
-                                <button
-                                  onClick={addSpecGroup}
-                                  className="w-full h-9 rounded-lg border border-dashed border-primary/20 text-[10px] font-black uppercase tracking-wide text-muted-foreground hover:text-primary hover:border-primary/40 transition-all flex items-center justify-center gap-1.5"
-                                >
-                                  <Plus className="h-3 w-3" />
-                                  Add Spec Group
-                                </button>
+                                )}
                               </CardContent>
                             </Card>
                           )}
