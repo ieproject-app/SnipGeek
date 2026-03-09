@@ -220,7 +220,8 @@
       "label": "Instruksi Cepat:",
       "narrative": "Hanya update narasi",
       "images": "Hanya update gambar",
-      "metadata": "Hanya tambah tgl update"
+      "metadata": "Hanya tambah tgl update",
+      "polish": "Polish alur naratif (Tone)"
     },
     "downloadLinks": {
       "title": "Tautan Unduhan",

@@ -220,7 +220,8 @@
       "label": "Quick Instructions:",
       "narrative": "Update narrative only",
       "images": "Update images only",
-      "metadata": "Add update date only"
+      "metadata": "Add update date only",
+      "polish": "Polish narrative flow (Tone)"
     },
     "downloadLinks": {
       "title": "Download Links",

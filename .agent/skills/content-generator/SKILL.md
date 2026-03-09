@@ -26,7 +26,7 @@ Every article MUST have a valid YAML frontmatter.
 - `tags`: Array of short, **one-word** tags.
 - `published`: `true` or `false`.
 - `featured`: `true` or `false` (Blog only).
-- `heroImage`: Path to image (usually `.webp`).
+- `heroImage`: Full path (e.g., `/images/_posts/apps/slug/hero.webp`).
 - `imageAlt`: Descriptive SEO alt text.
 
 ## 3. MDX Components Standards
@@ -64,6 +64,9 @@ Use `<kbd>Key</kbd>` for hotkeys: `<kbd>Ctrl</kbd> + <kbd>C</kbd>`.
 - **Format**: Prefer WebP with optimized file size.
 - **Galleries**: Use `<Gallery caption="Optional caption or source">\n  ![Img 1](path1)\n  ![Img 2](path2)\n  ![Img 3](path3)\n</Gallery>` for a full-width 3-image hero-style gallery.
 - **Grids**: Use `<ImageGrid columns="2">\n  ![Img 1](path1)\n  ![Img 2](path2)\n</ImageGrid>` for inline image grouping. **CRITICAL:** `ImageGrid` is STRICTLY INCOMPATIBLE with `<Steps>`. Inside `<Steps>`, you MUST only use single standard images, never grids.
+
+### 🔴 React Context (className)
+ALWAYS use `className` instead of `class` for all elements. React will throw an error if `class` is used.
 
 ## 5. Automation Logic for AI
 

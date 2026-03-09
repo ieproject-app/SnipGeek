@@ -405,7 +405,8 @@ export function ToolPrompts({
     const isModify = mode === "modify";
 
     let prompt = `**INTERNAL CONTENT BRIEF FOR SNIPGEEK AGENT**\n`;
-    prompt += `**FOLLOWING SKILL:** \`content-generator\`\n\n`;
+    const activeSkills = isBlog ? ["content-generator", "snipgeek-blog-tone"] : ["content-generator"];
+    prompt += `**FOLLOWING SKILLS:** \`${activeSkills.join("`, `")}\`\n\n`;
 
     prompt += `**1. MODE & TYPE**\n`;
     prompt += `- Action: ${isModify ? "MODIFY EXISTING" : "CREATE NEW"}\n`;
@@ -466,7 +467,10 @@ export function ToolPrompts({
       prompt += `**DRAFT/CONTENT SOURCE:**\n${draft || "[MISSING]"}\n`;
     }
 
-    prompt += `\n---\n**FINAL INSTRUCTION:** Generate the full MDX following the SnipGeek content-generator skill. `;
+    prompt += `\n---\n**FINAL INSTRUCTION:** Generate the full MDX following the SnipGeek skills assigned above. `;
+    if (isBlog) {
+      prompt += `Use \`snipgeek-blog-tone\` for narrative depth, personal voice, and bilingual storytelling, while ensuring \`content-generator\` technical standards are strictly met. `;
+    }
     if (isModify) {
       prompt += `Hanya ubah bagian yang diminta secara spesifik dalam **MODIFICATION INSTRUCTIONS**. Untuk bagian lainnya, **pertahankan narasi, diksi, dan struktur kalimat asli** secara utuh. Jangan mengubah gaya bahasa penulisan aslinya jika tidak diinstruksikan. `;
     }
@@ -521,12 +525,21 @@ export function ToolPrompts({
     );
 
   const applyQuickAction = (action: string) => {
-    const text =
-      action === "narrative"
-        ? dictionary.quickActions.narrative
-        : action === "images"
-          ? dictionary.quickActions.images
-          : dictionary.quickActions.metadata;
+    let text = "";
+    switch (action) {
+      case "narrative":
+        text = dictionary.quickActions.narrative;
+        break;
+      case "images":
+        text = dictionary.quickActions.images;
+        break;
+      case "metadata":
+        text = dictionary.quickActions.metadata;
+        break;
+      case "polish":
+        text = dictionary.quickActions.polish;
+        break;
+    }
     setModInstructions((prev) => (prev ? `${prev}\n- ${text}` : `- ${text}`));
   };
 
@@ -909,15 +922,20 @@ export function ToolPrompts({
                     <CardContent className="p-5 space-y-4">
                       {/* Quick actions */}
                       <div className="flex flex-wrap gap-1.5">
-                        {(["narrative", "images", "metadata"] as const).map(
+                        {(["narrative", "images", "metadata", "polish"] as const).map(
                           (action) => (
                             <button
                               key={action}
                               onClick={() => applyQuickAction(action)}
-                              className="flex items-center gap-1.5 px-3 h-7 rounded-full text-[9px] font-black uppercase tracking-wide bg-accent/10 text-accent hover:bg-accent/20 border border-accent/20 transition-all"
+                              className={cn(
+                                "flex items-center gap-1.5 px-3 h-7 rounded-full text-[9px] font-black uppercase tracking-wide transition-all",
+                                action === "polish"
+                                  ? "bg-fuchsia-500/10 text-fuchsia-500 hover:bg-fuchsia-500/20 border border-fuchsia-500/20"
+                                  : "bg-accent/10 text-accent hover:bg-accent/20 border border-accent/20"
+                              )}
                             >
                               <Sparkles className="h-3 w-3" />
-                              {action}
+                              {action === "polish" ? "Narrative Polish" : action}
                             </button>
                           ),
                         )}

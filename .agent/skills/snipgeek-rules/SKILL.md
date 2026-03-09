@@ -25,8 +25,7 @@ Content in SnipGeek is not plain text — it is structured documentation.
 Every `.mdx` file MUST have:
 ```yaml
 translationKey: "english-kebab-case-slug"  # REQUIRED: Must be in English kebab-case for both ID and EN
-heroImage: "img-id-from-json"          # PREFERRED: Use ID from placeholder-images.json
-# heroImage: "/images/blog/custom.webp" # EXCEPTION: Standard path (must start with /images/ and exist in public/images/)
+heroImage: "/images/_posts/apps/my-app/hero.webp" # REQUIRED: Full path starting with /images/ and ending with .webp
 published: true                        # REQUIRED: Must be true to appear in listings (avoids draft folder)
 ```
 
@@ -45,7 +44,9 @@ published: true                        # REQUIRED: Must be true to appear in lis
 | Element | Required Component |
 |---|---|
 | Download Button | `<DownloadButton id="slug-from-data-downloads" />` |
-| Image Gallery | `<ImageGrid columns={2}> ... </ImageGrid>` |
+| Image Gallery | `<Gallery caption="..."> ... </Gallery>` |
+| Image Grid | `<ImageGrid columns={2}> ... </ImageGrid>` |
+| Callout / Alert | `<Callout variant="info" title="..."> ... </Callout>` |
 | Zoomable Image | No external library needed — all MDX images already support Lightbox automatically |
 
 ### Heading Structure
@@ -54,7 +55,19 @@ published: true                        # REQUIRED: Must be true to appear in lis
 
 ---
 
-## 2. Custom Features & Logic
+## 2. React Standard in MDX
+
+SnipGeek renders MDX through Next.js (React).
+
+### 🔴 className vs class — MANDATORY
+Never use the attribute `class="..."` in any tag (including raw tags like `<div>`, `<span>`, or `<a>`). You MUST always use `className="..."`.
+
+**CORRECT:** `<div className="my-class">`
+**WRONG:** `<div class="my-class">` (Causes Console Error: Invalid DOM property `class`)
+
+---
+
+## 3. Custom Features & Logic
 
 AI must recognize these built-in features of SnipGeek:
 
