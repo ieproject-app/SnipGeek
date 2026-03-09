@@ -121,41 +121,57 @@ const CustomImage = ({
   );
 };
 
-return (
-  <span className="block my-6 text-left">
-    <span className="inline-flex max-w-full flex-wrap items-center gap-3 rounded-xl border border-border/60 bg-card/50 px-3 py-2.5 align-top shadow-sm transition-colors duration-200 hover:border-primary/20 hover:bg-card/70">
-      <span className="flex min-w-0 items-start gap-3">
-        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-border/60 bg-muted/40 text-muted-foreground">
-          {getPlatformIcon(linkData.platform, "h-4.5 w-4.5")}
-        </span>
+export const DownloadButton = ({ id }: { id: string }) => {
+  const linkData = id ? downloadLinks[id] : null;
 
-        <span className="min-w-0">
-          <span className="block text-sm font-semibold leading-snug text-foreground sm:text-[15px]">
-            {linkData.fileName}
+  if (!linkData) {
+    if (process.env.NODE_ENV === "development") {
+      return (
+        <span className="block font-bold text-destructive">
+          [DownloadButton Error: Invalid ID &quot;{id}&quot;]
+        </span>
+      );
+    }
+    return null;
+  }
+
+  const linkHref = `/download/${id}`;
+
+  return (
+    <span className="block my-6 text-left">
+      <span className="inline-flex max-w-full flex-wrap items-center gap-3 rounded-xl border border-border/60 bg-card/50 px-3 py-2.5 align-top shadow-sm transition-colors duration-200 hover:border-primary/20 hover:bg-card/70">
+        <span className="flex min-w-0 items-start gap-3">
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-border/60 bg-muted/40 text-muted-foreground">
+            {getPlatformIcon(linkData.platform, "h-4.5 w-4.5")}
           </span>
 
-          <span className="mt-1 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
-            {linkData.fileSize && (
-              <span>{linkData.fileSize}</span>
-            )}
+          <span className="min-w-0">
+            <span className="block text-sm font-semibold leading-snug text-foreground sm:text-[15px]">
+              {linkData.fileName}
+            </span>
+
+            <span className="mt-1 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
+              {linkData.fileSize && (
+                <span>{linkData.fileSize}</span>
+              )}
+            </span>
           </span>
         </span>
+
+        <Link
+          href={linkHref}
+          rel="noopener nofollow"
+          className={cn(
+            buttonVariants({ variant: "outline", size: "sm" }),
+            "h-8 shrink-0 rounded-md border-border/60 px-3 text-xs font-semibold shadow-none",
+          )}
+        >
+          <Download className="h-3.5 w-3.5" />
+          Download
+        </Link>
       </span>
-
-      <Link
-        href={linkHref}
-        rel="noopener nofollow"
-        className={cn(
-          buttonVariants({ variant: "outline", size: "sm" }),
-          "h-8 shrink-0 rounded-md border-border/60 px-3 text-xs font-semibold shadow-none",
-        )}
-      >
-        <Download className="h-3.5 w-3.5" />
-        Download
-      </Link>
     </span>
-  </span>
-);
+  );
 };
 
 /**
