@@ -51,6 +51,7 @@ import {
 import { downloadLinks } from "@/lib/data-downloads";
 import { useNotification } from "@/hooks/use-notification";
 import { cn } from "@/lib/utils";
+import { useCallback } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ToolWrapper } from "@/components/tools/tool-wrapper";
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
@@ -156,7 +157,7 @@ function FeaturePill({
   activeClass: string;
 }) {
   return (
-    <SnipTooltip label={label} side="bottom">
+    <SnipTooltip label={label} side="top">
       <button
         onClick={onClick}
         className={cn(
@@ -166,7 +167,7 @@ function FeaturePill({
             : "bg-background/40 text-muted-foreground border-primary/5 hover:border-primary/20 hover:bg-background/80 hover:text-primary hover:scale-[1.05] shadow-sm",
         )}
       >
-        <Icon className={cn("h-5 w-5 shrink-0", active && "animate-pulse")} />
+        <Icon className={cn("h-5 w-5 shrink-0", active && "animate-[subtleGlow_3s_ease-in-out_infinite]")} />
       </button>
     </SnipTooltip>
   );
@@ -417,6 +418,9 @@ export function ToolPrompts({
       : (isModify ? "[KEEP OR UPDATE]" : new Date().toISOString().split("T")[0]);
 
     prompt += `- Date: ${finalDate}\n`;
+    if (isModify) {
+      prompt += `- Updated: ${new Date().toISOString().split("T")[0]}\n`;
+    }
     prompt += `- Status: ${isPublished ? "PUBLISHED" : "DRAFT"}${isFeatured && isBlog ? " | FEATURED" : ""}\n`;
     prompt += `- Category Hint: ${categoryHint || "[AI: AUTOMATIC]"}\n\n`;
 
@@ -427,19 +431,19 @@ export function ToolPrompts({
         const [imgPath, imgAlt] = line.split("|").map(s => s?.trim() || "");
         prompt += `- Image ${i + 1}: "${imgPath}" ${imgAlt ? `| Label: "${imgAlt}"` : ""}\n`;
       });
-
-      if (showGrids && imageGridMappings) {
-        prompt += `\n**Image Grids:**\n`;
-        imageGridMappings.split("\n").filter(l => l.trim()).forEach((line, i) => {
-          prompt += `- Group ${i + 1}: ${line}\n`;
-        });
-      }
     }
 
     if (showDownloads && downloadItems.length > 0) {
       prompt += `\n**4. DOWNLOAD LINKS**\n`;
       downloadItems.forEach((item, i) => {
-        prompt += `- Link ${i + 1}: ${item.type.toUpperCase()} -> "${item.value}"\n`;
+        prompt += `- Link ${i + 1}: ${item.type.toUpperCase()} -> "${item.value}" (use {{Link ${i + 1}}} in draft)\n`;
+      });
+    }
+
+    if (showGrids && imageGridMappings) {
+      prompt += `\n**5. IMAGE GRIDS**\n`;
+      imageGridMappings.split("\n").filter(l => l.trim()).forEach((line, i) => {
+        prompt += `- Group ${i + 1}: ${line} (use {{Grid ${i + 1}}} in draft)\n`;
       });
     }
 
@@ -473,6 +477,7 @@ export function ToolPrompts({
     imageGridMappings,
     showDownloads,
     showGrids,
+    showImages,
     selectedSlug,
     categoryHint,
   ]);
@@ -512,6 +517,22 @@ export function ToolPrompts({
     setModInstructions((prev) => (prev ? `${prev}\n- ${text}` : `- ${text}`));
   };
 
+  const copyLinkCaller = useCallback((index: number) => {
+    navigator.clipboard.writeText(`{{Link ${index + 1}}}`);
+    notify(
+      `Link ${index + 1} caller copied`,
+      <Copy className="h-4 w-4 text-blue-400" />,
+    );
+  }, [notify]);
+
+  const copyGridCaller = useCallback((index: number) => {
+    navigator.clipboard.writeText(`{{Grid ${index + 1}}}`);
+    notify(
+      `Grid ${index + 1} caller copied`,
+      <Copy className="h-4 w-4 text-violet-400" />,
+    );
+  }, [notify]);
+
   const focusRing =
     "focus-visible:ring-primary/20 focus-visible:ring-offset-0 focus-visible:border-primary/30 transition-all duration-300";
 
@@ -525,6 +546,14 @@ export function ToolPrompts({
       dictionary={fullDictionary}
       isPublic={true}
     >
+      {/* Subtle glow animation keyframes */}
+      <style dangerouslySetInnerHTML={{
+        __html: `
+        @keyframes subtleGlow {
+          0%, 100% { opacity: 0.75; transform: scale(1); }
+          50% { opacity: 1; transform: scale(1.08); }
+        }
+      `}} />
       <div className="max-w-full mx-auto space-y-6">
         {/* ── REDESIGNED TOOLBAR ── */}
         {/* ── REDESIGNED ISLAND-STYLE TOOLBAR ── */}
@@ -533,7 +562,7 @@ export function ToolPrompts({
             {/* Island 1: Primary Actions (Action Mode & Content Type) */}
             <div className="bg-card/50 backdrop-blur-lg border border-primary/10 shadow-sm rounded-xl p-1 flex items-center gap-1">
               <div className="relative flex p-1 rounded-lg">
-                <SnipTooltip label={dictionary.modes.create} side="bottom">
+                <SnipTooltip label={dictionary.modes.create} side="top">
                   <button
                     onClick={() => setMode("create")}
                     className={cn(
@@ -541,11 +570,11 @@ export function ToolPrompts({
                       mode === "create" ? "text-primary" : "text-muted-foreground hover:text-primary/70"
                     )}
                   >
-                    <PenLine className={cn("h-4 w-4", mode === "create" ? "animate-pulse" : "")} />
+                    <PenLine className={cn("h-4 w-4", mode === "create" ? "animate-[subtleGlow_3s_ease-in-out_infinite]" : "")} />
                   </button>
                 </SnipTooltip>
 
-                <SnipTooltip label={dictionary.modes.modify} side="bottom">
+                <SnipTooltip label={dictionary.modes.modify} side="top">
                   <button
                     onClick={() => setMode("modify")}
                     className={cn(
@@ -553,7 +582,7 @@ export function ToolPrompts({
                       mode === "modify" ? "text-primary" : "text-muted-foreground hover:text-primary/70"
                     )}
                   >
-                    <Layers className={cn("h-4 w-4", mode === "modify" ? "animate-pulse" : "")} />
+                    <Layers className={cn("h-4 w-4", mode === "modify" ? "animate-[subtleGlow_3s_ease-in-out_infinite]" : "")} />
                   </button>
                 </SnipTooltip>
                 <div
@@ -567,7 +596,7 @@ export function ToolPrompts({
               <div className="w-px h-5 bg-primary/10 mx-1 self-center" />
 
               <div className="flex p-1 rounded-lg">
-                <SnipTooltip label={dictionary.contentTypeBlog} side="bottom">
+                <SnipTooltip label={dictionary.contentTypeBlog} side="top">
                   <button
                     onClick={() => setContentType("blog")}
                     className={cn(
@@ -581,7 +610,7 @@ export function ToolPrompts({
                   </button>
                 </SnipTooltip>
 
-                <SnipTooltip label={dictionary.contentTypeNote} side="bottom">
+                <SnipTooltip label={dictionary.contentTypeNote} side="top">
                   <button
                     onClick={() => setContentType("note")}
                     className={cn(
@@ -994,6 +1023,14 @@ export function ToolPrompts({
                                     >
                                       <Trash2 className="h-3 w-3" />
                                     </button>
+                                    <SnipTooltip label={`Copy {{Link ${downloadItems.indexOf(item) + 1}}}`} side="top">
+                                      <button
+                                        onClick={() => copyLinkCaller(downloadItems.indexOf(item))}
+                                        className="h-7 w-7 flex items-center justify-center rounded-md text-muted-foreground hover:text-blue-500 hover:bg-blue-500/10 transition-colors shrink-0"
+                                      >
+                                        <Copy className="h-3 w-3" />
+                                      </button>
+                                    </SnipTooltip>
                                   </div>
                                 ))}
                                 <button
@@ -1014,10 +1051,13 @@ export function ToolPrompts({
                                 <CardTitle className="text-[10px] font-black uppercase tracking-widest">
                                   Grids
                                 </CardTitle>
+                                <span className="ml-auto text-[9px] text-muted-foreground/50 font-mono">
+                                  cols | img1, img2, ...
+                                </span>
                               </CardHeader>
-                              <CardContent className="p-5">
+                              <CardContent className="p-5 space-y-3">
                                 <Textarea
-                                  placeholder="2 | path1.webp, path2.webp&#10;3 | img1.webp, img2.webp, img3.webp"
+                                  placeholder={"2 | path1.webp, path2.webp\n3 | img1.webp, img2.webp, img3.webp"}
                                   value={imageGridMappings}
                                   onChange={(e) =>
                                     setImageGridMappings(e.target.value)
@@ -1027,6 +1067,24 @@ export function ToolPrompts({
                                     focusRing,
                                   )}
                                 />
+                                {/* Grid caller references */}
+                                {imageGridMappings.trim() && (
+                                  <div className="space-y-1">
+                                    <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/50">Callers</span>
+                                    <div className="flex flex-wrap gap-1">
+                                      {imageGridMappings.split("\n").filter(l => l.trim()).map((_, i) => (
+                                        <button
+                                          key={i}
+                                          onClick={() => copyGridCaller(i)}
+                                          className="flex items-center gap-1 px-2 py-1 rounded-md text-[9px] font-mono bg-violet-500/10 text-violet-500 hover:bg-violet-500/20 border border-violet-500/20 transition-colors"
+                                        >
+                                          <Copy className="h-2.5 w-2.5" />
+                                          {`{{Grid ${i + 1}}}`}
+                                        </button>
+                                      ))}
+                                    </div>
+                                  </div>
+                                )}
                               </CardContent>
                             </Card>
                           )}
