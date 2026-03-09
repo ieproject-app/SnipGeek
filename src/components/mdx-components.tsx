@@ -28,13 +28,7 @@ import {
 } from "lucide-react";
 import { WindowsStoreLogo } from "@/components/icons/windows-store-logo";
 import { downloadLinks } from "@/lib/data-downloads";
-import {
-  Dialog,
-  DialogContent,
-  DialogTrigger,
-  DialogTitle,
-  DialogDescription,
-} from "@/components/ui/dialog";
+import { ZoomableImage } from "./zoomable-image";
 
 const extractText = (children: React.ReactNode): string => {
   return React.Children.toArray(children)
@@ -90,53 +84,9 @@ const getPlatformIcon = (platform?: string, className?: string) => {
 /**
  * ZoomableImage - Wrapper component to make images clickable and expandabe.
  */
-const ZoomableImage = ({
-  src,
-  alt,
-  width,
-  height,
-  className,
-  priority,
-  ...props
-}: any) => {
-  return (
-    <Dialog>
-      <DialogTrigger asChild>
-        <div className="group relative cursor-zoom-in overflow-hidden rounded-lg shadow-md transition-all hover:shadow-xl">
-          <Image
-            src={src}
-            alt={alt || "SnipGeek Image"}
-            width={width || 1200}
-            height={height || 675}
-            className={cn(
-              "h-auto w-full transition-transform duration-500 group-hover:scale-[1.02]",
-              className,
-            )}
-            priority={priority}
-            {...props}
-          />
-          <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-colors flex items-center justify-center">
-            <Maximize2 className="text-white h-8 w-8 drop-shadow-lg" />
-          </div>
-        </div>
-      </DialogTrigger>
-      <DialogContent className="max-w-[95vw] max-h-[95vh] p-0 border-none bg-transparent overflow-hidden flex items-center justify-center">
-        <DialogTitle className="sr-only">Pratinjau Gambar</DialogTitle>
-        <DialogDescription className="sr-only">
-          Tampilan gambar diperbesar untuk {alt || "gambar artikel"}
-        </DialogDescription>
-        <div className="relative w-full h-full flex items-center justify-center">
-          <img
-            src={src}
-            alt={alt}
-            className="max-w-full max-h-[90vh] object-contain rounded-lg shadow-2xl"
-          />
-        </div>
-      </DialogContent>
-    </Dialog>
-  );
-};
-
+/**
+ * CustomImage - Wrapper around ZoomableImage for MDX
+ */
 const CustomImage = ({
   class: _class,
   className,
