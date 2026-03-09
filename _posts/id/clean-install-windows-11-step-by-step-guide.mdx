@@ -1,0 +1,141 @@
+---
+title: "Cara Instal Ulang Windows 11: Panduan Lengkap & Gambar"
+slug: "clean-install-windows-11-step-by-step-guide"
+translationKey: "clean-install-windows-11-step-by-step-guide"
+date: "2026-03-09"
+published: true
+featured: true
+heroImage: "/images/_posts/windows11/install-windows-11/virtualbox/banner-50-anniv.webp"
+imageAlt: "Panduan lengkap instal ulang Windows 11 dengan gambar langkah demi langkah"
+tags: ["Windows 11", "Instal Ulang", "Tutorial", "Sistem Operasi", "Panduan"]
+category: "Instalasi OS"
+---
+
+Jadi, Anda siap untuk melakukan instalasi bersih Windows 11? Pilihan yang bagus! Ini adalah cara terbaik untuk mendapatkan sistem yang super cepat dan bebas dari *bloatware*. Prosesnya mungkin terlihat sedikit mengintimidasi, tapi percayalah, dengan panduan ini, kita akan menjalaninya bersama langkah demi langkah, lengkap dengan gambar untuk semuanya.
+
+## #1 Persiapan Kunci (Jangan Dilewatkan!)
+
+Sebelum kita mulai, mari siapkan segalanya. Ini adalah bagian terpenting untuk memastikan semuanya berjalan lancar.
+
+<Callout variant="danger" title="Peringatan Kritis! Cadangkan Data Anda">
+Ini adalah langkah paling krusial. Instalasi bersih akan **menghapus semuanya** di drive utama Anda (biasanya Drive C:). Tolong, tolong cadangkan semua dokumen, foto, dan file penting Anda ke hard drive eksternal atau layanan cloud sebelum Anda mulai.
+</Callout>
+
+1. **Siapkan USB Bootable Windows 11:** Ini akan menjadi alat instalasi kita. Jika Anda belum membuatnya, ikuti saja panduan super sederhana kami di sini.
+   - **Baca lebih lanjut:** [Panduan Lengkap: Cara Membuat USB Bootable Windows 11 dengan Rufus](/blog/how-to-create-windows-11-bootable-usb-with-rufus)
+2. **Koneksi Internet (Direkomendasikan):** Sebaiknya siapkan koneksi internet. Ini membantu Windows mengambil pembaruan penting dan driver secara otomatis selama penyiapan.
+3. **Catat Product Key Anda (Untuk Berjaga-jaga):** Jika Windows Anda sebelumnya asli dan diaktifkan dengan akun Microsoft, kunci Anda kemungkinan besar bersifat digital dan akan aktif secara otomatis. Tetapi jika Anda memiliki kunci ritel terpisah, ada baiknya untuk mencatatnya.
+
+## #2 Proses Instalasi, Langkah demi Langkah
+
+Semuanya sudah siap? Mari kita mulai instalasi.
+
+### 1. Booting dari Drive USB
+
+- Colokkan USB bootable Anda ke laptop atau PC.
+- Restart komputer Anda dan bersiaplah untuk masuk ke menu BIOS/UEFI. Tombol yang harus ditekan bervariasi, tetapi biasanya salah satu dari ini: <kbd>F2</kbd>, <kbd>DEL</kbd>, <kbd>F10</kbd>, atau <kbd>F12</kbd>. Tekan saja berulang kali begitu komputer Anda mulai menyala.
+- **Contoh di Laptop MSI Saya:** Saya menekan tombol <kbd>DEL</kbd> tepat saat logo MSI muncul.
+
+![Tampilan BIOS Laptop MSI](/images/_posts/windows11/install-windows-11/virtualbox/MSI_bios.webp "Tampilan BIOS bisa terlihat berbeda, tetapi tujuannya sama: temukan menu Boot.")
+*Tampilan BIOS bisa bervariasi, tetapi prinsipnya sama: temukan menu Boot.*
+
+- Setelah Anda berada di BIOS, cari menu **"Boot"** atau **"Boot Priority"**. Atur USB Flash Drive Anda sebagai opsi boot nomor satu (`Boot Option #1`).
+- Simpan perubahan Anda dan keluar (biasanya dengan menekan <kbd>F10</kbd>). Komputer Anda akan restart dan mulai booting dari USB.
+
+### 2. Memulai Penyiapan Windows
+
+<Steps>
+<Step>
+**Pilih "Previous Version of Setup"**
+Layar penyiapan Windows akan muncul. Jangan klik 'Next' dulu. Sebaliknya, cari tautan di kiri bawah yang bertuliskan **"Previous Version of Setup"** dan klik. Ini adalah trik kecil untuk memulai alur instalasi standar yang lebih familiar.
+
+![Pilih Previous Version of Setup](/images/_posts/windows11/install-windows-11/virtualbox/1.webp "Layar instalasi awal Windows 11, pilih 'Previous Version of Setup'.")
+</Step>
+
+<Step>
+**Konfigurasi Bahasa dan Regional**
+Layar berikutnya akan menanyakan bahasa, format waktu, dan keyboard Anda. Klik **Next**.
+
+![Pengaturan Bahasa dan Wilayah](/images/_posts/windows11/install-windows-11/virtualbox/2.webp "Layar instalasi Windows 11 untuk pemilihan bahasa dan wilayah.")
+</Step>
+
+<Step>
+**Mulai Instalasi**
+Klik tombol besar **"Install now"** untuk memulai proses.
+
+![Klik Install Now](/images/_posts/windows11/install-windows-11/virtualbox/3.webp "Tombol 'Install now' untuk memulai proses instalasi.")
+</Step>
+
+<Step>
+**Aktivasi Windows**
+Setup akan meminta kunci produk. Jika lisensi Anda terhubung ke akun Microsoft Anda, klik **"I don't have a product key"**.
+
+![Opsi Aktivasi Windows](/images/_posts/windows11/install-windows-11/virtualbox/4.1.webp "Opsi untuk memasukkan kunci produk atau melewatinya.")
+</Step>
+
+<Step>
+**Pilih Edisi Windows 11**
+Pilih edisi yang sesuai dengan lisensi Anda (misalnya, Windows 11 Pro). Klik **Next**.
+
+![Pilih Edisi Windows 11](/images/_posts/windows11/install-windows-11/virtualbox/4.2.webp "Daftar edisi Windows 11 yang tersedia.")
+</Step>
+
+<Step>
+**Pilih Tipe Instalasi**
+Selalu pilih **"Custom: Install Windows only (advanced)"** untuk instalasi benar-benar bersih.
+
+![Pilih Custom Installation](/images/_posts/windows11/install-windows-11/virtualbox/5.1.webp "Memilih opsi 'Custom' untuk kontrol instalasi penuh.")
+</Step>
+
+<Step>
+**Mengelola Partisi (Kritis!)**
+Temukan partisi tempat Windows lama Anda berada. Pilih setiap partisi terkait (System, MSR, Recovery, Primary) **satu per satu**, lalu klik **Delete**.
+
+<Callout variant="warning" title="Perhatian!">
+Langkah ini akan menghapus semua data di partisi yang dipilih. Pastikan Anda telah mencadangkan file penting Anda.
+</Callout>
+
+<ImageGrid columns={2}>
+![Daftar Partisi Awal](/images/_posts/windows11/install-windows-11/virtualbox/6.1.webp "Daftar semua partisi yang ada sebelum dihapus.")
+![Proses Hapus Partisi](/images/_posts/windows11/install-windows-11/virtualbox/6.3%20Tambahan.webp "Menghapus partisi sistem satu per satu.")
+</ImageGrid>
+
+Setelah hanya menyisa satu blok **"Unallocated Space"**, pilih itu dan klik **Next**.
+
+![Unallocated Space](/images/_posts/windows11/install-windows-11/virtualbox/6.2.webp "Tampilan setelah partisi dihapus, menyisakan Unallocated Space.")
+</Step>
+
+<Step>
+**Proses Instalasi**
+Windows akan mulai menyalin file. Komputer akan restart beberapa kali. Biarkan saja.
+
+![Status Instalasi](/images/_posts/windows11/install-windows-11/virtualbox/7.1.webp "Layar 'Installing Windows' dengan bilah kemajuan.")
+</Step>
+</Steps>
+
+## #3 Penyiapan Pertama Kali (OOBE)
+
+Setelah instalasi selesai, Anda akan masuk ke layar OOBE (*Out of Box Experience*).
+
+<Steps>
+<Step>
+**Wilayah dan Keyboard**
+Pilih negara (Indonesia), tata letak keyboard, dan sambungkan ke Wi-Fi.
+
+![Pilih Wilayah](/images/_posts/windows11/install-windows-11/virtualbox/8.1.webp "Layar OOBE untuk memilih negara atau wilayah.")
+</Step>
+
+<Step>
+**Masuk dengan Akun Microsoft**
+Masuk dengan akun Microsoft Anda untuk sinkronisasi pengaturan dan aktivasi otomatis.
+
+![Login Akun Microsoft](/images/_posts/windows11/install-windows-11/virtualbox/8.2.webp "Layar untuk masuk dengan akun Microsoft.")
+</Step>
+
+<Step>
+**Personalisasi Akhir**
+Buat PIN, atur privasi, dan lewati atau pilih opsi minat Anda.
+</Step>
+</Steps>
+
+Setelah selesai, Anda akan mendarat di desktop Windows 11 yang segar dan siap digunakan!

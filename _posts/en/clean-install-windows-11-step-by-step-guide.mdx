@@ -1,0 +1,141 @@
+---
+title: "Clean Install Windows 11: A Step-by-Step Complete Guide"
+slug: "clean-install-windows-11-step-by-step-guide"
+translationKey: "clean-install-windows-11-step-by-step-guide"
+date: "2026-03-09"
+published: true
+featured: true
+heroImage: "/images/_posts/windows11/install-windows-11/virtualbox/banner-50-anniv.webp"
+imageAlt: "Complete step-by-step guide for clean installing Windows 11 with screenshots"
+tags: ["Windows 11", "Clean Install", "Tutorial", "Operating System", "Guide"]
+category: "OS Installation"
+---
+
+Ready for a fresh start with Windows 11? Great choice! A clean install is the best way to get a super-fast system free from bloatware. The process might look a bit intimidating, but don't worry—with this guide, we'll walk through it step-by-step, complete with screenshots for every part.
+
+## #1 Key Preparation (Don't Skip!)
+
+Before we begin, let's get everything ready. This is the most important part to ensure a smooth process.
+
+<Callout variant="danger" title="Critical Warning! Back Up Your Data">
+This is the most crucial step. A clean install will **delete everything** on your primary drive (usually Drive C:). Please, please back up all your documents, photos, and important files to an external hard drive or cloud service before you start.
+</Callout>
+
+1. **Prepare a Windows 11 Bootable USB:** This will be our installation tool. If you haven't made one yet, follow our simple guide here.
+   - **Read more:** [Complete Guide: How to Create Windows 11 Bootable USB with Rufus](/blog/how-to-create-windows-11-bootable-usb-with-rufus)
+2. **Internet Connection (Recommended):** It's best to have an internet connection ready. This helps Windows grab important updates and drivers automatically during setup.
+3. **Note Down Your Product Key (To Be Safe):** If your previous Windows was genuine and linked to a Microsoft account, your key is likely digital and will activate automatically. However, if you have a separate retail key, it's good to write it down.
+
+## #2 Installation Process, Step by Step
+
+Everything ready? Let's start the installation.
+
+### 1. Booting from the USB Drive
+
+- Plug your bootable USB into your laptop or PC.
+- Restart your computer and get ready to enter the BIOS/UEFI menu. The key to press varies, but it's usually one of these: <kbd>F2</kbd>, <kbd>DEL</kbd>, <kbd>F10</kbd>, or <kbd>F12</kbd>. Press it repeatedly as soon as your computer starts up.
+- **Example on My MSI Laptop:** I press the <kbd>DEL</kbd> key right when the MSI logo appears.
+
+![MSI Laptop BIOS Screen](/images/_posts/windows11/install-windows-11/virtualbox/MSI_bios.webp "BIOS looks might vary, but the goal is the same: find the Boot menu.")
+*BIOS screens can vary, but the principle is the same: find the Boot menu.*
+
+- Once in BIOS, look for the **"Boot"** or **"Boot Priority"** menu. Set your USB Flash Drive as the number one boot option (`Boot Option #1`).
+- Save your changes and exit (usually by pressing <kbd>F10</kbd>). Your computer will restart and boot from the USB.
+
+### 2. Starting Windows Setup
+
+<Steps>
+<Step>
+**Select "Previous Version of Setup"**
+The Windows setup screen will appear. Don't click 'Next' yet. Instead, look for the link at the bottom left that says **"Previous Version of Setup"** and click it. This is a small trick to start the standard, more familiar installation flow.
+
+![Select Previous Version of Setup](/images/_posts/windows11/install-windows-11/virtualbox/1.webp "Initial Windows 11 setup screen, select 'Previous Version of Setup'.")
+</Step>
+
+<Step>
+**Configure Language and Regional Settings**
+The next screen will ask for your language, time format, and keyboard. Click **Next**.
+
+![Language and Regional Settings](/images/_posts/windows11/install-windows-11/virtualbox/2.webp "Windows 11 setup screen for language and region selection.")
+</Step>
+
+<Step>
+**Start Installation**
+Click the large **"Install now"** button to begin the process.
+
+![Click Install Now](/images/_posts/windows11/install-windows-11/virtualbox/3.webp "The 'Install now' button to start the installation process.")
+</Step>
+
+<Step>
+**Activate Windows**
+Setup will ask for a product key. If your license is linked to your Microsoft account, just click **"I don't have a product key"**.
+
+![Windows Activation Options](/images/_posts/windows11/install-windows-11/virtualbox/4.1.webp "Option to enter a product key or skip it.")
+</Step>
+
+<Step>
+**Choose Windows 11 Edition**
+Select the edition that matches your license (e.g., Windows 11 Pro). Click **Next**.
+
+![Choose Windows 11 Edition](/images/_posts/windows11/install-windows-11/virtualbox/4.2.webp "List of available Windows 11 editions.")
+</Step>
+
+<Step>
+**Choose Installation Type**
+Always select **"Custom: Install Windows only (advanced)"** for a truly clean installation.
+
+![Choose Custom Installation](/images/_posts/windows11/install-windows-11/virtualbox/5.1.webp "Selecting 'Custom' option for full installation control.")
+</Step>
+
+<Step>
+**Managing Partitions (Critical!)**
+Find the partition where your old Windows is located. Select each related partition (System, MSR, Recovery, Primary) **one by one**, then click **Delete**.
+
+<Callout variant="warning" title="Warning!">
+This step will delete all data on the selected partitions. Make sure you have backed up your important files.
+</Callout>
+
+<ImageGrid columns={2}>
+![Initial Partition List](/images/_posts/windows11/install-windows-11/virtualbox/6.1.webp "List of all partitions before deletion.")
+![Deleting Partitions](/images/_posts/windows11/install-windows-11/virtualbox/6.3%20Tambahan.webp "Deleting system partitions one by one.")
+</ImageGrid>
+
+Once you have only one block of **"Unallocated Space"**, select it and click **Next**.
+
+![Unallocated Space](/images/_posts/windows11/install-windows-11/virtualbox/6.2.webp "Screen after partitions are deleted, leaving Unallocated Space.")
+</Step>
+
+<Step>
+**Installation Progress**
+Windows will start copying files. The computer will restart several times. Just let it do its thing.
+
+![Installation Status](/images/_posts/windows11/install-windows-11/virtualbox/7.1.webp "Layar 'Installing Windows' with progress bar.")
+</Step>
+</Steps>
+
+## #3 First-Time Setup (OOBE)
+
+After the core installation is complete, you'll go through a series of setup screens called OOBE (Out of Box Experience).
+
+<Steps>
+<Step>
+**Region and Keyboard**
+Follow the prompts to select your country, keyboard layout, and connect to Wi-Fi.
+
+![Select Region](/images/_posts/windows11/install-windows-11/virtualbox/8.1.webp "OOBE screen to select country or region.")
+</Step>
+
+<Step>
+**Sign in with Microsoft Account**
+I highly recommend signing in with your Microsoft account. It syncs your settings and automatically activates your Windows digital license.
+
+![Microsoft Account Sign In](/images/_posts/windows11/install-windows-11/virtualbox/8.2.webp "Screen to sign in with a Microsoft account.")
+</Step>
+
+<Step>
+**Final Personalization**
+You'll be asked to create a PIN, set privacy settings, and choose your interests for customization.
+</Step>
+</Steps>
+
+Once you're through all that, you'll finally land on your clean, fresh Windows 11 desktop!

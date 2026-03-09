@@ -73,46 +73,86 @@
 
 @layer base {
     :root {
-        --background: 214 25% 90%;
-        --foreground: 225 14% 17%;
-        --card: 210 30% 99%;
-        --card-foreground: 225 14% 17%;
-        --popover: 0 0% 100%;
-        --popover-foreground: 225 14% 17%;
-        --primary: 225 14% 27%;
+        /* "Clean Slate" Light Mode - User adjusted (Bg: White, Card: Slate-50) */
+        color-scheme: light;
+        --background: 0 0% 100%;
+        /* white */
+        --foreground: 222.2 84% 4.9%;
+        /* slate-950 */
+        --card: 210 40% 98%;
+        /* slate-50 */
+        --card-foreground: 222.2 84% 4.9%;
+        /* slate-950 */
+        --popover: 210 40% 98%;
+        /* slate-50 for consistency with card */
+        --popover-foreground: 222.2 84% 4.9%;
+        /* slate-950 */
+        --primary: 222.2 47.4% 11.2%;
+        /* slate-900 */
         --primary-foreground: 210 40% 98%;
-        --secondary: 210 16% 93%;
-        --secondary-foreground: 225 14% 27%;
-        --muted: 210 15% 88%;
-        --muted-foreground: 225 10% 45%;
-        --accent: 200 94% 73%;
-        --accent-foreground: 225 14% 27%;
-        --border: 0 0% 89.8%;
-        --input: 0 0% 89.8%;
-        --ring: 200 94% 73%;
+        /* slate-50 */
+        --secondary: 210 40% 96.1%;
+        /* slate-100 */
+        --secondary-foreground: 222.2 47.4% 11.2%;
+        /* slate-900 */
+        --muted: 210 40% 96.1%;
+        /* slate-100 */
+        --muted-foreground: 215.4 16.3% 46.9%;
+        /* slate-500 */
+        --accent: 200 94% 45%;
+        /* Darker Blue for high contrast on white */
+        --accent-foreground: 0 0% 100%;
+        /* White text on blue accent bg */
+        --destructive: 0 84.2% 60.2%;
+        --destructive-foreground: 210 40% 98%;
+        --border: 214.3 31.8% 91.4%;
+        /* slate-200 */
+        --input: 214.3 31.8% 91.4%;
+        /* slate-200 */
+        --ring: 200 94% 45%;
+        /* Legible Blue */
         --radius: 0.5rem;
     }
 
     .dark {
-        --background: 205 22% 11%;
-        --foreground: 210 40% 98%;
-        --card: 202 22% 18%;
-        --card-foreground: 210 40% 98%;
-        --popover: 202 22% 16%;
-        --popover-foreground: 210 40% 98%;
-        --primary: 210 40% 98%;
-        --primary-foreground: 202 22% 10%;
-        --secondary: 203 20% 21%;
-        --secondary-foreground: 210 40% 98%;
-        --muted: 203 20% 21%;
-        --muted-foreground: 215 20% 65%;
+        /* "Clean Slate" Dark Mode - Using Zinc (neutral feeling) */
+        color-scheme: dark;
+        --background: 240 10% 3.9%;
+        /* zinc-950 */
+        --foreground: 0 0% 98%;
+        /* zinc-50 */
+        --card: 240 5.3% 10.2%;
+        /* zinc-900 */
+        --card-foreground: 0 0% 98%;
+        /* zinc-50 */
+        --popover: 240 5.3% 10.2%;
+        /* zinc-900 */
+        --popover-foreground: 0 0% 98%;
+        /* zinc-50 */
+        --primary: 0 0% 98%;
+        /* zinc-50 */
+        --primary-foreground: 240 5.9% 10%;
+        /* zinc-900 */
+        --secondary: 240 3.7% 15.9%;
+        /* zinc-800 */
+        --secondary-foreground: 0 0% 98%;
+        /* zinc-50 */
+        --muted: 240 3.7% 15.9%;
+        /* zinc-800 */
+        --muted-foreground: 240 5% 64.9%;
+        /* zinc-400 */
         --accent: 200 94% 73%;
+        /* SnipGeek cyan brand color */
         --accent-foreground: 202 22% 10%;
+        /* Darker foreground for cyan bg */
         --destructive: 0 62.8% 30.6%;
         --destructive-foreground: 0 0% 98%;
-        --border: 203 20% 21%;
-        --input: 203 20% 21%;
+        --border: 240 3.7% 15.9%;
+        /* zinc-800 */
+        --input: 240 3.7% 15.9%;
+        /* zinc-800 */
         --ring: 200 94% 73%;
+        /* SnipGeek cyan brand color */
     }
 }
 

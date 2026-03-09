@@ -264,14 +264,14 @@ export function Header({
   ];
 
   const navItemClass =
-    "h-9 w-9 p-0 rounded-xl transition-all duration-300 text-foreground/70 hover:text-foreground hover:bg-muted/60 flex items-center justify-center relative";
+    "h-9 w-9 p-0 rounded-xl transition-all duration-300 text-foreground/70 hover:text-accent hover:bg-accent/10 flex items-center justify-center relative";
 
   return (
     <header
       ref={headerRef}
       data-scrolled={isScrolled}
       className={cn(
-        "fixed top-0 left-0 right-0 z-50 w-full bg-background border-b border-border transition-all [transition-timing-function:cubic-bezier(0.4,0,0.2,1)] will-change-transform overflow-visible",
+        "fixed top-0 left-0 right-0 z-50 w-full bg-background/80 backdrop-blur-md border-b border-border transition-all [transition-timing-function:cubic-bezier(0.4,0,0.2,1)] will-change-transform overflow-visible",
         isVisible
           ? "translate-y-0 duration-500"
           : "-translate-y-full duration-300",
@@ -350,7 +350,7 @@ export function Header({
                   "px-3 py-2 font-sans text-[10px] font-black uppercase tracking-[0.12em] transition-all relative",
                   isActive
                     ? "text-accent"
-                    : "text-foreground/60 hover:text-foreground",
+                    : "text-foreground/60 hover:text-accent",
                 )}
               >
                 {item.name}
@@ -449,7 +449,7 @@ export function Header({
                     <NextLink
                       key={item.href}
                       href={`${linkPrefix}${item.href}`}
-                      className="group/item flex items-center gap-3 px-4 py-2.5 font-sans text-[11px] font-bold uppercase tracking-wider hover:bg-muted transition-colors rounded-lg mx-1 relative"
+                      className="group/item flex items-center gap-3 px-4 py-2.5 font-sans text-[11px] font-bold uppercase tracking-wider hover:bg-accent/10 hover:text-accent transition-colors rounded-lg mx-1 relative"
                       onClick={() => setActiveView("none")}
                     >
                       <div className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-4 bg-accent opacity-0 group-hover/item:opacity-60 transition-opacity" />
@@ -577,7 +577,7 @@ export function Header({
           <Button
             variant="ghost"
             size="icon"
-            className="rounded-full h-10 w-10 hover:bg-transparent text-foreground/40 hover:text-foreground"
+            className="rounded-full h-10 w-10 hover:bg-accent/10 text-foreground/40 hover:text-accent"
             onClick={() => {
               setActiveView("none");
               setQuery("");
@@ -657,7 +657,7 @@ export function Header({
                     <div
                       key={`${item.type}-${item.slug}`}
                       className={cn(
-                        "group flex items-center gap-3 rounded-xl px-3 py-2.5 transition-all [transition-duration:320ms] hover:bg-muted/50",
+                        "group flex items-center gap-3 rounded-xl px-3 py-2.5 transition-all [transition-duration:320ms] hover:bg-accent/10",
                         removingSlug === item.slug &&
                         "opacity-0 -translate-x-2 scale-[0.96] ease-in",
                       )}
@@ -728,7 +728,7 @@ export function Header({
             <div className="border-t border-border mt-1 p-1">
               <NextLink
                 href={`${linkPrefix}/blog`}
-                className="w-full py-2.5 flex items-center justify-center gap-2 font-sans text-[10px] font-black uppercase tracking-wider text-muted-foreground hover:bg-muted hover:text-accent transition-all rounded-lg"
+                className="w-full py-2.5 flex items-center justify-center gap-2 font-sans text-[10px] font-black uppercase tracking-wider text-muted-foreground hover:bg-accent/10 hover:text-accent transition-all rounded-lg"
                 onClick={() => setActiveView("none")}
               >
                 Browse all posts <ArrowRight className="h-3 w-3" />
@@ -762,7 +762,7 @@ export function Header({
                           <li key={`${item.type}-${item.slug}`}>
                             <NextLink
                               href={item.href}
-                              className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-muted/50 transition-all group"
+                              className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-accent/10 transition-all group"
                               onClick={() => setActiveView("none")}
                             >
                               <div className="w-[52px] h-[39px] relative rounded-md overflow-hidden bg-muted shrink-0 border border-border/50">
