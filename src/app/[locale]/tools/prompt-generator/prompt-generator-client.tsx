@@ -314,7 +314,6 @@ export function PromptGeneratorClient({
   const [showImages, setShowImages] = useState(true);
   const [showDownloads, setShowDownloads] = useState(false);
   const [showGrids, setShowGrids] = useState(false);
-  const [useMdxRules, setUseMdxRules] = useState(true);
   const [isIdOnly, setIsIdOnly] = useState(false);
 
   // ── Status flags ──
@@ -378,7 +377,6 @@ export function PromptGeneratorClient({
         setShowImages(p.showImages !== undefined ? !!p.showImages : true);
         setShowDownloads(!!p.showDownloads);
         setShowGrids(!!p.showGrids);
-        setUseMdxRules(p.useMdxRules !== undefined ? !!p.useMdxRules : true);
         setIsIdOnly(!!p.isIdOnly);
       } catch (_) { }
     }
@@ -388,133 +386,69 @@ export function PromptGeneratorClient({
     if (!mounted) return;
     localStorage.setItem(
       "snipgeek-prompt-features",
-      JSON.stringify({ showImages, showDownloads, showGrids, useMdxRules, isIdOnly }),
+      JSON.stringify({ showImages, showDownloads, showGrids, isIdOnly }),
     );
-  }, [showImages, showDownloads, showGrids, useMdxRules, isIdOnly, mounted]);
+  }, [showImages, showDownloads, showGrids, isIdOnly, mounted]);
 
   // ── Build prompt ──
   useEffect(() => {
     const isBlog = contentType === "blog";
     const isModify = mode === "modify";
 
-    let prompt = "";
+    let prompt = `**INTERNAL CONTENT BRIEF FOR SNIPGEEK AGENT**\n`;
+    prompt += `**FOLLOWING SKILL:** \`content-generator\`\n\n`;
 
-    if (isModify) {
-      prompt = `${dictionary.modifyPromptBase}\n\n`;
-      if (selectedSlug) {
-        prompt += `**TARGET ARTICLE SLUG:** \`${selectedSlug}\`\n\n`;
-      }
-    } else {
-      const base = isBlog
-        ? isIdOnly
-          ? dictionary.promptBaseBlogIdOnly
-          : dictionary.promptBaseBlog
-        : isIdOnly
-          ? dictionary.promptBaseNoteIdOnly
-          : dictionary.promptBaseNote;
-      prompt = `${base}\n\n`;
+    prompt += `**1. MODE & TYPE**\n`;
+    prompt += `- Action: ${isModify ? "MODIFY EXISTING" : "CREATE NEW"}\n`;
+    prompt += `- Format: ${isBlog ? "BLOG POST" : "TECHNICAL NOTE"}\n`;
+    prompt += `- Language: ${isIdOnly ? "INDONESIAN ONLY" : "BILINGUAL (ID/EN)"}\n\n`;
+
+    prompt += `**2. METADATA BRIEF**\n`;
+    if (isModify && selectedSlug) {
+      prompt += `- Target Slug: \`${selectedSlug}\`\n`;
     }
 
-    prompt += `**${dictionary.frontmatterDetails}:**\n`;
-    prompt += `- ${dictionary.contentTypeLabel}: ${isBlog ? dictionary.contentTypeBlog : dictionary.contentTypeNote}\n`;
-    prompt += `- ${dictionary.titleLabel}: ${isModify ? "[KEEP ORIGINAL UNLESS CHANGED]" : "[AI: generate SEO-optimized title 50-60 chars]"}\n`;
-
-    if (!isModify) {
-      prompt += `- slug: [AI: Generate unique kebab-case English slug]\n`;
-      prompt += `- translationKey: [AI: Generate unique kebab-case key]\n`;
-    }
-
-    // Parse the date if exists, otherwise fallback
     const finalDate = publishDate
       ? parseNaturalDate(publishDate)
-      : (isModify ? "[KEEP ORIGINAL]" : new Date().toISOString().split("T")[0]);
+      : (isModify ? "[KEEP OR UPDATE]" : new Date().toISOString().split("T")[0]);
 
-    prompt += `- ${dictionary.dateLabel}: ${finalDate}\n`;
-    if (isModify)
-      prompt += `- updated: ${new Date().toISOString().split("T")[0]}\n`;
-
-    let frontmatterStatus = `published: ${isPublished}`;
-    if (isBlog) frontmatterStatus += `, featured: ${isFeatured}`;
-    prompt += `- ${dictionary.statusLabel}: ${frontmatterStatus}\n`;
+    prompt += `- Date: ${finalDate}\n`;
+    prompt += `- Status: ${isPublished ? "PUBLISHED" : "DRAFT"}${isFeatured && isBlog ? " | FEATURED" : ""}\n`;
+    prompt += `- Category Hint: ${categoryHint || "[AI: AUTOMATIC]"}\n\n`;
 
     const imageLines = images.split("\n").filter((l) => l.trim() !== "");
-
-    if (isBlog && !isModify) {
-      const heroLine = showImages && imageLines.length > 0 ? imageLines[0] : "";
-      const [heroPath, heroAlt] = heroLine
-        .split("|")
-        .map((s) => (s ? s.trim() : ""));
-      prompt += `- heroImage: "${heroPath || "/images/blank/blank.webp"}"\n`;
-      prompt += `- imageAlt: "${heroAlt || "[AI: GENERATE DESCRIPTIVE ALT]"}"\n`;
-    }
-
-    if (isModify) {
-      const catModifyInstruction = categoryHint.trim()
-        ? `"${categoryHint.trim()}" (override original)`
-        : `[KEEP ORIGINAL]`;
-      prompt += `- category: ${catModifyInstruction}\n`;
-    } else {
-      const catInstruction = categoryHint.trim()
-        ? `"${categoryHint.trim()}" — [AI: use this as a hint, or invent a better category name if more appropriate]`
-        : `[AI: FREELY CREATE a new category name. You are NOT limited to existing ones. Current examples: Tutorial, Windows, Hardware, Linux, Software Updates — but feel absolutely free to invent something more fitting for this content]`;
-      prompt += `- tags: [AI: Generate 3-5 relevant tags]\n`;
-      prompt += `- category: ${catInstruction}\n\n`;
-    }
-
-    const sliceIndex = isBlog && !isModify ? 1 : 0;
-    if (showImages && imageLines.length > sliceIndex) {
-      prompt += `**${isBlog ? dictionary.supportingImagesLabel : dictionary.supportingImagesLabelNote}:**\n`;
-      imageLines.slice(sliceIndex).forEach((line, i) => {
-        const [imgPath, imgAlt] = line
-          .split("|")
-          .map((s) => (s ? s.trim() : ""));
-        prompt += `- Image ${i + 1} Path: "${imgPath}" | Alt: "${imgAlt || "[AI: GENERATE ALT]"}"\n`;
+    if (showImages && imageLines.length > 0) {
+      prompt += `**3. ASSETS & MEDIA**\n`;
+      imageLines.forEach((line, i) => {
+        const [imgPath, imgAlt] = line.split("|").map(s => s?.trim() || "");
+        prompt += `- Image ${i + 1}: "${imgPath}" ${imgAlt ? `| Label: "${imgAlt}"` : ""}\n`;
       });
-      prompt += "\n";
+
+      if (showGrids && imageGridMappings) {
+        prompt += `\n**Image Grids:**\n`;
+        imageGridMappings.split("\n").filter(l => l.trim()).forEach((line, i) => {
+          prompt += `- Group ${i + 1}: ${line}\n`;
+        });
+      }
     }
 
     if (showDownloads && downloadItems.length > 0) {
-      prompt += `\n**${dictionary.downloadLinks.promptTitle}:**\n`;
+      prompt += `\n**4. DOWNLOAD LINKS**\n`;
       downloadItems.forEach((item, i) => {
-        prompt += `- [DOWNLOAD_${i + 1}] -> ${item.type === "id" ? `ID: "${item.value}"` : `URL: "${item.value}"`}\n`;
+        prompt += `- Link ${i + 1}: ${item.type.toUpperCase()} -> "${item.value}"\n`;
       });
     }
 
-    if (showGrids && imageGridMappings) {
-      prompt += `\n**${dictionary.imageGrid.promptTitle}:**\n`;
-      imageGridMappings
-        .split("\n")
-        .filter((l) => l.trim() !== "")
-        .forEach((line, i) => {
-          prompt += `- [GRID_${i + 1}] -> Paths: ${line}\n`;
-        });
-    }
-
-    if (useMdxRules) {
-      prompt += `\n**AVAILABLE CUSTOM MDX COMPONENTS:**\n`;
-      prompt += `Use these React components natively instead of standard markdown when the context perfectly fits. DO NOT force them into every paragraph; use them naturally to enhance the article's readability.\n`;
-      prompt += `\n1. Alerts/Callouts:\n`;
-      prompt += `   Usage: For tips, warnings, or important developer notes.\n`;
-      prompt += `   Syntax: <Callout variant="info|tip|warning|danger" title="Custom Heading">Your message here</Callout>\n`;
-      prompt += `\n2. Numbered Tutorial Steps:\n`;
-      prompt += `   Usage: When explaining a sequential process or step-by-step tutorial.\n`;
-      prompt += `   Syntax:\n`;
-      prompt += `   <Steps>\n`;
-      prompt += `     <Step>First do this...</Step>\n`;
-      prompt += `     <Step>Then do this...</Step>\n`;
-      prompt += `   </Steps>\n`;
-      prompt += `\n3. Keyboard Shortcuts:\n`;
-      prompt += `   Usage: When mentioning hotkeys or key bindings.\n`;
-      prompt += `   Syntax: <kbd>Ctrl</kbd> + <kbd>C</kbd>\n`;
-    }
-
+    prompt += `\n---\n\n`;
     if (isModify) {
-      prompt += `---\n\n**${dictionary.originalContentLabel}:**\n\n${originalContent || "[PASTE CONTENT]"}\n\n**${dictionary.modInstructionsLabel}:**\n\n${modInstructions || "[INSTRUCTIONS]"}`;
+      prompt += `**ORIGINAL CONTENT:**\n${originalContent || "[MISSING]"}\n\n`;
+      prompt += `**MODIFICATION INSTRUCTIONS:**\n${modInstructions || "Optimize for SEO and follow SnipGeek standards."}\n`;
     } else {
-      prompt += `---\n\n**${dictionary.draftContentLabel}:**\n\n${draft}`;
+      prompt += `**DRAFT/CONTENT SOURCE:**\n${draft || "[MISSING]"}\n`;
     }
 
-    prompt += `\n\n---\n**${dictionary.finalInstruction}**`;
+    prompt += `\n---\n**FINAL INSTRUCTION:** Generate the full MDX following the SnipGeek content-generator skill. Ensure all metadata (slugs, translation keys, alt texts) are generated automatically and tags are standardized (one-word).`;
+
     setGeneratedPrompt(prompt);
   }, [
     mode,
@@ -526,14 +460,11 @@ export function PromptGeneratorClient({
     isFeatured,
     isIdOnly,
     images,
-    dictionary,
     contentType,
     downloadItems,
     imageGridMappings,
     showDownloads,
     showGrids,
-    useMdxRules,
-    showImages,
     selectedSlug,
     categoryHint,
   ]);
@@ -754,13 +685,6 @@ export function PromptGeneratorClient({
                   icon={Hash}
                   label="ID-Only"
                   activeClass="bg-rose-500/10 text-rose-600 border-rose-500/20 dark:text-rose-400"
-                />
-                <FeaturePill
-                  active={useMdxRules}
-                  onClick={() => setUseMdxRules(!useMdxRules)}
-                  icon={Sparkles}
-                  label="MDX Rules"
-                  activeClass="bg-amber-500/10 text-amber-600 border-amber-500/20 dark:text-amber-400"
                 />
               </div>
             </div>
@@ -1137,7 +1061,7 @@ export function PromptGeneratorClient({
                     <div className="flex-1 mx-3 h-5 bg-white/[0.04] rounded-md flex items-center px-3 gap-1.5">
                       <Terminal className="h-2.5 w-2.5 text-white/20" />
                       <span className="text-[9px] text-white/25 font-mono">
-                        prompt-output.md
+                        content-brief.md
                       </span>
                     </div>
                     <button
@@ -1161,7 +1085,7 @@ export function PromptGeneratorClient({
                   {/* Prompt stats bar */}
                   <div className="px-5 py-2 border-b border-white/[0.04] flex items-center justify-between">
                     <span className="text-[9px] font-black uppercase tracking-[0.2em] text-white/20">
-                      Generated Prompt
+                      Content Brief
                     </span>
                     <div className="flex items-center gap-3 text-[9px] font-mono text-white/20">
                       <span>{promptStats.words}w</span>
@@ -1199,7 +1123,7 @@ export function PromptGeneratorClient({
                       ) : (
                         <Copy className="h-3.5 w-3.5" />
                       )}
-                      {isCopied ? dictionary.copiedButton : "Copy Prompt"}
+                      {isCopied ? dictionary.copiedButton : "Copy Brief"}
                     </button>
                   </div>
                 </Card>
