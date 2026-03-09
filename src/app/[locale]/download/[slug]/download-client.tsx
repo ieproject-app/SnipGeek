@@ -334,10 +334,10 @@ export function DownloadClient({
 
                 {/* Main Action */}
                 <div className="mt-6 flex flex-col items-center gap-6">
-                  <motion.div variants={itemVariants} className="relative w-full sm:w-auto">
+                  <motion.div variants={itemVariants} className="relative w-full sm:w-auto z-10">
                     {isReady && (
                       <div className={cn(
-                        "absolute -inset-4 rounded-2xl opacity-20 blur-xl animate-pulse",
+                        "absolute -inset-4 rounded-2xl opacity-20 blur-xl animate-pulse pointer-events-none",
                         theme.bg
                       )} />
                     )}
@@ -345,7 +345,7 @@ export function DownloadClient({
                       onClick={handleDownloadClick}
                       disabled={!isReady}
                       className={cn(
-                        "w-full sm:w-auto h-12 sm:h-14 rounded-xl px-8 text-[11px] font-black uppercase tracking-[0.2em] transition-all shadow-xl",
+                        "w-full sm:w-auto h-12 sm:h-14 rounded-xl px-8 text-[11px] font-black uppercase tracking-[0.2em] transition-all shadow-xl cursor-pointer hover:z-20",
                         isReady
                           ? "bg-foreground text-background hover:scale-[1.02] hover:brightness-110 active:scale-[0.98]"
                           : "bg-muted text-muted-foreground opacity-50 cursor-not-allowed"
@@ -373,10 +373,10 @@ export function DownloadClient({
             <div className="p-4 rounded-2xl border border-primary/5 bg-card/60 backdrop-blur-md">
               <div className="flex items-center gap-2 mb-2">
                 <Lock className="h-3 w-3 text-muted-foreground/50" />
-                <span className="text-[8px] font-black uppercase tracking-widest text-muted-foreground/50">Support</span>
+                <span className="text-[8px] font-black uppercase tracking-widest text-muted-foreground/50">Community Support</span>
               </div>
               <p className="text-[10px] font-medium text-muted-foreground/80 leading-relaxed">
-                Problems? <span className="text-primary hover:underline cursor-pointer">Help Center</span>
+                Need help? <span className="text-primary hover:underline cursor-pointer font-bold">Visit Support & Discussion</span>
               </p>
             </div>
           </aside>
