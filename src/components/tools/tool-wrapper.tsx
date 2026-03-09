@@ -30,7 +30,7 @@ import type { Dictionary } from "@/lib/get-dictionary";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 
-interface InternalToolWrapperProps {
+interface ToolWrapperProps {
   children: React.ReactNode;
   title: string;
   description: string;
@@ -38,13 +38,13 @@ interface InternalToolWrapperProps {
   isPublic?: boolean;
 }
 
-export function InternalToolWrapper({
+export function ToolWrapper({
   children,
   title,
   description,
   dictionary,
   isPublic = false,
-}: InternalToolWrapperProps) {
+}: ToolWrapperProps) {
   const { user, isUserLoading } = useUser();
   const auth = useAuth();
   const { notify } = useNotification();

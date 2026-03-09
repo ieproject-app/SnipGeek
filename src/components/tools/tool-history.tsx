@@ -12,7 +12,7 @@ import { parse, isValid } from 'date-fns'
 import { cn } from '@/lib/utils'
 import { Search, FileText, UserCheck, Plus, Trash2, Loader2 } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
-import { InternalToolWrapper } from '@/components/tools/internal-tool-wrapper'
+import { ToolWrapper } from '@/components/tools/tool-wrapper'
 import { ScrollReveal } from '@/components/ui/scroll-reveal'
 
 // --- TYPE DEFINITIONS ---
@@ -77,7 +77,7 @@ const formatDate = (date: Date, locale: string = 'id-ID') => {
   return date.toLocaleDateString(locale, { day: 'numeric', month: 'long', year: 'numeric' });
 }
 
-export default function EmployeeHistoryClient({
+export function ToolHistory({
   dictionary,
   employeeData,
   locale
@@ -199,7 +199,7 @@ export default function EmployeeHistoryClient({
   };
 
   return (
-    <InternalToolWrapper
+    <ToolWrapper
       title={toolMeta.title}
       description={toolMeta.description}
       dictionary={dictionary}
@@ -431,6 +431,6 @@ export default function EmployeeHistoryClient({
           </Card>
         </ScrollReveal>
       </div>
-    </InternalToolWrapper>
+    </ToolWrapper>
   )
 }

@@ -42,7 +42,7 @@ export function SnipTooltip({
         className={cn(
           "px-3 py-1.5 rounded-full bg-primary text-primary-foreground",
           "text-[10px] font-black uppercase tracking-widest",
-          "shadow-2xl whitespace-nowrap z-50 pointer-events-none",
+          "shadow-xl whitespace-nowrap z-50 pointer-events-none",
           "transition-all duration-300",
           tooltipPositionClasses[side],
           className,

@@ -1,6 +1,6 @@
 
 import { Metadata } from 'next';
-import { NomorGeneratorClient } from './components/NomorGeneratorClient';
+import { ToolNumbers } from '@/components/tools/tool-numbers';
 import { getDictionary } from '@/lib/get-dictionary';
 import { Locale } from '@/i18n-config';
 
@@ -37,7 +37,7 @@ export default async function NomorGeneratorPage({
   return (
     <div className="w-full">
       <main className="mx-auto max-w-4xl px-4 pt-10 pb-16 sm:px-6">
-        <NomorGeneratorClient dictionary={dictionary} />
+        <ToolNumbers dictionary={dictionary} />
       </main>
     </div>
   );

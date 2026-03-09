@@ -48,7 +48,7 @@ import {
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useNotification } from '@/hooks/use-notification';
-import { InternalToolWrapper } from '@/components/tools/internal-tool-wrapper';
+import { ToolWrapper } from '@/components/tools/tool-wrapper';
 import { Dictionary } from '@/lib/get-dictionary';
 
 const DAILY_LIMIT = 10;
@@ -112,7 +112,7 @@ function createNewRequest(): GenerationRequest {
     };
 }
 
-export function NomorGeneratorClient({ dictionary }: { dictionary: Dictionary }) {
+export function ToolNumbers({ dictionary }: { dictionary: Dictionary }) {
     const [requests, setRequests] = useState<GenerationRequest[]>([createNewRequest()]);
     const [valueCategory, setValueCategory] = useState<ValueCategory>('below_500m');
     const [isGenerating, setIsGenerating] = useState(false);
@@ -613,7 +613,7 @@ export function NomorGeneratorClient({ dictionary }: { dictionary: Dictionary })
     const hasResults = generatedNumbers.length > 0;
 
     return (
-        <InternalToolWrapper
+        <ToolWrapper
             title={toolMeta.title}
             description={toolMeta.description}
             dictionary={dictionary}
@@ -1149,6 +1149,6 @@ export function NomorGeneratorClient({ dictionary }: { dictionary: Dictionary })
                     )}
                 </Tabs>
             </div>
-        </InternalToolWrapper>
+        </ToolWrapper>
     );
 }

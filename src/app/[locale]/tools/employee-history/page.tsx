@@ -1,6 +1,6 @@
 import { getDictionary } from '@/lib/get-dictionary'
 import { Locale } from '@/i18n-config'
-import EmployeeHistoryClient from './employee-history-client'
+import { ToolHistory } from '@/components/tools/tool-history'
 import fs from 'fs'
 import path from 'path'
 import type { Metadata } from 'next'
@@ -51,7 +51,7 @@ export default async function EmployeeHistoryPage({
   return (
     <div className="w-full">
       <main className="mx-auto max-w-5xl px-4 pt-10 pb-16 sm:px-6">
-        <EmployeeHistoryClient dictionary={dictionary} employeeData={employeeData} locale={locale} />
+        <ToolHistory dictionary={dictionary} employeeData={employeeData} locale={locale} />
       </main>
     </div>
   );

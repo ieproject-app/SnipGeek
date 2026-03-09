@@ -18,6 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { SnipTooltip } from "@/components/ui/snip-tooltip";
 import {
   Copy,
   Check,
@@ -50,7 +51,7 @@ import { downloadLinks } from "@/lib/data-downloads";
 import { useNotification } from "@/hooks/use-notification";
 import { cn } from "@/lib/utils";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { InternalToolWrapper } from "@/components/tools/internal-tool-wrapper";
+import { ToolWrapper } from "@/components/tools/tool-wrapper";
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
 import type { Dictionary } from "@/lib/get-dictionary";
 
@@ -131,7 +132,7 @@ const generateUUID = (): string => {
   });
 };
 
-interface PromptGeneratorClientProps {
+interface ToolPromptsProps {
   dictionary: any;
   existingArticles: ArticleSummary[];
   fullDictionary: Dictionary;
@@ -154,18 +155,19 @@ function FeaturePill({
   activeClass: string;
 }) {
   return (
-    <button
-      onClick={onClick}
-      className={cn(
-        "flex items-center gap-1.5 px-3 h-7 rounded-full text-[9px] font-black uppercase tracking-wide border transition-all duration-200",
-        active
-          ? activeClass
-          : "bg-muted/30 text-muted-foreground border-transparent hover:border-primary/10 hover:text-primary",
-      )}
-    >
-      <Icon className="h-3 w-3 shrink-0" />
-      {label}
-    </button>
+    <SnipTooltip label={label} side="bottom">
+      <button
+        onClick={onClick}
+        className={cn(
+          "flex items-center justify-center w-10 h-10 rounded-xl border transition-all duration-300",
+          active
+            ? activeClass
+            : "bg-background/40 text-muted-foreground border-primary/5 hover:border-primary/20 hover:bg-background/80 hover:text-primary hover:scale-[1.05] shadow-sm",
+        )}
+      >
+        <Icon className={cn("h-5 w-5 shrink-0", active && "animate-pulse")} />
+      </button>
+    </SnipTooltip>
   );
 }
 
@@ -290,11 +292,11 @@ function DownloadIdPicker({
 // ──────────────────────────────────────────────────────────────────────────────
 // Main component
 // ──────────────────────────────────────────────────────────────────────────────
-export function PromptGeneratorClient({
+export function ToolPrompts({
   dictionary,
   existingArticles,
   fullDictionary,
-}: PromptGeneratorClientProps) {
+}: ToolPromptsProps) {
   const [mounted, setMounted] = useState(false);
 
   // ── Mode & content type ──
@@ -511,184 +513,161 @@ export function PromptGeneratorClient({
   // RENDER
   // ──────────────────────────────────────────────────────────────────────────
   return (
-    <InternalToolWrapper
+    <ToolWrapper
       title={dictionary.title}
       description={dictionary.description}
       dictionary={fullDictionary}
       isPublic={true}
     >
-      <div className="max-w-[1600px] mx-auto space-y-6">
-        {/* ── TOOLBAR ── */}
+      <div className="max-w-full mx-auto space-y-6">
+        {/* ── REDESIGNED TOOLBAR ── */}
+        {/* ── REDESIGNED ISLAND-STYLE TOOLBAR ── */}
         <ScrollReveal direction="down" delay={0.05} duration={0.4}>
-          <Card className="bg-background/80 backdrop-blur-xl border-primary/10 shadow-lg overflow-hidden rounded-xl">
-            <div className="px-4 py-3 flex flex-wrap lg:flex-nowrap items-center justify-between gap-4">
-              {/* Left group - Core Selectors */}
-              <div className="flex flex-wrap items-center gap-3">
-                {/* Mode slider */}
-                <div className="relative flex bg-muted/50 p-1 rounded-lg border border-primary/5">
+          <div className="flex flex-wrap items-center justify-center gap-3">
+            {/* Island 1: Primary Actions (Action Mode & Content Type) */}
+            <div className="bg-card/50 backdrop-blur-lg border border-primary/10 shadow-sm rounded-xl p-1 flex items-center gap-1">
+              <div className="relative flex p-1 rounded-lg">
+                <SnipTooltip label={dictionary.modes.create} side="bottom">
                   <button
                     onClick={() => setMode("create")}
                     className={cn(
-                      "relative flex items-center gap-1.5 px-4 h-8 rounded-md text-[10px] font-black uppercase tracking-wider transition-colors z-10",
-                      mode === "create"
-                        ? "text-primary"
-                        : "text-muted-foreground",
+                      "relative flex items-center justify-center w-10 h-8 rounded-md transition-all duration-300 z-10",
+                      mode === "create" ? "text-primary" : "text-muted-foreground hover:text-primary/70"
                     )}
                   >
-                    <PenLine className="h-3 w-3" />
-                    {dictionary.modes.create}
+                    <PenLine className={cn("h-4 w-4", mode === "create" ? "animate-pulse" : "")} />
                   </button>
+                </SnipTooltip>
+
+                <SnipTooltip label={dictionary.modes.modify} side="bottom">
                   <button
                     onClick={() => setMode("modify")}
                     className={cn(
-                      "relative flex items-center gap-1.5 px-4 h-8 rounded-md text-[10px] font-black uppercase tracking-wider transition-colors z-10",
-                      mode === "modify"
-                        ? "text-primary"
-                        : "text-muted-foreground",
+                      "relative flex items-center justify-center w-10 h-8 rounded-md transition-all duration-300 z-10",
+                      mode === "modify" ? "text-primary" : "text-muted-foreground hover:text-primary/70"
                     )}
                   >
-                    <Layers className="h-3 w-3" />
-                    {dictionary.modes.modify}
+                    <Layers className={cn("h-4 w-4", mode === "modify" ? "animate-pulse" : "")} />
                   </button>
-                  {/* Sliding background */}
-                  <div
-                    className={cn(
-                      "absolute top-1 bottom-1 w-[calc(50%-4px)] bg-background rounded-md shadow-sm transition-all duration-300 z-0",
-                      mode === "modify" ? "translate-x-full" : "translate-x-0",
-                    )}
-                  />
-                </div>
+                </SnipTooltip>
+                <div
+                  className={cn(
+                    "absolute top-1 bottom-1 w-[calc(50%-4px)] bg-background border border-primary/5 rounded-md shadow-sm transition-all duration-500 ease-out z-0",
+                    mode === "modify" ? "translate-x-full" : "translate-x-0"
+                  )}
+                />
+              </div>
 
-                {/* Content type */}
-                <div className="flex bg-muted/30 p-1 rounded-lg border border-primary/5">
+              <div className="w-px h-5 bg-primary/10 mx-1 self-center" />
+
+              <div className="flex p-1 rounded-lg">
+                <SnipTooltip label={dictionary.contentTypeBlog} side="bottom">
                   <button
                     onClick={() => setContentType("blog")}
                     className={cn(
-                      "flex items-center gap-1.5 px-3 h-8 rounded-md text-[10px] font-black uppercase tracking-wider transition-all",
+                      "flex items-center justify-center w-10 h-8 rounded-md transition-all",
                       contentType === "blog"
-                        ? "bg-background shadow-sm text-primary"
-                        : "text-muted-foreground hover:text-primary",
+                        ? "bg-background border border-primary/5 shadow-sm text-primary"
+                        : "text-muted-foreground hover:text-primary"
                     )}
                   >
-                    <FileText className="h-3 w-3" />
-                    {dictionary.contentTypeBlog}
+                    <FileText className="h-4 w-4" />
                   </button>
+                </SnipTooltip>
+
+                <SnipTooltip label={dictionary.contentTypeNote} side="bottom">
                   <button
                     onClick={() => setContentType("note")}
                     className={cn(
-                      "flex items-center gap-1.5 px-3 h-8 rounded-md text-[10px] font-black uppercase tracking-wider transition-all",
+                      "flex items-center justify-center w-10 h-8 rounded-md transition-all",
                       contentType === "note"
-                        ? "bg-background shadow-sm text-primary"
-                        : "text-muted-foreground hover:text-primary",
+                        ? "bg-background border border-primary/5 shadow-sm text-primary"
+                        : "text-muted-foreground hover:text-primary"
                     )}
                   >
-                    <StickyNote className="h-3 w-3" />
-                    {dictionary.contentTypeNote}
+                    <StickyNote className="h-4 w-4" />
                   </button>
-                </div>
+                </SnipTooltip>
               </div>
+            </div>
 
-              {/* Middle group - Inputs & Status */}
-              <div className="flex flex-wrap items-center gap-2">
-                {/* Category hint */}
-                <div className="flex items-center gap-2 bg-muted/20 px-3 h-9 rounded-lg border border-primary/5">
-                  <Tag className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-                  <Input
-                    value={categoryHint}
-                    onChange={(e) => setCategoryHint(e.target.value)}
-                    placeholder={
-                      dictionary.categoryHintPlaceholder ||
-                      "AI creates category…"
-                    }
-                    className="h-7 w-[100px] xl:w-[130px] border-none bg-transparent text-[10px] font-mono px-0 focus-visible:ring-0"
-                  />
-                </div>
-
-                {/* Date input */}
-                <div className="flex items-center gap-2 bg-muted/20 px-3 h-9 rounded-lg border border-primary/5">
-                  <Calendar className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+            {/* Island 2: Quick Config (Date & Status) */}
+            <div className="bg-card/50 backdrop-blur-lg border border-primary/10 shadow-sm rounded-xl p-1.5 flex items-center gap-3">
+              <div className="flex items-center gap-2 px-3 h-9 rounded-lg bg-primary/5 border border-primary/10">
+                <div className="flex items-center gap-2 pr-3 border-r border-primary/10">
+                  <Calendar className="h-3.5 w-3.5 text-primary shrink-0" />
                   <Input
                     value={publishDate}
                     onChange={(e) => setPublishDate(e.target.value)}
-                    placeholder={
-                      mode === "modify" ? "ORIGINAL DATE" : "YYYY-MM-DD"
-                    }
-                    className="h-7 w-[110px] xl:w-[125px] border-none bg-transparent text-[10px] font-mono px-0 focus-visible:ring-0"
+                    placeholder={mode === "modify" ? "DATE" : "YYYY-MM-DD"}
+                    className="h-7 w-32 border-none bg-transparent text-[11px] font-bold px-0 focus-visible:ring-0 placeholder:opacity-50"
                   />
                 </div>
 
-                {/* Published & Featured */}
-                <div className="flex items-center gap-3 bg-muted/20 px-3 h-9 rounded-lg border border-primary/5">
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground">
-                      Live
+                <div className="flex items-center gap-3 pl-1">
+                  <div className="flex items-center gap-2">
+                    <span className={cn(
+                      "text-[9px] font-black uppercase tracking-tighter transition-colors",
+                      isPublished ? "text-emerald-500" : "text-muted-foreground"
+                    )}>
+                      {isPublished ? "LIVE" : "DRAFT"}
                     </span>
                     <Switch
                       checked={isPublished}
                       onCheckedChange={setIsPublished}
-                      className="scale-75 origin-left"
+                      className="scale-75 data-[state=checked]:bg-emerald-500"
                     />
                   </div>
 
                   {contentType === "blog" && (
-                    <>
-                      <div className="w-px h-4 bg-primary/10" />
-                      <div className="flex items-center gap-1.5">
-                        <Star
-                          className={cn(
-                            "h-3 w-3 shrink-0 transition-colors",
-                            isFeatured
-                              ? "text-amber-500 fill-amber-500"
-                              : "text-muted-foreground",
-                          )}
-                        />
-                        <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground">
-                          Feat
-                        </span>
-                        <Switch
-                          checked={isFeatured}
-                          onCheckedChange={setIsFeatured}
-                          className="scale-75 origin-left"
-                        />
-                      </div>
-                    </>
+                    <div className="flex items-center gap-2">
+                      <Star className={cn(
+                        "h-3.5 w-3.5 transition-all",
+                        isFeatured ? "text-amber-500 fill-amber-500 animate-pulse" : "text-muted-foreground"
+                      )} />
+                      <Switch
+                        checked={isFeatured}
+                        onCheckedChange={setIsFeatured}
+                        className="scale-75 data-[state=checked]:bg-amber-500"
+                      />
+                    </div>
                   )}
                 </div>
               </div>
-
-              {/* Right group - Features */}
-              <div className="flex flex-wrap items-center gap-1.5 p-1 rounded-lg border border-primary/5 bg-background shadow-sm">
-                <FeaturePill
-                  active={showImages}
-                  onClick={() => setShowImages(!showImages)}
-                  icon={ImageIcon}
-                  label="Images"
-                  activeClass="bg-emerald-500/10 text-emerald-600 border-emerald-500/20 dark:text-emerald-400"
-                />
-                <FeaturePill
-                  active={showDownloads}
-                  onClick={() => setShowDownloads(!showDownloads)}
-                  icon={Download}
-                  label="Downs"
-                  activeClass="bg-blue-500/10 text-blue-600 border-blue-500/20 dark:text-blue-400"
-                />
-                <FeaturePill
-                  active={showGrids}
-                  onClick={() => setShowGrids(!showGrids)}
-                  icon={Grid3X3}
-                  label="Grids"
-                  activeClass="bg-violet-500/10 text-violet-600 border-violet-500/20 dark:text-violet-400"
-                />
-                <FeaturePill
-                  active={isIdOnly}
-                  onClick={() => setIsIdOnly(!isIdOnly)}
-                  icon={Hash}
-                  label="ID-Only"
-                  activeClass="bg-rose-500/10 text-rose-600 border-rose-500/20 dark:text-rose-400"
-                />
-              </div>
             </div>
-          </Card>
+
+            {/* Island 3: Feature Toggles (Pill Style) */}
+            <div className="flex items-center gap-1.5 p-1 rounded-xl border border-primary/10 bg-card/50 backdrop-blur-lg shadow-sm">
+              <FeaturePill
+                active={showImages}
+                onClick={() => setShowImages(!showImages)}
+                icon={ImageIcon}
+                label="Images"
+                activeClass="bg-emerald-500 text-white border-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.3)]"
+              />
+              <FeaturePill
+                active={showDownloads}
+                onClick={() => setShowDownloads(!showDownloads)}
+                icon={Download}
+                label="Downloads"
+                activeClass="bg-blue-500 text-white border-blue-400 shadow-[0_0_15px_rgba(59,130,246,0.3)]"
+              />
+              <FeaturePill
+                active={showGrids}
+                onClick={() => setShowGrids(!showGrids)}
+                icon={Grid3X3}
+                label="Grids"
+                activeClass="bg-violet-500 text-white border-violet-400 shadow-[0_0_15px_rgba(139,92,246,0.3)]"
+              />
+              <FeaturePill
+                active={isIdOnly}
+                onClick={() => setIsIdOnly(!isIdOnly)}
+                icon={Hash}
+                label="ID-Only"
+                activeClass="bg-rose-500 text-white border-rose-400 shadow-[0_0_15px_rgba(244,63,94,0.3)]"
+              />
+            </div>
+          </div>
         </ScrollReveal>
 
         {/* ── MAIN GRID ── */}
@@ -1132,6 +1111,6 @@ export function PromptGeneratorClient({
           </div>
         </div>
       </div>
-    </InternalToolWrapper>
+    </ToolWrapper>
   );
 }
