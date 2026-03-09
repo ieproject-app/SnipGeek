@@ -1,5 +1,6 @@
 import { LayoutHeader } from "@/components/layout/layout-header";
 import { LayoutFooter } from "@/components/layout/layout-footer";
+import { BackToTop } from "@/components/layout/back-to-top";
 import { i18n } from "@/i18n-config";
 import {
   getAllTranslationsMap as getAllPostTranslationsMap,
@@ -216,6 +217,7 @@ export default async function LocaleLayout({
                   dictionary={dictionary}
                   translationsMap={translationsMap}
                 />
+                <BackToTop />
                 <DraftList
                   draftPosts={draftPosts}
                   draftNotes={draftNotes}
