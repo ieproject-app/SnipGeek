@@ -4,16 +4,18 @@ import { usePathname, useParams, useRouter } from "next/navigation";
 import { i18n, type Locale } from "@/i18n-config";
 import { type TranslationsMap } from "@/lib/posts";
 import { cn } from "@/lib/utils";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import type { Dictionary } from "@/lib/get-dictionary";
 import { SnipTooltip } from "@/components/ui/snip-tooltip";
 
 export function LanguageSwitcher({
   translationsMap,
   dictionary,
+  variant = "pill",
 }: {
   translationsMap: TranslationsMap;
   dictionary: Dictionary;
+  variant?: "pill" | "minimal";
 }) {
   const pathName = usePathname();
   const params = useParams();
@@ -80,6 +82,35 @@ export function LanguageSwitcher({
     }
     return `/${newLocale}${pathWithoutLocale}`;
   };
+
+  if (variant === "minimal") {
+    return (
+      <div className="flex items-center gap-2" suppressHydrationWarning>
+        {i18n.locales.map((locale, index) => {
+          const isActive = currentLocale === locale;
+          return (
+            <React.Fragment key={locale}>
+              <button
+                type="button"
+                onClick={() => handleLocaleChange(locale as Locale)}
+                className={cn(
+                  "text-[10px] font-black uppercase tracking-[0.2em] transition-all duration-300",
+                  isActive
+                    ? "text-accent"
+                    : "text-primary/30 hover:text-primary/60",
+                )}
+              >
+                {locale}
+              </button>
+              {index < i18n.locales.length - 1 && (
+                <span className="text-[10px] font-light text-primary/10">|</span>
+              )}
+            </React.Fragment>
+          );
+        })}
+      </div>
+    );
+  }
 
   return (
     <div

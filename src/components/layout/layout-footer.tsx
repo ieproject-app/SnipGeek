@@ -184,12 +184,11 @@ export function LayoutFooter({
           <ScrollReveal direction="up" delay={0.6}>
             <div className="flex flex-col justify-center items-center gap-6 text-sm text-primary/80 border-t border-primary/10 pt-12 mt-12">
               <div className="flex items-center gap-4">
-                <div className="bg-primary/90 backdrop-blur-sm rounded-full p-1.5 flex items-center gap-2 shadow-xl border border-white/5">
-                  <LanguageSwitcher
-                    translationsMap={translationsMap}
-                    dictionary={dictionary}
-                  />
-                </div>
+                <LanguageSwitcher
+                  translationsMap={translationsMap}
+                  dictionary={dictionary}
+                  variant="minimal"
+                />
               </div>
               <div className="flex flex-col items-center justify-center gap-5 text-center">
                 <nav className="flex flex-wrap items-center justify-center gap-x-6 gap-y-3 px-6 py-2.5 rounded-full bg-muted/20 border border-primary/5 backdrop-blur-sm">
