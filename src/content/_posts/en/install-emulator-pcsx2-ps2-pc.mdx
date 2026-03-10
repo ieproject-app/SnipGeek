@@ -1,0 +1,100 @@
+---
+title: "How to Install PCSX2 Emulator to Play PS2 Games on PC"
+slug: "install-emulator-pcsx2-ps2-pc"
+translationKey: "install-pcsx2-ps2-pc"
+date: "2026-03-12"
+category: "Tutorial"
+tags: ["pcsx2", "emulator", "ps2"]
+published: true
+featured: true
+heroImage: "/images/_posts/apps/pcsx-2/emulator-pcsx2-ps2-banner.webp"
+imageAlt: "PCSX2 emulator banner featuring PlayStation 2 games and console"
+---
+
+The PS2 emulator, PCSX2, is a fantastic way to replay legendary PlayStation 2 games directly on your laptop or computer. I've been using it for a while to revisit old favorites, and honestly, the experience is often better than the original hardware. PCSX2 is a free and *open-source* emulator that has been in development for nearly 20 years. While its initial versions could only run a few demos, modern releases can now play almost all PS2 games smoothly, including iconic titles like **Final Fantasy X** and **Devil May Cry 3**.
+
+Not only that, PCSX2 offers many advantages not found on the original console. You get custom resolutions and graphics upscaling, which makes old games look stunning on modern displays. It also features virtual memory cards that are easy to share, a *save-state* feature that let you save your game at any exact moment, and an internal recorder for capturing high-quality gameplay.
+
+> **Note:** This guide has been updated to reflect the more modern and user-friendly interface of PCSX2 version 2.x, which brings a massive overhaul to how the emulator is configured.
+
+---
+
+## #1 File Preparation
+
+The first step is downloading all the necessary files. **It is highly recommended** to download the package we have prepared below. I've bundled the latest version of the PCSX2 emulator with the required BIOS files in a single `.zip` package, adjusting the folder structure to match exactly what you'll see in the screenshots of this tutorial.
+
+[Download Latest PCSX2 + BIOS (via IR Web)](/download/pcsx2-bios-bundle)
+
+If you prefer to grab the files yourself, you can download the latest version directly from the [official PCSX2 site](https://pcsx2.net/), and source the necessary BIOS files from the [Retrostic site](https://www.retrostic.com/bios/pcsx2-playstation-2).
+
+> **Note:** If you choose to download from alternative sources, the visual guide below might look slightly different, as folder structures and filenames can vary.
+
+<Callout variant="warning" title="Hardware & Supporting Software">
+  For the best experience, make sure your PC has a capable graphics card and all supporting runtimes, like DirectX and Visual C++, are installed. If you frequently encounter errors when launching games, I recommend grabbing this [AIO Runtimes package](/blog/solusi-error-0xc000007b-aio-runtimes).
+</Callout>
+
+---
+
+## #2 Installation & Configuration Process
+
+The modern version of PCSX2 offers two types of installation: **Installer** and **Portable**. I always recommend the **Installer** method for beginners because it handles the shortcuts and keeps your configuration files neatly tucked away in your Documents folder.
+
+<details>
+  <summary>What's the difference between Installer and Portable?</summary>
+  <ul>
+    <li><strong>Installer (.exe):</strong> The recommended method. This creates a Start Menu shortcut and saves config files in your Documents folder. Much neater.</li>
+    <li><strong>Portable (run `pcsx2-qt.exe`):</strong> Just extract and run. All config files stay in the extracted directory. Great if you want to carry the emulator around on a thumb drive.</li>
+  </ul>
+</details>
+
+<Steps>
+  <Step>
+    ### Extract the File
+    Right-click the `.zip` file you downloaded and extract it to your preferred folder. Inside, you will see two sub-folders: `01. PCSX2` (which contains the installer) and `02. BIOS PS2`.
+    
+    ![PCSX2 extracted folder contents structure](/images/_posts/apps/pcsx-2/pcsx2-qt_0.webp)
+  </Step>
+  <Step>
+    ### Run the Installer
+    Navigate into the `01. PCSX2` folder and run the `.exe` installer file.
+  </Step>
+  <Step>
+    ### Complete the Configuration Wizard
+    Follow the on-screen instructions. You'll be greeted by a short configuration wizard that guides you through the initial setup, from selecting your language to configuring your controller mapping. Make sure to follow each step carefully.
+  </Step>
+</Steps>
+
+If you need a bit more visual help with the wizard, here's what each step looks like:
+
+<Gallery caption="PCSX2 Initial Setup Wizard Steps 1">
+  ![Language selection exactly as seen in PCSX2 setup](/images/_posts/apps/pcsx-2/pcsx2-qt_1.webp)
+  ![Selecting theme and interface options in PCSX2](/images/_posts/apps/pcsx-2/pcsx2-qt_2.webp)
+  ![Directing the emulator to the BIOS folder](/images/_posts/apps/pcsx-2/pcsx2-qt_3.webp)
+</Gallery>
+
+<Gallery caption="PCSX2 Initial Setup Wizard Steps 2">
+  ![Scanning for BIOS files in the directory](/images/_posts/apps/pcsx-2/pcsx2-qt_4.webp)
+  ![Selecting the game directories](/images/_posts/apps/pcsx-2/pcsx2-qt_5.webp)
+  ![Controller setup mapping interface](/images/_posts/apps/pcsx-2/pcsx2-qt_6.webp)
+</Gallery>
+
+Once you're through the wizard, you'll arrive at the modern main interface of PCSX2. If you added a game directory during the setup, your game list will already be populated.
+
+![The modern main interface of PCSX2 displaying the game list](/images/_posts/apps/pcsx-2/pcsx2-qt_7.webp)
+
+---
+
+## #3 How to Run a Game (ISO File)
+
+Keep in mind that the emulator itself does not come with games. You'll need to source your own PS2 game files in `.iso` format. You can easily find them via Google by searching "download ps2 game iso" or by visiting preservation sites like [CoolROM](https://coolrom.com.au/roms/ps2/).
+
+Running those games in the latest version of PCSX2 is incredibly straightforward:
+
+1. **Set the Game Directory (If you skipped it earlier):** If your game list is empty, simply navigate to **Settings > Game List** and click **"Add"** to select the folder where you keep your ISO files.
+2. **Start the Game:** Back in the main PCSX2 window, just **double-click** the title you want to play.
+
+![Game list view in PCSX2 ready to be played, with the game 'God of War' highlighted.](/images/articles/aplikasi/panduan-emulator-pcsx2-ps2/panduan-emulator-pcsx2-ps2-explorer-revisi.webp "Just double-click on the game in the list to start.")
+
+Boom! Your game will launch. A connected USB controller or gamepad is usually detected automatically, but you can always dive back into **Settings > Controllers** if you need to tweak the mappings.
+
+Enjoy the trip down memory lane! If you run into any snags or have any questions about getting a specific game to run, just drop a comment down below.
