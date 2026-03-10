@@ -217,20 +217,19 @@ export default async function Page({
               isCentered={true}
             />
 
-            <div className="relative mt-8 mb-12 rounded-xl overflow-hidden shadow-2xl bg-muted group ring-1 ring-primary/5">
+            <div className="relative mt-8 mb-12 rounded-xl overflow-hidden shadow-2xl bg-muted group ring-1 ring-primary/5 aspect-[4/3]">
               {heroSource ? (
                 <Image
                   src={heroSource.url}
                   alt={imageAlt || initialPost.frontmatter.title}
-                  width={1200}
-                  height={630}
-                  className="w-full h-auto aspect-video object-cover transition-transform duration-700 group-hover:scale-105"
+                  fill
+                  className="object-cover transition-transform duration-700 group-hover:scale-105"
                   sizes="(max-width: 1200px) 100vw, 1200px"
                   priority
                   data-ai-hint={heroSource.hint}
                 />
               ) : (
-                <div className="w-full aspect-video flex items-center justify-center bg-primary/5">
+                <div className="w-full h-full flex items-center justify-center bg-primary/5">
                   <span className="text-primary/20 font-display text-6xl font-black">
                     SnipGeek
                   </span>
