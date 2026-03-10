@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
@@ -8,6 +8,10 @@ import { formatRelativeTime } from "@/lib/utils";
 import { AddToReadingListButton } from "@/components/layout/add-to-reading-list-button";
 import { CategoryBadge } from "@/components/layout/category-badge";
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
+import { Button } from "@/components/ui/button";
+import { ChevronDown } from "lucide-react";
+
+const POSTS_PER_PAGE = 9;
 
 export function BlogListClient({
   initialPosts,
@@ -19,6 +23,7 @@ export function BlogListClient({
   locale: string;
 }) {
   const linkPrefix = locale === "en" ? "" : `/${locale}`;
+  const [visibleCount, setVisibleCount] = useState(POSTS_PER_PAGE);
 
   const allPosts = useMemo(() => {
     return [...initialPosts].sort(
@@ -27,6 +32,14 @@ export function BlogListClient({
         new Date(a.frontmatter.date).getTime(),
     );
   }, [initialPosts]);
+
+  const displayedPosts = allPosts.slice(0, visibleCount);
+  const hasMore = visibleCount < allPosts.length;
+  const remainingCount = Math.min(POSTS_PER_PAGE, allPosts.length - visibleCount);
+
+  const handleLoadMore = () => {
+    setVisibleCount((prev) => prev + POSTS_PER_PAGE);
+  };
 
   return (
     <div className="w-full">
@@ -41,7 +54,7 @@ export function BlogListClient({
         </header>
 
         <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-8">
-          {allPosts.map((post, index) => {
+          {displayedPosts.map((post, index) => {
             const heroImageValue = post.frontmatter.heroImage;
             let heroImageSrc: string | undefined;
             let heroImageHint: string | undefined;
@@ -121,6 +134,24 @@ export function BlogListClient({
             );
           })}
         </section>
+
+        {hasMore && (
+          <div className="mt-12 flex justify-center">
+            <Button
+              onClick={handleLoadMore}
+              variant="outline"
+              size="lg"
+              className="group gap-2 border-primary/20 bg-background/50 px-8 py-6 text-base font-semibold transition-all hover:border-primary/40 hover:bg-primary/5 hover:shadow-lg"
+            >
+              <span>
+                {locale === "id"
+                  ? `Muat ${remainingCount} Artikel Lagi`
+                  : `Load ${remainingCount} More Article${remainingCount > 1 ? "s" : ""}`}
+              </span>
+              <ChevronDown className="h-4 w-4 transition-transform group-hover:translate-y-0.5" />
+            </Button>
+          </div>
+        )}
       </main>
     </div>
   );

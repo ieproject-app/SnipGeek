@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -9,10 +9,13 @@ import {
   CardFooter,
   CardHeader,
 } from "@/components/ui/card";
-import { StickyNote } from "lucide-react";
+import { StickyNote, ChevronDown } from "lucide-react";
 import { AddToReadingListButton } from "@/components/layout/add-to-reading-list-button";
 import { CategoryBadge } from "@/components/layout/category-badge";
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
+import { Button } from "@/components/ui/button";
+
+const NOTES_PER_PAGE = 9;
 
 export function NotesListClient({
   initialNotes,
@@ -24,6 +27,7 @@ export function NotesListClient({
   locale: string;
 }) {
   const linkPrefix = locale === "en" ? "" : `/${locale}`;
+  const [visibleCount, setVisibleCount] = useState(NOTES_PER_PAGE);
 
   const allNotes = useMemo(() => {
     return [...initialNotes].sort(
@@ -32,6 +36,14 @@ export function NotesListClient({
         new Date(a.frontmatter.date).getTime(),
     );
   }, [initialNotes]);
+
+  const displayedNotes = allNotes.slice(0, visibleCount);
+  const hasMore = visibleCount < allNotes.length;
+  const remainingCount = Math.min(NOTES_PER_PAGE, allNotes.length - visibleCount);
+
+  const handleLoadMore = () => {
+    setVisibleCount((prev) => prev + NOTES_PER_PAGE);
+  };
 
   const formatDate = (date: Date) => {
     return new Intl.DateTimeFormat(locale, {
@@ -54,7 +66,7 @@ export function NotesListClient({
         </header>
 
         <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-          {allNotes.map((note, index) => {
+          {displayedNotes.map((note, index) => {
             const noteDate = new Date(note.frontmatter.date);
             const item = {
               slug: note.slug,
@@ -101,6 +113,24 @@ export function NotesListClient({
             );
           })}
         </section>
+
+        {hasMore && (
+          <div className="mt-12 flex justify-center">
+            <Button
+              onClick={handleLoadMore}
+              variant="outline"
+              size="lg"
+              className="group gap-2 border-primary/20 bg-background/50 px-8 py-6 text-base font-semibold transition-all hover:border-primary/40 hover:bg-primary/5 hover:shadow-lg"
+            >
+              <span>
+                {locale === "id"
+                  ? `Muat ${remainingCount} Catatan Lagi`
+                  : `Load ${remainingCount} More Note${remainingCount > 1 ? "s" : ""}`}
+              </span>
+              <ChevronDown className="h-4 w-4 transition-transform group-hover:translate-y-0.5" />
+            </Button>
+          </div>
+        )}
       </main>
     </div>
   );
