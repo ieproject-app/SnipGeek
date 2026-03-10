@@ -177,7 +177,7 @@ function FeaturePill({
           "flex items-center justify-center w-10 h-10 rounded-xl border transition-all duration-300",
           active
             ? activeClass
-            : "bg-background/40 text-muted-foreground border-primary/5 hover:border-primary/20 hover:bg-background/80 hover:text-primary hover:scale-[1.05] shadow-sm",
+            : "bg-background/50 text-foreground/70 border-primary/10 hover:border-primary/30 hover:bg-accent/10 hover:text-foreground hover:shadow-sm hover:scale-[1.05]",
         )}
       >
         <Icon className={cn("h-5 w-5 shrink-0", active && "animate-[subtleGlow_3s_ease-in-out_infinite]")} />
@@ -224,7 +224,7 @@ function DownloadIdPicker({
           type="button"
           className={cn(
             "flex-1 h-7 rounded-md border border-primary/10 bg-background px-2 text-left text-[10px] transition-colors",
-            "hover:border-primary/30 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary/30",
+            "hover:border-primary/35 hover:bg-accent/10 hover:text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary/30",
           )}
         >
           <span className="flex items-center justify-between gap-2">

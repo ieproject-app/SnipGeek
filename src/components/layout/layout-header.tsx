@@ -149,6 +149,20 @@ export function LayoutHeader({
   useEffect(() => {
     setActiveView("none");
     setQuery("");
+    if (typeof window !== "undefined") {
+      const root = document.documentElement;
+      const previousScrollBehavior = root.style.scrollBehavior;
+
+      root.style.scrollBehavior = "auto";
+      window.scrollTo(0, 0);
+      lastScrollY.current = 0;
+      setIsVisible(true);
+      setIsScrolled(false);
+
+      requestAnimationFrame(() => {
+        root.style.scrollBehavior = previousScrollBehavior;
+      });
+    }
   }, [pathname]);
 
   useEffect(() => {
@@ -264,7 +278,7 @@ export function LayoutHeader({
   ];
 
   const navItemClass =
-    "h-9 w-9 p-0 rounded-xl transition-all duration-300 text-foreground/70 hover:text-accent hover:bg-accent/10 flex items-center justify-center relative";
+    "h-9 w-9 p-0 rounded-xl transition-all duration-300 text-foreground/75 hover:text-foreground hover:bg-accent/15 hover:shadow-sm flex items-center justify-center relative";
 
   return (
     <>
@@ -292,7 +306,7 @@ export function LayoutHeader({
             {pathname !== "/" && pathname !== `/${currentLocale}` ? (
               <NextLink
                 href="/"
-                className="flex items-center gap-3 group text-foreground hover:text-accent transition-colors duration-300"
+                className="flex items-center gap-3 group text-foreground hover:text-foreground transition-colors duration-300"
                 aria-label="Back to Site"
               >
                 <div className="flex items-center gap-1 shrink-0">
@@ -300,7 +314,7 @@ export function LayoutHeader({
                     <ChevronRight className="h-4 w-4 rotate-180 text-accent" />
                   </div>
                   <div className="relative h-9 w-9 flex items-center justify-center shrink-0">
-                    <div className="absolute inset-0 bg-accent/10 rounded-xl transition-all duration-500 group-hover:bg-accent/20 group-hover:rotate-6 group-hover:scale-110" />
+                    <div className="absolute inset-0 bg-accent/10 rounded-xl transition-all duration-500 group-hover:bg-accent/20 group-hover:shadow-sm group-hover:rotate-6 group-hover:scale-110" />
                     <SnipGeekLogo className="h-6 w-6 relative z-10 transition-all duration-500 group-hover:scale-110 group-hover:rotate-3" />
                   </div>
                 </div>
@@ -308,7 +322,7 @@ export function LayoutHeader({
                   <span className="font-display text-base font-black tracking-tight leading-tight">
                     Back to Home
                   </span>
-                  <span className="font-sans text-[9px] font-bold uppercase tracking-[0.12em] text-muted-foreground/50 mt-0.5 group-hover:text-accent/70 transition-colors">
+                  <span className="font-sans text-[9px] font-bold uppercase tracking-[0.12em] text-muted-foreground/70 mt-0.5 group-hover:text-foreground/90 transition-colors">
                     {(params.locale as string) === "en"
                       ? "Return Home"
                       : "Kembali"}
@@ -351,7 +365,7 @@ export function LayoutHeader({
                     "px-3 py-2 font-sans text-[10px] font-black uppercase tracking-[0.12em] transition-all relative",
                     isActive
                       ? "text-accent"
-                      : "text-foreground/60 hover:text-accent",
+                      : "text-foreground/65 hover:text-foreground",
                   )}
                 >
                   {item.name}
@@ -430,7 +444,7 @@ export function LayoutHeader({
                       <NextLink
                         key={item.href}
                         href={`${linkPrefix}${item.href}`}
-                        className="group/item flex items-center gap-3 px-4 py-2.5 font-sans text-[11px] font-bold uppercase tracking-wider hover:bg-muted transition-colors rounded-lg mx-1 relative"
+                        className="group/item flex items-center gap-3 px-4 py-2.5 font-sans text-[11px] font-bold uppercase tracking-wider text-foreground/80 hover:bg-accent/10 hover:text-foreground transition-colors rounded-lg mx-1 relative"
                         onClick={() => setActiveView("none")}
                       >
                         <div className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-4 bg-accent opacity-0 group-hover/item:opacity-60 transition-opacity" />
@@ -450,7 +464,7 @@ export function LayoutHeader({
                       <NextLink
                         key={item.href}
                         href={`${linkPrefix}${item.href}`}
-                        className="group/item flex items-center gap-3 px-4 py-2.5 font-sans text-[11px] font-bold uppercase tracking-wider hover:bg-accent/10 hover:text-accent transition-colors rounded-lg mx-1 relative"
+                        className="group/item flex items-center gap-3 px-4 py-2.5 font-sans text-[11px] font-bold uppercase tracking-wider text-foreground/80 hover:bg-accent/15 hover:text-foreground transition-colors rounded-lg mx-1 relative"
                         onClick={() => setActiveView("none")}
                       >
                         <div className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-4 bg-accent opacity-0 group-hover/item:opacity-60 transition-opacity" />

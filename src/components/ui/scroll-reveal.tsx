@@ -1,7 +1,7 @@
 'use client';
 
-import { motion, useInView } from 'framer-motion';
-import { useRef, ReactNode } from 'react';
+import { motion, useInView, useReducedMotion } from 'framer-motion';
+import { useMemo, useRef, ReactNode } from 'react';
 import { cn } from '@/lib/utils';
 
 interface ScrollRevealProps {
@@ -19,16 +19,22 @@ export function ScrollReveal({
     className,
     delay = 0,
     direction = 'up',
-    duration = 0.5,
-    distance = 40,
+    duration = 0.35,
+    distance = 20,
     once = true,
 }: ScrollRevealProps) {
     const ref = useRef<HTMLDivElement>(null);
-    // Menggunakan useInView dengan margin asimetris: 
-    // Memicu elemen sedikit sebelum masuk utuh ke viewport bawah
-    const isInView = useInView(ref, { once, margin: "0px 0px -10% 0px" });
+    const prefersReducedMotion = useReducedMotion();
+    const isInView = useInView(ref, {
+        once,
+        margin: "0px 0px -15% 0px",
+    });
 
-    const getDirectionOffset = () => {
+    const initialOffset = useMemo(() => {
+        if (prefersReducedMotion || direction === 'none') {
+            return { x: 0, y: 0 };
+        }
+
         switch (direction) {
             case 'up': return { y: distance };
             case 'down': return { y: -distance };
@@ -36,22 +42,22 @@ export function ScrollReveal({
             case 'right': return { x: -distance };
             default: return { x: 0, y: 0 };
         }
-    };
+    }, [direction, distance, prefersReducedMotion]);
 
-    const initialOffset = getDirectionOffset();
+    const shouldAnimate = !prefersReducedMotion && direction !== 'none';
 
     return (
         <motion.div
             ref={ref}
-            initial={{ opacity: direction === 'none' ? 1 : 0, ...initialOffset }}
+            initial={shouldAnimate ? { opacity: 0, ...initialOffset } : false}
             animate={{
-                opacity: isInView ? 1 : (direction === 'none' ? 1 : 0),
+                opacity: 1,
                 x: isInView ? 0 : initialOffset.x,
                 y: isInView ? 0 : initialOffset.y,
             }}
             transition={{
                 duration: duration,
-                delay: delay,
+                delay: shouldAnimate ? delay : 0,
                 ease: [0.21, 0.47, 0.32, 0.98], // cubic-bezier smooth out
             }}
             className={cn(className)}

@@ -97,7 +97,6 @@ export function LayoutFooter({
         <div className="absolute left-1/2 -translate-x-1/2 top-0 -translate-y-1/2 z-20">
           <ScrollReveal
             direction="down"
-            delay={0.2}
             className="relative rounded-full ring-2 ring-primary/20 ring-offset-4 ring-offset-background shadow-2xl transition-all duration-300 ease-in-out group hover:ring-primary/40"
           >
             <Avatar className="w-24 h-24 mx-auto border-4 border-background bg-background transition-transform duration-500 group-hover:scale-105">
@@ -113,11 +112,7 @@ export function LayoutFooter({
         </div>
 
         <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <ScrollReveal
-            direction="up"
-            delay={0.3}
-            className="text-center mb-12"
-          >
+          <ScrollReveal direction="up" className="text-center mb-12">
             <h4 className="font-display text-2xl font-bold text-foreground tracking-tight">
               {authorName}
             </h4>
@@ -140,7 +135,7 @@ export function LayoutFooter({
               className="flex items-center justify-center gap-4 mt-8"
               aria-label="Social links"
             >
-              {socialLinks.map((social, index) => {
+              {socialLinks.map((social) => {
                 const brandStyles: Record<string, string> = {
                   Facebook:
                     "hover:shadow-[0_0_20px_rgba(59,89,152,0.5)] hover:bg-[#3b5998]",
@@ -157,57 +152,53 @@ export function LayoutFooter({
 
                 return (
                   <li key={social.label}>
-                    <ScrollReveal direction="up" delay={0.4 + index * 0.1}>
-                      <SnipTooltip label={social.label} side="top">
-                        <a
-                          href={social.href}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          title={social.label}
-                          className={cn(
-                            "relative inline-flex p-3 rounded-full bg-primary/90 text-primary-foreground shadow-md transition-all duration-300 ease-in-out",
-                            "hover:-translate-y-1 hover:scale-105",
-                            brandStyle,
-                          )}
-                          aria-label={social.label}
-                        >
-                          {social.icon}
-                        </a>
-                      </SnipTooltip>
-                    </ScrollReveal>
+                    <SnipTooltip label={social.label} side="top">
+                      <a
+                        href={social.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        title={social.label}
+                        className={cn(
+                          "relative inline-flex p-3 rounded-full bg-primary/90 text-primary-foreground shadow-md transition-all duration-300 ease-in-out",
+                          "hover:-translate-y-1 hover:scale-105",
+                          brandStyle,
+                        )}
+                        aria-label={social.label}
+                      >
+                        {social.icon}
+                      </a>
+                    </SnipTooltip>
                   </li>
                 );
               })}
             </ul>
           </ScrollReveal>
 
-          <ScrollReveal direction="up" delay={0.6}>
-            <div className="flex flex-col justify-center items-center gap-6 text-sm text-primary/80 border-t border-primary/10 pt-12 mt-12">
-              <div className="flex items-center gap-4">
-                <LanguageSwitcher
-                  translationsMap={translationsMap}
-                  dictionary={dictionary}
-                  variant="minimal"
-                />
-              </div>
-              <div className="flex flex-col items-center justify-center gap-5 text-center">
-                <nav className="flex flex-wrap items-center justify-center gap-x-6 gap-y-3 px-6 py-2.5 rounded-full bg-muted/20 border border-primary/5 backdrop-blur-sm">
-                  {footerNavItems.map((item) => (
-                    <Link
-                      key={item.id}
-                      href={item.href}
-                      className="text-[10px] font-black uppercase tracking-widest text-primary/40 hover:text-accent transition-all duration-300"
-                    >
-                      {item.title}
-                    </Link>
-                  ))}
-                </nav>
-                <small className="font-extrabold tracking-widest text-[10px] uppercase text-primary/30 hover:text-primary transition-colors duration-300">
-                  &copy; {new Date().getFullYear()} SnipGeek. All Rights Reserved.
-                </small>
-              </div>
+          <div className="flex flex-col justify-center items-center gap-6 text-sm text-primary/80 border-t border-primary/10 pt-12 mt-12">
+            <div className="flex items-center gap-4">
+              <LanguageSwitcher
+                translationsMap={translationsMap}
+                dictionary={dictionary}
+                variant="minimal"
+              />
             </div>
-          </ScrollReveal>
+            <div className="flex flex-col items-center justify-center gap-5 text-center">
+              <nav className="flex flex-wrap items-center justify-center gap-x-6 gap-y-3 px-6 py-2.5 rounded-full bg-muted/20 border border-primary/5 backdrop-blur-sm">
+                {footerNavItems.map((item) => (
+                  <Link
+                    key={item.id}
+                    href={item.href}
+                    className="text-[10px] font-black uppercase tracking-widest text-primary/40 hover:text-accent transition-all duration-300"
+                  >
+                    {item.title}
+                  </Link>
+                ))}
+              </nav>
+              <small className="font-extrabold tracking-widest text-[10px] uppercase text-primary/30 hover:text-primary transition-colors duration-300">
+                &copy; {new Date().getFullYear()} SnipGeek. All Rights Reserved.
+              </small>
+            </div>
+          </div>
         </div>
       </section>
     </footer>

@@ -80,19 +80,31 @@ export function ArticleComments({ article, type, locale }: ArticleCommentsProps)
 
         <div className="space-y-8 rounded-2xl border border-primary/10 bg-card/40 p-6 shadow-sm">
           <div className="flex items-start gap-4">
-            <Skeleton className="h-10 w-10 shrink-0 rounded-full" />
+            <Skeleton
+              className="h-10 w-10 shrink-0 rounded-full"
+              data-variant="static"
+            />
             <div className="flex-1 space-y-2">
-              <Skeleton className="h-4 w-24" />
-              <Skeleton className="h-20 w-full rounded-xl" />
+              <Skeleton className="h-4 w-24" data-variant="pulse" />
+              <Skeleton
+                className="h-20 w-full rounded-xl"
+                data-variant="pulse"
+              />
             </div>
           </div>
           <div className="space-y-6 pl-14">
             {[...Array(2)].map((_, i) => (
               <div key={i} className="flex items-start gap-4 opacity-50">
-                <Skeleton className="h-8 w-8 shrink-0 rounded-full" />
+                <Skeleton
+                  className="h-8 w-8 shrink-0 rounded-full"
+                  data-variant="static"
+                />
                 <div className="flex-1 space-y-2">
-                  <Skeleton className="h-3 w-20" />
-                  <Skeleton className="h-12 w-full rounded-lg" />
+                  <Skeleton className="h-3 w-20" data-variant="pulse" />
+                  <Skeleton
+                    className="h-12 w-full rounded-lg"
+                    data-variant="pulse"
+                  />
                 </div>
               </div>
             ))}

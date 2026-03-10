@@ -161,7 +161,8 @@
         @apply border-border;
         transition-property:
             color, background-color, border-color, text-decoration-color, fill,
-            stroke, opacity, transform;
+            stroke;
+
         transition-duration: 200ms;
         transition-timing-function: ease-in-out;
     }
@@ -172,6 +173,14 @@
         background-color: hsl(var(--muted));
         transform: translateZ(0);
         backface-visibility: hidden;
+    }
+
+    .skeleton[data-variant="static"] {
+        background-color: hsl(var(--muted));
+    }
+
+    .skeleton[data-variant="pulse"] {
+        animation: skeleton-pulse 1.8s ease-in-out infinite;
     }
 
     .skeleton::after {
@@ -188,6 +197,11 @@
         animation: skeleton-shimmer 1.6s ease-in-out infinite;
         will-change: transform;
         pointer-events: none;
+        opacity: 0;
+    }
+
+    .skeleton[data-variant="shimmer"]::after {
+        opacity: 1;
     }
 
     @keyframes skeleton-shimmer {
@@ -204,6 +218,21 @@
 
         50% {
             opacity: 0.78;
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        * {
+            transition-duration: 0ms;
+        }
+
+        .skeleton[data-variant="pulse"] {
+            animation: none;
+        }
+
+        .skeleton[data-variant="shimmer"]::after {
+            animation: none;
+            opacity: 0;
         }
     }
 

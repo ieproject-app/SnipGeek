@@ -302,7 +302,7 @@ export function ToolHistory({
                               key={`${p.nik}-${i}`}
                               className={cn(
                                 "border-b transition-colors animate-in fade-in slide-in-from-bottom-1 duration-300",
-                                isActive ? 'bg-primary/[0.03] hover:bg-primary/[0.08]' : 'hover:bg-muted/50 border-transparent hover:border-primary/10'
+                                isActive ? 'bg-primary/[0.04] hover:bg-primary/[0.10]' : 'hover:bg-accent/10 border-transparent hover:border-primary/15'
                               )}
                             >
                               <TableCell className="sticky left-0 z-10 bg-card py-4 pl-6 font-semibold border-r min-w-[200px]">
@@ -310,7 +310,7 @@ export function ToolHistory({
                                   <TooltipTrigger asChild>
                                     <button
                                       onClick={() => handleCopy(p.nama, p.nik, 'nama', 'Nama')}
-                                      className="text-left w-full hover:text-primary transition-colors flex items-center gap-2 group/copy focus:outline-none"
+                                      className="text-left w-full hover:text-foreground transition-colors flex items-center gap-2 group/copy focus:outline-none"
                                     >
                                       <span className="truncate">{p.nama}</span>
                                       {copiedState?.id === p.nik && copiedState?.type === 'nama' ? (
@@ -399,7 +399,7 @@ export function ToolHistory({
               <CardContent className="p-6">
                 <div className="space-y-4">
                   {docQueries.map((query, index) => (
-                    <div key={query.id} className="flex flex-col md:flex-row items-end gap-4 p-5 border rounded-lg bg-background/30 relative group transition-all hover:border-primary/30">
+                    <div key={query.id} className="flex flex-col md:flex-row items-end gap-4 p-5 border rounded-lg bg-background/30 relative group transition-all hover:border-primary/30 hover:bg-accent/5">
                       <div className="w-full md:flex-1 space-y-2">
                         <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">{t.docTypePlaceholder}</label>
                         <Select value={query.docType} onValueChange={value => handleQueryChange(query.id, 'docType', value)}>
@@ -424,7 +424,7 @@ export function ToolHistory({
                         size="icon"
                         onClick={() => removeQueryRow(query.id)}
                         disabled={docQueries.length <= 1}
-                        className="rounded-full hover:bg-destructive/10 hover:text-destructive transition-colors shrink-0 mb-1"
+                        className="rounded-full hover:bg-destructive/12 hover:text-destructive transition-colors shrink-0 mb-1"
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>
@@ -433,7 +433,7 @@ export function ToolHistory({
                 </div>
 
                 <div className="flex flex-col sm:flex-row gap-4 mt-8">
-                  <Button onClick={addQueryRow} variant="outline" className="flex-1 rounded-lg h-12 border-dashed border-primary/30 hover:bg-primary/5 transition-colors">
+                  <Button onClick={addQueryRow} variant="outline" className="flex-1 rounded-lg h-12 border-dashed border-primary/30 hover:border-primary/40 hover:bg-accent/10 transition-colors">
                     <Plus className="mr-2 h-4 w-4" /> Add Another Document
                   </Button>
                   <Button onClick={handleGenerateSigners} className="flex-1 rounded-lg h-12 shadow-lg shadow-primary/20 transition-all hover:scale-[1.02] active:scale-[0.98]">
@@ -465,7 +465,7 @@ export function ToolHistory({
                                   size="sm"
                                   onClick={() => handleCopyAllGenerated(key, signers)}
                                   className={cn(
-                                    "h-8 text-xs font-semibold gap-2 opacity-0 group-hover/result:opacity-100 transition-all border-primary/20 hover:bg-primary/5",
+                                    "h-8 text-xs font-semibold gap-2 opacity-0 group-hover/result:opacity-100 transition-all border-primary/20 hover:border-primary/35 hover:bg-accent/10",
                                     copiedState?.id === key && copiedState?.type === 'all' && "opacity-100 border-emerald-500/30 bg-emerald-500/5 text-emerald-600 hover:bg-emerald-500/10 hover:text-emerald-700"
                                   )}
                                 >
@@ -477,7 +477,7 @@ export function ToolHistory({
                                 </Button>
                               )}
                             </div>
-                            <div className="overflow-hidden border border-primary/10 rounded-lg bg-background/40 backdrop-blur-sm shadow-sm transition-all hover:border-primary/30">
+                            <div className="overflow-hidden border border-primary/10 rounded-lg bg-background/40 backdrop-blur-sm shadow-sm transition-all hover:border-primary/30 hover:bg-accent/[0.03]">
                               <Table>
                                 <TableHeader className="bg-muted/30">
                                   <TableRow className="hover:bg-transparent">
@@ -488,7 +488,7 @@ export function ToolHistory({
                                 </TableHeader>
                                 <TableBody>
                                   {signers.length > 0 ? signers.map((p, i) => (
-                                    <TableRow key={`${p.nik}-${i}`} className="hover:bg-primary/[0.04] transition-colors">
+                                    <TableRow key={`${p.nik}-${i}`} className="hover:bg-accent/10 transition-colors">
                                       <TableCell className="pl-6">
                                         <Badge variant="outline" className="rounded-md uppercase text-[10px] tracking-wider font-bold bg-background/50">{p.grupJabatan}</Badge>
                                       </TableCell>
