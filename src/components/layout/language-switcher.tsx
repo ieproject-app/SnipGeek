@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import React, { useEffect, useState } from "react";
 import type { Dictionary } from "@/lib/get-dictionary";
 import { SnipTooltip } from "@/components/ui/snip-tooltip";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export function LanguageSwitcher({
   translationsMap,
@@ -118,7 +119,7 @@ export function LanguageSwitcher({
       suppressHydrationWarning
     >
       {!mounted ? (
-        <div className="w-[76px] h-6 rounded-full bg-gradient-to-r from-muted via-muted-foreground/10 to-muted bg-[length:200%_100%] animate-shimmer" />
+        <Skeleton className="w-[76px] h-6 rounded-full" />
       ) : (
         <>
           <div
