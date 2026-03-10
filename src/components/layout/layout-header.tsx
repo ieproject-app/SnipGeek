@@ -170,7 +170,7 @@ export function LayoutHeader({
       const currentScrollY = window.scrollY;
       setIsScrolled(currentScrollY > 10);
 
-      if (activeView !== "none" || message) return;
+      if (activeView !== "none") return;
       const delta = currentScrollY - lastScrollY.current;
 
       if (currentScrollY < 10) {
