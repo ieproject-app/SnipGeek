@@ -516,7 +516,19 @@ If you are unsure where something belongs, ask:
 
 ---
 
-## 18. Canonical Summary
+## 18. Common Pitfalls (AI & Human)
+
+### The "src/content" Hallucination
+Many modern Next.js templates or documentation suggest a `src/content` folder. **SnipGeek does NOT use this.** 
+If you see or feel tempted to create `src/content/_posts`, STOP. The correct path is `_posts/` at the root.
+
+### MDX Component Usage
+- Always use `className` in MDX tags.
+- Use `<Steps>` for tutorials, but never put `<ImageGrid>` inside them.
+
+---
+
+## 19. Canonical Summary
 
 For SnipGeek:
 

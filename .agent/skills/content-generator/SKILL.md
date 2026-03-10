@@ -9,8 +9,12 @@ Use this skill when generating or modifying blog posts (`_posts/`) and technical
 
 ## 1. Content Types & Targets
 
-- **Blog Posts**: Located in `src/content/_posts/{locale}/`. Focus on tutorials and tech news.
-- **Notes**: Located in `src/content/_notes/{locale}/`. Focus on snippet-like documentation or quick guides.
+> [!WARNING]
+> **CRITICAL:** Content folders (`_posts`, `_notes`, `_pages`) MUST be located at the **absolute root** of the project. **NEVER** place them inside `src/content/`.
+
+- **Blog Posts**: Located in `_posts/{locale}/` at the project root.
+- **Notes**: Located in `_notes/{locale}/` at the project root.
+- **Static Pages**: Located in `_pages/{slug}/` at the project root.
 
 ## 2. Frontmatter Standards
 
@@ -48,12 +52,17 @@ Variants: `info`, `tip`, `warning`, `danger`.
     ### First Step
     Explain the first action.
   </Step>
-  <Step>
-    ### Second Step
-    Explain the second action.
-  </Step>
 </Steps>
 ```
+
+### Expandable (Accordions)
+**NEVER** use standard `<details>`/`<summary>`. ALWAYS use the custom `<Expandable>` component for interactive collapse blocks.
+```mdx
+<Expandable title="Question or Topic Title" icon="help">
+  Your hidden content here.
+</Expandable>
+```
+Icons available: `info`, `help`, `folder`, `warning`, `tip`.
 
 ### Keyboard Shortcuts
 Use `<kbd>Key</kbd>` for hotkeys: `<kbd>Ctrl</kbd> + <kbd>C</kbd>`.

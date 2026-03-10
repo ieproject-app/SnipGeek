@@ -32,6 +32,7 @@ import { WindowsStoreLogo } from "@/components/icons/windows-store-logo";
 import { downloadLinks } from "@/lib/data-downloads";
 import { ZoomableImage } from "./zoomable-image";
 import { SpecList, SpecItem } from "./mdx/spec-sheet";
+import { Expandable } from "./mdx/expandable";
 
 const extractText = (children: React.ReactNode): string => {
   return React.Children.toArray(children)
@@ -723,37 +724,22 @@ export const mdxComponents = {
   em: MdxEm,
   code: MdxCode,
   kbd: Kbd,
-  details: ({
-    children,
-    class: _class,
-    className,
-    parentName,
-    ...props
-  }: any) => (
+  details: ({ children, className, ...props }: any) => (
     <details
       className={cn(
         "my-6 rounded-xl border border-primary/10 bg-muted/20 p-4",
-        _class,
-        className,
+        className
       )}
       {...props}
     >
       {children}
     </details>
   ),
-  summary: ({
-    children,
-    class: _class,
-    className,
-    parentName,
-    ...props
-  }: any) => (
+  summary: ({ children, className, ...props }: any) => (
     <summary
       className={cn(
         "font-display cursor-pointer font-bold transition-colors hover:text-accent",
-        _class,
-        className,
-        ...props
+        className
       )}
       {...props}
     >
@@ -763,6 +749,7 @@ export const mdxComponents = {
   DownloadButton,
   SpecList,
   SpecItem,
+  Expandable,
   ImageGrid,
   Gallery,
   Callout,

@@ -23,11 +23,18 @@ Bukan cuma itu, PCSX2 juga ngasih banyak kelebihan yang nggak akan kamu temukan 
 
 Langkah paling awal jelas mengunduh semua perlengkapannya. **Sangat disarankan** buat kamu *download* file dari paket yang sudah saya siapkan di bawah. Kenapa? Karena bungkus `.zip` ini udah saya atur sedemikian rupa—isinya PCSX2 rilisan terbaru yang sudah sepaket sama file BIOS, lengkap dengan struktur folder yang sengaja **disamakan persis dengan panduan visual dan screenshot** di bawah.
 
-[Download PCSX2 Terbaru + BIOS (via IR Web)](/download/pcsx2-bios-bundle)
+<DownloadButton id="pcsx2-bios-bundle" />
 
 Kalau kamu *hardcore* dan pengennya ngulik sendirian dari versi nol, silakan ambil berkas terbarunya dari [situs resmi PCSX2](https://pcsx2.net/), dan untuk BIOS-nya bisa nemu di situs cagar macam [Retrostic](https://www.retrostic.com/bios/pcsx2-playstation-2).
 
 > **Catatan Tambahan:** Kalau kamu pilih jalur alternatif ini, harap dipahami kalau patokan *screenshot* folder saya nanti bakal sedikit berbeda bentuk nyatanya di layar kamu, ya.
+
+<SpecList title="Kebutuhan Sistem (Minimum)">
+  <SpecItem label="Prosesor" value="2.1+ GHz Intel / AMD" />
+  <SpecItem label="RAM" value="4 GB" />
+  <SpecItem label="Grafis" value="DirectX 11 / OpenGL 4.5" />
+  <SpecItem label="Penyimpanan" value="500 MB Ruang Kosong" />
+</SpecList>
 
 <Callout variant="warning" title="Spesifikasi & Runtimes Pendukung">
   Biar mainnya lancar dan dapat FPS nyaman, PC/laptop kamu wajib punya jeroan kartu grafis (VGA) yang memadai. Jangan lupa juga memastikan *Runtimes* (seperti DirectX atau Visual C++) sudah sukses dipasang. Kalau sering nemu peringatan error aneh pas buka file `.exe`, tebakan saya karena Runtimes-nya bolong—cobain aja *install* paket [AIO Runtimes](/blog/solusi-error-0xc000007b-aio-runtimes) praktis ini.
@@ -39,13 +46,12 @@ Kalau kamu *hardcore* dan pengennya ngulik sendirian dari versi nol, silakan amb
 
 Versi modern PCSX2 menyediakan dua jenis jalur instalasi: **Installer** dan **Portable**. Di tutorial ini, saya cuma bakal bahas versi **Installer** karena rutenya sangat efisien, bersih, dan memanjakan banget buat pemula.
 
-<details>
-  <summary>Bedanya Installer vs Portable apa sih?</summary>
+<Expandable title="Bedanya Installer vs Portable apa sih?" icon="help">
   <ul>
     <li><strong>Installer (.exe):</strong> Metode yang jadi primadona. Jalur ini akan pintar buatin panjer (shortcut) ke Start Menu dan mindahin file pusing konfigurasinya rapi terselip di dalam folder <em>Documents</em> biar nggak ngerusak pemandangan.</li>
     <li><strong>Portable (lewat `pcsx2-qt.exe`):</strong> Singkat, cuma butuh ditarik/ekstrak lalu siap dipencet. Enaknya, semua jeroan berpusat di folder yang sama. Cocok buat kamu tipe <em>backpacker digital</em> yang suka mencolokkan rupa-rupa emulator lewat sebuah flashdisk.</li>
   </ul>
-</details>
+</Expandable>
 
 <Steps>
   <Step>
@@ -93,7 +99,7 @@ Nah, cara buat mencabut paksa *games* nostalgia ini gampang banget kalau di PCSX
 1. **Kasih Tahu Tempat Mainnya (Hanya kalau tadi kelupaan setting):** Kalau pas dibuka etalasenya malah kopong, nggak usah panik. Singgah dulu ke menu **Settings > Game List**, terus gebrak tombok **"Add"** di pojoknya demi menyambungkan jalan balik kamu ke tempat pertapaan file gamenya terkumpul.
 2. **Langsung Sikat!:** Sekarang tutup bagian menunya. Di halaman utama tadi kamu cuma butuh ngandelin jari dengan nge-**klik 2 kali** (*double-click*) aja tuntas urusannya. 
 
-![Tampilan game ready-to-play dari database PCSX Explorer, menyorot keagungan tajuk game God of War.](/images/articles/aplikasi/panduan-emulator-pcsx2-ps2/panduan-emulator-pcsx2-ps2-explorer-revisi.webp "Kamu bebas ngatur tata letak view-nya, habis itu klik ganda buat lompat langsung in-game.")
+![Tampilan game ready-to-play dari database PCSX Explorer, menyorot keagungan tajuk game God of War.](/images/_posts/apps/pcsx-2/pcsx2-qt_8.webp "Kamu bebas ngatur tata letak view-nya, habis itu klik ganda buat lompat langsung in-game.")
 
 Yessss! Gamenya langsung nyala! Enaknya versi baru ini kalau kamu colok *joystick* bertape USB ke *port*, langsung sigap kebaca tanpa koding jlimet lagi. Biar begitu, seandainya ada letak tombol mencolot dari ekspektasi jarimu, fitur remapping manual bisa dijejel dengan cara nunduk kembali ke menu **Settings > Controllers**.
 

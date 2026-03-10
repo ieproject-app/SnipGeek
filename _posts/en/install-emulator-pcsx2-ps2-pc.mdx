@@ -23,11 +23,18 @@ Not only that, PCSX2 offers many advantages not found on the original console. Y
 
 The first step is downloading all the necessary files. **It is highly recommended** to download the package we have prepared below. I've bundled the latest version of the PCSX2 emulator with the required BIOS files in a single `.zip` package, adjusting the folder structure to match exactly what you'll see in the screenshots of this tutorial.
 
-[Download Latest PCSX2 + BIOS (via IR Web)](/download/pcsx2-bios-bundle)
+<DownloadButton id="pcsx2-bios-bundle" />
 
 If you prefer to grab the files yourself, you can download the latest version directly from the [official PCSX2 site](https://pcsx2.net/), and source the necessary BIOS files from the [Retrostic site](https://www.retrostic.com/bios/pcsx2-playstation-2).
 
 > **Note:** If you choose to download from alternative sources, the visual guide below might look slightly different, as folder structures and filenames can vary.
+
+<SpecList title="System Requirements (Minimum)">
+  <SpecItem label="CPU" value="2.1+ GHz Intel / AMD" />
+  <SpecItem label="RAM" value="4 GB" />
+  <SpecItem label="GPU" value="DirectX 11 / OpenGL 4.5" />
+  <SpecItem label="Storage" value="500 MB Free Space" />
+</SpecList>
 
 <Callout variant="warning" title="Hardware & Supporting Software">
   For the best experience, make sure your PC has a capable graphics card and all supporting runtimes, like DirectX and Visual C++, are installed. If you frequently encounter errors when launching games, I recommend grabbing this [AIO Runtimes package](/blog/solusi-error-0xc000007b-aio-runtimes).
@@ -39,13 +46,12 @@ If you prefer to grab the files yourself, you can download the latest version di
 
 The modern version of PCSX2 offers two types of installation: **Installer** and **Portable**. I always recommend the **Installer** method for beginners because it handles the shortcuts and keeps your configuration files neatly tucked away in your Documents folder.
 
-<details>
-  <summary>What's the difference between Installer and Portable?</summary>
+<Expandable title="What's the difference between Installer and Portable?" icon="help">
   <ul>
     <li><strong>Installer (.exe):</strong> The recommended method. This creates a Start Menu shortcut and saves config files in your Documents folder. Much neater.</li>
     <li><strong>Portable (run `pcsx2-qt.exe`):</strong> Just extract and run. All config files stay in the extracted directory. Great if you want to carry the emulator around on a thumb drive.</li>
   </ul>
-</details>
+</Expandable>
 
 <Steps>
   <Step>
@@ -93,7 +99,7 @@ Running those games in the latest version of PCSX2 is incredibly straightforward
 1. **Set the Game Directory (If you skipped it earlier):** If your game list is empty, simply navigate to **Settings > Game List** and click **"Add"** to select the folder where you keep your ISO files.
 2. **Start the Game:** Back in the main PCSX2 window, just **double-click** the title you want to play.
 
-![Game list view in PCSX2 ready to be played, with the game 'God of War' highlighted.](/images/articles/aplikasi/panduan-emulator-pcsx2-ps2/panduan-emulator-pcsx2-ps2-explorer-revisi.webp "Just double-click on the game in the list to start.")
+![Game list view in PCSX2 ready to be played, with the game 'God of War' highlighted.](/images/_posts/apps/pcsx-2/pcsx2-qt_8.webp "Just double-click on the game in the list to start.")
 
 Boom! Your game will launch. A connected USB controller or gamepad is usually detected automatically, but you can always dive back into **Settings > Controllers** if you need to tweak the mappings.
 
