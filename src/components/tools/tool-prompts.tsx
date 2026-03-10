@@ -119,6 +119,18 @@ const parseNaturalDate = (input: string): string => {
   return `${yyyy}-${mm}-${dd}`;
 };
 
+// ──────────────────────────────────────────────────────────────────────────────
+// Utility: Normalize Image Paths (flip \ to /, strip 'public/', ensure leading /)
+// ──────────────────────────────────────────────────────────────────────────────
+const normalizeImagePath = (path: string): string => {
+  if (!path) return "";
+  return path
+    .trim()
+    .replace(/\\/g, "/")                // Flip \ to /
+    .replace(/^public\//, "/")          // Remove 'public/' prefix
+    .replace(/^\/+/, "/");              // Ensure single leading /
+};
+
 // Safe UUID v4 generator — works in HTTP, HTTPS, and all browsers
 const generateUUID = (): string => {
   if (
@@ -437,7 +449,8 @@ export function ToolPrompts({
       prompt += `**3. ASSETS & MEDIA**\n`;
       imageLines.forEach((line, i) => {
         const [imgPath, imgAlt] = line.split("|").map(s => s?.trim() || "");
-        prompt += `- Image ${i + 1}: "${imgPath}" ${imgAlt ? `| Label: "${imgAlt}"` : ""}\n`;
+        const normalizedPath = normalizeImagePath(imgPath);
+        prompt += `- Image ${i + 1}: "${normalizedPath}" ${imgAlt ? `| Label: "${imgAlt}"` : ""}\n`;
       });
     }
 
@@ -451,14 +464,28 @@ export function ToolPrompts({
     if (showGrids && imageGridMappings) {
       prompt += `\n**5. IMAGE GRIDS**\n`;
       imageGridMappings.split("\n").filter(l => l.trim()).forEach((line, i) => {
-        prompt += `- Group ${i + 1}: ${line} (use {{Grid ${i + 1}}} in draft)\n`;
+        const [config, pathPart] = line.split("|").map(s => s.trim());
+        if (config && pathPart) {
+          const normalizedPaths = pathPart.split(",").map(p => normalizeImagePath(p.trim())).join(", ");
+          prompt += `- Group ${i + 1}: ${config} | ${normalizedPaths} (use {{Grid ${i + 1}}} in draft)\n`;
+        } else {
+          prompt += `- Group ${i + 1}: ${line} (use {{Grid ${i + 1}}} in draft)\n`;
+        }
       });
     }
 
     if (showGallery && galleryMappings) {
       prompt += `\n**6. HERO GALLERIES**\n`;
       galleryMappings.split("\n").filter(l => l.trim()).forEach((line, i) => {
-        prompt += `- Gallery ${i + 1}: ${line} (use {{Gallery ${i + 1}}} in draft)\n`;
+        const [caption, pathPart] = line.split("|").map(s => s.trim());
+        if (caption && pathPart) {
+          const normalizedPaths = pathPart.split(",").map(p => normalizeImagePath(p.trim())).join(", ");
+          prompt += `- Gallery ${i + 1}: ${caption} | ${normalizedPaths} (use {{Gallery ${i + 1}}} in draft)\n`;
+        } else {
+          // If no | separator, assume it's just paths
+          const normalizedPaths = line.split(",").map(p => normalizeImagePath(p.trim())).join(", ");
+          prompt += `- Gallery ${i + 1}: ${normalizedPaths} (use {{Gallery ${i + 1}}} in draft)\n`;
+        }
       });
     }
 
