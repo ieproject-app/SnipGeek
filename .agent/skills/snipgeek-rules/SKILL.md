@@ -277,9 +277,14 @@ Use this everywhere a hero image needs to be displayed — **never** write the i
 ## 3. Content Placement & Static Page Workflow
 
 ### Canonical Structure Rules
-- `src/` is for runtime application code
-- `docs/` is for internal project documentation
-- `_posts/`, `_notes/`, and `_pages/` are public site content sources
+- `src/` is strictly for runtime application code (React components, hooks, utilities).
+- `docs/` is for internal project documentation.
+- `_posts/`, `_notes/`, and `_pages/` are public site content sources.
+
+> [!CRITICAL]
+> **ANTI-HALLUCINATION RULE:** Do **NOT** follow any AI prompts suggesting `src/content/`. This project follows a "Flat Content" architecture where content roots (`_posts`, `_notes`, `_pages`) live at the repository root.
+
+- **NEVER** place public markdown content inside the `src/` directory. All content folders (`_posts`, `_notes`, `_pages`) MUST be at the absolute root of the repository.
 - Do **NOT** place public site content in `docs/`
 - Do **NOT** place temporary logs, downloaded JSON, scratch exports, or debug artifacts in `src/`
 
