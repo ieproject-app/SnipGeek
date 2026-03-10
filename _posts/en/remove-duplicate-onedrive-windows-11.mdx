@@ -1,0 +1,87 @@
+---
+title: "How to Remove Duplicate OneDrive Folders in Windows 11"
+slug: "remove-duplicate-onedrive-windows-11"
+translationKey: "remove-duplicate-onedrive-windows-11"
+date: "2026-03-11"
+category: "Windows"
+tags: ["Windows11", "OneDrive", "Troubleshooting", "Tutorial"]
+published: true
+featured: false
+heroImage: "/images/_posts/windows11/onedrive-duplicate/onedrive-1.webp"
+imageAlt: "Duplicate OneDrive folders in Windows 11 File Explorer navigation pane."
+---
+
+I recently decided to perform a clean installation of Windows 11 LTSC edition. If you are not familiar, LTSC is a lightweight version of Windows that strips away most of the bloatware, including Microsoft's built-in apps like OneDrive. It is great for performance, but strangely, once I reached the desktop, I found two "ghost" OneDrive folders hanging out in my File Explorer navigation pane.
+
+These folders were essentially useless. They couldn't be deleted through the UI, and clicking them did absolutely nothing. It is a small detail, but for someone who likes a clean workspace, it was incredibly annoying. After trying standard fixes like unlinking an account (which wasn't even there), I found the solution hidden deep within the Windows Registry.
+
+<Callout variant="warning" title="Critical Warning: Backup Your Registry">
+  This method involves editing the Windows Registry. Errors here can cause serious system issues. Proceed at your own risk, and I highly recommend [backing up your registry](https://support.microsoft.com/en-us/topic/how-to-back-up-and-restore-the-registry-in-windows-855140ad-e318-2a13-2829-d428a2ab0692) before starting.
+</Callout>
+
+## Part 1: Removing Folder Entries from the NameSpace
+
+The first step is to clean up the 'keys' that tell File Explorer to display these folders in the sidebar.
+
+<Steps>
+  <Step>
+    ### Open Registry Editor
+    Press <kbd>Win</kbd> + <kbd>R</kbd>, type `regedit`, and press <kbd>Enter</kbd>.
+  </Step>
+
+  <Step>
+    ### Navigate to NameSpace
+    Copy and paste the following address into the top bar and press <kbd>Enter</kbd>:
+    
+    `Computer\HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Desktop\NameSpace`
+
+    ![Navigate to the NameSpace path in the Registry Editor](/images/_posts/windows11/onedrive-duplicate/onedrive-2.webp)
+    *Double-check you are in the HKEY_CURRENT_USER hive.*
+  </Step>
+
+  <Step>
+    ### Identify and Delete OneDrive Keys
+    Under the `NameSpace` folder in the left pane, you'll see several folders with long alphanumeric names (CLSIDs). Click each one and check the **Data** column in the right pane.
+    
+    Look for entries that mention **"OneDrive"**. Once found, **right-click** that folder in the left pane and select **Delete**. Repeat this for any duplicate OneDrive entries you find.
+
+    ![Delete the registry key folder related to OneDrive](/images/_posts/windows11/onedrive-duplicate/onedrive-3.webp)
+    *Removing the CLSID folder associated with OneDrive.*
+  </Step>
+</Steps>
+
+Close the Registry Editor and reopen File Explorer. In many cases, those duplicate folders will vanish immediately.
+
+## Part 2: Eliminating the Stubborn "OneDrive - Personal" Folder
+
+If "OneDrive - Personal" still reappears or refuses to go away after a restart, we need to adjust one specific stubborn key.
+
+<Steps>
+  <Step>
+    ### Locate the Specific CLSID
+    Back in Registry Editor, navigate to this exact path:
+    
+    `Computer\HKEY_CLASSES_ROOT\CLSID\{018D5C66-4533-4307-9B53-224DE2ED1FE6}`
+  </Step>
+
+  <Step>
+    ### Change Pinning Status
+    In the right-hand pane, find the entry named `System.IsPinnedToNameSpaceTree`. **Double-click** it and change the **Value data** from `1` to `0`. Click **OK**.
+
+    ![Changing the pinning value to 0](/images/_posts/windows11/onedrive-duplicate/onedrive-5.webp)
+    *Setting this to 0 prevents it from being pinned to the sidebar.*
+  </Step>
+</Steps>
+
+You might need to restart your computer for the changes to take full effect. Once done, your File Explorer should be back to a clean, minimal state.
+
+![Clean File Explorer view](/images/_posts/windows11/onedrive-duplicate/onedrive-4.webp)
+*My final File Explorer view, much better without those phantom folders.*
+
+If you ever want to bring it back, just head back to Part 2 and change the value back to `1`. Hopefully, this helps you reclaim some visual peace in Windows 11!
+
+---
+
+### References
+1. [Microsoft Community - Duplicate entries in file explorer](https://answers.microsoft.com/en-us/windows/forum/all/duplicate-entries-in-file-explorer/3e9d3eec-d3b7-4a66-b482-8a9590e9a748)
+2. [WinPoin - Cara Menghilangkan Folder OneDrive Pada File Explorer](https://winpoin.com/cara-menghilangkan-folder-onedrive-pada-file-explorer-windows-10/)

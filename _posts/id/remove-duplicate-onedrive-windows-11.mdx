@@ -1,0 +1,87 @@
+---
+title: "Cara Menghilangkan Duplikat Folder OneDrive di Windows 11"
+slug: "remove-duplicate-onedrive-windows-11"
+translationKey: "remove-duplicate-onedrive-windows-11"
+date: "2026-03-11"
+category: "Windows"
+tags: ["Windows11", "OneDrive", "Troubleshooting", "Tutorial"]
+published: true
+featured: false
+heroImage: "/images/_posts/windows11/onedrive-duplicate/onedrive-1.webp"
+imageAlt: "Tampilan duplikat folder OneDrive di panel navigasi File Explorer Windows 11."
+---
+
+Baru-baru ini saya memutuskan untuk melakukan instalasi ulang menggunakan Windows 11 edisi LTSC. Kalau kamu belum tahu, LTSC adalah versi Windows yang sangat ringan karena hampir semua aplikasi bawaan Microsoft — termasuk OneDrive — sudah dihapus. Memang enak buat performa, tapi anehnya, setelah masuk ke *desktop*, saya malah menemukan dua folder OneDrive "hantu" di panel navigasi File Explorer.
+
+Folder ini sama sekali tidak berfungsi. Tidak bisa dihapus lewat klik kanan biasa, dan kalau diklik pun tidak terjadi apa-apa. Memang masalah sepele, tapi buat saya yang suka tampilan rapi, ini cukup mengganggu pemandangan. Setelah mencoba cara standar tapi gagal, akhirnya saya menemukan solusinya lewat Registry Editor (Regedit).
+
+<Callout variant="warning" title="Penting: Backup Registry Kamu">
+  Langkah ini melibatkan pengeditan Windows Registry. Kesalahan di sini bisa menyebabkan masalah sistem yang serius. Lakukan dengan hati-hati, dan saya sangat menyarankan untuk [mem-backup registry](https://support.microsoft.com/en-us/topic/how-to-back-up-and-restore-the-registry-in-windows-855140ad-e318-2a13-2829-d428a2ab0692) sebelum memulai.
+</Callout>
+
+## Bagian 1: Menghapus Entri Folder dari NameSpace
+
+Langkah pertama adalah membersihkan 'kunci' yang memerintahkan File Explorer untuk menampilkan folder-folder tersebut di bilah samping.
+
+<Steps>
+  <Step>
+    ### Buka Registry Editor
+    Tekan <kbd>Win</kbd> + <kbd>R</kbd>, ketik `regedit`, lalu tekan <kbd>Enter</kbd>.
+  </Step>
+
+  <Step>
+    ### Masuk ke Jalur NameSpace
+    Copy dan paste alamat berikut ke bar bagian atas Regedit dan tekan <kbd>Enter</kbd>:
+    
+    `Computer\HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Desktop\NameSpace`
+
+    ![Navigasi ke jalur NameSpace di Registry Editor](/images/_posts/windows11/onedrive-duplicate/onedrive-2.webp)
+    *Pastikan kamu berada di bagian HKEY_CURRENT_USER.*
+  </Step>
+
+  <Step>
+    ### Identifikasi dan Hapus Key OneDrive
+    Di bawah folder `NameSpace` di panel kiri, kamu akan melihat beberapa folder dengan nama kode panjang (CLSID). Klik satu per satu dan perhatikan kolom **Data** di panel sebelah kanan.
+    
+    Cari entri yang mengandung kata **"OneDrive"**. Jika sudah ketemu, **klik kanan** folder tersebut di panel kiri, lalu pilih **Delete**. Ulangi untuk semua entri OneDrive duplikat yang kamu temukan.
+
+    ![Menghapus folder kunci registry terkait OneDrive](/images/_posts/windows11/onedrive-duplicate/onedrive-3.webp)
+    *Hapus folder CLSID yang diasosiasikan dengan OneDrive.*
+  </Step>
+</Steps>
+
+Tutup Registry Editor dan buka kembali File Explorer. Biasanya, folder duplikat tersebut akan langsung hilang.
+
+## Bagian 2: Menghilangkan Folder "OneDrive - Personal" yang Membandel
+
+Jika folder "OneDrive - Personal" masih muncul atau kembali lagi setelah komputer dinyalakan ulang, ada satu kunci lagi yang perlu kita sesuaikan.
+
+<Steps>
+  <Step>
+    ### Cari CLSID Spesifik
+    Kembali ke Registry Editor, masuk ke jalur tepat berikut ini:
+    
+    `Computer\HKEY_CLASSES_ROOT\CLSID\{018D5C66-4533-4307-9B53-224DE2ED1FE6}`
+  </Step>
+
+  <Step>
+    ### Ubah Status Pinning
+    Di panel kanan, cari entri bernama `System.IsPinnedToNameSpaceTree`. **Klik dua kali** pada entri tersebut dan ubah **Value data** dari `1` menjadi `0`. Klik **OK**.
+
+    ![Mengubah nilai pinning menjadi 0](/images/_posts/windows11/onedrive-duplicate/onedrive-5.webp)
+    *Mengubah nilai ke 0 akan menyembunyikan folder dari panel navigasi.*
+  </Step>
+</Steps>
+
+Mungkin kamu perlu melakukan *restart* agar perubahannya terlihat sepenuhnya. Sekarang, File Explorer kamu sudah kembali bersih dan rapi.
+
+![Tampilan File Explorer yang sudah bersih](/images/_posts/windows11/onedrive-duplicate/onedrive-4.webp)
+*Tampilan akhir File Explorer saya, jauh lebih lega tanpa folder hantu.*
+
+Kalau suatu saat kamu ingin menampilkannya lagi, cukup ikuti langkah di Bagian 2 dan ubah nilainya kembali ke `1`. Semoga panduan ini membantu kamu yang juga terganggu dengan detail-detail kecil seperti ini di Windows 11!
+
+---
+
+### Referensi
+1. [Microsoft Community - Duplicate entries in file explorer](https://answers.microsoft.com/en-us/windows/forum/all/duplicate-entries-in-file-explorer/3e9d3eec-d3b7-4a66-b482-8a9590e9a748)
+2. [WinPoin - Cara Menghilangkan Folder OneDrive Pada File Explorer](https://winpoin.com/cara-menghilangkan-folder-onedrive-pada-file-explorer-windows-10/)
