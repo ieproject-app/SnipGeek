@@ -10,10 +10,12 @@ import { Button } from '@/components/ui/button'
 import { getDictionary, type Dictionary } from '@/lib/get-dictionary'
 import { parse, isValid } from 'date-fns'
 import { cn } from '@/lib/utils'
-import { Search, FileText, UserCheck, Plus, Trash2, Loader2 } from 'lucide-react'
+import { Search, FileText, UserCheck, Plus, Trash2, Loader2, Copy, CheckCircle2 } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { ToolWrapper } from '@/components/tools/tool-wrapper'
 import { ScrollReveal } from '@/components/ui/scroll-reveal'
+import { useNotification } from '@/hooks/use-notification'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 
 // --- TYPE DEFINITIONS ---
 interface Pejabat {
@@ -105,11 +107,16 @@ export function ToolHistory({
     }).filter(p => p.nama);
   }, [employeeData]);
 
+  // Hooks
+  const { notify } = useNotification();
+
   // State for Employee History
   const [searchText, setSearchText] = useState<string>('');
   const [searchGrup, setSearchGrup] = useState<string>('all');
   const [filteredPejabat, setFilteredPejabat] = useState<Pejabat[]>([]);
   const [isSearching, setIsSearching] = useState(false);
+
+  const [copiedState, setCopiedState] = useState<{ id: string, type: string } | null>(null);
 
   const uniqueGrupJabatans = useMemo(() =>
     ['all', ...Array.from(new Set(allPejabat.map(p => p.grupJabatan)))]
@@ -198,13 +205,37 @@ export function ToolHistory({
     setGeneratedResults(results);
   };
 
+  const handleCopy = async (text: string, id: string, type: string, label: string) => {
+    try {
+      if (!text) return;
+      await navigator.clipboard.writeText(text);
+      setCopiedState({ id, type });
+      notify(
+        <span className="font-medium text-sm flex items-center gap-2">
+          <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+          {label} disalin
+        </span>
+      );
+      setTimeout(() => setCopiedState(null), 2000);
+    } catch (err) {
+      console.error('Failed to copy text: ', err);
+    }
+  };
+
+  const handleCopyAllGenerated = (key: string, signers: Pejabat[]) => {
+    if (!signers.length) return;
+    const textToCopy = signers.map(s => `${s.nama}\n${s.jabatan}`).join('\n\n');
+    handleCopy(textToCopy, key, 'all', 'Daftar penandatangan');
+  };
+
   return (
-    <ToolWrapper
-      title={toolMeta.title}
-      description={toolMeta.description}
-      dictionary={dictionary}
-      isPublic={true}
-    >
+    <TooltipProvider delayDuration={300}>
+      <ToolWrapper
+        title={toolMeta.title}
+        description={toolMeta.description}
+        dictionary={dictionary}
+        isPublic={true}
+      >
       <div className="space-y-12">
         {/* Search Section */}
         <ScrollReveal direction="up" delay={0.1}>
@@ -275,9 +306,41 @@ export function ToolHistory({
                             )}
                           >
                             <TableCell className="sticky left-0 z-10 bg-card py-4 pl-6 font-semibold border-r min-w-[200px]">
-                              {p.nama}
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <button
+                                    onClick={() => handleCopy(p.nama, p.nik, 'nama', 'Nama')}
+                                    className="text-left w-full hover:text-primary transition-colors flex items-center gap-2 group/copy focus:outline-none"
+                                  >
+                                    <span className="truncate">{p.nama}</span>
+                                    {copiedState?.id === p.nik && copiedState?.type === 'nama' ? (
+                                      <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500 shrink-0" />
+                                    ) : (
+                                      <Copy className="h-3.5 w-3.5 opacity-0 group-hover/copy:opacity-50 transition-opacity shrink-0" />
+                                    )}
+                                  </button>
+                                </TooltipTrigger>
+                                <TooltipContent side="top" className="text-xs">Klik untuk menyalin</TooltipContent>
+                              </Tooltip>
                             </TableCell>
-                            <TableCell className="text-muted-foreground px-4 text-xs md:text-sm">{p.jabatan}</TableCell>
+                            <TableCell className="text-muted-foreground px-4 text-xs md:text-sm">
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <button
+                                    onClick={() => handleCopy(p.jabatan, p.nik, 'jabatan', 'Jabatan')}
+                                    className="text-left w-full hover:text-foreground transition-colors flex items-center gap-2 group/copy focus:outline-none"
+                                  >
+                                    <span className="line-clamp-2 leading-relaxed">{p.jabatan}</span>
+                                    {copiedState?.id === p.nik && copiedState?.type === 'jabatan' ? (
+                                      <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500 shrink-0" />
+                                    ) : (
+                                      <Copy className="h-3.5 w-3.5 opacity-0 group-hover/copy:opacity-50 transition-opacity shrink-0" />
+                                    )}
+                                  </button>
+                                </TooltipTrigger>
+                                <TooltipContent side="top" className="text-xs">Klik untuk menyalin</TooltipContent>
+                              </Tooltip>
+                            </TableCell>
                             <TableCell className="px-4">
                               <span className="px-2 py-0.5 rounded-md bg-muted text-[10px] font-bold tracking-wider uppercase text-muted-foreground border">
                                 {p.grupJabatan}
@@ -391,9 +454,28 @@ export function ToolHistory({
                   <div className="grid grid-cols-1 gap-8">
                     {Object.entries(generatedResults).map(([key, signers], index) => (
                       <ScrollReveal key={key} delay={index * 0.1} direction="up">
-                        <div className="space-y-4">
-                          <div className="inline-flex items-center px-4 py-1.5 rounded-full bg-primary text-primary-foreground text-sm font-bold tracking-tight shadow-md">
-                            {key}
+                        <div className="space-y-4 relative group/result">
+                          <div className="flex items-center justify-between gap-4">
+                            <div className="inline-flex items-center px-4 py-1.5 rounded-full bg-primary text-primary-foreground text-sm font-bold tracking-tight shadow-md">
+                              {key}
+                            </div>
+                            {signers.length > 0 && (
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => handleCopyAllGenerated(key, signers)}
+                                className={cn(
+                                  "h-8 text-xs font-semibold gap-2 opacity-0 group-hover/result:opacity-100 transition-all border-primary/20 hover:bg-primary/5",
+                                  copiedState?.id === key && copiedState?.type === 'all' && "opacity-100 border-emerald-500/30 bg-emerald-500/5 text-emerald-600 hover:bg-emerald-500/10 hover:text-emerald-700"
+                                )}
+                              >
+                                {copiedState?.id === key && copiedState?.type === 'all' ? (
+                                  <><CheckCircle2 className="h-3.5 w-3.5" /> Tersalin</>
+                                ) : (
+                                  <><Copy className="h-3.5 w-3.5" /> Copy All</>
+                                )}
+                              </Button>
+                            )}
                           </div>
                           <div className="overflow-hidden border border-primary/10 rounded-lg bg-background/40 backdrop-blur-sm shadow-sm transition-all hover:border-primary/30">
                             <Table>
@@ -410,8 +492,42 @@ export function ToolHistory({
                                     <TableCell className="pl-6">
                                       <Badge variant="outline" className="rounded-md uppercase text-[10px] tracking-wider font-bold bg-background/50">{p.grupJabatan}</Badge>
                                     </TableCell>
-                                    <TableCell className="font-semibold text-primary">{p.nama}</TableCell>
-                                    <TableCell className="text-muted-foreground text-sm">{p.jabatan}</TableCell>
+                                    <TableCell className="font-semibold text-primary">
+                                      <Tooltip>
+                                        <TooltipTrigger asChild>
+                                          <button
+                                            onClick={() => handleCopy(p.nama, `${key}-${i}`, 'gen-nama', 'Nama')}
+                                            className="text-left w-full hover:text-foreground transition-colors flex items-center gap-2 group/copy focus:outline-none"
+                                          >
+                                            <span className="truncate">{p.nama}</span>
+                                            {copiedState?.id === `${key}-${i}` && copiedState?.type === 'gen-nama' ? (
+                                              <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500 shrink-0" />
+                                            ) : (
+                                              <Copy className="h-3.5 w-3.5 opacity-0 group-hover/copy:opacity-50 transition-opacity shrink-0" />
+                                            )}
+                                          </button>
+                                        </TooltipTrigger>
+                                        <TooltipContent side="top" className="text-xs">Klik untuk menyalin</TooltipContent>
+                                      </Tooltip>
+                                    </TableCell>
+                                    <TableCell className="text-muted-foreground text-sm">
+                                      <Tooltip>
+                                        <TooltipTrigger asChild>
+                                          <button
+                                            onClick={() => handleCopy(p.jabatan, `${key}-${i}`, 'gen-jabatan', 'Jabatan')}
+                                            className="text-left w-full hover:text-foreground transition-colors flex items-center gap-2 group/copy focus:outline-none"
+                                          >
+                                            <span className="line-clamp-2 leading-relaxed">{p.jabatan}</span>
+                                            {copiedState?.id === `${key}-${i}` && copiedState?.type === 'gen-jabatan' ? (
+                                              <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500 shrink-0" />
+                                            ) : (
+                                              <Copy className="h-3.5 w-3.5 opacity-0 group-hover/copy:opacity-50 transition-opacity shrink-0" />
+                                            )}
+                                          </button>
+                                        </TooltipTrigger>
+                                        <TooltipContent side="top" className="text-xs">Klik untuk menyalin</TooltipContent>
+                                      </Tooltip>
+                                    </TableCell>
                                   </TableRow>
                                 )) : (
                                   <TableRow>
@@ -432,5 +548,6 @@ export function ToolHistory({
         </ScrollReveal>
       </div>
     </ToolWrapper>
+    </TooltipProvider>
   )
 }
