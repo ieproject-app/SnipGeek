@@ -42,6 +42,20 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+  async redirects() {
+    return [
+      {
+        source: "/blog/hapus-folder-onedrive-duplikat-explorer",
+        destination: "/blog/remove-duplicate-onedrive-windows-11",
+        permanent: true,
+      },
+      {
+        source: "/id/blog/hapus-folder-onedrive-duplikat-explorer",
+        destination: "/id/blog/remove-duplicate-onedrive-windows-11",
+        permanent: true,
+      },
+    ];
+  },
   images: {
     formats: ["image/avif", "image/webp"],
     remotePatterns: [
