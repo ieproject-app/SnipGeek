@@ -1,7 +1,7 @@
 
 'use client'
 
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useMemo, useEffect, useCallback } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
@@ -10,12 +10,17 @@ import { Button } from '@/components/ui/button'
 import { getDictionary, type Dictionary } from '@/lib/get-dictionary'
 import { parse, isValid } from 'date-fns'
 import { cn } from '@/lib/utils'
-import { Search, FileText, UserCheck, Plus, Trash2, Loader2, Copy, CheckCircle2 } from 'lucide-react'
+import { Search, FileText, UserCheck, Plus, Trash2, Loader2, Copy, CheckCircle2, Database, AlertTriangle, Chrome } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { ToolWrapper } from '@/components/tools/tool-wrapper'
 import { ScrollReveal } from '@/components/ui/scroll-reveal'
 import { useNotification } from '@/hooks/use-notification'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
+import { Textarea } from '@/components/ui/textarea'
+import { Label } from '@/components/ui/label'
+import { useAuth, useFirestore, useUser } from '@/firebase'
+import { collection, doc, getDoc, getDocs, writeBatch } from 'firebase/firestore'
+import { initiateGoogleSignIn } from '@/firebase/non-blocking-login'
 
 // --- TYPE DEFINITIONS ---
 interface Pejabat {
@@ -41,6 +46,8 @@ interface DocQuery {
 interface GeneratedResult {
   [key: string]: Pejabat[];
 }
+
+const EMPLOYEE_HISTORY_COLLECTION = 'employee_history';
 
 // --- CONSTANTS ---
 const docRules: DocRule = {
@@ -79,6 +86,72 @@ const formatDate = (date: Date, locale: string = 'id-ID') => {
   return date.toLocaleDateString(locale, { day: 'numeric', month: 'long', year: 'numeric' });
 }
 
+const formatDateForStorage = (date: Date): string => {
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const year = String(date.getFullYear());
+  return `${day}/${month}/${year}`;
+};
+
+const formatDateKey = (date: Date): string => {
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const year = String(date.getFullYear());
+  return `${year}${month}${day}`;
+};
+
+const sanitizeIdPart = (value: string): string =>
+  (value || '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)/g, '') || 'x';
+
+const buildEmployeeDocId = (pejabat: Pejabat): string => {
+  return [
+    sanitizeIdPart(pejabat.nik),
+    formatDateKey(pejabat.tglMulai),
+    formatDateKey(pejabat.tglSelesai),
+    sanitizeIdPart(pejabat.grupJabatan),
+  ].join('_');
+};
+
+const parseEmployeeRows = (rawText: string): Pejabat[] => {
+  if (!rawText) return [];
+
+  return rawText
+    .split(/\r?\n/)
+    .map(line => line.trim())
+    .filter(line => line.length > 0)
+    .map((line, idx) => {
+      const parts = line.split('\t').map(part => part.trim());
+      if (parts.length < 6) return null;
+
+      const [grupJabatan, tglMulaiRaw, tglSelesaiRaw, nama, jabatan, ...nikParts] = parts;
+      const nik = nikParts.join(' ').trim();
+
+      const isHeader =
+        idx === 0 &&
+        /grup/i.test(grupJabatan) &&
+        /mulai|start/i.test(tglMulaiRaw) &&
+        /selesai|end/i.test(tglSelesaiRaw);
+      if (isHeader) return null;
+
+      const tglMulai = parseDate(tglMulaiRaw);
+      const tglSelesai = parseDate(tglSelesaiRaw);
+      if (!nama || isNaN(tglMulai.getTime()) || isNaN(tglSelesai.getTime())) return null;
+
+      return {
+        grupJabatan,
+        tglMulai,
+        tglSelesai,
+        nama,
+        jabatan,
+        nik,
+      };
+    })
+    .filter((item): item is Pejabat => Boolean(item));
+};
+
 export function ToolHistory({
   dictionary,
   employeeData,
@@ -91,24 +164,19 @@ export function ToolHistory({
   const { employeeHistory: t } = dictionary;
   const toolMeta = dictionary.tools.tool_list.employee_history;
 
-  const allPejabat = useMemo<Pejabat[]>(() => {
-    if (!employeeData) return [];
-    const lines = employeeData.trim().split(/\r?\n/).slice(1);
-    return lines.map(line => {
-      const [grupJabatan, tglMulai, tglSelesai, nama, jabatan, nik] = line.split('\t');
-      return {
-        grupJabatan,
-        tglMulai: parseDate(tglMulai),
-        tglSelesai: parseDate(tglSelesai),
-        nama,
-        jabatan,
-        nik
-      };
-    }).filter(p => p.nama);
-  }, [employeeData]);
-
   // Hooks
   const { notify } = useNotification();
+  const auth = useAuth();
+  const firestore = useFirestore();
+  const { user } = useUser();
+
+  const fallbackPejabat = useMemo<Pejabat[]>(() => parseEmployeeRows(employeeData), [employeeData]);
+  const [allPejabat, setAllPejabat] = useState<Pejabat[]>(fallbackPejabat);
+  const [isDatasetLoading, setIsDatasetLoading] = useState(false);
+  const [isAdminUser, setIsAdminUser] = useState(false);
+  const [isAdminLoading, setIsAdminLoading] = useState(true);
+  const [injectText, setInjectText] = useState('');
+  const [isInjecting, setIsInjecting] = useState(false);
 
   // State for Employee History
   const [searchText, setSearchText] = useState<string>('');
@@ -121,6 +189,76 @@ export function ToolHistory({
   const uniqueGrupJabatans = useMemo(() =>
     ['all', ...Array.from(new Set(allPejabat.map(p => p.grupJabatan)))]
     , [allPejabat]);
+
+  const fetchAdminStatus = useCallback(async () => {
+    if (!firestore || !user) {
+      setIsAdminUser(false);
+      setIsAdminLoading(false);
+      return;
+    }
+
+    setIsAdminLoading(true);
+    try {
+      const adminDocRef = doc(firestore, 'roles_admin', user.uid);
+      const adminDocSnap = await getDoc(adminDocRef);
+      setIsAdminUser(adminDocSnap.exists() && adminDocSnap.data()?.role === 'admin');
+    } catch (error) {
+      console.error('Error checking admin role:', error);
+      setIsAdminUser(false);
+    } finally {
+      setIsAdminLoading(false);
+    }
+  }, [firestore, user]);
+
+  const fetchFirestoreEmployees = useCallback(async () => {
+    if (!firestore || !user) {
+      setAllPejabat(fallbackPejabat);
+      setIsDatasetLoading(false);
+      return;
+    }
+
+    setIsDatasetLoading(true);
+    try {
+      const snapshot = await getDocs(collection(firestore, EMPLOYEE_HISTORY_COLLECTION));
+      if (snapshot.empty) {
+        setAllPejabat(fallbackPejabat);
+        return;
+      }
+
+      const rows = snapshot.docs
+        .map(docSnap => docSnap.data())
+        .map(data => ({
+          grupJabatan: data.grupJabatan || '',
+          tglMulai: parseDate(data.tglMulai || ''),
+          tglSelesai: parseDate(data.tglSelesai || ''),
+          nama: data.nama || '',
+          jabatan: data.jabatan || '',
+          nik: data.nik || '',
+        }))
+        .filter(row => row.nama);
+
+      setAllPejabat(rows);
+    } catch (error) {
+      console.error('Error fetching Firestore employee history:', error);
+      setAllPejabat(fallbackPejabat);
+    } finally {
+      setIsDatasetLoading(false);
+    }
+  }, [firestore, user, fallbackPejabat]);
+
+  useEffect(() => {
+    fetchAdminStatus();
+  }, [fetchAdminStatus]);
+
+  useEffect(() => {
+    fetchFirestoreEmployees();
+  }, [fetchFirestoreEmployees]);
+
+  useEffect(() => {
+    if (!firestore || !user) {
+      setAllPejabat(fallbackPejabat);
+    }
+  }, [firestore, user, fallbackPejabat]);
 
   useEffect(() => {
     setIsSearching(true);
@@ -228,6 +366,88 @@ export function ToolHistory({
     handleCopy(textToCopy, key, 'all', 'Daftar penandatangan');
   };
 
+  const handleGoogleLogin = () => {
+    if (!auth) {
+      notify('Auth belum siap. Silakan tunggu beberapa saat.', <AlertTriangle className="h-4 w-4" />);
+      return;
+    }
+    initiateGoogleSignIn(auth);
+  };
+
+  const handleInjectEmployeeHistory = async () => {
+    if (!firestore || !user || !isAdminUser) {
+      notify('Akses ditolak: hanya admin yang bisa inject data.', <AlertTriangle className="h-4 w-4" />);
+      return;
+    }
+
+    const parsedRows = parseEmployeeRows(injectText);
+    if (parsedRows.length === 0) {
+      notify('Format tidak valid. Gunakan tab-separated 6 kolom per baris.', <AlertTriangle className="h-4 w-4" />);
+      return;
+    }
+
+    setIsInjecting(true);
+    try {
+      const collectionRef = collection(firestore, EMPLOYEE_HISTORY_COLLECTION);
+      const incomingRows = parsedRows.map(pejabat => ({
+        id: buildEmployeeDocId(pejabat),
+        data: {
+          grupJabatan: pejabat.grupJabatan,
+          tglMulai: formatDateForStorage(pejabat.tglMulai),
+          tglSelesai: formatDateForStorage(pejabat.tglSelesai),
+          nama: pejabat.nama,
+          jabatan: pejabat.jabatan,
+          nik: pejabat.nik,
+          updatedAt: new Date().toISOString(),
+          updatedBy: user.email || user.uid,
+        },
+      }));
+
+      const incomingIds = new Set(incomingRows.map(row => row.id));
+      const existingSnapshot = await getDocs(collectionRef);
+      const existingIds = existingSnapshot.docs.map(docSnap => docSnap.id);
+      const deleteIds = existingIds.filter(id => !incomingIds.has(id));
+
+      const ops: Array<
+        | { type: 'set'; id: string; data: Record<string, string> }
+        | { type: 'delete'; id: string }
+      > = [
+        ...incomingRows.map(row => ({ type: 'set' as const, id: row.id, data: row.data })),
+        ...deleteIds.map(id => ({ type: 'delete' as const, id })),
+      ];
+
+      const BATCH_SIZE = 450;
+      for (let i = 0; i < ops.length; i += BATCH_SIZE) {
+        const chunk = ops.slice(i, i + BATCH_SIZE);
+        const batch = writeBatch(firestore);
+        for (const op of chunk) {
+          const targetRef = doc(collectionRef, op.id);
+          if (op.type === 'set') {
+            batch.set(targetRef, op.data, { merge: true });
+          } else {
+            batch.delete(targetRef);
+          }
+        }
+        await batch.commit();
+      }
+
+      notify(
+        <span className="font-medium text-sm flex items-center gap-2">
+          <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+          {`Berhasil inject ${parsedRows.length} baris ke Firestore`}
+        </span>
+      );
+
+      setInjectText('');
+      await fetchFirestoreEmployees();
+    } catch (error) {
+      console.error('Inject employee history failed:', error);
+      notify('Gagal inject data ke Firestore.', <AlertTriangle className="h-4 w-4" />);
+    } finally {
+      setIsInjecting(false);
+    }
+  };
+
   return (
     <TooltipProvider delayDuration={300}>
       <ToolWrapper
@@ -237,6 +457,76 @@ export function ToolHistory({
         isPublic={true}
       >
         <div className="space-y-12">
+          {(isAdminLoading || isAdminUser || !user) && (
+            <ScrollReveal direction="up" delay={0.05}>
+              <Card className="border bg-card/50 rounded-lg overflow-hidden shadow-sm border-primary/10 transition-all duration-300 hover:border-primary/20">
+                <CardHeader className="border-b bg-muted/20">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-primary/10 rounded-lg">
+                      <Database className="h-5 w-5 text-primary" />
+                    </div>
+                    <div>
+                      <CardTitle className="font-display text-xl">Admin Data Injection</CardTitle>
+                      <CardDescription>Paste data tab-separated: Grup, Tgl Mulai, Tgl Selesai, Nama, Jabatan, NIK</CardDescription>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="p-6 space-y-4">
+                  {!user ? (
+                    <div className="flex flex-col items-start gap-3">
+                      <p className="text-sm text-muted-foreground">
+                        Silakan login sebagai admin untuk melakukan inject data.
+                      </p>
+                      <Button
+                        onClick={handleGoogleLogin}
+                        className="rounded-lg"
+                      >
+                        <Chrome className="mr-2 h-4 w-4" />
+                        Login dengan Google
+                      </Button>
+                    </div>
+                  ) : isAdminLoading ? (
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      Memeriksa hak akses admin...
+                    </div>
+                  ) : (
+                    <>
+                      <div className="space-y-2">
+                        <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                          Data Karyawan (TSV)
+                        </Label>
+                        <Textarea
+                          value={injectText}
+                          onChange={(e) => setInjectText(e.target.value)}
+                          placeholder={'Mgr Finance\t01/02/2026\t31/12/9999\tAZHARY AGUNG KURNIA\tMgr Business Support Area Sumatera\t925598'}
+                          className="min-h-[160px] font-mono text-xs"
+                        />
+                      </div>
+                      <Button
+                        onClick={handleInjectEmployeeHistory}
+                        disabled={isInjecting || !injectText.trim()}
+                        className="rounded-lg"
+                      >
+                        {isInjecting ? (
+                          <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            Injecting...
+                          </>
+                        ) : (
+                          <>
+                            <Database className="mr-2 h-4 w-4" />
+                            Inject ke Firestore
+                          </>
+                        )}
+                      </Button>
+                    </>
+                  )}
+                </CardContent>
+              </Card>
+            </ScrollReveal>
+          )}
+
           {/* Search Section */}
           <ScrollReveal direction="up" delay={0.1}>
             <Card className="border bg-card/50 rounded-lg overflow-hidden shadow-sm border-primary/10 transition-all duration-300 hover:border-primary/20">
@@ -261,7 +551,7 @@ export function ToolHistory({
                       onChange={e => setSearchText(e.target.value)}
                       className="pl-10 h-11 rounded-lg bg-background/50 border-muted focus-visible:ring-primary/20"
                     />
-                    {isSearching && (
+                    {(isSearching || isDatasetLoading) && (
                       <div className="absolute right-3 top-1/2 -translate-y-1/2">
                         <Loader2 className="h-4 w-4 animate-spin text-primary" />
                       </div>
@@ -358,7 +648,7 @@ export function ToolHistory({
                     </Table>
                   </div>
 
-                  {isSearching && (
+                  {(isSearching || isDatasetLoading) && (
                     <div className="absolute inset-0 z-30 flex flex-col items-center justify-center bg-background/40 backdrop-blur-[2px] gap-3 animate-in fade-in duration-200">
                       <div className="p-4 bg-background rounded-full shadow-xl border border-primary/10">
                         <Loader2 className="h-8 w-8 animate-spin text-primary" />
