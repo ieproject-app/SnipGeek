@@ -4,14 +4,16 @@ import rehypeShiki from "@shikijs/rehype";
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
 import { mdxComponents } from "@/components/mdx-components";
 import { cn } from "@/lib/utils";
+import type { ComponentType, SVGProps } from "react";
 import {
   Shield,
   FileText,
   Mail,
   ScrollText,
   BadgeInfo,
-  type LucideIcon,
 } from "lucide-react";
+
+type IconComponent = ComponentType<SVGProps<SVGSVGElement>>;
 
 type StaticPageTemplateProps = {
   title: string;
@@ -19,13 +21,13 @@ type StaticPageTemplateProps = {
   lastUpdated?: string;
   content: string;
   badgeLabel?: string;
-  icon?: LucideIcon;
+  icon?: IconComponent;
   maxWidthClassName?: string;
   contentClassName?: string;
   footerNote?: string;
 };
 
-const iconMap: Record<string, LucideIcon> = {
+const iconMap: Record<string, IconComponent> = {
   shield: Shield,
   filetext: FileText,
   mail: Mail,
@@ -33,7 +35,7 @@ const iconMap: Record<string, LucideIcon> = {
   badgeinfo: BadgeInfo,
 };
 
-export function resolveStaticPageIcon(icon?: string | LucideIcon): LucideIcon {
+export function resolveStaticPageIcon(icon?: string | IconComponent): IconComponent {
   if (!icon) return FileText;
   if (typeof icon !== "string") return icon;
 

@@ -3,10 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "cross-env NODE_OPTIONS=--max-old-space-size=4096 next dev --turbopack -p 9003",
-    "build": "cross-env NODE_ENV=production next build",
+    "dev": "set NODE_OPTIONS=--max-old-space-size=4096 && next dev -p 9003",
+    "build": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint .",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
@@ -52,14 +52,16 @@
     "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
+    "@eslint/eslintrc": "^3.3.5",
     "@tailwindcss/postcss": "^4.2.1",
     "@tailwindcss/vite": "^4.2.1",
     "@types/negotiator": "^0.6.3",
     "@types/node": "^20",
     "@types/react": "^19.2.1",
     "@types/react-dom": "^19.2.1",
-    "cross-env": "^10.1.0",
     "depcheck": "^1.4.7",
+    "eslint": "^9.39.4",
+    "eslint-config-next": "^16.1.6",
     "postcss": "^8",
     "tailwindcss": "^4.2.1",
     "typescript": "^5.9.3",
