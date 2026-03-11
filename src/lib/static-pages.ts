@@ -14,7 +14,9 @@ export type StaticPageFrontmatter = {
   description?: string;
   lastUpdated?: string;
   seoTitle?: string;
-  [key: string]: any;
+  badgeLabel?: string;
+  icon?: string;
+  [key: string]: string | number | boolean | string[] | null | undefined;
 };
 
 export type StaticPageData = {

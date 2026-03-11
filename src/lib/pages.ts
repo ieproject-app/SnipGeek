@@ -7,7 +7,7 @@ import { notFound } from 'next/navigation';
 const pagesDirectory = path.join(process.cwd(), '_pages');
 
 export type PageData = {
-  frontmatter: { [key: string]: any };
+  frontmatter: Record<string, string | number | boolean | string[] | null | undefined>;
   content: string;
 };
 

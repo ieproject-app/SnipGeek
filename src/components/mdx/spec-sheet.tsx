@@ -79,7 +79,7 @@ export const SpecItem = ({
 }: {
     label: string;
     value: string;
-    icon?: any
+    icon?: React.ComponentType<{ className?: string }>
 }) => {
     // Map common labels to icons if not provided
     const getIcon = () => {
