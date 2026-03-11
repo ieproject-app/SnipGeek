@@ -24,6 +24,7 @@ export function ArticleComments({ article, type, locale }: ArticleCommentsProps)
   const commentsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
 
     const isProduction = process.env.NODE_ENV === "production";

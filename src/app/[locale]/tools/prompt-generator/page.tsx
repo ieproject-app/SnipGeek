@@ -1,6 +1,6 @@
 
 import { getDictionary } from '@/lib/get-dictionary';
-import { i18n, Locale } from '@/i18n-config';
+import { i18n, type Locale } from '@/i18n-config';
 import type { Metadata } from 'next';
 import { ToolPrompts } from '@/components/tools/tool-prompts';
 import { getSortedPostsData } from '@/lib/posts';
@@ -8,7 +8,7 @@ import { getSortedNotesData } from '@/lib/notes';
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
-  const dictionary = await getDictionary(locale as any);
+  const dictionary = await getDictionary(locale as Locale);
   const title = dictionary.promptGenerator.title;
   const description = dictionary.promptGenerator.description;
 
@@ -28,7 +28,7 @@ export async function generateStaticParams() {
 
 export default async function PromptGeneratorPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale: lang } = await params;
-  const dictionary = await getDictionary(lang as any);
+  const dictionary = await getDictionary(lang as Locale);
   const pageContent = dictionary.promptGenerator;
 
   // MUST await both async calls

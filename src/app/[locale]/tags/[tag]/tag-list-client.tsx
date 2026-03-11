@@ -10,31 +10,11 @@ import { CategoryBadge } from "@/components/layout/category-badge";
 import { formatRelativeTime } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { ChevronDown } from "lucide-react";
+import type { Post, PostFrontmatter } from "@/lib/posts";
+import type { Note, NoteFrontmatter } from "@/lib/notes";
+import type { Dictionary } from "@/lib/get-dictionary";
 
 const ITEMS_PER_PAGE = 9;
-
-interface Post {
-  slug: string;
-  frontmatter: {
-    title: string;
-    description: string;
-    date: string;
-    heroImage?: string;
-    imageAlt?: string;
-    category: string;
-    tags?: string[];
-  };
-}
-
-interface Note {
-  slug: string;
-  frontmatter: {
-    title: string;
-    description: string;
-    date: string;
-    tags?: string[];
-  };
-}
 
 export function TagListClient({
   posts,
@@ -43,9 +23,9 @@ export function TagListClient({
   locale,
   decodedTag,
 }: {
-  posts: Post[];
-  notes: Note[];
-  dictionary: any;
+  posts: Post<PostFrontmatter>[];
+  notes: Note<NoteFrontmatter>[];
+  dictionary: Dictionary;
   locale: string;
   decodedTag: string;
 }) {

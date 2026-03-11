@@ -71,27 +71,29 @@ const HighlightMatch = ({ text, query }: { text: string; query: string }) => {
     return <>{text || ""}</>;
 
   const escapedQuery = escapeRegExp(query.trim());
+  let parts: string[] = [text];
   try {
-    const parts = text.split(new RegExp(`(${escapedQuery})`, "gi"));
-    return (
-      <>
-        {parts.map((part, i) =>
-          part.toLowerCase() === query.toLowerCase().trim() ? (
-            <mark
-              key={i}
-              className="bg-accent/30 text-accent-foreground rounded-[2px] px-0.5 font-bold"
-            >
-              {part}
-            </mark>
-          ) : (
-            part
-          ),
-        )}
-      </>
-    );
-  } catch (e) {
+    parts = text.split(new RegExp(`(${escapedQuery})`, "gi"));
+  } catch {
     return <>{text}</>;
   }
+
+  return (
+    <>
+      {parts.map((part, i) =>
+        part.toLowerCase() === query.toLowerCase().trim() ? (
+          <mark
+            key={i}
+            className="bg-accent/30 text-accent-foreground rounded-[2px] px-0.5 font-bold"
+          >
+            {part}
+          </mark>
+        ) : (
+          part
+        ),
+      )}
+    </>
+  );
 };
 
 export function LayoutHeader({
@@ -117,7 +119,6 @@ export function LayoutHeader({
     currentMode,
     cycleTheme,
     tooltipLabel: themeTooltipLabel,
-    resolvedTheme,
   } = useThemeMode();
 
   const lastScrollY = useRef(0);
@@ -135,18 +136,21 @@ export function LayoutHeader({
   const linkPrefix = getLinkPrefix(currentLocale);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
     setTimeLabel(getTimeLabel());
   }, []);
 
   useEffect(() => {
     if (mounted && readingListItems.length > prevCount.current) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setIsVisible(true);
     }
     prevCount.current = readingListItems.length;
   }, [readingListItems.length, mounted]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setActiveView("none");
     setQuery("");
     if (typeof window !== "undefined") {
@@ -173,6 +177,7 @@ export function LayoutHeader({
           (item.title || "").toLowerCase().includes(lowerCaseQuery) ||
           (item.description || "").toLowerCase().includes(lowerCaseQuery),
       );
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setResults(filteredData);
     } else {
       setResults([]);
@@ -766,8 +771,8 @@ export function LayoutHeader({
                 {query.length > 1 ? (
                   <>
                     <div className="font-sans text-[9px] font-black uppercase tracking-[0.15em] text-muted-foreground/60 px-4 py-2 border-b border-border bg-muted/5">
-                      {results.length} {dictionary.search.resultsFound} for "
-                      {query}"
+                      {results.length} {dictionary.search.resultsFound} for &quot;
+                      {query}&quot;
                     </div>
                     {results.length > 0 ? (
                       <ul className="space-y-1 pt-1">
@@ -815,7 +820,7 @@ export function LayoutHeader({
                           <Search className="h-8 w-8 opacity-10 text-muted-foreground" />
                         </div>
                         <p className="font-sans italic text-xs text-muted-foreground">
-                          {dictionary.search.noResults} "{query}"
+                          {dictionary.search.noResults} &quot;{query}&quot;
                         </p>
                       </div>
                     )}
@@ -942,9 +947,12 @@ export function LayoutHeader({
             )}
           >
             {icon &&
-              React.cloneElement(icon as React.ReactElement<any>, {
+              React.cloneElement(
+                icon as React.ReactElement<{ className?: string }>,
+                {
                 className: "h-3.5 w-3.5",
-              })}
+                },
+              )}
           </span>
 
           {/* Message */}

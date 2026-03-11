@@ -137,8 +137,8 @@ export default function NotFound() {
               </div>
 
               <p className="text-sm text-muted-foreground border-t border-border pt-8 italic">
-                "Technology is best when it brings people together... or when it
-                actually works."
+                &quot;Technology is best when it brings people together... or when it
+                actually works.&quot;
               </p>
             </main>
           </div>

@@ -65,7 +65,6 @@ export function useThemeMode() {
       "startViewTransition" in document &&
       !window.matchMedia("(prefers-reduced-motion: reduce)").matches
     ) {
-      // @ts-ignore — startViewTransition is not yet in all TS lib targets
       document.startViewTransition(() => run());
     } else {
       run();

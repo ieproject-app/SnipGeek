@@ -5,14 +5,14 @@ import { DraftingCompass, Copy, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import type { Post } from '@/lib/posts';
-import type { Note } from '@/lib/notes';
+import type { Post, PostFrontmatter } from '@/lib/posts';
+import type { Note, NoteFrontmatter } from '@/lib/notes';
 import type { Dictionary } from '@/lib/get-dictionary';
 import { useNotification } from '@/hooks/use-notification';
 
 type DraftListProps = {
-  draftPosts: Post<any>[];
-  draftNotes: Note<any>[];
+  draftPosts: Post<PostFrontmatter>[];
+  draftNotes: Note<NoteFrontmatter>[];
   dictionary: Dictionary;
 };
 

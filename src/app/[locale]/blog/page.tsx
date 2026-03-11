@@ -49,7 +49,7 @@ export default async function BlogPage({
 
   return (
     <BlogListClient
-      initialPosts={initialPosts as any}
+      initialPosts={initialPosts}
       dictionary={dictionary}
       locale={locale}
     />

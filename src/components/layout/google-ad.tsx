@@ -57,6 +57,7 @@ export function GoogleAd({
 
   // Step 1: wait for client mount
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
   }, []);
 
@@ -69,8 +70,9 @@ export function GoogleAd({
 
     try {
       (window.adsbygoogle = window.adsbygoogle || []).push({});
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setPushed(true);
-    } catch (err) {
+    } catch {
       // AdSense script not yet loaded — silently ignore
     }
   }, [mounted, pushed]);

@@ -1,5 +1,5 @@
 
-import { i18n } from '@/i18n-config';
+import { i18n, type Locale } from '@/i18n-config';
 import type { Metadata } from 'next';
 import { getDictionary } from '@/lib/get-dictionary';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -19,9 +19,18 @@ import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { ScrollReveal } from '@/components/ui/scroll-reveal';
 
+type ToolCardConfig = {
+  id: string;
+  icon: React.ReactElement<{ className?: string }>;
+  badge?: string;
+  badgeVariant?: React.ComponentProps<typeof Badge>['variant'];
+  isLink?: boolean;
+  href?: string;
+};
+
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
-  const dictionary = await getDictionary(locale as any);
+  const dictionary = await getDictionary(locale as Locale);
   return {
     title: dictionary.tools.title,
     description: dictionary.tools.description,
@@ -34,7 +43,7 @@ export async function generateStaticParams() {
 
 export default async function ToolsPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
-  const dictionary = await getDictionary(locale as any);
+  const dictionary = await getDictionary(locale as Locale);
   const pageContent = dictionary.tools;
   const linkPrefix = locale === i18n.defaultLocale ? '' : `/${locale}`;
 
@@ -77,7 +86,7 @@ export default async function ToolsPage({ params }: { params: Promise<{ locale: 
   ];
 
   const renderCard = (
-    tool: { id: string, icon: React.ReactElement, badge?: string, badgeVariant?: any },
+    tool: ToolCardConfig,
     isClickable: boolean = false
   ) => {
     const toolContent = pageContent.tool_list[tool.id as keyof typeof pageContent.tool_list];
@@ -105,7 +114,7 @@ export default async function ToolsPage({ params }: { params: Promise<{ locale: 
               {badgeText}
             </Badge>
           </div>
-          {React.cloneElement(tool.icon as React.ReactElement<any>, {
+          {React.cloneElement(tool.icon, {
             className: cn(
               "h-8 w-8 text-muted-foreground transition-opacity",
               isClickable ? "opacity-50 group-hover:opacity-100" : "opacity-40"

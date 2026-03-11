@@ -47,7 +47,7 @@ export default async function Home({
 
   return (
     <HomeClient
-      initialPosts={initialPosts as any}
+      initialPosts={initialPosts}
       dictionary={dictionary}
       locale={locale}
     />

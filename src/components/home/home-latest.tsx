@@ -9,10 +9,12 @@ import { formatRelativeTime } from "@/lib/utils";
 import { AddToReadingListButton } from "@/components/layout/add-to-reading-list-button";
 import { CategoryBadge } from "@/components/layout/category-badge";
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
+import type { Post, PostFrontmatter } from "@/lib/posts";
+import type { Dictionary } from "@/lib/get-dictionary";
 
 interface HomeLatestProps {
-    posts: any[];
-    dictionary: any;
+    posts: Post<PostFrontmatter>[];
+    dictionary: Dictionary;
     locale: string;
     linkPrefix: string;
 }
@@ -23,7 +25,7 @@ export const HomeLatest = ({
     locale,
     linkPrefix,
 }: HomeLatestProps) => {
-    const renderLatestCard = (post: any, index: number) => {
+    const renderLatestCard = (post: Post<PostFrontmatter>, index: number) => {
         const heroImageValue = post.frontmatter.heroImage;
         let heroImageSrc: string | undefined;
         let heroImageHint: string | undefined;

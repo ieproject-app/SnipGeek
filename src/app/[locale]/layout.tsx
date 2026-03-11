@@ -1,7 +1,7 @@
 import { LayoutHeader } from "@/components/layout/layout-header";
 import { LayoutFooter } from "@/components/layout/layout-footer";
 import { BackToTop } from "@/components/layout/back-to-top";
-import { i18n } from "@/i18n-config";
+import { i18n, type Locale } from "@/i18n-config";
 import {
   getAllTranslationsMap as getAllPostTranslationsMap,
   getSortedPostsData,
@@ -179,7 +179,7 @@ export default async function LocaleLayout({
   }));
 
   const searchableData = [...searchablePosts, ...searchableNotes];
-  const dictionary = await getDictionary(locale as any);
+  const dictionary = await getDictionary(locale as Locale);
   const draftPosts = await getDraftPostsData(locale);
   const draftNotes = await getDraftNotesData(locale);
 

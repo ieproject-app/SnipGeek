@@ -22,33 +22,29 @@ const ReadingListContext = createContext<ReadingListContextType | undefined>(und
 const LOCAL_STORAGE_KEY = 'readingList';
 
 export function ReadingListProvider({ children }: { children: ReactNode }) {
-  const [items, setItems] = useState<ReadingListItem[]>([]);
-  const [isLoaded, setIsLoaded] = useState(false);
+  const [items, setItems] = useState<ReadingListItem[]>(() => {
+    if (typeof window === 'undefined') {
+      return [];
+    }
 
-  useEffect(() => {
-    // This effect runs once on the client to load from localStorage.
     try {
       const storedItems = localStorage.getItem(LOCAL_STORAGE_KEY);
-      if (storedItems) {
-        setItems(JSON.parse(storedItems));
-      }
+      if (!storedItems) return [];
+      const parsed = JSON.parse(storedItems);
+      return Array.isArray(parsed) ? (parsed as ReadingListItem[]) : [];
     } catch (error) {
       console.error('Failed to parse reading list from localStorage', error);
-      setItems([]);
+      return [];
     }
-    setIsLoaded(true); // Mark as loaded
-  }, []);
+  });
 
   useEffect(() => {
-    // This effect runs only after the initial load is complete and items change.
-    if (isLoaded) {
-      try {
-        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(items));
-      } catch (error) {
-        console.error('Failed to save reading list to localStorage', error);
-      }
+    try {
+      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(items));
+    } catch (error) {
+      console.error('Failed to save reading list to localStorage', error);
     }
-  }, [items, isLoaded]);
+  }, [items]);
 
   const addItem = useCallback((item: ReadingListItem) => {
     setItems((prevItems) => {

@@ -1,7 +1,7 @@
 
 import React, { useId } from 'react';
 
-interface SnipGeekLogoProps extends React.SVGProps<SVGSVGElement> { }
+type SnipGeekLogoProps = React.SVGProps<SVGSVGElement>;
 
 /**
  * SnipGeekLogo - Adaptive branding with two versions:

@@ -2,18 +2,17 @@
 
 import React, { useMemo, useState } from "react";
 import Link from "next/link";
-import { Badge } from "@/components/ui/badge";
 import {
   Card,
   CardContent,
-  CardFooter,
   CardHeader,
 } from "@/components/ui/card";
 import { StickyNote, ChevronDown } from "lucide-react";
 import { AddToReadingListButton } from "@/components/layout/add-to-reading-list-button";
-import { CategoryBadge } from "@/components/layout/category-badge";
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
 import { Button } from "@/components/ui/button";
+import type { Note, NoteFrontmatter } from "@/lib/notes";
+import type { Dictionary } from "@/lib/get-dictionary";
 
 const NOTES_PER_PAGE = 9;
 
@@ -22,8 +21,8 @@ export function NotesListClient({
   dictionary,
   locale,
 }: {
-  initialNotes: any[];
-  dictionary: any;
+  initialNotes: Note<NoteFrontmatter>[];
+  dictionary: Dictionary;
   locale: string;
 }) {
   const linkPrefix = locale === "en" ? "" : `/${locale}`;

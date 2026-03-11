@@ -8,12 +8,21 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Save, ArrowLeft, Loader2, StickyNote } from "lucide-react";
 import Link from "next/link";
+import type { NoteFrontmatter } from "@/lib/notes";
 
 interface NoteEditorProps {
-  initialData?: any;
+  initialData?: Partial<{
+    title: string;
+    description: string;
+    contentMdx: string;
+    tags: string[];
+    translationKey: string;
+    locale: string | string[];
+    date: NoteFrontmatter["date"];
+  }>;
   id?: string;
 }
 

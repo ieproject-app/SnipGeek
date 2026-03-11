@@ -6,9 +6,23 @@ import Image from "next/image";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { AddToReadingListButton } from "@/components/layout/add-to-reading-list-button";
 import { StickyNote } from "lucide-react";
-import { formatRelativeTime, cn } from "@/lib/utils";
+import { formatRelativeTime } from "@/lib/utils";
 import { CategoryBadge } from "@/components/layout/category-badge";
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
+import type { Dictionary } from "@/lib/get-dictionary";
+
+type RelatedContentItem = {
+  slug: string;
+  frontmatter: {
+    title: string;
+    description: string;
+    date: string;
+    tags?: string[];
+    category?: string;
+    heroImage?: string;
+    imageAlt?: string;
+  };
+};
 
 type ArticleRelatedProps = {
   type: "blog" | "note";
@@ -16,8 +30,8 @@ type ArticleRelatedProps = {
   currentSlug: string;
   currentTags?: string[];
   currentCategory?: string;
-  initialRelatedContent: any[];
-  dictionary: any;
+  initialRelatedContent: RelatedContentItem[];
+  dictionary: Dictionary;
 };
 
 /**
@@ -46,6 +60,7 @@ export function ArticleRelated({
   // Related content is now strictly from local MDX files
   const allRelated = useMemo(() => {
     const scored = initialRelatedContent
+      .filter((item) => item.slug !== currentSlug)
       .map((item) => {
         let score = 0;
         const itemTags = item.frontmatter.tags || [];
@@ -71,11 +86,11 @@ export function ArticleRelated({
       .sort((a, b) => b.score - a.score);
 
     return scored.slice(0, 3);
-  }, [initialRelatedContent, currentCategory, currentTags, type]);
+  }, [currentCategory, currentSlug, currentTags, initialRelatedContent, type]);
 
   if (allRelated.length === 0) return null;
 
-  const renderCard = (item: any) => {
+  const renderCard = (item: RelatedContentItem) => {
     const isBlog = type === "blog";
     const heroImageValue = item.frontmatter.heroImage;
     let heroImageSrc: string | undefined;

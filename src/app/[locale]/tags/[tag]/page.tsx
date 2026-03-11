@@ -1,6 +1,6 @@
 import { getSortedPostsData } from "@/lib/posts";
 import { getSortedNotesData as getRawNotes } from "@/lib/notes";
-import { i18n } from "@/i18n-config";
+import { i18n, type Locale } from "@/i18n-config";
 import { getDictionary } from "@/lib/get-dictionary";
 import { TagListClient } from "./tag-list-client";
 import type { Metadata } from "next";
@@ -12,7 +12,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale, tag } = await params;
   const decodedTag = decodeURIComponent(tag).toUpperCase();
-  const dictionary = await getDictionary(locale as any);
+  const dictionary = await getDictionary(locale as Locale);
   const canonicalPath =
     locale === i18n.defaultLocale ? `/tags/${tag}` : `/${locale}/tags/${tag}`;
 
@@ -80,7 +80,7 @@ export default async function TagPage({
 }) {
   const { locale, tag } = await params;
   const decodedTag = decodeURIComponent(tag).toLowerCase();
-  const dictionary = await getDictionary(locale as any);
+  const dictionary = await getDictionary(locale as Locale);
 
   const allPosts = await getSortedPostsData(locale);
   const posts = allPosts.filter((p) =>
@@ -94,8 +94,8 @@ export default async function TagPage({
 
   return (
     <TagListClient
-      posts={posts as any}
-      notes={filteredNotes as any}
+      posts={posts}
+      notes={filteredNotes}
       dictionary={dictionary}
       locale={locale}
       decodedTag={decodedTag}

@@ -8,12 +8,15 @@ import { cn } from "@/lib/utils";
 import { SnipTooltip } from "@/components/ui/snip-tooltip";
 import { useThemeMode } from "@/hooks/use-theme-mode";
 
-export function ThemeSwitcher({ dictionary }: { dictionary: Dictionary }) {
+export function ThemeSwitcher({ dictionary: _dictionary }: { dictionary: Dictionary }) {
   const [mounted, setMounted] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   const { currentMode, cycleTheme, tooltipLabel } = useThemeMode();
 
+  void _dictionary;
+
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
 
     const toggleVisibility = () => {

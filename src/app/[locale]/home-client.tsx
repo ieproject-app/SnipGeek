@@ -1,27 +1,21 @@
 "use client";
 
 import React, { useMemo } from "react";
-import Link from "next/link";
-import Image from "next/image";
-import { PlaceHolderImages } from "@/lib/placeholder-images";
-import { formatRelativeTime } from "@/lib/utils";
-import { AddToReadingListButton } from "@/components/layout/add-to-reading-list-button";
-import { ChevronRight } from "lucide-react";
 import { HomeTutorials } from "@/components/home/home-tutorials";
 import { HomeTopics } from "@/components/home/home-topics";
 import { HomeUpdates } from "@/components/home/home-updates";
 import { HomeHero } from "@/components/home/home-hero";
 import { HomeLatest } from "@/components/home/home-latest";
-import { CategoryBadge } from "@/components/layout/category-badge";
-import { ScrollReveal } from "@/components/ui/scroll-reveal";
+import type { Post, PostFrontmatter } from "@/lib/posts";
+import type { Dictionary } from "@/lib/get-dictionary";
 
 export function HomeClient({
   initialPosts,
   dictionary,
   locale,
 }: {
-  initialPosts: any[];
-  dictionary: any;
+  initialPosts: Post<PostFrontmatter>[];
+  dictionary: Dictionary;
   locale: string;
 }) {
   const linkPrefix = locale === "en" ? "" : `/${locale}`;
@@ -80,14 +74,14 @@ export function HomeClient({
   return (
     <div className="w-full">
       <HomeHero
-        posts={featuredPosts as any}
+        posts={featuredPosts}
         dictionary={dictionary}
         locale={locale}
         linkPrefix={linkPrefix}
       />
 
       <HomeLatest
-        posts={latestPosts as any}
+        posts={latestPosts}
         dictionary={dictionary}
         locale={locale}
         linkPrefix={linkPrefix}
@@ -95,7 +89,7 @@ export function HomeClient({
 
       {sliderPosts.length > 0 && (
         <HomeTutorials
-          posts={sliderPosts as any}
+          posts={sliderPosts}
           title={dictionary.home.sliderAndShadow.title}
           viewMoreText={dictionary.home.sliderAndShadow.viewMore}
           dictionary={dictionary}
@@ -106,7 +100,7 @@ export function HomeClient({
 
       {topicPosts.length > 0 && (
         <HomeTopics
-          posts={topicPosts as any}
+          posts={topicPosts}
           title={dictionary.home.specialTagSectionTitle}
           breadcrumbHome={dictionary.home.breadcrumbHome}
           viewAllText={dictionary.home.viewAllPosts}
@@ -119,7 +113,7 @@ export function HomeClient({
 
       {updatePosts.length > 0 && (
         <HomeUpdates
-          posts={updatePosts as any}
+          posts={updatePosts}
           title={dictionary.home.softwareUpdateSlider.title}
           viewMoreText={dictionary.home.softwareUpdateSlider.viewMore}
           dictionary={dictionary}

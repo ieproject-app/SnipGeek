@@ -10,6 +10,8 @@ import { CategoryBadge } from "@/components/layout/category-badge";
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
 import { Button } from "@/components/ui/button";
 import { ChevronDown } from "lucide-react";
+import type { Post, PostFrontmatter } from "@/lib/posts";
+import type { Dictionary } from "@/lib/get-dictionary";
 
 const POSTS_PER_PAGE = 9;
 
@@ -18,8 +20,8 @@ export function BlogListClient({
   dictionary,
   locale,
 }: {
-  initialPosts: any[];
-  dictionary: any;
+  initialPosts: Post<PostFrontmatter>[];
+  dictionary: Dictionary;
   locale: string;
 }) {
   const linkPrefix = locale === "en" ? "" : `/${locale}`;

@@ -78,7 +78,9 @@ export function hashCategoryToIndex(str: string): number {
 /**
  * Helper to simplify labels to single-word versions for a minimalist look.
  */
-export function simplifyCategoryLabel(label: any): string {
+export function simplifyCategoryLabel(
+  label: string | number | null | undefined,
+): string {
   if (!label) return 'Article';
   const strLabel = String(label).toLowerCase();
   const map: Record<string, string> = {

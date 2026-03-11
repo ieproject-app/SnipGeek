@@ -64,7 +64,6 @@ export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({
 
   useEffect(() => {
     if (!auth) {
-      setUserAuthState({ user: null, isUserLoading: false, userError: null });
       return;
     }
 
@@ -88,9 +87,9 @@ export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({
       firebaseApp,
       firestore,
       auth,
-      user: userAuthState.user,
-      isUserLoading: userAuthState.isUserLoading,
-      userError: userAuthState.userError,
+      user: auth ? userAuthState.user : null,
+      isUserLoading: auth ? userAuthState.isUserLoading : false,
+      userError: auth ? userAuthState.userError : null,
     };
   }, [firebaseApp, firestore, auth, userAuthState]);
 
@@ -142,11 +141,12 @@ export const useFirebaseApp = (): FirebaseApp | null => {
 type MemoFirebase <T> = T & {__memo?: boolean};
 
 export function useMemoFirebase<T>(factory: () => T, deps: DependencyList): T | (MemoFirebase<T>) {
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const memoized = useMemo(factory, deps);
-  
+
   if(typeof memoized !== 'object' || memoized === null) return memoized;
   (memoized as MemoFirebase<T>).__memo = true;
-  
+
   return memoized;
 }
 
