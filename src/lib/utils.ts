@@ -92,7 +92,7 @@ export function formatRelativeTime(date: Date, locale: string = "en") {
 
     const diffInYears = Math.floor(diffInMonths / 12);
     return rtf.format(-diffInYears, "year");
-  } catch (e) {
+  } catch {
     return date.toLocaleDateString(locale);
   }
 }

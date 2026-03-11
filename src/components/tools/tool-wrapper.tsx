@@ -23,12 +23,10 @@ import {
   CheckCircle2,
   Terminal,
   ShieldX,
-  ChevronRight,
 } from "lucide-react";
 import { useNotification } from "@/hooks/use-notification";
 import type { Dictionary } from "@/lib/get-dictionary";
 import { Separator } from "@/components/ui/separator";
-import { cn } from "@/lib/utils";
 
 interface ToolWrapperProps {
   children: React.ReactNode;

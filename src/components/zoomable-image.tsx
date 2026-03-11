@@ -1,9 +1,9 @@
 "use client";
 
 import Image from "next/image";
+import type { ComponentProps } from "react";
 import { cn } from "@/lib/utils";
 import {
-    Maximize2,
     Plus,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -19,6 +19,11 @@ import {
 /**
  * ZoomableImage - Wrapper component to make images clickable and expandabe.
  */
+type ZoomableImageProps = ComponentProps<typeof Image> & {
+    src: string;
+    alt?: string;
+};
+
 export const ZoomableImage = ({
     src,
     alt,
@@ -27,7 +32,7 @@ export const ZoomableImage = ({
     className,
     priority,
     ...props
-}: any) => {
+}: ZoomableImageProps) => {
     return (
         <Dialog>
             <DialogTrigger asChild>
@@ -80,9 +85,11 @@ export const ZoomableImage = ({
                                 }}
                                 className="relative max-w-7xl max-h-full"
                             >
-                                <img
+                                <Image
                                     src={src}
-                                    alt={alt}
+                                    alt={alt || "SnipGeek Image"}
+                                    width={width || 1600}
+                                    height={height || 900}
                                     className="max-w-full max-h-[85vh] object-contain rounded-2xl shadow-[0_0_100px_-20px_rgba(0,0,0,0.5)] border border-white/5"
                                 />
 

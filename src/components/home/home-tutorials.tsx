@@ -7,7 +7,6 @@ import {
   Carousel,
   CarouselContent,
   CarouselItem,
-  type CarouselApi
 } from '@/components/ui/carousel';
 import { ChevronRight } from 'lucide-react';
 import { cn, formatRelativeTime } from '@/lib/utils';
@@ -40,21 +39,6 @@ interface HomeTutorialsProps {
 }
 
 export function HomeTutorials({ posts, title, viewMoreText, dictionary, locale, tag }: HomeTutorialsProps) {
-  const [api, setApi] = React.useState<CarouselApi>();
-  const [current, setCurrent] = React.useState(0);
-  const [count, setCount] = React.useState(0);
-
-  React.useEffect(() => {
-    if (!api) return;
-
-    setCount(api.scrollSnapList().length);
-    setCurrent(api.selectedScrollSnap());
-
-    api.on('select', () => {
-      setCurrent(api.selectedScrollSnap());
-    });
-  }, [api]);
-
   const linkPrefix = locale === 'en' ? '' : `/${locale}`;
   const viewMoreHref = tag ? `${linkPrefix}/tags/${tag.toLowerCase()}` : `${linkPrefix}/blog`;
 
@@ -74,7 +58,6 @@ export function HomeTutorials({ posts, title, viewMoreText, dictionary, locale, 
         {/* Slider */}
         <ScrollReveal direction="up" delay={0.2}>
           <Carousel
-            setApi={setApi}
             opts={{
               align: 'start',
               loop: false,

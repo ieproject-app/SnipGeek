@@ -4,7 +4,7 @@ import { getAllTags } from "@/lib/tags";
 import { cn, getLinkPrefix } from "@/lib/utils";
 import Link from "next/link";
 import { Hash, ArrowRight } from "lucide-react";
-import { CategoryBadge, getBadgeStyle } from "@/components/layout/category-badge";
+import { getBadgeStyle } from "@/components/layout/category-badge";
 import { LayoutBreadcrumbs } from "@/components/layout/layout-breadcrumbs";
 import type { Metadata } from "next";
 

@@ -7,11 +7,7 @@ type ThemeProviderProps = React.ComponentProps<typeof NextThemesProvider>;
 import { STORAGE_KEYS } from "@/lib/constants";
 
 export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
-  const [mounted, setMounted] = React.useState(false);
-
   React.useEffect(() => {
-    setMounted(true);
-
     // Check for manual theme override expiration
     const manualExpire = localStorage.getItem(STORAGE_KEYS.THEME_MANUAL_EXPIRE);
     if (manualExpire) {

@@ -12,7 +12,6 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { MDXRemote } from "next-mdx-remote/rsc";
 import Image from "next/image";
-import Link from "next/link";
 import { mdxComponents } from "@/components/mdx-components";
 import { ArticleComments } from "@/components/blog/article-comments";
 import { ArticleMeta } from "@/components/blog/article-meta";

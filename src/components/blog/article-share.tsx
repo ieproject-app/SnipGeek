@@ -22,7 +22,7 @@ interface ArticleShareProps {
 // TODO: Replace with your actual production domain
 const productionUrl = "https://snipgeek.com";
 
-export function ArticleShare({ title, imageUrl }: ArticleShareProps) {
+export function ArticleShare({ title }: ArticleShareProps) {
   const pathname = usePathname();
   const [currentUrl, setCurrentUrl] = useState("");
   const [copied, setCopied] = useState(false);

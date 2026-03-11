@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -86,11 +86,6 @@ interface GeneratedResult {
     isError?: boolean;
 }
 
-interface RemainingCount {
-    label: string;
-    count: number;
-}
-
 interface StockMatrix {
     [category: string]: {
         [period: string]: number; // period is 'YYYY-MM'
@@ -101,6 +96,9 @@ interface UserLimit {
     count: number;
     isLimited: boolean;
 }
+
+const getErrorMessage = (error: unknown, fallback: string) =>
+    error instanceof Error ? error.message : fallback;
 
 function createNewRequest(): GenerationRequest {
     return {
@@ -117,7 +115,6 @@ export function ToolNumbers({ dictionary }: { dictionary: Dictionary }) {
     const [valueCategory, setValueCategory] = useState<ValueCategory>('below_500m');
     const [isGenerating, setIsGenerating] = useState(false);
     const [generatedNumbers, setGeneratedNumbers] = useState<GeneratedResult[]>([]);
-    const [remainingCounts, setRemainingCounts] = useState<RemainingCount[]>([]);
     const [isCopied, setIsCopied] = useState<'full' | 'numbers' | null>(null);
     const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
 
@@ -140,7 +137,6 @@ export function ToolNumbers({ dictionary }: { dictionary: Dictionary }) {
     const [userLimit, setUserLimit] = useState<UserLimit>({ count: 0, isLimited: false });
     const [isLimitLoading, setIsLimitLoading] = useState(true);
     const [isAdminUser, setIsAdminUser] = useState(false);
-    const [isAdminLoading, setIsAdminLoading] = useState(true);
 
     const { toast } = useToast();
     const { notify } = useNotification();
@@ -151,12 +147,10 @@ export function ToolNumbers({ dictionary }: { dictionary: Dictionary }) {
 
     const fetchAdminStatus = useCallback(async () => {
         if (!firestore || !user) {
-            setIsAdminLoading(false);
             setIsAdminUser(false);
             return;
         }
 
-        setIsAdminLoading(true);
         try {
             const adminDocRef = doc(firestore, 'roles_admin', user.uid);
             const adminDocSnap = await getDoc(adminDocRef);
@@ -164,8 +158,6 @@ export function ToolNumbers({ dictionary }: { dictionary: Dictionary }) {
         } catch (error) {
             console.error("Error fetching admin status:", error);
             setIsAdminUser(false);
-        } finally {
-            setIsAdminLoading(false);
         }
     }, [firestore, user]);
 
@@ -320,7 +312,7 @@ export function ToolNumbers({ dictionary }: { dictionary: Dictionary }) {
         ));
     };
 
-    const handleRequestChange = (id: string, field: keyof GenerationRequest, value: any) => {
+    const handleRequestChange = (id: string, field: keyof GenerationRequest, value: GenerationRequest[keyof GenerationRequest]) => {
         setRequests(prev => prev.map(req => req.id === id ? { ...req, [field]: value } : req));
     };
 
@@ -347,11 +339,8 @@ export function ToolNumbers({ dictionary }: { dictionary: Dictionary }) {
 
         setIsGenerating(true);
         setGeneratedNumbers([]);
-        setRemainingCounts([]);
 
         try {
-            const totalRequested = requests.reduce((sum, req) => sum + req.quantity, 0);
-
             const generated = await runTransaction(firestore, async (transaction) => {
                 const limitRef = doc(firestore, 'userGenerationLimits', user.uid);
                 const todayStr = format(new Date(), 'yyyy-MM-dd');
@@ -442,7 +431,7 @@ export function ToolNumbers({ dictionary }: { dictionary: Dictionary }) {
             await fetchUserLimit();
             await fetchMyHistory();
 
-            const counts = await Promise.all(
+            await Promise.all(
                 Array.from(new Set(requests.map(r => `${r.category}|${r.docDate!.getFullYear()}|${r.docDate!.getMonth() + 1}`)))
                     .map(async (uniqueReqKey) => {
                         const [category, yearStr, monthStr] = uniqueReqKey.split('|');
@@ -462,7 +451,6 @@ export function ToolNumbers({ dictionary }: { dictionary: Dictionary }) {
                         };
                     })
             );
-            setRemainingCounts(counts);
 
             const sortedGenerated = generated.sort((a, b) => a.date.getTime() - b.date.getTime());
             setGeneratedNumbers(sortedGenerated);
@@ -474,9 +462,9 @@ export function ToolNumbers({ dictionary }: { dictionary: Dictionary }) {
                 notify(`Gagal! Tidak ada nomor yang tersedia untuk dibuat.`, <AlertTriangle className="h-4 w-4 text-destructive" />);
             }
 
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error("Error generating numbers:", error);
-            notify(error.message || "Gagal membuat nomor. Terjadi kesalahan sistem.", <AlertTriangle className="h-4 w-4" />);
+            notify(getErrorMessage(error, "Gagal membuat nomor. Terjadi kesalahan sistem."), <AlertTriangle className="h-4 w-4" />);
         } finally {
             setIsGenerating(false);
         }
@@ -557,9 +545,9 @@ export function ToolNumbers({ dictionary }: { dictionary: Dictionary }) {
             notify(`Berhasil! ${validNumbers.length} nomor berhasil disuntikkan.`, <CheckCircle className="h-4 w-4 text-emerald-500" />);
             setInjectText('');
             setInjectProgress('');
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error("Error bulk injecting:", error);
-            notify(error.message || "Gagal melakukan injeksi nomor.", <AlertTriangle className="h-4 w-4" />);
+            notify(getErrorMessage(error, "Gagal melakukan injeksi nomor."), <AlertTriangle className="h-4 w-4" />);
         } finally {
             setIsInjecting(false);
         }
@@ -568,7 +556,6 @@ export function ToolNumbers({ dictionary }: { dictionary: Dictionary }) {
     const handleReset = () => {
         setRequests([createNewRequest()]);
         setGeneratedNumbers([]);
-        setRemainingCounts([]);
     };
 
     const copyFullResults = () => {
@@ -629,7 +616,7 @@ export function ToolNumbers({ dictionary }: { dictionary: Dictionary }) {
                             { step: 1, label: "Pilih Jenis & Tanggal", active: !hasResults },
                             { step: 2, label: "Generate Nomor", active: !hasResults },
                             { step: 3, label: "Salin Hasil", active: hasResults }
-                        ].map((s, idx) => (
+                        ].map((s) => (
                             <div key={s.step} className="flex flex-col items-center gap-3 bg-background px-4">
                                 <div className={cn(
                                     "w-8 h-8 rounded-full flex items-center justify-center text-xs font-black transition-all duration-500",

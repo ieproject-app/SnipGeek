@@ -9,21 +9,23 @@ import type { Dictionary } from "@/lib/get-dictionary";
 import { SnipTooltip } from "@/components/ui/snip-tooltip";
 import { Skeleton } from "@/components/ui/skeleton";
 
-export function LanguageSwitcher({
-  translationsMap,
-  dictionary,
-  variant = "pill",
-}: {
+const setPreferredLocaleCookie = (locale: Locale) => {
+  document.cookie = `NEXT_LOCALE=${locale}; path=/; max-age=31536000; SameSite=Lax`;
+};
+
+export function LanguageSwitcher(props: {
   translationsMap: TranslationsMap;
   dictionary: Dictionary;
   variant?: "pill" | "minimal";
 }) {
+  const { translationsMap, variant = "pill" } = props;
   const pathName = usePathname();
   const params = useParams();
   const [mounted, setMounted] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
   }, []);
 
@@ -31,7 +33,7 @@ export function LanguageSwitcher({
 
   const handleLocaleChange = (locale: Locale) => {
     if (locale === currentLocale) return;
-    document.cookie = `NEXT_LOCALE=${locale}; path=/; max-age=31536000; SameSite=Lax`;
+    setPreferredLocaleCookie(locale);
     localStorage.removeItem("snipgeek-pending-notify");
     router.push(redirectedPathName(locale), { scroll: false });
   };
@@ -132,10 +134,7 @@ export function LanguageSwitcher({
           />
           <div className="flex items-center gap-0.5 w-full justify-between px-0.5">
             {i18n.locales.map((locale) => {
-              const tooltipKey = locale === "en" ? "languageEn" : "languageId";
-              const label =
-                (dictionary?.promptGenerator as any)?.tooltips?.[tooltipKey] ??
-                (locale === "en" ? "English" : "Indonesia");
+              const label = locale === "en" ? "English" : "Indonesia";
               const isActive = currentLocale === locale;
 
               return (

@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
@@ -47,7 +46,6 @@ import {
   BookOpen,
   ChevronsUpDown,
   CheckCircle2,
-  Tag,
 } from "lucide-react";
 import { downloadLinks } from "@/lib/data-downloads";
 import { useNotification } from "@/hooks/use-notification";
@@ -68,6 +66,43 @@ type ArticleSummary = {
   slug: string;
   title: string;
   type: "blog" | "note";
+};
+
+type ToolPromptsDictionary = {
+  title: string;
+  description: string;
+  copiedButton: string;
+  modes: {
+    create: string;
+    modify: string;
+  };
+  contentTypeBlog: string;
+  contentTypeNote: string;
+  selectArticleLabel: string;
+  searchArticlePlaceholder: string;
+  originalContentTitle: string;
+  draftTitle: string;
+  originalContentPlaceholder: string;
+  draftPlaceholder: string;
+  modInstructionsTitle: string;
+  modInstructionsPlaceholder: string;
+  imagesTitle: string;
+  imagesPlaceholder: string;
+  downloadLinks: {
+    title: string;
+    description: string;
+    addDownload: string;
+    selectId: string;
+    urlPlaceholder: string;
+    promptTitle: string;
+    promptInstruction: string;
+  };
+  quickActions: {
+    narrative: string;
+    images: string;
+    metadata: string;
+    polish: string;
+  };
 };
 
 // ──────────────────────────────────────────────────────────────────────────────
@@ -148,7 +183,7 @@ const generateUUID = (): string => {
 };
 
 interface ToolPromptsProps {
-  dictionary: any;
+  dictionary: ToolPromptsDictionary;
   existingArticles: ArticleSummary[];
   fullDictionary: Dictionary;
 }
@@ -342,7 +377,7 @@ export function ToolPrompts({
   const [isOutputVisible, setIsOutputVisible] = useState(true);
 
   // ── Category hint (optional — AI is free to create a new one) ──
-  const [categoryHint, setCategoryHint] = useState("");
+  const categoryHint = "";
 
   // ── Media / technical ──
   const [isTechnicalExpanded, setIsTechnicalExpanded] = useState(true);
@@ -391,6 +426,7 @@ export function ToolPrompts({
 
   // ── Persist feature flags ──
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
     const saved = localStorage.getItem("snipgeek-prompt-features");
     if (saved) {
@@ -402,7 +438,7 @@ export function ToolPrompts({
         setShowGallery(!!p.showGallery);
         setShowSpecs(!!p.showSpecs);
         setIsIdOnly(!!p.isIdOnly);
-      } catch (_) { }
+      } catch { }
     }
   }, []);
 
@@ -513,6 +549,7 @@ export function ToolPrompts({
     }
     prompt += `Ensure all metadata (slugs, translation keys, alt texts) are generated automatically and tags are standardized (one-word).`;
 
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setGeneratedPrompt(prompt);
   }, [
     mode,
@@ -532,6 +569,8 @@ export function ToolPrompts({
     showGrids,
     showGallery,
     showImages,
+    showSpecs,
+    specsMappings,
     selectedSlug,
     categoryHint,
   ]);
