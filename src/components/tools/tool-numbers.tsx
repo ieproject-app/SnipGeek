@@ -31,7 +31,7 @@ import {
     FileSpreadsheet
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { format, addMonths, startOfDay } from 'date-fns';
+import { format, addMonths } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { useToast } from '@/hooks/use-toast';
 import { useFirestore, useUser } from '@/firebase';
@@ -211,7 +211,8 @@ export function ToolNumbers({ dictionary }: { dictionary: Dictionary }) {
         if (!firestore || !user) return;
         setIsHistoryLoading(true);
         try {
-            const today = startOfDay(new Date());
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
             const todayStartISO = today.toISOString();
 
             const q = query(
