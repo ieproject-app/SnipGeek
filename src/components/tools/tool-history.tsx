@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Button } from '@/components/ui/button'
-import { getDictionary, type Dictionary } from '@/lib/get-dictionary'
+import { type Dictionary } from '@/lib/get-dictionary'
 import { parse, isValid } from 'date-fns'
 import { cn } from '@/lib/utils'
 import { Search, FileText, UserCheck, Plus, Trash2, Loader2, Copy, CheckCircle2, Database, AlertTriangle, Chrome } from 'lucide-react'
@@ -76,7 +76,7 @@ const tryParseDate = (text: string): Date | null => {
     try {
       const parsedDate = parse(text, format, new Date());
       if (isValid(parsedDate)) return parsedDate;
-    } catch (e) { }
+    } catch { }
   }
   return null;
 };
@@ -688,7 +688,7 @@ export function ToolHistory({
               </CardHeader>
               <CardContent className="p-6">
                 <div className="space-y-4">
-                  {docQueries.map((query, index) => (
+                  {docQueries.map((query) => (
                     <div key={query.id} className="flex flex-col md:flex-row items-end gap-4 p-5 border rounded-lg bg-background/30 relative group transition-all hover:border-primary/30 hover:bg-accent/5">
                       <div className="w-full md:flex-1 space-y-2">
                         <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">{t.docTypePlaceholder}</label>

@@ -28,7 +28,7 @@ export function AdminGuard({ children }: AdminGuardProps) {
   }, [firestore, user?.uid]);
 
   // Subscribe to the admin document
-  const { data: adminDoc, isLoading: isAdminLoading, error: adminError } = useDoc(adminDocRef);
+  const { data: adminDoc, isLoading: isAdminLoading } = useDoc(adminDocRef);
 
   useEffect(() => {
     // If auth is finished and no user, redirect to login

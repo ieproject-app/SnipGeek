@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import {
   useFirestore,
@@ -38,9 +38,39 @@ import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 
 interface PostEditorProps {
-  initialData?: any;
+  initialData?: Partial<Omit<PostFormData, "tags" | "locale">> & {
+    publishDate?: string;
+    tags?: string[];
+    locale?: string | string[];
+  };
   id?: string;
 }
+
+type PostImage = {
+  url: string;
+  alt: string;
+  path?: string;
+  mediaId?: string;
+};
+
+type PostFormData = {
+  title: string;
+  slug: string;
+  excerpt: string;
+  contentMdx: string;
+  heroImageUrl: string;
+  heroImageAltText: string;
+  isPublished: boolean;
+  featured: boolean;
+  category: string;
+  tags: string;
+  translationKey: string;
+  images: PostImage[];
+  locale: string;
+};
+
+const getErrorMessage = (error: unknown, fallback: string) =>
+  error instanceof Error ? error.message : fallback;
 
 export function PostEditor({ initialData, id }: PostEditorProps) {
   const db = useFirestore();
@@ -51,7 +81,7 @@ export function PostEditor({ initialData, id }: PostEditorProps) {
   const [isUploading, setIsUploading] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<PostFormData>({
     title: initialData?.title || "",
     slug: initialData?.slug || "",
     excerpt: initialData?.excerpt || "",
@@ -61,10 +91,15 @@ export function PostEditor({ initialData, id }: PostEditorProps) {
     isPublished: initialData?.isPublished ?? false,
     featured: initialData?.featured ?? false,
     category: initialData?.category || "",
-    tags: initialData?.tags?.join(", ") || "",
+    tags: Array.isArray(initialData?.tags) ? initialData.tags.join(", ") : "",
     translationKey: initialData?.translationKey || "",
     images: initialData?.images || [], // Array of {url, alt, path, mediaId}
-    locale: initialData?.locale || currentLocale || "en",
+    locale:
+      (typeof initialData?.locale === "string"
+        ? initialData.locale
+        : Array.isArray(currentLocale)
+          ? currentLocale[0]
+          : currentLocale) || "en",
   });
 
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -123,12 +158,12 @@ export function PostEditor({ initialData, id }: PostEditorProps) {
         title: "Berhasil!",
         description: `${files.length} gambar berhasil diunggah.`,
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Upload failed", error);
       toast({
         variant: "destructive",
         title: "Gagal Mengunggah",
-        description: error.message,
+        description: getErrorMessage(error, "Gagal mengunggah file."),
       });
     } finally {
       setIsUploading(false);
@@ -155,7 +190,7 @@ export function PostEditor({ initialData, id }: PostEditorProps) {
 
         // 3. Update local state
         const newImages = formData.images.filter(
-          (_: any, i: number) => i !== index,
+          (_img: PostImage, i: number) => i !== index,
         );
         setFormData((prev) => ({
           ...prev,
@@ -170,11 +205,11 @@ export function PostEditor({ initialData, id }: PostEditorProps) {
           title: "Gambar dihapus",
           description: "File telah dibersihkan dari server.",
         });
-      } catch (error: any) {
+      } catch (error: unknown) {
         toast({
           variant: "destructive",
           title: "Gagal menghapus file fisik",
-          description: error.message,
+          description: getErrorMessage(error, "Gagal menghapus file fisik."),
         });
       }
     }
@@ -369,7 +404,7 @@ export function PostEditor({ initialData, id }: PostEditorProps) {
                 </div>
 
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                  {formData.images.map((img: any, idx: number) => (
+                  {formData.images.map((img: PostImage, idx: number) => (
                     <div
                       key={idx}
                       className={cn(

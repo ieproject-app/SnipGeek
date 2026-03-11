@@ -14,7 +14,6 @@ function getPreferredLocale(request: NextRequest): Locale {
   const headers: Record<string, string> = {};
   request.headers.forEach((value, key) => (headers[key] = value));
 
-  // @ts-ignore Negotiator can handle the headers object
   const languages = new Negotiator({ headers }).languages();
 
   try {
@@ -23,7 +22,7 @@ function getPreferredLocale(request: NextRequest): Locale {
       [...i18n.locales],
       i18n.defaultLocale,
     ) as Locale;
-  } catch (e) {
+  } catch {
     // Fallback to default if there's an error
     return i18n.defaultLocale;
   }

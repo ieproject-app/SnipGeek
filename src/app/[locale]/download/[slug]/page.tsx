@@ -48,8 +48,6 @@ export default async function DownloadPage({
   }
 
   const dictionary = await getDictionary(locale);
-  // You might want to replace this with your actual site name from a config or env var
-  const siteName = "SnipGeek";
 
   return (
     <DownloadClient
