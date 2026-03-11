@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 import {
@@ -19,20 +18,34 @@ import {
   Cpu,
   Settings,
   FileText,
-  Maximize2,
   ExternalLink,
   Info,
   Lightbulb,
   TriangleAlert,
   ShieldAlert,
-  ChevronRight,
-  Layers,
 } from "lucide-react";
 import { WindowsStoreLogo } from "@/components/icons/windows-store-logo";
 import { downloadLinks } from "@/lib/data-downloads";
 import { ZoomableImage } from "./zoomable-image";
 import { SpecList, SpecItem } from "./mdx/spec-sheet";
 import { Expandable } from "./mdx/expandable";
+
+type MdxElementProps = {
+  children?: React.ReactNode;
+  class?: string;
+  className?: string;
+  parentName?: string;
+} & React.HTMLAttributes<HTMLElement>;
+
+type MdxStepProps = MdxElementProps & {
+  stepNumber?: React.ReactNode;
+  isLast?: boolean;
+};
+
+type MdxCalloutProps = MdxElementProps & {
+  title?: React.ReactNode;
+  variant?: CalloutVariant;
+};
 
 const extractText = (children: React.ReactNode): string => {
   return React.Children.toArray(children)
@@ -94,24 +107,25 @@ const getPlatformIcon = (platform?: string, className?: string) => {
 const CustomImage = ({
   class: _class,
   className,
-  parentName,
+  src,
+  alt,
   priority,
   ...props
-}: any) => {
-  if (!props.src || typeof props.src !== "string" || props.src.trim() === "") {
+}: MdxElementProps & { src?: string; alt?: string; priority?: boolean }) => {
+  if (!src || typeof src !== "string" || src.trim() === "") {
     return null;
   }
 
-  let src = props.src;
-  if (src.startsWith("public/")) {
-    src = src.replace("public/", "/");
+  let normalizedSrc = src;
+  if (normalizedSrc.startsWith("public/")) {
+    normalizedSrc = normalizedSrc.replace("public/", "/");
   }
 
   return (
     <span className="block relative my-8 w-full">
       <ZoomableImage
-        src={src}
-        alt={props.alt}
+        src={normalizedSrc as string}
+        alt={alt ?? ""}
         className={cn(_class, className)}
         priority={priority}
         {...props}
@@ -179,9 +193,8 @@ export const ImageGrid = ({
   columns = 2,
   class: _class,
   className,
-  parentName,
   ...props
-}: any) => {
+}: MdxElementProps & { columns?: number | string }) => {
   const cols = Number(columns);
   const gridCols =
     {
@@ -211,9 +224,8 @@ export const Gallery = ({
   caption,
   class: _class,
   className,
-  parentName,
   ...props
-}: any) => {
+}: MdxElementProps & { caption?: React.ReactNode }) => {
   return (
     <div
       className={cn(
@@ -239,9 +251,8 @@ const MdxH1 = ({
   children,
   class: _class,
   className,
-  parentName,
   ...props
-}: any) => (
+}: MdxElementProps) => (
   <h1
     id={generateId(children)}
     className={cn(
@@ -259,9 +270,8 @@ const MdxH2 = ({
   children,
   class: _class,
   className,
-  parentName,
   ...props
-}: any) => (
+}: MdxElementProps) => (
   <div className="mt-14 mb-6 text-left">
     <h2
       id={generateId(children)}
@@ -282,9 +292,8 @@ const MdxH3 = ({
   children,
   class: _class,
   className,
-  parentName,
   ...props
-}: any) => (
+}: MdxElementProps) => (
   <h3
     id={generateId(children)}
     className={cn(
@@ -301,9 +310,8 @@ const MdxH4 = ({
   children,
   class: _class,
   className,
-  parentName,
   ...props
-}: any) => (
+}: MdxElementProps) => (
   <h4
     id={generateId(children)}
     className={cn(
@@ -321,9 +329,8 @@ const MdxP = ({
   children,
   class: _class,
   className,
-  parentName,
   ...props
-}: any) => (
+}: MdxElementProps) => (
   <span className={cn("block leading-7 my-6", _class, className)} {...props}>
     {children}
   </span>
@@ -332,7 +339,6 @@ const MdxP = ({
 const MdxA = ({
   class: _class,
   className,
-  parentName,
   href,
   children,
   ...props
@@ -390,9 +396,8 @@ const MdxUl = ({
   children,
   class: _class,
   className,
-  parentName,
   ...props
-}: any) => (
+}: MdxElementProps) => (
   <ul
     className={cn("my-6 ml-6 list-disc [&>li]:mt-2", _class, className)}
     {...props}
@@ -404,9 +409,8 @@ const MdxOl = ({
   children,
   class: _class,
   className,
-  parentName,
   ...props
-}: any) => (
+}: MdxElementProps) => (
   <ol
     className={cn("my-6 ml-6 list-decimal [&>li]:mt-2", _class, className)}
     {...props}
@@ -418,20 +422,8 @@ const MdxAItem = ({
   children,
   class: _class,
   className,
-  parentName,
   ...props
-}: any) => (
-  <li className={cn(_class, className)} {...props}>
-    {children}
-  </li>
-);
-const MdxAItemOl = ({
-  children,
-  class: _class,
-  className,
-  parentName,
-  ...props
-}: any) => (
+}: MdxElementProps) => (
   <li className={cn(_class, className)} {...props}>
     {children}
   </li>
@@ -440,9 +432,8 @@ const MdxBlockquote = ({
   children,
   class: _class,
   className,
-  parentName,
   ...props
-}: any) => (
+}: MdxElementProps) => (
   <blockquote
     className={cn(
       "my-8 rounded-r-2xl border-l-4 border-primary/30 bg-primary/5 px-5 py-4 italic text-foreground/75 [&>*:first-child]:mt-0 [&>*:last-child]:mb-0",
@@ -459,10 +450,9 @@ const MdxPre = ({
   children,
   className,
   class: _class,
-  parentName,
   style,
   ...props
-}: any) => (
+}: MdxElementProps & { style?: React.CSSProperties }) => (
   <pre
     className={cn(
       "rounded-lg p-6 my-6 overflow-x-auto border border-primary/5 text-[13px] leading-relaxed font-mono",
@@ -477,7 +467,7 @@ const MdxPre = ({
   </pre>
 );
 
-const MdxHr = ({ class: _class, className, parentName, ...props }: any) => (
+const MdxHr = ({ class: _class, className, ...props }: MdxElementProps) => (
   <hr
     className={cn(
       "my-10 border-0 h-px bg-gradient-to-r from-transparent via-accent/40 to-transparent",
@@ -492,9 +482,8 @@ const MdxStrong = ({
   children,
   class: _class,
   className,
-  parentName,
   ...props
-}: any) => (
+}: MdxElementProps) => (
   <strong
     className={cn("font-extrabold text-foreground", _class, className)}
     {...props}
@@ -507,9 +496,8 @@ const MdxEm = ({
   children,
   class: _class,
   className,
-  parentName,
   ...props
-}: any) => (
+}: MdxElementProps) => (
   <em className={cn("italic text-foreground/85", _class, className)} {...props}>
     {children}
   </em>
@@ -519,9 +507,8 @@ const MdxCode = ({
   children,
   class: _class,
   className,
-  parentName,
   ...props
-}: any) => (
+}: MdxElementProps) => (
   <code
     className={cn(
       "rounded-md bg-muted px-1.5 py-0.5 font-mono text-[0.85em] font-semibold text-foreground/85",
@@ -538,9 +525,8 @@ export const Kbd = ({
   children,
   class: _class,
   className,
-  parentName,
   ...props
-}: any) => (
+}: MdxElementProps) => (
   <kbd
     className={cn(
       "inline-flex min-h-6 items-center rounded-md border border-border bg-background px-2 py-0.5 font-mono text-[0.78rem] font-bold text-foreground shadow-sm",
@@ -596,9 +582,8 @@ export const Callout = ({
   variant = "info",
   class: _class,
   className,
-  parentName,
   ...props
-}: any) => {
+}: MdxCalloutProps) => {
   const config = calloutConfig[variant as CalloutVariant] ?? calloutConfig.info;
   const Icon = config.icon;
 
@@ -629,9 +614,8 @@ export const Steps = ({
   children,
   class: _class,
   className,
-  parentName,
   ...props
-}: any) => {
+}: MdxElementProps) => {
   const items = React.Children.toArray(children);
 
   return (
@@ -641,10 +625,13 @@ export const Steps = ({
           return child;
         }
 
-        return React.cloneElement(child as React.ReactElement<any>, {
+        return React.cloneElement(
+          child as React.ReactElement<{ stepNumber?: number; isLast?: boolean }>,
+          {
           stepNumber: index + 1,
           isLast: index === items.length - 1,
-        });
+          },
+        );
       })}
     </div>
   );
@@ -656,9 +643,8 @@ export const Step = ({
   isLast,
   class: _class,
   className,
-  parentName,
   ...props
-}: any) => (
+}: MdxStepProps) => (
   <div
     className={cn(
       "relative grid grid-cols-[auto_1fr] gap-x-6 gap-y-0 pb-6",
@@ -705,8 +691,8 @@ export const mdxComponents = {
   li: MdxAItem,
   blockquote: MdxBlockquote,
   img: CustomImage,
-  table: (props: any) => {
-    const { class: _class, parentName, ...rest } = props;
+  table: (props: MdxElementProps) => {
+    const { ...rest } = props;
     return (
       <span className="block my-6 overflow-x-auto">
         <Table {...rest} />
@@ -724,7 +710,7 @@ export const mdxComponents = {
   em: MdxEm,
   code: MdxCode,
   kbd: Kbd,
-  details: ({ children, className, ...props }: any) => (
+  details: ({ children, className, ...props }: MdxElementProps) => (
     <details
       className={cn(
         "my-6 rounded-xl border border-primary/10 bg-muted/20 p-4",
@@ -735,7 +721,7 @@ export const mdxComponents = {
       {children}
     </details>
   ),
-  summary: ({ children, className, ...props }: any) => (
+  summary: ({ children, className, ...props }: MdxElementProps) => (
     <summary
       className={cn(
         "font-display cursor-pointer font-bold transition-colors hover:text-accent",
@@ -756,3 +742,9 @@ export const mdxComponents = {
   Steps,
   Step,
 };
+
+
+
+
+
+

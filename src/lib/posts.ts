@@ -18,7 +18,7 @@ export type PostFrontmatter = {
   tags?: string[];
   category?: string;
   authorId?: string;
-  [key: string]: any;
+  [key: string]: unknown;
 };
 
 export type Post<TFrontmatter> = {
@@ -65,7 +65,7 @@ export async function getSortedPostsData(
           frontmatter: data as PostFrontmatter,
           locale: targetLocale!,
         };
-      } catch (e) {
+      } catch {
         return null;
       }
     })
@@ -117,7 +117,7 @@ export async function getDraftPostsData(
   let fileNames: string[];
   try {
     fileNames = fs.readdirSync(localeDirectory);
-  } catch (err) {
+  } catch {
     return [];
   }
 
@@ -139,7 +139,7 @@ export async function getDraftPostsData(
           frontmatter: data as PostFrontmatter,
           locale: targetLocale!,
         };
-      } catch (e) {
+      } catch {
         return null;
       }
     })
@@ -203,7 +203,7 @@ export async function getPostData(
       locale: resolvedPath.locale,
       isFallback: resolvedPath.locale !== targetLocale,
     };
-  } catch (e) {
+  } catch {
     return null;
   }
 }
@@ -219,7 +219,7 @@ export async function getAllPostSlugs(locale?: string) {
   let fileNames: string[];
   try {
     fileNames = fs.readdirSync(localeDirectory);
-  } catch (err) {
+  } catch {
     return [];
   }
 
@@ -236,7 +236,7 @@ export async function getAllPostSlugs(locale?: string) {
           };
         }
         return null;
-      } catch (e) {
+      } catch {
         return null;
       }
     })
@@ -262,7 +262,7 @@ export async function getAllLocales() {
       .filter((item) =>
         fs.statSync(path.join(postsDirectory, item)).isDirectory(),
       );
-  } catch (error) {
+  } catch {
     return [];
   }
 }
@@ -286,7 +286,7 @@ export async function getAllTranslationsMap(): Promise<TranslationsMap> {
     let fileNames: string[];
     try {
       fileNames = fs.readdirSync(localeDirectory);
-    } catch (err) {
+    } catch {
       continue;
     }
 
@@ -311,7 +311,7 @@ export async function getAllTranslationsMap(): Promise<TranslationsMap> {
         if (!existing) {
           translationsMap[key].push({ locale, slug });
         }
-      } catch (e) {}
+      } catch {}
     }
   }
   return translationsMap;

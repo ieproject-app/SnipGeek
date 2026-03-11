@@ -14,7 +14,9 @@ export type NoteFrontmatter = {
   published?: boolean;
   tags?: string[];
   authorId?: string;
-  [key: string]: any;
+  heroImage?: string;
+  category?: string;
+  [key: string]: string | number | boolean | string[] | null | undefined;
 };
 
 export type Note<TFrontmatter> = {
@@ -38,7 +40,7 @@ export async function getSortedNotesData(
   let fileNames: string[];
   try {
     fileNames = fs.readdirSync(localeDirectory);
-  } catch (err) {
+  } catch {
     return [];
   }
 
@@ -61,7 +63,7 @@ export async function getSortedNotesData(
           frontmatter: data as NoteFrontmatter,
           locale: targetLocale!,
         };
-      } catch (e) {
+      } catch {
         return null;
       }
     })
@@ -90,7 +92,7 @@ export async function getDraftNotesData(
   let fileNames: string[];
   try {
     fileNames = fs.readdirSync(localeDirectory);
-  } catch (err) {
+  } catch {
     return [];
   }
 
@@ -113,7 +115,7 @@ export async function getDraftNotesData(
           frontmatter: data as NoteFrontmatter,
           locale: targetLocale!,
         };
-      } catch (e) {
+      } catch {
         return null;
       }
     })
@@ -172,7 +174,7 @@ export async function getNoteData(
       locale: resolvedPath.locale,
       isFallback: resolvedPath.locale !== targetLocale,
     };
-  } catch (e) {
+  } catch {
     return null;
   }
 }
@@ -188,7 +190,7 @@ export async function getAllNoteSlugs(locale?: string) {
   let fileNames: string[];
   try {
     fileNames = fs.readdirSync(localeDirectory);
-  } catch (err) {
+  } catch {
     return [];
   }
 
@@ -205,7 +207,7 @@ export async function getAllNoteSlugs(locale?: string) {
           };
         }
         return null;
-      } catch (e) {
+      } catch {
         return null;
       }
     })
@@ -220,7 +222,7 @@ export async function getAllLocales() {
       .filter((item) =>
         fs.statSync(path.join(notesDirectory, item)).isDirectory(),
       );
-  } catch (error) {
+  } catch {
     return [];
   }
 }
@@ -255,7 +257,7 @@ export async function getAllNotesTranslationsMap(): Promise<NotesTranslationsMap
     let fileNames: string[];
     try {
       fileNames = fs.readdirSync(localeDirectory);
-    } catch (err) {
+    } catch {
       continue;
     }
 
@@ -282,8 +284,9 @@ export async function getAllNotesTranslationsMap(): Promise<NotesTranslationsMap
         if (!existing) {
           translationsMap[key].push({ locale, slug });
         }
-      } catch (e) {}
+      } catch {}
     }
   }
   return translationsMap;
 }
+
