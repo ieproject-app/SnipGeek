@@ -21,12 +21,21 @@ export async function generateMetadata({
     const dictionary = await getDictionary(locale);
     const currentPrefix = locale === i18n.defaultLocale ? "" : `/${locale}`;
     const canonicalPath = `${currentPrefix}/tags`;
+    const languages: Record<string, string> = {};
+    i18n.locales.forEach((loc) => {
+        const prefix = loc === i18n.defaultLocale ? "" : `/${loc}`;
+        languages[loc] = `${prefix}/tags`;
+    });
 
     return {
         title: dictionary.tags.allTagsTitle,
         description: dictionary.tags.allTagsDescription,
         alternates: {
             canonical: canonicalPath,
+            languages: {
+                ...languages,
+                "x-default": languages[i18n.defaultLocale] || canonicalPath,
+            },
         },
     };
 }

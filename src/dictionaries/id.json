@@ -155,6 +155,13 @@
     "noResults": "Tidak ada hasil yang ditemukan untuk",
     "resultsFound": "hasil ditemukan"
   },
+  "localeSuggestion": {
+    "title": "Lebih nyaman membaca dalam Bahasa Indonesia?",
+    "description": "Kami mendeteksi browser Anda memakai preferensi bahasa Indonesia. Pindah ke versi Indonesia untuk navigasi dan konten yang lebih sesuai.",
+    "switch": "Pindah ke Bahasa Indonesia",
+    "stay": "Tetap di English",
+    "dismiss": "Tutup saran bahasa"
+  },
   "post": {
     "by": "Oleh",
     "readingTime": "{minutes} mnt baca",

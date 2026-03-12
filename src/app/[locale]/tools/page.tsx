@@ -32,9 +32,24 @@ type ToolCardConfig = {
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
   const dictionary = await getDictionary(locale as Locale);
+  const canonicalPath =
+    locale === i18n.defaultLocale ? "/tools" : `/${locale}/tools`;
+  const languages: Record<string, string> = {};
+  i18n.locales.forEach((loc) => {
+    const prefix = loc === i18n.defaultLocale ? "" : `/${loc}`;
+    languages[loc] = `${prefix}/tools`;
+  });
+
   return {
     title: dictionary.tools.title,
     description: dictionary.tools.description,
+    alternates: {
+      canonical: canonicalPath,
+      languages: {
+        ...languages,
+        "x-default": languages[i18n.defaultLocale] || canonicalPath,
+      },
+    },
   };
 }
 

@@ -155,6 +155,13 @@
     "noResults": "No results found for",
     "resultsFound": "results found"
   },
+  "localeSuggestion": {
+    "title": "Prefer reading in Bahasa Indonesia?",
+    "description": "We detected your browser prefers Indonesian. Switch to the Indonesian version for localized content and navigation.",
+    "switch": "Switch to Indonesian",
+    "stay": "Stay in English",
+    "dismiss": "Dismiss language suggestion"
+  },
   "post": {
     "by": "By",
     "readingTime": "{minutes} min read",

@@ -1,8 +1,7 @@
-
 import { Metadata } from 'next';
 import { ToolNumbers } from '@/components/tools/tool-numbers';
 import { getDictionary } from '@/lib/get-dictionary';
-import { Locale } from '@/i18n-config';
+import { i18n, Locale } from '@/i18n-config';
 
 export async function generateMetadata({
   params,
@@ -12,12 +11,16 @@ export async function generateMetadata({
   const { locale } = await params;
   const dictionary = await getDictionary(locale);
   const pageContent = dictionary.tools.tool_list.number_generator;
+  const canonicalPath =
+    locale === i18n.defaultLocale
+      ? '/tools/number-generator'
+      : `/${locale}/tools/number-generator`;
 
   return {
     title: pageContent.title,
     description: pageContent.description,
     alternates: {
-      canonical: '/tools/number-generator',
+      canonical: canonicalPath,
     },
     robots: {
       index: false,

@@ -26,6 +26,7 @@ import {
 import { cn } from "@/lib/utils";
 import Script from "next/script";
 import { FirebaseProviderWrapper } from "@/components/layout/firebase-provider-wrapper";
+import { LocaleSuggestionBanner } from "@/components/layout/locale-suggestion-banner";
 
 const fontDisplay = Bricolage_Grotesque({
   subsets: ["latin"],
@@ -55,86 +56,104 @@ const fontMono = JetBrains_Mono({
   display: "swap",
 });
 
-export const metadata: Metadata = {
-  metadataBase: new URL("https://snipgeek.com"),
-  title: {
-    default: "SnipGeek - A Modern Minimalist Tech Blog",
-    template: "%s | SnipGeek",
-  },
-  description:
-    "A modern minimalist tech blog for geeks, exploring software, hardware, and IT automation.",
-  keywords: [
-    "Tech Blog",
-    "Next.js",
-    "Programming",
-    "Windows",
-    "Web Development",
-    "Tutorials",
-    "SnipGeek",
-  ],
-  authors: [{ name: "Iwan Efendi" }],
-  creator: "Iwan Efendi",
-  publisher: "SnipGeek",
-  icons: {
-    icon: [
-      {
-        url: "/images/logo/favicon-96x96.png",
-        sizes: "96x96",
-        type: "image/png",
-      },
-      { url: "/images/logo/favicon.svg", type: "image/svg+xml" },
-    ],
-    shortcut: "/images/logo/favicon.ico",
-    apple: "/images/logo/apple-touch-icon.png",
-  },
-  manifest: "/images/logo/site.webmanifest",
-  alternates: {
-    canonical: "/",
-    languages: {
-      en: "/",
-      id: "/id",
+const openGraphLocaleMap: Record<Locale, string> = {
+  en: "en_US",
+  id: "id_ID",
+};
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: Locale }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const canonicalPath = locale === i18n.defaultLocale ? "/" : `/${locale}`;
+  const dictionary = await getDictionary(locale);
+  const homepageTitle =
+    dictionary.home.title || "SnipGeek - A Modern Minimalist Tech Blog";
+  const homepageDescription =
+    dictionary.home.description ||
+    "A modern minimalist tech blog for geeks, exploring software, hardware, and IT automation.";
+
+  return {
+    metadataBase: new URL("https://snipgeek.com"),
+    title: {
+      default: "SnipGeek - A Modern Minimalist Tech Blog",
+      template: "%s | SnipGeek",
     },
-  },
-  openGraph: {
-    type: "website",
-    locale: "en_US",
-    url: "https://snipgeek.com",
-    siteName: "SnipGeek",
-    title: "SnipGeek - A Modern Minimalist Tech Blog",
-    description:
-      "A modern minimalist tech blog for geeks, exploring software, hardware, and IT automation.",
-    images: [
-      {
-        url: "/images/footer/about.webp",
-        width: 1200,
-        height: 630,
-        alt: "SnipGeek - Modern Tech Insights",
-      },
+    description: homepageDescription,
+    keywords: [
+      "Tech Blog",
+      "Next.js",
+      "Programming",
+      "Windows",
+      "Web Development",
+      "Tutorials",
+      "SnipGeek",
     ],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "SnipGeek - A Modern Minimalist Tech Blog",
-    description:
-      "A modern minimalist tech blog for geeks, exploring software, hardware, and IT automation.",
-    images: ["/images/footer/about.webp"],
-    creator: "@iwnefnd",
-  },
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: {
+    authors: [{ name: "Iwan Efendi" }],
+    creator: "Iwan Efendi",
+    publisher: "SnipGeek",
+    icons: {
+      icon: [
+        {
+          url: "/images/logo/favicon-96x96.png",
+          sizes: "96x96",
+          type: "image/png",
+        },
+        { url: "/images/logo/favicon.svg", type: "image/svg+xml" },
+      ],
+      shortcut: "/images/logo/favicon.ico",
+      apple: "/images/logo/apple-touch-icon.png",
+    },
+    manifest: "/images/logo/site.webmanifest",
+    alternates: {
+      canonical: canonicalPath,
+      languages: {
+        en: "/",
+        id: "/id",
+        "x-default": "/",
+      },
+    },
+    openGraph: {
+      type: "website",
+      locale: openGraphLocaleMap[locale],
+      url: `https://snipgeek.com${canonicalPath === "/" ? "" : canonicalPath}`,
+      siteName: "SnipGeek",
+      title: homepageTitle,
+      description: homepageDescription,
+      images: [
+        {
+          url: "/images/footer/about.webp",
+          width: 1200,
+          height: 630,
+          alt: "SnipGeek - Modern Tech Insights",
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: homepageTitle,
+      description: homepageDescription,
+      images: ["/images/footer/about.webp"],
+      creator: "@iwnefnd",
+    },
+    robots: {
       index: true,
       follow: true,
-      "max-video-preview": -1,
-      "max-image-preview": "large",
-      "max-snippet": -1,
+      googleBot: {
+        index: true,
+        follow: true,
+        "max-video-preview": -1,
+        "max-image-preview": "large",
+        "max-snippet": -1,
+      },
     },
-  },
-  other: {
-    "google-adsense-account": "ca-pub-6235611333449307",
-  },
-};
+    other: {
+      "google-adsense-account": "ca-pub-6235611333449307",
+    },
+  };
+}
 
 export async function generateStaticParams() {
   return i18n.locales.map((locale) => ({ locale }));
@@ -206,6 +225,11 @@ export default async function LocaleLayout({
                 <LayoutHeader
                   searchableData={searchableData}
                   dictionary={dictionary}
+                />
+                <LocaleSuggestionBanner
+                  locale={locale}
+                  dictionary={dictionary}
+                  translationsMap={translationsMap}
                 />
                 <main className="pt-16">{children}</main>
                 <LayoutFooter
