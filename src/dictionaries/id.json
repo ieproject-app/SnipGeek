@@ -89,6 +89,10 @@
       "number_generator": {
         "title": "Generator Nomor",
         "description": "Menghasilkan nomor urut unik untuk keperluan pelacakan internal."
+      },
+      "spin_wheel": {
+        "title": "Spin Wheel",
+        "description": "Roda putar interaktif untuk pengacakan. Masukkan daftar nama, putar, dan dapatkan pemenang secara acak. Tersedia mode raffle, template, dan efek suara."
       }
     },
     "systemNotReady": {
@@ -175,10 +179,7 @@
     "inYourList": "dalam daftar baca Anda",
     "empty": "Daftar baca Anda kosong. Simpan artikel untuk membacanya nanti."
   },
-  "drafts": {
-    "title": "Draf",
-    "noDrafts": "Tidak ada draf dalam kategori ini."
-  },
+
   "downloadGate": {
     "title": "Mempersiapkan Unduhan Anda",
     "fileSizeLabel": "Ukuran:",

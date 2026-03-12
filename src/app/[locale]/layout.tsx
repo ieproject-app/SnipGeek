@@ -5,12 +5,10 @@ import { i18n, type Locale } from "@/i18n-config";
 import {
   getAllTranslationsMap as getAllPostTranslationsMap,
   getSortedPostsData,
-  getDraftPostsData,
 } from "@/lib/posts";
 import {
   getAllNotesTranslationsMap,
   getSortedNotesData,
-  getDraftNotesData,
 } from "@/lib/notes";
 import "../globals.css";
 import type { Metadata } from "next";
@@ -18,7 +16,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { ReadingListProvider } from "@/hooks/use-reading-list";
 import { NotificationProvider } from "@/hooks/use-notification";
 import { getDictionary } from "@/lib/get-dictionary";
-import { DraftList } from "@/components/layout/draft-list";
+
 import {
   Bricolage_Grotesque,
   Plus_Jakarta_Sans,
@@ -180,8 +178,6 @@ export default async function LocaleLayout({
 
   const searchableData = [...searchablePosts, ...searchableNotes];
   const dictionary = await getDictionary(locale as Locale);
-  const draftPosts = await getDraftPostsData(locale);
-  const draftNotes = await getDraftNotesData(locale);
 
   return (
     <html
@@ -218,11 +214,7 @@ export default async function LocaleLayout({
                   translationsMap={translationsMap}
                 />
                 <BackToTop />
-                <DraftList
-                  draftPosts={draftPosts}
-                  draftNotes={draftNotes}
-                  dictionary={dictionary}
-                />
+
               </ReadingListProvider>
             </NotificationProvider>
           </ThemeProvider>

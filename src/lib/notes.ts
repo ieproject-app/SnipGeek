@@ -79,57 +79,6 @@ export async function getSortedNotesData(
   });
 }
 
-export async function getDraftNotesData(
-  locale?: string,
-): Promise<Note<NoteFrontmatter>[]> {
-  const targetLocale = i18n.locales.includes(locale as Locale)
-    ? locale
-    : i18n.defaultLocale;
-  const localeDirectory = path.join(notesDirectory, targetLocale!);
-
-  if (!fs.existsSync(localeDirectory)) return [];
-
-  let fileNames: string[];
-  try {
-    fileNames = fs.readdirSync(localeDirectory);
-  } catch {
-    return [];
-  }
-
-  const allNotesData = fileNames
-    .filter((fileName) => fileName.endsWith(".mdx"))
-    .map((fileName) => {
-      const slug = fileName.replace(/\.mdx$/, "");
-      const fullPath = path.join(localeDirectory, fileName);
-      try {
-        const fileContents = fs.readFileSync(fullPath, "utf8");
-        const { data } = matter(fileContents);
-
-        // Return null for invalid/empty files
-        if (!data.title || !data.date) {
-          return null;
-        }
-
-        return {
-          slug,
-          frontmatter: data as NoteFrontmatter,
-          locale: targetLocale!,
-        };
-      } catch {
-        return null;
-      }
-    })
-    .filter((note): note is Note<NoteFrontmatter> => note !== null)
-    .filter((note) => note.frontmatter.published !== true); // Only show drafts
-
-  return allNotesData.sort((a, b) => {
-    if (new Date(a.frontmatter.date) < new Date(b.frontmatter.date)) {
-      return 1;
-    } else {
-      return -1;
-    }
-  });
-}
 
 export type NoteData = {
   slug: string;

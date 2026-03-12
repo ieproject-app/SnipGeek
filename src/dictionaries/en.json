@@ -89,6 +89,10 @@
       "number_generator": {
         "title": "Number Generator",
         "description": "Generate unique sequential numbers for internal tracking purposes."
+      },
+      "spin_wheel": {
+        "title": "Spin Wheel",
+        "description": "An interactive randomizer wheel. Add any list of entries and spin to pick a winner. Includes raffle mode, templates, and sound effects."
       }
     },
     "systemNotReady": {
@@ -175,10 +179,7 @@
     "inYourList": "in your reading list",
     "empty": "Your reading list is empty. Save articles to read them later."
   },
-  "drafts": {
-    "title": "Drafts",
-    "noDrafts": "No drafts in this category."
-  },
+
   "downloadGate": {
     "title": "Preparing Your Download",
     "fileSizeLabel": "Size:",

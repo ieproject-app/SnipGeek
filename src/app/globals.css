@@ -1,6 +1,6 @@
 @import "tailwindcss";
-@plugin "../../node_modules/tailwindcss-animate/index.js";
-@plugin "../../node_modules/@tailwindcss/typography/src/index.js";
+@plugin "tailwindcss-animate";
+@plugin "@tailwindcss/typography";
 
 @theme {
     /* ── Font Families ────────────────────────────── */

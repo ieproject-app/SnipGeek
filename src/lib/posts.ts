@@ -104,56 +104,6 @@ export async function getSortedPostsData(
   });
 }
 
-export async function getDraftPostsData(
-  locale?: string,
-): Promise<Post<PostFrontmatter>[]> {
-  const targetLocale = i18n.locales.includes(locale as Locale)
-    ? locale
-    : i18n.defaultLocale;
-  const localeDirectory = path.join(postsDirectory, targetLocale!);
-
-  if (!fs.existsSync(localeDirectory)) return [];
-
-  let fileNames: string[];
-  try {
-    fileNames = fs.readdirSync(localeDirectory);
-  } catch {
-    return [];
-  }
-
-  const allPostsData = fileNames
-    .filter((fileName) => fileName.endsWith(".mdx"))
-    .map((fileName) => {
-      const slug = fileName.replace(/\.mdx$/, "");
-      const fullPath = path.join(localeDirectory, fileName);
-      try {
-        const fileContents = fs.readFileSync(fullPath, "utf8");
-        const { data } = matter(fileContents);
-
-        if (!data.heroImage) {
-          data.heroImage = "footer-about";
-        }
-
-        return {
-          slug,
-          frontmatter: data as PostFrontmatter,
-          locale: targetLocale!,
-        };
-      } catch {
-        return null;
-      }
-    })
-    .filter((p): p is Post<PostFrontmatter> => p !== null)
-    .filter((post) => post.frontmatter.published !== true);
-
-  return allPostsData.sort((a, b) => {
-    if (new Date(a.frontmatter.date) < new Date(b.frontmatter.date)) {
-      return 1;
-    } else {
-      return -1;
-    }
-  });
-}
 
 export type PostData = {
   slug: string;

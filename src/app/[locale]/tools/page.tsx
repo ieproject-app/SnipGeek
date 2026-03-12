@@ -12,7 +12,8 @@ import {
   ClipboardPenLine,
   Lock,
   Globe,
-  ArrowUpRight
+  ArrowUpRight,
+  Dices
 } from 'lucide-react';
 import React from 'react';
 import Link from 'next/link';
@@ -80,6 +81,14 @@ export default async function ToolsPage({ params }: { params: Promise<{ locale: 
       icon: <Hash className="h-8 w-8" />,
       isLink: true,
       href: `${linkPrefix}/tools/number-generator`,
+      badge: pageContent.open_tool,
+      badgeVariant: 'secondary' as const,
+    },
+    {
+      id: 'spin_wheel',
+      icon: <Dices className="h-8 w-8" />,
+      isLink: true,
+      href: `${linkPrefix}/tools/spin-wheel`,
       badge: pageContent.open_tool,
       badgeVariant: 'secondary' as const,
     },
