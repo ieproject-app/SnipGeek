@@ -95,7 +95,7 @@ export function ArticleTOC({
         )}
       >
         <div className="mx-4 border-t border-primary/5" />
-        <ul className="space-y-1 p-5 text-sm">
+        <ul className="space-y-1 p-5 text-sm max-h-[50vh] overflow-y-auto overscroll-contain [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-primary/20 hover:[&::-webkit-scrollbar-thumb]:bg-primary/40">
           {headings.map((heading) => {
             return (
               <li
