@@ -2,7 +2,6 @@
 
 import * as React from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import {
   Carousel,
   CarouselContent,
@@ -16,6 +15,7 @@ import type { Dictionary } from '@/lib/get-dictionary';
 import { CategoryBadge } from '@/components/layout/category-badge';
 
 import { ScrollReveal } from '@/components/ui/scroll-reveal';
+import { RevealImage } from '@/components/ui/reveal-image';
 
 interface SliderPost {
   slug: string;
@@ -100,12 +100,16 @@ export function HomeTutorials({ posts, title, viewMoreText, dictionary, locale, 
                       <Link href={`${linkPrefix}/blog/${post.slug}`} className="block h-full group">
                         {/* Image container - Changed to aspect 4:3 */}
                         <div className="relative aspect-[4/3] overflow-hidden z-10 rounded-t-lg">
-                          <Image
+                          <RevealImage
                             src={heroImageSrc}
                             alt={post.frontmatter.imageAlt || post.frontmatter.title}
                             fill
-                            className="object-cover transition-transform duration-700 group-hover:scale-110"
+                            className="transition-transform duration-700 group-hover:scale-110"
+                            wrapperClassName="absolute inset-0"
                             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 33vw, 300px"
+                            holdUntilLoaded
+                            initialVisitOnly
+                            showSkeleton
                             data-ai-hint={heroImageHint}
                           />
                           <AddToReadingListButton

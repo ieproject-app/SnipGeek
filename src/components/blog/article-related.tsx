@@ -2,13 +2,13 @@
 
 import React, { useMemo } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { AddToReadingListButton } from "@/components/layout/add-to-reading-list-button";
 import { StickyNote } from "lucide-react";
 import { formatRelativeTime } from "@/lib/utils";
 import { CategoryBadge } from "@/components/layout/category-badge";
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
+import { RevealImage } from "@/components/ui/reveal-image";
 import type { Dictionary } from "@/lib/get-dictionary";
 
 type RelatedContentItem = {
@@ -128,12 +128,15 @@ export function ArticleRelated({
           <Link href={readingListItem.href} className="block">
             <div className="relative w-full aspect-[4/3] overflow-hidden rounded-xl mb-4 shadow-sm border border-primary/5 bg-primary/5 flex items-center justify-center">
               {heroImageSrc ? (
-                <Image
+                <RevealImage
                   src={heroImageSrc}
                   alt={item.frontmatter.imageAlt || item.frontmatter.title}
                   fill
-                  className="object-cover transition-transform duration-700 group-hover:scale-110"
+                  className="transition-transform duration-700 group-hover:scale-110"
+                  wrapperClassName="absolute inset-0"
                   sizes="(max-width: 768px) 100vw, 300px"
+                  holdUntilLoaded
+                  showSkeleton
                   data-ai-hint={heroImageHint}
                 />
               ) : (

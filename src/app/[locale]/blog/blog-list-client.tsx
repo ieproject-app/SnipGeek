@@ -2,12 +2,12 @@
 
 import React, { useMemo, useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { formatRelativeTime } from "@/lib/utils";
 import { AddToReadingListButton } from "@/components/layout/add-to-reading-list-button";
 import { CategoryBadge } from "@/components/layout/category-badge";
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
+import { RevealImage } from "@/components/ui/reveal-image";
 import { Button } from "@/components/ui/button";
 import { ChevronDown } from "lucide-react";
 import type { Post, PostFrontmatter } from "@/lib/posts";
@@ -98,15 +98,18 @@ export function BlogListClient({
                   >
                     <div className="relative w-full aspect-[4/3] overflow-hidden rounded-xl mb-4 shadow-sm transition-all duration-500 border border-primary/5">
                       {heroImageSrc && (
-                        <Image
+                        <RevealImage
                           src={heroImageSrc}
                           alt={
                             post.frontmatter.imageAlt || post.frontmatter.title
                           }
                           fill
-                          className="object-cover transition-transform duration-700 group-hover:scale-110"
+                          className="transition-transform duration-700 group-hover:scale-110"
+                          wrapperClassName="absolute inset-0"
                           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 33vw, 300px"
                           priority={index < 3}
+                          holdUntilLoaded={index < 3}
+                          showSkeleton
                           data-ai-hint={heroImageHint}
                         />
                       )}

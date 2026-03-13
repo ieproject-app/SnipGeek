@@ -1,0 +1,353 @@
+---
+title: "Cara Mengatasi Git Commit dan Push yang Gagal"
+slug: "fix-git-commit-and-push-failed-errors"
+date: "2026-03-13"
+description: "Catatan teknis praktis tentang penyebab Git commit atau push gagal, cara mengenali akar masalahnya, dan langkah paling aman untuk mengatasi error Git lokal maupun remote."
+translationKey: "fix-git-commit-and-push-failed-errors"
+published: true
+tags: ["Git", "Github", "Commit", "Push", "Debugging"]
+category: "Git"
+---
+
+Gagal saat menjalankan `git commit` atau `git push` sering terasa lebih menegangkan daripada yang sebenarnya. Dalam banyak kasus, penyebabnya bukan kode yang rusak sama sekali. Masalahnya biasanya berasal dari **state repository, autentikasi, branch tracking, atau konfigurasi Git lokal yang belum lengkap**.
+
+Catatan ini membahas penyebab paling umum kenapa `commit` dan `push` bisa gagal, cara mendiagnosisnya secara sistematis, dan cara memulihkannya dengan aman tanpa memperburuk keadaan.
+
+## Aturan Pertama: Jangan Panik Mengulang Command
+
+Saat Git gagal, banyak orang langsung mengulang command yang sama berkali-kali:
+
+```bash
+git commit -m "update"
+git push
+git push
+git push
+```
+
+Biasanya itu tidak membantu.
+
+Pendekatan yang lebih baik adalah berhenti sejenak lalu mengklasifikasikan error-nya:
+
+- apakah masalahnya lokal atau remote?
+- apakah gagalnya saat `commit` atau saat `push`?
+- apakah penyebabnya repository state, autentikasi, atau branch tracking?
+
+<Callout variant="warning" title="Workflow yang Lebih Aman">
+Kalau command Git gagal, diagnosis dulu. Mengulang command tanpa memahami error hanya akan membuang waktu dan kadang menutupi akar masalahnya.
+</Callout>
+
+## Kenapa `git commit` Bisa Gagal?
+
+Kegagalan `git commit` terjadi **sebelum apapun dikirim ke GitHub**. Artinya, masalahnya biasanya ada di sisi lokal.
+
+### Penyebab umum `git commit` gagal
+
+- `user.name` atau `user.email` belum dikonfigurasi
+- repository sedang berada dalam state yang tidak sehat
+- ada lock file di `.git`
+- commit hook menolak commit
+- GPG signing diwajibkan tetapi tidak berfungsi
+- tidak ada perubahan yang benar-benar sudah di-stage
+
+## Kasus 1: Git Identity Belum Ada
+
+Ini adalah salah satu penyebab paling umum, terutama di mesin baru atau repo yang belum pernah dikonfigurasi secara lokal.
+
+Git membutuhkan dua nilai untuk membuat identitas author commit:
+
+- `user.name`
+- `user.email`
+
+Tanpa itu, `git commit` bisa gagal.
+
+### Cara mengatasinya
+
+Untuk repository saat ini saja:
+
+```bash
+git config user.name "Nama Anda"
+git config user.email "anda@example.com"
+```
+
+Untuk semua repository di mesin Anda:
+
+```bash
+git config --global user.name "Nama Anda"
+git config --global user.email "anda@example.com"
+```
+
+<Callout variant="tip" title="Perbedaan Penting">
+URL profil GitHub Anda bukan identitas author commit. Git commit menggunakan `user.name` dan `user.email`, bukan link profil GitHub.
+</Callout>
+
+## Kasus 2: Tidak Ada File yang Di-stage
+
+Kadang command gagal hanya karena sebenarnya tidak ada yang siap di-commit.
+
+### Cara mengeceknya
+
+```bash
+git status
+```
+
+Kalau Git mengatakan ada file berubah tetapi belum di-stage, Anda harus menambahkannya dulu:
+
+```bash
+git add path/to/file
+git commit -m "Deskripsi perubahan yang jelas"
+```
+
+Kalau Git mengatakan working tree bersih, mungkin memang tidak ada perubahan baru untuk di-commit.
+
+## Kasus 3: Ada Git Lock File
+
+Proses Git sebelumnya bisa meninggalkan lock file, terutama setelah crash atau command terinterupsi.
+
+Contoh file yang sering bermasalah:
+
+```text
+.git/index.lock
+```
+
+Kalau file ini ada, Git bisa menolak operasi berikutnya.
+
+### Cara menangani dengan aman
+
+Pertama, pastikan tidak ada proses Git yang masih berjalan.
+
+Setelah itu, hapus lock file tersebut secara manual **hanya jika** Anda yakin proses lamanya memang sudah tidak aktif.
+
+## Kasus 4: Commit Hook Menolak Commit
+
+Beberapa repository memakai hook seperti:
+
+- `pre-commit`
+- `commit-msg`
+- `pre-push`
+
+Hook ini bisa menolak commit jika:
+
+- lint gagal
+- test gagal
+- format message tidak sesuai
+- metadata wajib belum terpenuhi
+
+### Apa yang harus dilakukan?
+
+Periksa apakah repo memiliki hook aktif di `.git/hooks/` atau melalui tool seperti Husky.
+
+Kalau memang ada hook aktif, perbaiki penyebab sebenarnya daripada langsung membypass semuanya tanpa alasan.
+
+## Kasus 5: GPG Signing atau Kebijakan Signing Gagal
+
+Beberapa environment Git mewajibkan signed commit. Jika GPG atau signing Anda salah konfigurasi, pembuatan commit bisa gagal walaupun perubahan file sebenarnya baik-baik saja.
+
+Gejala umumnya:
+
+- `git commit` langsung gagal
+- state repo terlihat normal
+- staging benar
+- remote bukan sumber masalah
+
+### Solusi yang mungkin
+
+Matikan signing untuk commit saat ini saja jika memang sesuai kebutuhan:
+
+```bash
+git -c commit.gpgsign=false commit -m "Pesan commit Anda"
+```
+
+Gunakan ini hanya jika Anda memang yakin signing adalah sumber masalah dan memahami kebijakan repo Anda.
+
+## Kenapa `git push` Bisa Gagal?
+
+Kegagalan `git push` terjadi **setelah commit berhasil dibuat**, saat Git mencoba berbicara dengan remote.
+
+Artinya, sumber masalah biasanya salah satu dari ini:
+
+- autentikasi gagal
+- upstream branch belum disetel
+- push ditolak remote
+- branch lokal tertinggal dari remote
+- tidak punya permission push
+- ada masalah jaringan
+
+## Kasus 6: Autentikasi GitHub Gagal
+
+Jika remote Anda memakai HTTPS, Git biasanya membutuhkan:
+
+- credential helper yang valid
+- token GitHub yang masih benar
+- sesi login yang masih aktif
+
+Kalau autentikasinya tidak valid, push akan gagal walaupun commit berhasil.
+
+### Yang perlu dicek
+
+```bash
+git remote -v
+```
+
+Pastikan remote benar-benar mengarah ke repository yang tepat.
+
+Lalu cek kembali apakah alur credential lokal Anda masih valid.
+
+## Kasus 7: Upstream Branch Belum Ada
+
+Biasanya ini terjadi jika branch lokal sekarang belum pernah dikaitkan ke branch remote.
+
+### Solusi yang umum
+
+```bash
+git push -u origin main
+```
+
+Ganti `main` dengan nama branch aktif Anda jika berbeda.
+
+Setelah itu, `git push` biasa biasanya sudah cukup.
+
+## Kasus 8: Push Ditolak karena Branch Anda Tertinggal
+
+Kalau ada orang lain yang lebih dulu push commit baru, branch lokal Anda bisa tertinggal dari branch remote.
+
+Git menolak push untuk mencegah history tertimpa.
+
+### Solusi yang lebih aman
+
+```bash
+git pull --rebase origin main
+git push origin main
+```
+
+Dalam banyak kasus ini membuat history lebih bersih dibanding merge commit yang tidak perlu.
+
+<Callout variant="warning" title="Hindari Force Push Secara Default">
+Jangan gunakan `git push --force` kecuali Anda benar-benar paham history branch tersebut dan yakin tindakan itu aman untuk workflow tim Anda.
+</Callout>
+
+## Kasus 9: Remote Salah atau Tidak Punya Izin
+
+Push juga bisa gagal kalau:
+
+- URL remote salah
+- repo dipindah atau di-rename
+- akun Anda tidak punya akses tulis
+- branch dilindungi
+
+### Yang perlu diperiksa
+
+```bash
+git remote -v
+git branch -vv
+```
+
+Command ini membantu memastikan:
+
+- remote mana yang dipakai
+- branch mana yang sedang aktif
+- apakah upstream branch sudah ada
+
+## Urutan Debugging yang Praktis
+
+Kalau `commit` atau `push` gagal, urutan ini biasanya sudah cukup untuk mengisolasi masalah.
+
+<Steps>
+<Step>
+
+### Cek state repository
+
+```bash
+git status --short --branch
+```
+
+Ini memberi tahu branch saat ini dan apakah ada file yang sudah di-stage.
+
+</Step>
+<Step>
+
+### Cek branch tracking
+
+```bash
+git branch -vv
+```
+
+Ini menunjukkan apakah branch lokal sudah terhubung ke branch remote.
+
+</Step>
+<Step>
+
+### Cek konfigurasi remote
+
+```bash
+git remote -v
+```
+
+Ini memastikan apakah `origin` memang menunjuk ke repository GitHub yang benar.
+
+</Step>
+<Step>
+
+### Cek Git identity lokal
+
+```bash
+git config user.name
+git config user.email
+```
+
+Kalau salah satu kosong, perbaiki itu dulu.
+
+</Step>
+<Step>
+
+### Commit dulu, push belakangan
+
+Jangan gabungkan terlalu banyak variabel saat debugging. Pastikan `commit` sukses lokal dulu. Setelah itu, debug `push` secara terpisah kalau perlu.
+
+</Step>
+</Steps>
+
+## Pelajaran Pentingnya
+
+Gagal `git commit` dan gagal `git push` bukan kelas masalah yang sama.
+
+### Masalah `git commit` biasanya lokal
+
+Pikirkan hal-hal seperti:
+
+- identity
+- hooks
+- lock files
+- signing
+- staging
+
+### Masalah `git push` biasanya terkait remote atau branch
+
+Pikirkan hal-hal seperti:
+
+- autentikasi
+- upstream tracking
+- remote yang salah
+- permission
+- branch protection
+
+Setelah dua lapisan ini dipisahkan, error Git biasanya jauh lebih mudah diselesaikan.
+
+## Pola Recovery yang Aman
+
+Kalau masih ragu, gunakan checklist mental berikut:
+
+1. **Cek `git status` lebih dulu.**
+2. **Pastikan gagalnya di `commit` atau di `push`.**
+3. **Verifikasi `user.name` dan `user.email`.**
+4. **Periksa `git remote -v` dan `git branch -vv`.**
+5. **Hindari force-push kecuali memang benar-benar perlu.**
+6. **Perbaiki akar masalah, bukan membypass semua pengaman.**
+
+## Poin Penting
+
+1. **Gagal `git commit` biasanya masalah konfigurasi lokal atau state repository.**
+2. **Gagal `git push` biasanya masalah autentikasi, branch, atau remote.**
+3. **Git identity yang belum disetel adalah salah satu penyebab commit gagal yang paling umum.**
+4. **`git status`, `git remote -v`, dan `git branch -vv` menyelesaikan banyak misteri Git dengan cepat.**
+5. **Perlakukan `commit` dan `push` sebagai dua tahap debugging yang berbeda.**
+6. **Jangan langsung melompat ke `--force` kalau belum paham konsekuensinya.**

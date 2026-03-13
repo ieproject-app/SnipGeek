@@ -1,14 +1,18 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import Image from 'next/image';
-import { Post, PostFrontmatter } from '@/lib/posts';
-import { Dictionary } from '@/lib/get-dictionary';
-import { PlaceHolderImages } from '@/lib/placeholder-images';
-import { cn, formatRelativeTime } from '@/lib/utils';
-import { AddToReadingListButton } from '@/components/layout/add-to-reading-list-button';
-import { ArrowRight } from 'lucide-react';
-import { CategoryBadge, getBadgeStyle, simplifyCategoryLabel } from '@/components/layout/category-badge';
+import Link from "next/link";
+import { Post, PostFrontmatter } from "@/lib/posts";
+import { Dictionary } from "@/lib/get-dictionary";
+import { PlaceHolderImages } from "@/lib/placeholder-images";
+import { cn, formatRelativeTime } from "@/lib/utils";
+import { AddToReadingListButton } from "@/components/layout/add-to-reading-list-button";
+import { ArrowRight } from "lucide-react";
+import {
+    CategoryBadge,
+    getBadgeStyle,
+    simplifyCategoryLabel,
+} from "@/components/layout/category-badge";
+import { RevealImage } from "@/components/ui/reveal-image";
 
 interface HomeHeroProps {
     posts: Post<PostFrontmatter>[];
@@ -80,13 +84,17 @@ export function HomeHero({ posts, dictionary, locale, linkPrefix }: HomeHeroProp
 
                                             {/* Hero Image */}
                                             {heroImageSrc && (
-                                                <Image
+                                                <RevealImage
                                                     src={heroImageSrc}
                                                     alt={post.frontmatter.imageAlt || post.frontmatter.title}
                                                     fill
-                                                    className="object-cover transition-transform duration-1000 ease-out group-hover:scale-[1.06]"
+                                                    className="transition-transform duration-1000 ease-out group-hover:scale-[1.06]"
+                                                    wrapperClassName="absolute inset-0"
                                                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
                                                     priority={index < 4}
+                                                    holdUntilLoaded={index < 4}
+                                                    initialVisitOnly={index < 4}
+                                                    showSkeleton
                                                     data-ai-hint={heroImageHint}
                                                 />
                                             )}
