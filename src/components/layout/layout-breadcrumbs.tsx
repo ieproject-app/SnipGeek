@@ -2,7 +2,6 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 
 export type LayoutBreadcrumbSegment = {
@@ -20,17 +19,6 @@ interface LayoutBreadcrumbsProps {
  * Shows hierarchy up to category/tag level.
  */
 export function LayoutBreadcrumbs({ segments, className }: LayoutBreadcrumbsProps) {
-  const pathname = usePathname();
-
-  // Helper to normalize path by removing trailing slash (except for root '/')
-  const normalizePath = (path: string) => {
-    if (!path) return '';
-    const normalized = path.replace(/\/$/, '');
-    return normalized === '' ? '/' : normalized;
-  };
-
-  const normalizedPathname = normalizePath(pathname);
-
   return (
     <nav
       aria-label="Breadcrumb"
@@ -41,14 +29,7 @@ export function LayoutBreadcrumbs({ segments, className }: LayoutBreadcrumbsProp
     >
       {segments.map((segment, index) => {
         const isLast = index === segments.length - 1;
-
-        const normalizedHref = segment.href ? normalizePath(segment.href) : null;
-
-        // Non-interactive if:
-        // 1. No href provided
-        // 2. It's the last segment (current page)
-        // 3. The href matches the current normalized pathname (prevents links to current page)
-        const isInteractive = normalizedHref && !isLast && normalizedHref !== normalizedPathname;
+        const isInteractive = Boolean(segment.href) && !isLast;
 
         return (
           <div key={index} className="flex items-center gap-2">
@@ -60,7 +41,10 @@ export function LayoutBreadcrumbs({ segments, className }: LayoutBreadcrumbsProp
                 {segment.label}
               </Link>
             ) : (
-              <span className={cn(isLast ? "opacity-60" : "opacity-80")}>
+              <span
+                aria-current={isLast ? 'page' : undefined}
+                className={cn(isLast ? "opacity-60" : "opacity-80")}
+              >
                 {segment.label}
               </span>
             )}
