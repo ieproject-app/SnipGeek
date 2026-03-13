@@ -38,8 +38,12 @@ import {
   getBadgeStyle,
 } from "@/components/layout/category-badge";
 import { useThemeMode } from "@/hooks/use-theme-mode";
-import { getLinkPrefix } from "@/lib/utils";
 import { SnipTooltip } from "@/components/ui/snip-tooltip";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 type SearchableItem = {
   slug: string;
@@ -133,7 +137,7 @@ export function LayoutHeader({
   const isReadingListOpen = activeView === "readingList";
 
   const currentLocale = (params.locale as string) || "en";
-  const linkPrefix = getLinkPrefix(currentLocale);
+  const linkPrefix = `/${currentLocale}`;
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -395,47 +399,50 @@ export function LayoutHeader({
             )}
           >
             {/* 1. More Menu Toggle */}
-            <div className="relative">
-              <SnipTooltip
-                label={
-                  dictionary?.promptGenerator?.tooltips?.moreMenu ?? "More Menu"
-                }
-                side="bottom"
-              >
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className={cn(navItemClass, "relative inline-flex")}
-                  onClick={() => toggleView("menu")}
-                  aria-label="More Menu"
+            <DropdownMenu
+              open={isMenuOpen}
+              onOpenChange={(open) => setActiveView(open ? "menu" : "none")}
+            >
+              <div className="relative z-[110]">
+                <SnipTooltip
+                  label={
+                    dictionary?.promptGenerator?.tooltips?.moreMenu ?? "More Menu"
+                  }
+                  side="bottom"
                 >
-                  <MoreHorizontal
-                    className={cn(
-                      "h-5 w-5 transition-all duration-300",
-                      isMenuOpen
-                        ? "rotate-90 opacity-0 scale-0 absolute"
-                        : "opacity-100 scale-100",
-                    )}
-                  />
-                  <X
-                    className={cn(
-                      "h-5 w-5 transition-all duration-300",
-                      isMenuOpen
-                        ? "opacity-100 scale-100"
-                        : "-rotate-90 opacity-0 scale-0 absolute",
-                    )}
-                  />
-                </Button>
-              </SnipTooltip>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className={cn(navItemClass, "relative inline-flex")}
+                      aria-label="More Menu"
+                    >
+                      <MoreHorizontal
+                        className={cn(
+                          "h-5 w-5 transition-all duration-300",
+                          isMenuOpen
+                            ? "rotate-90 opacity-0 scale-0 absolute"
+                            : "opacity-100 scale-100",
+                        )}
+                      />
+                      <X
+                        className={cn(
+                          "h-5 w-5 transition-all duration-300",
+                          isMenuOpen
+                            ? "opacity-100 scale-100"
+                            : "-rotate-90 opacity-0 scale-0 absolute",
+                        )}
+                      />
+                    </Button>
+                  </DropdownMenuTrigger>
+                </SnipTooltip>
+              </div>
 
-              {/* FLOATING MORE MENU DROPDOWN */}
-              <div
-                className={cn(
-                  "absolute top-full right-0 mt-5 min-w-[220px] bg-background border border-border shadow-2xl rounded-2xl overflow-hidden origin-top-right transition-all duration-300 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] z-[100] ring-1 ring-black/[0.03]",
-                  isMenuOpen
-                    ? "opacity-100 scale-100 translate-y-0"
-                    : "opacity-0 scale-[0.95] -translate-y-2 pointer-events-none",
-                )}
+              <DropdownMenuContent
+                align="end"
+                side="bottom"
+                sideOffset={18}
+                className="z-[200] min-w-[220px] rounded-2xl border border-border bg-background p-0 shadow-2xl ring-1 ring-black/[0.03] overflow-hidden"
               >
                 <div className="py-3">
                   <div className="px-4 py-2 mb-1">
@@ -449,7 +456,7 @@ export function LayoutHeader({
                       <NextLink
                         key={item.href}
                         href={`${linkPrefix}${item.href}`}
-                        className="group/item flex items-center gap-3 px-4 py-2.5 font-sans text-[11px] font-bold uppercase tracking-wider text-foreground/80 hover:bg-accent/10 hover:text-foreground transition-colors rounded-lg mx-1 relative"
+                        className="group/item relative mx-1 flex cursor-pointer items-center gap-3 rounded-lg px-4 py-2.5 font-sans text-[11px] font-bold uppercase tracking-wider text-foreground/80 transition-colors hover:bg-accent/10 hover:text-foreground"
                         onClick={() => setActiveView("none")}
                       >
                         <div className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-4 bg-accent opacity-0 group-hover/item:opacity-60 transition-opacity" />
@@ -469,7 +476,7 @@ export function LayoutHeader({
                       <NextLink
                         key={item.href}
                         href={`${linkPrefix}${item.href}`}
-                        className="group/item flex items-center gap-3 px-4 py-2.5 font-sans text-[11px] font-bold uppercase tracking-wider text-foreground/80 hover:bg-accent/15 hover:text-foreground transition-colors rounded-lg mx-1 relative"
+                        className="group/item relative mx-1 flex cursor-pointer items-center gap-3 rounded-lg px-4 py-2.5 font-sans text-[11px] font-bold uppercase tracking-wider text-foreground/80 transition-colors hover:bg-accent/15 hover:text-foreground"
                         onClick={() => setActiveView("none")}
                       >
                         <div className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-4 bg-accent opacity-0 group-hover/item:opacity-60 transition-opacity" />
@@ -479,8 +486,8 @@ export function LayoutHeader({
                     ))}
                   </div>
                 </div>
-              </div>
-            </div>
+              </DropdownMenuContent>
+            </DropdownMenu>
 
             {/* Vertical Divider */}
             <div className="w-px h-4 bg-border/70 mx-0.5 hidden sm:block" />
