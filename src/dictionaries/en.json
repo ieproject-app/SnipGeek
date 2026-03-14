@@ -1,9 +1,7 @@
 {
   "navigation": {
     "blog": "Blog",
-    "projects": "Projects",
     "about": "About",
-    "archive": "Archive",
     "contact": "Contact",
     "notes": "Notes",
     "tools": "Tools",
@@ -39,11 +37,6 @@
   "notes": {
     "title": "Notes",
     "description": "Personal technical snippets and quick references."
-  },
-  "projects": {
-    "title": "Projects",
-    "description": "A showcase of my projects.",
-    "wip": "This page is under construction."
   },
   "about": {
     "title": "About Iwan & SnipGeek",
@@ -130,11 +123,6 @@
     "generatorDescription": "Quickly identify the correct signers for specific document types based on a target date.",
     "docTypePlaceholder": "Select Document Type",
     "projectValuePlaceholder": "Project Value (IDR)"
-  },
-  "archive": {
-    "title": "Archive",
-    "description": "Browse all posts and notes.",
-    "wip": "This page is under construction."
   },
   "contact": {
     "title": "Contact",

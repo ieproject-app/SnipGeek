@@ -136,7 +136,12 @@ export function LocaleSuggestionBanner({
       )}
       aria-hidden={!visible}
     >
-      <div className="pointer-events-auto mx-auto flex w-full max-w-2xl items-start gap-3 rounded-2xl border border-accent/20 bg-background/95 px-4 py-3 shadow-2xl ring-1 ring-black/5 backdrop-blur supports-[backdrop-filter]:bg-background/85">
+      <div
+        className={cn(
+          "mx-auto flex w-full max-w-2xl items-start gap-3 rounded-2xl border border-accent/20 bg-background/95 px-4 py-3 shadow-2xl ring-1 ring-black/5 backdrop-blur supports-[backdrop-filter]:bg-background/85",
+          visible ? "pointer-events-auto" : "pointer-events-none",
+        )}
+      >
         <div className="min-w-0 flex-1">
           <p className="text-[13px] font-semibold text-foreground sm:text-sm">
             {localeSuggestion.title}

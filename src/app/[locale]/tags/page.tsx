@@ -64,11 +64,6 @@ export default async function TagsPage({
                         className="mb-6 justify-center"
                     />
 
-                    <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-primary/10 bg-primary/5 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.2em] text-primary">
-                        <Hash className="h-3.5 w-3.5" />
-                        Archive
-                    </div>
-
                     <h1 className="font-display text-4xl font-extrabold tracking-tighter text-primary mb-4 sm:text-5xl">
                         {dictionary.tags.allTagsTitle}
                     </h1>

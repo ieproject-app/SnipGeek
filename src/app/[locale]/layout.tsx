@@ -211,12 +211,11 @@ export default async function LocaleLayout({
       suppressHydrationWarning
     >
       <body className="font-sans antialiased fade-in-on-load">
-        {/* Google AdSense — lazyOnload prevents blocking FCP/LCP */}
         <Script
           async
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6235611333449307"
           crossOrigin="anonymous"
-          strategy="lazyOnload"
+          strategy="afterInteractive"
         />
         <FirebaseProviderWrapper>
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
@@ -231,7 +230,7 @@ export default async function LocaleLayout({
                   dictionary={dictionary}
                   translationsMap={translationsMap}
                 />
-                <main className="pt-16">{children}</main>
+                <main>{children}</main>
                 <LayoutFooter
                   locale={locale}
                   dictionary={dictionary}

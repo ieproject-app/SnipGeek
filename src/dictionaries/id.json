@@ -1,9 +1,7 @@
 {
   "navigation": {
     "blog": "Blog",
-    "projects": "Proyek",
     "about": "Tentang",
-    "archive": "Arsip",
     "contact": "Kontak",
     "notes": "Catatan",
     "tools": "Alat",
@@ -39,11 +37,6 @@
   "notes": {
     "title": "Catatan",
     "description": "Catatan teknis pribadi dan referensi cepat."
-  },
-  "projects": {
-    "title": "Proyek",
-    "description": "Sebuah pameran proyek-proyek saya.",
-    "wip": "Halaman ini sedang dalam tahap pembuatan."
   },
   "about": {
     "title": "Tentang SnipGeek",
@@ -130,11 +123,6 @@
     "generatorDescription": "Identifikasi penandatangan yang tepat dengan cepat untuk jenis dokumen tertentu berdasarkan tanggal target.",
     "docTypePlaceholder": "Pilih Jenis Dokumen",
     "projectValuePlaceholder": "Nilai Proyek (Rp)"
-  },
-  "archive": {
-    "title": "Arsip",
-    "description": "Telusuri semua postingan dan catatan.",
-    "wip": "Halaman ini sedang dalam pembuatan."
   },
   "contact": {
     "title": "Kontak",

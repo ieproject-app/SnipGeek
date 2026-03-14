@@ -20,6 +20,7 @@ import {
   SunMoon,
   ScrollText,
   ShieldAlert,
+  Hash,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -282,12 +283,43 @@ export function LayoutHeader({
   const moreItems = [
     { name: dictionary.navigation.about, href: "/about", icon: User },
     { name: dictionary.navigation.contact, href: "/contact", icon: Mail },
+    { name: dictionary.navigation.privacy, href: "/privacy", icon: ShieldAlert },
     { name: dictionary.navigation.terms, href: "/terms", icon: ScrollText },
     {
       name: dictionary.navigation.disclaimer,
       href: "/disclaimer",
       icon: ShieldAlert,
     },
+  ];
+
+  const topTagLinks = useMemo(() => {
+    const categoryCount = new Map<string, number>();
+    const categoryLabel = new Map<string, string>();
+
+    (searchableData || []).forEach((item) => {
+      const rawCategory = item.category?.trim();
+      if (!rawCategory) return;
+
+      const key = rawCategory.toLowerCase();
+      categoryCount.set(key, (categoryCount.get(key) || 0) + 1);
+      if (!categoryLabel.has(key)) {
+        categoryLabel.set(key, rawCategory);
+      }
+    });
+
+    return [...categoryCount.entries()]
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 3)
+      .map(([tag]) => ({
+        name: categoryLabel.get(tag) || tag,
+        href: `/tags/${encodeURIComponent(tag)}`,
+        icon: Hash,
+      }));
+  }, [searchableData]);
+
+  const secondaryLinks = [
+    { name: dictionary.tags.allTagsTitle, href: "/tags", icon: Hash },
+    ...topTagLinks,
   ];
 
   const navItemClass =
@@ -473,7 +505,7 @@ export function LayoutHeader({
                   <div className="pt-1">
                     <div className="px-4 py-2">
                       <p className="font-sans text-[8px] font-black uppercase tracking-[0.15em] text-accent">
-                        Connect
+                        Info
                       </p>
                     </div>
                     {moreItems.map((item) => (
@@ -942,6 +974,37 @@ export function LayoutHeader({
         </div>
       </header>
 
+      <div className="relative z-20 w-full bg-background/95 pt-16">
+        <div className="mx-auto max-w-4xl px-4 md:px-6">
+          <nav
+            aria-label="Quick navigation"
+            data-nav-slot="secondary"
+            className="flex min-h-11 flex-wrap items-center justify-center gap-2 border-b border-border/70 py-2"
+          >
+            {secondaryLinks.map((item) => {
+              const isActive = pathname.includes(item.href);
+              return (
+                <NextLink
+                  key={item.href}
+                  href={`${linkPrefix}${item.href}`}
+                  aria-current={isActive ? "page" : undefined}
+                  data-nav-item={item.href.replace("/", "") || "home"}
+                  className={cn(
+                    "group inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 font-sans text-[10px] font-black uppercase tracking-[0.13em] transition-all",
+                    isActive
+                      ? "border-accent/40 bg-accent/10 text-accent"
+                      : "border-border/80 bg-background text-foreground/70 hover:border-accent/30 hover:bg-accent/5 hover:text-foreground",
+                  )}
+                >
+                  <item.icon className="h-3.5 w-3.5" />
+                  <span>{item.name}</span>
+                </NextLink>
+              );
+            })}
+          </nav>
+        </div>
+      </div>
+
       {/* ── Notification Toast Pill (Floating Center, Outside Header bounds) ── */}
       <div
         className={cn(
@@ -951,7 +1014,12 @@ export function LayoutHeader({
             : "opacity-0 -translate-y-8",
         )}
       >
-        <div className="relative flex items-center justify-center gap-2.5 h-10 px-6 bg-background border border-border shadow-2xl rounded-full overflow-hidden pointer-events-auto ring-1 ring-black/[0.03]">
+        <div
+          className={cn(
+            "relative flex items-center justify-center gap-2.5 h-10 px-6 bg-background border border-border shadow-2xl rounded-full overflow-hidden ring-1 ring-black/[0.03]",
+            message ? "pointer-events-auto" : "pointer-events-none",
+          )}
+        >
           {/* Icon */}
           <span
             className={cn(
