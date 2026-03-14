@@ -141,6 +141,11 @@ export async function getPostData(
   try {
     const fileContents = fs.readFileSync(resolvedPath.path, "utf8");
     const { data, content } = matter(fileContents);
+    const isPublished = data.published === true;
+
+    if (!isPublished && process.env.NODE_ENV !== "development") {
+      return null;
+    }
 
     if (!data.heroImage) {
       data.heroImage = "footer-about";
