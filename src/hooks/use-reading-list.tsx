@@ -14,6 +14,7 @@ interface ReadingListContextType {
   items: ReadingListItem[];
   addItem: (item: ReadingListItem) => void;
   removeItem: (slug: string) => void;
+  clearItems: () => void;
   isItemSaved: (slug: string) => boolean;
 }
 
@@ -59,12 +60,16 @@ export function ReadingListProvider({ children }: { children: ReactNode }) {
     setItems((prevItems) => prevItems.filter((item) => item.slug !== slug));
   }, []);
 
+  const clearItems = useCallback(() => {
+    setItems([]);
+  }, []);
+
   const isItemSaved = useCallback((slug: string) => {
     return items.some((item) => item.slug === slug);
   }, [items]);
 
   return (
-    <ReadingListContext.Provider value={{ items, addItem, removeItem, isItemSaved }}>
+    <ReadingListContext.Provider value={{ items, addItem, removeItem, clearItems, isItemSaved }}>
       {children}
     </ReadingListContext.Provider>
   );

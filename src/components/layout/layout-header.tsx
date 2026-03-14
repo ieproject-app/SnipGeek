@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useMemo } from "react";
-import { cn } from "@/lib/utils";
+import { cn, getLinkPrefix } from "@/lib/utils";
 import {
   Search,
   X,
@@ -116,7 +116,11 @@ export function LayoutHeader({
   const [timeLabel, setTimeLabel] = useState("");
   const [mounted, setMounted] = useState(false);
 
-  const { items: readingListItems, removeItem: removeReadingListItem } =
+  const {
+    items: readingListItems,
+    removeItem: removeReadingListItem,
+    clearItems: clearReadingListItems,
+  } =
     useReadingList();
   const { message, icon, progress, clear } = useNotification();
   const {
@@ -137,7 +141,7 @@ export function LayoutHeader({
   const isReadingListOpen = activeView === "readingList";
 
   const currentLocale = (params.locale as string) || "en";
-  const linkPrefix = `/${currentLocale}`;
+  const linkPrefix = getLinkPrefix(currentLocale);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -664,7 +668,11 @@ export function LayoutHeader({
                 Queue · {readingListItems.length} items
               </p>
               {readingListItems.length > 0 && (
-                <button className="font-sans text-[9px] font-black uppercase tracking-wider text-destructive hover:opacity-70 transition-opacity">
+                <button
+                  type="button"
+                  onClick={() => clearReadingListItems()}
+                  className="font-sans text-[9px] font-black uppercase tracking-wider text-destructive hover:opacity-70 transition-opacity"
+                >
                   Clear all
                 </button>
               )}

@@ -14,6 +14,16 @@ export function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
+  // Canonicalize default-locale paths: /en/* -> /*
+  if (pathname === `/${i18n.defaultLocale}`) {
+    return NextResponse.redirect(new URL("/", request.url), 308);
+  }
+
+  if (pathname.startsWith(`/${i18n.defaultLocale}/`)) {
+    const normalizedPath = pathname.replace(`/${i18n.defaultLocale}`, "") || "/";
+    return NextResponse.redirect(new URL(normalizedPath, request.url), 308);
+  }
+
   const pathnameIsMissingLocale = i18n.locales.every(
     (locale) =>
       !pathname.startsWith(`/${locale}/`) && pathname !== `/${locale}`,
