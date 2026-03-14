@@ -24,6 +24,9 @@ import remarkGfm from "remark-gfm";
 import rehypeShiki from "@shikijs/rehype";
 import { resolveHeroImage, getLinkPrefix } from "@/lib/utils";
 
+// Only pre-render known published slugs; unknown/removed slugs should return 404.
+export const dynamicParams = false;
+
 export async function generateMetadata({
   params,
 }: {
