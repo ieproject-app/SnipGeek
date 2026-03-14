@@ -1,0 +1,75 @@
+---
+title: "Cara Membagi File Besar Menjadi Beberapa Part dengan WinRAR"
+slug: "how-to-split-rar-files-into-multiple-parts"
+translationKey: "how-to-split-rar-files-into-multiple-parts"
+date: "2026-03-17"
+description: "Panduan praktis membagi file besar menjadi beberapa part RAR dengan WinRAR, lengkap dengan pengaturan ukuran dan cara menggabungkannya kembali."
+heroImage: "/images/_posts/apps/winrar/banner-winrar.webp"
+imageAlt: "Banner WinRAR yang menampilkan proses pengelolaan arsip dan pemecahan file"
+published: true
+featured: false
+tags: ["winrar", "rar", "arsip", "split", "windows"]
+category: "Apps"
+---
+
+Sebagai blogger yang kadang membagikan file game atau aplikasi berukuran besar, saya sering dapat permintaan yang sama: "Bisa dibagi jadi beberapa part biar download-nya lebih ringan?"
+
+Dan jujur, itu permintaan yang sangat masuk akal.
+
+Dengan file yang dipecah menjadi beberapa bagian, pengunjung bisa unduh satu per satu. Risiko gagal di tengah jalan juga lebih kecil dibanding unduh satu file besar sekaligus.
+
+Selain itu, metode ini juga berguna untuk kebutuhan lain, misalnya:
+- Mengirim file lewat email yang punya batas ukuran lampiran.
+- Menyimpan file ke beberapa flash drive atau media dengan kapasitas terbatas.
+
+Kabar baiknya, software legendaris **WinRAR** sudah punya fitur ini dan langkahnya sangat mudah.
+
+## #1 Instal Aplikasi WinRAR
+
+Kalau WinRAR belum terpasang, instal dulu. Aplikasi ini juga termasuk [utility penting yang kami rekomendasikan setelah instal Windows 11](/blog/langkah-penting-setelah-instal-windows-11).
+
+Gunakan referensi link berikut dari workflow publikasi kamu:
+- [WinRAR Installer 32-bit](/download/winrar-installer-32bit)
+- [WinRAR Installer 64-bit](/download/winrar-installer-64bit)
+- [Official WinRAR Download](https://www.win-rar.com/download.html?&L=0)
+
+<Callout variant="warning" title="Aplikasi Gratis">
+WinRAR bisa dipakai gratis. Memang ada notifikasi untuk membeli versi Pro, tapi fitur utamanya tetap bisa digunakan tanpa batas waktu keras.
+</Callout>
+
+Proses instalasinya sama seperti aplikasi `.exe` biasa: jalankan installer, ikuti instruksi, selesai.
+
+## #2 Proses Membagi File Menjadi Beberapa Part RAR
+
+Setelah WinRAR terinstal, ikuti langkah berikut.
+
+1. **Siapkan file:** Tentukan file atau folder yang ingin dibagi.
+2. **Mulai proses arsip:** Klik kanan file/folder lalu pilih **Add to archive...**.
+3. **Atur konfigurasi split:** Di jendela yang muncul, fokus ke bagian ini.
+   - **Archive name:** Ubah nama file output jika diperlukan.
+   - **Archive options:** Centang **Create solid archive** dan **Add recovery record** untuk menjaga integritas data.
+   - **Split to volumes, size (paling penting):** Tentukan ukuran tiap part. Bisa pilih preset atau ketik manual, misalnya `100M` untuk 100 MB per part.
+
+![Jendela pengaturan WinRAR yang menampilkan konfigurasi split file menjadi beberapa volume.](/images/_posts/apps/winrar/split_rar.webp "Pengaturan split to volumes di WinRAR pada Windows.")
+*Pengaturan utama ada di opsi **Split to volumes, size**.*
+
+4. **Mulai proses:** Klik **OK** lalu tunggu hingga selesai. Hasilnya akan muncul beberapa file seperti `.part1.rar`, `.part2.rar`, dan seterusnya.
+
+## #3 Cara Menggabungkan dan Mengekstrak Kembali
+
+Supaya file bisa diekstrak sempurna di sisi penerima, ada satu aturan utama yang wajib dijelaskan.
+
+### Semua Part Harus Ada di Satu Folder
+
+Semua file part harus berada di folder yang sama, contohnya:
+- `file.part1.rar`
+- `file.part2.rar`
+- `file.part3.rar`
+
+Kalau satu part saja hilang, proses ekstraksi akan gagal.
+
+### Langkah Ekstraksi
+
+Klik kanan `part1.rar`, lalu pilih **Extract Here** atau **Extract to...**. WinRAR akan otomatis membaca dan menggabungkan part lainnya.
+
+Selesai. Simpel, praktis, dan sangat berguna untuk menangani file berukuran besar.

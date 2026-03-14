@@ -1,0 +1,75 @@
+---
+title: "How to Split Large Files into Multiple Parts with WinRAR"
+slug: "how-to-split-rar-files-into-multiple-parts"
+translationKey: "how-to-split-rar-files-into-multiple-parts"
+date: "2026-03-17"
+description: "A practical step-by-step guide to splitting large files into smaller RAR parts with WinRAR, including ideal size settings and extraction tips."
+heroImage: "/images/_posts/apps/winrar/banner-winrar.webp"
+imageAlt: "WinRAR banner showing archive management and split-file workflow"
+published: true
+featured: false
+tags: ["winrar", "rar", "archive", "split", "windows"]
+category: "Apps"
+---
+
+As a blogger who occasionally shares large game files or software packages, I often get the same request: "Can you split this into parts so it is easier to download?"
+
+And honestly, that request makes total sense.
+
+When a file is divided into smaller chunks, users can download part by part with less risk of a failed full download. It is also more practical in many everyday situations.
+
+For example:
+- Sending files through email services with attachment limits.
+- Saving large files across multiple flash drives or older storage media.
+
+The good news is that **WinRAR** has this feature built in, and the process is very straightforward.
+
+## #1 Install WinRAR First
+
+If WinRAR is not installed yet, download it first. It is also one of the [essential utilities we recommend after a Windows 11 installation](/blog/langkah-penting-setelah-instal-windows-11).
+
+Use these download references from your publishing workflow:
+- [WinRAR Installer 32-bit](/download/winrar-installer-32bit)
+- [WinRAR Installer 64-bit](/download/winrar-installer-64bit)
+- [Official WinRAR Download](https://www.win-rar.com/download.html?&L=0)
+
+<Callout variant="warning" title="Free Application">
+WinRAR can be used for free. You may see a purchase reminder for the Pro license, but core features remain usable without a hard time limit.
+</Callout>
+
+Installation is the same as any normal `.exe` app: run installer, follow prompts, done.
+
+## #2 Split a File into Multiple RAR Parts
+
+After WinRAR is installed, follow these steps.
+
+1. **Prepare the file:** Decide which file or folder you want to split.
+2. **Open archive dialog:** Right-click the file/folder and choose **Add to archive...**.
+3. **Configure split settings:** In the window that appears, focus on these fields.
+   - **Archive name:** Change output file name if needed.
+   - **Archive options:** Enable **Create solid archive** and **Add recovery record** for better integrity.
+   - **Split to volumes, size (most important):** Set the size for each part. You can pick presets or type manually, such as `100M` for 100 MB per part.
+
+![WinRAR archive settings window showing how to split files into multiple volume parts.](/images/_posts/apps/winrar/split_rar.webp "WinRAR split-to-volumes configuration in Windows.")
+*The key setting is in **Split to volumes, size**.*
+
+4. **Start process:** Click **OK** and wait. WinRAR will generate files such as `.part1.rar`, `.part2.rar`, and so on.
+
+## #3 How to Rejoin and Extract the Parts
+
+To avoid extraction failure on the receiver side, there is one rule you must emphasize.
+
+### Keep All Parts in One Folder
+
+All parts must be in the same directory, for example:
+- `file.part1.rar`
+- `file.part2.rar`
+- `file.part3.rar`
+
+If one part is missing, extraction will fail.
+
+### Extraction Steps
+
+Right-click `part1.rar` and choose **Extract Here** or **Extract to...**. WinRAR will automatically detect and combine the remaining parts.
+
+That is it. Simple, practical, and very useful when handling large files.
