@@ -14,8 +14,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/tools/spin-wheel",
     "/about",
     "/contact",
-    "/archive",
-    "/projects",
     "/privacy",
     "/terms",
     "/disclaimer",

@@ -22,6 +22,10 @@ export async function generateMetadata({
   return {
     title: dictionary.archive.title,
     description: dictionary.archive.description,
+    robots: {
+      index: false,
+      follow: false,
+    },
     alternates: {
       canonical: canonicalPath,
       languages: {
