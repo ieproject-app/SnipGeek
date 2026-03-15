@@ -446,10 +446,10 @@ export function LayoutHeader({
     "h-9 w-9 p-0 rounded-xl transition-all duration-300 text-foreground/75 hover:text-foreground hover:bg-accent/15 hover:shadow-sm flex items-center justify-center relative";
 
   const secondaryHoverStyles = [
-    "hover:border-sky-300 hover:bg-sky-100 hover:text-sky-900",
-    "hover:border-cyan-300 hover:bg-cyan-100 hover:text-cyan-900",
-    "hover:border-indigo-300 hover:bg-indigo-100 hover:text-indigo-900",
-    "hover:border-blue-300 hover:bg-blue-100 hover:text-blue-900",
+    "hover:border-white/60 hover:bg-white/20 hover:text-nav-primary-foreground",
+    "hover:border-white/70 hover:bg-white/25 hover:text-nav-primary-foreground",
+    "hover:border-white/65 hover:bg-white/18 hover:text-nav-primary-foreground",
+    "hover:border-white/75 hover:bg-white/28 hover:text-nav-primary-foreground",
   ] as const;
 
   return (
@@ -1101,7 +1101,7 @@ export function LayoutHeader({
         </div>
       </header>
 
-      <div className="relative z-20 w-full bg-primary border-b border-primary/60 pt-16">
+      <div className="relative z-20 w-full bg-nav-primary border-b border-nav-primary/70 pt-16">
         <div className="mx-auto max-w-4xl px-4 md:px-6">
           <nav
             aria-label="Quick navigation"
@@ -1122,9 +1122,9 @@ export function LayoutHeader({
                   className={cn(
                     "group inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full border px-3.5 font-sans text-[10px] font-black uppercase tracking-[0.13em] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50",
                     isActive
-                      ? "border-background/80 bg-background text-primary shadow-sm"
+                      ? "border-white/80 bg-white text-nav-primary shadow-sm"
                       : cn(
-                          "border-primary/30 bg-background/95 text-foreground/80",
+                          "border-white/30 bg-white/10 text-nav-primary-foreground/90",
                           hoverStyle,
                         ),
                   )}
