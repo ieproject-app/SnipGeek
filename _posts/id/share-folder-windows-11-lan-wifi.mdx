@@ -1,0 +1,142 @@
+---
+title: "Cara Share Folder di Windows 11 via LAN dan WiFi"
+slug: "share-folder-windows-11-lan-wifi"
+translationKey: "share-folder-windows-11-lan-wifi"
+date: "2026-03-17"
+description: "Panduan lengkap share folder di Windows 11 lewat LAN atau WiFi, mulai dari aktivasi network discovery sampai akses folder dengan alamat IP."
+heroImage: "/images/_posts/windows11/share-folder/banner-share.webp"
+imageAlt: "Banner panduan share folder Windows 11 untuk kolaborasi LAN dan WiFi"
+published: true
+featured: true
+tags: ["windows11", "share", "jaringan", "lan", "wifi"]
+category: "Windows"
+---
+
+Fitur share folder masih jadi salah satu senjata produktivitas paling praktis di Windows 11, terutama kalau kamu kerja bareng tim dalam satu jaringan lokal.
+
+Saya sendiri masih rutin pakai setup ini di lingkungan kantor kecil karena simpel dan hemat waktu. Daripada bolak-balik pindah file lewat flash drive, semua orang bisa akses folder yang sama langsung dari PC masing-masing.
+
+Di panduan ini, kita bahas alur lengkapnya: aktifkan pengaturan jaringan yang wajib, bagikan folder dengan permission yang tepat, lalu akses dari komputer lain lewat alamat IP.
+
+## Langkah 1: Aktifkan Network Discovery Dulu
+
+Sebelum share folder, pastikan semua perangkat di jaringan bisa saling melihat.
+
+<Steps>
+   <Step>
+      **Buka pengaturan jaringan**
+      Buka **Settings** di Windows 11, lalu masuk ke **Network & internet**.
+   </Step>
+
+   <Step>
+      **Masuk ke pengaturan lanjutan**
+      Pilih **Advanced network settings**, lalu pada bagian **More settings** klik **Advanced sharing settings**.
+   </Step>
+
+   <Step>
+      **Aktifkan discovery dan file sharing**
+      Aktifkan **Network Discovery** dan **File Sharing** pada seluruh profil jaringan yang kamu gunakan.
+   </Step>
+</Steps>
+
+Di halaman ini, atur tiga profil jaringan. Untuk jaringan rumah atau kantor yang tepercaya, kamu bisa aktifkan semua opsi sharing agar tidak ada kendala deteksi perangkat.
+
+![Halaman advanced sharing settings Windows 11 dengan network discovery dan file sharing aktif di semua profil.](/images/_posts/windows11/share-folder/lan-wifi-1.webp "Aktifkan Network Discovery dan File Sharing di semua profil jaringan")
+*Set semua profil jaringan ke status aktif untuk Network Discovery dan File Sharing.*
+
+<Callout variant="warning" title="Catatan Keamanan Penting">
+Di bagian **All Networks**, nonaktifkan **Password protected sharing** hanya jika jaringan kamu benar-benar tepercaya. Dengan ini, rekan kerja bisa akses lebih cepat tanpa login username dan password lokal.
+</Callout>
+
+Pastikan pengaturan ini diterapkan di perangkat yang akan share folder dan perangkat yang akan mengaksesnya.
+
+## Langkah 2: Bagikan Folder yang Diinginkan
+
+Setelah network discovery beres, lanjut ke folder yang ingin kamu bagikan.
+
+<Steps>
+   <Step>
+      **Buka properti folder**
+      Klik kanan folder target, lalu pilih **Properties**.
+   </Step>
+
+   <Step>
+      **Masuk ke menu sharing**
+      Buka tab **Sharing** lalu klik **Share...**.
+   </Step>
+
+   <Step>
+      **Tambahkan pengguna Everyone**
+      Pada daftar user, pilih **Everyone** dari dropdown lalu klik **Add**.
+   </Step>
+
+   <Step>
+      **Atur Permission Level**
+      - **Read**: pengguna hanya bisa melihat file.
+      - **Read/Write**: pengguna bisa melihat dan mengedit file.
+   </Step>
+
+   <Step>
+      **Selesaikan proses share**
+      Klik **Share** untuk menyelesaikan.
+   </Step>
+</Steps>
+
+![Dialog share folder Windows 11 dengan user Everyone dan izin Read/Write.](/images/_posts/windows11/share-folder/lan-wifi-2.webp "Tambah Everyone dan atur Permission Level saat share folder")
+*Pilih **Everyone** lalu set **Read/Write** jika pengguna lain perlu mengedit file.*
+
+<Callout variant="info" title="Tips Permission">
+Untuk lingkungan campuran, mulai dari izin **Read** terlebih dahulu. Naikkan ke **Read/Write** hanya pada folder yang memang butuh kolaborasi penuh.
+</Callout>
+
+## Langkah 3: Cara Akses Folder dari Komputer Lain
+
+Untuk membuka folder yang sudah dishare dari PC lain, kamu butuh alamat IP komputer sumber.
+
+### Cara Mengetahui IP Komputer Sumber
+
+<Steps>
+   <Step>
+      **Buka Command Prompt**
+      Buka **Command Prompt (CMD)** dari menu Start.
+   </Step>
+
+   <Step>
+      **Jalankan perintah IP**
+      Ketik `ipconfig`, lalu tekan Enter.
+   </Step>
+
+   <Step>
+      **Catat IPv4 Address**
+      Cari bagian **IPv4 Address** (contoh `192.168.1.5` atau `10.27.30.150`).
+   </Step>
+</Steps>
+
+![Output Command Prompt menampilkan IPv4 Address untuk akses folder share di jaringan lokal.](/images/_posts/windows11/share-folder/lan-wifi-3.webp "Cek alamat IPv4 dengan ipconfig di Windows 11")
+*Gunakan nilai IPv4 Address dari hasil `ipconfig` sebagai alamat tujuan.*
+
+### Akses Lewat Run dengan Alamat IP
+
+<Steps>
+   <Step>
+      **Buka jendela Run**
+      Tekan <kbd>Win</kbd> + <kbd>R</kbd>.
+   </Step>
+
+   <Step>
+      **Masukkan alamat target**
+      Ketik `\\` diikuti alamat IP komputer sumber. Contoh: `\\10.27.30.150`.
+   </Step>
+
+   <Step>
+      **Buka folder share**
+      Tekan Enter.
+   </Step>
+</Steps>
+
+![Jendela Run Windows dengan format double backslash plus IP untuk membuka folder share.](/images/_posts/windows11/share-folder/lan-wifi-4.webp "Akses folder share dengan format \\\\ip-address")
+*Gunakan format `\\{ip_address}` di Run untuk menampilkan daftar folder share.*
+
+Kalau semua konfigurasi benar, File Explorer akan menampilkan daftar folder (dan kadang printer) yang dishare dari komputer target.
+
+Setelah ini, proses kolaborasi file di jaringan lokal jadi jauh lebih praktis: transfer lebih cepat, duplikasi file berkurang, dan kamu tidak perlu lagi bergantung pada flash drive untuk tiap revisi.

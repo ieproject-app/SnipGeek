@@ -5,6 +5,7 @@ import type { NoteFrontmatter } from '@/lib/notes';
 import type { Dictionary } from '@/lib/get-dictionary';
 import type { ReadingListItem } from '@/hooks/use-reading-list';
 import Link from 'next/link';
+import { CalendarDays, Clock3 } from 'lucide-react';
 import { i18n } from '@/i18n-config';
 import { cn, formatRelativeTime } from '@/lib/utils';
 
@@ -54,12 +55,16 @@ export function ArticleMeta({ frontmatter, item, locale, dictionary, readingTime
           <div className="flex flex-wrap items-center gap-3 text-sm font-medium text-white/90">
             <span className="font-bold text-white">{authorName}</span>
             <span className="opacity-40">•</span>
-            <time>{timeLabel}{relativeTimeStr}</time>
+            <time className="inline-flex items-center gap-1.5">
+              <CalendarDays className="h-3.5 w-3.5 opacity-80" />
+              <span>{timeLabel}{relativeTimeStr}</span>
+            </time>
             {readingTime && (
               <>
                 <span className="opacity-40">•</span>
-                <span className="bg-accent/20 px-2 py-0.5 rounded text-xs font-bold text-accent">
-                  {readingTime} min
+                <span className="inline-flex items-center gap-1.5 bg-accent/20 px-2 py-0.5 rounded text-xs font-bold text-accent">
+                  <Clock3 className="h-3 w-3" />
+                  <span>{readingTime} min</span>
                 </span>
               </>
             )}
@@ -78,11 +83,17 @@ export function ArticleMeta({ frontmatter, item, locale, dictionary, readingTime
       <div className="flex items-center gap-3 text-sm font-medium text-muted-foreground">
         <span className="text-primary font-bold">{authorName}</span>
         <span className="opacity-30">•</span>
-        <time>{timeLabel}{relativeTimeStr}</time>
+        <time className="inline-flex items-center gap-1.5">
+          <CalendarDays className="h-3.5 w-3.5 opacity-70" />
+          <span>{timeLabel}{relativeTimeStr}</span>
+        </time>
         {readingTime && (
           <>
             <span className="opacity-30">•</span>
-            <span>{readingTime} min</span>
+            <span className="inline-flex items-center gap-1.5">
+              <Clock3 className="h-3.5 w-3.5 opacity-70" />
+              <span>{readingTime} min</span>
+            </span>
           </>
         )}
       </div>

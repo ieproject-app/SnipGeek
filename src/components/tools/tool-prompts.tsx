@@ -547,6 +547,7 @@ export function ToolPrompts({
     if (isModify) {
       prompt += `Hanya ubah bagian yang diminta secara spesifik dalam **MODIFICATION INSTRUCTIONS**. Untuk bagian lainnya, **pertahankan narasi, diksi, dan struktur kalimat asli** secara utuh. Jangan mengubah gaya bahasa penulisan aslinya jika tidak diinstruksikan. `;
     }
+    prompt += `For procedural or tutorial sections, use custom MDX components \`<Steps>\` and \`<Step>\` instead of plain numbered markdown lists. `;
     prompt += `Ensure all metadata (slugs, translation keys, alt texts) are generated automatically and tags are standardized (one-word).`;
 
     // eslint-disable-next-line react-hooks/set-state-in-effect
