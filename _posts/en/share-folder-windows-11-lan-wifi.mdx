@@ -1,0 +1,142 @@
+---
+title: "How to Share a Folder in Windows 11 via LAN and WiFi"
+slug: "share-folder-windows-11-lan-wifi"
+translationKey: "share-folder-windows-11-lan-wifi"
+date: "2026-03-17"
+description: "Step-by-step guide to sharing folders in Windows 11 over LAN or WiFi, from enabling network discovery to opening shared folders by IP address."
+heroImage: "/images/_posts/windows11/share-folder/banner-share.webp"
+imageAlt: "Windows 11 folder sharing banner for LAN and WiFi collaboration"
+published: true
+featured: true
+tags: ["windows11", "sharing", "network", "lan", "wifi"]
+category: "Windows"
+---
+
+Folder sharing is still one of the most practical features in Windows 11, especially when you work with teammates on the same local network.
+
+I still use this setup in small office environments because it is simple, fast, and saves time. Instead of repeatedly moving files with a flash drive, everyone can open the same folder directly from their own PC.
+
+In this guide, I will walk you through the full setup flow: enabling required network settings, sharing a folder with proper permissions, and opening it from another computer using the target IP address.
+
+## Step 1: Enable Network Discovery First
+
+Before sharing any folder, make sure all devices on your network can see each other.
+
+<Steps>
+   <Step>
+      **Open network settings**
+      Open **Settings** in Windows 11, then go to **Network & internet**.
+   </Step>
+
+   <Step>
+      **Go to advanced sharing options**
+      Open **Advanced network settings**, then under **More settings** click **Advanced sharing settings**.
+   </Step>
+
+   <Step>
+      **Enable discovery and file sharing**
+      Turn on **Network Discovery** and **File Sharing** for all network profiles you use.
+   </Step>
+</Steps>
+
+Inside this page, configure all three network profiles. For trusted home or office networks, you can enable all sharing options to avoid discovery issues.
+
+![Windows 11 advanced sharing settings with network discovery and file sharing enabled for all profiles.](/images/_posts/windows11/share-folder/lan-wifi-1.webp "Enable Network Discovery and File Sharing in all network profiles")
+*Set all network profiles to enable Network Discovery and File Sharing.*
+
+<Callout variant="warning" title="Important Security Note">
+In the **All Networks** section, turn off **Password protected sharing** only when you are on a trusted private network. This makes access easier because coworkers will not need a local username and password.
+</Callout>
+
+Apply this setting on devices that will share folders and devices that will access them.
+
+## Step 2: Share a Specific Folder
+
+After network discovery is configured, share the folder you want other users to access.
+
+<Steps>
+   <Step>
+      **Open folder properties**
+      Right-click your target folder, then select **Properties**.
+   </Step>
+
+   <Step>
+      **Open sharing menu**
+      Go to the **Sharing** tab and click **Share...**.
+   </Step>
+
+   <Step>
+      **Add Everyone user**
+      In the user list, select **Everyone** from the dropdown, then click **Add**.
+   </Step>
+
+   <Step>
+      **Set permission level**
+      - **Read**: users can view files only.
+      - **Read/Write**: users can view and edit files.
+   </Step>
+
+   <Step>
+      **Complete sharing**
+      Click **Share** to finish.
+   </Step>
+</Steps>
+
+![Windows 11 share dialog showing Everyone user with Read/Write permission.](/images/_posts/windows11/share-folder/lan-wifi-2.webp "Add Everyone and set permission level when sharing a folder")
+*Choose **Everyone** and set **Read/Write** if users need to edit files.*
+
+<Callout variant="info" title="Permission Tip">
+For mixed environments, start with **Read** first. Upgrade to **Read/Write** only for folders that require active collaboration.
+</Callout>
+
+## Step 3: Access the Shared Folder from Another PC
+
+To open the shared folder from another computer, you need the IP address of the source PC.
+
+### Find the Source PC IP Address
+
+<Steps>
+   <Step>
+      **Open Command Prompt**
+      Open **Command Prompt** from Start.
+   </Step>
+
+   <Step>
+      **Run IP command**
+      Type `ipconfig`, then press Enter.
+   </Step>
+
+   <Step>
+      **Note the IPv4 address**
+      Find **IPv4 Address** (for example `192.168.1.5` or `10.27.30.150`).
+   </Step>
+</Steps>
+
+![Command Prompt output showing IPv4 Address used for LAN shared folder access.](/images/_posts/windows11/share-folder/lan-wifi-3.webp "Check IPv4 address with ipconfig in Windows 11")
+*Use the IPv4 Address from `ipconfig` as the target address.*
+
+### Open Shared Folder via Run Command
+
+<Steps>
+   <Step>
+      **Open Run dialog**
+      Press <kbd>Win</kbd> + <kbd>R</kbd>.
+   </Step>
+
+   <Step>
+      **Enter target address**
+      Type `\\` followed by the source PC IP. Example: `\\10.27.30.150`.
+   </Step>
+
+   <Step>
+      **Open shared resources**
+      Press Enter.
+   </Step>
+</Steps>
+
+![Windows Run dialog using double backslash IP format to open shared folders.](/images/_posts/windows11/share-folder/lan-wifi-4.webp "Access shared folder with \\\\ip-address format")
+*Use `\\{ip_address}` in Run to list shared folders from that PC.*
+
+If everything is configured correctly, File Explorer will show shared folders (and sometimes shared printers) from the target machine.
+
+At this point, your local file transfer workflow becomes much easier: faster collaboration, fewer duplicate copies, and no more dependency on flash drives for every update.

@@ -54,6 +54,7 @@ type SearchableItem = {
   href: string;
   heroImage?: string;
   category?: string;
+  tags?: string[];
 };
 
 type ActiveView = "none" | "search" | "menu" | "readingList";
@@ -293,34 +294,153 @@ export function LayoutHeader({
   ];
 
   const topTagLinks = useMemo(() => {
-    const categoryCount = new Map<string, number>();
-    const categoryLabel = new Map<string, string>();
+    const tagCount = new Map<string, number>();
+    const tagLabel = new Map<string, string>();
 
     (searchableData || []).forEach((item) => {
-      const rawCategory = item.category?.trim();
-      if (!rawCategory) return;
+      (item.tags || []).forEach((rawTag) => {
+        const normalizedTag = rawTag.trim();
+        if (!normalizedTag) return;
 
-      const key = rawCategory.toLowerCase();
-      categoryCount.set(key, (categoryCount.get(key) || 0) + 1);
-      if (!categoryLabel.has(key)) {
-        categoryLabel.set(key, rawCategory);
-      }
+        const key = normalizedTag.toLowerCase();
+        tagCount.set(key, (tagCount.get(key) || 0) + 1);
+        if (!tagLabel.has(key)) {
+          tagLabel.set(key, normalizedTag);
+        }
+      });
     });
 
-    return [...categoryCount.entries()]
+    const dynamicTagLinks = [...tagCount.entries()]
       .sort((a, b) => b[1] - a[1])
       .slice(0, 3)
       .map(([tag]) => ({
-        name: categoryLabel.get(tag) || tag,
+        name: tagLabel.get(tag) || tag,
         href: `/tags/${encodeURIComponent(tag)}`,
         icon: Hash,
       }));
+
+    if (dynamicTagLinks.length >= 3) {
+      return dynamicTagLinks;
+    }
+
+    const fallbackTags = ["windows", "android", "tutorial"];
+    const existingHrefs = new Set(dynamicTagLinks.map((item) => item.href));
+    const fallbackLinks = fallbackTags
+      .filter((tag) => !existingHrefs.has(`/tags/${tag}`))
+      .slice(0, 3 - dynamicTagLinks.length)
+      .map((tag) => ({
+        name: tag.charAt(0).toUpperCase() + tag.slice(1),
+        href: `/tags/${tag}`,
+        icon: Hash,
+      }));
+
+    return [...dynamicTagLinks, ...fallbackLinks];
   }, [searchableData]);
 
   const secondaryLinks = [
     { name: dictionary.tags.allTagsTitle, href: "/tags", icon: Hash },
     ...topTagLinks,
   ];
+
+  const normalizedPath = useMemo(() => {
+    if (!pathname) return "/";
+    const stripped = pathname.replace(/\/+$/, "");
+    return stripped || "/";
+  }, [pathname]);
+
+  const contextualSecondaryLink = useMemo(() => {
+    const blogDetailPrefix = `${linkPrefix}/blog/`;
+    const noteDetailPrefix = `${linkPrefix}/notes/`;
+    const isDetailPage =
+      (normalizedPath.startsWith(blogDetailPrefix) &&
+        !normalizedPath.slice(blogDetailPrefix.length).includes("/")) ||
+      (normalizedPath.startsWith(noteDetailPrefix) &&
+        !normalizedPath.slice(noteDetailPrefix.length).includes("/"));
+
+    if (!isDetailPage) return null;
+
+    const currentItem = (searchableData || []).find(
+      (item) => item.href === normalizedPath,
+    );
+
+    if (!currentItem) return null;
+
+    const selectedTag = (currentItem.tags || []).find((tag) => tag.trim());
+
+    if (selectedTag) {
+      const tagLabel = selectedTag.trim();
+      const tagKey = tagLabel.toLowerCase();
+      return {
+        name: tagLabel,
+        href: `/tags/${encodeURIComponent(tagKey)}`,
+        icon: Hash,
+      };
+    }
+
+    const selectedCategory = currentItem.category?.trim();
+    if (!selectedCategory) return null;
+
+    const categoryKey = selectedCategory.toLowerCase();
+    return {
+      name: selectedCategory,
+      href: `/tags/${encodeURIComponent(categoryKey)}`,
+      icon: Hash,
+    };
+  }, [linkPrefix, normalizedPath, searchableData]);
+
+  const finalSecondaryLinks = useMemo(() => {
+    const merged = contextualSecondaryLink
+      ? [secondaryLinks[0], contextualSecondaryLink, ...secondaryLinks.slice(1)]
+      : secondaryLinks;
+
+    const seen = new Set<string>();
+    return merged.filter((item) => {
+      if (seen.has(item.href)) return false;
+      seen.add(item.href);
+      return true;
+    });
+  }, [contextualSecondaryLink, secondaryLinks]);
+
+  const getIsActivePath = (href: string) => {
+    const localizedHref = `${linkPrefix}${href}` || "/";
+
+    if (href === "/tags") {
+      return pathname === localizedHref;
+    }
+
+    return (
+      pathname === localizedHref || pathname.startsWith(`${localizedHref}/`)
+    );
+  };
+
+  const trackSecondaryNavClick = (item: {
+    name: string;
+    href: string;
+  }, position: number) => {
+    if (typeof window === "undefined") return;
+
+    const detail = {
+      name: item.name,
+      href: item.href,
+      position,
+      locale: currentLocale,
+      sourcePath: normalizedPath,
+    };
+
+    window.dispatchEvent(
+      new CustomEvent("snipgeek:secondary-nav-click", { detail }),
+    );
+
+    const gtag = (
+      window as typeof window & {
+        gtag?: (...args: unknown[]) => void;
+      }
+    ).gtag;
+
+    if (typeof gtag === "function") {
+      gtag("event", "secondary_nav_click", detail);
+    }
+  };
 
   const navItemClass =
     "h-9 w-9 p-0 rounded-xl transition-all duration-300 text-foreground/75 hover:text-foreground hover:bg-accent/15 hover:shadow-sm flex items-center justify-center relative";
@@ -401,13 +521,13 @@ export function LayoutHeader({
             )}
           >
             {directLinks.map((item) => {
-              const isActive = pathname.includes(item.href);
+              const isActive = getIsActivePath(item.href);
               return (
                 <NextLink
                   key={item.href}
                   href={`${linkPrefix}${item.href}`}
                   className={cn(
-                    "px-3 py-2 font-sans text-[10px] font-black uppercase tracking-[0.12em] transition-all relative",
+                    "px-3 py-2 font-sans text-[10px] font-black uppercase tracking-[0.12em] transition-all relative rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50",
                     isActive
                       ? "text-accent"
                       : "text-foreground/65 hover:text-foreground",
@@ -974,26 +1094,27 @@ export function LayoutHeader({
         </div>
       </header>
 
-      <div className="relative z-20 w-full bg-background/95 pt-16">
+      <div className="relative z-20 w-full bg-gradient-to-b from-accent/24 via-accent/14 to-accent/6 pt-16">
         <div className="mx-auto max-w-4xl px-4 md:px-6">
           <nav
             aria-label="Quick navigation"
             data-nav-slot="secondary"
-            className="flex min-h-11 flex-wrap items-center justify-center gap-2 border-b border-border/70 py-2"
+            className="flex min-h-11 items-center justify-start md:justify-center gap-2 overflow-x-auto whitespace-nowrap py-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
           >
-            {secondaryLinks.map((item) => {
-              const isActive = pathname.includes(item.href);
+            {finalSecondaryLinks.map((item, index) => {
+              const isActive = getIsActivePath(item.href);
               return (
                 <NextLink
                   key={item.href}
                   href={`${linkPrefix}${item.href}`}
                   aria-current={isActive ? "page" : undefined}
                   data-nav-item={item.href.replace("/", "") || "home"}
+                  onClick={() => trackSecondaryNavClick(item, index + 1)}
                   className={cn(
-                    "group inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 font-sans text-[10px] font-black uppercase tracking-[0.13em] transition-all",
+                    "group inline-flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1.5 font-sans text-[10px] font-black uppercase tracking-[0.13em] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50",
                     isActive
-                      ? "border-accent/40 bg-accent/10 text-accent"
-                      : "border-border/80 bg-background text-foreground/70 hover:border-accent/30 hover:bg-accent/5 hover:text-foreground",
+                      ? "border-primary/60 bg-primary text-primary-foreground shadow-sm"
+                      : "border-primary/30 bg-background/80 text-foreground/80 hover:border-primary/50 hover:bg-primary/10 hover:text-foreground",
                   )}
                 >
                   <item.icon className="h-3.5 w-3.5" />
