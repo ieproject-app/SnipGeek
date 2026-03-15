@@ -138,7 +138,7 @@ export function LocaleSuggestionBanner({
     >
       <div
         className={cn(
-          "mx-auto flex w-full max-w-2xl items-start gap-3 rounded-2xl border border-accent/20 bg-background/95 px-4 py-3 shadow-2xl ring-1 ring-black/5 backdrop-blur supports-[backdrop-filter]:bg-background/85",
+          "mx-auto flex w-full max-w-2xl items-start gap-3 rounded-2xl border border-accent/20 bg-background/95 px-4 py-3 shadow-2xl ring-1 ring-black/5 backdrop-blur supports-backdrop-filter:bg-background/85",
           visible ? "pointer-events-auto" : "pointer-events-none",
         )}
       >
