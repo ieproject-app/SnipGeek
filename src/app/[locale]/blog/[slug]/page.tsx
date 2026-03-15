@@ -219,7 +219,7 @@ export default async function Page({
               isCentered={true}
             />
 
-            <div className="relative mt-8 mb-12 rounded-xl overflow-hidden shadow-2xl bg-muted group ring-1 ring-primary/5 aspect-[4/3]">
+            <div className="relative mt-8 mb-12 rounded-xl overflow-hidden shadow-2xl bg-muted group ring-1 ring-primary/5 aspect-video">
               {heroSource ? (
                 <Image
                   src={heroSource.url}

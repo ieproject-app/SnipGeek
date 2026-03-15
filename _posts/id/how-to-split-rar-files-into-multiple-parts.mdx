@@ -45,17 +45,33 @@ Proses instalasinya sama seperti aplikasi `.exe` biasa: jalankan installer, ikut
 
 Setelah WinRAR terinstal, ikuti langkah berikut.
 
-1. **Siapkan file:** Tentukan file atau folder yang ingin dibagi.
-2. **Mulai proses arsip:** Klik kanan file/folder lalu pilih **Add to archive...**.
-3. **Atur konfigurasi split:** Di jendela yang muncul, fokus ke bagian ini.
-   - **Archive name:** Ubah nama file output jika diperlukan.
-   - **Archive options:** Centang **Create solid archive** dan **Add recovery record** untuk menjaga integritas data.
-   - **Split to volumes, size (paling penting):** Tentukan ukuran tiap part. Bisa pilih preset atau ketik manual, misalnya `100M` untuk 100 MB per part.
+<Steps>
+   <Step>
+      **Siapkan file atau folder target**
+      Tentukan file atau folder yang ingin dibagi menjadi beberapa part.
+   </Step>
+
+   <Step>
+      **Buka menu arsip WinRAR**
+      Klik kanan file/folder, lalu pilih **Add to archive...**.
+   </Step>
+
+   <Step>
+      **Atur konfigurasi split volume**
+      Di jendela pengaturan, fokus ke bagian berikut:
+      - **Archive name:** Ubah nama file output jika diperlukan.
+      - **Archive options:** Centang **Create solid archive** dan **Add recovery record** untuk menjaga integritas data.
+      - **Split to volumes, size (paling penting):** Tentukan ukuran tiap part. Bisa pilih preset atau ketik manual, misalnya `100M` untuk 100 MB per part.
+   </Step>
+
+   <Step>
+      **Jalankan proses split**
+      Klik **OK** lalu tunggu sampai selesai. Hasilnya akan muncul dalam beberapa file seperti `.part1.rar`, `.part2.rar`, dan seterusnya.
+   </Step>
+</Steps>
 
 ![Jendela pengaturan WinRAR yang menampilkan konfigurasi split file menjadi beberapa volume.](/images/_posts/apps/winrar/split_rar.webp "Pengaturan split to volumes di WinRAR pada Windows.")
 *Pengaturan utama ada di opsi **Split to volumes, size**.*
-
-4. **Mulai proses:** Klik **OK** lalu tunggu hingga selesai. Hasilnya akan muncul beberapa file seperti `.part1.rar`, `.part2.rar`, dan seterusnya.
 
 ## #3 Cara Menggabungkan dan Mengekstrak Kembali
 
@@ -72,6 +88,21 @@ Kalau satu part saja hilang, proses ekstraksi akan gagal.
 
 ### Langkah Ekstraksi
 
-Klik kanan `part1.rar`, lalu pilih **Extract Here** atau **Extract to...**. WinRAR akan otomatis membaca dan menggabungkan part lainnya.
+<Steps>
+   <Step>
+      **Pastikan semua part ada dalam satu folder**
+      Cek ulang bahwa semua file part sudah lengkap dan berada di direktori yang sama.
+   </Step>
+
+   <Step>
+      **Mulai ekstraksi dari file pertama**
+      Klik kanan `part1.rar`, lalu pilih **Extract Here** atau **Extract to...**.
+   </Step>
+
+   <Step>
+      **Biarkan WinRAR menggabungkan otomatis**
+      WinRAR akan membaca part berikutnya secara otomatis sampai proses ekstraksi selesai.
+   </Step>
+</Steps>
 
 Selesai. Simpel, praktis, dan sangat berguna untuk menangani file berukuran besar.

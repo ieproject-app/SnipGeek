@@ -96,7 +96,7 @@ export function BlogListClient({
                     className="block"
                     aria-label={`Read more about ${post.frontmatter.title}`}
                   >
-                    <div className="relative w-full aspect-[4/3] overflow-hidden rounded-xl mb-4 shadow-sm transition-all duration-500 border border-primary/5">
+                    <div className="relative w-full aspect-[8/5] overflow-hidden rounded-xl mb-4 shadow-sm transition-all duration-500 border border-primary/5">
                       {heroImageSrc && (
                         <RevealImage
                           src={heroImageSrc}

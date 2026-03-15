@@ -74,7 +74,7 @@ export function HomeHero({ posts, dictionary, locale, linkPrefix }: HomeHeroProp
                                 <Link href={`${linkPrefix}/blog/${post.slug}`} className="block" aria-label={`Read ${post.frontmatter.title}`}>
                                     <article className="space-y-5">
                                         {/* Image Block */}
-                                        <div className="relative aspect-[4/3] rounded-xl overflow-hidden bg-muted shadow-md group-hover:shadow-xl group-hover:-translate-y-2 transition-all duration-500">
+                                        <div className="relative aspect-[3/2] rounded-xl overflow-hidden bg-muted shadow-md group-hover:shadow-xl group-hover:-translate-y-2 transition-all duration-500">
                                             {/* Accent Bar (Bottom) - Color matches category */}
                                             <div
                                                 className={cn("absolute bottom-0 left-0 right-0 h-[3px] z-30 transition-opacity duration-500 opacity-0 group-hover:opacity-100", badgeStyle.dot)}

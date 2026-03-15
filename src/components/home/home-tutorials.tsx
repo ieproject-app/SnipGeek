@@ -98,8 +98,8 @@ export function HomeTutorials({ posts, title, viewMoreText, dictionary, locale, 
                       "dark:shadow-black/40"
                     )}>
                       <Link href={`${linkPrefix}/blog/${post.slug}`} className="block h-full group">
-                        {/* Image container - Changed to aspect 4:3 */}
-                        <div className="relative aspect-[4/3] overflow-hidden z-10 rounded-t-lg">
+                        {/* Image container - Tuned to 8:5 for richer card height */}
+                        <div className="relative aspect-[8/5] overflow-hidden z-10 rounded-t-lg">
                           <RevealImage
                             src={heroImageSrc}
                             alt={post.frontmatter.imageAlt || post.frontmatter.title}
