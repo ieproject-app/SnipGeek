@@ -355,7 +355,7 @@ export function PostEditor({ initialData, id }: PostEditorProps) {
               <TabsContent value="write" className="m-0 p-6">
                 <Textarea
                   placeholder="Tulis konten MDX Anda di sini..."
-                  className="min-h-[650px] font-mono text-sm leading-relaxed border-none focus-visible:ring-0 resize-none p-0 bg-transparent"
+                  className="min-h-162.5 font-mono text-sm leading-relaxed border-none focus-visible:ring-0 resize-none p-0 bg-transparent"
                   value={formData.contentMdx}
                   onChange={(e) =>
                     setFormData((prev) => ({
@@ -368,7 +368,7 @@ export function PostEditor({ initialData, id }: PostEditorProps) {
 
               <TabsContent
                 value="media"
-                className="m-0 p-6 space-y-6 min-h-[650px]"
+                className="m-0 p-6 space-y-6 min-h-162.5"
               >
                 <div className="flex items-center justify-between">
                   <div>
@@ -486,7 +486,7 @@ export function PostEditor({ initialData, id }: PostEditorProps) {
 
               <TabsContent
                 value="preview"
-                className="m-0 p-8 prose prose-slate dark:prose-invert max-none bg-background min-h-[650px]"
+                className="m-0 p-8 prose prose-slate dark:prose-invert max-none bg-background min-h-162.5"
               >
                 <div className="whitespace-pre-wrap">
                   {formData.contentMdx || "Nothing to preview yet..."}
@@ -646,7 +646,7 @@ export function PostEditor({ initialData, id }: PostEditorProps) {
             </CardContent>
           </Card>
 
-          <Card className="border-primary/10 bg-emerald-500/[0.02] shadow-sm">
+          <Card className="border-primary/10 bg-emerald-500/2 shadow-sm">
             <CardHeader className="py-3 border-b">
               <CardTitle className="text-[10px] font-black uppercase tracking-widest">
                 Publish Settings

@@ -8,7 +8,7 @@ import {
   getStaticPageTitle,
 } from "@/lib/static-pages";
 import {
-  StaticPageTemplate,
+  LayoutStaticPageTemplate,
   resolveStaticPageIcon,
 } from "@/components/layout/static-page-template";
 
@@ -47,7 +47,7 @@ export default async function TermsPage({
   const lastUpdated = getStaticPageLastUpdated(frontmatter);
 
   return (
-    <StaticPageTemplate
+    <LayoutStaticPageTemplate
       title={title}
       description={description}
       lastUpdated={lastUpdated}

@@ -43,7 +43,7 @@ export function resolveStaticPageIcon(icon?: string | IconComponent): IconCompon
   return iconMap[normalized] || FileText;
 }
 
-export function StaticPageTemplate({
+export function LayoutStaticPageTemplate({
   title,
   description,
   lastUpdated,

@@ -51,7 +51,7 @@ export function HomeTutorials({ posts, title, viewMoreText, dictionary, locale, 
             <h2 className="text-sm font-medium font-display text-primary mb-2 italic">
               {title}
             </h2>
-            <div className="w-full h-0.5 bg-gradient-to-r from-accent via-accent/50 to-transparent" />
+            <div className="w-full h-0.5 bg-linear-to-r from-accent via-accent/50 to-transparent" />
           </div>
         </ScrollReveal>
 
@@ -99,7 +99,7 @@ export function HomeTutorials({ posts, title, viewMoreText, dictionary, locale, 
                     )}>
                       <Link href={`${linkPrefix}/blog/${post.slug}`} className="block h-full group">
                         {/* Image container - Tuned to 8:5 for richer card height */}
-                        <div className="relative aspect-[8/5] overflow-hidden z-10 rounded-t-lg">
+                        <div className="relative aspect-8/5 overflow-hidden z-10 rounded-t-lg">
                           <RevealImage
                             src={heroImageSrc}
                             alt={post.frontmatter.imageAlt || post.frontmatter.title}

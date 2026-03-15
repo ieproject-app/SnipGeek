@@ -85,7 +85,7 @@ export default async function AboutPage({
     <div className="w-full">
       <main className="mx-auto max-w-5xl px-4 pt-8 pb-14 sm:px-6 lg:px-8">
         <ScrollReveal direction="down">
-          <section className="relative overflow-hidden rounded-3xl border border-primary/10 bg-gradient-to-br from-primary/6 via-background to-accent/6 p-8 md:p-12">
+          <section className="relative overflow-hidden rounded-3xl border border-primary/10 bg-linear-to-br from-primary/6 via-background to-accent/6 p-8 md:p-12">
             <div className="pointer-events-none absolute -top-20 -left-20 h-72 w-72 rounded-full bg-primary/10 blur-3xl" />
             <div className="pointer-events-none absolute -right-20 -bottom-20 h-72 w-72 rounded-full bg-accent/10 blur-3xl" />
 
@@ -131,8 +131,8 @@ export default async function AboutPage({
 
               <div className="flex w-full justify-center lg:justify-end">
                 <div className="w-full max-w-md">
-                  <div className="relative rounded-[28px] border border-primary/10 bg-card/70 px-5 pb-6 pt-5 shadow-xl backdrop-blur-sm sm:px-6 sm:pb-7 sm:pt-6">
-                    <div className="absolute top-0 right-0 h-[3.75rem] w-[3.75rem] rounded-tr-[28px] rounded-bl-[24px] bg-background/92 sm:h-[4.5rem] sm:w-[4.5rem]" />
+                  <div className="relative rounded-7 border border-primary/10 bg-card/70 px-5 pb-6 pt-5 shadow-xl backdrop-blur-sm sm:px-6 sm:pb-7 sm:pt-6">
+                    <div className="absolute top-0 right-0 h-15 w-15 rounded-tr-[28px] rounded-bl-3xl bg-background/92 sm:h-18 sm:w-18" />
                     <MotionDiv
                       initial={{
                         opacity: 0,
@@ -172,7 +172,7 @@ export default async function AboutPage({
                         />
                         <MotionSpan
                           aria-hidden="true"
-                          className="absolute inset-[-8px] rounded-full border border-primary/12"
+                          className="absolute -inset-2 rounded-full border border-primary/12"
                           whileInView={{
                             scale: [0.96, 1.1, 0.96],
                             opacity: [0.22, 0.05, 0.22],
@@ -216,7 +216,7 @@ export default async function AboutPage({
 
         <ScrollReveal direction="up" delay={0.06}>
           <section className="mt-8 mb-16">
-            <div className="mx-auto max-w-4xl rounded-[28px] border border-primary/10 bg-gradient-to-br from-card/85 via-card/70 to-background/90 p-6 shadow-sm backdrop-blur-sm sm:p-8">
+            <div className="mx-auto max-w-4xl rounded-7 border border-primary/10 bg-linear-to-br from-card/85 via-card/70 to-background/90 p-6 shadow-sm backdrop-blur-sm sm:p-8">
               <div className="flex flex-col gap-8 sm:flex-row sm:items-center sm:justify-between">
                 <div className="flex-1 sm:pr-8">
                   <div className="mb-3 flex items-center gap-2">
@@ -230,7 +230,7 @@ export default async function AboutPage({
                   </p>
                 </div>
 
-                <div className="grid w-full grid-cols-2 gap-3 sm:w-auto sm:min-w-[280px]">
+                <div className="grid w-full grid-cols-2 gap-3 sm:w-auto sm:min-w-70">
                   {data.profile.stats.map((stat) => (
                     <MiniStat
                       key={`${stat.label}-${stat.value}`}
@@ -275,7 +275,7 @@ export default async function AboutPage({
             <SectionHeading title={dictionary.about.story} />
             <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_300px] lg:items-start">
               <div className="min-w-0">
-                <div className="rounded-[28px] border border-primary/10 bg-card/20 p-6 shadow-sm backdrop-blur-sm sm:p-8">
+                <div className="rounded-7 border border-primary/10 bg-card/20 p-6 shadow-sm backdrop-blur-sm sm:p-8">
                   <div className="prose-content text-lg text-foreground/80 [&>h2:first-child]:mt-0 [&>p:first-child]:mt-0">
                     <MDXRemote
                       source={content}
@@ -294,8 +294,8 @@ export default async function AboutPage({
               </div>
 
               <aside className="lg:sticky lg:top-24">
-                <div className="relative rounded-[24px] border border-primary/10 bg-gradient-to-br from-primary/6 via-background to-accent/6 p-5 shadow-sm">
-                  <div className="absolute top-0 right-0 h-[3.5rem] w-[3.5rem] rounded-tr-[24px] rounded-bl-[20px] bg-background/92 sm:h-[4rem] sm:w-[4rem]" />
+                <div className="relative rounded-3xl border border-primary/10 bg-linear-to-br from-primary/6 via-background to-accent/6 p-5 shadow-sm">
+                  <div className="absolute top-0 right-0 h-14 w-14 rounded-tr-3xl rounded-bl-[20px] bg-background/92 sm:h-16 sm:w-16" />
                   <MotionDiv
                     initial={{
                       opacity: 0,
@@ -335,7 +335,7 @@ export default async function AboutPage({
                       />
                       <MotionSpan
                         aria-hidden="true"
-                        className="absolute inset-[-6px] rounded-full border border-primary/12"
+                        className="absolute -inset-1.5 rounded-full border border-primary/12"
                         whileInView={{
                           scale: [0.96, 1.08, 0.96],
                           opacity: [0.22, 0.05, 0.22],
@@ -389,7 +389,7 @@ export default async function AboutPage({
             </div>
 
             <div className="relative px-2 sm:px-0">
-              <div className="absolute top-0 bottom-0 left-[20px] w-px -translate-x-1/2 bg-gradient-to-b from-transparent via-primary/20 to-transparent sm:left-1/2" />
+              <div className="absolute top-0 bottom-0 left-5 w-px -translate-x-1/2 bg-linear-to-b from-transparent via-primary/20 to-transparent sm:left-1/2" />
 
               <div className="space-y-10">
                 {data.experiences.map((exp, index) => {
@@ -411,7 +411,7 @@ export default async function AboutPage({
                             )}
                           </div>
 
-                          <div className="absolute top-8 left-[20px] z-10 flex -translate-x-1/2 -translate-y-1/2 items-center justify-center sm:top-1/2 sm:left-1/2">
+                          <div className="absolute top-8 left-5 z-10 flex -translate-x-1/2 -translate-y-1/2 items-center justify-center sm:top-1/2 sm:left-1/2">
                             <div className="relative">
                               <div className="absolute inset-0 scale-150 rounded-full bg-primary/10 group-hover:bg-primary/20" />
                               <div className="relative flex h-10 w-10 items-center justify-center rounded-full border-2 border-primary/40 bg-background shadow-xl transition-all duration-300 group-hover:scale-110 group-hover:border-primary">
@@ -449,7 +449,7 @@ export default async function AboutPage({
             {data.skills.map((cat, index) => (
               <ScrollReveal key={cat.name} delay={index * 0.08} direction="up">
                 <Card className="relative h-full overflow-hidden rounded-2xl border-primary/10 bg-card/50 transition-all duration-300 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5">
-                  <div className="absolute top-0 right-0 left-0 h-0.5 bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
+                  <div className="absolute top-0 right-0 left-0 h-0.5 bg-linear-to-r from-transparent via-primary/50 to-transparent" />
                   <CardHeader className="pb-3">
                     <CardTitle className="font-display text-sm font-bold uppercase tracking-widest text-primary">
                       {cat.name}
@@ -549,7 +549,7 @@ export default async function AboutPage({
         </div>
 
         <ScrollReveal direction="up" distance={40}>
-          <section className="relative overflow-hidden rounded-3xl border border-primary/15 bg-gradient-to-br from-primary/8 via-background to-accent/8 p-10 text-center md:p-14">
+          <section className="relative overflow-hidden rounded-3xl border border-primary/15 bg-linear-to-br from-primary/8 via-background to-accent/8 p-10 text-center md:p-14">
             <div className="pointer-events-none absolute -top-20 left-1/2 h-40 w-80 -translate-x-1/2 rounded-full bg-primary/10 blur-3xl" />
             <div className="relative z-10 mx-auto max-w-2xl">
               <div className="mb-6 inline-flex h-16 w-16 items-center justify-center rounded-2xl border border-primary/20 bg-primary/10">
@@ -583,7 +583,7 @@ function SectionHeading({ title }: { title: string }) {
       <h2 className="font-display shrink-0 text-xl font-bold uppercase tracking-tight text-primary">
         {title}
       </h2>
-      <div className="h-px flex-1 bg-gradient-to-r from-primary/40 to-transparent" />
+      <div className="h-px flex-1 bg-linear-to-r from-primary/40 to-transparent" />
     </div>
   );
 }

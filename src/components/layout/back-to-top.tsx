@@ -5,7 +5,7 @@ import { ArrowUp } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 
-export function BackToTop() {
+export function LayoutBackToTop() {
     const [isVisible, setIsVisible] = useState(false);
     const [lastScrollY, setLastScrollY] = useState(0);
 
@@ -46,7 +46,7 @@ export function BackToTop() {
                     exit={{ opacity: 0, y: 20, x: "-50%" }}
                     onClick={scrollToTop}
                     className={cn(
-                        "fixed bottom-8 left-1/2 z-[60]",
+                        "fixed bottom-8 left-1/2 z-60",
                         "flex items-center gap-2.5 px-5 py-2 rounded-full",
                         "bg-background/60 backdrop-blur-xl border border-primary/10",
                         "shadow-[0_8px_32px_rgba(0,0,0,0.12)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.5)]",

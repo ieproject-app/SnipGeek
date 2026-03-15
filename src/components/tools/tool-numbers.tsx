@@ -625,7 +625,7 @@ export function ToolNumbers({ dictionary }: { dictionary: Dictionary }) {
                                     {s.step}
                                 </div>
                                 <span className={cn(
-                                    "text-[10px] uppercase tracking-widest font-black text-center max-w-[80px]",
+                                    "text-[10px] uppercase tracking-widest font-black text-center max-w-20",
                                     s.active ? "text-primary" : "text-muted-foreground/40"
                                 )}>
                                     {s.label}
@@ -668,7 +668,7 @@ export function ToolNumbers({ dictionary }: { dictionary: Dictionary }) {
                                         {isLimitLoading ? (
                                             <Skeleton className="h-16 w-40 rounded-xl" />
                                         ) : (
-                                            <div className="bg-background/80 backdrop-blur-sm p-4 rounded-xl border border-primary/5 shadow-inner min-w-[180px]">
+                                            <div className="bg-background/80 backdrop-blur-sm p-4 rounded-xl border border-primary/5 shadow-inner min-w-45">
                                                 <div className="flex items-center justify-between mb-2">
                                                     <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-1">
                                                         <Database className="h-3" /> Kuota Hari Ini
@@ -709,7 +709,7 @@ export function ToolNumbers({ dictionary }: { dictionary: Dictionary }) {
                                         {requests.map((req, index) => (
                                             <motion.div
                                                 key={req.id}
-                                                className="grid grid-cols-1 md:grid-cols-[auto_2fr_1.5fr_1fr_auto] gap-4 items-end p-4 md:p-5 border-2 border-primary/5 hover:border-primary/15 transition-colors rounded-2xl bg-gradient-to-br from-background to-muted/20 shadow-inner"
+                                                className="grid grid-cols-1 md:grid-cols-[auto_2fr_1.5fr_1fr_auto] gap-4 items-end p-4 md:p-5 border-2 border-primary/5 hover:border-primary/15 transition-colors rounded-2xl bg-linear-to-br from-background to-muted/20 shadow-inner"
                                                 initial={{ opacity: 0, y: -10 }}
                                                 animate={{ opacity: 1, y: 0 }}
                                                 exit={{ opacity: 0, scale: 0.95 }}
@@ -776,7 +776,7 @@ export function ToolNumbers({ dictionary }: { dictionary: Dictionary }) {
                                                         <Input
                                                             type="number" min="1" max="20" value={req.quantity}
                                                             onChange={(e) => handleRequestChange(req.id, 'quantity', Number(e.target.value))}
-                                                            className="h-11 flex-1 min-w-[50px] text-center rounded-lg border-primary/10 font-bold [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none focus-visible:ring-accent"
+                                                            className="h-11 flex-1 min-w-12.5 text-center rounded-lg border-primary/10 font-bold [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none focus-visible:ring-accent"
                                                         />
                                                         <Button
                                                             variant="outline" size="icon" className="h-11 w-11 rounded-lg border-primary/10 focus-visible:ring-accent"
@@ -819,7 +819,7 @@ export function ToolNumbers({ dictionary }: { dictionary: Dictionary }) {
                                             </Button>
                                         </DialogTrigger>
                                         <DialogContent className="max-w-5xl p-0 overflow-hidden border-primary/10 rounded-2xl shadow-2xl shadow-primary/10">
-                                            <DialogHeader className="p-6 bg-gradient-to-br from-primary/5 to-accent/5 border-b border-primary/10">
+                                            <DialogHeader className="p-6 bg-linear-to-br from-primary/5 to-accent/5 border-b border-primary/10">
                                                 <div className="flex items-center gap-4">
                                                     <div className="p-3 rounded-xl bg-primary/10 ring-1 ring-primary/10">
                                                         <Database className="h-6 w-6 text-primary" />
@@ -850,20 +850,20 @@ export function ToolNumbers({ dictionary }: { dictionary: Dictionary }) {
                                                                 </TabsList>
                                                             </div>
                                                             <TabsContent value="2025" className="mt-0">
-                                                                <div className="relative max-h-[55vh] overflow-auto bg-background">
+                                                                <div className="relative max-h-137.5 overflow-auto bg-background">
                                                                     <table className="w-full border-collapse text-[11px]">
                                                                         <thead className="sticky top-0 z-10 bg-background border-b-2 border-primary/10">
                                                                             <tr className="bg-muted/30">
-                                                                                <th className="sticky left-0 z-20 bg-muted/60 backdrop-blur-sm p-4 text-left font-black uppercase tracking-widest text-muted-foreground w-[110px] border-r border-primary/10">Kategori</th>
+                                                                                <th className="sticky left-0 z-20 bg-muted/60 backdrop-blur-sm p-4 text-left font-black uppercase tracking-widest text-muted-foreground w-27.5 border-r border-primary/10">Kategori</th>
                                                                                 {stockPeriods2025.map(period => (
-                                                                                    <th key={period} className="p-3 text-center font-black uppercase tracking-widest text-muted-foreground min-w-[64px]">{format(new Date(period), 'MMM', { locale: id }).toUpperCase()}</th>
+                                                                                    <th key={period} className="p-3 text-center font-black uppercase tracking-widest text-muted-foreground min-w-16">{format(new Date(period), 'MMM', { locale: id }).toUpperCase()}</th>
                                                                                 ))}
                                                                             </tr>
                                                                         </thead>
                                                                         <tbody className="divide-y divide-primary/5">
                                                                             {stockCategories.map(category => (
-                                                                                <tr key={category} className="group hover:bg-primary/[0.03] transition-colors">
-                                                                                    <th className="sticky left-0 bg-background group-hover:bg-primary/[0.03] p-4 text-left font-black text-[10px] tracking-widest text-primary/50 border-r border-primary/5 transition-colors">{category}</th>
+                                                                                <tr key={category} className="group hover:bg-primary/3 transition-colors">
+                                                                                    <th className="sticky left-0 bg-background group-hover:bg-primary/3 p-4 text-left font-black text-[10px] tracking-widest text-primary/50 border-r border-primary/5 transition-colors">{category}</th>
                                                                                     {stockPeriods2025.map(period => (
                                                                                         <td key={`${category}-${period}`} className={cn(
                                                                                             "p-3 text-center font-mono text-xs transition-colors",
@@ -886,20 +886,20 @@ export function ToolNumbers({ dictionary }: { dictionary: Dictionary }) {
                                                                 </div>
                                                             </TabsContent>
                                                             <TabsContent value="2026" className="mt-0">
-                                                                <div className="relative max-h-[55vh] overflow-auto bg-background">
+                                                                <div className="relative max-h-137.5 overflow-auto bg-background">
                                                                     <table className="w-full border-collapse text-[11px]">
                                                                         <thead className="sticky top-0 z-10 bg-background border-b-2 border-primary/10">
                                                                             <tr className="bg-muted/30">
-                                                                                <th className="sticky left-0 z-20 bg-muted/60 backdrop-blur-sm p-4 text-left font-black uppercase tracking-widest text-muted-foreground w-[110px] border-r border-primary/10">Kategori</th>
+                                                                                <th className="sticky left-0 z-20 bg-muted/60 backdrop-blur-sm p-4 text-left font-black uppercase tracking-widest text-muted-foreground w-27.5 border-r border-primary/10">Kategori</th>
                                                                                 {stockPeriods2026.map(period => (
-                                                                                    <th key={period} className="p-3 text-center font-black uppercase tracking-widest text-muted-foreground min-w-[64px]">{format(new Date(period), 'MMM', { locale: id }).toUpperCase()}</th>
+                                                                                    <th key={period} className="p-3 text-center font-black uppercase tracking-widest text-muted-foreground min-w-16">{format(new Date(period), 'MMM', { locale: id }).toUpperCase()}</th>
                                                                                 ))}
                                                                             </tr>
                                                                         </thead>
                                                                         <tbody className="divide-y divide-primary/5">
                                                                             {stockCategories.map(category => (
-                                                                                <tr key={category} className="group hover:bg-primary/[0.03] transition-colors">
-                                                                                    <th className="sticky left-0 bg-background group-hover:bg-primary/[0.03] p-4 text-left font-black text-[10px] tracking-widest text-primary/50 border-r border-primary/5 transition-colors">{category}</th>
+                                                                                <tr key={category} className="group hover:bg-primary/3 transition-colors">
+                                                                                    <th className="sticky left-0 bg-background group-hover:bg-primary/3 p-4 text-left font-black text-[10px] tracking-widest text-primary/50 border-r border-primary/5 transition-colors">{category}</th>
                                                                                     {stockPeriods2026.map(period => (
                                                                                         <td key={`${category}-${period}`} className={cn(
                                                                                             "p-3 text-center font-mono text-xs transition-colors",
@@ -948,7 +948,7 @@ export function ToolNumbers({ dictionary }: { dictionary: Dictionary }) {
                                 </div>
 
                                 {!isAdminUser && userLimit.isLimited && (
-                                    <div className="mt-4 flex items-center gap-4 rounded-xl border border-destructive/20 bg-gradient-to-r from-destructive/10 to-destructive/5 p-5 border-l-4 border-l-destructive animate-in slide-in-from-top-2">
+                                    <div className="mt-4 flex items-center gap-4 rounded-xl border border-destructive/20 bg-linear-to-r from-destructive/10 to-destructive/5 p-5 border-l-4 border-l-destructive animate-in slide-in-from-top-2">
                                         <AlertTriangle className="h-6 w-6 shrink-0 text-destructive" />
                                         <div className="space-y-0.5">
                                             <p className="text-sm font-black text-destructive uppercase tracking-tight">Batas Harian Tercapai</p>
@@ -963,7 +963,7 @@ export function ToolNumbers({ dictionary }: { dictionary: Dictionary }) {
                             {hasResults && (
                                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="animate-in zoom-in-95 duration-500">
                                     <Card className="border-accent/20 bg-accent/5 shadow-xl ring-1 ring-accent/5 overflow-hidden transition-shadow duration-300 hover:shadow-2xl">
-                                        <CardHeader className="bg-gradient-to-r from-accent/15 to-accent/5 border-b border-accent/10 p-6">
+                                        <CardHeader className="bg-linear-to-r from-accent/15 to-accent/5 border-b border-accent/10 p-6">
                                             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                                                 <div className="flex items-center gap-3">
                                                     <div className="p-2 bg-accent rounded-xl shadow-lg shadow-accent/30"><CheckCircle className="h-5 w-5 text-white" /></div>
@@ -1104,7 +1104,7 @@ export function ToolNumbers({ dictionary }: { dictionary: Dictionary }) {
                                     <div className="space-y-2">
                                         <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Format: 06153/UM.000/TA-851040/03-2025 (Setiap nomor di baris baru)</Label>
                                         <textarea
-                                            className="flex min-h-[300px] w-full rounded-xl border border-input bg-background/50 px-4 py-3 text-sm font-mono shadow-inner transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-destructive/50 disabled:cursor-not-allowed disabled:opacity-50"
+                                            className="flex min-h-75 w-full rounded-xl border border-input bg-background/50 px-4 py-3 text-sm font-mono shadow-inner transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-destructive/50 disabled:cursor-not-allowed disabled:opacity-50"
                                             placeholder="06153/UM.000/TA-851040/03-2025&#10;06154/UM.000/TA-851040/03-2025&#10;..."
                                             value={injectText}
                                             onChange={(e) => setInjectText(e.target.value)}

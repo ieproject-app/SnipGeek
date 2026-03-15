@@ -235,7 +235,7 @@ export const Gallery = ({
       )}
       {...props}
     >
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 [&>p]:contents [&>span]:contents [&_span.block]:!my-0 [&_span.block]:w-full [&_img]:!my-0 [&_img]:rounded-xl [&_img]:w-full hover:[&_img]:shadow-md transition-shadow">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 [&>p]:contents [&>span]:contents [&_span.block]:my-0! [&_span.block]:w-full [&_img]:my-0! [&_img]:rounded-xl [&_img]:w-full hover:[&_img]:shadow-md transition-shadow">
         {children}
       </div>
       {caption && (
@@ -284,7 +284,7 @@ const MdxH2 = ({
     >
       {children}
     </h2>
-    <div className="w-full h-0.5 bg-gradient-to-r from-accent via-accent/50 to-transparent" />
+    <div className="w-full h-0.5 bg-linear-to-r from-accent via-accent/50 to-transparent" />
   </div>
 );
 
@@ -470,7 +470,7 @@ const MdxPre = ({
 const MdxHr = ({ class: _class, className, ...props }: MdxElementProps) => (
   <hr
     className={cn(
-      "my-10 border-0 h-px bg-gradient-to-r from-transparent via-accent/40 to-transparent",
+      "my-10 border-0 h-px bg-linear-to-r from-transparent via-accent/40 to-transparent",
       _class,
       className,
     )}
@@ -664,7 +664,7 @@ export const Step = ({
       {/* Connector Line */}
       <div
         className={cn(
-          "mt-2 h-full w-0.5 bg-gradient-to-b from-primary/30 via-primary/10 to-transparent",
+          "mt-2 h-full w-0.5 bg-linear-to-b from-primary/30 via-primary/10 to-transparent",
           isLast && "opacity-50",
         )}
       />

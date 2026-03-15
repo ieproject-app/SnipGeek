@@ -129,7 +129,7 @@ export function LocaleSuggestionBanner({
   return (
     <div
       className={cn(
-        "pointer-events-none fixed inset-x-0 top-[4.5rem] z-[120] px-3 transition-all duration-200 sm:px-4",
+        "pointer-events-none fixed inset-x-0 top-18 z-120 px-3 transition-all duration-200 sm:px-4",
         visible
           ? "translate-y-0 opacity-100"
           : "-translate-y-2 opacity-0",

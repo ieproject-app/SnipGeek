@@ -121,7 +121,7 @@ export function LanguageSwitcher(props: {
       suppressHydrationWarning
     >
       {!mounted ? (
-        <Skeleton className="w-[76px] h-6 rounded-full" />
+        <Skeleton className="w-19 h-6 rounded-full" />
       ) : (
         <>
           <div

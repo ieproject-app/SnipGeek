@@ -51,7 +51,7 @@ export function HomeUpdates({ posts, title, viewMoreText, dictionary, locale, ta
             <h2 className="text-sm font-medium font-display text-primary mb-2 italic">
               {title}
             </h2>
-            <div className="w-full h-0.5 bg-gradient-to-r from-accent via-accent/50 to-transparent" />
+            <div className="w-full h-0.5 bg-linear-to-r from-accent via-accent/50 to-transparent" />
           </div>
         </ScrollReveal>
 
@@ -98,7 +98,7 @@ export function HomeUpdates({ posts, title, viewMoreText, dictionary, locale, ta
                     )}>
                       <Link href={`${linkPrefix}/blog/${post.slug}`} className="contents">
                         {/* Thumbnail Container - Responsive 3:2 for denser visual balance */}
-                        <div className="relative w-[120px] h-[80px] sm:w-[144px] sm:h-[96px] shrink-0 overflow-hidden rounded-lg shadow-sm border border-primary/5 mt-0.5">
+                        <div className="relative w-30 h-20 sm:w-36 sm:h-24 shrink-0 overflow-hidden rounded-lg shadow-sm border border-primary/5 mt-0.5">
                           <Image
                             src={heroImageSrc}
                             alt={post.frontmatter.imageAlt || post.frontmatter.title}

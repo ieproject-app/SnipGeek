@@ -13,6 +13,7 @@ import { ScrollReveal } from "@/components/ui/scroll-reveal";
 import { Button } from "@/components/ui/button";
 import type { Note, NoteFrontmatter } from "@/lib/notes";
 import type { Dictionary } from "@/lib/get-dictionary";
+import { formatRelativeTime } from "@/lib/utils";
 
 const NOTES_PER_PAGE = 9;
 
@@ -42,14 +43,6 @@ export function NotesListClient({
 
   const handleLoadMore = () => {
     setVisibleCount((prev) => prev + NOTES_PER_PAGE);
-  };
-
-  const formatDate = (date: Date) => {
-    return new Intl.DateTimeFormat(locale, {
-      day: "numeric",
-      month: "short",
-      year: "numeric",
-    }).format(date);
   };
 
   return (
@@ -95,7 +88,7 @@ export function NotesListClient({
                       className="block group/link"
                     >
                       <time className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-2 block">
-                        {formatDate(noteDate)}
+                        {formatRelativeTime(noteDate, locale)}
                       </time>
                       <h3 className="font-display text-base font-bold tracking-tight text-primary transition-colors group-hover/link:text-accent mb-2 leading-tight">
                         {note.frontmatter.title}
@@ -106,7 +99,7 @@ export function NotesListClient({
                     </Link>
                   </CardContent>
 
-                  <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-primary/5 to-transparent" />
+                  <div className="absolute bottom-0 left-0 w-full h-px bg-linear-to-r from-transparent via-primary/5 to-transparent" />
                 </Card>
               </ScrollReveal>
             );

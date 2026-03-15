@@ -137,7 +137,7 @@ export function ArticleComments({ article, type, locale }: ArticleCommentsProps)
           </div>
         </div>
 
-        <div className="rounded-2xl border border-primary/10 bg-gradient-to-br from-muted/40 via-background to-muted/10 p-6 shadow-sm">
+        <div className="rounded-2xl border border-primary/10 bg-linear-to-br from-muted/40 via-background to-muted/10 p-6 shadow-sm">
           <div className="flex items-start gap-4">
             <div className="mt-0.5 flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-primary">
               <ShieldCheck className="h-5 w-5" />

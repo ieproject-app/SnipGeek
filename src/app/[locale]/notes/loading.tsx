@@ -30,7 +30,7 @@ export default function Loading() {
                   <Skeleton className="h-4 w-2/3" />
                 </div>
               </CardContent>
-              <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-primary/5 to-transparent" />
+              <div className="absolute bottom-0 left-0 w-full h-px bg-linear-to-r from-transparent via-primary/5 to-transparent" />
             </Card>
           ))}
         </section>

@@ -500,7 +500,7 @@ export function ToolHistory({
                           value={injectText}
                           onChange={(e) => setInjectText(e.target.value)}
                           placeholder={'Mgr Finance\t01/02/2026\t31/12/9999\tAZHARY AGUNG KURNIA\tMgr Business Support Area Sumatera\t925598'}
-                          className="min-h-[160px] font-mono text-xs"
+                          className="min-h-40 font-mono text-xs"
                         />
                       </div>
                       <Button
@@ -558,7 +558,7 @@ export function ToolHistory({
                     )}
                   </div>
                   <Select value={searchGrup} onValueChange={setSearchGrup}>
-                    <SelectTrigger className="w-full md:w-[240px] h-11 rounded-lg bg-background/50 border-muted">
+                    <SelectTrigger className="w-full md:w-60 h-11 rounded-lg bg-background/50 border-muted">
                       <SelectValue placeholder={t.groupPlaceholder} />
                     </SelectTrigger>
                     <SelectContent className="rounded-lg">
@@ -569,12 +569,12 @@ export function ToolHistory({
                   </Select>
                 </div>
 
-                <div className="relative rounded-lg border bg-background/50 overflow-hidden min-h-[400px] flex flex-col">
+                <div className="relative rounded-lg border bg-background/50 overflow-hidden min-h-100 flex flex-col">
                   <div className="overflow-x-auto flex-1">
                     <Table>
                       <TableHeader className="bg-muted/30">
                         <TableRow className="hover:bg-transparent">
-                          <TableHead className="sticky left-0 z-20 bg-card font-bold py-4 pl-6 min-w-[200px] border-r">
+                          <TableHead className="sticky left-0 z-20 bg-card font-bold py-4 pl-6 min-w-50 border-r">
                             {t.nameHeader}
                           </TableHead>
                           <TableHead className="font-bold px-4">{t.positionHeader}</TableHead>
@@ -595,7 +595,7 @@ export function ToolHistory({
                                 isActive ? 'bg-primary/[0.04] hover:bg-primary/[0.10]' : 'hover:bg-accent/10 border-transparent hover:border-primary/15'
                               )}
                             >
-                              <TableCell className="sticky left-0 z-10 bg-card py-4 pl-6 font-semibold border-r min-w-[200px]">
+                              <TableCell className="sticky left-0 z-10 bg-card py-4 pl-6 font-semibold border-r min-w-50">
                                 <Tooltip>
                                   <TooltipTrigger asChild>
                                     <button
@@ -771,7 +771,7 @@ export function ToolHistory({
                               <Table>
                                 <TableHeader className="bg-muted/30">
                                   <TableRow className="hover:bg-transparent">
-                                    <TableHead className="font-bold py-4 pl-6 w-[120px]">{t.groupHeader}</TableHead>
+                                    <TableHead className="font-bold py-4 pl-6 w-30">{t.groupHeader}</TableHead>
                                     <TableHead className="font-bold">{t.nameHeader}</TableHead>
                                     <TableHead className="font-bold">{t.positionHeader}</TableHead>
                                   </TableRow>

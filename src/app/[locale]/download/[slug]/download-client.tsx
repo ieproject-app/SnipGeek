@@ -154,7 +154,7 @@ function AdPlaceholder({ label, className }: { label: string; className?: string
         {label}
       </span>
       <div className="absolute inset-0 z-0 opacity-10 pointer-events-none">
-        <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_1px_1px,rgba(0,0,0,0.05)_1px,transparent_0)] bg-[size:24px_24px]" />
+        <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_1px_1px,rgba(0,0,0,0.05)_1px,transparent_0)] bg-size-[24px_24px]" />
       </div>
     </div>
   );
@@ -218,8 +218,8 @@ export function DownloadClient({
     <div className="w-full min-h-screen relative flex flex-col items-center py-4 sm:py-8 px-4 selection:bg-primary/20 overflow-x-hidden justify-center bg-background/50">
       {/* Background Decor */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden -z-10">
-        <div className={cn("absolute top-[-5%] left-[-5%] w-[30%] h-[30%] rounded-full blur-[100px] opacity-15", theme.bg)} />
-        <div className={cn("absolute bottom-[-5%] right-[-5%] w-[30%] h-[30%] rounded-full blur-[100px] opacity-15", theme.bg)} />
+        <div className={cn("absolute top-[-5%] left-[-5%] size-[30%] rounded-full blur-[100px] opacity-15", theme.bg)} />
+        <div className={cn("absolute bottom-[-5%] right-[-5%] size-[30%] rounded-full blur-[100px] opacity-15", theme.bg)} />
       </div>
 
       <main className="w-full max-w-7xl flex flex-col items-center gap-4 sm:gap-6">
@@ -227,7 +227,7 @@ export function DownloadClient({
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="w-full max-w-3xl h-[80px]"
+          className="w-full max-w-3xl h-20"
         >
           <AdPlaceholder label="AD BANNER (Top)" className="h-full rounded-xl" />
         </motion.div>
@@ -237,7 +237,7 @@ export function DownloadClient({
 
           {/* Left Sidebar */}
           <aside className="hidden lg:block self-stretch">
-            <AdPlaceholder label="SIDEBAR (Left)" className="h-full min-h-[400px] rounded-2xl" />
+            <AdPlaceholder label="SIDEBAR (Left)" className="h-full min-h-100 rounded-2xl" />
           </aside>
 
           {/* Main Card - ULTRA COMPACT */}
@@ -248,11 +248,11 @@ export function DownloadClient({
             className="w-full flex flex-col items-center"
           >
             <section className={cn(
-              "relative overflow-hidden rounded-[2rem] border bg-background/60 backdrop-blur-2xl saturate-150 p-[1px] shadow-2xl w-full max-w-xl mx-auto",
+              "relative overflow-hidden rounded-4xl border bg-background/60 backdrop-blur-2xl saturate-150 p-px shadow-2xl w-full max-w-xl mx-auto",
               theme.border,
               theme.shadow
             )}>
-              <div className="rounded-[1.95rem] bg-gradient-to-b from-card/90 to-background p-6 sm:p-8">
+              <div className="rounded-[1.95rem] bg-linear-to-b from-card/90 to-background p-6 sm:p-8">
 
                 {/* Header Section */}
                 <div className="flex flex-col items-center text-center">
@@ -370,7 +370,7 @@ export function DownloadClient({
 
           {/* Right Sidebar */}
           <aside className="hidden lg:flex flex-col gap-4 self-stretch">
-            <AdPlaceholder label="AD (Side)" className="flex-1 min-h-[300px] rounded-2xl" />
+            <AdPlaceholder label="AD (Side)" className="flex-1 min-h-75 rounded-2xl" />
             <div className="p-4 rounded-2xl border border-primary/5 bg-card/60 backdrop-blur-md">
               <div className="flex items-center gap-2 mb-2">
                 <Lock className="h-3 w-3 text-muted-foreground/50" />
@@ -391,8 +391,8 @@ export function DownloadClient({
           transition={{ delay: 0.3 }}
           className="w-full max-w-4xl grid grid-cols-2 gap-4"
         >
-          <AdPlaceholder label="RECOMENDED (1)" className="h-[70px] rounded-xl" />
-          <AdPlaceholder label="RECOMENDED (2)" className="h-[70px] rounded-xl" />
+          <AdPlaceholder label="RECOMENDED (1)" className="h-17.5 rounded-xl" />
+          <AdPlaceholder label="RECOMENDED (2)" className="h-17.5 rounded-xl" />
         </motion.div>
 
       </main>

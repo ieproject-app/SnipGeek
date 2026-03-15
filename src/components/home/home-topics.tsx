@@ -77,7 +77,7 @@ export function HomeTopics({
             href={`${linkPrefix}/blog/${post.slug}`}
             className="flex items-start gap-4 flex-1 min-w-0"
           >
-            <div className="relative w-[120px] h-[80px] sm:w-[144px] sm:h-[96px] shrink-0 overflow-hidden rounded-lg shadow-sm border border-primary/5 mt-0.5">
+            <div className="relative w-30 h-20 sm:w-36 sm:h-24 shrink-0 overflow-hidden rounded-lg shadow-sm border border-primary/5 mt-0.5">
               <Image
                 src={heroImageSrc}
                 alt={post.frontmatter.imageAlt || post.frontmatter.title}
@@ -122,7 +122,7 @@ export function HomeTopics({
             {title}
           </h2>
           <LayoutBreadcrumbs segments={breadcrumbSegments} className="mb-4" />
-          <div className="w-full h-0.5 bg-gradient-to-r from-accent via-accent/50 to-transparent" />
+          <div className="w-full h-0.5 bg-linear-to-r from-accent via-accent/50 to-transparent" />
         </header>
       </ScrollReveal>
 

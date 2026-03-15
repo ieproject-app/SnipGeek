@@ -77,10 +77,10 @@ export function HomeHero({ posts, dictionary, locale, linkPrefix }: HomeHeroProp
                                         <div className="relative aspect-[3/2] rounded-xl overflow-hidden bg-muted shadow-md group-hover:shadow-xl group-hover:-translate-y-2 transition-all duration-500">
                                             {/* Accent Bar (Bottom) - Color matches category */}
                                             <div
-                                                className={cn("absolute bottom-0 left-0 right-0 h-[3px] z-30 transition-opacity duration-500 opacity-0 group-hover:opacity-100", badgeStyle.dot)}
+                                                className={cn("absolute bottom-0 left-0 right-0 h-0.75 z-30 transition-opacity duration-500 opacity-0 group-hover:opacity-100", badgeStyle.dot)}
                                             />
                                             {/* Cinematic Gradient Overlay */}
-                                            <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-10" />
+                                            <div className="absolute inset-0 bg-linear-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-10" />
 
                                             {/* Hero Image */}
                                             {heroImageSrc && (

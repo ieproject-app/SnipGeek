@@ -90,12 +90,12 @@ export function ArticleTOC({
         className={cn(
           "overflow-hidden transition-all duration-300 ease-out",
           isOpen
-            ? "max-h-[1000px] translate-y-0 opacity-100"
+            ? "max-h-250 translate-y-0 opacity-100"
             : "max-h-0 -translate-y-2 opacity-0",
         )}
       >
         <div className="mx-4 border-t border-primary/5" />
-        <ul className="space-y-1 p-5 text-sm max-h-[50vh] overflow-y-auto overscroll-contain [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-primary/20 hover:[&::-webkit-scrollbar-thumb]:bg-primary/40">
+        <ul className="space-y-1 p-5 text-sm max-h-125 overflow-y-auto overscroll-contain [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-primary/20 hover:[&::-webkit-scrollbar-thumb]:bg-primary/40">
           {headings.map((heading) => {
             return (
               <li

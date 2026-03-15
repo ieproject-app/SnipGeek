@@ -55,10 +55,6 @@ export function TagListClient({
     setVisibleNotesCount((prev) => prev + ITEMS_PER_PAGE);
   };
 
-  const formatDatePart = (date: Date, options: Intl.DateTimeFormatOptions) => {
-    return new Intl.DateTimeFormat(locale, options).format(date);
-  };
-
   return (
     <div className="w-full">
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-16">
@@ -86,7 +82,7 @@ export function TagListClient({
                   <h2 className="text-2xl font-bold font-display text-primary shrink-0 uppercase tracking-tight">
                     {dictionary.navigation.blog}
                   </h2>
-                  <div className="w-full h-0.5 bg-gradient-to-r from-accent via-accent/50 to-transparent flex-1" />
+                  <div className="w-full h-0.5 bg-linear-to-r from-accent via-accent/50 to-transparent flex-1" />
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-10">
                   {displayedPosts.map((post) => {
@@ -127,7 +123,7 @@ export function TagListClient({
                           href={`${linkPrefix}/blog/${post.slug}`}
                           className="block"
                         >
-                          <div className="relative w-full aspect-[8/5] overflow-hidden rounded-xl mb-4 shadow-sm transition-all duration-500 border border-primary/5">
+                          <div className="relative w-full aspect-8/5 overflow-hidden rounded-xl mb-4 shadow-sm transition-all duration-500 border border-primary/5">
                             {heroImageSrc && (
                               <Image
                                 src={heroImageSrc}
@@ -194,7 +190,7 @@ export function TagListClient({
                   <h2 className="text-2xl font-bold font-display text-primary shrink-0 uppercase tracking-tight">
                     {dictionary.navigation.notes}
                   </h2>
-                  <div className="w-full h-0.5 bg-gradient-to-r from-accent via-accent/50 to-transparent flex-1" />
+                  <div className="w-full h-0.5 bg-linear-to-r from-accent via-accent/50 to-transparent flex-1" />
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
                   {displayedNotes.map((note) => {
@@ -213,11 +209,7 @@ export function TagListClient({
                       >
                         <div className="p-6 pb-0 flex flex-row justify-between items-start">
                           <div className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-60">
-                            {formatDatePart(noteDate, {
-                              day: "numeric",
-                              month: "short",
-                              year: "numeric",
-                            })}
+                            {formatRelativeTime(noteDate, locale)}
                           </div>
                           <AddToReadingListButton
                             item={item}
@@ -239,7 +231,7 @@ export function TagListClient({
                             </p>
                           </Link>
                         </div>
-                        <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-primary/5 to-transparent" />
+                        <div className="absolute bottom-0 left-0 w-full h-px bg-linear-to-r from-transparent via-primary/5 to-transparent" />
                       </Card>
                     );
                   })}

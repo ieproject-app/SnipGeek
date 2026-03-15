@@ -77,7 +77,7 @@ export function SpinWheelTemplates({ onSelectTemplate }: SpinWheelTemplatesProps
     });
 
   return (
-    <div className="flex h-[500px] divide-x">
+    <div className="flex h-125 divide-x">
       {/* Left: category + template list */}
       <ScrollArea className="w-1/2 p-3">
         <div className="space-y-1">

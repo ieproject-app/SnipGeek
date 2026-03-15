@@ -1,7 +1,6 @@
 "use client";
 
-import Image from "next/image";
-import type { ComponentProps } from "react";
+import type { ImgHTMLAttributes } from "react";
 import { cn } from "@/lib/utils";
 import {
     Plus,
@@ -19,34 +18,32 @@ import {
 /**
  * ZoomableImage - Wrapper component to make images clickable and expandabe.
  */
-type ZoomableImageProps = ComponentProps<typeof Image> & {
+type ZoomableImageProps = ImgHTMLAttributes<HTMLImageElement> & {
     src: string;
     alt?: string;
+    priority?: boolean;
 };
 
 export const ZoomableImage = ({
     src,
     alt,
-    width,
-    height,
     className,
-    priority,
+    priority: _priority,
     ...props
 }: ZoomableImageProps) => {
     return (
         <Dialog>
             <DialogTrigger asChild>
                 <div className="group relative cursor-zoom-in overflow-hidden rounded-xl shadow-md transition-all duration-500 hover:shadow-2xl">
-                    <Image
+                    <img
                         src={src}
                         alt={alt || "SnipGeek Image"}
-                        width={width || 1200}
-                        height={height || 675}
+                        loading={props.loading ?? "lazy"}
+                        decoding={props.decoding ?? "async"}
                         className={cn(
                             "h-auto w-full transition-all duration-700 ease-in-out group-hover:scale-[1.03]",
                             className,
                         )}
-                        priority={priority}
                         {...props}
                     />
 
@@ -62,7 +59,7 @@ export const ZoomableImage = ({
                 </div>
             </DialogTrigger>
 
-            <DialogContent className="max-w-[100vw] max-h-[100vh] border-none bg-transparent p-0 shadow-none outline-none flex items-center justify-center z-[100] [&>button]:hidden">
+            <DialogContent className="max-w-[100vw] max-h-screen border-none bg-transparent p-0 shadow-none outline-none flex items-center justify-center z-100 [&>button]:hidden">
                 <DialogTitle className="sr-only">Pratinjau Gambar</DialogTitle>
                 <DialogDescription className="sr-only">
                     Tampilan gambar diperbesar untuk {alt || "gambar artikel"}
@@ -85,12 +82,12 @@ export const ZoomableImage = ({
                                 }}
                                 className="relative max-w-7xl max-h-full"
                             >
-                                <Image
+                                <img
                                     src={src}
                                     alt={alt || "SnipGeek Image"}
-                                    width={width || 1600}
-                                    height={height || 900}
-                                    className="max-w-full max-h-[85vh] object-contain rounded-2xl shadow-[0_0_100px_-20px_rgba(0,0,0,0.5)] border border-white/5"
+                                    loading="eager"
+                                    decoding="async"
+                                    className="max-w-full max-h-212.5 object-contain rounded-2xl shadow-[0_0_100px_-20px_rgba(0,0,0,0.5)] border border-white/5"
                                 />
 
                             </motion.div>

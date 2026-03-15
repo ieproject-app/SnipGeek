@@ -270,7 +270,7 @@ function DownloadIdPicker({
           </span>
         </button>
       </PopoverTrigger>
-      <PopoverContent align="start" className="w-[460px] p-2">
+      <PopoverContent align="start" className="w-115 p-2">
         <div className="space-y-2">
           <Input
             value={query}
@@ -707,7 +707,7 @@ export function ToolPrompts({
                 </SnipTooltip>
                 <div
                   className={cn(
-                    "absolute top-1 bottom-1 w-[calc(50%-4px)] bg-background border border-primary/5 rounded-md shadow-sm transition-all duration-500 ease-out z-0",
+                    "absolute top-1 bottom-1 w-1/2 bg-background border border-primary/5 rounded-md shadow-sm transition-all duration-500 ease-out z-0",
                     mode === "modify" ? "translate-x-full" : "translate-x-0"
                   )}
                 />
@@ -884,7 +884,7 @@ export function ToolPrompts({
                           )}
                         />
                       </div>
-                      <ScrollArea className="h-[200px] rounded-lg border border-primary/5 bg-background/20 p-2">
+                      <ScrollArea className="h-50 rounded-lg border border-primary/5 bg-background/20 p-2">
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
                           {filteredArticles.length === 0 && (
                             <p className="col-span-2 text-center py-8 text-[10px] text-muted-foreground">
@@ -989,7 +989,7 @@ export function ToolPrompts({
                         ? setOriginalContent(e.target.value)
                         : setDraft(e.target.value)
                     }
-                    className="w-full border-none rounded-none bg-transparent font-mono text-xs p-6 resize-none focus-visible:ring-0 leading-relaxed min-h-[480px]"
+                    className="w-full border-none rounded-none bg-transparent font-mono text-xs p-6 resize-none focus-visible:ring-0 leading-relaxed min-h-120"
                   />
                   {/* Footer hint */}
                   <div className="px-5 py-2 border-t bg-muted/5 flex items-center gap-2">
@@ -1038,7 +1038,7 @@ export function ToolPrompts({
                         value={modInstructions}
                         onChange={(e) => setModInstructions(e.target.value)}
                         className={cn(
-                          "min-h-[130px] bg-background/30 rounded-lg font-mono text-xs p-4",
+                          "min-h-32.5 bg-background/30 rounded-lg font-mono text-xs p-4",
                           focusRing,
                         )}
                       />
@@ -1090,7 +1090,7 @@ export function ToolPrompts({
                               value={images}
                               onChange={(e) => setImages(e.target.value)}
                               className={cn(
-                                "font-mono text-[11px] bg-background/50 rounded-lg p-4 min-h-[90px]",
+                                "font-mono text-[11px] bg-background/50 rounded-lg p-4 min-h-22.5",
                                 focusRing,
                               )}
                             />
@@ -1124,7 +1124,7 @@ export function ToolPrompts({
                                         })
                                       }
                                     >
-                                      <SelectTrigger className="w-[60px] h-7 text-[9px] border-primary/10">
+                                      <SelectTrigger className="w-15 h-7 text-[9px] border-primary/10">
                                         <SelectValue />
                                       </SelectTrigger>
                                       <SelectContent>
@@ -1202,7 +1202,7 @@ export function ToolPrompts({
                                     setImageGridMappings(e.target.value)
                                   }
                                   className={cn(
-                                    "min-h-[90px] font-mono text-[11px] bg-background/50 p-4",
+                                    "min-h-22.5 font-mono text-[11px] bg-background/50 p-4",
                                     focusRing,
                                   )}
                                 />
@@ -1247,7 +1247,7 @@ export function ToolPrompts({
                                     setGalleryMappings(e.target.value)
                                   }
                                   className={cn(
-                                    "min-h-[90px] font-mono text-[11px] bg-background/50 p-4",
+                                    "min-h-22.5 font-mono text-[11px] bg-background/50 p-4",
                                     focusRing,
                                   )}
                                 />
@@ -1290,7 +1290,7 @@ export function ToolPrompts({
                                   value={specsMappings}
                                   onChange={(e) => setSpecsMappings(e.target.value)}
                                   className={cn(
-                                    "min-h-[120px] font-mono text-[11px] bg-background/50 p-4",
+                                    "min-h-30 font-mono text-[11px] bg-background/50 p-4",
                                     focusRing,
                                   )}
                                 />
@@ -1320,7 +1320,7 @@ export function ToolPrompts({
 
                       {/* Empty state when all features are off */}
                       {!showImages && !showDownloads && !showGrids && !showGallery && !showSpecs && (
-                        <div className="py-8 flex flex-col items-center gap-3 text-center border border-dashed border-primary/10 rounded-xl bg-muted/[0.02]">
+                        <div className="py-8 flex flex-col items-center gap-3 text-center border border-dashed border-primary/10 rounded-xl bg-muted/2">
                           <Settings2 className="h-6 w-6 text-muted-foreground/20" />
                           <p className="text-[10px] text-muted-foreground/40 font-medium">
                             Enable features above to show media inputs here.
@@ -1349,15 +1349,15 @@ export function ToolPrompts({
                 <ScrollReveal direction="right" delay={0.15} distance={0}>
                   <div className="sticky top-28">
                     {/* Terminal card */}
-                    <Card className="border-0 shadow-2xl overflow-hidden ring-1 ring-white/[0.06] rounded-xl bg-[#0d0e11]">
+                    <Card className="border-0 shadow-2xl overflow-hidden ring-1 ring-white/6 rounded-xl bg-[#0d0e11]">
                       {/* macOS-style title bar */}
-                      <div className="flex items-center gap-2 px-4 py-3 border-b border-white/[0.05] bg-white/[0.015]">
+                      <div className="flex items-center gap-2 px-4 py-3 border-b border-white/5 bg-white/1.5">
                         <div className="flex items-center gap-1.5">
                           <div className="h-3 w-3 rounded-full bg-[#ff5f57]" />
                           <div className="h-3 w-3 rounded-full bg-[#ffbd2e]" />
                           <div className="h-3 w-3 rounded-full bg-[#28c840]" />
                         </div>
-                        <div className="flex-1 mx-3 h-5 bg-white/[0.04] rounded-md flex items-center px-3 gap-1.5">
+                        <div className="flex-1 mx-3 h-5 bg-white/4 rounded-md flex items-center px-3 gap-1.5">
                           <Terminal className="h-2.5 w-2.5 text-white/20" />
                           <span className="text-[9px] text-white/25 font-mono">
                             content-brief.md
@@ -1366,7 +1366,7 @@ export function ToolPrompts({
                       </div>
 
                       {/* Prompt stats bar */}
-                      <div className="px-5 py-2 border-b border-white/[0.04] flex items-center justify-between">
+                      <div className="px-5 py-2 border-b border-white/4 flex items-center justify-between">
                         <span className="text-[9px] font-black uppercase tracking-[0.2em] text-white/20">
                           Content Brief
                         </span>
@@ -1377,16 +1377,16 @@ export function ToolPrompts({
                       </div>
 
                       {/* Prompt textarea */}
-                      <ScrollArea className="h-[calc(100vh-260px)] min-h-[400px]">
+                      <ScrollArea className="h-[calc(100vh-260px)] min-h-100">
                         <Textarea
                           readOnly
                           value={generatedPrompt}
-                          className="min-h-[600px] border-none bg-transparent font-mono text-[11.5px] p-6 resize-none focus-visible:ring-0 leading-relaxed text-slate-300/80 selection:bg-accent/30"
+                          className="min-h-150 border-none bg-transparent font-mono text-[11.5px] p-6 resize-none focus-visible:ring-0 leading-relaxed text-slate-300/80 selection:bg-accent/30"
                         />
                       </ScrollArea>
 
                       {/* Bottom action bar */}
-                      <div className="px-5 py-3 border-t border-white/[0.05] bg-white/[0.01] flex items-center justify-between gap-3">
+                      <div className="px-5 py-3 border-t border-white/5 bg-white/1 flex items-center justify-between gap-3">
                         <span className="text-[9px] text-white/20 font-mono">
                           {mode === "create"
                             ? `✦ ${contentType} · ${isPublished ? "published" : "draft"}${isFeatured && contentType === "blog" ? " · featured" : ""}`

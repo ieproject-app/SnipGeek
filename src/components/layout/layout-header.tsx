@@ -90,7 +90,7 @@ const HighlightMatch = ({ text, query }: { text: string; query: string }) => {
         part.toLowerCase() === query.toLowerCase().trim() ? (
           <mark
             key={i}
-            className="bg-accent/30 text-accent-foreground rounded-[2px] px-0.5 font-bold"
+            className="bg-accent/30 text-accent-foreground rounded-xs px-0.5 font-bold"
           >
             {part}
           </mark>
@@ -446,10 +446,10 @@ export function LayoutHeader({
     "h-9 w-9 p-0 rounded-xl transition-all duration-300 text-foreground/75 hover:text-foreground hover:bg-accent/15 hover:shadow-sm flex items-center justify-center relative";
 
   const secondaryHoverStyles = [
-    "hover:border-white/60 hover:bg-white/20 hover:text-nav-primary-foreground",
-    "hover:border-white/70 hover:bg-white/25 hover:text-nav-primary-foreground",
-    "hover:border-white/65 hover:bg-white/18 hover:text-nav-primary-foreground",
-    "hover:border-white/75 hover:bg-white/28 hover:text-nav-primary-foreground",
+    "hover:border-white/45 hover:bg-white/20 hover:text-nav-primary-foreground",
+    "hover:border-white/55 hover:bg-white/24 hover:text-nav-primary-foreground",
+    "hover:border-white/50 hover:bg-white/18 hover:text-nav-primary-foreground",
+    "hover:border-white/60 hover:bg-white/26 hover:text-nav-primary-foreground",
   ] as const;
 
   return (
@@ -465,7 +465,7 @@ export function LayoutHeader({
           isScrolled && "shadow-sm border-border/90",
         )}
       >
-        <div className="max-w-4xl mx-auto h-16 min-h-[64px] px-4 md:px-6 flex items-center justify-between relative overflow-visible">
+        <div className="max-w-4xl mx-auto h-16 min-h-16 px-4 md:px-6 flex items-center justify-between relative overflow-visible">
           {/* Left: Branding & Back to Site */}
           <div
             className={cn(
@@ -543,7 +543,7 @@ export function LayoutHeader({
                   {item.name}
                   <div
                     className={cn(
-                      "absolute bottom-0 left-1/2 -translate-x-1/2 h-[2px] bg-accent transition-all duration-300",
+                      "absolute bottom-0 left-1/2 -translate-x-1/2 h-0.5 bg-accent transition-all duration-300",
                       isActive ? "w-4" : "w-0",
                     )}
                   />
@@ -566,7 +566,7 @@ export function LayoutHeader({
               open={isMenuOpen}
               onOpenChange={(open) => setActiveView(open ? "menu" : "none")}
             >
-              <div className="relative z-[110]">
+              <div className="relative z-110">
                 <SnipTooltip
                   label={
                     dictionary?.promptGenerator?.tooltips?.moreMenu ?? "More Menu"
@@ -605,7 +605,7 @@ export function LayoutHeader({
                 align="end"
                 side="bottom"
                 sideOffset={18}
-                className="z-[200] min-w-[220px] rounded-2xl border border-border bg-background p-0 shadow-2xl ring-1 ring-black/[0.03] overflow-hidden"
+                className="z-200 min-w-55 rounded-2xl border border-border bg-background p-0 shadow-2xl ring-1 ring-black/3 overflow-hidden"
               >
                 <div className="py-3">
                   <div className="px-4 py-2 mb-1">
@@ -677,7 +677,7 @@ export function LayoutHeader({
                   )}
                 />
                 {mounted && readingListItems.length > 0 && (
-                  <span className="absolute top-1.5 right-1.5 flex h-3.5 min-w-[14px] items-center justify-center rounded-full bg-accent text-accent-foreground font-sans text-[8px] font-black px-1 animate-badge-pop shadow-sm">
+                  <span className="absolute top-1.5 right-1.5 flex h-3.5 min-w-3.5 items-center justify-center rounded-full bg-accent text-accent-foreground font-sans text-[8px] font-black px-1 animate-badge-pop shadow-sm">
                     {readingListItems.length}
                   </span>
                 )}
@@ -836,7 +836,7 @@ export function LayoutHeader({
                 </button>
               )}
             </div>
-            <ScrollArea className="max-h-[300px]">
+            <ScrollArea className="max-h-75">
               <div className="p-2 space-y-1">
                 {readingListItems.length > 0 ? (
                   readingListItems.map((item) => {
@@ -861,7 +861,7 @@ export function LayoutHeader({
                           className="flex items-center gap-3 flex-1 min-w-0"
                           onClick={() => setActiveView("none")}
                         >
-                          <div className="w-[52px] h-[39px] relative rounded-md overflow-hidden bg-muted shrink-0 border border-border/50">
+                          <div className="w-13 h-9.75 relative rounded-md overflow-hidden bg-muted shrink-0 border border-border/50">
                             <Image
                               src={imgUrl}
                               alt=""
@@ -940,7 +940,7 @@ export function LayoutHeader({
                 : "opacity-0 scale-[0.97] -translate-y-1 pointer-events-none",
             )}
           >
-            <ScrollArea className="max-h-[450px]">
+            <ScrollArea className="max-h-112.5">
               <div className="p-2">
                 {query.length > 1 ? (
                   <>
@@ -959,7 +959,7 @@ export function LayoutHeader({
                                 className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-accent/10 transition-all group"
                                 onClick={() => setActiveView("none")}
                               >
-                                <div className="w-[52px] h-[39px] relative rounded-md overflow-hidden bg-muted shrink-0 border border-border/50">
+                                <div className="w-13 h-9.75 relative rounded-md overflow-hidden bg-muted shrink-0 border border-border/50">
                                   <Image
                                     src={resolvedHero}
                                     alt=""
@@ -1015,7 +1015,7 @@ export function LayoutHeader({
                               className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-accent/10 transition-all group"
                               onClick={() => setActiveView("none")}
                             >
-                              <div className="w-[52px] h-[39px] relative rounded-md overflow-hidden bg-muted shrink-0 border border-border/50">
+                              <div className="w-13 h-9.75 relative rounded-md overflow-hidden bg-muted shrink-0 border border-border/50">
                                 <Image
                                   src={resolvedHero}
                                   alt=""
@@ -1101,7 +1101,7 @@ export function LayoutHeader({
         </div>
       </header>
 
-      <div className="relative z-20 w-full bg-nav-primary border-b border-nav-primary/70 pt-16">
+      <div className="relative z-20 w-full bg-linear-[140deg] from-[hsl(var(--nav-primary)/0.98)] to-[hsl(var(--accent)/0.78)] border-b border-nav-primary/70 pt-16">
         <div className="mx-auto max-w-4xl px-4 md:px-6">
           <nav
             aria-label="Quick navigation"
@@ -1124,7 +1124,7 @@ export function LayoutHeader({
                     isActive
                       ? "border-white/80 bg-white text-nav-primary shadow-sm"
                       : cn(
-                          "border-white/30 bg-white/10 text-nav-primary-foreground/90",
+                          "border-white/20 bg-white/[0.07] text-nav-primary-foreground/90",
                           hoverStyle,
                         ),
                   )}
@@ -1141,7 +1141,7 @@ export function LayoutHeader({
       {/* ── Notification Toast Pill (Floating Center, Outside Header bounds) ── */}
       <div
         className={cn(
-          "fixed top-3 left-1/2 z-[100] -translate-x-1/2 pointer-events-none transition-all duration-300",
+          "fixed top-3 left-1/2 z-100 -translate-x-1/2 pointer-events-none transition-all duration-300",
           mounted && message
             ? "opacity-100 translate-y-0"
             : "opacity-0 -translate-y-8",
@@ -1149,7 +1149,7 @@ export function LayoutHeader({
       >
         <div
           className={cn(
-            "relative flex items-center justify-center gap-2.5 h-10 px-6 bg-background border border-border shadow-2xl rounded-full overflow-hidden ring-1 ring-black/[0.03]",
+            "relative flex items-center justify-center gap-2.5 h-10 px-6 bg-background border border-border shadow-2xl rounded-full overflow-hidden ring-1 ring-black/3",
             message ? "pointer-events-auto" : "pointer-events-none",
           )}
         >
@@ -1190,7 +1190,7 @@ export function LayoutHeader({
           </button>
 
           {/* Progress line at the very bottom of the pill */}
-          <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-transparent">
+          <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-transparent">
             <div
               className="h-full bg-accent/60 transition-none"
               style={{ width: `${progress}%`, borderRadius: "0 0 0 16px" }}

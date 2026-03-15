@@ -133,7 +133,7 @@ function ConfettiOverlay({ onDone }: { onDone: () => void }) {
   }, [onDone]);
 
   return (
-    <div className="absolute inset-0 pointer-events-none z-[50] overflow-hidden rounded-none" aria-hidden>
+    <div className="absolute inset-0 pointer-events-none z-50 overflow-hidden rounded-none" aria-hidden>
       {pieces.map(p => (
         <div
           key={p.id}
@@ -206,8 +206,8 @@ function WinnerCard({
   // In fullscreen: render as absolute overlay inside the wrapper.
   // Outside fullscreen: render as fixed overlay over the whole page.
   const positionClass = isFullscreen
-    ? "absolute inset-0 z-[60]"
-    : "fixed inset-0 z-[300]";
+    ? "absolute inset-0 z-60"
+    : "fixed inset-0 z-300";
 
   return (
     <div
@@ -266,7 +266,7 @@ function WinnerCard({
 
           {/* Winner name */}
           <div
-            className="font-display font-black tracking-tight leading-tight break-words w-full"
+            className="font-display font-black tracking-tight leading-tight wrap-break-word w-full"
             style={{
               fontSize: "clamp(1.75rem, 5vw, 2.5rem)",
               color: winnerColor,
@@ -786,7 +786,7 @@ export function SpinWheelCanvas({
       )}
 
       {/* Title + description (shown in normal mode AND fullscreen) */}
-      <div className="text-center w-full max-w-[520px] mx-auto">
+      <div className="text-center w-full max-w-130 mx-auto">
         <h2 className="text-h2 font-display font-black text-primary leading-tight">
           {wheelTitle}
         </h2>
@@ -802,7 +802,7 @@ export function SpinWheelCanvas({
           ref={containerRef}
           className={cn(
             "relative w-full aspect-square mx-auto",
-            isFullscreen ? "max-w-[min(65vh,560px)]" : "max-w-[520px]"
+            isFullscreen ? "max-w-[min(65vh,560px)]" : "max-w-130"
           )}
           style={{ minWidth: 240 }}
         >
@@ -874,7 +874,7 @@ export function SpinWheelCanvas({
                 aria-label={labels.spinButton}
                 className={cn(
                   "absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10",
-                  "w-[22%] h-[22%] min-w-[60px] min-h-[60px] rounded-full",
+                  "size-[22%] min-w-15 min-h-15 rounded-full",
                   "font-display font-black text-base md:text-lg",
                   "bg-white text-gray-900 shadow-2xl border-4 border-white/80",
                   "transition-all duration-200 select-none active:scale-95",

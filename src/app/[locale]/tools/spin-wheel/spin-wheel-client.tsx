@@ -266,7 +266,7 @@ export function SpinWheelClient({ locale }: SpinWheelClientProps) {
               </TabsList>
 
               {/* ── Entries ────────────────────────────────────────────────── */}
-              <TabsContent value="entries" className="p-5 flex flex-col gap-4 focus-visible:ring-0 min-h-[500px]">
+              <TabsContent value="entries" className="p-5 flex flex-col gap-4 focus-visible:ring-0 min-h-125">
                 <div className="flex items-center justify-between">
                   <Label className="font-bold text-base">{t.entriesLabel}</Label>
                   <Tooltip>
@@ -287,7 +287,7 @@ export function SpinWheelClient({ locale }: SpinWheelClientProps) {
                     setTemplateContext(undefined);
                   }}
                   placeholder={t.entriesPlaceholder}
-                  className="flex-1 min-h-[280px] font-mono text-sm resize-none bg-muted/20 border-2 rounded-xl p-3 leading-relaxed"
+                  className="flex-1 min-h-70 font-mono text-sm resize-none bg-muted/20 border-2 rounded-xl p-3 leading-relaxed"
                 />
 
                 <p className="text-xs text-muted-foreground font-medium text-right">
@@ -296,14 +296,14 @@ export function SpinWheelClient({ locale }: SpinWheelClientProps) {
               </TabsContent>
 
               {/* ── Templates ──────────────────────────────────────────────── */}
-              <TabsContent value="templates" className="p-0 focus-visible:ring-0 min-h-[500px]">
+              <TabsContent value="templates" className="p-0 focus-visible:ring-0 min-h-125">
                 <SpinWheelTemplates
                   onSelectTemplate={(items, context) => handleSelectTemplate(items, context)}
                 />
               </TabsContent>
 
               {/* ── Settings ───────────────────────────────────────────────── */}
-              <TabsContent value="settings" className="p-5 flex flex-col gap-6 focus-visible:ring-0 min-h-[500px]">
+              <TabsContent value="settings" className="p-5 flex flex-col gap-6 focus-visible:ring-0 min-h-125">
 
                 {/* Spin Duration */}
                 <div className="space-y-3">
@@ -419,7 +419,7 @@ export function SpinWheelClient({ locale }: SpinWheelClientProps) {
               </TabsContent>
 
               {/* ── Design ─────────────────────────────────────────────────── */}
-              <TabsContent value="customize" className="p-5 flex flex-col gap-5 focus-visible:ring-0 min-h-[500px]">
+              <TabsContent value="customize" className="p-5 flex flex-col gap-5 focus-visible:ring-0 min-h-125">
                 <div className="space-y-2">
                   <Label className="font-bold">{t.wheelTitleLabel}</Label>
                   <Input value={wheelTitle} onChange={e => setWheelTitle(e.target.value)}
@@ -437,7 +437,7 @@ export function SpinWheelClient({ locale }: SpinWheelClientProps) {
                     <Label className="font-bold flex items-center gap-2">
                       <Palette className="h-4 w-4" /> {t.colorPickerLabel}
                     </Label>
-                    <ScrollArea className="h-[220px] rounded-xl border-2 p-3 bg-muted/20">
+                    <ScrollArea className="h-55 rounded-xl border-2 p-3 bg-muted/20">
                       <div className="space-y-3">
                         {filteredEntries.map((item, i) => {
                           const currentColor = entryColors[item];
@@ -453,7 +453,7 @@ export function SpinWheelClient({ locale }: SpinWheelClientProps) {
                                 }}
                               />
                               <span className="text-sm font-medium flex-1 truncate">{item}</span>
-                              <div className="flex gap-1 flex-wrap justify-end max-w-[140px]">
+                              <div className="flex gap-1 flex-wrap justify-end max-w-35">
                                 {COLOR_PRESETS.map(color => (
                                   <button key={color}
                                     onClick={() => currentColor === color ? clearColor(item) : setColor(item, color)}
@@ -482,7 +482,7 @@ export function SpinWheelClient({ locale }: SpinWheelClientProps) {
               </TabsContent>
 
               {/* ── History Tab (not Dialog) ───────────────────────────────── */}
-              <TabsContent value="history" className="p-5 flex flex-col gap-4 focus-visible:ring-0 min-h-[500px]">
+              <TabsContent value="history" className="p-5 flex flex-col gap-4 focus-visible:ring-0 min-h-125">
                 <div className="flex items-center justify-between">
                   <Label className="font-bold text-base flex items-center gap-2">
                     <Trophy className="h-4 w-4 text-amber-500" />
@@ -500,7 +500,7 @@ export function SpinWheelClient({ locale }: SpinWheelClientProps) {
                   )}
                 </div>
 
-                <ScrollArea className="flex-1 rounded-xl border-2 bg-muted/20 min-h-[400px]">
+                <ScrollArea className="flex-1 rounded-xl border-2 bg-muted/20 min-h-100">
                   {winnerHistory.length > 0 ? (
                     <ol className="p-3 space-y-2">
                       {winnerHistory.map((item, idx) => (
@@ -523,7 +523,7 @@ export function SpinWheelClient({ locale }: SpinWheelClientProps) {
                       ))}
                     </ol>
                   ) : (
-                    <div className="h-full min-h-[380px] flex flex-col items-center justify-center gap-3 text-muted-foreground">
+                    <div className="h-full min-h-95 flex flex-col items-center justify-center gap-3 text-muted-foreground">
                       <ChevronDown className="w-10 h-10 opacity-20" />
                       <p className="text-sm font-medium">{t.noWinners}</p>
                     </div>
