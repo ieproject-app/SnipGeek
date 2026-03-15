@@ -446,10 +446,10 @@ export function LayoutHeader({
     "h-9 w-9 p-0 rounded-xl transition-all duration-300 text-foreground/75 hover:text-foreground hover:bg-accent/15 hover:shadow-sm flex items-center justify-center relative";
 
   const secondaryHoverStyles = [
-    "hover:border-sky-400/50 hover:bg-sky-500/15 hover:text-sky-100",
-    "hover:border-cyan-400/50 hover:bg-cyan-500/15 hover:text-cyan-100",
-    "hover:border-indigo-400/50 hover:bg-indigo-500/15 hover:text-indigo-100",
-    "hover:border-blue-300/50 hover:bg-blue-400/15 hover:text-blue-100",
+    "hover:border-sky-300 hover:bg-sky-100 hover:text-sky-900",
+    "hover:border-cyan-300 hover:bg-cyan-100 hover:text-cyan-900",
+    "hover:border-indigo-300 hover:bg-indigo-100 hover:text-indigo-900",
+    "hover:border-blue-300 hover:bg-blue-100 hover:text-blue-900",
   ] as const;
 
   return (
@@ -1122,7 +1122,7 @@ export function LayoutHeader({
                   className={cn(
                     "group inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full border px-3.5 font-sans text-[10px] font-black uppercase tracking-[0.13em] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50",
                     isActive
-                      ? "border-primary/60 bg-primary text-primary-foreground shadow-sm"
+                      ? "border-background/80 bg-background text-primary shadow-sm"
                       : cn(
                           "border-primary/30 bg-background/95 text-foreground/80",
                           hoverStyle,
