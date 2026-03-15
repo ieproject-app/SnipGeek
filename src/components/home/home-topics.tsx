@@ -77,20 +77,26 @@ export function HomeTopics({
             href={`${linkPrefix}/blog/${post.slug}`}
             className="flex items-start gap-4 flex-1 min-w-0"
           >
-            <div className="relative w-[120px] h-[90px] shrink-0 overflow-hidden rounded-lg shadow-sm border border-primary/5">
+            <div className="relative w-[120px] h-[80px] sm:w-[144px] sm:h-[96px] shrink-0 overflow-hidden rounded-lg shadow-sm border border-primary/5 mt-0.5">
               <Image
                 src={heroImageSrc}
                 alt={post.frontmatter.imageAlt || post.frontmatter.title}
                 fill
                 className="object-cover transition-transform duration-500 group-hover:scale-110"
-                sizes="120px"
+                sizes="(max-width: 640px) 120px, 144px"
+              />
+              <AddToReadingListButton
+                item={item}
+                dictionary={dictionary}
+                showText={false}
+                className="absolute top-1 right-1 z-20 text-white bg-black/30 hover:bg-black/50 hover:text-white opacity-0 group-hover:opacity-100 transition-opacity h-6 w-6"
               />
             </div>
-            <div className="flex-1 min-w-0 py-1">
+            <div className="flex-1 min-w-0 py-1 flex flex-col justify-start">
               <div className="mb-1">
                 <CategoryBadge category={post.frontmatter.category || tag} />
               </div>
-              <h3 className="font-display text-base font-medium text-primary leading-snug line-clamp-2 transition-colors group-hover:text-accent">
+              <h3 className="font-display text-[15px] sm:text-base font-medium text-primary leading-snug transition-colors group-hover:text-accent">
                 {post.frontmatter.title}
               </h3>
               <time className="text-[10px] text-muted-foreground mt-2 block font-medium opacity-60">
@@ -98,12 +104,6 @@ export function HomeTopics({
               </time>
             </div>
           </Link>
-          <AddToReadingListButton
-            item={item}
-            dictionary={dictionary}
-            showText={false}
-            className="self-center text-muted-foreground hover:text-primary h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity shrink-0"
-          />
         </div>
       </ScrollReveal>
     );

@@ -445,13 +445,20 @@ export function LayoutHeader({
   const navItemClass =
     "h-9 w-9 p-0 rounded-xl transition-all duration-300 text-foreground/75 hover:text-foreground hover:bg-accent/15 hover:shadow-sm flex items-center justify-center relative";
 
+  const secondaryHoverStyles = [
+    "hover:border-sky-400/50 hover:bg-sky-500/15 hover:text-sky-100",
+    "hover:border-cyan-400/50 hover:bg-cyan-500/15 hover:text-cyan-100",
+    "hover:border-indigo-400/50 hover:bg-indigo-500/15 hover:text-indigo-100",
+    "hover:border-blue-300/50 hover:bg-blue-400/15 hover:text-blue-100",
+  ] as const;
+
   return (
     <>
       <header
         ref={headerRef}
         data-scrolled={isScrolled}
         className={cn(
-          "fixed top-0 left-0 right-0 z-50 w-full bg-background/80 backdrop-blur-md border-b border-border transition-all [transition-timing-function:cubic-bezier(0.4,0,0.2,1)] will-change-transform overflow-visible",
+          "fixed top-0 left-0 right-0 z-50 w-full bg-background border-b border-border transition-all [transition-timing-function:cubic-bezier(0.4,0,0.2,1)] will-change-transform overflow-visible",
           isVisible
             ? "translate-y-0 duration-500"
             : "-translate-y-full duration-300",
@@ -743,7 +750,7 @@ export function LayoutHeader({
           {/* BAR OVERLAYS (Only for Search and Reading List) */}
           <div
             className={cn(
-              "absolute inset-0 z-10 flex h-16 w-full items-center bg-background px-6 transition-all [transition-duration:280ms] [transition-timing-function:cubic-bezier(0.34,1.56,0.64,1)]",
+              "absolute inset-0 z-10 flex h-16 w-full items-center bg-background border-b border-border px-6 transition-all [transition-duration:280ms] [transition-timing-function:cubic-bezier(0.34,1.56,0.64,1)]",
               isSearchOpen
                 ? "opacity-100 translate-y-0"
                 : "opacity-0 -translate-y-full pointer-events-none",
@@ -772,7 +779,7 @@ export function LayoutHeader({
 
           <div
             className={cn(
-              "absolute inset-0 z-10 flex h-16 w-full items-center justify-between bg-background px-6 transition-all [transition-duration:280ms] [transition-timing-function:cubic-bezier(0.34,1.56,0.64,1)]",
+              "absolute inset-0 z-10 flex h-16 w-full items-center justify-between bg-background border-b border-border px-6 transition-all [transition-duration:280ms] [transition-timing-function:cubic-bezier(0.34,1.56,0.64,1)]",
               isReadingListOpen
                 ? "opacity-100 translate-y-0"
                 : "opacity-0 -translate-y-full pointer-events-none",
@@ -815,7 +822,7 @@ export function LayoutHeader({
                 : "opacity-0 scale-[0.97] -translate-y-1 pointer-events-none",
             )}
           >
-            <div className="flex items-center justify-between px-4 pt-3 pb-2 border-b border-border bg-muted/5">
+            <div className="flex items-center justify-between px-4 pt-3 pb-2 border-b border-border bg-background/60">
               <p className="font-sans text-[9px] font-black uppercase tracking-[0.15em] text-muted-foreground/60">
                 Queue · {readingListItems.length} items
               </p>
@@ -937,7 +944,7 @@ export function LayoutHeader({
               <div className="p-2">
                 {query.length > 1 ? (
                   <>
-                    <div className="font-sans text-[9px] font-black uppercase tracking-[0.15em] text-muted-foreground/60 px-4 py-2 border-b border-border bg-muted/5">
+                    <div className="font-sans text-[9px] font-black uppercase tracking-[0.15em] text-muted-foreground/60 px-4 py-2 border-b border-border bg-background/60">
                       {results.length} {dictionary.search.resultsFound} for &quot;
                       {query}&quot;
                     </div>
@@ -1005,7 +1012,7 @@ export function LayoutHeader({
                             <NextLink
                               key={item.slug}
                               href={item.href}
-                              className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-muted/50 transition-all group"
+                              className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-accent/10 transition-all group"
                               onClick={() => setActiveView("none")}
                             >
                               <div className="w-[52px] h-[39px] relative rounded-md overflow-hidden bg-muted shrink-0 border border-border/50">
@@ -1070,7 +1077,7 @@ export function LayoutHeader({
                 )}
               </div>
             </ScrollArea>
-            <div className="px-4 py-2 border-t border-border bg-muted/5 flex items-center justify-between">
+            <div className="px-4 py-2 border-t border-border bg-background/60 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="flex items-center gap-1.5">
                   <kbd className="px-1.5 py-0.5 rounded border bg-background font-sans text-[8px] font-bold shadow-sm">
@@ -1094,15 +1101,17 @@ export function LayoutHeader({
         </div>
       </header>
 
-      <div className="relative z-20 w-full bg-gradient-to-b from-accent/24 via-accent/14 to-accent/6 pt-16">
+      <div className="relative z-20 w-full bg-primary border-b border-primary/60 pt-16">
         <div className="mx-auto max-w-4xl px-4 md:px-6">
           <nav
             aria-label="Quick navigation"
             data-nav-slot="secondary"
-            className="flex min-h-11 items-center justify-start md:justify-center gap-2 overflow-x-auto whitespace-nowrap py-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            className="flex h-16 items-center justify-start md:justify-center gap-2 overflow-x-auto whitespace-nowrap py-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
           >
             {finalSecondaryLinks.map((item, index) => {
               const isActive = getIsActivePath(item.href);
+              const hoverStyle =
+                secondaryHoverStyles[index % secondaryHoverStyles.length];
               return (
                 <NextLink
                   key={item.href}
@@ -1111,10 +1120,13 @@ export function LayoutHeader({
                   data-nav-item={item.href.replace("/", "") || "home"}
                   onClick={() => trackSecondaryNavClick(item, index + 1)}
                   className={cn(
-                    "group inline-flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1.5 font-sans text-[10px] font-black uppercase tracking-[0.13em] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50",
+                    "group inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full border px-3.5 font-sans text-[10px] font-black uppercase tracking-[0.13em] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50",
                     isActive
                       ? "border-primary/60 bg-primary text-primary-foreground shadow-sm"
-                      : "border-primary/30 bg-background/80 text-foreground/80 hover:border-primary/50 hover:bg-primary/10 hover:text-foreground",
+                      : cn(
+                          "border-primary/30 bg-background/95 text-foreground/80",
+                          hoverStyle,
+                        ),
                   )}
                 >
                   <item.icon className="h-3.5 w-3.5" />

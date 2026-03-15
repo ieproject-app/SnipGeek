@@ -235,7 +235,7 @@ export const Gallery = ({
       )}
       {...props}
     >
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 [&>p]:contents [&>span]:contents [&_span.block]:!my-0 [&_span.block]:w-full [&_img]:!my-0 [&_img]:rounded-xl [&_img]:w-full [&_img]:aspect-[4/3] [&_img]:object-cover hover:[&_img]:shadow-md transition-shadow">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 [&>p]:contents [&>span]:contents [&_span.block]:!my-0 [&_span.block]:w-full [&_img]:!my-0 [&_img]:rounded-xl [&_img]:w-full hover:[&_img]:shadow-md transition-shadow">
         {children}
       </div>
       {caption && (

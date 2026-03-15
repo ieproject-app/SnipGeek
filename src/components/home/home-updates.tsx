@@ -97,14 +97,14 @@ export function HomeUpdates({ posts, title, viewMoreText, dictionary, locale, ta
                       "hover:-translate-y-1 hover:bg-card hover:border-primary/10"
                     )}>
                       <Link href={`${linkPrefix}/blog/${post.slug}`} className="contents">
-                        {/* Thumbnail Container - Updated to 4:3 (120x90) */}
-                        <div className="relative w-[120px] h-[90px] shrink-0 overflow-hidden rounded-lg shadow-sm border border-primary/5">
+                        {/* Thumbnail Container - Responsive 3:2 for denser visual balance */}
+                        <div className="relative w-[120px] h-[80px] sm:w-[144px] sm:h-[96px] shrink-0 overflow-hidden rounded-lg shadow-sm border border-primary/5 mt-0.5">
                           <Image
                             src={heroImageSrc}
                             alt={post.frontmatter.imageAlt || post.frontmatter.title}
                             fill
                             className="object-cover transition-transform duration-700 group-hover:scale-110"
-                            sizes="120px"
+                            sizes="(max-width: 640px) 120px, 144px"
                             data-ai-hint={heroImageHint}
                           />
                           <AddToReadingListButton
@@ -116,11 +116,11 @@ export function HomeUpdates({ posts, title, viewMoreText, dictionary, locale, ta
                         </div>
 
                         {/* Content Area */}
-                        <div className="flex-1 min-w-0 py-1">
+                        <div className="flex-1 min-w-0 py-1 flex flex-col justify-start">
                           <div className="mb-1">
                             <CategoryBadge category={post.frontmatter.category || 'Update'} />
                           </div>
-                          <h3 className="font-display text-base font-medium text-primary leading-snug line-clamp-2 transition-colors group-hover:text-accent">
+                          <h3 className="font-display text-[15px] sm:text-base font-medium text-primary leading-snug transition-colors group-hover:text-accent">
                             {post.frontmatter.title}
                           </h3>
                           <time className="text-[10px] text-muted-foreground mt-2 block font-medium opacity-60">
