@@ -1,0 +1,197 @@
+---
+title: "Mencoba Antigravity: AI Code Editor yang Bikin Penasaran"
+slug: "trying-antigravity-ai-code-editor"
+translationKey: "trying-antigravity-ai-code-editor"
+date: "2026-03-17"
+description: "Kesan pertama saya mencoba Antigravity di Linux, mulai dari trial Google One, pilihan model AI, kendala instalasi Ubuntu, sampai crash yang cukup mengganggu."
+heroImage: "/images/_posts/google/antigravity/01_banner_antigravity.webp"
+imageAlt: "Banner Antigravity AI code editor di desktop Linux"
+published: true
+featured: false
+tags: ["Antigravity", "Linux", "Ubuntu", "Google", "AI"]
+category: "AI"
+---
+
+Belakangan ini saya lumayan sering lihat **Antigravity** lewat TikTok.
+
+Awalnya saya kira ini cuma satu lagi AI code editor yang ikut masuk ke arena yang sudah diisi Cursor, Windsurf, dan Zed. Tapi makin sering muncul di timeline, makin besar juga rasa penasaran saya. Namanya unik, tampilannya kelihatan rapi, dan konsepnya jelas: editor khusus yang dari awal memang dibangun di sekitar akses ke model AI premium.
+
+Akhirnya saya coba sendiri.
+
+## Saya Masih Baru Banget di Linux
+
+Saya perlu kasih konteks ini dulu, karena menurut saya cukup penting.
+
+Saya baru mulai serius pakai Linux belum lama ini setelah setup dual-boot. Di sistem Linux saya sendiri, editor yang benar-benar baru saya sentuh sejauh ini juga masih sedikit: **VS Code** dan **Antigravity**. Windsurf memang sudah terpasang, tapi jujur saja belum sempat saya eksplor.
+
+Jadi tulisan ini bukan review dari sudut pandang pengguna Linux senior yang sudah bertahun-tahun hidup di terminal. Ini lebih ke cerita dari orang yang masih adaptasi, masih belajar, dan masih bisa tersandung hal-hal dasar.
+
+Kalau kamu juga lagi ada di fase itu, mungkin pengalaman saya justru lebih relate.
+
+## Sebelumnya Saya Sudah Coba di Windows
+
+Sebelum mencobanya di Linux, saya sebenarnya sudah lebih dulu pasang Antigravity di **Windows**. Penyebabnya sama: TikTok.
+
+Kesan awal saya waktu itu cukup campur aduk. Fitur AI-nya terlihat menarik, tapi aplikasinya sendiri belum terasa stabil. Masalah yang paling sering bikin kesal adalah proses login yang kadang susah masuk tanpa alasan yang jelas. Saya beberapa kali harus ulang lagi dari awal.
+
+Meski begitu, karena trial gratisnya lumayan menarik, saya tetap lanjut iseng eksplorasi. Dari situlah muncul rasa ingin tahu apakah versi Linux-nya akan terasa lebih baik atau justru sama saja.
+
+## Antigravity Terlihat Serius dari Cara Distribusinya
+
+Hal pertama yang cukup bikin saya memperhatikan Antigravity adalah cara mereka mendistribusikan aplikasi ini di Ubuntu.
+
+Ini bukan model distribusi yang sekadar lempar AppImage ke halaman download lalu selesai. Antigravity punya repository APT sendiri yang di-host di Google Cloud, lengkap dengan GPG signing key. Memang itu bukan jaminan aplikasinya otomatis bagus, tapi minimal ada kesan bahwa produk ini dibangun dengan rencana update dan maintenance jangka panjang.
+
+Untuk editor AI, detail seperti ini menurut saya penting. Bukan cuma soal fitur chat atau auto-complete, tapi juga soal bagaimana software itu dikelola sebagai produk yang benar-benar dipakai setiap hari.
+
+## Trial Gratis 30 Hari dari Google One
+
+Bagian ini yang paling cepat membuat saya tertarik.
+
+Antigravity memang bukan editor gratis sepenuhnya, tapi saya berhasil dapat **trial 30 hari** lewat promo di aplikasi **Google One** di Android. Waktu itu saya cuma lagi buka aplikasinya secara santai, lalu tiba-tiba lihat penawaran Antigravity di sana.
+
+Setelah saya klaim, saya juga dapat **1.000 AI Credits**. Buat saya ini penting, karena artinya saya bisa benar-benar mencoba beberapa model dan merasakan editor-nya tanpa langsung mentok ke batas yang terlalu kecil.
+
+<Callout variant="info" title="Cek Dulu Kalau Punya Google One">
+  Kalau kamu memang berlangganan Google One, coba buka aplikasinya dan cek apakah promo Antigravity yang sama masih tersedia di akun kamu.
+</Callout>
+
+## Daftar Model AI-nya Cukup Menarik
+
+Setelah masuk ke **Settings → Models**, saya lumayan terkesan dengan pilihan model yang tersedia. Di akun saya, daftar yang muncul kurang lebih seperti ini:
+
+- **Gemini 3.1 Pro** dengan beberapa tier kuota
+- **Gemini 3 Flash**
+- **Claude Sonnet 4.6 (Thinking)**
+- **Claude Opus 4.6 (Thinking)**
+- **GPT-OSS 120B (Medium)**
+
+Untuk ukuran trial, daftar ini menurut saya sudah cukup mewah. Yang saya suka lagi, informasi kuotanya juga ditampilkan cukup jelas, jadi kita bisa lebih gampang mengatur model mana yang dipakai untuk tugas tertentu.
+
+![Halaman pengaturan model di Antigravity yang menampilkan pilihan model AI dan opsi penggunaan kredit.](/images/_posts/google/antigravity/02_antigravity_settings.webp)
+*Layar ini yang bikin trial Antigravity terasa lebih serius dari dugaan awal saya.*
+
+### Cara Mengaktifkan AI Credit Overages
+
+Opsi ini berguna, tapi lokasinya agak gampang kelewat kalau baru pertama kali masuk.
+
+<Steps>
+  <Step>
+    **Buka Settings dari menu editor**
+
+    Jangan langsung cari halaman pengaturan khusus Antigravity. Buka **Settings** dari menu **Editor**.
+  </Step>
+
+  <Step>
+    **Masuk ke tab Models**
+
+    Di dalam Settings, pindah ke tab **Models** untuk melihat daftar model dan kuota masing-masing.
+  </Step>
+
+  <Step>
+    **Aktifkan AI Credit Overages**
+
+    Nyalakan opsi **Enable AI Credit Overages** kalau kamu ingin Antigravity otomatis memakai AI Credits saat kuota model utama sudah habis.
+  </Step>
+</Steps>
+
+### Cara Saya Menghemat Kredit
+
+Karena jumlah kreditnya terbatas, menurut saya sayang kalau semua prompt langsung dilempar ke model paling berat.
+
+- Untuk tanya jawab ringan atau eksplorasi cepat, **Gemini 3 Flash** sudah terasa cukup masuk akal.
+- Untuk tugas coding yang butuh reasoning lebih rapi atau refactor yang lebih serius, baru naik ke **Gemini Pro** atau **Claude Sonnet**.
+- **Claude Opus** sebaiknya disimpan untuk tugas yang benar-benar rumit, bukan untuk percakapan editor yang masih level biasa.
+
+Kalau dipakai dengan strategi seperti itu, **1.000 kredit** bisa bertahan lebih lama dari yang kelihatannya.
+
+## Instalasi di Ubuntu Tidak Selicin yang Saya Bayangkan
+
+Secara resmi, proses instalasinya kelihatan simpel, cuma beberapa langkah. Tapi saya langsung kena batu di awal karena **curl belum terinstal** di sistem saya.
+
+Akibatnya, langkah download GPG key gagal, tapi repository-nya telanjur masuk. Setelah itu, saat menjalankan `apt update`, muncul error seperti ini:
+
+```bash
+NO_PUBKEY C0BA5CE6DC6315A3
+```
+
+Begitu saya paham akar masalahnya, solusinya sebenarnya cukup lurus.
+
+<Steps>
+  <Step>
+    **Pasang curl dulu**
+
+    ```bash
+    sudo apt install curl -y
+    ```
+  </Step>
+
+  <Step>
+    **Unduh ulang signing key repository Antigravity**
+
+    ```bash
+    curl -fsSL https://us-central1-apt.pkg.dev/doc/repo-signing-key.gpg | \
+      sudo gpg --dearmor --yes -o /etc/apt/keyrings/antigravity-repo-key.gpg
+    ```
+  </Step>
+
+  <Step>
+    **Verifikasi bahwa key sudah tersimpan**
+
+    ```bash
+    sudo gpg --no-default-keyring \
+      --keyring /etc/apt/keyrings/antigravity-repo-key.gpg \
+      --list-keys
+    ```
+  </Step>
+
+  <Step>
+    **Update index paket lalu instal Antigravity**
+
+    ```bash
+    sudo apt update
+    sudo apt install antigravity
+    ```
+  </Step>
+</Steps>
+
+Dari pengalaman kecil ini, saya malah jadi diingatkan lagi bahwa dokumentasi instalasi resmi sering mengasumsikan sistem kita sudah punya dependency dasar yang lengkap.
+
+## Soal Stabilitas, Menurut Saya Ini PR Terbesarnya
+
+Di bagian ini saya harus jujur.
+
+Walaupun pengalaman memakai Antigravity cukup menyenangkan di beberapa sisi, saya belum bisa menyebutnya stabil di Linux. Saya beberapa kali mengalami crash, dan salah satu notifikasinya kurang lebih seperti ini:
+
+![Dialog crash Ubuntu yang menunjukkan Antigravity tertutup tiba-tiba karena memori bebas tidak mencukupi.](/images/_posts/google/antigravity/03_error_bug_antigravity.webp)
+*Pesan seperti ini cukup bikin mood coding turun seketika.*
+
+> "Sorry, the program 'antigravity' closed unexpectedly. Your computer does not have enough free memory to automatically analyze the problem and send a report to the developers."
+
+Ini cukup mengganggu. Crash saja sudah buruk, apalagi kalau crash-nya sampai membuat proses analisis bug otomatis ikut gagal karena memori habis.
+
+Dan di titik ini, pengalaman saya di Linux terasa seperti mengulang pola yang sudah saya rasakan sebelumnya di Windows. Bentuk masalahnya memang beda, tapi kesan dasarnya sama: Antigravity punya potensi, cuma kestabilannya masih belum meyakinkan.
+
+## Beberapa Screenshot Selama Trial
+
+<Gallery caption="Sedikit gambaran Antigravity di sistem saya, dari tampilan editor sampai momen yang agak bikin gemas.">
+  ![Tampilan jendela Antigravity di Linux saat sesi pengujian.](/images/_posts/google/antigravity/screenshot/ss_anti1.webp)
+  ![Antarmuka Antigravity yang menampilkan area coding dan panel editor.](/images/_posts/google/antigravity/screenshot/ss_anti2.webp)
+  ![Screenshot Antigravity di Linux saat aplikasi sedang dipakai.](/images/_posts/google/antigravity/screenshot/ss_anti3.webp)
+</Gallery>
+
+Saya tetap berharap tim developer-nya terus membenahi produk ini, karena pondasinya sendiri sebenarnya tidak buruk.
+
+## Verdict Sementara Saya
+
+Antigravity itu menarik. Bagian itu menurut saya tidak sulit untuk diakui.
+
+Akses ke model seperti **Claude Opus**, **Claude Sonnet**, **Gemini Pro**, dan **GPT-OSS** dari dalam satu editor jelas punya nilai jual yang nyata, apalagi kalau sistem kuotanya terlihat cukup transparan untuk dikelola. Cara distribusinya lewat repository APT yang proper juga memberi kesan bahwa ini bukan proyek iseng.
+
+Tapi kalau saya jujur, tanpa **trial 30 hari dari Google One**, saya mungkin akan jauh lebih hati-hati sebelum berkomitmen. Crash di Linux dan masalah login yang sebelumnya saya temui di Windows sama-sama menunjukkan bahwa produk ini masih punya banyak hal yang perlu dirapikan.
+
+Untuk sekarang, pendekatan paling aman menurut saya sederhana saja: nikmati trial-nya, eksplor kemampuan AI-nya, pakai kredit dengan hemat, dan jangan pasang ekspektasi terlalu tinggi dulu.
+
+Kalau kamu ingin lihat produknya langsung, kamu bisa buka [halaman resmi Antigravity](https://antigravity.google/product).
+
+Kalau kamu juga kenal Antigravity dari TikTok, atau justru sudah lebih lama memakainya, saya penasaran apakah pengalaman kamu sejauh ini lebih mulus atau malah mirip seperti yang saya alami.

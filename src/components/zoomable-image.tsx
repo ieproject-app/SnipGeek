@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type ImgHTMLAttributes } from "react";
+import { useEffect, useState, type ImgHTMLAttributes } from "react";
 import { cn } from "@/lib/utils";
 import {
     Plus,
@@ -34,6 +34,10 @@ export const ZoomableImage = ({
     const [isLoaded, setIsLoaded] = useState(false);
     const { onLoad: onImageLoad, ...imageProps } = props;
 
+    useEffect(() => {
+        setIsLoaded(false);
+    }, [src]);
+
     const parseDimension = (value: number | string | undefined) => {
         if (typeof value === "number" && Number.isFinite(value) && value > 0) {
             return value;
@@ -51,19 +55,22 @@ export const ZoomableImage = ({
 
     const width = parseDimension(imageProps.width);
     const height = parseDimension(imageProps.height);
-    const reservedAspectRatio = width && height ? `${width} / ${height}` : "16 / 9";
+    const reservedAspectRatio = width && height ? `${width} / ${height}` : undefined;
 
     return (
         <Dialog>
             <DialogTrigger asChild>
-                <div className="group relative cursor-zoom-in overflow-hidden rounded-xl bg-muted shadow-md transition-all duration-500 hover:shadow-2xl">
+                <div className="group relative cursor-zoom-in overflow-hidden rounded-xl ring-1 ring-border/45 transition-[box-shadow,transform] duration-300 hover:shadow-lg hover:ring-border/70">
                     <div
-                        className="relative w-full"
-                        style={{ aspectRatio: reservedAspectRatio }}
+                        className={cn(
+                            "relative w-full overflow-hidden rounded-xl",
+                            !reservedAspectRatio && !isLoaded && "min-h-48",
+                        )}
+                        style={reservedAspectRatio ? { aspectRatio: reservedAspectRatio } : undefined}
                     >
                     {!isLoaded && (
                         <div
-                            className="skeleton absolute inset-0 z-0"
+                            className="skeleton absolute inset-0 z-0 bg-muted/45"
                             data-variant="shimmer"
                             aria-hidden="true"
                         />
@@ -80,18 +87,17 @@ export const ZoomableImage = ({
                             onImageLoad?.(event);
                         }}
                         className={cn(
-                            "absolute inset-0 z-[1] h-full w-full object-contain transition-all duration-500 ease-out group-hover:scale-[1.03]",
+                            "relative z-[1] block h-auto w-full rounded-xl transition-[opacity,transform] duration-300 ease-out group-hover:scale-[1.01]",
                             isLoaded ? "opacity-100" : "opacity-0",
                             className,
                         )}
                     />
                     </div>
 
-                    {/* Hover Overlay: Plus Pill */}
-                    <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/5 opacity-0 transition-all duration-500 group-hover:bg-black/20 group-hover:opacity-100">
-                        <div className="flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-white shadow-2xl backdrop-blur-md transition-transform duration-500 group-hover:scale-110">
-                            <Plus className="h-4 w-4" />
-                            <span className="text-[10px] font-black uppercase tracking-[0.2em]">
+                    <div className="pointer-events-none absolute top-3 right-3 z-10 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+                        <div className="flex items-center gap-1.5 rounded-full border border-white/30 bg-black/45 px-3 py-1.5 text-white shadow-lg backdrop-blur-sm">
+                            <Plus className="h-3.5 w-3.5" />
+                            <span className="text-[10px] font-black uppercase tracking-[0.18em]">
                                 Zoom
                             </span>
                         </div>
