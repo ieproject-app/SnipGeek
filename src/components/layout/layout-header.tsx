@@ -510,7 +510,7 @@ export function LayoutHeader({
                 <SnipGeekLogo className="h-7 w-7 sm:h-8 sm:w-8 transition-transform duration-500 ease-in-out group-hover:scale-[1.15] group-hover:rotate-3" />
                 <div className="font-display text-lg sm:text-xl font-black tracking-[-0.03em] flex items-baseline leading-none">
                   <span className="text-foreground">Snip</span>
-                  <span className="text-accent dark:text-foreground ml-px">
+                  <span className="text-accent ml-px">
                     Geek
                   </span>
                 </div>
