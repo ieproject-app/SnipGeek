@@ -86,8 +86,8 @@ export default async function AboutPage({
       <main className="mx-auto max-w-5xl px-4 pt-8 pb-14 sm:px-6 lg:px-8">
         <ScrollReveal direction="down">
           <section className="relative overflow-hidden rounded-3xl border border-primary/10 bg-linear-to-br from-primary/6 via-background to-accent/6 p-8 md:p-12">
-            <div className="pointer-events-none absolute -top-20 -left-20 h-72 w-72 rounded-full bg-primary/10 blur-3xl" />
-            <div className="pointer-events-none absolute -right-20 -bottom-20 h-72 w-72 rounded-full bg-accent/10 blur-3xl" />
+            <div className="pointer-events-none absolute -top-20 -left-20 h-72 w-72 rounded-full bg-primary/8 blur-3xl" />
+            <div className="pointer-events-none absolute -right-20 -bottom-20 h-72 w-72 rounded-full bg-accent/8 blur-3xl" />
 
             <div className="relative z-10 grid grid-cols-1 gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
               <div>
@@ -96,11 +96,11 @@ export default async function AboutPage({
                   {data.profile.badge}
                 </div>
 
-                <h1 className="font-display text-4xl font-black tracking-tighter text-primary">
+                <h1 className="font-display text-3xl font-black tracking-tighter text-primary sm:text-4xl lg:text-5xl">
                   {dictionary.about.title}
                 </h1>
 
-                <p className="mt-4 max-w-2xl text-lg leading-relaxed text-muted-foreground">
+                <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg">
                   {dictionary.about.description}
                 </p>
 
@@ -131,8 +131,7 @@ export default async function AboutPage({
 
               <div className="flex w-full justify-center lg:justify-end">
                 <div className="w-full max-w-md">
-                  <div className="relative rounded-7 border border-primary/10 bg-card/70 px-5 pb-6 pt-5 shadow-xl backdrop-blur-sm sm:px-6 sm:pb-7 sm:pt-6">
-                    <div className="absolute top-0 right-0 h-15 w-15 rounded-tr-[28px] rounded-bl-3xl bg-background/92 sm:h-18 sm:w-18" />
+                  <div className="relative z-10 overflow-visible rounded-3xl border border-primary/12 bg-card/95 px-5 pb-6 pt-5 shadow-xl backdrop-blur-sm sm:px-6 sm:pb-7 sm:pt-6">
                     <MotionDiv
                       initial={{
                         opacity: 0,
@@ -154,7 +153,7 @@ export default async function AboutPage({
                         delay: 0.12,
                         ease: [0.21, 0.47, 0.32, 0.98],
                       }}
-                      className="absolute -top-8 right-4 sm:-top-10 sm:right-5"
+                      className="absolute -top-8 left-1/2 z-20 -translate-x-1/2 sm:-top-7 sm:right-5 sm:left-auto sm:translate-x-0"
                     >
                       <div className="relative">
                         <MotionSpan
@@ -184,7 +183,7 @@ export default async function AboutPage({
                             delay: 0.35,
                           }}
                         />
-                        <Avatar className="relative h-20 w-20 shadow-2xl ring-4 ring-primary/20 ring-offset-4 ring-offset-background sm:h-24 sm:w-24">
+                        <Avatar className="relative h-14 w-14 shadow-2xl ring-2 ring-primary/20 ring-offset-2 ring-offset-background sm:h-24 sm:w-24 sm:ring-4 sm:ring-offset-4">
                           <AvatarImage src={authorAvatar} alt={data.name} />
                           <AvatarFallback className="text-xl font-bold">
                             IE
@@ -193,14 +192,14 @@ export default async function AboutPage({
                       </div>
                     </MotionDiv>
 
-                    <div className="text-left">
+                    <div className="relative z-10 pt-10 text-left sm:pt-0">
                       <p className="text-[11px] font-black uppercase tracking-widest text-accent">
                         {data.profile.panelLabel}
                       </p>
                       <h2 className="mt-2 font-display text-2xl font-black tracking-tight text-primary">
                         {data.name}
                       </h2>
-                      <p className="mt-2 text-sm font-semibold leading-relaxed text-muted-foreground">
+                      <p className="mt-2 text-xs font-semibold leading-relaxed text-muted-foreground sm:text-sm">
                         {learningRole}
                       </p>
                       <p className="mt-4 text-sm leading-relaxed text-foreground/70">
@@ -216,7 +215,7 @@ export default async function AboutPage({
 
         <ScrollReveal direction="up" delay={0.06}>
           <section className="mt-8 mb-16">
-            <div className="mx-auto max-w-4xl rounded-7 border border-primary/10 bg-linear-to-br from-card/85 via-card/70 to-background/90 p-6 shadow-sm backdrop-blur-sm sm:p-8">
+            <div className="mx-auto max-w-4xl rounded-3xl border border-primary/10 bg-linear-to-br from-card/85 via-card/70 to-background/90 p-6 shadow-sm backdrop-blur-sm sm:p-8">
               <div className="flex flex-col gap-8 sm:flex-row sm:items-center sm:justify-between">
                 <div className="flex-1 sm:pr-8">
                   <div className="mb-3 flex items-center gap-2">
@@ -275,7 +274,7 @@ export default async function AboutPage({
             <SectionHeading title={dictionary.about.story} />
             <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_300px] lg:items-start">
               <div className="min-w-0">
-                <div className="rounded-7 border border-primary/10 bg-card/20 p-6 shadow-sm backdrop-blur-sm sm:p-8">
+                <div className="rounded-3xl border border-primary/10 bg-card/20 p-6 shadow-sm backdrop-blur-sm sm:p-8">
                   <div className="prose-content text-lg text-foreground/80 [&>h2:first-child]:mt-0 [&>p:first-child]:mt-0">
                     <MDXRemote
                       source={content}
@@ -294,8 +293,7 @@ export default async function AboutPage({
               </div>
 
               <aside className="lg:sticky lg:top-24">
-                <div className="relative rounded-3xl border border-primary/10 bg-linear-to-br from-primary/6 via-background to-accent/6 p-5 shadow-sm">
-                  <div className="absolute top-0 right-0 h-14 w-14 rounded-tr-3xl rounded-bl-[20px] bg-background/92 sm:h-16 sm:w-16" />
+                <div className="relative z-10 overflow-visible rounded-3xl border border-primary/12 bg-card/95 p-5 shadow-sm">
                   <MotionDiv
                     initial={{
                       opacity: 0,
@@ -317,7 +315,7 @@ export default async function AboutPage({
                       delay: 0.1,
                       ease: [0.21, 0.47, 0.32, 0.98],
                     }}
-                    className="absolute -top-7 right-3 sm:-top-8 sm:right-4"
+                    className="absolute -top-6 left-1/2 z-20 -translate-x-1/2 sm:-top-6 sm:right-4 sm:left-auto sm:translate-x-0"
                   >
                     <div className="relative">
                       <MotionSpan
@@ -347,7 +345,7 @@ export default async function AboutPage({
                           delay: 0.35,
                         }}
                       />
-                      <Avatar className="relative h-16 w-16 shadow-xl ring-4 ring-primary/20 ring-offset-4 ring-offset-background sm:h-20 sm:w-20">
+                      <Avatar className="relative h-12 w-12 shadow-xl ring-2 ring-primary/20 ring-offset-2 ring-offset-background sm:h-20 sm:w-20 sm:ring-4 sm:ring-offset-4">
                         <AvatarImage src={authorAvatar} alt={data.name} />
                         <AvatarFallback className="text-lg font-bold">
                           IE
@@ -356,7 +354,7 @@ export default async function AboutPage({
                     </div>
                   </MotionDiv>
 
-                  <div className="text-left">
+                  <div className="relative z-10 pt-8 text-left sm:pt-0">
                     <p className="text-[11px] font-black uppercase tracking-[0.22em] text-accent">
                       {data.profile.panelLabel}
                     </p>
@@ -561,7 +559,7 @@ export default async function AboutPage({
               <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
                 {data.profile.resumeDescription}
               </p>
-              <div className="mt-6 flex justify-start">
+              <div className="mt-6 flex justify-center">
                 <DownloadButton id="cv-iwan-efendi" />
               </div>
               <div className="mt-6 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-muted-foreground">

@@ -482,7 +482,7 @@ export function LayoutHeader({
                 aria-label="Back to Site"
               >
                 <div className="flex items-center gap-1 shrink-0">
-                  <div className="opacity-0 group-hover:opacity-100 -translate-x-1 group-hover:translate-x-0 transition-all duration-300">
+                  <div className="opacity-100 translate-x-0 transition-all duration-300 md:opacity-0 md:-translate-x-1 md:group-hover:opacity-100 md:group-hover:translate-x-0">
                     <ChevronRight className="h-4 w-4 rotate-180 text-accent" />
                   </div>
                   <div className="relative h-9 w-9 flex items-center justify-center shrink-0">

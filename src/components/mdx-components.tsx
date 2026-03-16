@@ -29,6 +29,7 @@ import { downloadLinks } from "@/lib/data-downloads";
 import { ZoomableImage } from "./zoomable-image";
 import { SpecList, SpecItem } from "./mdx/spec-sheet";
 import { Expandable } from "./mdx/expandable";
+import { GalleryLightbox, type GalleryImageItem } from "./mdx/gallery-lightbox";
 
 type MdxElementProps = {
   children?: React.ReactNode;
@@ -75,6 +76,40 @@ const generateId = (children: React.ReactNode) => {
     .toLowerCase()
     .replace(/[^\w\s-]/g, "")
     .replace(/\s+/g, "-");
+};
+
+const collectGalleryImages = (
+  children: React.ReactNode,
+  items: GalleryImageItem[] = [],
+): GalleryImageItem[] => {
+  React.Children.forEach(children, (child) => {
+    if (!React.isValidElement(child)) return;
+
+    const props = child.props as {
+      src?: unknown;
+      alt?: unknown;
+      title?: unknown;
+      children?: React.ReactNode;
+    };
+
+    if (typeof props.src === "string" && props.src.trim().length > 0) {
+      const normalizedSrc = props.src.startsWith("public/")
+        ? props.src.replace("public/", "/")
+        : props.src;
+
+      items.push({
+        src: normalizedSrc,
+        alt: typeof props.alt === "string" ? props.alt : "",
+        title: typeof props.title === "string" ? props.title : undefined,
+      });
+    }
+
+    if (props.children) {
+      collectGalleryImages(props.children, items);
+    }
+  });
+
+  return items;
 };
 
 const getPlatformIcon = (platform?: string, className?: string) => {
@@ -226,6 +261,18 @@ export const Gallery = ({
   className,
   ...props
 }: MdxElementProps & { caption?: React.ReactNode }) => {
+  const images = collectGalleryImages(children);
+
+  if (images.length > 0) {
+    return (
+      <GalleryLightbox
+        images={images}
+        caption={caption}
+        className={cn(_class, className)}
+      />
+    );
+  }
+
   return (
     <div
       className={cn(
