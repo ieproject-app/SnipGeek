@@ -11,7 +11,6 @@ import type { Locale } from "@/i18n-config";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { MDXRemote } from "next-mdx-remote/rsc";
-import Image from "next/image";
 import { mdxComponents } from "@/components/mdx-components";
 import { ArticleComments } from "@/components/blog/article-comments";
 import { ArticleMeta } from "@/components/blog/article-meta";
@@ -19,6 +18,7 @@ import { ArticleShare } from "@/components/blog/article-share";
 import { ArticleRelated } from "@/components/blog/article-related";
 import { ArticleTOC } from "@/components/blog/article-toc";
 import { ArticleTags } from "@/components/blog/article-tags";
+import { RevealImage } from "@/components/ui/reveal-image";
 import { extractHeadings } from "@/lib/mdx-utils";
 import { LayoutBreadcrumbs } from "@/components/layout/layout-breadcrumbs";
 import { resolveHeroImage, getLinkPrefix } from "@/lib/utils";
@@ -205,7 +205,7 @@ export default async function Page({
               className="mb-6 justify-center"
             />
 
-            <h1 className="font-display text-4xl font-extrabold tracking-tighter text-primary mb-6 max-w-3xl mx-auto">
+            <h1 className="font-display text-h1 font-extrabold tracking-tighter text-primary mb-6 max-w-3xl mx-auto">
               {initialPost.frontmatter.title}
             </h1>
 
@@ -221,11 +221,16 @@ export default async function Page({
 
             <div className="relative mt-8 mb-12 rounded-xl overflow-hidden shadow-2xl bg-muted group ring-1 ring-primary/5 aspect-video">
               {heroSource ? (
-                <Image
+                <RevealImage
                   src={heroSource.url}
                   alt={imageAlt || initialPost.frontmatter.title}
                   fill
                   className="object-cover transition-transform duration-700 group-hover:scale-105"
+                  wrapperClassName="h-full w-full"
+                  placeholderClassName="rounded-none"
+                  showSkeleton
+                  holdUntilLoaded
+                  revealDurationMs={420}
                   sizes="(max-width: 1200px) 100vw, 1200px"
                   priority
                   data-ai-hint={heroSource.hint}

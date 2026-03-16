@@ -10,6 +10,9 @@
     --font-display: var(--gf-display), system-ui, -apple-system, sans-serif;
     --font-mono: var(--gf-mono), "SF Mono", Consolas, Menlo, monospace;
 
+    /* ── Typography Tokens (Fluid) ───────────────── */
+    --text-h1: clamp(1.875rem, 1.2rem + 2.5vw, 3.25rem);
+
     /* ── Colors ───────────────────────────────────── */
     --color-background: hsl(var(--background));
     --color-foreground: hsl(var(--foreground));

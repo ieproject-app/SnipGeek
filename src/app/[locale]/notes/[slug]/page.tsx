@@ -178,7 +178,7 @@ export default async function Page({
               segments={breadcrumbSegments}
               className="mb-6 justify-center"
             />
-            <h1 className="font-display text-4xl font-extrabold tracking-tighter text-primary mb-6 max-w-3xl mx-auto">
+            <h1 className="font-display text-h1 font-extrabold tracking-tighter text-primary mb-6 max-w-3xl mx-auto">
               {initialNote.frontmatter.title}
             </h1>
             <ArticleMeta

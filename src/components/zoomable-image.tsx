@@ -1,6 +1,6 @@
 "use client";
 
-import type { ImgHTMLAttributes } from "react";
+import { useState, type ImgHTMLAttributes } from "react";
 import { cn } from "@/lib/utils";
 import {
     Plus,
@@ -31,21 +31,61 @@ export const ZoomableImage = ({
     priority: _priority,
     ...props
 }: ZoomableImageProps) => {
+    const [isLoaded, setIsLoaded] = useState(false);
+    const { onLoad: onImageLoad, ...imageProps } = props;
+
+    const parseDimension = (value: number | string | undefined) => {
+        if (typeof value === "number" && Number.isFinite(value) && value > 0) {
+            return value;
+        }
+
+        if (typeof value === "string") {
+            const parsed = Number.parseFloat(value);
+            if (Number.isFinite(parsed) && parsed > 0) {
+                return parsed;
+            }
+        }
+
+        return null;
+    };
+
+    const width = parseDimension(imageProps.width);
+    const height = parseDimension(imageProps.height);
+    const reservedAspectRatio = width && height ? `${width} / ${height}` : "16 / 9";
+
     return (
         <Dialog>
             <DialogTrigger asChild>
-                <div className="group relative cursor-zoom-in overflow-hidden rounded-xl shadow-md transition-all duration-500 hover:shadow-2xl">
+                <div className="group relative cursor-zoom-in overflow-hidden rounded-xl bg-muted shadow-md transition-all duration-500 hover:shadow-2xl">
+                    <div
+                        className="relative w-full"
+                        style={{ aspectRatio: reservedAspectRatio }}
+                    >
+                    {!isLoaded && (
+                        <div
+                            className="skeleton absolute inset-0 z-0"
+                            data-variant="shimmer"
+                            aria-hidden="true"
+                        />
+                    )}
+
                     <img
                         src={src}
                         alt={alt || "SnipGeek Image"}
-                        loading={props.loading ?? "lazy"}
-                        decoding={props.decoding ?? "async"}
+                        loading={imageProps.loading ?? "lazy"}
+                        decoding={imageProps.decoding ?? "async"}
+                        {...imageProps}
+                        onLoad={(event) => {
+                            setIsLoaded(true);
+                            onImageLoad?.(event);
+                        }}
                         className={cn(
-                            "h-auto w-full transition-all duration-700 ease-in-out group-hover:scale-[1.03]",
+                            "absolute inset-0 z-[1] h-full w-full object-contain transition-all duration-500 ease-out group-hover:scale-[1.03]",
+                            isLoaded ? "opacity-100" : "opacity-0",
                             className,
                         )}
-                        {...props}
                     />
+                    </div>
 
                     {/* Hover Overlay: Plus Pill */}
                     <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/5 opacity-0 transition-all duration-500 group-hover:bg-black/20 group-hover:opacity-100">
