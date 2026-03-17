@@ -214,8 +214,8 @@
     "modInstructionsPlaceholder": "Bagian mana yang mau diubah? (misal: Update narasi intro, tambahkan kesimpulan tentang desain 4px...)",
     "quickActions": {
       "label": "Instruksi Cepat:",
-      "intro": "Refresh intro & penutup",
-      "steps": "Ubah list jadi Steps",
+      "narrative": "Refresh intro & penutup",
+      "images": "Ubah list jadi Steps",
       "metadata": "Hanya tambah tgl update",
       "polish": "Polish alur naratif (Tone)"
     },
