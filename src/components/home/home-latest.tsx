@@ -118,16 +118,15 @@ export const HomeLatest = ({
             >
                 <Link
                     href={`${linkPrefix}/blog`}
-                    className="flex items-center gap-6 bg-muted/30 px-5 py-2.5 rounded-full border border-primary/5 hover:bg-muted/50 transition-all group"
+                    className="flex items-center gap-2 bg-accent/5 px-3 py-1.5 rounded-full border border-accent/30 hover:bg-accent/10 transition-all group"
                 >
-                    <div className="flex items-center gap-2 pr-4 border-r border-primary/10">
-                        <div className="h-1.5 w-8 bg-accent rounded-full" />
-                        <div className="h-1.5 w-1.5 bg-primary/20 rounded-full" />
-                        <div className="h-1.5 w-1.5 bg-primary/20 rounded-full" />
+                    <div className="flex items-center gap-1 pr-2.5 border-r border-accent/20">
+                        <div className="h-1 w-5 bg-accent rounded-full" />
+                        <div className="h-0.75 w-0.75 bg-accent rounded-full" />
                     </div>
-                    <span className="text-[11px] font-black uppercase tracking-widest text-primary/80 group-hover:text-primary transition-all flex items-center gap-2">
+                    <span className="text-[10px] font-bold uppercase tracking-wide text-accent/90 group-hover:text-accent transition-all flex items-center gap-1">
                         {dictionary.home.viewAllPosts}
-                        <ChevronRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
+                        <ChevronRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5" />
                     </span>
                 </Link>
             </ScrollReveal>
