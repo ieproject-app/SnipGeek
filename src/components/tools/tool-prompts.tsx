@@ -22,6 +22,7 @@ import { SnipTooltip } from "@/components/ui/snip-tooltip";
 import {
   Copy,
   Check,
+  X,
   Plus,
   Trash2,
   ChevronDown,
@@ -99,12 +100,15 @@ type ToolPromptsDictionary = {
     promptInstruction: string;
   };
   quickActions: {
+    label?: string;
     narrative: string;
     images: string;
     metadata: string;
     polish: string;
   };
 };
+
+type QuickActionKey = "narrative" | "images" | "metadata" | "polish";
 
 const toTimestamp = (value: string) => {
   const parsed = Date.parse(value);
@@ -152,6 +156,23 @@ const parseNaturalDate = (input: string): string => {
     const regex = new RegExp(`\\b${id}\\b`, "g");
     translated = translated.replace(regex, en);
   }
+
+  // Normalize 2-digit years to avoid browser-dependent interpretation.
+  const normalize2DigitYear = (year: string) => {
+    const yy = Number(year);
+    return yy >= 70 ? `19${year}` : `20${year}`;
+  };
+
+  translated = translated.replace(
+    /(\b\d{1,2}\s+[a-z]+\s+)(\d{2})(\b)/gi,
+    (_match, prefix: string, yy: string, suffix: string) =>
+      `${prefix}${normalize2DigitYear(yy)}${suffix}`,
+  );
+  translated = translated.replace(
+    /(\b\d{1,2}[\/\-]\d{1,2}[\/\-])(\d{2})(\b)/g,
+    (_match, prefix: string, yy: string, suffix: string) =>
+      `${prefix}${normalize2DigitYear(yy)}${suffix}`,
+  );
 
   const date = new Date(translated);
 
@@ -221,17 +242,33 @@ function FeaturePill({
 }) {
   return (
     <SnipTooltip label={label} side="top">
-      <button
+      <motion.button
+        type="button"
+        aria-label={label}
+        aria-pressed={active}
         onClick={onClick}
+        whileHover={{ scale: 1.08 }}
+        whileTap={{ scale: 0.91 }}
+        transition={{ type: "spring", stiffness: 450, damping: 25 }}
         className={cn(
-          "flex items-center justify-center w-10 h-10 rounded-xl border transition-all duration-300",
+          "flex items-center justify-center w-10 h-10 rounded-xl border transition-colors duration-300",
           active
             ? activeClass
-            : "bg-background/50 text-foreground/70 border-primary/10 hover:border-primary/30 hover:bg-accent/10 hover:text-foreground hover:shadow-sm hover:scale-[1.05]",
+            : "bg-background/50 text-foreground/70 border-primary/10 hover:border-primary/30 hover:bg-accent/10 hover:text-foreground",
         )}
       >
-        <Icon className={cn("h-5 w-5 shrink-0", active && "animate-[subtleGlow_3s_ease-in-out_infinite]")} />
-      </button>
+        <motion.span
+          animate={
+            active
+              ? { scale: [1, 1.35, 1], rotate: [0, -12, 0] }
+              : { scale: 1, rotate: 0 }
+          }
+          transition={{ duration: 0.35, ease: "backOut" }}
+          className="flex"
+        >
+          <Icon className="h-5 w-5 shrink-0" />
+        </motion.span>
+      </motion.button>
     </SnipTooltip>
   );
 }
@@ -397,7 +434,7 @@ export function ToolPrompts({
   const [isOutputVisible, setIsOutputVisible] = useState(true);
 
   // ── Category hint (optional — AI is free to create a new one) ──
-  const categoryHint = "";
+  const [categoryHint, setCategoryHint] = useState("");
 
   // ── Media / technical ──
   const [isTechnicalExpanded, setIsTechnicalExpanded] = useState(true);
@@ -438,9 +475,22 @@ export function ToolPrompts({
     () =>
       articlesForType
         .filter((article) => !article.published)
-        .sort((a, b) => toTimestamp(a.date) - toTimestamp(b.date))
+        .sort((a, b) => {
+          const ageA = getDraftAgeDays(a.date) ?? -1;
+          const ageB = getDraftAgeDays(b.date) ?? -1;
+          return ageB - ageA;
+        })
         .slice(0, 3),
     [articlesForType],
+  );
+
+  const specsGroups = useMemo(
+    () =>
+      specsMappings
+        .split(/\n\s*\n/)
+        .map((block) => block.trim())
+        .filter((block) => block.length > 0),
+    [specsMappings],
   );
 
   const staleDraftCount = useMemo(
@@ -648,6 +698,8 @@ export function ToolPrompts({
         setShowGallery(!!p.showGallery);
         setShowSpecs(!!p.showSpecs);
         setIsIdOnly(!!p.isIdOnly);
+        setIsOutputVisible(p.isOutputVisible !== undefined ? !!p.isOutputVisible : true);
+        setCategoryHint(typeof p.categoryHint === "string" ? p.categoryHint : "");
       } catch { }
     }
   }, []);
@@ -656,9 +708,28 @@ export function ToolPrompts({
     if (!mounted) return;
     localStorage.setItem(
       "snipgeek-prompt-features",
-      JSON.stringify({ showImages, showDownloads, showGrids, showGallery, showSpecs, isIdOnly }),
+      JSON.stringify({
+        showImages,
+        showDownloads,
+        showGrids,
+        showGallery,
+        showSpecs,
+        isIdOnly,
+        isOutputVisible,
+        categoryHint,
+      }),
     );
-  }, [showImages, showDownloads, showGrids, showGallery, showSpecs, isIdOnly, mounted]);
+  }, [
+    showImages,
+    showDownloads,
+    showGrids,
+    showGallery,
+    showSpecs,
+    isIdOnly,
+    isOutputVisible,
+    categoryHint,
+    mounted,
+  ]);
 
   // ── Build prompt ──
   useEffect(() => {
@@ -791,13 +862,45 @@ export function ToolPrompts({
   ]);
 
   // ── Handlers ──
-  const handleCopy = () => {
-    navigator.clipboard.writeText(generatedPrompt);
+  const writeClipboard = useCallback(
+    async (value: string, successMessage: string) => {
+      try {
+        await navigator.clipboard.writeText(value);
+        notify(successMessage, <Check className="h-4 w-4 text-emerald-400" />);
+        return true;
+      } catch {
+        // Desktop fallback when Clipboard API is blocked by permissions.
+        const area = document.createElement("textarea");
+        area.value = value;
+        area.style.position = "fixed";
+        area.style.opacity = "0";
+        document.body.appendChild(area);
+        area.focus();
+        area.select();
+        try {
+          const ok = document.execCommand("copy");
+          document.body.removeChild(area);
+          if (ok) {
+            notify(successMessage, <Check className="h-4 w-4 text-emerald-400" />);
+            return true;
+          }
+        } catch {
+          document.body.removeChild(area);
+        }
+        notify(
+          "Clipboard blocked. Copy manually.",
+          <X className="h-4 w-4 text-destructive" />,
+        );
+        return false;
+      }
+    },
+    [notify],
+  );
+
+  const handleCopy = async () => {
+    const copied = await writeClipboard(generatedPrompt, dictionary.copiedButton);
+    if (!copied) return;
     setIsCopied(true);
-    notify(
-      dictionary.copiedButton,
-      <Check className="h-4 w-4 text-emerald-400" />,
-    );
     setTimeout(() => setIsCopied(false), 2000);
   };
 
@@ -815,14 +918,14 @@ export function ToolPrompts({
       ),
     );
 
-  const applyQuickAction = (action: string) => {
+  const applyQuickAction = (action: QuickActionKey) => {
     let text = "";
     switch (action) {
-      case "intro":
-        text = dictionary.quickActions.intro;
+      case "narrative":
+        text = dictionary.quickActions.narrative;
         break;
-      case "steps":
-        text = dictionary.quickActions.steps;
+      case "images":
+        text = dictionary.quickActions.images;
         break;
       case "metadata":
         text = dictionary.quickActions.metadata;
@@ -840,38 +943,38 @@ export function ToolPrompts({
     }, 20);
   };
 
-  const copyLinkCaller = useCallback((index: number) => {
-    navigator.clipboard.writeText(`{{Link ${index + 1}}}`);
-    notify(
-      `Link ${index + 1} caller copied`,
-      <Copy className="h-4 w-4 text-blue-400" />,
-    );
-  }, [notify]);
+  const getQuickActionLabel = useCallback(
+    (action: QuickActionKey) => {
+      switch (action) {
+        case "narrative":
+          return dictionary.quickActions.narrative;
+        case "images":
+          return dictionary.quickActions.images;
+        case "metadata":
+          return dictionary.quickActions.metadata;
+        case "polish":
+          return dictionary.quickActions.polish;
+      }
+    },
+    [dictionary.quickActions],
+  );
 
-  const copyGridCaller = useCallback((index: number) => {
-    navigator.clipboard.writeText(`{{Grid ${index + 1}}}`);
-    notify(
-      `Grid ${index + 1} caller copied`,
-      <Copy className="h-4 w-4 text-violet-400" />,
-    );
-  }, [notify]);
+  const copyLinkCaller = useCallback(async (index: number) => {
+    await writeClipboard(`{{Link ${index + 1}}}`, `Link ${index + 1} caller copied`);
+  }, [writeClipboard]);
 
-  const copyGalleryCaller = useCallback((index: number) => {
-    navigator.clipboard.writeText(`{{Gallery ${index + 1}}}`);
-    notify(
-      `Gallery ${index + 1} caller copied`,
-      <Copy className="h-4 w-4 text-fuchsia-400" />,
-    );
-  }, [notify]);
+  const copyGridCaller = useCallback(async (index: number) => {
+    await writeClipboard(`{{Grid ${index + 1}}}`, `Grid ${index + 1} caller copied`);
+  }, [writeClipboard]);
+
+  const copyGalleryCaller = useCallback(async (index: number) => {
+    await writeClipboard(`{{Gallery ${index + 1}}}`, `Gallery ${index + 1} caller copied`);
+  }, [writeClipboard]);
 
 
-  const copySpecCaller = useCallback((index: number) => {
-    navigator.clipboard.writeText(`{{Specs ${index + 1}}}`);
-    notify(
-      `Specs ${index + 1} caller copied`,
-      <Copy className="h-4 w-4 text-orange-400" />,
-    );
-  }, [notify]);
+  const copySpecCaller = useCallback(async (index: number) => {
+    await writeClipboard(`{{Specs ${index + 1}}}`, `Specs ${index + 1} caller copied`);
+  }, [writeClipboard]);
 
   const focusRing =
     "focus-visible:ring-primary/20 focus-visible:ring-offset-0 focus-visible:border-primary/30 transition-all duration-300";
@@ -886,64 +989,68 @@ export function ToolPrompts({
       dictionary={fullDictionary}
       isPublic={true}
     >
-      {/* Subtle glow animation keyframes */}
-      <style dangerouslySetInnerHTML={{
-        __html: `
-        @keyframes subtleGlow {
-          0%, 100% { opacity: 0.75; transform: scale(1); }
-          50% { opacity: 1; transform: scale(1.08); }
-        }
-      `}} />
+
       <div className="max-w-full mx-auto space-y-6">
-        {/* ── REDESIGNED TOOLBAR ── */}
-        {/* ── REDESIGNED ISLAND-STYLE TOOLBAR ── */}
-        <ScrollReveal direction="down" delay={0.05} duration={0.4}>
-          <div className="flex flex-wrap items-center justify-center gap-3">
-            {/* Island 1: Primary Actions (Action Mode & Content Type) */}
-            <div className="bg-card/50 backdrop-blur-lg border border-primary/10 shadow-sm rounded-xl p-1 flex items-center gap-1">
-              <div className="relative flex p-1 rounded-lg">
+        {/* ── ISLAND-STYLE TOOLBAR ── */}
+        <div className="flex flex-wrap items-center justify-center gap-3">
+            {/* Island 1: Mode & Content Type */}
+            <motion.div
+              initial={{ opacity: 0, y: -8, scale: 0.96 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ duration: 0.35, delay: 0.04, ease: [0.21, 0.47, 0.32, 0.98] }}
+              className="bg-card/50 backdrop-blur-lg border border-primary/10 shadow-sm rounded-xl p-1.5 flex items-center gap-1.5"
+            >
+              {/* Mode group: no inner padding so w-1/2 = exactly w-10 */}
+              <div className="relative flex items-center">
                 <SnipTooltip label={dictionary.modes.create} side="top">
                   <button
+                    type="button"
+                    aria-label={dictionary.modes.create}
+                    aria-pressed={mode === "create"}
                     onClick={() => setMode("create")}
                     className={cn(
-                      "relative flex items-center justify-center w-10 h-8 rounded-md transition-all duration-300 z-10",
+                      "relative flex items-center justify-center w-10 h-9 rounded-md transition-colors duration-200 z-10",
                       mode === "create" ? "text-primary" : "text-muted-foreground hover:text-primary/70"
                     )}
                   >
-                    <PenLine className={cn("h-4 w-4", mode === "create" ? "animate-[subtleGlow_3s_ease-in-out_infinite]" : "")} />
+                    <PenLine className="h-4 w-4" />
                   </button>
                 </SnipTooltip>
 
                 <SnipTooltip label={dictionary.modes.modify} side="top">
                   <button
+                    type="button"
+                    aria-label={dictionary.modes.modify}
+                    aria-pressed={mode === "modify"}
                     onClick={() => setMode("modify")}
                     className={cn(
-                      "relative flex items-center justify-center w-10 h-8 rounded-md transition-all duration-300 z-10",
+                      "relative flex items-center justify-center w-10 h-9 rounded-md transition-colors duration-200 z-10",
                       mode === "modify" ? "text-primary" : "text-muted-foreground hover:text-primary/70"
                     )}
                   >
-                    <Layers className={cn("h-4 w-4", mode === "modify" ? "animate-[subtleGlow_3s_ease-in-out_infinite]" : "")} />
+                    <Layers className="h-4 w-4" />
                   </button>
                 </SnipTooltip>
-                <div
-                  className={cn(
-                    "absolute top-1 bottom-1 w-1/2 bg-background border border-primary/5 rounded-md shadow-sm transition-all duration-500 ease-out z-0",
-                    mode === "modify" ? "translate-x-full" : "translate-x-0"
-                  )}
+                <motion.div
+                  className="absolute inset-y-0 w-1/2 bg-background border border-primary/5 rounded-md shadow-sm z-0"
+                  animate={{ x: mode === "modify" ? "100%" : "0%" }}
+                  transition={{ type: "spring", stiffness: 520, damping: 38 }}
                 />
               </div>
 
-              <div className="w-px h-5 bg-primary/10 mx-1 self-center" />
+              <div className="w-px h-5 bg-primary/10 self-center" />
 
-              <div className="flex p-1 rounded-lg">
+              {/* Content type group: same no-inner-padding approach */}
+              <div className="relative flex items-center">
                 <SnipTooltip label={dictionary.contentTypeBlog} side="top">
                   <button
+                    type="button"
+                    aria-label={dictionary.contentTypeBlog}
+                    aria-pressed={contentType === "blog"}
                     onClick={() => setContentType("blog")}
                     className={cn(
-                      "flex items-center justify-center w-10 h-8 rounded-md transition-all",
-                      contentType === "blog"
-                        ? "bg-background border border-primary/5 shadow-sm text-primary"
-                        : "text-muted-foreground hover:text-primary"
+                      "relative flex items-center justify-center w-10 h-9 rounded-md transition-colors duration-200 z-10",
+                      contentType === "blog" ? "text-primary" : "text-muted-foreground hover:text-primary/70"
                     )}
                   >
                     <FileText className="h-4 w-4" />
@@ -952,41 +1059,61 @@ export function ToolPrompts({
 
                 <SnipTooltip label={dictionary.contentTypeNote} side="top">
                   <button
+                    type="button"
+                    aria-label={dictionary.contentTypeNote}
+                    aria-pressed={contentType === "note"}
                     onClick={() => setContentType("note")}
                     className={cn(
-                      "flex items-center justify-center w-10 h-8 rounded-md transition-all",
-                      contentType === "note"
-                        ? "bg-background border border-primary/5 shadow-sm text-primary"
-                        : "text-muted-foreground hover:text-primary"
+                      "relative flex items-center justify-center w-10 h-9 rounded-md transition-colors duration-200 z-10",
+                      contentType === "note" ? "text-primary" : "text-muted-foreground hover:text-primary/70"
                     )}
                   >
                     <StickyNote className="h-4 w-4" />
                   </button>
                 </SnipTooltip>
+                <motion.div
+                  className="absolute inset-y-0 w-1/2 bg-background border border-primary/5 rounded-md shadow-sm z-0"
+                  animate={{ x: contentType === "note" ? "100%" : "0%" }}
+                  transition={{ type: "spring", stiffness: 520, damping: 38 }}
+                />
               </div>
-            </div>
+            </motion.div>
 
-            {/* Island 2: Quick Config (Date & Status) */}
-            <div className="bg-card/50 backdrop-blur-lg border border-primary/10 shadow-sm rounded-xl p-1.5 flex items-center gap-3">
-              <div className="flex items-center gap-2 px-3 h-9 rounded-lg bg-primary/5 border border-primary/10">
-                <div className="flex items-center gap-2 pr-3 border-r border-primary/10">
+            {/* Island 2: Date & Status */}
+            <motion.div
+              initial={{ opacity: 0, y: -8, scale: 0.96 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ duration: 0.35, delay: 0.1, ease: [0.21, 0.47, 0.32, 0.98] }}
+              className="bg-card/50 backdrop-blur-lg border border-primary/10 shadow-sm rounded-xl p-1.5 flex items-center gap-3"
+            >
+              <div className="flex items-center gap-2.5 px-3.5 h-10 rounded-lg bg-primary/5 border border-primary/10">
+                <div className="flex items-center gap-2 pr-3.5 border-r border-primary/10">
                   <Calendar className="h-3.5 w-3.5 text-primary shrink-0" />
                   <Input
                     value={publishDate}
                     onChange={(e) => setPublishDate(e.target.value)}
                     placeholder={mode === "modify" ? "DATE" : "YYYY-MM-DD"}
-                    className="h-7 w-32 border-none bg-transparent text-[11px] font-bold px-0 focus-visible:ring-0 placeholder:opacity-50"
+                    className="h-8 w-32 border-none bg-transparent text-[11px] font-bold px-0 focus-visible:ring-0 placeholder:opacity-50"
                   />
                 </div>
 
-                <div className="flex items-center gap-3 pl-1">
-                  <div className="flex items-center gap-2">
-                    <span className={cn(
-                      "text-[9px] font-black uppercase tracking-tighter transition-colors",
-                      isPublished ? "text-emerald-500" : "text-muted-foreground"
-                    )}>
-                      {isPublished ? "LIVE" : "DRAFT"}
-                    </span>
+                <div className="flex items-center gap-3.5 pl-0.5">
+                  <div className="flex items-center gap-2.5">
+                    <AnimatePresence mode="wait" initial={false}>
+                      <motion.span
+                        key={isPublished ? "live" : "draft"}
+                        initial={{ opacity: 0, y: -7 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 7 }}
+                        transition={{ duration: 0.14, ease: "easeOut" }}
+                        className={cn(
+                          "text-[9px] font-black uppercase tracking-tighter",
+                          isPublished ? "text-emerald-500" : "text-muted-foreground"
+                        )}
+                      >
+                        {isPublished ? "LIVE" : "DRAFT"}
+                      </motion.span>
+                    </AnimatePresence>
                     <Switch
                       checked={isPublished}
                       onCheckedChange={setIsPublished}
@@ -994,25 +1121,59 @@ export function ToolPrompts({
                     />
                   </div>
 
-                  {contentType === "blog" && (
-                    <div className="flex items-center gap-2">
-                      <Star className={cn(
-                        "h-3.5 w-3.5 transition-all",
-                        isFeatured ? "text-amber-500 fill-amber-500 animate-pulse" : "text-muted-foreground"
-                      )} />
-                      <Switch
-                        checked={isFeatured}
-                        onCheckedChange={setIsFeatured}
-                        className="scale-75 data-[state=checked]:bg-amber-500"
-                      />
-                    </div>
-                  )}
+                  <AnimatePresence initial={false}>
+                    {contentType === "blog" && (
+                      <motion.div
+                        key="featured-toggle"
+                        initial={{ opacity: 0, x: 10, width: 0 }}
+                        animate={{ opacity: 1, x: 0, width: "auto" }}
+                        exit={{ opacity: 0, x: 10, width: 0 }}
+                        transition={{ duration: 0.22, ease: "easeInOut" }}
+                        className="flex items-center gap-2 overflow-hidden"
+                      >
+                        <motion.span
+                          animate={
+                            isFeatured
+                              ? { rotate: [0, 20, -12, 0], scale: [1, 1.4, 1] }
+                              : { rotate: 0, scale: 1 }
+                          }
+                          transition={{ duration: 0.4, ease: "backOut" }}
+                          className="flex"
+                        >
+                          <Star className={cn(
+                            "h-3.5 w-3.5 transition-colors duration-300",
+                            isFeatured ? "text-amber-500 fill-amber-500" : "text-muted-foreground"
+                          )} />
+                        </motion.span>
+                        <Switch
+                          checked={isFeatured}
+                          onCheckedChange={setIsFeatured}
+                          className="scale-75 data-[state=checked]:bg-amber-500"
+                        />
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+
+                  <div className="hidden xl:flex items-center gap-2 pl-2 border-l border-primary/10">
+                    <Hash className="h-3.5 w-3.5 text-muted-foreground/70 shrink-0" />
+                    <Input
+                      value={categoryHint}
+                      onChange={(e) => setCategoryHint(e.target.value)}
+                      placeholder="Category hint"
+                      className="h-8 w-32 border-none bg-transparent px-0 text-[10px] font-bold focus-visible:ring-0"
+                    />
+                  </div>
                 </div>
               </div>
-            </div>
+            </motion.div>
 
-            {/* Island 3: Feature Toggles (Pill Style) */}
-            <div className="flex items-center gap-1.5 p-1 rounded-xl border border-primary/10 bg-card/50 backdrop-blur-lg shadow-sm">
+            {/* Island 3: Feature Toggles */}
+            <motion.div
+              initial={{ opacity: 0, y: -8, scale: 0.96 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ duration: 0.35, delay: 0.16, ease: [0.21, 0.47, 0.32, 0.98] }}
+              className="flex items-center gap-1.5 p-1.5 rounded-xl border border-primary/10 bg-card/50 backdrop-blur-lg shadow-sm"
+            >
               <FeaturePill
                 active={showImages}
                 onClick={() => setShowImages(!showImages)}
@@ -1063,9 +1224,8 @@ export function ToolPrompts({
                 label={isOutputVisible ? "Hide Output" : "Show Output"}
                 activeClass="bg-primary text-primary-foreground border-primary"
               />
-            </div>
-          </div>
-        </ScrollReveal>
+            </motion.div>
+        </div>
 
         {/* ── MAIN GRID ── */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 overflow-hidden">
@@ -1390,7 +1550,7 @@ export function ToolPrompts({
                     <CardContent className="p-5 space-y-4">
                       {/* Quick actions */}
                       <div className="flex flex-wrap gap-1.5">
-                        {(["intro", "steps", "metadata", "polish"] as const).map(
+                        {(["narrative", "images", "metadata", "polish"] as const).map(
                           (action) => (
                             <button
                               key={action}
@@ -1399,13 +1559,13 @@ export function ToolPrompts({
                                 "flex items-center gap-1.5 px-3 h-7 rounded-full text-[9px] font-black uppercase tracking-wide transition-all",
                                 action === "polish"
                                   ? "bg-fuchsia-500/10 text-fuchsia-500 hover:bg-fuchsia-500/20 border border-fuchsia-500/20"
-                                  : action === "steps"
+                                  : action === "images"
                                   ? "bg-violet-500/10 text-violet-500 hover:bg-violet-500/20 border border-violet-500/20"
                                   : "bg-accent/10 text-accent hover:bg-accent/20 border border-accent/20"
                               )}
                             >
                               <Sparkles className="h-3 w-3" />
-                              {dictionary.quickActions[action]}
+                              {getQuickActionLabel(action)}
                             </button>
                           ),
                         )}
@@ -1488,7 +1648,7 @@ export function ToolPrompts({
                                 </CardTitle>
                               </CardHeader>
                               <CardContent className="p-5 space-y-3">
-                                {downloadItems.map((item) => (
+                                {downloadItems.map((item, index) => (
                                   <div
                                     key={item.id}
                                     className="flex items-center gap-2 p-2 border border-primary/5 rounded-lg bg-background/30"
@@ -1535,14 +1695,18 @@ export function ToolPrompts({
                                       />
                                     )}
                                     <button
+                                      type="button"
+                                      aria-label={`Remove download item ${index + 1}`}
                                       onClick={() => removeDownloadItem(item.id)}
                                       className="h-7 w-7 flex items-center justify-center rounded-md text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors shrink-0"
                                     >
                                       <Trash2 className="h-3 w-3" />
                                     </button>
-                                    <SnipTooltip label={`Copy {{Link ${downloadItems.indexOf(item) + 1}}}`} side="top">
+                                    <SnipTooltip label={`Copy {{Link ${index + 1}}}`} side="top">
                                       <button
-                                        onClick={() => copyLinkCaller(downloadItems.indexOf(item))}
+                                        type="button"
+                                        aria-label={`Copy link caller ${index + 1}`}
+                                        onClick={() => copyLinkCaller(index)}
                                         className="h-7 w-7 flex items-center justify-center rounded-md text-muted-foreground hover:text-blue-500 hover:bg-blue-500/10 transition-colors shrink-0"
                                       >
                                         <Copy className="h-3 w-3" />
@@ -1551,6 +1715,7 @@ export function ToolPrompts({
                                   </div>
                                 ))}
                                 <button
+                                  type="button"
                                   onClick={addDownloadItem}
                                   className="w-full h-9 rounded-lg border border-dashed border-primary/20 text-[10px] font-black uppercase tracking-wide text-muted-foreground hover:text-primary hover:border-primary/40 transition-all flex items-center justify-center gap-1.5"
                                 >
@@ -1677,7 +1842,7 @@ export function ToolPrompts({
                                   <div className="space-y-1">
                                     <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/50">Callers</span>
                                     <div className="flex flex-wrap gap-1">
-                                      {specsMappings.split("\n").filter(l => l.trim()).map((_, i) => (
+                                      {specsGroups.map((_, i) => (
                                         <button
                                           key={i}
                                           onClick={() => copySpecCaller(i)}
