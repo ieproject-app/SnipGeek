@@ -4,6 +4,7 @@ import { i18n, type Locale } from "@/i18n-config";
 import { getDictionary } from "@/lib/get-dictionary";
 import { TagListClient } from "./tag-list-client";
 import type { Metadata } from "next";
+import { shouldIndexTag } from "@/lib/tags";
 
 export async function generateMetadata({
   params,
@@ -33,23 +34,7 @@ export async function generateMetadata({
   ).length;
 
   const totalItems = postsCount + notesCount;
-  const highValueTags = [
-    "windows 11",
-    "epson",
-    "printer",
-    "hardware",
-    "ram",
-    "tutorial",
-    "linux",
-    "sap",
-    "telegram",
-    "android",
-    "firebase",
-  ];
-  const isHighValue = highValueTags.includes(decodedTag.toLowerCase());
-
-  // Index if it has 3+ items OR is a high-value category
-  const shouldIndex = totalItems >= 3 || isHighValue;
+  const shouldIndex = shouldIndexTag(decodedTag, totalItems);
 
   return {
     title: dictionary.tags.title.replace("{tag}", decodedTag),

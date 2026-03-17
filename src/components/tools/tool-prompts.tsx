@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef, useCallback, type SyntheticEvent } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -50,7 +50,6 @@ import {
 import { downloadLinks } from "@/lib/data-downloads";
 import { useNotification } from "@/hooks/use-notification";
 import { cn } from "@/lib/utils";
-import { useCallback } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ToolWrapper } from "@/components/tools/tool-wrapper";
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
@@ -66,6 +65,8 @@ type ArticleSummary = {
   slug: string;
   title: string;
   type: "blog" | "note";
+  published: boolean;
+  date: string;
 };
 
 type ToolPromptsDictionary = {
@@ -103,6 +104,19 @@ type ToolPromptsDictionary = {
     metadata: string;
     polish: string;
   };
+};
+
+const toTimestamp = (value: string) => {
+  const parsed = Date.parse(value);
+  return Number.isNaN(parsed) ? Number.POSITIVE_INFINITY : parsed;
+};
+
+const getDraftAgeDays = (value: string) => {
+  const timestamp = toTimestamp(value);
+  if (!Number.isFinite(timestamp)) return null;
+
+  const dayMs = 1000 * 60 * 60 * 24;
+  return Math.max(0, Math.floor((Date.now() - timestamp) / dayMs));
 };
 
 // ──────────────────────────────────────────────────────────────────────────────
@@ -186,6 +200,7 @@ interface ToolPromptsProps {
   dictionary: ToolPromptsDictionary;
   existingArticles: ArticleSummary[];
   fullDictionary: Dictionary;
+  locale: string;
 }
 
 // ──────────────────────────────────────────────────────────────────────────────
@@ -346,8 +361,12 @@ export function ToolPrompts({
   dictionary,
   existingArticles,
   fullDictionary,
+  locale,
 }: ToolPromptsProps) {
   const [mounted, setMounted] = useState(false);
+  const originalContentRef = useRef<HTMLTextAreaElement>(null);
+  const modInstructionsRef = useRef<HTMLTextAreaElement>(null);
+  const blockComposerRef = useRef<HTMLDivElement>(null);
 
   // ── Mode & content type ──
   const [mode, setMode] = useState<"create" | "modify">("create");
@@ -356,6 +375,7 @@ export function ToolPrompts({
   // ── Article selector (modify mode) ──
   const [selectedSlug, setSelectedSlug] = useState<string>("");
   const [articleSearch, setArticleSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState<"all" | "published" | "draft">("all");
 
   // ── Content areas ──
   const [draft, setDraft] = useState("");
@@ -390,19 +410,209 @@ export function ToolPrompts({
   // ── Output ──
   const [generatedPrompt, setGeneratedPrompt] = useState("");
   const [isCopied, setIsCopied] = useState(false);
+  const [isOriginalLoading, setIsOriginalLoading] = useState(false);
+  const [selectedBlock, setSelectedBlock] = useState("");
+  const [selectedBlockLine, setSelectedBlockLine] = useState<number | null>(
+    null,
+  );
+  const [selectedBlockComment, setSelectedBlockComment] = useState("");
 
   const { notify } = useNotification();
   const downloadIds = useMemo(() => Object.keys(downloadLinks).sort(), []);
 
   // ── Filtered article list ──
+  const articlesForType = useMemo(
+    () => existingArticles.filter((article) => article.type === contentType),
+    [contentType, existingArticles],
+  );
+
+  const articleStats = useMemo(() => {
+    const total = articlesForType.length;
+    const draft = articlesForType.filter((article) => !article.published).length;
+    const published = total - draft;
+
+    return { total, published, draft };
+  }, [articlesForType]);
+
+  const urgentDrafts = useMemo(
+    () =>
+      articlesForType
+        .filter((article) => !article.published)
+        .sort((a, b) => toTimestamp(a.date) - toTimestamp(b.date))
+        .slice(0, 3),
+    [articlesForType],
+  );
+
+  const staleDraftCount = useMemo(
+    () =>
+      articlesForType.filter((article) => {
+        if (article.published) return false;
+        const age = getDraftAgeDays(article.date);
+        return age !== null && age >= 30;
+      }).length,
+    [articlesForType],
+  );
+
   const filteredArticles = useMemo(() => {
-    if (!articleSearch.trim()) return existingArticles;
-    const q = articleSearch.toLowerCase();
-    return existingArticles.filter(
-      (a) =>
-        a.title.toLowerCase().includes(q) || a.slug.toLowerCase().includes(q),
+    const q = articleSearch.trim().toLowerCase();
+
+    return articlesForType.filter((article) => {
+      const matchesStatus =
+        statusFilter === "all" ||
+        (statusFilter === "published" && article.published) ||
+        (statusFilter === "draft" && !article.published);
+
+      const matchesQuery =
+        q === "" ||
+        article.title.toLowerCase().includes(q) ||
+        article.slug.toLowerCase().includes(q);
+
+      return matchesStatus && matchesQuery;
+    });
+  }, [articleSearch, articlesForType, statusFilter]);
+
+  const selectedArticle = useMemo(
+    () =>
+      existingArticles.find(
+        (article) =>
+          article.slug === selectedSlug && article.type === contentType,
+      ),
+    [contentType, existingArticles, selectedSlug],
+  );
+
+  const selectedBlockRows = useMemo(() => {
+    if (!selectedBlock) return 4;
+    const lineCount = selectedBlock.split("\n").length;
+    return Math.min(22, Math.max(4, lineCount + 1));
+  }, [selectedBlock]);
+
+  const handleOriginalSelection = useCallback(
+    (event: SyntheticEvent<HTMLTextAreaElement>) => {
+      if (mode !== "modify") return;
+
+      const target = event.currentTarget;
+      const start = target.selectionStart ?? 0;
+      const end = target.selectionEnd ?? 0;
+
+      if (end <= start) {
+        setSelectedBlock("");
+        setSelectedBlockLine(null);
+        return;
+      }
+
+      const picked = target.value.slice(start, end).trim();
+      if (!picked) {
+        setSelectedBlock("");
+        setSelectedBlockLine(null);
+        return;
+      }
+
+      const lineNumber = target.value.slice(0, start).split("\n").length;
+      setSelectedBlock(picked);
+      setSelectedBlockLine(lineNumber);
+
+      window.setTimeout(() => {
+        blockComposerRef.current?.scrollIntoView({
+          behavior: "smooth",
+          block: "nearest",
+        });
+      }, 30);
+    },
+    [mode],
+  );
+
+  const addSelectedBlockToInstructions = useCallback(() => {
+    if (!selectedBlock) return;
+
+    const compact = selectedBlock.replace(/\s+/g, " ").trim();
+    const snippet = compact.length > 220 ? `${compact.slice(0, 220)}...` : compact;
+    const lineLabel = selectedBlockLine ?? "?";
+    const note = selectedBlockComment.trim() || "[describe exact change]";
+    const blockInstruction = `- Target block (line ${lineLabel}): "${snippet}"\n  Change request: ${note}`;
+
+    setModInstructions((prev) => (prev ? `${prev}\n${blockInstruction}` : blockInstruction));
+    setSelectedBlockComment("");
+    notify(
+      "Selected block inserted into instructions",
+      <CheckCircle2 className="h-4 w-4 text-emerald-400" />,
     );
-  }, [existingArticles, articleSearch]);
+    window.setTimeout(() => {
+      const el = modInstructionsRef.current;
+      if (!el) return;
+      el.focus();
+      el.scrollTop = el.scrollHeight;
+    }, 50);
+  }, [notify, selectedBlock, selectedBlockComment, selectedBlockLine]);
+
+  useEffect(() => {
+    if (!selectedSlug) return;
+
+    const stillMatchesType = existingArticles.some(
+      (article) => article.slug === selectedSlug && article.type === contentType,
+    );
+
+    if (!stillMatchesType) {
+      setSelectedSlug("");
+    }
+  }, [contentType, existingArticles, selectedSlug]);
+
+  useEffect(() => {
+    if (mode !== "modify") {
+      setSelectedBlock("");
+      setSelectedBlockLine(null);
+      setSelectedBlockComment("");
+      return;
+    }
+
+    setSelectedBlock("");
+    setSelectedBlockLine(null);
+    setSelectedBlockComment("");
+  }, [mode, selectedSlug]);
+
+  useEffect(() => {
+    if (mode !== "modify") return;
+
+    if (!selectedArticle) {
+      setOriginalContent("");
+      return;
+    }
+
+    const controller = new AbortController();
+    const loadOriginalContent = async () => {
+      try {
+        setIsOriginalLoading(true);
+        const params = new URLSearchParams({
+          type: selectedArticle.type,
+          slug: selectedArticle.slug,
+          locale,
+        });
+
+        const res = await fetch(`/api/dev/prompt-content?${params.toString()}`, {
+          signal: controller.signal,
+        });
+
+        if (!res.ok) {
+          throw new Error("Failed to load original content");
+        }
+
+        const data = (await res.json()) as { content?: string };
+        setOriginalContent(data.content || "");
+      } catch (error) {
+        if ((error as Error).name === "AbortError") return;
+        setOriginalContent("");
+        notify(
+          "Failed to load original content",
+          <X className="h-4 w-4 text-destructive" />,
+        );
+      } finally {
+        setIsOriginalLoading(false);
+      }
+    };
+
+    loadOriginalContent();
+
+    return () => controller.abort();
+  }, [locale, mode, notify, selectedArticle]);
 
   // ── Text stats ──
   const counters = useMemo(() => {
@@ -467,6 +677,9 @@ export function ToolPrompts({
     prompt += `**2. METADATA BRIEF**\n`;
     if (isModify && selectedSlug) {
       prompt += `- Target Slug: \`${selectedSlug}\`\n`;
+      if (selectedArticle) {
+        prompt += `- Current Status: ${selectedArticle.published ? "PUBLISHED" : "DRAFT"}\n`;
+      }
     }
 
     const finalDate = publishDate
@@ -545,10 +758,10 @@ export function ToolPrompts({
       prompt += `Use \`snipgeek-blog-tone\` for narrative depth, personal voice, and bilingual storytelling, while ensuring \`content-generator\` technical standards are strictly met. `;
     }
     if (isModify) {
-      prompt += `Hanya ubah bagian yang diminta secara spesifik dalam **MODIFICATION INSTRUCTIONS**. Untuk bagian lainnya, **pertahankan narasi, diksi, dan struktur kalimat asli** secara utuh. Jangan mengubah gaya bahasa penulisan aslinya jika tidak diinstruksikan. `;
+      prompt += `Treat **MODIFICATION INSTRUCTIONS** as the single source of truth. When instructions include "Target block (line X)", apply edits to those referenced blocks only. For all untouched sections, preserve the original wording, structure, language, and tone exactly as-is. Do not perform global rewrites unless explicitly requested in the instructions. The same rule applies for both English and Indonesian source content. `;
     }
     prompt += `For procedural or tutorial sections, use custom MDX components \`<Steps>\` and \`<Step>\` instead of plain numbered markdown lists. `;
-    prompt += `Ensure all metadata (slugs, translation keys, alt texts) are generated automatically and tags are standardized (one-word).`;
+    prompt += `Ensure all metadata (slugs, translation keys, alt texts) are generated automatically. Tags must never contain spaces and must never produce %20 in URLs. Any tag that would produce %20 is invalid and must be rewritten into lowercase kebab-case (e.g., windows-11, clean-install, ui-design, ubuntu-25-10). Always include 1 platform tag (windows/ubuntu/linux/android/hardware) and 1 versioned tag if the article targets a specific OS version (e.g., windows-11, ubuntu-25-10). Minimum 3 tags, maximum 6 tags per article.`;
 
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setGeneratedPrompt(prompt);
@@ -574,6 +787,7 @@ export function ToolPrompts({
     specsMappings,
     selectedSlug,
     categoryHint,
+    selectedArticle,
   ]);
 
   // ── Handlers ──
@@ -604,11 +818,11 @@ export function ToolPrompts({
   const applyQuickAction = (action: string) => {
     let text = "";
     switch (action) {
-      case "narrative":
-        text = dictionary.quickActions.narrative;
+      case "intro":
+        text = dictionary.quickActions.intro;
         break;
-      case "images":
-        text = dictionary.quickActions.images;
+      case "steps":
+        text = dictionary.quickActions.steps;
         break;
       case "metadata":
         text = dictionary.quickActions.metadata;
@@ -618,6 +832,12 @@ export function ToolPrompts({
         break;
     }
     setModInstructions((prev) => (prev ? `${prev}\n- ${text}` : `- ${text}`));
+    window.setTimeout(() => {
+      const el = modInstructionsRef.current;
+      if (!el) return;
+      el.focus();
+      el.scrollTop = el.scrollHeight;
+    }, 20);
   };
 
   const copyLinkCaller = useCallback((index: number) => {
@@ -872,6 +1092,94 @@ export function ToolPrompts({
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="p-5 space-y-3">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="rounded-full border border-primary/10 bg-background/40 px-3 py-1 text-[9px] font-black uppercase tracking-wider text-muted-foreground">
+                          {contentType} · {articleStats.total}
+                        </span>
+                        <button
+                          onClick={() => setStatusFilter("all")}
+                          className={cn(
+                            "rounded-full px-3 py-1 text-[9px] font-black uppercase tracking-wider transition-colors",
+                            statusFilter === "all"
+                              ? "bg-primary text-primary-foreground"
+                              : "bg-primary/5 text-muted-foreground hover:bg-primary/10 hover:text-primary",
+                          )}
+                        >
+                          All {articleStats.total}
+                        </button>
+                        <button
+                          onClick={() => setStatusFilter("published")}
+                          className={cn(
+                            "rounded-full px-3 py-1 text-[9px] font-black uppercase tracking-wider transition-colors",
+                            statusFilter === "published"
+                              ? "bg-emerald-500 text-white"
+                              : "bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/20 dark:text-emerald-400",
+                          )}
+                        >
+                          Live {articleStats.published}
+                        </button>
+                        <button
+                          onClick={() => setStatusFilter("draft")}
+                          className={cn(
+                            "rounded-full px-3 py-1 text-[9px] font-black uppercase tracking-wider transition-colors",
+                            statusFilter === "draft"
+                              ? "bg-amber-500 text-white"
+                              : "bg-amber-500/10 text-amber-600 hover:bg-amber-500/20 dark:text-amber-400",
+                          )}
+                        >
+                          Draft {articleStats.draft}
+                        </button>
+                      </div>
+                      <div className="rounded-lg border border-amber-500/20 bg-amber-500/5 px-3 py-2">
+                        <div className="flex items-center justify-between gap-2">
+                          <p className="text-[9px] font-black uppercase tracking-[0.12em] text-amber-600 dark:text-amber-400">
+                            Draft Queue ({contentType})
+                          </p>
+                          <button
+                            type="button"
+                            onClick={() => setStatusFilter("draft")}
+                            className="rounded-full border border-amber-500/30 bg-amber-500/10 px-2.5 py-1 text-[8px] font-black uppercase tracking-wider text-amber-700 transition-colors hover:bg-amber-500/20 dark:text-amber-300"
+                          >
+                            Show Draft Only
+                          </button>
+                        </div>
+
+                        {articleStats.draft > 0 ? (
+                          <>
+                            <p className="mt-1 text-[10px] text-muted-foreground leading-relaxed">
+                              Total {articleStats.draft} draft · {staleDraftCount} stale (&ge;30d)
+                            </p>
+                            <div className="mt-2 flex flex-wrap gap-1.5">
+                              {urgentDrafts.map((article) => {
+                                const ageDays = getDraftAgeDays(article.date);
+                                const isStale = ageDays !== null && ageDays >= 30;
+
+                                return (
+                                  <button
+                                    key={article.slug}
+                                    type="button"
+                                    onClick={() => setSelectedSlug(article.slug)}
+                                    className={cn(
+                                      "inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-[8px] font-black uppercase tracking-wide transition-colors",
+                                      isStale
+                                        ? "border-destructive/40 bg-destructive/10 text-destructive"
+                                        : "border-amber-500/25 bg-amber-500/8 text-amber-700 dark:text-amber-300",
+                                    )}
+                                  >
+                                    <span className="truncate max-w-30">{article.slug}</span>
+                                    <span className="opacity-75">{parseNaturalDate(article.date)}</span>
+                                    {ageDays !== null && <span>· {ageDays}d</span>}
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          </>
+                        ) : (
+                          <p className="mt-1 text-[10px] text-muted-foreground leading-relaxed">
+                            No draft in this content type. Queue is clear.
+                          </p>
+                        )}
+                      </div>
                       <div className="relative">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground pointer-events-none" />
                         <Input
@@ -911,6 +1219,16 @@ export function ToolPrompts({
                                 <span className="font-bold text-[11px] truncate leading-tight">
                                   {article.title}
                                 </span>
+                                <span
+                                  className={cn(
+                                    "ml-auto rounded-full px-1.5 py-0.5 text-[8px] font-black uppercase tracking-wider",
+                                    article.published
+                                      ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400"
+                                      : "bg-amber-500/15 text-amber-600 dark:text-amber-400",
+                                  )}
+                                >
+                                  {article.published ? "Live" : "Draft"}
+                                </span>
                               </div>
                               <span className="text-[9px] font-mono opacity-60 truncate pl-4">
                                 {article.slug}
@@ -919,11 +1237,16 @@ export function ToolPrompts({
                           ))}
                         </div>
                       </ScrollArea>
-                      {selectedSlug && (
+                      {selectedSlug && selectedArticle && (
                         <div className="flex items-center justify-between px-3 py-2 bg-amber-500/10 rounded-lg border border-amber-500/20">
-                          <span className="text-[9px] font-mono text-amber-600 dark:text-amber-400 truncate">
-                            ✓ {selectedSlug}
-                          </span>
+                          <div className="min-w-0">
+                            <span className="text-[9px] font-mono text-amber-600 dark:text-amber-400 truncate block">
+                              ✓ {selectedSlug}
+                            </span>
+                            <span className="text-[8px] font-black uppercase tracking-wider text-muted-foreground">
+                              {selectedArticle.published ? "Published article" : "Draft article"}
+                            </span>
+                          </div>
                           <button
                             onClick={() => setSelectedSlug("")}
                             className="text-[9px] font-black uppercase text-muted-foreground hover:text-destructive ml-2 shrink-0"
@@ -978,6 +1301,7 @@ export function ToolPrompts({
                     </div>
                   </CardHeader>
                   <Textarea
+                    ref={originalContentRef}
                     placeholder={
                       mode === "modify"
                         ? dictionary.originalContentPlaceholder
@@ -989,6 +1313,7 @@ export function ToolPrompts({
                         ? setOriginalContent(e.target.value)
                         : setDraft(e.target.value)
                     }
+                    onSelect={handleOriginalSelection}
                     className="w-full border-none rounded-none bg-transparent font-mono text-xs p-6 resize-none focus-visible:ring-0 leading-relaxed min-h-120"
                   />
                   {/* Footer hint */}
@@ -998,7 +1323,57 @@ export function ToolPrompts({
                         ? "Paste the existing MDX content above"
                         : "Write your draft in MDX or plain text above"}
                     </span>
+                    {mode === "modify" && selectedArticle && (
+                      <span className="ml-auto text-[9px] font-mono text-muted-foreground/55">
+                        {isOriginalLoading
+                          ? `Loading ${selectedArticle.slug}...`
+                          : `Loaded ${selectedArticle.slug}`}
+                      </span>
+                    )}
                   </div>
+
+                  {mode === "modify" && (
+                    <div ref={blockComposerRef} className="border-t border-primary/10 bg-sky-500/[0.06] px-5 py-3">
+                      <div className="flex items-center justify-between gap-2">
+                        <p className="text-[9px] font-black uppercase tracking-[0.12em] text-sky-600 dark:text-sky-400">
+                          Block Comment Composer
+                        </p>
+                        {selectedBlockLine !== null && (
+                          <span className="rounded-full border border-sky-500/30 bg-background/80 px-2.5 py-1 text-[8px] font-black uppercase tracking-wider text-sky-700 dark:text-sky-300">
+                            Line {selectedBlockLine}
+                          </span>
+                        )}
+                      </div>
+                      <p className="mt-2 text-[10px] text-muted-foreground">
+                        Select a block from the original content, write the intended change, then insert it into modification instructions.
+                      </p>
+                      <div className="mt-3 space-y-2">
+                        <Textarea
+                          rows={selectedBlockRows}
+                          value={selectedBlock}
+                          onChange={(e) => setSelectedBlock(e.target.value)}
+                          placeholder="Selected block preview will appear here"
+                          className="bg-background/60 font-mono text-[11px]"
+                        />
+                        <Textarea
+                          value={selectedBlockComment}
+                          onChange={(e) => setSelectedBlockComment(e.target.value)}
+                          placeholder="Comment the exact change you want for this selected block"
+                          className="min-h-16 bg-background/60 text-[11px]"
+                        />
+                        <div className="flex justify-end">
+                          <button
+                            type="button"
+                            onClick={addSelectedBlockToInstructions}
+                            disabled={!selectedBlock.trim()}
+                            className="rounded-full border border-sky-500/35 bg-sky-500/10 px-3 py-1.5 text-[9px] font-black uppercase tracking-wider text-sky-700 transition-colors hover:bg-sky-500/20 disabled:cursor-not-allowed disabled:opacity-50 dark:text-sky-300"
+                          >
+                            Insert To Instructions
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </Card>
               </ScrollReveal>
 
@@ -1015,7 +1390,7 @@ export function ToolPrompts({
                     <CardContent className="p-5 space-y-4">
                       {/* Quick actions */}
                       <div className="flex flex-wrap gap-1.5">
-                        {(["narrative", "images", "metadata", "polish"] as const).map(
+                        {(["intro", "steps", "metadata", "polish"] as const).map(
                           (action) => (
                             <button
                               key={action}
@@ -1024,16 +1399,19 @@ export function ToolPrompts({
                                 "flex items-center gap-1.5 px-3 h-7 rounded-full text-[9px] font-black uppercase tracking-wide transition-all",
                                 action === "polish"
                                   ? "bg-fuchsia-500/10 text-fuchsia-500 hover:bg-fuchsia-500/20 border border-fuchsia-500/20"
+                                  : action === "steps"
+                                  ? "bg-violet-500/10 text-violet-500 hover:bg-violet-500/20 border border-violet-500/20"
                                   : "bg-accent/10 text-accent hover:bg-accent/20 border border-accent/20"
                               )}
                             >
                               <Sparkles className="h-3 w-3" />
-                              {action === "polish" ? "Narrative Polish" : action}
+                              {dictionary.quickActions[action]}
                             </button>
                           ),
                         )}
                       </div>
                       <Textarea
+                        ref={modInstructionsRef}
                         placeholder={dictionary.modInstructionsPlaceholder}
                         value={modInstructions}
                         onChange={(e) => setModInstructions(e.target.value)}
@@ -1390,7 +1768,7 @@ export function ToolPrompts({
                         <span className="text-[9px] text-white/20 font-mono">
                           {mode === "create"
                             ? `✦ ${contentType} · ${isPublished ? "published" : "draft"}${isFeatured && contentType === "blog" ? " · featured" : ""}`
-                            : `✦ modify · ${selectedSlug || "no article selected"}`}
+                            : `✦ modify · ${selectedSlug || "no article selected"}${selectedArticle ? ` · ${selectedArticle.published ? "live" : "draft"}` : ""}`}
                         </span>
                         <button
                           onClick={handleCopy}

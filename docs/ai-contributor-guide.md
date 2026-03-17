@@ -282,6 +282,48 @@ When a piece of content exists in both English and Indonesian:
 
 ---
 
+## Tag Standards
+
+Tags form public URLs at `/tags/<tag>`. Strict formatting is required.
+
+### Format
+- **Always kebab-case**: `windows-11`, `clean-install`, `ui-design`
+- **Always lowercase**: never `Windows`, `Tutorial`, `Dark Mode`
+- **No spaces**: spaces become `%20` in URLs — always use `-` as separator
+- **EN/ID parity**: both locale files for the same article must have identical tags (English kebab-case only — no Indonesian-language tags)
+
+### Two-Tier System
+Every article must include:
+1. **Tier 1 — Platform tag** (mandatory): `windows`, `ubuntu`, `linux`, `android`, `hardware`
+2. **Tier 2 — Versioned tag** (when article targets a specific OS version): `windows-11`, `ubuntu-25-10`
+3. **Topic tag** (mandatory): `tutorial`, `driver`, `gaming`, `opinion`, `error-fix`, etc.
+4. **Specific tags** (optional, 1–2): `clean-install`, `powertoys`, `emulator`, `ui-design`, etc.
+
+**Example:**
+```yaml
+tags: ["windows", "windows-11", "tutorial", "clean-install"]
+```
+
+### Count Rules
+- **Minimum: 3 tags**
+- **Maximum: 6 tags**
+- Target 4–5 tags. More than 6 dilutes SEO and tag page value.
+
+### Versioned OS Tags (update yearly)
+| OS | Current tag |
+|---|---|
+| Windows | `windows-11` |
+| Ubuntu | `ubuntu-25-10` |
+
+When a new OS version releases, update this table and the More menu in `layout-header.tsx` (`moreItems` array).
+
+### Never
+- Do not use multi-word tags without hyphens: ~~`"Dark Mode"`, `"Windows 11"`~~
+- Do not use locale-specific terms: ~~`"Kustomisasi"`, `"Sistem Operasi"`~~
+- Do not use overly generic single tags alone (always pair with platform): ~~`["tutorial"]`~~
+
+---
+
 ## 10. i18n Rules
 
 SnipGeek uses locale routing with:

@@ -9,7 +9,6 @@ import {
   Shuffle,
   Briefcase,
   Hash,
-  ClipboardPenLine,
   Lock,
   Globe,
   ArrowUpRight,
@@ -75,14 +74,6 @@ export default async function ToolsPage({ params }: { params: Promise<{ locale: 
   ];
 
   const internalTools = [
-    {
-      id: 'ai_prompt_generator',
-      icon: <ClipboardPenLine className="h-8 w-8" />,
-      isLink: true,
-      href: `${linkPrefix}/tools/prompt-generator`,
-      badge: pageContent.new_badge,
-      badgeVariant: 'secondary' as const,
-    },
     {
       id: 'employee_history',
       icon: <Briefcase className="h-8 w-8" />,
@@ -225,6 +216,7 @@ export default async function ToolsPage({ params }: { params: Promise<{ locale: 
               </ScrollReveal>
             ))}
           </div>
+
         </section>
       </main>
     </div>

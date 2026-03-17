@@ -214,8 +214,8 @@
     "modInstructionsPlaceholder": "What exactly do you want to change? (e.g., Update the intro, add a conclusion about design updates...)",
     "quickActions": {
       "label": "Quick Instructions:",
-      "narrative": "Update narrative only",
-      "images": "Update images only",
+      "intro": "Refresh intro & conclusion",
+      "steps": "Convert lists to Steps",
       "metadata": "Add update date only",
       "polish": "Polish narrative flow (Tone)"
     },

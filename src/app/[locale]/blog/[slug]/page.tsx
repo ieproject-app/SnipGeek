@@ -166,8 +166,7 @@ export default async function Page({
 
   const allPosts = await getSortedPostsData(locale);
   const initialRelatedContent = allPosts
-    .filter((p) => p.slug !== slug)
-    .slice(0, 10);
+    .filter((p) => p.slug !== slug);
 
   const heroSourceOg = resolveHeroImage(
     initialPost.frontmatter.heroImage,

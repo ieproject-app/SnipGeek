@@ -48,6 +48,11 @@ export function ArticleRelated({
   dictionary,
 }: ArticleRelatedProps) {
   const linkPrefix = locale === "en" ? "" : `/${locale}`;
+  const normalizedCurrentTags = useMemo(
+    () => Array.from(new Set(currentTags.map((tag) => tag.toLowerCase().trim()).filter(Boolean))),
+    [currentTags],
+  );
+  const normalizedCurrentCategory = currentCategory?.toLowerCase().trim();
 
   const formatDate = (date: Date) => {
     return new Intl.DateTimeFormat(locale, {
@@ -63,30 +68,48 @@ export function ArticleRelated({
       .filter((item) => item.slug !== currentSlug)
       .map((item) => {
         let score = 0;
-        const itemTags = item.frontmatter.tags || [];
-        const itemCategory = item.frontmatter.category;
+        const normalizedItemTags = (item.frontmatter.tags || [])
+          .map((tag) => tag.toLowerCase().trim())
+          .filter(Boolean);
+        const normalizedItemCategory = item.frontmatter.category
+          ?.toLowerCase()
+          .trim();
+        const sharedTags = normalizedItemTags.filter((tag) =>
+          normalizedCurrentTags.includes(tag),
+        );
+        const sameCategory = Boolean(
+          normalizedCurrentCategory &&
+            normalizedItemCategory &&
+            normalizedCurrentCategory === normalizedItemCategory,
+        );
 
-        if (
-          type === "blog" &&
-          currentCategory &&
-          itemCategory &&
-          currentCategory === itemCategory
-        ) {
-          score += 5;
+        if (sameCategory) {
+          score += type === "blog" ? 4 : 2;
         }
 
-        currentTags.forEach((tag) => {
-          if (itemTags.includes(tag)) {
-            score += 1;
-          }
-        });
+        score += sharedTags.length * 3;
 
-        return { ...item, score };
+        if (sameCategory && sharedTags.length > 0) {
+          score += 2;
+        }
+
+        const isStrongMatch =
+          sharedTags.length >= 2 ||
+          (sameCategory && sharedTags.length >= 1) ||
+          (type === "blog" && sameCategory && normalizedCurrentTags.length === 0);
+
+        return {
+          ...item,
+          score,
+          sharedTagsCount: sharedTags.length,
+          isStrongMatch,
+        };
       })
+      .filter((item) => item.isStrongMatch)
       .sort((a, b) => b.score - a.score);
 
     return scored.slice(0, 3);
-  }, [currentCategory, currentSlug, currentTags, initialRelatedContent, type]);
+  }, [currentSlug, initialRelatedContent, normalizedCurrentCategory, normalizedCurrentTags, type]);
 
   if (allRelated.length === 0) return null;
 

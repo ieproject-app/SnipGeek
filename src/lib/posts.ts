@@ -27,12 +27,18 @@ export type Post<TFrontmatter> = {
   locale: string;
 };
 
+type GetPostsOptions = {
+  includeDrafts?: boolean;
+};
+
 export async function getSortedPostsData(
   locale?: string,
+  options: GetPostsOptions = {},
 ): Promise<Post<PostFrontmatter>[]> {
   const targetLocale = i18n.locales.includes(locale as Locale)
     ? locale
     : i18n.defaultLocale;
+  const { includeDrafts = false } = options;
   const localeDirectory = path.join(postsDirectory, targetLocale!);
 
   if (!fs.existsSync(localeDirectory)) {
@@ -70,7 +76,7 @@ export async function getSortedPostsData(
       }
     })
     .filter((p): p is Post<PostFrontmatter> => p !== null)
-    .filter((post) => post.frontmatter.published === true);
+    .filter((post) => includeDrafts || post.frontmatter.published === true);
 
   const postsWithKeys = new Map<string, Post<PostFrontmatter>>();
   const postsWithoutKeys: Post<PostFrontmatter>[] = [];

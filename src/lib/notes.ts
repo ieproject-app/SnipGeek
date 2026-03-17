@@ -25,12 +25,18 @@ export type Note<TFrontmatter> = {
   locale: string;
 };
 
+type GetNotesOptions = {
+  includeDrafts?: boolean;
+};
+
 export async function getSortedNotesData(
   locale?: string,
+  options: GetNotesOptions = {},
 ): Promise<Note<NoteFrontmatter>[]> {
   const targetLocale = i18n.locales.includes(locale as Locale)
     ? locale
     : i18n.defaultLocale;
+  const { includeDrafts = false } = options;
   const localeDirectory = path.join(notesDirectory, targetLocale!);
 
   if (!fs.existsSync(localeDirectory)) {
@@ -68,7 +74,7 @@ export async function getSortedNotesData(
       }
     })
     .filter((note): note is Note<NoteFrontmatter> => note !== null)
-    .filter((note) => note.frontmatter.published === true); // Only show published notes
+    .filter((note) => includeDrafts || note.frontmatter.published === true); // Only show published notes unless explicitly requested
 
   return allNotesData.sort((a, b) => {
     if (new Date(a.frontmatter.date) < new Date(b.frontmatter.date)) {

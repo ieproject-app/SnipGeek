@@ -150,8 +150,7 @@ export default async function Page({
 
   const allNotes = await getSortedNotesData(locale);
   const initialRelatedContent = allNotes
-    .filter((n) => n.slug !== slug)
-    .slice(0, 10);
+    .filter((n) => n.slug !== slug);
 
   const heroSourceOg = resolveHeroImage(
     initialNote.frontmatter.heroImage,

@@ -1,6 +1,7 @@
 import { MetadataRoute } from "next";
 import { getSortedPostsData } from "@/lib/posts";
 import { getSortedNotesData } from "@/lib/notes";
+import { shouldIndexTag } from "@/lib/tags";
 import { i18n } from "@/i18n-config";
 
 const DOMAIN = "https://snipgeek.com";
@@ -69,20 +70,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   );
 
   // 4. Tags (Selective indexing)
-  const highValueTags = [
-    "windows 11",
-    "epson",
-    "printer",
-    "hardware",
-    "ram",
-    "tutorial",
-    "linux",
-    "sap",
-    "telegram",
-    "android",
-    "firebase",
-  ];
-
   const tagEntries = await Promise.all(
     i18n.locales.map(async (locale) => {
       const posts = await getSortedPostsData(locale);
@@ -100,7 +87,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       const localePrefix = locale === i18n.defaultLocale ? "" : `/${locale}`;
 
       return Object.entries(tagCounts)
-        .filter(([tag, count]) => count >= 3 || highValueTags.includes(tag))
+        .filter(([tag, count]) => shouldIndexTag(tag, count))
         .map(([tag]) => ({
           url: `${DOMAIN}${localePrefix}/tags/${encodeURIComponent(tag)}`,
           lastModified: new Date(),

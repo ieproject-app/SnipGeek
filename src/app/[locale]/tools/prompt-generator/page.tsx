@@ -2,6 +2,7 @@
 import { getDictionary } from '@/lib/get-dictionary';
 import { i18n, type Locale } from '@/i18n-config';
 import type { Metadata } from 'next';
+import { notFound } from 'next/navigation';
 import { ToolPrompts } from '@/components/tools/tool-prompts';
 import { getSortedPostsData } from '@/lib/posts';
 import { getSortedNotesData } from '@/lib/notes';
@@ -27,18 +28,39 @@ export async function generateStaticParams() {
 }
 
 export default async function PromptGeneratorPage({ params }: { params: Promise<{ locale: string }> }) {
+  if (process.env.NODE_ENV !== 'development') {
+    notFound();
+  }
+
   const { locale: lang } = await params;
   const dictionary = await getDictionary(lang as Locale);
   const pageContent = dictionary.promptGenerator;
 
-  // MUST await both async calls
-  const posts = await getSortedPostsData(lang);
-  const notes = await getSortedNotesData(lang);
+  const posts = await getSortedPostsData(lang, { includeDrafts: true });
+  const notes = await getSortedNotesData(lang, { includeDrafts: true });
 
   const existingArticles = [
-    ...posts.map(p => ({ slug: p.slug, title: p.frontmatter.title, type: 'blog' as const })),
-    ...notes.map(n => ({ slug: n.slug, title: n.frontmatter.title, type: 'note' as const }))
-  ].sort((a, b) => a.title.localeCompare(b.title));
+    ...posts.map((p) => ({
+      slug: p.slug,
+      title: p.frontmatter.title,
+      type: 'blog' as const,
+      published: p.frontmatter.published === true,
+      date: p.frontmatter.date,
+    })),
+    ...notes.map((n) => ({
+      slug: n.slug,
+      title: n.frontmatter.title,
+      type: 'note' as const,
+      published: n.frontmatter.published === true,
+      date: n.frontmatter.date,
+    })),
+  ].sort((a, b) => {
+    if (a.published !== b.published) {
+      return a.published ? 1 : -1;
+    }
+
+    return a.title.localeCompare(b.title);
+  });
 
   return (
     <div className="w-full">
@@ -47,6 +69,7 @@ export default async function PromptGeneratorPage({ params }: { params: Promise<
           dictionary={pageContent}
           existingArticles={existingArticles}
           fullDictionary={dictionary}
+          locale={lang}
         />
       </main>
     </div>

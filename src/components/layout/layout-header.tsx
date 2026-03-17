@@ -5,28 +5,30 @@ import { cn, getLinkPrefix } from "@/lib/utils";
 import {
   Search,
   X,
+  ClipboardPenLine,
   Bookmark,
   Trash2,
   MoreHorizontal,
   BookOpen,
   StickyNote,
   LayoutGrid,
-  User,
-  Mail,
   ChevronRight,
   ArrowRight,
   Sun,
   Moon,
   SunMoon,
-  ScrollText,
-  ShieldAlert,
   Hash,
+  Monitor,
+  Terminal,
+  Smartphone,
+  Cpu,
+  GraduationCap,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
-import { usePathname, useParams } from "next/navigation";
+import { usePathname, useParams, useRouter } from "next/navigation";
 import { useReadingList } from "@/hooks/use-reading-list";
 import { useNotification } from "@/hooks/use-notification";
 import type { Dictionary } from "@/lib/get-dictionary";
@@ -136,6 +138,7 @@ export function LayoutHeader({
   const headerRef = useRef<HTMLElement>(null);
   const pathname = usePathname();
   const params = useParams();
+  const router = useRouter();
   const prevCount = useRef(readingListItems.length);
 
   const isSearchOpen = activeView === "search";
@@ -281,16 +284,13 @@ export function LayoutHeader({
     { name: dictionary.navigation.tools, href: "/tools", icon: LayoutGrid },
   ];
 
+  // ── Curated Featured Topics — update manually each year ──
   const moreItems = [
-    { name: dictionary.navigation.about, href: "/about", icon: User },
-    { name: dictionary.navigation.contact, href: "/contact", icon: Mail },
-    { name: dictionary.navigation.privacy, href: "/privacy", icon: ShieldAlert },
-    { name: dictionary.navigation.terms, href: "/terms", icon: ScrollText },
-    {
-      name: dictionary.navigation.disclaimer,
-      href: "/disclaimer",
-      icon: ShieldAlert,
-    },
+    { name: "Windows 11", href: "/tags/windows-11", icon: Monitor },
+    { name: "Ubuntu 25.10", href: "/tags/ubuntu-25-10", icon: Terminal },
+    { name: "Android", href: "/tags/android", icon: Smartphone },
+    { name: "Hardware", href: "/tags/hardware", icon: Cpu },
+    { name: "Tutorial", href: "/tags/tutorial", icon: GraduationCap },
   ];
 
   const topTagLinks = useMemo(() => {
@@ -347,6 +347,53 @@ export function LayoutHeader({
     const stripped = pathname.replace(/\/+$/, "");
     return stripped || "/";
   }, [pathname]);
+
+  const isArticleDetailPage = useMemo(() => {
+    const blogDetailPrefix = `${linkPrefix}/blog/`;
+    const noteDetailPrefix = `${linkPrefix}/notes/`;
+
+    return (
+      (normalizedPath.startsWith(blogDetailPrefix) &&
+        !normalizedPath.slice(blogDetailPrefix.length).includes("/")) ||
+      (normalizedPath.startsWith(noteDetailPrefix) &&
+        !normalizedPath.slice(noteDetailPrefix.length).includes("/"))
+    );
+  }, [linkPrefix, normalizedPath]);
+
+  const isHomePage = useMemo(
+    () => normalizedPath === (linkPrefix || "/"),
+    [linkPrefix, normalizedPath],
+  );
+
+  const showDevPromptShortcut =
+    process.env.NODE_ENV === "development" && (isArticleDetailPage || isHomePage);
+
+  useEffect(() => {
+    if (process.env.NODE_ENV !== "development") return;
+
+    const handlePromptShortcut = (event: KeyboardEvent) => {
+      const isPromptShortcut =
+        event.key.toLowerCase() === "p" &&
+        (event.metaKey || event.ctrlKey) &&
+        event.shiftKey &&
+        !event.altKey;
+
+      if (!isPromptShortcut) return;
+
+      const target = event.target as HTMLElement | null;
+      const isTypingContext = Boolean(
+        target?.closest("input, textarea, [contenteditable='true']"),
+      );
+
+      if (isTypingContext) return;
+
+      event.preventDefault();
+      router.push(`${linkPrefix}/tools/prompt-generator`);
+    };
+
+    window.addEventListener("keydown", handlePromptShortcut);
+    return () => window.removeEventListener("keydown", handlePromptShortcut);
+  }, [linkPrefix, router]);
 
   const contextualSecondaryLink = useMemo(() => {
     const blogDetailPrefix = `${linkPrefix}/blog/`;
@@ -632,7 +679,7 @@ export function LayoutHeader({
                   <div className="pt-1">
                     <div className="px-4 py-2">
                       <p className="font-sans text-[8px] font-black uppercase tracking-[0.15em] text-accent">
-                        Info
+                        Featured Topics
                       </p>
                     </div>
                     {moreItems.map((item) => (
@@ -1198,6 +1245,17 @@ export function LayoutHeader({
           </div>
         </div>
       </div>
+
+      {showDevPromptShortcut && (
+        <NextLink
+          href={`${linkPrefix}/tools/prompt-generator`}
+          className="fixed right-4 bottom-5 z-90 inline-flex h-11 items-center gap-2 rounded-full border border-accent/35 bg-background/90 px-3.5 text-[10px] font-black uppercase tracking-[0.12em] text-accent shadow-xl backdrop-blur transition-all hover:-translate-y-0.5 hover:border-accent/55 hover:bg-background"
+          aria-label="Open Prompt Generator"
+        >
+          <ClipboardPenLine className="h-3.5 w-3.5" />
+          Prompt Studio
+        </NextLink>
+      )}
     </>
   );
 }
