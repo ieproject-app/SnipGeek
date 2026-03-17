@@ -12,7 +12,8 @@ import {
   Lock,
   Globe,
   ArrowUpRight,
-  Dices
+  Dices,
+  Crop
 } from 'lucide-react';
 import React from 'react';
 import Link from 'next/link';
@@ -95,6 +96,14 @@ export default async function ToolsPage({ params }: { params: Promise<{ locale: 
       icon: <Dices className="h-8 w-8" />,
       isLink: true,
       href: `${linkPrefix}/tools/spin-wheel`,
+      badge: pageContent.open_tool,
+      badgeVariant: 'secondary' as const,
+    },
+    {
+      id: 'image_crop',
+      icon: <Crop className="h-8 w-8" />,
+      isLink: true,
+      href: `${linkPrefix}/tools/image-crop`,
       badge: pageContent.open_tool,
       badgeVariant: 'secondary' as const,
     },

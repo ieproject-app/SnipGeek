@@ -86,6 +86,10 @@
       "spin_wheel": {
         "title": "Spin Wheel",
         "description": "Roda putar interaktif untuk pengacakan. Masukkan daftar nama, putar, dan dapatkan pemenang secara acak. Tersedia mode raffle, template, dan efek suara."
+      },
+      "image_crop": {
+        "title": "Crop Gambar & Konverter WebP",
+        "description": "Crop gambar apapun ke rasio 16:9 yang sempurna dan ekspor sebagai file .webp terkompresi, siap dipakai di artikel blog."
       }
     },
     "systemNotReady": {
