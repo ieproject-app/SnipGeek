@@ -86,6 +86,10 @@
       "spin_wheel": {
         "title": "Spin Wheel",
         "description": "An interactive randomizer wheel. Add any list of entries and spin to pick a winner. Includes raffle mode, templates, and sound effects."
+      },
+      "image_crop": {
+        "title": "Image Crop & WebP Converter",
+        "description": "Crop any image to a perfect 16:9 ratio and export it as a compressed .webp file, ready for blog articles."
       }
     },
     "systemNotReady": {
