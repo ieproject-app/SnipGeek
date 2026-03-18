@@ -28,6 +28,12 @@ export const INDEXABLE_TAGS = [
     "network",
     "security",
     "performance",
+    "dual-boot",
+    "grub",
+    "uefi",
+    "secure-boot",
+    "partition",
+    "recovery",
 ] as const;
 
 export function shouldIndexTag(tag: string, count: number) {
