@@ -3,6 +3,7 @@ title: "How to Remove Duplicate OneDrive Folders in Windows 11"
 slug: "remove-duplicate-onedrive-windows-11"
 translationKey: "remove-duplicate-onedrive-windows-11"
 date: "2026-03-11"
+updated: "2026-03-19"
 category: "Windows"
 tags: ["windows", "windows-11", "tutorial", "onedrive", "troubleshooting"]
 published: true
@@ -18,6 +19,33 @@ These folders were essentially useless. They couldn't be deleted through the UI,
 <Callout variant="warning" title="Critical Warning: Backup Your Registry">
   This method involves editing the Windows Registry. Errors here can cause serious system issues. Proceed at your own risk, and I highly recommend [backing up your registry](https://support.microsoft.com/en-us/topic/how-to-back-up-and-restore-the-registry-in-windows-855140ad-e318-2a13-2829-d428a2ab0692) before starting.
 </Callout>
+
+## Why This Happens (Quick Context)
+
+In LTSC or custom debloated installs, OneDrive app components may be removed but some Explorer registration keys can remain. File Explorer reads those registration keys (CLSID/NameSpace), then still renders a OneDrive node even though the app endpoint is gone.
+
+That is why you see a folder in the sidebar that does nothing when clicked.
+
+## Safe Registry Backup (Do This First)
+
+Before changing anything:
+
+<Steps>
+  <Step>
+    **Create a System Restore Point**
+    Open Start, search for **Create a restore point**, then create one with a clear label.
+  </Step>
+
+  <Step>
+    **Export only the key you are about to edit**
+    In Registry Editor, right-click the target key and choose **Export**.
+  </Step>
+
+  <Step>
+    **Store backup `.reg` files in a dedicated folder**
+    Keep one folder per fix session so rollback is fast and unambiguous.
+  </Step>
+</Steps>
 
 ## Part 1: Removing Folder Entries from the NameSpace
 
@@ -56,6 +84,8 @@ Close the Registry Editor and reopen File Explorer. In many cases, those duplica
 
 If "OneDrive - Personal" still reappears or refuses to go away after a restart, we need to adjust one specific stubborn key.
 
+This second step works because `System.IsPinnedToNameSpaceTree` controls whether that shell folder is pinned in Explorer navigation.
+
 <Steps>
   <Step>
     ### Locate the Specific CLSID
@@ -74,6 +104,16 @@ If "OneDrive - Personal" still reappears or refuses to go away after a restart, 
 </Steps>
 
 You might need to restart your computer for the changes to take full effect. Once done, your File Explorer should be back to a clean, minimal state.
+
+## Recovery (If Something Looks Wrong)
+
+If Explorer behaves unexpectedly after edits:
+
+1. Double-click your exported `.reg` backup file to restore the original key.
+2. Restart Explorer from Task Manager or reboot the PC.
+3. If still unstable, use the restore point you created before registry edits.
+
+For this specific tweak, restoring `System.IsPinnedToNameSpaceTree` back to `1` usually returns the default behavior.
 
 ![Clean File Explorer view](/images/_posts/windows11/onedrive-duplicate/onedrive-4.webp)
 *My final File Explorer view, much better without those phantom folders.*

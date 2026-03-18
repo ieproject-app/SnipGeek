@@ -36,6 +36,32 @@ interface ToolWrapperProps {
   isPublic?: boolean;
 }
 
+const INTERNAL_TOOL_ALLOWLIST_RAW =
+  process.env.NEXT_PUBLIC_INTERNAL_TOOL_ALLOWLIST || "";
+
+// Supports entries like: alice@company.com,bob@company.com,@company.com
+const INTERNAL_TOOL_ALLOWLIST = INTERNAL_TOOL_ALLOWLIST_RAW
+  .split(",")
+  .map((item) => item.trim().toLowerCase())
+  .filter(Boolean);
+
+const hasInternalAllowlist = INTERNAL_TOOL_ALLOWLIST.length > 0;
+
+function isInternalUserAllowed(email: string | null | undefined) {
+  if (!hasInternalAllowlist) return true;
+  if (!email) return false;
+
+  const normalizedEmail = email.toLowerCase();
+
+  return INTERNAL_TOOL_ALLOWLIST.some((entry) => {
+    if (entry.startsWith("@")) {
+      return normalizedEmail.endsWith(entry);
+    }
+
+    return normalizedEmail === entry;
+  });
+}
+
 export function ToolWrapper({
   children,
   title,
@@ -252,6 +278,46 @@ export function ToolWrapper({
             >
               <Chrome className="h-5 w-5" />
               {t.loginWithGoogle}
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  if (!isInternalUserAllowed(user.email)) {
+    return (
+      <div className="max-w-md mx-auto animate-in fade-in zoom-in-95 duration-500">
+        <Card className="text-center mt-8 border-destructive/20 bg-card/50 shadow-xl rounded-2xl overflow-hidden">
+          <div className="h-1.5 w-full bg-destructive/80" />
+          <CardHeader className="pt-10 pb-6 space-y-4">
+            <div className="mx-auto p-4 bg-destructive/10 rounded-full w-fit border border-destructive/20">
+              <ShieldX className="h-8 w-8 text-destructive opacity-80" />
+            </div>
+            <div className="space-y-1">
+              <CardTitle className="font-display text-2xl font-black uppercase tracking-tighter text-destructive">
+                Akses Ditolak
+              </CardTitle>
+              <CardDescription className="text-xs uppercase font-bold tracking-widest opacity-70">
+                Internal Allowlist Required
+              </CardDescription>
+            </div>
+          </CardHeader>
+          <CardContent className="px-10 pb-12 space-y-6">
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              Akun Google ini belum terdaftar untuk mengakses tool internal.
+              Hubungi admin jika akun perlu ditambahkan ke allowlist.
+            </p>
+            <p className="text-[10px] font-mono text-muted-foreground/70 break-all rounded-lg bg-muted/40 px-3 py-2">
+              {user.email}
+            </p>
+            <Button
+              variant="outline"
+              onClick={handleLogout}
+              className="w-full h-11 rounded-full gap-2 font-black uppercase tracking-widest"
+            >
+              <LogOut className="h-4 w-4" />
+              Keluar Akun
             </Button>
           </CardContent>
         </Card>

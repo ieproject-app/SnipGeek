@@ -3,6 +3,7 @@ title: "Cara Menghilangkan Duplikat Folder OneDrive di Windows 11"
 slug: "remove-duplicate-onedrive-windows-11"
 translationKey: "remove-duplicate-onedrive-windows-11"
 date: "2026-03-11"
+updated: "2026-03-19"
 category: "Windows"
 tags: ["windows", "windows-11", "tutorial", "onedrive", "troubleshooting"]
 published: true
@@ -18,6 +19,33 @@ Folder ini sama sekali tidak berfungsi. Tidak bisa dihapus lewat klik kanan bias
 <Callout variant="warning" title="Penting: Backup Registry Kamu">
   Langkah ini melibatkan pengeditan Windows Registry. Kesalahan di sini bisa menyebabkan masalah sistem yang serius. Lakukan dengan hati-hati, dan saya sangat menyarankan untuk [mem-backup registry](https://support.microsoft.com/en-us/topic/how-to-back-up-and-restore-the-registry-in-windows-855140ad-e318-2a13-2829-d428a2ab0692) sebelum memulai.
 </Callout>
+
+## Kenapa Ini Bisa Terjadi?
+
+Di LTSC atau instalasi Windows yang sudah dibersihkan, aplikasi OneDrive bisa saja hilang, tetapi sebagian key registrasi Explorer masih tertinggal. File Explorer tetap membaca key CLSID/NameSpace itu, lalu menampilkan node OneDrive walaupun endpoint aplikasinya sudah tidak ada.
+
+Itulah kenapa folder terlihat di sidebar, tapi tidak berfungsi saat diklik.
+
+## Backup Registry yang Aman (Wajib Sebelum Edit)
+
+Sebelum mengubah apa pun:
+
+<Steps>
+  <Step>
+    **Buat System Restore Point dulu**
+    Buka Start, cari **Create a restore point**, lalu buat restore point dengan nama yang jelas.
+  </Step>
+
+  <Step>
+    **Export key yang akan diedit**
+    Di Registry Editor, klik kanan key target lalu pilih **Export**.
+  </Step>
+
+  <Step>
+    **Simpan file backup `.reg` di folder khusus**
+    Pisahkan backup per sesi perbaikan supaya rollback nanti cepat dan tidak tertukar.
+  </Step>
+</Steps>
 
 ## Bagian 1: Menghapus Entri Folder dari NameSpace
 
@@ -56,6 +84,8 @@ Tutup Registry Editor dan buka kembali File Explorer. Biasanya, folder duplikat 
 
 Jika folder "OneDrive - Personal" masih muncul atau kembali lagi setelah komputer dinyalakan ulang, ada satu kunci lagi yang perlu kita sesuaikan.
 
+Bagian ini efektif karena nilai `System.IsPinnedToNameSpaceTree` menentukan apakah folder shell tersebut dipasang (pinned) di panel navigasi Explorer.
+
 <Steps>
   <Step>
     ### Cari CLSID Spesifik
@@ -74,6 +104,16 @@ Jika folder "OneDrive - Personal" masih muncul atau kembali lagi setelah kompute
 </Steps>
 
 Mungkin kamu perlu melakukan *restart* agar perubahannya terlihat sepenuhnya. Sekarang, File Explorer kamu sudah kembali bersih dan rapi.
+
+## Langkah Pemulihan (Kalau Ada yang Tidak Beres)
+
+Kalau setelah edit registry Explorer jadi aneh:
+
+1. Klik dua kali file backup `.reg` yang tadi kamu export untuk mengembalikan key semula.
+2. Restart Explorer dari Task Manager atau restart komputer.
+3. Kalau masih bermasalah, pakai restore point yang sudah dibuat sebelum edit.
+
+Untuk kasus ini, mengembalikan nilai `System.IsPinnedToNameSpaceTree` ke `1` biasanya sudah cukup untuk mengembalikan kondisi default.
 
 ![Tampilan File Explorer yang sudah bersih](/images/_posts/windows11/onedrive-duplicate/onedrive-4.webp)
 *Tampilan akhir File Explorer saya, jauh lebih lega tanpa folder hantu.*

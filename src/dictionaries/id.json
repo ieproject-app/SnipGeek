@@ -88,9 +88,54 @@
         "description": "Roda putar interaktif untuk pengacakan. Masukkan daftar nama, putar, dan dapatkan pemenang secara acak. Tersedia mode raffle, template, dan efek suara."
       },
       "image_crop": {
-        "title": "Crop Gambar & Konverter WebP",
-        "description": "Crop gambar apapun ke rasio 16:9 yang sempurna dan ekspor sebagai file .webp terkompresi, siap dipakai di artikel blog."
+        "title": "Potong Gambar",
+        "description": "Potong ke rasio 16:9 dan ekspor WebP untuk banner hero."
       }
+    },
+    "image_crop": {
+      "invalidImageFile": "Silakan unggah file gambar yang valid.",
+      "downloaded": "Berhasil diunduh: {filename} ({size})",
+      "dropTitle": "Tarik gambar ke sini",
+      "dropDescription": "atau klik untuk memilih - mendukung PNG, JPG, dan WebP.",
+      "pasteHint": "Kamu juga bisa Ctrl+V / Cmd+V untuk menempel",
+      "outputBadge": "Output: 16:9 .webp",
+      "original": "Asli",
+      "ratio": "Rasio",
+      "target": "Target 16:9",
+      "already169": "Sudah 16:9",
+      "horizontal": "Horizontal",
+      "vertical": "Vertikal",
+      "noAdjustment": "tidak ada penyesuaian",
+      "center": "Tengah",
+      "webpQuality": "Kualitas WebP",
+      "qualityHigh": "Kelas lossless",
+      "qualityBalanced": "Seimbang",
+      "qualitySmall": "Ukuran kecil",
+      "defaultLabel": "85% default",
+      "outputLabel": "Output:",
+      "clientSideInfo": "100% diproses di perangkat, tanpa upload.",
+      "downloadButton": "Unduh WebP",
+      "loadAnother": "Muat Gambar Lain",
+      "dragHint": "Geser untuk posisi",
+      "removeImage": "Hapus gambar",
+      "previewAlt": "Pratinjau potong",
+      "howTo": [
+        {
+          "step": "01",
+          "title": "Unggah Gambar",
+          "desc": "Tarik atau pilih gambar dari screenshot atau file."
+        },
+        {
+          "step": "02",
+          "title": "Geser untuk Posisi",
+          "desc": "Klik lalu geser pratinjau untuk menentukan area potong 16:9."
+        },
+        {
+          "step": "03",
+          "title": "Unduh WebP",
+          "desc": "Dapatkan file .webp yang sudah terpotong rapi untuk artikel kamu."
+        }
+      ]
     },
     "systemNotReady": {
       "title": "SISTEM BELUM SIAP",

@@ -3,6 +3,7 @@ title: "Cara Membagi File Besar Menjadi Beberapa Part dengan WinRAR"
 slug: "how-to-split-rar-files-into-multiple-parts"
 translationKey: "how-to-split-rar-files-into-multiple-parts"
 date: "2026-03-17"
+updated: "2026-03-19"
 description: "Panduan praktis membagi file besar menjadi beberapa part RAR dengan WinRAR, lengkap dengan pengaturan ukuran dan cara menggabungkannya kembali."
 heroImage: "/images/_posts/apps/winrar/banner-winrar.webp"
 imageAlt: "Banner WinRAR yang menampilkan proses pengelolaan arsip dan pemecahan file"
@@ -23,6 +24,20 @@ Selain itu, metode ini juga berguna untuk kebutuhan lain, misalnya:
 - Menyimpan file ke beberapa flash drive atau media dengan kapasitas terbatas.
 
 Kabar baiknya, software legendaris **WinRAR** sudah punya fitur ini dan langkahnya sangat mudah.
+
+## Panduan Cepat Menentukan Ukuran Part
+
+Pemilihan ukuran part itu penting. Salah ukuran biasanya bikin proses upload/download jadi lebih ribet.
+
+| Skenario | Ukuran Part yang Disarankan | Alasan |
+|---|---:|---|
+| Kirim lewat email | `20M` sampai `24M` | Aman untuk batas umum 25 MB setelah overhead metadata. |
+| Kirim via aplikasi chat | `50M` sampai `100M` | Lebih gampang retry kalau ada satu upload gagal. |
+| Upload cloud dengan internet kurang stabil | `100M` sampai `250M` | Seimbang antara kecepatan dan biaya retry. |
+| Pindah file ke flash drive lama | `500M` | Lebih aman untuk media penyimpanan yang kualitasnya beragam. |
+| Arsip backup lokal | `1000M` atau lebih | Jumlah part lebih sedikit kalau tidak tergantung jaringan. |
+
+Kalau bingung mulai dari mana, pakai **`100M`** dulu. Itu biasanya jadi titik aman paling praktis.
 
 ## #1 Instal Aplikasi WinRAR
 
@@ -106,3 +121,39 @@ Kalau satu part saja hilang, proses ekstraksi akan gagal.
 </Steps>
 
 Selesai. Simpel, praktis, dan sangat berguna untuk menangani file berukuran besar.
+
+## Masalah yang Paling Sering Terjadi (dan Solusinya)
+
+Kalau proses ekstraksi gagal, biasanya penyebabnya salah satu dari ini:
+
+1. **Ada part yang belum terunduh lengkap**
+   Cek ulang daftar file part, lalu unduh ulang part yang hilang.
+2. **Salah satu part rusak/corrupt**
+   Cukup unduh ulang file part yang rusak, tidak perlu semua part.
+3. **Ekstraksi dimulai dari file yang salah**
+   Selalu mulai dari `part1.rar`, bukan `part2` dan seterusnya.
+4. **Nama file part berubah**
+   Pastikan urutan nama file asli tidak diubah agar WinRAR bisa membaca rantainya.
+
+## Validasi Sebelum Dibagikan (Opsional tapi Disarankan)
+
+Supaya penerima tidak dapat error “archive corrupt”, lakukan validasi sederhana ini:
+
+<Steps>
+   <Step>
+      **Tes ekstraksi di komputer sendiri**
+      Coba ekstrak hasil split sekali sebelum kamu kirim ke orang lain.
+   </Step>
+
+   <Step>
+      **Pisahkan folder arsip aktif dari arsip lama**
+      Hindari mencampur file part baru dengan file uji coba lama yang namanya mirip.
+   </Step>
+
+   <Step>
+      **Aktifkan recovery record saat membuat arsip**
+      Opsi **Add recovery record** membantu toleransi jika ada kerusakan minor pada data.
+   </Step>
+</Steps>
+
+Langkah kecil ini biasanya sangat mengurangi keluhan gagal ekstrak dari penerima file.

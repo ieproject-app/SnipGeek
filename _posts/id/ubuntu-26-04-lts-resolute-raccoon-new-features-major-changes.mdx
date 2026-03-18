@@ -1,0 +1,144 @@
+---
+title: "Ubuntu 26.04 LTS 'Resolute Raccoon': Fitur Baru dan Perubahan Utama"
+slug: "ubuntu-26-04-lts-resolute-raccoon-fitur-baru-dan-perubahan-utama"
+translationKey: "ubuntu-26-04-lts-resolute-raccoon-new-features-major-changes"
+date: "2026-03-17"
+description: "Rangkuman lengkap Ubuntu 26.04 LTS menjelang rilis final: GNOME 50 full Wayland, kernel terbaru, toolchain modern, fitur keamanan enterprise, dan peningkatan AI/GPU."
+heroImage: "/images/_posts/ubuntu/ubuntu-26-04/Resolute_Raccoon_banner.webp"
+imageAlt: "Banner Ubuntu 26.04 LTS Resolute Raccoon"
+published: true
+featured: true
+tags: ["ubuntu", "ubuntu-26-04", "linux", "gnome-50", "wayland", "rocm"]
+category: "Linux"
+---
+
+Ubuntu 26.04 LTS dengan nama kode **Resolute Raccoon** dijadwalkan rilis stabil pada **23 April 2026**. Buat saya pribadi, ini tipe rilis Ubuntu yang justru makin menarik saat dilihat lebih dekat. Bukan karena ada satu fitur heboh yang langsung mencuri perhatian, tapi karena rilis ini terasa seperti titik pematangan besar dari transisi penting yang sudah dimulai sejak 25.10.
+
+Kalau kamu mengikuti perjalanan Ubuntu beberapa tahun terakhir, kamu akan langsung melihat polanya. Canonical makin agresif mengunci pengalaman desktop modern, mempercepat stack developer, dan mempertebal fokus ke AI serta enterprise. Bedanya, di 26.04 arah itu terasa jauh lebih matang dan sengaja dipertegas. Di artikel ini, saya rangkum perubahan yang paling penting, plus apa artinya untuk pengguna harian.
+
+## Wayland Jadi Jalur Utama, GNOME 50 Jadi Fondasi
+
+Perubahan paling jelas di desktop adalah ini: sesi Ubuntu kini full Wayland. Opsi Xorg di login screen sudah tidak lagi jadi jalur default sejak fase sebelumnya, dan di 26.04 pendekatan ini makin ditegaskan. Buat sebagian pengguna lama, ini mungkin terasa seperti akhir dari satu era. Tapi kalau dilihat dari arah platform Ubuntu, langkah ini sekarang terasa nyaris tidak mungkin dibalik.
+
+Dengan **GNOME 50** sebagai desktop utama, Ubuntu juga bergerak lebih dekat ke arah pengalaman GNOME vanilla. Ada dua aplikasi baru yang cukup menarik perhatian:
+
+- **Showtime** sebagai pengganti pemutar video lama.
+- **Resources** sebagai monitor resource modern pengganti GNOME System Monitor klasik.
+
+Untuk pengguna NVIDIA, kabar baiknya ada optimasi tambahan di stack rendering Wayland yang diarahkan supaya frame pacing lebih rapat dan latency lebih rendah di desktop GNOME.
+
+## Dapur Sistem: Kernel Baru, GCC 15, OpenJDK 25
+
+Di level sistem, Ubuntu 26.04 membawa lompatan yang terasa signifikan:
+
+- Kernel Linux terbaru di jalur rilis 6.20 menuju penamaan 7.0.
+- **GCC 15** sebagai toolchain default.
+- **OpenJDK 25** jadi Java default menggantikan generasi sebelumnya.
+- Integrasi Rust yang makin luas di komponen penting untuk arah memory safety jangka panjang.
+
+Kalau kamu developer, kombinasi ini enak karena tidak perlu banyak "nambal manual" di mesin baru. Buat server workload, ini juga berarti baseline performa dan kompatibilitas software modern jadi lebih baik sejak awal install. Singkatnya, Ubuntu 26.04 terasa lebih seperti sistem yang memang siap kerja dari hari pertama.
+
+## Database dan Cloud Auth Makin Serius
+
+Ubuntu 26.04 tidak cuma fokus desktop. Paket server yang dibawa juga lebih matang untuk kebutuhan produksi:
+
+- PostgreSQL 18
+- MariaDB 11.8
+- DocumentDB (kompatibel API MongoDB, berbasis PostgreSQL)
+- Authd untuk integrasi login cloud seperti Entra ID dan Google IAM
+
+Buat tim infra, ini menarik karena pilihan stack data dan identity jadi lebih luas tanpa harus buru-buru lompat ke repositori eksternal.
+
+## AI dan GPU: ROCm Kini Lebih Mudah
+
+Satu perubahan yang menurut saya penting untuk ekosistem AI Linux adalah kehadiran **ROCm** di repositori resmi. Buat yang pernah repot dengan friction setup GPU di Linux, perubahan seperti ini justru lebih terasa nilainya daripada pengumuman yang kedengarannya besar tapi efek nyatanya kecil. Artinya proses setup jadi lebih sederhana:
+
+```bash
+sudo apt install rocm
+```
+
+Untuk pengguna workstation AMD, langkah ini memangkas friction yang biasanya muncul di tahap awal. Sementara di sisi NVIDIA, peningkatan Wayland di GNOME juga membantu skenario gaming dan compute desktop supaya terasa lebih stabil.
+
+## Keamanan dan Enterprise: TPM, Snap Permissions, OpenSSH 10.2
+
+Ubuntu 26.04 juga mempertebal sisi keamanan:
+
+- Full Disk Encryption berbasis TPM makin mudah dikelola lewat Security Center.
+- Prompt izin Snap dibuat lebih jelas dan lebih eksplisit.
+- OpenSSH 10.2 hadir dengan pembaruan kriptografi modern sekaligus pemangkasan algoritma lama yang lemah.
+
+Buat pengguna perusahaan, ini penting karena pengalaman keamanan tidak cuma kuat di belakang layar, tapi juga lebih mudah dipahami pengguna biasa.
+
+## Perubahan UX GNOME Shell Search
+
+Di desktop GNOME, Ubuntu 26.04 membawa provider pencarian tambahan:
+
+- Web Search Provider, supaya pencarian dari overview bisa diarahkan ke browser lewat aksi yang jelas dari pengguna.
+- Snap Search Provider, untuk menemukan aplikasi Snap langsung dari overview sebelum membuka App Center.
+
+Pendekatannya relatif lebih transparan dibanding model integrasi pencarian lama di era Unity dulu, karena aksi web terjadi saat pengguna memang memilih hasilnya.
+
+## Yaru Refresh: Ikon Lebih Bersih, Dock Lebih Tegas
+
+Di sisi visual, tema Yaru ikut disegarkan. Perubahan yang paling mudah terlihat adalah ikon folder baru yang lebih tebal, lebih cerah, dan konsisten dengan accent color sistem.
+
+![Ikon folder baru Yaru di Ubuntu 26.04 yang lebih cerah dan konsisten.](/images/_posts/ubuntu/ubuntu-26-04/ubuntu-yaru-icons.webp)
+*Pembaruan Yaru di 26.04 terasa kecil di permukaan, tapi efeknya besar untuk konsistensi visual harian.*
+
+Selain itu, Ubuntu Dock sekarang tampil dengan latar yang lebih solid agar kontras antarelemen lebih stabil di berbagai wallpaper. Arah besarnya jelas: lebih dekat ke fondasi tema GNOME default, lalu Yaru fokus di override penting saja.
+
+## Wallpaper Default Resolute Raccoon
+
+Saya cukup suka arah wallpaper resmi Ubuntu 26.04. Maskot rakun ditempatkan sebagai pusat visual, dengan komposisi gradasi yang tetap terasa "Ubuntu" tapi terlihat lebih rapi dari rilis sebelumnya. Rasanya tetap familiar, tapi dengan pendekatan yang lebih tenang dan lebih percaya diri.
+
+<Gallery caption="Wallpaper default Ubuntu 26.04 LTS Resolute Raccoon (varian Color, Dark, dan Light).">
+  ![Wallpaper Ubuntu 26.04 Resolute Raccoon varian warna 1920x1080.](/images/_posts/ubuntu/ubuntu-26-04/wallpaper/Resolute_Raccoon_Wallpaper_Color_1920x1080.webp)
+  ![Wallpaper Ubuntu 26.04 Resolute Raccoon varian gelap 1920x1080.](/images/_posts/ubuntu/ubuntu-26-04/wallpaper/Resolute_Raccoon_Wallpaper_Dark_1920x1080.webp)
+  ![Wallpaper Ubuntu 26.04 Resolute Raccoon varian terang 1920x1080.](/images/_posts/ubuntu/ubuntu-26-04/wallpaper/Resolute_Raccoon_Wallpaper_Light_1920x1080.webp)
+</Gallery>
+
+*Gambar: Wallpaper default Ubuntu 26.04 LTS "Resolute Raccoon" dalam varian Color, Dark, dan Light.*
+
+Kalau kamu ingin mengunduh koleksi wallpaper terkait rilis ini, gunakan tautan berikut:
+[Unduh koleksi wallpaper Ubuntu 26.04 (Google Drive)](https://drive.google.com/drive/folders/15ABjpdsI6z4aAHsOY_leA-hT8wD_Pu9X)
+
+## Timeline Rilis dan Cara Persiapan Upgrade
+
+Menjelang rilis final, milestone pengembangan Ubuntu 26.04 berjalan ketat dari fase UI freeze, beta, kernel freeze, sampai release candidate.
+
+Kalau kamu ingin uji build terakhir Snapshot 4, unduh dari kanal resmi ini:
+[Ubuntu 26.04 Snapshot 4 (Official CD Image)](https://cdimage.ubuntu.com/ubuntu/releases/26.04/snapshot-4/)
+
+Kalau kamu berencana migrasi dari 25.10 ke 26.04, pendekatan paling aman menurut saya seperti ini:
+
+<Steps>
+  <Step>
+    **Backup data penting terlebih dahulu**
+
+    Simpan dokumen kerja, konfigurasi shell, dan file aplikasi penting ke storage terpisah sebelum upgrade.
+  </Step>
+
+  <Step>
+    **Pastikan ruang penyimpanan dan paket dalam kondisi bersih**
+
+    Jalankan pembaruan rutin, hapus paket yang tidak dipakai, dan sisakan ruang kosong yang memadai untuk proses upgrade.
+  </Step>
+
+  <Step>
+    **Uji aplikasi kritikal di lingkungan non-produksi**
+
+    Jika kamu mengelola mesin kerja, validasi dulu aplikasi utama (VPN, tool dev, stack database klien, dan utilitas enterprise) sebelum eksekusi di mesin utama.
+  </Step>
+
+  <Step>
+    **Lakukan upgrade saat kanal resmi sudah stabil**
+
+    Untuk kebanyakan pengguna, menunggu rilis stabil atau point release awal biasanya memberi pengalaman upgrade yang jauh lebih minim drama.
+  </Step>
+</Steps>
+
+## Kesimpulan
+
+Ubuntu 26.04 LTS "Resolute Raccoon" menurut saya memang bukan rilis yang heboh secara gimmick, tapi justru kuat di kualitas fondasi. Full Wayland, GNOME 50, toolchain terbaru, opsi database yang makin kaya, serta jalur AI/GPU yang lebih mulus membuat rilis ini terlihat matang untuk desktop dan server sekaligus.
+
+Kalau prioritasmu stabilitas jangka panjang, 26.04 adalah kandidat LTS yang layak ditunggu. Dan kalau kamu suka mengikuti teknologi baru tanpa meninggalkan kebutuhan produksi, rilis ini menawarkan keseimbangan yang menurut saya pas sekali. Buat ukuran rilis LTS, itu nilai yang besar.

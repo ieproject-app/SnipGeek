@@ -1,6 +1,7 @@
 ---
 title: "Cara Membuat Bootable USB Windows 11 dengan Rufus (2026)"
 date: "2026-03-08"
+updated: "2026-03-19"
 description: "Panduan lengkap langkah demi langkah membuat bootable USB Windows 11 menggunakan Rufus, termasuk opsi kompatibilitas saat proses setup."
 heroImage: "/images/_posts/rufus/pasang-rufus-terbaru.webp"
 imageAlt: "Antarmuka Rufus 4.9 menunjukkan konfigurasi untuk membuat drive USB bootable Windows 11"
@@ -89,3 +90,48 @@ Setelah semua persiapan selesai, ikuti langkah-langkah berikut:
 </Steps>
 
 Setelah selesai, Anda bisa menutup aplikasi Rufus. Flash drive bootable Windows 11 Anda kini siap digunakan untuk melakukan instalasi bersih di komputer mana pun yang mendukung sistem UEFI. Mudah, bukan?
+
+---
+
+## #3 Kesalahan Umum (dan Solusi Cepat)
+
+Sebelum menyimpulkan USB gagal, cek masalah yang paling sering terjadi berikut:
+
+1.  **USB tidak muncul di Boot Menu BIOS**
+  Buat ulang USB dan pastikan **Partition scheme = GPT** untuk sistem UEFI.
+
+2.  **Proses boot mulai tetapi installer cepat error**
+  Unduh ulang file ISO dan verifikasi checksum bila tersedia. ISO korup adalah penyebab yang sangat umum.
+
+3.  **Muncul pesan "This PC can't run Windows 11"**
+  Biasanya pemeriksaan hardware masih aktif. Gunakan opsi kompatibilitas Rufus hanya untuk skenario uji/lab dan jika Anda memahami risikonya.
+
+4.  **Pembuatan USB berhenti di persentase tertentu**
+  Coba pindah ke port USB lain (sering lebih stabil di USB 2.0) dan hindari proses berat lain yang memakai disk.
+
+---
+
+## #4 Checklist BIOS/UEFI Sebelum Instalasi
+
+Pakai checklist ini agar installer bisa jalan di percobaan pertama:
+
+*   Mode boot sudah **UEFI** (bukan Legacy/CSM).
+*   USB sudah diprioritaskan di boot menu.
+*   Status Secure Boot sesuai rencana instalasi.
+*   Mode SATA (AHCI/RAID) sudah diketahui sebelumnya, terutama di laptop.
+
+Empat poin ini mencegah sebagian besar kasus "USB berhasil di satu perangkat, gagal di perangkat lain".
+
+---
+
+## #5 Catatan Aman untuk Dual-Boot (Windows + Linux)
+
+Jika komputer target dual-boot (misalnya Windows 11 + Ubuntu), hindari menghapus partisi secara asal saat instalasi.
+
+Pendekatan aman:
+
+1.  Identifikasi dulu partisi Linux yang sudah ada.
+2.  Install Windows hanya di partisi/disk yang memang dituju.
+3.  Siapkan langkah perbaikan bootloader setelah instalasi; GRUB sering perlu dipulihkan via Linux live USB.
+
+Cara ini membuat migrasi dual-boot lebih rapi dan meminimalkan pekerjaan recovery setelah instalasi.

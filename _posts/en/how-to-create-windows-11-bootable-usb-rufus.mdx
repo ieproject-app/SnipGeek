@@ -1,6 +1,7 @@
 ---
 title: "How to Create a Windows 11 Bootable USB with Rufus (2026)"
 date: "2026-03-08"
+updated: "2026-03-19"
 description: "Master the step-by-step process of creating a Windows 11 bootable USB using Rufus, including practical compatibility options during setup."
 heroImage: "/images/_posts/rufus/pasang-rufus-terbaru.webp"
 imageAlt: "Rufus 4.9 interface showing the configuration for creating a Windows 11 bootable USB drive"
@@ -89,3 +90,48 @@ Once all preparations are complete, follow these steps:
 </Steps>
 
 After it's finished, you can close the Rufus app. Your Windows 11 bootable flash drive is now ready to use for a clean installation on any computer that supports the UEFI system. Easy, right?
+
+---
+
+## #3 Common Mistakes (and Fast Fixes)
+
+Before you assume the USB failed, check these common issues:
+
+1.  **USB not listed in BIOS Boot Menu**
+  Recreate the USB and make sure **Partition scheme = GPT** for UEFI systems.
+
+2.  **Boot starts but installer crashes early**
+  Redownload the ISO and verify checksum if available. Corrupted ISO files are a frequent cause.
+
+3.  **"This PC can't run Windows 11" appears**
+  This usually means your hardware checks are active. Use Rufus compatibility options only for test/lab scenarios where you understand the trade-offs.
+
+4.  **USB creation stops at a certain percentage**
+  Try another USB port (preferably USB 2.0 for stability) and avoid running heavy background disk tasks.
+
+---
+
+## #4 BIOS/UEFI Checklist Before Install
+
+Use this quick checklist so installation starts on the first try:
+
+*   Boot mode is set to **UEFI** (not Legacy/CSM).
+*   Your USB is prioritized in the boot menu.
+*   Secure Boot state matches the installation plan.
+*   SATA mode (AHCI/RAID) is known before setup, especially on laptops.
+
+These 4 checks prevent most "USB works on one PC but not another" cases.
+
+---
+
+## #5 Dual-Boot Safety Note (Windows + Linux)
+
+If your target machine is dual-boot (for example Windows 11 + Ubuntu), avoid deleting partitions blindly during setup.
+
+Safe approach:
+
+1.  Identify the current Linux partitions first.
+2.  Install Windows only to the intended partition/disk.
+3.  Expect the bootloader to change after installation; plan to repair GRUB from Linux live USB if needed.
+
+This keeps your dual-boot migration cleaner and reduces post-install recovery work.

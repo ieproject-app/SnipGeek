@@ -26,3 +26,9 @@ env:
     availability:
       - BUILD
       - RUNTIME
+
+  - variable: NEXT_PUBLIC_INTERNAL_TOOL_ALLOWLIST
+    value: "nurmalasaripohan11@gmail.com,tuxlinux3@gmail.com,iwansmeansa@gmail.com,iwan.efndi@gmail.com"
+    availability:
+      - BUILD
+      - RUNTIME

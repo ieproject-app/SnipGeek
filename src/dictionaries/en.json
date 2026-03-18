@@ -88,9 +88,54 @@
         "description": "An interactive randomizer wheel. Add any list of entries and spin to pick a winner. Includes raffle mode, templates, and sound effects."
       },
       "image_crop": {
-        "title": "Image Crop & WebP Converter",
-        "description": "Crop any image to a perfect 16:9 ratio and export it as a compressed .webp file, ready for blog articles."
+        "title": "Image Crop",
+        "description": "Crop to 16:9 and export as WebP for hero banners."
       }
+    },
+    "image_crop": {
+      "invalidImageFile": "Please upload a valid image file.",
+      "downloaded": "Downloaded: {filename} ({size})",
+      "dropTitle": "Drop image here",
+      "dropDescription": "or click to browse - PNG, JPG, and WebP supported.",
+      "pasteHint": "You can also Ctrl+V / Cmd+V to paste",
+      "outputBadge": "Output: 16:9 .webp",
+      "original": "Original",
+      "ratio": "Ratio",
+      "target": "Target 16:9",
+      "already169": "Already 16:9",
+      "horizontal": "Horizontal",
+      "vertical": "Vertical",
+      "noAdjustment": "no adjustment",
+      "center": "Center",
+      "webpQuality": "WebP Quality",
+      "qualityHigh": "Lossless-class",
+      "qualityBalanced": "Balanced",
+      "qualitySmall": "Small size",
+      "defaultLabel": "85% default",
+      "outputLabel": "Output:",
+      "clientSideInfo": "100% client-side, no upload.",
+      "downloadButton": "Download WebP",
+      "loadAnother": "Load Another Image",
+      "dragHint": "Drag to reposition",
+      "removeImage": "Remove image",
+      "previewAlt": "Crop preview",
+      "howTo": [
+        {
+          "step": "01",
+          "title": "Upload Image",
+          "desc": "Drop or pick any image from screenshots or files."
+        },
+        {
+          "step": "02",
+          "title": "Drag to Reposition",
+          "desc": "Click and drag the preview directly to position the 16:9 crop window."
+        },
+        {
+          "step": "03",
+          "title": "Download WebP",
+          "desc": "Get a perfectly cropped .webp ready to use in your articles."
+        }
+      ]
     },
     "systemNotReady": {
       "title": "System Not Ready",

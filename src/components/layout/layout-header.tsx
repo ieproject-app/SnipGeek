@@ -11,7 +11,6 @@ import {
   MoreHorizontal,
   BookOpen,
   StickyNote,
-  LayoutGrid,
   ChevronRight,
   ArrowRight,
   Sun,
@@ -278,16 +277,21 @@ export function LayoutHeader({
     return (searchableData || []).slice(0, 3);
   }, [searchableData]);
 
+  const ubuntuFocusHref =
+    currentLocale === "id"
+      ? "/blog/ubuntu-26-04-lts-resolute-raccoon-fitur-baru-dan-perubahan-utama"
+      : "/blog/ubuntu-26-04-lts-resolute-raccoon-new-features-major-changes";
+
   const directLinks = [
     { name: dictionary.navigation.blog, href: "/blog", icon: BookOpen },
     { name: dictionary.navigation.notes, href: "/notes", icon: StickyNote },
-    { name: dictionary.navigation.tools, href: "/tools", icon: LayoutGrid },
+    { name: "Ubuntu 26.04", href: ubuntuFocusHref, icon: Terminal },
   ];
 
   // ── Curated Featured Topics — update manually each year ──
   const moreItems = [
     { name: "Windows 11", href: "/tags/windows-11", icon: Monitor },
-    { name: "Ubuntu 25.10", href: "/tags/ubuntu-25-10", icon: Terminal },
+    { name: "Linux", href: "/tags/linux", icon: Terminal },
     { name: "Android", href: "/tags/android", icon: Smartphone },
     { name: "Hardware", href: "/tags/hardware", icon: Cpu },
     { name: "Tutorial", href: "/tags/tutorial", icon: GraduationCap },

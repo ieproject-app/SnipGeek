@@ -10,7 +10,7 @@ import {
   JetBrains_Mono,
 } from "next/font/google";
 import { cn } from "@/lib/utils";
-import { Home, BookOpen, PenTool, LayoutGrid } from "lucide-react";
+import { Home, BookOpen, PenTool } from "lucide-react";
 import { ThemeProvider } from "@/components/theme-provider";
 
 const fontDisplay = Bricolage_Grotesque({
@@ -60,12 +60,6 @@ const navItems = [
     labelId: "Baca Catatan",
     icon: PenTool,
   },
-  {
-    href: "/tools",
-    label: "Explore Tools",
-    labelId: "Jelajahi Alat",
-    icon: LayoutGrid,
-  },
 ];
 
 export default function NotFound() {
@@ -84,7 +78,7 @@ export default function NotFound() {
         <title>404 - Page Not Found | SnipGeek</title>
         <meta
           name="description"
-          content="Sorry, the page you're looking for doesn't exist. Find tutorials, notes, and tech tools at SnipGeek."
+          content="Sorry, the page you're looking for doesn't exist. Find tutorials and technical notes at SnipGeek."
         />
       </head>
       <body className="font-sans antialiased bg-background text-foreground">

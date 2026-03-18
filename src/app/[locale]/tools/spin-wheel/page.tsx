@@ -25,6 +25,10 @@ export async function generateMetadata({
   return {
     title: pageContent.title,
     description: pageContent.description,
+    robots: {
+      index: false,
+      follow: false,
+    },
     alternates: {
       canonical: canonicalPath,
       languages: {

@@ -23,6 +23,7 @@ import {
   Copy,
   Check,
   X,
+  AlertTriangle,
   Plus,
   Trash2,
   ChevronDown,
@@ -109,6 +110,13 @@ type ToolPromptsDictionary = {
 };
 
 type QuickActionKey = "narrative" | "images" | "metadata" | "polish";
+
+type ValidationIssue = {
+  id: string;
+  severity: "error" | "warning";
+  title: string;
+  description: string;
+};
 
 const toTimestamp = (value: string) => {
   const parsed = Date.parse(value);
@@ -684,6 +692,143 @@ export function ToolPrompts({
     };
   }, [generatedPrompt]);
 
+  const sourceContent = mode === "modify" ? originalContent : draft;
+
+  const unresolvedMarkers = useMemo(() => {
+    const matches = generatedPrompt.match(/\{\{[^}]+\}\}/g) ?? [];
+    return Array.from(new Set(matches));
+  }, [generatedPrompt]);
+
+  const hasUnresolvedMarkers = unresolvedMarkers.length > 0;
+
+  const validationIssues = useMemo<ValidationIssue[]>(() => {
+    const issues: ValidationIssue[] = [];
+    const markerConfigs = [
+      {
+        label: "Link",
+        enabled: showDownloads,
+        count: downloadItems.filter((item) => item.value.trim() !== "").length,
+      },
+      {
+        label: "Grid",
+        enabled: showGrids,
+        count: imageGridMappings.split("\n").filter((line) => line.trim() !== "").length,
+      },
+      {
+        label: "Gallery",
+        enabled: showGallery,
+        count: galleryMappings.split("\n").filter((line) => line.trim() !== "").length,
+      },
+      {
+        label: "Specs",
+        enabled: showSpecs,
+        count: specsGroups.length,
+      },
+    ] as const;
+
+    for (const config of markerConfigs) {
+      const markerRegex = new RegExp(`\\{\\{\\s*${config.label}\\s+(\\d+)\\s*\\}\\}`, "gi");
+      const matches = Array.from(sourceContent.matchAll(markerRegex));
+      if (matches.length === 0) continue;
+
+      const requestedIndexes = Array.from(
+        new Set(
+          matches
+            .map((match) => Number(match[1]))
+            .filter((value) => Number.isFinite(value) && value > 0),
+        ),
+      ).sort((a, b) => a - b);
+
+      if (!config.enabled) {
+        issues.push({
+          id: `${config.label.toLowerCase()}-feature-disabled`,
+          severity: "error",
+          title: `${config.label} marker found while feature is disabled`,
+          description: `Source content references ${config.label} markers, but the ${config.label.toLowerCase()} feature is currently off.`,
+        });
+        continue;
+      }
+
+      const missingIndexes = requestedIndexes.filter((index) => index > config.count);
+      if (missingIndexes.length > 0) {
+        issues.push({
+          id: `${config.label.toLowerCase()}-mapping-missing`,
+          severity: "error",
+          title: `${config.label} marker has no matching mapping`,
+          description: `Referenced ${config.label} markers ${missingIndexes.map((index) => `{{${config.label} ${index}}}`).join(", ")} exceed the configured ${config.label.toLowerCase()} entries.`,
+        });
+      }
+    }
+
+    const openMarkerCount = (sourceContent.match(/\{\{/g) ?? []).length;
+    const closeMarkerCount = (sourceContent.match(/\}\}/g) ?? []).length;
+    if (openMarkerCount !== closeMarkerCount) {
+      issues.push({
+        id: "marker-brace-mismatch",
+        severity: "error",
+        title: "Placeholder braces look incomplete",
+        description: "The source content contains mismatched '{{' and '}}' counts, which usually means a placeholder marker is broken.",
+      });
+    }
+
+    const pairedTags = ["Gallery", "Steps", "Step", "Callout", "SpecList", "SpecItem", "details", "summary"];
+    for (const tag of pairedTags) {
+      const openTags = sourceContent.match(new RegExp(`<${tag}(?=[\\s>])[^>]*>`, "g")) ?? [];
+      const selfClosingTags = sourceContent.match(new RegExp(`<${tag}(?=[\\s>])[^>]*/>`, "g")) ?? [];
+      const closeTags = sourceContent.match(new RegExp(`</${tag}>`, "g")) ?? [];
+      const effectiveOpenCount = openTags.length - selfClosingTags.length;
+
+      if (effectiveOpenCount !== closeTags.length) {
+        issues.push({
+          id: `tag-balance-${tag.toLowerCase()}`,
+          severity: "error",
+          title: `<${tag}> tag count looks unbalanced`,
+          description: `Found ${effectiveOpenCount} opening <${tag}> tag(s) and ${closeTags.length} closing </${tag}> tag(s) in the source content.`,
+        });
+      }
+    }
+
+    if (showGallery && galleryMappings.trim() !== "" && !/\{\{\s*Gallery\s+\d+\s*\}\}/i.test(sourceContent)) {
+      issues.push({
+        id: "gallery-unused",
+        severity: "warning",
+        title: "Gallery entries are configured but not referenced",
+        description: "Gallery mappings exist, but the source content does not reference any {{Gallery n}} marker.",
+      });
+    }
+
+    if (showDownloads && downloadItems.some((item) => item.value.trim() !== "") && !/\{\{\s*Link\s+\d+\s*\}\}/i.test(sourceContent)) {
+      issues.push({
+        id: "downloads-unused",
+        severity: "warning",
+        title: "Download links are configured but not referenced",
+        description: "Download entries exist, but the source content does not reference any {{Link n}} marker.",
+      });
+    }
+
+    return issues;
+  }, [
+    downloadItems,
+    draft,
+    galleryMappings,
+    imageGridMappings,
+    mode,
+    originalContent,
+    showDownloads,
+    showGallery,
+    showGrids,
+    showSpecs,
+    sourceContent,
+    specsGroups,
+  ]);
+
+  const blockingValidationIssues = useMemo(
+    () => validationIssues.filter((issue) => issue.severity === "error"),
+    [validationIssues],
+  );
+
+  const hasBlockingIssues = hasUnresolvedMarkers || blockingValidationIssues.length > 0;
+
   // ── Persist feature flags ──
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -777,7 +922,7 @@ export function ToolPrompts({
     if (showDownloads && downloadItems.length > 0) {
       prompt += `\n**4. DOWNLOAD LINKS**\n`;
       downloadItems.forEach((item, i) => {
-        prompt += `- Link ${i + 1}: ${item.type.toUpperCase()} -> "${item.value}" (use {{Link ${i + 1}}} in draft)\n`;
+        prompt += `- Link ${i + 1}: ${item.type.toUpperCase()} -> "${item.value}" (source marker: {{Link ${i + 1}}})\n`;
       });
     }
 
@@ -787,9 +932,9 @@ export function ToolPrompts({
         const [config, pathPart] = line.split("|").map(s => s.trim());
         if (config && pathPart) {
           const normalizedPaths = pathPart.split(",").map(p => normalizeImagePath(p.trim())).join(", ");
-          prompt += `- Group ${i + 1}: ${config} | ${normalizedPaths} (use {{Grid ${i + 1}}} in draft)\n`;
+          prompt += `- Group ${i + 1}: ${config} | ${normalizedPaths} (source marker: {{Grid ${i + 1}}})\n`;
         } else {
-          prompt += `- Group ${i + 1}: ${line} (use {{Grid ${i + 1}}} in draft)\n`;
+          prompt += `- Group ${i + 1}: ${line} (source marker: {{Grid ${i + 1}}})\n`;
         }
       });
     }
@@ -800,11 +945,11 @@ export function ToolPrompts({
         const [caption, pathPart] = line.split("|").map(s => s.trim());
         if (caption && pathPart) {
           const normalizedPaths = pathPart.split(",").map(p => normalizeImagePath(p.trim())).join(", ");
-          prompt += `- Gallery ${i + 1}: ${caption} | ${normalizedPaths} (use {{Gallery ${i + 1}}} in draft)\n`;
+          prompt += `- Gallery ${i + 1}: ${caption} | ${normalizedPaths} (source marker: {{Gallery ${i + 1}}})\n`;
         } else {
           // If no | separator, assume it's just paths
           const normalizedPaths = line.split(",").map(p => normalizeImagePath(p.trim())).join(", ");
-          prompt += `- Gallery ${i + 1}: ${normalizedPaths} (use {{Gallery ${i + 1}}} in draft)\n`;
+          prompt += `- Gallery ${i + 1}: ${normalizedPaths} (source marker: {{Gallery ${i + 1}}})\n`;
         }
       });
     }
@@ -813,7 +958,15 @@ export function ToolPrompts({
       prompt += `\n**7. SYSTEM REQUIREMENTS (RAW DATA)**\n`;
       prompt += `Parse the following raw text into <SpecList> and <SpecItem> blocks. Each line or block represents a spec group.\n`;
       prompt += `${specsMappings}\n`;
-      prompt += `(Use {{Specs 1}}, {{Specs 2}}, etc. placeholders from the draft to place these spec sheets)\n`;
+      prompt += `(Source markers: {{Specs 1}}, {{Specs 2}}, etc.)\n`;
+    }
+
+    if (showDownloads || showGrids || showGallery || showSpecs) {
+      prompt += `\n**8. PLACEHOLDER RESOLUTION RULES**\n`;
+      prompt += `- Treat {{Link n}}, {{Grid n}}, {{Gallery n}}, and {{Specs n}} as source markers only.\n`;
+      prompt += `- In FINAL MDX output, resolve every marker into actual content/components at the correct position.\n`;
+      prompt += `- Never leave raw {{...}} markers in final output.\n`;
+      prompt += `- Ensure output is MDX-parse-safe (no invalid JS expressions such as raw moustache tokens).\n`;
     }
 
     prompt += `\n---\n\n`;
@@ -831,6 +984,7 @@ export function ToolPrompts({
     if (isModify) {
       prompt += `Treat **MODIFICATION INSTRUCTIONS** as the single source of truth. When instructions include "Target block (line X)", apply edits to those referenced blocks only. For all untouched sections, preserve the original wording, structure, language, and tone exactly as-is. Do not perform global rewrites unless explicitly requested in the instructions. The same rule applies for both English and Indonesian source content. `;
     }
+    prompt += `If source markers ({{Link n}}, {{Grid n}}, {{Gallery n}}, {{Specs n}}) are present, replace them with concrete MDX output and do not keep marker text in the final file. `;
     prompt += `For procedural or tutorial sections, use custom MDX components \`<Steps>\` and \`<Step>\` instead of plain numbered markdown lists. `;
     prompt += `Ensure all metadata (slugs, translation keys, alt texts) are generated automatically. Tags must never contain spaces and must never produce %20 in URLs. Any tag that would produce %20 is invalid and must be rewritten into lowercase kebab-case (e.g., windows-11, clean-install, ui-design, ubuntu-25-10). Always include 1 platform tag (windows/ubuntu/linux/android/hardware) and 1 versioned tag if the article targets a specific OS version (e.g., windows-11, ubuntu-25-10). Minimum 3 tags, maximum 6 tags per article.`;
 
@@ -898,6 +1052,19 @@ export function ToolPrompts({
   );
 
   const handleCopy = async () => {
+    if (hasBlockingIssues) {
+      const issueSummary = [
+        ...(hasUnresolvedMarkers ? [`unresolved markers: ${unresolvedMarkers.join(", ")}`] : []),
+        ...blockingValidationIssues.map((issue) => issue.title),
+      ].slice(0, 3);
+
+      notify(
+        `Resolve issues before copying: ${issueSummary.join(" | ")}`,
+        <AlertTriangle className="h-4 w-4 text-destructive" />,
+      );
+      return;
+    }
+
     const copied = await writeClipboard(generatedPrompt, dictionary.copiedButton);
     if (!copied) return;
     setIsCopied(true);
@@ -1919,6 +2086,75 @@ export function ToolPrompts({
                         </div>
                       </div>
 
+                      {hasUnresolvedMarkers && (
+                        <div className="border-b border-red-500/20 bg-red-500/10 px-5 py-3">
+                          <div className="flex items-start gap-2">
+                            <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-red-400" />
+                            <div className="space-y-1">
+                              <p className="text-[10px] font-black uppercase tracking-[0.18em] text-red-300">
+                                Unresolved Placeholder Markers
+                              </p>
+                              <p className="text-[10px] leading-relaxed text-red-100/80">
+                                Final output still contains raw markers. Resolve these before copying or using the brief.
+                              </p>
+                              <div className="flex flex-wrap gap-1.5 pt-0.5">
+                                {unresolvedMarkers.map((marker) => (
+                                  <span
+                                    key={marker}
+                                    className="rounded-full border border-red-400/25 bg-red-500/10 px-2 py-1 text-[9px] font-mono text-red-200"
+                                  >
+                                    {marker}
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {validationIssues.length > 0 && (
+                        <div className="border-b border-amber-500/20 bg-amber-500/10 px-5 py-3">
+                          <div className="flex items-start gap-2">
+                            <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-300" />
+                            <div className="space-y-2">
+                              <p className="text-[10px] font-black uppercase tracking-[0.18em] text-amber-100">
+                                Source Validation Check
+                              </p>
+                              <div className="space-y-2">
+                                {validationIssues.map((issue) => (
+                                  <div
+                                    key={issue.id}
+                                    className={cn(
+                                      "rounded-lg border px-3 py-2",
+                                      issue.severity === "error"
+                                        ? "border-red-400/25 bg-red-500/10"
+                                        : "border-amber-300/20 bg-amber-500/8",
+                                    )}
+                                  >
+                                    <p
+                                      className={cn(
+                                        "text-[10px] font-black uppercase tracking-[0.12em]",
+                                        issue.severity === "error" ? "text-red-200" : "text-amber-100",
+                                      )}
+                                    >
+                                      {issue.title}
+                                    </p>
+                                    <p
+                                      className={cn(
+                                        "pt-1 text-[10px] leading-relaxed",
+                                        issue.severity === "error" ? "text-red-50/85" : "text-amber-50/80",
+                                      )}
+                                    >
+                                      {issue.description}
+                                    </p>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
                       {/* Prompt textarea */}
                       <ScrollArea className="h-[calc(100vh-260px)] min-h-100">
                         <Textarea
@@ -1939,17 +2175,22 @@ export function ToolPrompts({
                           onClick={handleCopy}
                           className={cn(
                             "flex items-center gap-1.5 px-5 h-8 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all duration-200",
+                            hasBlockingIssues
+                              ? "bg-destructive/15 text-destructive border border-destructive/30 hover:bg-destructive/20"
+                              :
                             isCopied
                               ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
                               : "bg-accent/20 text-accent hover:bg-accent/30 border border-accent/20",
                           )}
                         >
-                          {isCopied ? (
+                          {hasBlockingIssues ? (
+                            <AlertTriangle className="h-3.5 w-3.5" />
+                          ) : isCopied ? (
                             <Check className="h-3.5 w-3.5" />
                           ) : (
                             <Copy className="h-3.5 w-3.5" />
                           )}
-                          {isCopied ? dictionary.copiedButton : "Copy Brief"}
+                          {hasBlockingIssues ? "Resolve Issues First" : isCopied ? dictionary.copiedButton : "Copy Brief"}
                         </button>
                       </div>
                     </Card>

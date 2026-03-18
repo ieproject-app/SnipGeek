@@ -43,6 +43,10 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   return {
     title: dictionary.tools.title,
     description: dictionary.tools.description,
+    robots: {
+      index: false,
+      follow: false,
+    },
     alternates: {
       canonical: canonicalPath,
       languages: {
@@ -62,8 +66,28 @@ export default async function ToolsPage({ params }: { params: Promise<{ locale: 
   const dictionary = await getDictionary(locale as Locale);
   const pageContent = dictionary.tools;
   const linkPrefix = locale === i18n.defaultLocale ? '' : `/${locale}`;
+  const isDevelopment = process.env.NODE_ENV === 'development';
 
   const publicTools = [
+    {
+      id: 'spin_wheel',
+      icon: <Dices className="h-8 w-8" />,
+      isLink: true,
+      href: `${linkPrefix}/tools/spin-wheel`,
+      badge: pageContent.open_tool,
+      badgeVariant: 'secondary' as const,
+    },
+    {
+      id: 'image_crop',
+      icon: <Crop className="h-8 w-8" />,
+      isLink: true,
+      href: `${linkPrefix}/tools/image-crop`,
+      badge: pageContent.open_tool,
+      badgeVariant: 'secondary' as const,
+    },
+  ];
+
+  const devPreviewTools = [
     {
       id: 'number_to_words',
       icon: <Calculator className="h-8 w-8" />,
@@ -88,22 +112,6 @@ export default async function ToolsPage({ params }: { params: Promise<{ locale: 
       icon: <Hash className="h-8 w-8" />,
       isLink: true,
       href: `${linkPrefix}/tools/number-generator`,
-      badge: pageContent.open_tool,
-      badgeVariant: 'secondary' as const,
-    },
-    {
-      id: 'spin_wheel',
-      icon: <Dices className="h-8 w-8" />,
-      isLink: true,
-      href: `${linkPrefix}/tools/spin-wheel`,
-      badge: pageContent.open_tool,
-      badgeVariant: 'secondary' as const,
-    },
-    {
-      id: 'image_crop',
-      icon: <Crop className="h-8 w-8" />,
-      isLink: true,
-      href: `${linkPrefix}/tools/image-crop`,
       badge: pageContent.open_tool,
       badgeVariant: 'secondary' as const,
     },
@@ -191,30 +199,6 @@ export default async function ToolsPage({ params }: { params: Promise<{ locale: 
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 items-stretch">
             {publicTools.map((tool, index) => (
               <ScrollReveal key={tool.id} delay={index * 0.1} direction="up">
-                {renderCard(tool, false)}
-              </ScrollReveal>
-            ))}
-          </div>
-        </section>
-
-        <section>
-          <ScrollReveal direction="right">
-            <div className="flex items-center gap-4 mb-6">
-              <div className="flex items-center gap-2 shrink-0">
-                <Lock className="h-5 w-5 text-primary" />
-                <div className="flex flex-col">
-                  <h2 className="text-xl font-bold font-display text-primary uppercase tracking-tight">
-                    {pageContent.internal_section}
-                  </h2>
-                  <p className="text-xs text-muted-foreground mt-0.5">For internal team use</p>
-                </div>
-              </div>
-              <div className="h-px bg-border flex-1" />
-            </div>
-          </ScrollReveal>
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 items-stretch">
-            {internalTools.map((tool, index) => (
-              <ScrollReveal key={tool.id} delay={index * 0.1} direction="up">
                 {tool.isLink ? (
                   <Link href={tool.href!} className="block h-full">
                     {renderCard(tool, true)}
@@ -225,8 +209,65 @@ export default async function ToolsPage({ params }: { params: Promise<{ locale: 
               </ScrollReveal>
             ))}
           </div>
-
         </section>
+
+        {isDevelopment && (
+          <section className="mb-16">
+            <ScrollReveal direction="up">
+              <div className="flex items-center gap-4 mb-6">
+                <div className="flex items-center gap-2 shrink-0">
+                  <Lock className="h-5 w-5 text-primary" />
+                  <div className="flex flex-col">
+                    <h2 className="text-xl font-bold font-display text-primary uppercase tracking-tight">
+                      {pageContent.coming_soon}
+                    </h2>
+                    <p className="text-xs text-muted-foreground mt-0.5">Visible in development only</p>
+                  </div>
+                </div>
+                <div className="h-px bg-border flex-1" />
+              </div>
+            </ScrollReveal>
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 items-stretch">
+              {devPreviewTools.map((tool, index) => (
+                <ScrollReveal key={tool.id} delay={index * 0.1} direction="up">
+                  {renderCard(tool, false)}
+                </ScrollReveal>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {isDevelopment && (
+          <section>
+            <ScrollReveal direction="right">
+              <div className="flex items-center gap-4 mb-6">
+                <div className="flex items-center gap-2 shrink-0">
+                  <Lock className="h-5 w-5 text-primary" />
+                  <div className="flex flex-col">
+                    <h2 className="text-xl font-bold font-display text-primary uppercase tracking-tight">
+                      {pageContent.internal_section}
+                    </h2>
+                    <p className="text-xs text-muted-foreground mt-0.5">Visible in development only</p>
+                  </div>
+                </div>
+                <div className="h-px bg-border flex-1" />
+              </div>
+            </ScrollReveal>
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 items-stretch">
+              {internalTools.map((tool, index) => (
+                <ScrollReveal key={tool.id} delay={index * 0.1} direction="up">
+                  {tool.isLink ? (
+                    <Link href={tool.href!} className="block h-full">
+                      {renderCard(tool, true)}
+                    </Link>
+                  ) : (
+                    renderCard(tool, false)
+                  )}
+                </ScrollReveal>
+              ))}
+            </div>
+          </section>
+        )}
       </main>
     </div>
   );

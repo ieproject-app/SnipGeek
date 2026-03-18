@@ -91,7 +91,13 @@ NEXT_PUBLIC_FIREBASE_API_KEY=your_api_key
 NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
 NEXT_PUBLIC_FIREBASE_PROJECT_ID=your_project_id
 NEXT_PUBLIC_FIREBASE_APP_ID=your_app_id
+
+# Optional: restrict internal tools to specific Google accounts/domains
+# Example: alice@snipgeek.com,bob@gmail.com,@telkomakses.co.id
+NEXT_PUBLIC_INTERNAL_TOOL_ALLOWLIST=
 ```
+
+If `NEXT_PUBLIC_INTERNAL_TOOL_ALLOWLIST` is empty, internal tools remain accessible to any authenticated Google account (legacy behavior). If set, only matching emails/domains can access non-public tools.
 
 ### Production (Google Cloud — `apphosting.yaml`)
 

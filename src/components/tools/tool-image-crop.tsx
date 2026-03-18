@@ -36,6 +36,8 @@ import {
 // ──────────────────────────────────────────────────────────────────────────────
 const TARGET_RATIO = 16 / 9;
 const DEFAULT_QUALITY = 85;
+const EXPORT_WIDTH = 1920;
+const EXPORT_HEIGHT = 1080;
 
 // ──────────────────────────────────────────────────────────────────────────────
 // Helpers
@@ -81,6 +83,7 @@ function InfoPill({ label, value }: { label: string; value: string }) {
 // ──────────────────────────────────────────────────────────────────────────────
 interface CropPreviewProps {
   imageSrc: string;
+  imageAlt: string;
   imgW: number;
   imgH: number;
   cropX: number;
@@ -93,11 +96,14 @@ interface CropPreviewProps {
   currentOffsetY: number;
   maxOffsetX: number;
   maxOffsetY: number;
+  dragHint: string;
+  removeImageLabel: string;
   onReset: () => void;
 }
 
 function CropPreview({
   imageSrc,
+  imageAlt,
   imgW,
   imgH,
   cropX,
@@ -110,6 +116,8 @@ function CropPreview({
   currentOffsetY,
   maxOffsetX,
   maxOffsetY,
+  dragHint,
+  removeImageLabel,
   onReset,
 }: CropPreviewProps) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -151,7 +159,8 @@ function CropPreview({
 
   const moveDrag = useCallback(
     (clientX: number, clientY: number) => {
-      if (!isDraggingRef.current || !dragStartRef.current) return;
+      if (!dragStartRef.current) return;
+
       const { clientX: sx, clientY: sy, offsetX: ox, offsetY: oy, rectW, rectH } = dragStartRef.current;
 
       // Display pixel delta → image pixel delta
@@ -231,7 +240,7 @@ function CropPreview({
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={imageSrc}
-            alt="Crop preview"
+            alt={imageAlt}
             className="w-full h-full object-fill block pointer-events-none"
             draggable={false}
           />
@@ -291,14 +300,14 @@ function CropPreview({
           {canDrag && (
             <div className="absolute top-3 left-1/2 -translate-x-1/2 flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/60 backdrop-blur-sm pointer-events-none">
               <GripHorizontal className="h-3.5 w-3.5 text-white/80" />
-              <span className="text-[10px] font-bold text-white/80 uppercase tracking-widest">Drag to reposition</span>
+              <span className="text-[10px] font-bold text-white/80 uppercase tracking-widest">{dragHint}</span>
             </div>
           )}
 
           {/* Reset button */}
           <button
             type="button"
-            aria-label="Remove image"
+            aria-label={removeImageLabel}
             onClick={onReset}
             className="absolute top-3 right-3 p-1.5 rounded-full bg-background/70 backdrop-blur-sm border border-primary/10 hover:bg-destructive/10 hover:border-destructive/30 hover:text-destructive transition-colors z-10"
           >
@@ -319,6 +328,55 @@ interface ToolImageCropProps {
 
 export function ToolImageCrop({ dictionary }: ToolImageCropProps) {
   const { notify } = useNotification();
+  const toolMeta = dictionary?.tools?.tool_list?.image_crop || {
+    title: "Image Crop",
+    description: "Crop to 16:9 and export as WebP.",
+  };
+  const t = dictionary?.tools?.image_crop || {
+    invalidImageFile: "Please upload a valid image file.",
+    downloaded: "Downloaded: {filename} ({size})",
+    dropTitle: "Drop image here",
+    dropDescription: "or click to browse - PNG, JPG, and WebP supported.",
+    pasteHint: "You can also Ctrl+V / Cmd+V to paste",
+    outputBadge: "Output: 16:9 .webp",
+    original: "Original",
+    ratio: "Ratio",
+    target: "Target 16:9",
+    already169: "Already 16:9",
+    horizontal: "Horizontal",
+    vertical: "Vertical",
+    noAdjustment: "no adjustment",
+    center: "Center",
+    webpQuality: "WebP Quality",
+    qualityHigh: "Lossless-class",
+    qualityBalanced: "Balanced",
+    qualitySmall: "Small size",
+    defaultLabel: "85% default",
+    outputLabel: "Output:",
+    clientSideInfo: "100% client-side, no upload.",
+    downloadButton: "Download WebP",
+    loadAnother: "Load Another Image",
+    dragHint: "Drag to reposition",
+    removeImage: "Remove image",
+    previewAlt: "Crop preview",
+    howTo: [
+      {
+        step: "01",
+        title: "Upload Image",
+        desc: "Drop or pick any image from screenshots or files.",
+      },
+      {
+        step: "02",
+        title: "Drag to Reposition",
+        desc: "Click and drag the preview directly to position the 16:9 crop window.",
+      },
+      {
+        step: "03",
+        title: "Download WebP",
+        desc: "Get a perfectly cropped .webp ready to use in your articles.",
+      },
+    ],
+  };
 
   // ── Image state ──
   const [imageSrc, setImageSrc] = useState<string | null>(null);
@@ -352,7 +410,7 @@ export function ToolImageCrop({ dictionary }: ToolImageCropProps) {
   const loadImage = useCallback(
     (file: File) => {
       if (!file.type.startsWith("image/")) {
-        notify("Please upload a valid image file.", <X className="h-4 w-4 text-destructive" />);
+        notify(t.invalidImageFile, <X className="h-4 w-4 text-destructive" />);
         return;
       }
       const reader = new FileReader();
@@ -427,30 +485,33 @@ export function ToolImageCrop({ dictionary }: ToolImageCropProps) {
     if (!img || imgW === 0) return;
 
     const offscreen = document.createElement("canvas");
-    offscreen.width = cropW;
-    offscreen.height = cropH;
+    offscreen.width = EXPORT_WIDTH;
+    offscreen.height = EXPORT_HEIGHT;
     const ctx = offscreen.getContext("2d");
     if (!ctx) return;
 
-    ctx.drawImage(img, cropX, cropY, cropW, cropH, 0, 0, cropW, cropH);
+    ctx.drawImage(img, cropX, cropY, cropW, cropH, 0, 0, EXPORT_WIDTH, EXPORT_HEIGHT);
     offscreen.toBlob(
       (blob) => {
         if (!blob) return;
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
-        a.download = `${fileName}-16x9.webp`;
+        a.download = `${fileName}-1920x1080.webp`;
         a.click();
         URL.revokeObjectURL(url);
+        const downloadedName = `${fileName}-1920x1080.webp`;
         notify(
-          `Downloaded: ${fileName}-16x9.webp (${formatBytes(blob.size)})`,
+          t.downloaded
+            .replace("{filename}", downloadedName)
+            .replace("{size}", formatBytes(blob.size)),
           <CheckCircle2 className="h-4 w-4 text-emerald-400" />,
         );
       },
       "image/webp",
       quality / 100,
     );
-  }, [cropH, cropW, cropX, cropY, fileName, imgW, notify, quality]);
+  }, [cropH, cropW, cropX, cropY, fileName, imgW, notify, quality, t.downloaded]);
 
   const handleReset = () => {
     setImageSrc(null);
@@ -465,8 +526,8 @@ export function ToolImageCrop({ dictionary }: ToolImageCropProps) {
   // ──────────────────────────────────────────────────────────────────────────
   return (
     <ToolWrapper
-      title="Image Crop"
-      description="Crop to 16:9 &amp; Export as WebP"
+      title={toolMeta.title}
+      description={toolMeta.description}
       dictionary={dictionary}
       isPublic={true}
     >
@@ -497,17 +558,18 @@ export function ToolImageCrop({ dictionary }: ToolImageCropProps) {
                   </div>
                   <div className="space-y-1">
                     <p className="font-black text-primary uppercase tracking-tight text-lg">
-                      Drop image here
+                      {t.dropTitle}
                     </p>
                     <p className="text-sm text-muted-foreground md:max-w-[280px] mx-auto">
-                      or click to browse — PNG, JPG, WebP, GIF supported.<br className="hidden sm:block" />
-                      <span className="hidden sm:inline">(You can also <strong>Ctrl+V / Cmd+V</strong> to paste)</span>
+                      {t.dropDescription}
+                      <br className="hidden sm:block" />
+                      <span className="hidden sm:inline">({t.pasteHint})</span>
                     </p>
                   </div>
                   <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-accent/10 border border-accent/20">
                     <Crop className="h-3.5 w-3.5 text-accent" />
                     <span className="text-xs font-bold text-accent uppercase tracking-widest">
-                      Output: 16:9 · .webp
+                      {t.outputBadge} · {EXPORT_WIDTH}x{EXPORT_HEIGHT}
                     </span>
                   </div>
                 </div>
@@ -531,13 +593,13 @@ export function ToolImageCrop({ dictionary }: ToolImageCropProps) {
             >
               {/* Stats */}
               <div className="flex flex-wrap justify-center gap-3">
-                <InfoPill label="Original" value={`${imgW} × ${imgH}`} />
-                <InfoPill label="Ratio" value={(imgW / imgH).toFixed(3)} />
-                <InfoPill label="Target 16:9" value={`${cropW} × ${cropH}`} />
+                <InfoPill label={t.original} value={`${imgW} × ${imgH}`} />
+                <InfoPill label={t.ratio} value={(imgW / imgH).toFixed(3)} />
+                <InfoPill label={t.target} value={`${EXPORT_WIDTH} × ${EXPORT_HEIGHT}`} />
                 {isAlready169 && (
                   <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 text-xs font-black uppercase tracking-wider">
                     <CheckCircle2 className="h-3.5 w-3.5" />
-                    Already 16:9
+                    {t.already169}
                   </div>
                 )}
               </div>
@@ -557,6 +619,9 @@ export function ToolImageCrop({ dictionary }: ToolImageCropProps) {
                 currentOffsetY={offsetY}
                 maxOffsetX={maxOffsetX}
                 maxOffsetY={maxOffsetY}
+                dragHint={t.dragHint}
+                removeImageLabel={t.removeImage}
+                imageAlt={t.previewAlt}
                 onReset={handleReset}
               />
 
@@ -568,10 +633,10 @@ export function ToolImageCrop({ dictionary }: ToolImageCropProps) {
                   <div className={cn("space-y-2", !canSlideX && "opacity-35 pointer-events-none")}>
                     <div className="flex items-center justify-between">
                       <span className="text-xs font-black uppercase tracking-widest text-muted-foreground">
-                        Horizontal
+                        {t.horizontal}
                       </span>
                       <span className="text-[10px] font-mono text-muted-foreground">
-                        {canSlideX ? `x: ${cropX}px` : "no adjustment"}
+                        {canSlideX ? `x: ${cropX}px` : t.noAdjustment}
                       </span>
                     </div>
                     <Slider
@@ -586,10 +651,10 @@ export function ToolImageCrop({ dictionary }: ToolImageCropProps) {
                   <div className={cn("space-y-2", !canSlideY && "opacity-35 pointer-events-none")}>
                     <div className="flex items-center justify-between">
                       <span className="text-xs font-black uppercase tracking-widest text-muted-foreground">
-                        Vertical
+                        {t.vertical}
                       </span>
                       <span className="text-[10px] font-mono text-muted-foreground">
-                        {canSlideY ? `y: ${cropY}px` : "no adjustment"}
+                        {canSlideY ? `y: ${cropY}px` : t.noAdjustment}
                       </span>
                     </div>
                     <Slider
@@ -609,7 +674,7 @@ export function ToolImageCrop({ dictionary }: ToolImageCropProps) {
                         className="flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest text-muted-foreground border border-primary/10 bg-muted/20 hover:border-primary/30 hover:text-primary hover:bg-muted/40 transition-all"
                       >
                         <AlignCenter className="h-3.5 w-3.5" />
-                        Center
+                        {t.center}
                       </button>
                     </div>
                   )}
@@ -622,13 +687,13 @@ export function ToolImageCrop({ dictionary }: ToolImageCropProps) {
                       <div className="flex items-center gap-1.5">
                         <ImageIcon className="h-3.5 w-3.5 text-muted-foreground" />
                         <span className="text-xs font-black uppercase tracking-widest text-muted-foreground">
-                          WebP Quality
+                          {t.webpQuality}
                         </span>
                       </div>
                       <div className="flex items-center gap-1">
                         <span className="text-sm font-black text-accent font-mono">{quality}%</span>
                         <span className="text-[10px] text-muted-foreground">
-                          {quality >= 90 ? "· Lossless-class" : quality >= 75 ? "· Balanced" : "· Small size"}
+                          {quality >= 90 ? `· ${t.qualityHigh}` : quality >= 75 ? `· ${t.qualityBalanced}` : `· ${t.qualitySmall}`}
                         </span>
                       </div>
                     </div>
@@ -638,7 +703,7 @@ export function ToolImageCrop({ dictionary }: ToolImageCropProps) {
                       min={40} max={100} step={1}
                     />
                     <div className="flex justify-between text-[9px] text-muted-foreground/60 font-mono">
-                      <span>40%</span><span>85% default</span><span>100%</span>
+                      <span>40%</span><span>{t.defaultLabel}</span><span>100%</span>
                     </div>
                   </div>
 
@@ -646,11 +711,11 @@ export function ToolImageCrop({ dictionary }: ToolImageCropProps) {
                   <div className="flex items-start gap-2 p-3 rounded-xl bg-muted/30 border border-primary/5">
                     <Info className="h-3.5 w-3.5 shrink-0 mt-0.5 text-muted-foreground" />
                     <p className="text-[11px] text-muted-foreground leading-relaxed">
-                      Output:{" "}
-                      <span className="font-mono font-bold text-primary">{fileName}-16x9.webp</span>
+                      {t.outputLabel}{" "}
+                      <span className="font-mono font-bold text-primary">{fileName}-1920x1080.webp</span>
                       {" "}—{" "}
-                      <span className="font-mono font-bold text-primary">{cropW} × {cropH} px</span>.
-                      {" "}100% client-side, no upload.
+                      <span className="font-mono font-bold text-primary">{EXPORT_WIDTH} × {EXPORT_HEIGHT} px</span>.
+                      {" "}{t.clientSideInfo}
                     </p>
                   </div>
                 </CardContent>
@@ -664,7 +729,7 @@ export function ToolImageCrop({ dictionary }: ToolImageCropProps) {
                   className="rounded-full gap-2.5 font-black uppercase tracking-widest shadow-lg shadow-primary/10 hover:scale-[1.02] transition-transform"
                 >
                   <Download className="h-4 w-4" />
-                  Download WebP
+                  {t.downloadButton}
                 </Button>
                 <Button
                   variant="outline"
@@ -673,7 +738,7 @@ export function ToolImageCrop({ dictionary }: ToolImageCropProps) {
                   className="rounded-full gap-2 font-bold uppercase tracking-widest border-primary/15 hover:border-primary/40"
                 >
                   <RefreshCw className="h-4 w-4" />
-                  Load Another Image
+                  {t.loadAnother}
                 </Button>
               </div>
             </motion.div>
@@ -682,11 +747,7 @@ export function ToolImageCrop({ dictionary }: ToolImageCropProps) {
 
         {/* How-to */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
-          {[
-            { step: "01", title: "Upload Image", desc: "Drop or pick any image from ChatGPT, screenshots, or files." },
-            { step: "02", title: "Drag to Reposition", desc: "Click and drag the preview directly to position the 16:9 crop window." },
-            { step: "03", title: "Download WebP", desc: "Get a perfectly cropped .webp ready to use in your articles." },
-          ].map((s) => (
+          {t.howTo.map((s: { step: string; title: string; desc: string }) => (
             <div key={s.step} className="p-4 rounded-xl bg-background border border-primary/5 space-y-1.5">
               <span className="text-3xl font-black text-primary/10">{s.step}</span>
               <p className="text-xs font-black uppercase tracking-tight text-primary">{s.title}</p>
