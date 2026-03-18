@@ -813,9 +813,14 @@ export function ToolPrompts({
   const sourceContent = mode === "modify" ? originalContent : draft;
 
   const unresolvedMarkers = useMemo(() => {
-    const matches = generatedPrompt.match(/\{\{[^}]+\}\}/g) ?? [];
-    return Array.from(new Set(matches));
-  }, [generatedPrompt]);
+    const matches = sourceContent.match(/\{\{[^}]+\}\}/g) ?? [];
+    const uniqueMarkers = Array.from(new Set(matches.map((marker) => marker.trim())));
+
+    // Treat numbered content markers as valid placeholders handled by mapping rules.
+    return uniqueMarkers.filter(
+      (marker) => !/\{\{\s*(Link|Grid|Gallery|Specs)\s+\d+\s*\}\}/i.test(marker),
+    );
+  }, [sourceContent]);
 
   const hasUnresolvedMarkers = unresolvedMarkers.length > 0;
 
@@ -1149,6 +1154,18 @@ export function ToolPrompts({
       prompt += `- Ensure output is MDX-parse-safe (no invalid JS expressions such as raw moustache tokens).\n`;
     }
 
+    prompt += `\n**9. SEO & HELPFUL CONTENT REQUIREMENTS**\n`;
+    prompt += `- Match the primary search intent directly; do not open with generic filler.\n`;
+    prompt += `- In the first 120 words, include a concise direct answer/outcome before deep explanation.\n`;
+    prompt += `- Generate a strong SEO title (target ~55-65 chars) and meta description (target ~140-160 chars) that align with user intent.\n`;
+    prompt += `- Keep one clear H1 and build scannable H2/H3 sections with practical progression.\n`;
+    prompt += `- For tutorial/procedural posts, include: prerequisites, step-by-step actions, verification/check results, and common error fixes.\n`;
+    prompt += `- Add 2-4 internal links to relevant SnipGeek content clusters (windows/ubuntu/tutorial/troubleshooting) where naturally useful.\n`;
+    prompt += `- For version-specific or factual claims, anchor to reliable/official sources and avoid unverifiable assertions.\n`;
+    prompt += `- Prefer concrete examples, command/output evidence, and practical caveats over abstract wording.\n`;
+    prompt += `- Word-count is not fixed; ensure coverage is complete and non-repetitive for the topic complexity.\n`;
+    prompt += `- If the topic is likely to age quickly, include a short freshness note (version/date context) in the narrative.\n`;
+
     prompt += `\n---\n\n`;
     if (isModify) {
       prompt += `**ORIGINAL CONTENT:**\n${originalContent || "[MISSING]"}\n\n`;
@@ -1176,7 +1193,8 @@ export function ToolPrompts({
     }
     prompt += `If source markers ({{Link n}}, {{Grid n}}, {{Gallery n}}, {{Specs n}}) are present, replace them with concrete MDX output and do not keep marker text in the final file. `;
     prompt += `For procedural or tutorial sections, use custom MDX components \`<Steps>\` and \`<Step>\` instead of plain numbered markdown lists. `;
-    prompt += `Ensure all metadata (slugs, translation keys, alt texts) are generated automatically. Tags must never contain spaces and must never produce %20 in URLs. Any tag that would produce %20 is invalid and must be rewritten into lowercase kebab-case (e.g., windows-11, clean-install, ui-design, ubuntu-25-10). Always include 1 platform tag (windows/ubuntu/linux/android/hardware) and 1 versioned tag if the article targets a specific OS version (e.g., windows-11, ubuntu-25-10). Minimum 3 tags, maximum 6 tags per article.`;
+    prompt += `Ensure all metadata (slugs, translation keys, alt texts) are generated automatically. Tags must never contain spaces and must never produce %20 in URLs. Any tag that would produce %20 is invalid and must be rewritten into lowercase kebab-case (e.g., windows-11, clean-install, ui-design, ubuntu-25-10). Always include 1 platform tag (windows/ubuntu/linux/android/hardware) and 1 versioned tag if the article targets a specific OS version (e.g., windows-11, ubuntu-25-10). Minimum 3 tags, maximum 6 tags per article. `;
+    prompt += `Ensure the output is genuinely helpful, intent-focused, and clearly better than a generic rewrite.`;
 
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setGeneratedPrompt(prompt);
@@ -2463,7 +2481,7 @@ export function ToolPrompts({
                                 Unresolved Placeholder Markers
                               </p>
                               <p className="text-[10px] leading-relaxed text-red-100/80">
-                                Final output still contains raw markers. Resolve these before copying or using the brief.
+                                Found unsupported placeholder markers in source content. Keep only numbered markers like {"{{Link 1}}"}, {"{{Grid 2}}"}, {"{{Gallery 1}}"}, or {"{{Specs 1}}"}.
                               </p>
                               <div className="flex flex-wrap gap-1.5 pt-0.5">
                                 {unresolvedMarkers.map((marker) => (

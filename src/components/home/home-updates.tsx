@@ -9,11 +9,10 @@ import {
   CarouselItem,
 } from '@/components/ui/carousel';
 import { ChevronRight } from 'lucide-react';
-import { cn, formatRelativeTime } from '@/lib/utils';
+import { cn } from '@/lib/utils';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { AddToReadingListButton } from '@/components/layout/add-to-reading-list-button';
 import type { Dictionary } from '@/lib/get-dictionary';
-import { CategoryBadge } from '@/components/layout/category-badge';
 
 import { ScrollReveal } from '@/components/ui/scroll-reveal';
 
@@ -52,7 +51,7 @@ export function HomeUpdates({ posts, title, viewMoreText, dictionary, locale, ta
             <h2 className="text-sm font-medium font-display text-primary mb-2 italic">
               {title}
             </h2>
-            <div className="w-full h-0.5 bg-linear-to-r from-accent via-accent/50 to-transparent" />
+            <div className="w-full h-0.5 bg-[linear-gradient(to_right,#0078D4,#E95420,transparent)]" />
           </div>
         </ScrollReveal>
 
@@ -117,16 +116,10 @@ export function HomeUpdates({ posts, title, viewMoreText, dictionary, locale, ta
                         </div>
 
                         {/* Content Area */}
-                        <div className="flex-1 min-w-0 py-1 flex flex-col justify-start">
-                          <div className="mb-1">
-                            <CategoryBadge category={post.frontmatter.category || 'Update'} />
-                          </div>
+                        <div className="flex-1 min-w-0 py-1 flex flex-col justify-center">
                           <h3 className="font-display text-[15px] sm:text-base font-medium text-primary leading-snug transition-colors group-hover:text-accent">
                             {post.frontmatter.title}
                           </h3>
-                          <time className="text-[10px] text-muted-foreground mt-2 block font-medium opacity-60">
-                            {formatRelativeTime(new Date(post.frontmatter.date), locale)}
-                          </time>
                         </div>
                       </Link>
                     </article>

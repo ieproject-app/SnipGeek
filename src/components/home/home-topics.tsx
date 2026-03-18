@@ -4,11 +4,8 @@ import Link from "next/link";
 import Image from "next/image";
 import { ChevronRight } from "lucide-react";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
-import { LayoutBreadcrumbs } from "@/components/layout/layout-breadcrumbs";
-import { formatRelativeTime } from "@/lib/utils";
 import { AddToReadingListButton } from "@/components/layout/add-to-reading-list-button";
 import type { Dictionary } from "@/lib/get-dictionary";
-import { CategoryBadge } from "@/components/layout/category-badge";
 
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
 
@@ -27,13 +24,11 @@ interface TopicPost {
 interface HomeTopicsProps {
   posts: TopicPost[];
   title: string;
-  breadcrumbHome: string;
   viewAllText: string;
   dictionary: Dictionary;
   locale: string;
   linkPrefix: string;
   tag: string;
-  breadcrumbTagLabel?: string;
   viewAllHref?: string;
 }
 
@@ -43,13 +38,11 @@ interface HomeTopicsProps {
 export function HomeTopics({
   posts,
   title,
-  breadcrumbHome,
   viewAllText,
   dictionary,
   locale,
   linkPrefix,
   tag,
-  breadcrumbTagLabel,
   viewAllHref,
 }: HomeTopicsProps) {
   const renderHorizontalCard = (post: TopicPost, index: number) => {
@@ -76,12 +69,12 @@ export function HomeTopics({
 
     return (
       <ScrollReveal key={post.slug} direction="up" delay={index * 0.1}>
-        <div className="group relative flex items-start gap-4 py-3 border-b border-primary/5 transition-all duration-300">
+        <div className="group relative flex items-center gap-4 py-3 border-b border-primary/5 transition-all duration-300">
           <Link
             href={`${linkPrefix}/blog/${post.slug}`}
-            className="flex items-start gap-4 flex-1 min-w-0"
+            className="flex items-center gap-4 flex-1 min-w-0"
           >
-            <div className="relative w-30 h-20 sm:w-36 sm:h-24 shrink-0 overflow-hidden rounded-lg shadow-sm border border-primary/5 mt-0.5">
+            <div className="relative w-30 h-20 sm:w-36 sm:h-24 shrink-0 overflow-hidden rounded-lg shadow-sm border border-primary/5">
               <Image
                 src={heroImageSrc}
                 alt={post.frontmatter.imageAlt || post.frontmatter.title}
@@ -96,16 +89,10 @@ export function HomeTopics({
                 className="absolute top-1 right-1 z-20 text-white bg-black/30 hover:bg-black/50 hover:text-white opacity-0 group-hover:opacity-100 transition-opacity h-6 w-6"
               />
             </div>
-            <div className="flex-1 min-w-0 py-1 flex flex-col justify-start">
-              <div className="mb-1">
-                <CategoryBadge category={post.frontmatter.category || tag} />
-              </div>
+            <div className="flex-1 min-w-0 flex flex-col justify-center">
               <h3 className="font-display text-[15px] sm:text-base font-medium text-primary leading-snug transition-colors group-hover:text-accent">
                 {post.frontmatter.title}
               </h3>
-              <time className="text-[10px] text-muted-foreground mt-2 block font-medium opacity-60">
-                {formatRelativeTime(new Date(post.frontmatter.date), locale)}
-              </time>
             </div>
           </Link>
         </div>
@@ -114,20 +101,19 @@ export function HomeTopics({
   };
 
   const breadcrumbSegments = [
-    { label: breadcrumbHome, href: linkPrefix || "/" },
-    { label: breadcrumbTagLabel || tag },
+    { label: linkPrefix || "/" },
+    { label: tag },
   ];
 
   return (
     <section className="container max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pb-12 sm:pb-16 overflow-hidden">
       <ScrollReveal direction="left">
-        <header className="mb-8 text-left">
-          <h2 className="text-3xl font-extrabold font-display tracking-tight text-primary mb-2">
+        <div className="mb-8 text-left">
+          <h2 className="text-sm font-medium font-display text-primary mb-2 italic">
             {title}
           </h2>
-          <LayoutBreadcrumbs segments={breadcrumbSegments} className="mb-4" />
-          <div className="w-full h-0.5 bg-linear-to-r from-accent via-accent/50 to-transparent" />
-        </header>
+          <div className="w-full h-0.5 bg-[linear-gradient(to_right,#0078D4,#E95420,transparent)]" />
+        </div>
       </ScrollReveal>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12">

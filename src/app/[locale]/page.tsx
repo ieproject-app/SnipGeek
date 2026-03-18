@@ -1,4 +1,5 @@
 import { getSortedPostsData } from "@/lib/posts";
+import { getSortedNotesData } from "@/lib/notes";
 import { i18n } from "@/i18n-config";
 import type { Locale } from "@/i18n-config";
 import { getDictionary } from "@/lib/get-dictionary";
@@ -43,11 +44,13 @@ export default async function Home({
 }) {
   const { locale } = await params;
   const initialPosts = await getSortedPostsData(locale);
+  const initialNotes = await getSortedNotesData(locale);
   const dictionary = await getDictionary(locale);
 
   return (
     <HomeClient
       initialPosts={initialPosts}
+      initialNotes={initialNotes}
       dictionary={dictionary}
       locale={locale}
     />

@@ -51,7 +51,7 @@ export function HomeTutorials({ posts, title, viewMoreText, dictionary, locale, 
             <h2 className="text-sm font-medium font-display text-primary mb-2 italic">
               {title}
             </h2>
-            <div className="w-full h-0.5 bg-linear-to-r from-accent via-accent/50 to-transparent" />
+            <div className="w-full h-0.5 bg-[linear-gradient(to_right,#0078D4,#E95420,transparent)]" />
           </div>
         </ScrollReveal>
 

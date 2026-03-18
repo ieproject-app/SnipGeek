@@ -279,22 +279,20 @@ export function LayoutHeader({
 
   const ubuntuFocusHref =
     currentLocale === "id"
-      ? "/blog/ubuntu-26-04-lts-resolute-raccoon-fitur-baru-dan-perubahan-utama"
+      ? "/blog/ubuntu-26-04-lts-resolute-raccoon-new-features-major-changes"
       : "/blog/ubuntu-26-04-lts-resolute-raccoon-new-features-major-changes";
 
   const directLinks = [
-    { name: dictionary.navigation.blog, href: "/blog", icon: BookOpen },
-    { name: dictionary.navigation.notes, href: "/notes", icon: StickyNote },
-    { name: "Ubuntu 26.04", href: ubuntuFocusHref, icon: Terminal },
+    { name: "Windows 11", href: "/tags/windows-11", icon: Monitor, badge: "25H2" },
+    { name: "Ubuntu 26.04", href: ubuntuFocusHref, icon: Terminal, badge: "LTS" },
   ];
 
   // ── Curated Featured Topics — update manually each year ──
   const moreItems = [
-    { name: "Windows 11", href: "/tags/windows-11", icon: Monitor },
+    { name: "Tutorial", href: "/tags/tutorial", icon: GraduationCap },
     { name: "Linux", href: "/tags/linux", icon: Terminal },
     { name: "Android", href: "/tags/android", icon: Smartphone },
     { name: "Hardware", href: "/tags/hardware", icon: Cpu },
-    { name: "Tutorial", href: "/tags/tutorial", icon: GraduationCap },
   ];
 
   const topTagLinks = useMemo(() => {
@@ -342,7 +340,8 @@ export function LayoutHeader({
   }, [searchableData]);
 
   const secondaryLinks = [
-    { name: dictionary.tags.allTagsTitle, href: "/tags", icon: Hash },
+    { name: dictionary.navigation.blog, href: "/blog", icon: BookOpen },
+    { name: dictionary.navigation.notes, href: "/notes", icon: StickyNote },
     ...topTagLinks,
   ];
 
@@ -585,13 +584,23 @@ export function LayoutHeader({
                   key={item.href}
                   href={`${linkPrefix}${item.href}`}
                   className={cn(
-                    "px-3 py-2 font-sans text-[10px] font-black uppercase tracking-[0.12em] transition-all relative rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50",
+                    "px-3 py-2 font-sans text-[10px] font-black uppercase tracking-[0.12em] transition-all relative rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50 inline-flex items-center gap-1.5",
                     isActive
                       ? "text-accent"
                       : "text-foreground/65 hover:text-foreground",
                   )}
                 >
                   {item.name}
+                  {item.name === "Ubuntu 26.04" && (
+                    <span className="text-[8px] font-black uppercase tracking-wide px-1 py-0.5 rounded bg-[#E95420]/15 text-[#E95420] border border-[#E95420]/30 leading-none">
+                      LTS
+                    </span>
+                  )}
+                  {item.name === "Windows 11" && (
+                    <span className="text-[8px] font-black uppercase tracking-wide px-1 py-0.5 rounded bg-[#0078D4]/15 text-[#0078D4] border border-[#0078D4]/30 leading-none">
+                      25H2
+                    </span>
+                  )}
                   <div
                     className={cn(
                       "absolute bottom-0 left-1/2 -translate-x-1/2 h-0.5 bg-accent transition-all duration-300",
@@ -676,6 +685,16 @@ export function LayoutHeader({
                         <div className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-4 bg-accent opacity-0 group-hover/item:opacity-60 transition-opacity" />
                         <item.icon className="h-4 w-4 text-accent" />
                         {item.name}
+                        {item.name === "Ubuntu 26.04" && (
+                          <span className="text-[8px] font-black uppercase tracking-wide px-1 py-0.5 rounded bg-[#E95420]/15 text-[#E95420] border border-[#E95420]/30 leading-none">
+                            LTS
+                          </span>
+                        )}
+                        {item.name === "Windows 11" && (
+                          <span className="text-[8px] font-black uppercase tracking-wide px-1 py-0.5 rounded bg-[#0078D4]/15 text-[#0078D4] border border-[#0078D4]/30 leading-none">
+                            25H2
+                          </span>
+                        )}
                       </NextLink>
                     ))}
                   </div>

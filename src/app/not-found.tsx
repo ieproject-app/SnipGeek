@@ -74,7 +74,7 @@ export default function NotFound() {
       )}
       suppressHydrationWarning
     >
-      <head>
+      <head suppressHydrationWarning>
         <title>404 - Page Not Found | SnipGeek</title>
         <meta
           name="description"
