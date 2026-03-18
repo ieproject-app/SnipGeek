@@ -70,15 +70,16 @@ export async function generateMetadata({
   const canonicalPath = locale === i18n.defaultLocale ? "/" : `/${locale}`;
   const dictionary = await getDictionary(locale);
   const homepageTitle =
-    dictionary.home.title || "SnipGeek - A Modern Minimalist Tech Blog";
+    dictionary.home.title ||
+    "SnipGeek - Windows dan Ubuntu: Tutorial, Troubleshooting, dan Update Penting";
   const homepageDescription =
     dictionary.home.description ||
-    "A modern minimalist tech blog for geeks, exploring software, hardware, and IT automation.";
+    "Windows and Ubuntu tutorials, troubleshooting guides, and important updates for daily users.";
 
   return {
     metadataBase: new URL("https://snipgeek.com"),
     title: {
-      default: "SnipGeek - A Modern Minimalist Tech Blog",
+      default: homepageTitle,
       template: "%s | SnipGeek",
     },
     description: homepageDescription,
