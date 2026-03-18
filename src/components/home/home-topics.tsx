@@ -33,6 +33,8 @@ interface HomeTopicsProps {
   locale: string;
   linkPrefix: string;
   tag: string;
+  breadcrumbTagLabel?: string;
+  viewAllHref?: string;
 }
 
 /**
@@ -47,6 +49,8 @@ export function HomeTopics({
   locale,
   linkPrefix,
   tag,
+  breadcrumbTagLabel,
+  viewAllHref,
 }: HomeTopicsProps) {
   const renderHorizontalCard = (post: TopicPost, index: number) => {
     const heroImageValue = post.frontmatter.heroImage;
@@ -111,7 +115,7 @@ export function HomeTopics({
 
   const breadcrumbSegments = [
     { label: breadcrumbHome, href: linkPrefix || "/" },
-    { label: tag },
+    { label: breadcrumbTagLabel || tag },
   ];
 
   return (
@@ -133,7 +137,7 @@ export function HomeTopics({
       <ScrollReveal direction="up" delay={0.3}>
         <footer className="mt-10 flex justify-center">
           <Link
-            href={`${linkPrefix}/tags/${tag.toLowerCase()}`}
+            href={viewAllHref || `${linkPrefix}/tags/${tag.toLowerCase()}`}
             className="flex items-center gap-2 bg-accent/5 px-3 py-1.5 rounded-full border border-accent/30 hover:bg-accent/10 transition-all group"
           >
             <div className="flex items-center gap-1 pr-2.5 border-r border-accent/20">

@@ -36,11 +36,12 @@ interface HomeUpdatesProps {
   dictionary: Dictionary;
   locale: string;
   tag?: string;
+  viewMoreHref?: string;
 }
 
-export function HomeUpdates({ posts, title, viewMoreText, dictionary, locale, tag }: HomeUpdatesProps) {
+export function HomeUpdates({ posts, title, viewMoreText, dictionary, locale, tag, viewMoreHref }: HomeUpdatesProps) {
   const linkPrefix = locale === 'en' ? '' : `/${locale}`;
-  const viewMoreHref = tag ? `${linkPrefix}/tags/${tag.toLowerCase()}` : `${linkPrefix}/blog`;
+  const finalViewMoreHref = viewMoreHref || (tag ? `${linkPrefix}/tags/${tag.toLowerCase()}` : `${linkPrefix}/blog`);
 
   return (
     <section className="pb-12 sm:pb-16 overflow-hidden">
@@ -137,7 +138,7 @@ export function HomeUpdates({ posts, title, viewMoreText, dictionary, locale, ta
             {/* Controls - Redesigned Style */}
             <div className="mt-6 flex justify-center">
               <Link
-                href={viewMoreHref}
+                href={finalViewMoreHref}
                 className="flex items-center gap-2 bg-accent/5 px-3 py-1.5 rounded-full border border-accent/30 hover:bg-accent/10 transition-all group"
               >
                 <div className="flex items-center gap-1 pr-2.5 border-r border-accent/20">

@@ -4,6 +4,12 @@ Status: Final
 Date: 2026-03-18
 Scope: Brand statement, 3 content types, homepage block mapping
 
+Implementation status (2026-03-18):
+
+- Home Topics feed now prioritizes Windows+Ubuntu posts (no longer Windows-only).
+- Home Updates feed now prioritizes Windows/Ubuntu update-relevant posts (no longer Android-centric).
+- Topics and Updates "view all" routes now point to blog index for broader brand-consistent discovery.
+
 ## 1) Brand Statement (Locked)
 
 Primary tagline:
