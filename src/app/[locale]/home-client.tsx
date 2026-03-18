@@ -19,6 +19,7 @@ export function HomeClient({
   locale: string;
 }) {
   const linkPrefix = locale === "en" ? "" : `/${locale}`;
+  const windowsUbuntuTags = new Set(["windows", "ubuntu", "linux", "dual-boot"]);
 
   const allPosts = useMemo(() => {
     return [...initialPosts].sort(
@@ -55,21 +56,41 @@ export function HomeClient({
       (post) =>
         post.frontmatter.published &&
         post.frontmatter.tags?.some(
-          (tag: string) => tag.toLowerCase() === "windows",
+          (tag: string) => windowsUbuntuTags.has(tag.toLowerCase()),
         ),
     )
     .slice(0, 8);
 
-  const updateTag = "Android";
-  const updatePosts = allPosts
+  const updateTag = "Ubuntu";
+  const primaryUpdatePosts = allPosts
     .filter(
       (post) =>
         post.frontmatter.published &&
-        post.frontmatter.tags?.some(
-          (tag: string) => tag.toLowerCase() === updateTag.toLowerCase(),
-        ),
+        post.frontmatter.tags?.some((tag: string) => windowsUbuntuTags.has(tag.toLowerCase())) &&
+        ((post.frontmatter.category || "").toLowerCase().includes("update") ||
+          post.frontmatter.tags?.some((tag: string) => {
+            const normalized = tag.toLowerCase();
+            return normalized === "update" || normalized === "news";
+          })),
     )
     .slice(0, 6);
+
+  const updateFallback = allPosts.filter(
+    (post) =>
+      post.frontmatter.published &&
+      post.frontmatter.tags?.some((tag: string) => windowsUbuntuTags.has(tag.toLowerCase())),
+  );
+
+  const updatePosts = [
+    ...primaryUpdatePosts,
+    ...updateFallback.filter(
+      (post) => !primaryUpdatePosts.some((picked) => picked.slug === post.slug),
+    ),
+  ].slice(0, 6);
+
+  const focusTopicsTitle = locale === "id" ? "Fokus Windows + Ubuntu" : "Windows + Ubuntu Focus";
+  const updatesTitle = locale === "id" ? "Update Penting Sistem" : "Important System Updates";
+  const updatesViewMore = locale === "id" ? "lihat update" : "view updates";
 
   return (
     <div className="w-full">
@@ -101,24 +122,27 @@ export function HomeClient({
       {topicPosts.length > 0 && (
         <HomeTopics
           posts={topicPosts}
-          title={dictionary.home.specialTagSectionTitle}
+          title={focusTopicsTitle}
           breadcrumbHome={dictionary.home.breadcrumbHome}
           viewAllText={dictionary.home.viewAllPosts}
           dictionary={dictionary}
           locale={locale}
           linkPrefix={linkPrefix}
           tag={topicTag}
+          breadcrumbTagLabel={locale === "id" ? "Windows + Ubuntu" : "Windows + Ubuntu"}
+          viewAllHref={`${linkPrefix}/blog`}
         />
       )}
 
       {updatePosts.length > 0 && (
         <HomeUpdates
           posts={updatePosts}
-          title={dictionary.home.softwareUpdateSlider.title}
-          viewMoreText={dictionary.home.softwareUpdateSlider.viewMore}
+          title={updatesTitle}
+          viewMoreText={updatesViewMore}
           dictionary={dictionary}
           locale={locale}
           tag={updateTag}
+          viewMoreHref={`${linkPrefix}/blog`}
         />
       )}
     </div>
