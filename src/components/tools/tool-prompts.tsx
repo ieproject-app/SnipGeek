@@ -44,7 +44,6 @@ import {
   PenLine,
   Settings2,
   FileText,
-  StickyNote,
   BookOpen,
   ChevronsUpDown,
   CheckCircle2,
@@ -79,8 +78,16 @@ type ToolPromptsDictionary = {
     create: string;
     modify: string;
   };
-  contentTypeBlog: string;
-  contentTypeNote: string;
+  contentTypeSeries: string;
+  contentTypeNews: string;
+  contentTypeTips: string;
+  seriesPhaseLabel: string;
+  seriesArticleLabel: string;
+  seriesTargetLabel: string;
+  seriesToneLabel: string;
+  newsSourceUrlsLabel: string;
+  newsAngleLabel: string;
+  tipsStandaloneLabel: string;
   selectArticleLabel: string;
   searchArticlePlaceholder: string;
   originalContentTitle: string;
@@ -231,6 +238,101 @@ interface ToolPromptsProps {
   fullDictionary: Dictionary;
   locale: string;
 }
+
+type WorkflowContentType = "series" | "news" | "tips";
+type SeriesPhase = "phase-1" | "phase-2" | "phase-3" | "phase-4" | "phase-5";
+
+const seriesPhaseOptions: Array<{ value: SeriesPhase; label: string }> = [
+  { value: "phase-1", label: "Phase 1" },
+  { value: "phase-2", label: "Phase 2" },
+  { value: "phase-3", label: "Phase 3" },
+  { value: "phase-4", label: "Phase 4" },
+  { value: "phase-5", label: "Phase 5" },
+];
+
+const seriesArticleOptions = Array.from({ length: 20 }, (_value, index) =>
+  String(index + 1).padStart(2, "0"),
+);
+
+const seriesBlueprint: Record<
+  SeriesPhase,
+  {
+    target: { en: string; id: string };
+    tone: { en: string; id: string };
+    context: { en: string; id: string };
+  }
+> = {
+  "phase-1": {
+    target: {
+      en: "Beginner moving from single-OS setup to safe dual-boot",
+      id: "Pemula yang berpindah dari single-OS ke dual-boot aman",
+    },
+    tone: {
+      en: "Practical, reassuring, low-jargon",
+      id: "Praktis, menenangkan, minim jargon",
+    },
+    context: {
+      en: "Initial planning and risk prevention before changing partitions or boot setup.",
+      id: "Perencanaan awal dan pencegahan risiko sebelum mengubah partisi atau boot setup.",
+    },
+  },
+  "phase-2": {
+    target: {
+      en: "User preparing installation media and firmware settings",
+      id: "Pengguna yang menyiapkan media instalasi dan pengaturan firmware",
+    },
+    tone: {
+      en: "Checklist-first and step-by-step",
+      id: "Checklist dulu lalu langkah bertahap",
+    },
+    context: {
+      en: "Execution phase for install media, BIOS/UEFI prep, and first boot decisions.",
+      id: "Fase eksekusi untuk media instalasi, persiapan BIOS/UEFI, dan keputusan boot awal.",
+    },
+  },
+  "phase-3": {
+    target: {
+      en: "Daily dual-boot user optimizing stability and workflow",
+      id: "Pengguna dual-boot harian yang mengoptimalkan stabilitas dan workflow",
+    },
+    tone: {
+      en: "Direct with practical tradeoff notes",
+      id: "Lugas dengan catatan kompromi praktis",
+    },
+    context: {
+      en: "Post-install improvements for drivers, updates, and productivity setup.",
+      id: "Peningkatan pasca-instalasi untuk driver, update, dan setup produktivitas.",
+    },
+  },
+  "phase-4": {
+    target: {
+      en: "Intermediate user dealing with edge cases and breakage",
+      id: "Pengguna menengah yang menangani kasus pinggiran dan kerusakan",
+    },
+    tone: {
+      en: "Diagnostic and methodical",
+      id: "Diagnostik dan metodis",
+    },
+    context: {
+      en: "Troubleshooting phase focused on boot errors, update failures, and recovery paths.",
+      id: "Fase troubleshooting yang fokus pada error boot, gagal update, dan jalur pemulihan.",
+    },
+  },
+  "phase-5": {
+    target: {
+      en: "Power user maintaining long-term dual-boot reliability",
+      id: "Power user yang menjaga keandalan dual-boot jangka panjang",
+    },
+    tone: {
+      en: "Strategic and maintenance-oriented",
+      id: "Strategis dan berorientasi maintenance",
+    },
+    context: {
+      en: "Long-term maintenance, rollback strategy, and future-proofing decisions.",
+      id: "Maintenance jangka panjang, strategi rollback, dan keputusan future-proofing.",
+    },
+  },
+};
 
 // ──────────────────────────────────────────────────────────────────────────────
 // Feature flag pill — reusable toggle button
@@ -415,7 +517,12 @@ export function ToolPrompts({
 
   // ── Mode & content type ──
   const [mode, setMode] = useState<"create" | "modify">("create");
-  const [contentType, setContentType] = useState<"blog" | "note">("blog");
+  const [contentType, setContentType] = useState<WorkflowContentType>("series");
+  const [seriesPhase, setSeriesPhase] = useState<SeriesPhase>("phase-1");
+  const [seriesArticleNumber, setSeriesArticleNumber] = useState("01");
+  const [newsSourceUrls, setNewsSourceUrls] = useState<string[]>([""]);
+  const [newsAngle, setNewsAngle] = useState("");
+  const [tipsStandalone, setTipsStandalone] = useState(true);
 
   // ── Article selector (modify mode) ──
   const [selectedSlug, setSelectedSlug] = useState<string>("");
@@ -464,11 +571,22 @@ export function ToolPrompts({
 
   const { notify } = useNotification();
   const downloadIds = useMemo(() => Object.keys(downloadLinks).sort(), []);
+  const isIndonesianLocale = locale === "id";
+  const seriesProfile = seriesBlueprint[seriesPhase];
+  const seriesTarget = isIndonesianLocale
+    ? seriesProfile.target.id
+    : seriesProfile.target.en;
+  const seriesTone = isIndonesianLocale
+    ? seriesProfile.tone.id
+    : seriesProfile.tone.en;
+  const seriesContext = isIndonesianLocale
+    ? seriesProfile.context.id
+    : seriesProfile.context.en;
 
   // ── Filtered article list ──
   const articlesForType = useMemo(
-    () => existingArticles.filter((article) => article.type === contentType),
-    [contentType, existingArticles],
+    () => existingArticles.filter((article) => article.type === "blog"),
+    [existingArticles],
   );
 
   const articleStats = useMemo(() => {
@@ -533,9 +651,9 @@ export function ToolPrompts({
     () =>
       existingArticles.find(
         (article) =>
-          article.slug === selectedSlug && article.type === contentType,
+          article.slug === selectedSlug && article.type === "blog",
       ),
-    [contentType, existingArticles, selectedSlug],
+    [existingArticles, selectedSlug],
   );
 
   const selectedBlockRows = useMemo(() => {
@@ -606,13 +724,13 @@ export function ToolPrompts({
     if (!selectedSlug) return;
 
     const stillMatchesType = existingArticles.some(
-      (article) => article.slug === selectedSlug && article.type === contentType,
+      (article) => article.slug === selectedSlug && article.type === "blog",
     );
 
     if (!stillMatchesType) {
       setSelectedSlug("");
     }
-  }, [contentType, existingArticles, selectedSlug]);
+  }, [existingArticles, selectedSlug]);
 
   useEffect(() => {
     if (mode !== "modify") {
@@ -806,13 +924,37 @@ export function ToolPrompts({
       });
     }
 
+    if (mode === "create" && contentType === "news") {
+      const validUrls = newsSourceUrls.filter((url) => url.trim() !== "");
+      if (validUrls.length === 0) {
+        issues.push({
+          id: "news-source-missing",
+          severity: "error",
+          title: "News mode requires at least one source URL",
+          description: "Add at least one source URL before generating or copying the brief.",
+        });
+      }
+
+      if (newsAngle.trim() === "") {
+        issues.push({
+          id: "news-angle-empty",
+          severity: "warning",
+          title: "News angle is empty",
+          description: "AI can still generate the brief, but without a clear SnipGeek angle the output may feel generic.",
+        });
+      }
+    }
+
     return issues;
   }, [
+    contentType,
     downloadItems,
     draft,
     galleryMappings,
     imageGridMappings,
     mode,
+    newsAngle,
+    newsSourceUrls,
     originalContent,
     showDownloads,
     showGallery,
@@ -878,16 +1020,25 @@ export function ToolPrompts({
 
   // ── Build prompt ──
   useEffect(() => {
-    const isBlog = contentType === "blog";
     const isModify = mode === "modify";
+    const normalizedUrls = newsSourceUrls
+      .map((url) => url.trim())
+      .filter((url) => url !== "");
+    const contentTypeLabel =
+      contentType === "series"
+        ? "SERIES"
+        : contentType === "news"
+          ? "NEWS / UPDATE"
+          : "TIPS & TRICKS";
 
     let prompt = `**INTERNAL CONTENT BRIEF FOR SNIPGEEK AGENT**\n`;
-    const activeSkills = isBlog ? ["content-generator", "snipgeek-blog-tone"] : ["content-generator"];
+    const activeSkills = ["content-generator", "snipgeek-blog-tone"];
     prompt += `**FOLLOWING SKILLS:** \`${activeSkills.join("`, `")}\`\n\n`;
 
     prompt += `**1. MODE & TYPE**\n`;
     prompt += `- Action: ${isModify ? "MODIFY EXISTING" : "CREATE NEW"}\n`;
-    prompt += `- Format: ${isBlog ? "BLOG POST" : "TECHNICAL NOTE"}\n`;
+    prompt += `- Format: BLOG POST\n`;
+    prompt += `- Workflow Type: ${contentTypeLabel}\n`;
     prompt += `- Language: ${isIdOnly ? "INDONESIAN ONLY" : "BILINGUAL (ID/EN)"}\n\n`;
 
     prompt += `**2. METADATA BRIEF**\n`;
@@ -906,8 +1057,37 @@ export function ToolPrompts({
     if (isModify) {
       prompt += `- Updated: ${new Date().toISOString().split("T")[0]}\n`;
     }
-    prompt += `- Status: ${isPublished ? "PUBLISHED" : "DRAFT"}${isFeatured && isBlog ? " | FEATURED" : ""}\n`;
+    prompt += `- Status: ${isPublished ? "PUBLISHED" : "DRAFT"}${isFeatured ? " | FEATURED" : ""}\n`;
     prompt += `- Category Hint: ${categoryHint || "[AI: AUTOMATIC]"}\n\n`;
+
+    if (!isModify) {
+      if (contentType === "series") {
+        prompt += `**SERIES CONTEXT BLOCK**\n`;
+        prompt += `- Phase: ${seriesPhase}\n`;
+        prompt += `- Series Article: ${seriesArticleNumber}\n`;
+        prompt += `- Target Reader: ${seriesTarget}\n`;
+        prompt += `- Tone Hint: ${seriesTone}\n`;
+        prompt += `- Context: ${seriesContext}\n\n`;
+      }
+
+      if (contentType === "news") {
+        prompt += `**NEWS SOURCE BLOCK**\n`;
+        if (normalizedUrls.length > 0) {
+          normalizedUrls.forEach((url, index) => {
+            prompt += `- Source URL ${index + 1}: ${url}\n`;
+          });
+        } else {
+          prompt += `- Source URLs: [MISSING]\n`;
+        }
+        prompt += `- Angle: ${newsAngle.trim() || "[NOT PROVIDED]"}\n\n`;
+      }
+
+      if (contentType === "tips") {
+        prompt += `**TIPS CONTEXT BLOCK**\n`;
+        prompt += `- Standalone: ${tipsStandalone ? "TRUE" : "FALSE"}\n`;
+        prompt += `- Goal: Deliver direct, practical, quick-to-apply guidance.\n\n`;
+      }
+    }
 
     const imageLines = images.split("\n").filter((l) => l.trim() !== "");
     if (showImages && imageLines.length > 0) {
@@ -974,12 +1154,22 @@ export function ToolPrompts({
       prompt += `**ORIGINAL CONTENT:**\n${originalContent || "[MISSING]"}\n\n`;
       prompt += `**MODIFICATION INSTRUCTIONS:**\n${modInstructions || "Follow instructions exactly."}\n`;
     } else {
-      prompt += `**DRAFT/CONTENT SOURCE:**\n${draft || "[MISSING]"}\n`;
+      if (contentType === "series") {
+        prompt += `**SERIES KEY POINTS (INPUT):**\n${draft || "[MISSING]"}\n`;
+      } else if (contentType === "news") {
+        prompt += `**NEWS ANALYSIS NOTES (INPUT):**\n${draft || "[OPTIONAL]"}\n`;
+      } else {
+        prompt += `**TIPS KEY POINTS (INPUT):**\n${draft || "[MISSING]"}\n`;
+      }
     }
 
     prompt += `\n---\n**FINAL INSTRUCTION:** Generate the full MDX following the SnipGeek skills assigned above. `;
-    if (isBlog) {
-      prompt += `Use \`snipgeek-blog-tone\` for narrative depth, personal voice, and bilingual storytelling, while ensuring \`content-generator\` technical standards are strictly met. `;
+    prompt += `Use \`snipgeek-blog-tone\` for narrative depth, personal voice, and bilingual storytelling, while ensuring \`content-generator\` technical standards are strictly met. `;
+    if (!isModify && contentType === "news") {
+      prompt += `Fetch all listed source URLs, extract only relevant facts, then rewrite in original SnipGeek voice with a clear "SnipGeek's take" section based on the provided angle. `;
+    }
+    if (!isModify && (contentType === "series" || contentType === "tips")) {
+      prompt += `Expand the provided key points into complete, practical sections with implementation details, warnings, and checks. `;
     }
     if (isModify) {
       prompt += `Treat **MODIFICATION INSTRUCTIONS** as the single source of truth. When instructions include "Target block (line X)", apply edits to those referenced blocks only. For all untouched sections, preserve the original wording, structure, language, and tone exactly as-is. Do not perform global rewrites unless explicitly requested in the instructions. The same rule applies for both English and Indonesian source content. `;
@@ -995,6 +1185,8 @@ export function ToolPrompts({
     draft,
     originalContent,
     modInstructions,
+    newsAngle,
+    newsSourceUrls,
     publishDate,
     isPublished,
     isFeatured,
@@ -1011,8 +1203,14 @@ export function ToolPrompts({
     showSpecs,
     specsMappings,
     selectedSlug,
+    seriesArticleNumber,
+    seriesContext,
+    seriesPhase,
+    seriesTarget,
+    seriesTone,
     categoryHint,
     selectedArticle,
+    tipsStandalone,
   ]);
 
   // ── Handlers ──
@@ -1076,6 +1274,27 @@ export function ToolPrompts({
       ...downloadItems,
       { id: generateUUID(), type: "id", value: "" },
     ]);
+
+  const addNewsSourceUrl = () => {
+    if (newsSourceUrls.length >= 3) return;
+    setNewsSourceUrls((prev) => [...prev, ""]);
+  };
+
+  const removeNewsSourceUrl = (index: number) => {
+    setNewsSourceUrls((prev) => {
+      if (prev.length === 1) return [""];
+      return prev.filter((_item, currentIndex) => currentIndex !== index);
+    });
+  };
+
+  const updateNewsSourceUrl = (index: number, value: string) => {
+    setNewsSourceUrls((prev) =>
+      prev.map((item, currentIndex) =>
+        currentIndex === index ? value : item,
+      ),
+    );
+  };
+
   const removeDownloadItem = (id: string) =>
     setDownloadItems(downloadItems.filter((item) => item.id !== id));
   const updateDownloadItem = (id: string, updates: Partial<DownloadItem>) =>
@@ -1209,38 +1428,60 @@ export function ToolPrompts({
 
               {/* Content type group: same no-inner-padding approach */}
               <div className="relative flex items-center">
-                <SnipTooltip label={dictionary.contentTypeBlog} side="top">
+                <SnipTooltip label={dictionary.contentTypeSeries} side="top">
                   <button
                     type="button"
-                    aria-label={dictionary.contentTypeBlog}
-                    aria-pressed={contentType === "blog"}
-                    onClick={() => setContentType("blog")}
+                    aria-label={dictionary.contentTypeSeries}
+                    aria-pressed={contentType === "series"}
+                    onClick={() => setContentType("series")}
                     className={cn(
                       "relative flex items-center justify-center w-10 h-9 rounded-md transition-colors duration-200 z-10",
-                      contentType === "blog" ? "text-primary" : "text-muted-foreground hover:text-primary/70"
+                      contentType === "series" ? "text-primary" : "text-muted-foreground hover:text-primary/70"
                     )}
                   >
-                    <FileText className="h-4 w-4" />
+                    <BookOpen className="h-4 w-4" />
                   </button>
                 </SnipTooltip>
 
-                <SnipTooltip label={dictionary.contentTypeNote} side="top">
+                <SnipTooltip label={dictionary.contentTypeNews} side="top">
                   <button
                     type="button"
-                    aria-label={dictionary.contentTypeNote}
-                    aria-pressed={contentType === "note"}
-                    onClick={() => setContentType("note")}
+                    aria-label={dictionary.contentTypeNews}
+                    aria-pressed={contentType === "news"}
+                    onClick={() => setContentType("news")}
                     className={cn(
                       "relative flex items-center justify-center w-10 h-9 rounded-md transition-colors duration-200 z-10",
-                      contentType === "note" ? "text-primary" : "text-muted-foreground hover:text-primary/70"
+                      contentType === "news" ? "text-primary" : "text-muted-foreground hover:text-primary/70"
                     )}
                   >
-                    <StickyNote className="h-4 w-4" />
+                    <Search className="h-4 w-4" />
+                  </button>
+                </SnipTooltip>
+
+                <SnipTooltip label={dictionary.contentTypeTips} side="top">
+                  <button
+                    type="button"
+                    aria-label={dictionary.contentTypeTips}
+                    aria-pressed={contentType === "tips"}
+                    onClick={() => setContentType("tips")}
+                    className={cn(
+                      "relative flex items-center justify-center w-10 h-9 rounded-md transition-colors duration-200 z-10",
+                      contentType === "tips" ? "text-primary" : "text-muted-foreground hover:text-primary/70"
+                    )}
+                  >
+                    <Sparkles className="h-4 w-4" />
                   </button>
                 </SnipTooltip>
                 <motion.div
-                  className="absolute inset-y-0 w-1/2 bg-background border border-primary/5 rounded-md shadow-sm z-0"
-                  animate={{ x: contentType === "note" ? "100%" : "0%" }}
+                  className="absolute inset-y-0 w-1/3 bg-background border border-primary/5 rounded-md shadow-sm z-0"
+                  animate={{
+                    x:
+                      contentType === "series"
+                        ? "0%"
+                        : contentType === "news"
+                          ? "100%"
+                          : "200%",
+                  }}
                   transition={{ type: "spring", stiffness: 520, damping: 38 }}
                 />
               </div>
@@ -1289,7 +1530,7 @@ export function ToolPrompts({
                   </div>
 
                   <AnimatePresence initial={false}>
-                    {contentType === "blog" && (
+                    {mode === "create" && (
                       <motion.div
                         key="featured-toggle"
                         initial={{ opacity: 0, x: 10, width: 0 }}
@@ -1538,11 +1779,7 @@ export function ToolPrompts({
                               )}
                             >
                               <div className="flex items-center gap-1.5">
-                                {article.type === "blog" ? (
-                                  <FileText className="h-2.5 w-2.5 shrink-0 opacity-60" />
-                                ) : (
-                                  <StickyNote className="h-2.5 w-2.5 shrink-0 opacity-60" />
-                                )}
+                                <FileText className="h-2.5 w-2.5 shrink-0 opacity-60" />
                                 <span className="font-bold text-[11px] truncate leading-tight">
                                   {article.title}
                                 </span>
@@ -1587,6 +1824,129 @@ export function ToolPrompts({
                 </ScrollReveal>
               )}
 
+              {mode === "create" && (
+                <ScrollReveal direction="left" delay={0.14}>
+                  <Card className="bg-card/50 border-primary/10 shadow-sm overflow-hidden border-l-4 border-l-emerald-400 rounded-xl">
+                    <CardHeader className="py-3 px-5 border-b bg-muted/5 flex flex-row items-center gap-2">
+                      <Sparkles className="h-3.5 w-3.5 text-emerald-500 shrink-0" />
+                      <CardTitle className="text-[10px] font-black uppercase tracking-widest">
+                        Workflow Context
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-5 space-y-4">
+                      {contentType === "series" && (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                          <div className="space-y-1.5">
+                            <p className="text-[9px] font-black uppercase tracking-wider text-muted-foreground">
+                              {dictionary.seriesPhaseLabel}
+                            </p>
+                            <Select value={seriesPhase} onValueChange={(value) => setSeriesPhase(value as SeriesPhase)}>
+                              <SelectTrigger className="h-9 text-xs bg-background/50 border-primary/10">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {seriesPhaseOptions.map((phase) => (
+                                  <SelectItem key={phase.value} value={phase.value}>
+                                    {phase.label}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div className="space-y-1.5">
+                            <p className="text-[9px] font-black uppercase tracking-wider text-muted-foreground">
+                              {dictionary.seriesArticleLabel}
+                            </p>
+                            <Select value={seriesArticleNumber} onValueChange={setSeriesArticleNumber}>
+                              <SelectTrigger className="h-9 text-xs bg-background/50 border-primary/10">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {seriesArticleOptions.map((number) => (
+                                  <SelectItem key={number} value={number}>
+                                    #{number}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div className="space-y-1.5 md:col-span-2">
+                            <p className="text-[9px] font-black uppercase tracking-wider text-muted-foreground">
+                              {dictionary.seriesTargetLabel}
+                            </p>
+                            <Input readOnly value={seriesTarget} className="h-9 text-xs bg-background/50 border-primary/10" />
+                          </div>
+                          <div className="space-y-1.5 md:col-span-2">
+                            <p className="text-[9px] font-black uppercase tracking-wider text-muted-foreground">
+                              {dictionary.seriesToneLabel}
+                            </p>
+                            <Input readOnly value={seriesTone} className="h-9 text-xs bg-background/50 border-primary/10" />
+                          </div>
+                        </div>
+                      )}
+
+                      {contentType === "news" && (
+                        <div className="space-y-3">
+                          <div className="space-y-1.5">
+                            <p className="text-[9px] font-black uppercase tracking-wider text-muted-foreground">
+                              {dictionary.newsSourceUrlsLabel}
+                            </p>
+                            <div className="space-y-2">
+                              {newsSourceUrls.map((url, index) => (
+                                <div key={index} className="flex items-center gap-2">
+                                  <Input
+                                    value={url}
+                                    onChange={(event) => updateNewsSourceUrl(index, event.target.value)}
+                                    placeholder={`https://example.com/source-${index + 1}`}
+                                    className="h-9 text-xs bg-background/50 border-primary/10"
+                                  />
+                                  <button
+                                    type="button"
+                                    onClick={() => removeNewsSourceUrl(index)}
+                                    className="h-9 w-9 rounded-md border border-primary/10 text-muted-foreground transition-colors hover:border-destructive/40 hover:text-destructive"
+                                  >
+                                    <Trash2 className="mx-auto h-3.5 w-3.5" />
+                                  </button>
+                                </div>
+                              ))}
+                            </div>
+                            <button
+                              type="button"
+                              onClick={addNewsSourceUrl}
+                              disabled={newsSourceUrls.length >= 3}
+                              className="inline-flex h-8 items-center gap-1.5 rounded-full border border-primary/15 px-3 text-[9px] font-black uppercase tracking-wider text-muted-foreground transition-colors hover:border-primary/30 hover:text-primary disabled:cursor-not-allowed disabled:opacity-50"
+                            >
+                              <Plus className="h-3 w-3" />
+                              Add URL (max 3)
+                            </button>
+                          </div>
+                          <div className="space-y-1.5">
+                            <p className="text-[9px] font-black uppercase tracking-wider text-muted-foreground">
+                              {dictionary.newsAngleLabel}
+                            </p>
+                            <Input
+                              value={newsAngle}
+                              onChange={(event) => setNewsAngle(event.target.value)}
+                              placeholder={isIndonesianLocale ? "Contoh: fokus ke dampak untuk daily Ubuntu user" : "Example: focus on impact for daily Ubuntu users"}
+                              className="h-9 text-xs bg-background/50 border-primary/10"
+                            />
+                          </div>
+                        </div>
+                      )}
+
+                      {contentType === "tips" && (
+                        <div className="flex items-center justify-between rounded-lg border border-primary/10 bg-background/40 px-3 py-2">
+                          <p className="text-[10px] font-black uppercase tracking-wider text-muted-foreground">
+                            {dictionary.tipsStandaloneLabel}
+                          </p>
+                          <Switch checked={tipsStandalone} onCheckedChange={setTipsStandalone} />
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                </ScrollReveal>
+              )}
+
               {/* Draft / Original content */}
               <ScrollReveal
                 direction="left"
@@ -1608,7 +1968,11 @@ export function ToolPrompts({
                       <CardTitle className="text-[10px] font-black uppercase tracking-widest">
                         {mode === "modify"
                           ? dictionary.originalContentTitle
-                          : dictionary.draftTitle}
+                          : contentType === "series"
+                            ? "Series Key Points"
+                            : contentType === "news"
+                              ? "News Notes / Extra Points"
+                              : "Tips Key Points"}
                       </CardTitle>
                     </div>
                     {/* Stats row */}
@@ -1632,7 +1996,11 @@ export function ToolPrompts({
                     placeholder={
                       mode === "modify"
                         ? dictionary.originalContentPlaceholder
-                        : dictionary.draftPlaceholder
+                        : contentType === "series"
+                          ? "Paste 5-10 key points for this series article..."
+                          : contentType === "news"
+                            ? "Optional: paste notable facts, context, or your quick notes..."
+                            : "Paste practical key points for this standalone tips article..."
                     }
                     value={mode === "modify" ? originalContent : draft}
                     onChange={(e) =>
@@ -2168,7 +2536,7 @@ export function ToolPrompts({
                       <div className="px-5 py-3 border-t border-white/5 bg-white/1 flex items-center justify-between gap-3">
                         <span className="text-[9px] text-white/20 font-mono">
                           {mode === "create"
-                            ? `✦ ${contentType} · ${isPublished ? "published" : "draft"}${isFeatured && contentType === "blog" ? " · featured" : ""}`
+                            ? `✦ ${contentType} · ${isPublished ? "published" : "draft"}${isFeatured ? " · featured" : ""}`
                             : `✦ modify · ${selectedSlug || "no article selected"}${selectedArticle ? ` · ${selectedArticle.published ? "live" : "draft"}` : ""}`}
                         </span>
                         <button
