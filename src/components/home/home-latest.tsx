@@ -4,11 +4,12 @@ import React from "react";
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
-import { formatRelativeTime } from "@/lib/utils";
+import { cn, formatRelativeTime } from "@/lib/utils";
 import { AddToReadingListButton } from "@/components/layout/add-to-reading-list-button";
 import { CategoryBadge } from "@/components/layout/category-badge";
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
 import { RevealImage } from "@/components/ui/reveal-image";
+import { getMulticolorSeed, getMulticolorTheme } from "@/lib/multicolor";
 import type { Post, PostFrontmatter } from "@/lib/posts";
 import type { Dictionary } from "@/lib/get-dictionary";
 
@@ -52,6 +53,9 @@ export const HomeLatest = ({
             href: `${linkPrefix}/blog/${post.slug}`,
             type: "blog" as const,
         };
+        const multicolor = getMulticolorTheme(
+            getMulticolorSeed(post.slug, post.frontmatter.category, post.frontmatter.title),
+        );
 
         return (
             <ScrollReveal key={post.slug} direction="up" delay={index * 0.1}>
@@ -61,7 +65,11 @@ export const HomeLatest = ({
                         className="block"
                         aria-label={`Read more about ${post.frontmatter.title}`}
                     >
-                        <div className="relative w-full aspect-8/5 overflow-hidden rounded-xl mb-4 shadow-sm transition-all duration-500 border border-primary/5">
+                        <div className={cn(
+                            "relative w-full aspect-8/5 overflow-hidden rounded-xl mb-4 shadow-sm transition-all duration-500 border border-primary/5 ring-1 ring-transparent",
+                            multicolor.hoverRing,
+                            multicolor.hoverShadow,
+                        )}>
                             {heroImageSrc && (
                                 <RevealImage
                                     src={heroImageSrc}
@@ -76,6 +84,8 @@ export const HomeLatest = ({
                                     data-ai-hint={heroImageHint}
                                 />
                             )}
+                            <div className={cn("absolute inset-0 bg-linear-to-t opacity-0 transition-opacity duration-500 group-hover:opacity-100", multicolor.overlayGradient)} />
+                            <div className={cn("absolute bottom-0 left-0 right-0 h-0.75 opacity-0 transition-opacity duration-500 group-hover:opacity-100", multicolor.accentBar)} />
                             <AddToReadingListButton
                                 item={item}
                                 dictionary={dictionary}
@@ -87,10 +97,10 @@ export const HomeLatest = ({
                         <div className="mb-2">
                             <CategoryBadge category={post.frontmatter.category} />
                         </div>
-                        <h3 className="font-display text-lg font-bold tracking-tight text-primary transition-colors group-hover:text-accent leading-tight">
+                        <h3 className={cn("font-display text-base sm:text-lg font-semibold tracking-tight text-primary transition-colors leading-tight mb-2", multicolor.hoverTitle)}>
                             {post.frontmatter.title}
                         </h3>
-                        <time className="text-[10px] font-medium text-muted-foreground mt-2 block opacity-60">
+                        <time className="text-[10px] font-medium text-muted-foreground block opacity-60">
                             {formatRelativeTime(new Date(post.frontmatter.date), locale)}
                         </time>
                     </Link>

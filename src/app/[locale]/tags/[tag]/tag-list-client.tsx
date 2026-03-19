@@ -147,12 +147,13 @@ export function TagListClient({
                           <div className="mb-2">
                             <CategoryBadge
                               category={post.frontmatter.category}
+                              size="xs"
                             />
                           </div>
-                          <h3 className="font-display text-base font-bold tracking-tight text-primary transition-colors group-hover:text-accent leading-tight">
+                          <h3 className="font-display text-base font-semibold tracking-tight text-primary transition-colors group-hover:text-accent leading-tight mb-2">
                             {post.frontmatter.title}
                           </h3>
-                          <time className="text-[10px] font-medium text-muted-foreground mt-2 block opacity-60">
+                          <time className="text-[10px] font-medium text-muted-foreground block opacity-60">
                             {formatRelativeTime(
                               new Date(post.frontmatter.date),
                               locale,

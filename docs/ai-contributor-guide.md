@@ -418,6 +418,20 @@ When asked to add a new text-heavy static page, use this workflow:
 
 4. Use frontmatter-driven metadata where possible
 
+---
+
+## 15. UI Badge and Multicolor Conventions
+
+For badge sizing, placement rhythm, and multicolor card accents, use this companion guide:
+
+- `docs/ui-badge-multicolor-guidelines.md`
+
+When updating card UIs, do not create one-off badge or color systems.
+Always reuse:
+
+- `src/components/layout/category-badge.tsx`
+- `src/lib/multicolor.ts`
+
 5. Keep layout consistent with existing static page patterns
 
 Do not start by writing the entire page body only inside TSX unless explicitly instructed.

@@ -10,25 +10,12 @@ import {
   type CarouselApi,
 } from "@/components/ui/carousel";
 import { AddToReadingListButton } from "@/components/layout/add-to-reading-list-button";
+import { CategoryBadge } from "@/components/layout/category-badge";
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
 import { formatRelativeTime, cn } from "@/lib/utils";
+import { getMulticolorSeed, getMulticolorTheme } from "@/lib/multicolor";
 import type { Note, NoteFrontmatter } from "@/lib/notes";
 import type { Dictionary } from "@/lib/get-dictionary";
-
-const NOTE_COLOR_PALETTE = [
-  "from-[#2f8ecf] to-[#3f98d4]",
-  "from-[#7f009e] to-[#8d00ac]",
-  "from-[#ec9634] to-[#f2a640]",
-  "from-[#1a9f7a] to-[#24b58d]",
-  "from-[#5b4fd9] to-[#6c63ec]",
-  "from-[#0f7c90] to-[#1794ab]",
-  "from-[#9a3412] to-[#c2410c]",
-  "from-[#14532d] to-[#1f7a46]",
-  "from-[#7c2d12] to-[#c2410c]",
-  "from-[#1e3a8a] to-[#2563eb]",
-  "from-[#831843] to-[#be185d]",
-  "from-[#365314] to-[#65a30d]",
-];
 
 interface HomeNotesProps {
   notes: Note<NoteFrontmatter>[];
@@ -40,18 +27,9 @@ interface HomeNotesProps {
   viewMoreHref: string;
 }
 
-const getColorIndex = (seed: string) => {
-  let hash = 0;
-  for (let i = 0; i < seed.length; i += 1) {
-    hash = (hash << 5) - hash + seed.charCodeAt(i);
-    hash |= 0;
-  }
-  return Math.abs(hash) % NOTE_COLOR_PALETTE.length;
-};
-
 const getNoteColorSeed = (note: Note<NoteFrontmatter>) => {
   const translationKey = note.frontmatter.translationKey || "";
-  return `${note.slug}|${translationKey}|${note.frontmatter.title}`.toLowerCase();
+  return getMulticolorSeed(note.slug, translationKey, note.frontmatter.title);
 };
 
 export function HomeNotes({
@@ -117,7 +95,7 @@ export function HomeNotes({
               {notes.map((note) => {
                 const noteHref = `${linkPrefix}/notes/${note.slug}`;
                 const seed = getNoteColorSeed(note);
-                const colorClass = NOTE_COLOR_PALETTE[getColorIndex(seed)];
+                const multicolor = getMulticolorTheme(seed);
                 const firstLetter = note.frontmatter.title.trim().charAt(0).toUpperCase();
                 const label = note.frontmatter.tags?.[0] || (locale === "id" ? "Catatan" : "Note");
 
@@ -131,9 +109,22 @@ export function HomeNotes({
 
                 return (
                   <CarouselItem key={note.slug} className="pl-4 sm:pl-6 md:basis-1/2 lg:basis-1/3 py-2 flex">
-                    <article className="group relative bg-card/80 rounded-md overflow-hidden border border-primary/10 shadow-md transition-all duration-400 hover:-translate-y-1 hover:border-primary/20 h-full flex flex-col w-full">
+                    <article
+                      className={cn(
+                        "group relative bg-card/80 rounded-md overflow-hidden border border-primary/10 ring-1 ring-transparent shadow-md transition-all duration-400 hover:-translate-y-1 h-full flex flex-col w-full",
+                        multicolor.hoverRing,
+                        multicolor.hoverShadow,
+                      )}
+                    >
                       <Link href={noteHref} className="flex h-full flex-col">
-                        <div className={cn("relative aspect-[3/4] bg-gradient-to-b flex items-center justify-center", colorClass)}>
+                        <div className={cn("relative aspect-[3/4] bg-gradient-to-b flex items-center justify-center", multicolor.gradient)}>
+                          <div
+                            className={cn(
+                              "absolute inset-0 bg-linear-to-t opacity-0 transition-opacity duration-500 group-hover:opacity-100",
+                              multicolor.overlayGradient,
+                            )}
+                          />
+                          <div className={cn("absolute bottom-0 left-0 right-0 h-0.75 opacity-0 transition-opacity duration-500 group-hover:opacity-100", multicolor.accentBar)} />
                           <span className="font-display text-5xl sm:text-6xl font-extrabold text-white/95 tracking-tight">
                             {firstLetter || "N"}
                           </span>
@@ -146,10 +137,14 @@ export function HomeNotes({
                         </div>
 
                         <div className="p-4 sm:p-5 flex-1">
-                          <p className="text-[11px] font-semibold text-emerald-500 mb-1.5 line-clamp-1">
-                            {label}
-                          </p>
-                          <h3 className="font-display text-base font-medium text-primary leading-snug transition-colors group-hover:text-accent mb-2">
+                          <div className="mb-2 line-clamp-1">
+                            <CategoryBadge
+                              label={label}
+                              type="note"
+                              size="xs"
+                            />
+                          </div>
+                          <h3 className={cn("font-display text-base font-semibold text-primary leading-snug transition-colors mb-2", multicolor.hoverTitle)}>
                             {note.frontmatter.title}
                           </h3>
                           <time className="text-[10px] text-muted-foreground/80 block">

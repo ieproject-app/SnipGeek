@@ -9,10 +9,10 @@ import { AddToReadingListButton } from "@/components/layout/add-to-reading-list-
 import { ArrowRight } from "lucide-react";
 import {
     CategoryBadge,
-    getBadgeStyle,
     simplifyCategoryLabel,
 } from "@/components/layout/category-badge";
 import { RevealImage } from "@/components/ui/reveal-image";
+import { getMulticolorSeed, getMulticolorTheme } from "@/lib/multicolor";
 
 interface HomeHeroProps {
     posts: Post<PostFrontmatter>[];
@@ -52,7 +52,9 @@ export function HomeHero({ posts, dictionary, locale, linkPrefix }: HomeHeroProp
 
                         const rawCategory = post.frontmatter.category || 'Tutorial';
                         const simplifiedCategory = simplifyCategoryLabel(rawCategory);
-                        const badgeStyle = getBadgeStyle(simplifiedCategory);
+                        const multicolor = getMulticolorTheme(
+                            getMulticolorSeed(post.slug, simplifiedCategory, post.frontmatter.title),
+                        );
                         const isStaggered = index % 2 !== 0;
 
                         const item = {
@@ -74,13 +76,24 @@ export function HomeHero({ posts, dictionary, locale, linkPrefix }: HomeHeroProp
                                 <Link href={`${linkPrefix}/blog/${post.slug}`} className="block" aria-label={`Read ${post.frontmatter.title}`}>
                                     <article className="space-y-5">
                                         {/* Image Block */}
-                                        <div className="relative aspect-[3/2] rounded-xl overflow-hidden bg-muted shadow-md group-hover:shadow-xl group-hover:-translate-y-2 transition-all duration-500">
+                                        <div
+                                            className={cn(
+                                                "relative aspect-[3/2] rounded-xl overflow-hidden bg-muted shadow-md group-hover:-translate-y-2 transition-all duration-500 ring-1 ring-transparent",
+                                                multicolor.hoverRing,
+                                                multicolor.hoverShadow,
+                                            )}
+                                        >
                                             {/* Accent Bar (Bottom) - Color matches category */}
                                             <div
-                                                className={cn("absolute bottom-0 left-0 right-0 h-0.75 z-30 transition-opacity duration-500 opacity-0 group-hover:opacity-100", badgeStyle.dot)}
+                                                className={cn("absolute bottom-0 left-0 right-0 h-0.75 z-30 transition-opacity duration-500 opacity-0 group-hover:opacity-100", multicolor.accentBar)}
                                             />
                                             {/* Cinematic Gradient Overlay */}
-                                            <div className="absolute inset-0 bg-linear-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-10" />
+                                            <div
+                                                className={cn(
+                                                    "absolute inset-0 bg-linear-to-t opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-10",
+                                                    multicolor.overlayGradient,
+                                                )}
+                                            />
 
                                             {/* Hero Image */}
                                             {heroImageSrc && (
@@ -130,7 +143,7 @@ export function HomeHero({ posts, dictionary, locale, linkPrefix }: HomeHeroProp
                                                     <div
                                                         className={cn(
                                                             "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all duration-300",
-                                                            badgeStyle.text,
+                                                            multicolor.readingButtonTone,
                                                             "group-hover:bg-primary/5"
                                                         )}
                                                     >

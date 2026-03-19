@@ -36,7 +36,6 @@ import { PlaceHolderImages } from "@/lib/placeholder-images";
 import NextLink from "next/link";
 import Image from "next/image";
 import {
-  CategoryBadge,
   getBadgeStyle,
 } from "@/components/layout/category-badge";
 import { useThemeMode } from "@/hooks/use-theme-mode";
@@ -71,6 +70,32 @@ const getTimeLabel = () => {
 // Helper to escape regex special characters
 const escapeRegExp = (string: string) => {
   return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+};
+
+const normalizeNavHref = (href: string) => {
+  if (!href) return "/";
+  const cleaned = href.toLowerCase().replace(/\/+$/, "");
+  return cleaned || "/";
+};
+
+const getTagKeyFromHref = (href: string) => {
+  const normalizedHref = normalizeNavHref(href);
+  if (!normalizedHref.startsWith("/tags/")) return null;
+
+  const tagPath = normalizedHref.slice("/tags/".length);
+  if (!tagPath) return null;
+
+  const firstSegment = tagPath.split("/")[0];
+  if (!firstSegment) return null;
+
+  return decodeURIComponent(firstSegment).toLowerCase();
+};
+
+const getTagFamilyKey = (tag: string) => {
+  const normalized = tag.toLowerCase();
+  if (normalized.startsWith("windows")) return "windows";
+  if (normalized.startsWith("ubuntu")) return "ubuntu";
+  return normalized;
 };
 
 const HighlightMatch = ({ text, query }: { text: string; query: string }) => {
@@ -118,6 +143,8 @@ export function LayoutHeader({
   const [removingSlug, setRemovingSlug] = useState<string | null>(null);
   const [timeLabel, setTimeLabel] = useState("");
   const [mounted, setMounted] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(-1);
+  const activeIndexRef = useRef(-1);
 
   const {
     items: readingListItems,
@@ -239,6 +266,7 @@ export function LayoutHeader({
       if (event.key === "Escape") {
         setActiveView("none");
         setQuery("");
+        setActiveIndex(-1);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -277,23 +305,100 @@ export function LayoutHeader({
     return (searchableData || []).slice(0, 3);
   }, [searchableData]);
 
+  useEffect(() => {
+    activeIndexRef.current = activeIndex;
+  }, [activeIndex]);
+
+  useEffect(() => {
+    setActiveIndex(-1);
+  }, [query, isSearchOpen]);
+
+  useEffect(() => {
+    if (!isSearchOpen) return;
+
+    const navigableItems = query.length > 1 ? results : quickPicks;
+
+    const handleArrowKeys = (event: KeyboardEvent) => {
+      if (event.key === "ArrowDown") {
+        event.preventDefault();
+        setActiveIndex((prev) =>
+          prev < navigableItems.length - 1 ? prev + 1 : 0,
+        );
+      } else if (event.key === "ArrowUp") {
+        event.preventDefault();
+        setActiveIndex((prev) =>
+          prev > 0 ? prev - 1 : navigableItems.length - 1,
+        );
+      } else if (event.key === "Enter") {
+        const idx = activeIndexRef.current;
+        if (idx >= 0 && navigableItems[idx]) {
+          event.preventDefault();
+          router.push(navigableItems[idx].href);
+          setActiveView("none");
+          setQuery("");
+          setActiveIndex(-1);
+        }
+      }
+    };
+
+    document.addEventListener("keydown", handleArrowKeys);
+    return () => document.removeEventListener("keydown", handleArrowKeys);
+  }, [isSearchOpen, query, results, quickPicks, router]);
+
+  useEffect(() => {
+    if (activeIndex >= 0) {
+      const el = document.querySelector<HTMLElement>(
+        `[data-result-index="${activeIndex}"]`,
+      );
+      el?.scrollIntoView({ block: "nearest" });
+    }
+  }, [activeIndex]);
+
   const ubuntuFocusHref =
     currentLocale === "id"
       ? "/blog/ubuntu-26-04-lts-resolute-raccoon-new-features-major-changes"
       : "/blog/ubuntu-26-04-lts-resolute-raccoon-new-features-major-changes";
 
-  const directLinks = [
-    { name: "Windows 11", href: "/tags/windows-11", icon: Monitor, badge: "25H2" },
-    { name: "Ubuntu 26.04", href: ubuntuFocusHref, icon: Terminal, badge: "LTS" },
-  ];
+  const directLinks = useMemo(
+    () => [
+      { name: "Windows 11", href: "/tags/windows-11", icon: Monitor, badge: "25H2" },
+      { name: "Ubuntu 26.04", href: ubuntuFocusHref, icon: Terminal, badge: "LTS" },
+    ],
+    [ubuntuFocusHref],
+  );
 
   // ── Curated Featured Topics — update manually each year ──
-  const moreItems = [
-    { name: "Tutorial", href: "/tags/tutorial", icon: GraduationCap },
-    { name: "Linux", href: "/tags/linux", icon: Terminal },
-    { name: "Android", href: "/tags/android", icon: Smartphone },
-    { name: "Hardware", href: "/tags/hardware", icon: Cpu },
-  ];
+  const moreItems = useMemo(
+    () => [
+      { name: "Tutorial", href: "/tags/tutorial", icon: GraduationCap },
+      { name: "Linux", href: "/tags/linux", icon: Terminal },
+      { name: "Android", href: "/tags/android", icon: Smartphone },
+      { name: "Hardware", href: "/tags/hardware", icon: Cpu },
+    ],
+    [],
+  );
+
+  const { reservedNavHrefs, reservedTagFamilies } = useMemo(() => {
+    const primaryNavItems = [...directLinks, ...moreItems];
+    const hrefs = new Set<string>();
+    const tagFamilies = new Set<string>();
+
+    primaryNavItems.forEach((item) => {
+      hrefs.add(normalizeNavHref(item.href));
+
+      const tagKey = getTagKeyFromHref(item.href);
+      if (tagKey) tagFamilies.add(getTagFamilyKey(tagKey));
+
+      const label = item.name.toLowerCase();
+      if (label.includes("windows")) tagFamilies.add("windows");
+      if (label.includes("ubuntu")) tagFamilies.add("ubuntu");
+    });
+
+    return {
+      reservedNavHrefs: hrefs,
+      reservedTagFamilies: tagFamilies,
+    };
+  }, [directLinks, moreItems]);
 
   const topTagLinks = useMemo(() => {
     const tagCount = new Map<string, number>();
@@ -314,21 +419,37 @@ export function LayoutHeader({
 
     const dynamicTagLinks = [...tagCount.entries()]
       .sort((a, b) => b[1] - a[1])
-      .slice(0, 3)
+      .slice(0, 6)
       .map(([tag]) => ({
         name: tagLabel.get(tag) || tag,
         href: `/tags/${encodeURIComponent(tag)}`,
         icon: Hash,
-      }));
+      }))
+      .filter((item) => {
+        const normalizedHref = normalizeNavHref(item.href);
+        if (reservedNavHrefs.has(normalizedHref)) return false;
+
+        const tagKey = getTagKeyFromHref(item.href);
+        if (!tagKey) return true;
+
+        return !reservedTagFamilies.has(getTagFamilyKey(tagKey));
+      })
+      .slice(0, 3);
 
     if (dynamicTagLinks.length >= 3) {
       return dynamicTagLinks;
     }
 
-    const fallbackTags = ["windows", "android", "tutorial"];
+    const fallbackTags = ["windows", "android", "tutorial", "tips", "review"];
     const existingHrefs = new Set(dynamicTagLinks.map((item) => item.href));
     const fallbackLinks = fallbackTags
-      .filter((tag) => !existingHrefs.has(`/tags/${tag}`))
+      .filter((tag) => {
+        const href = `/tags/${tag}`;
+        if (existingHrefs.has(href)) return false;
+        if (reservedNavHrefs.has(normalizeNavHref(href))) return false;
+        if (reservedTagFamilies.has(getTagFamilyKey(tag))) return false;
+        return true;
+      })
       .slice(0, 3 - dynamicTagLinks.length)
       .map((tag) => ({
         name: tag.charAt(0).toUpperCase() + tag.slice(1),
@@ -337,7 +458,7 @@ export function LayoutHeader({
       }));
 
     return [...dynamicTagLinks, ...fallbackLinks];
-  }, [searchableData]);
+  }, [reservedNavHrefs, reservedTagFamilies, searchableData]);
 
   const secondaryLinks = [
     { name: dictionary.navigation.blog, href: "/blog", icon: BookOpen },
@@ -445,11 +566,19 @@ export function LayoutHeader({
 
     const seen = new Set<string>();
     return merged.filter((item) => {
+      const normalizedHref = normalizeNavHref(item.href);
+      if (reservedNavHrefs.has(normalizedHref)) return false;
+
+      const tagKey = getTagKeyFromHref(item.href);
+      if (tagKey && reservedTagFamilies.has(getTagFamilyKey(tagKey))) {
+        return false;
+      }
+
       if (seen.has(item.href)) return false;
       seen.add(item.href);
       return true;
     });
-  }, [contextualSecondaryLink, secondaryLinks]);
+  }, [contextualSecondaryLink, reservedNavHrefs, reservedTagFamilies, secondaryLinks]);
 
   const getIsActivePath = (href: string) => {
     const localizedHref = `${linkPrefix}${href}` || "/";
@@ -579,15 +708,31 @@ export function LayoutHeader({
           >
             {directLinks.map((item) => {
               const isActive = getIsActivePath(item.href);
+              const isWindowsLink = item.name.toLowerCase().includes("windows");
+              const isUbuntuLink = item.name.toLowerCase().includes("ubuntu");
+
+              const activeToneClass = isWindowsLink
+                ? "border-[#0078D4]/40 bg-[#0078D4]/14 text-[#0078D4] shadow-[0_2px_10px_rgba(0,120,212,0.16)]"
+                : isUbuntuLink
+                  ? "border-[#E95420]/40 bg-[#E95420]/13 text-[#E95420] shadow-[0_2px_10px_rgba(233,84,32,0.16)]"
+                  : "border-accent/35 bg-accent/12 text-accent shadow-sm";
+
+              const hoverToneClass = isWindowsLink
+                ? "hover:text-[#0078D4] hover:border-[#0078D4]/25 hover:bg-[#0078D4]/7"
+                : isUbuntuLink
+                  ? "hover:text-[#E95420] hover:border-[#E95420]/25 hover:bg-[#E95420]/7"
+                  : "hover:text-foreground hover:border-accent/20 hover:bg-accent/7";
+
               return (
                 <NextLink
                   key={item.href}
                   href={`${linkPrefix}${item.href}`}
+                  aria-current={isActive ? "page" : undefined}
                   className={cn(
-                    "px-3 py-2 font-sans text-[10px] font-black uppercase tracking-[0.12em] transition-all relative rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50 inline-flex items-center gap-1.5",
+                    "px-3.5 py-2 font-sans text-[10px] font-black uppercase tracking-[0.12em] transition-all rounded-full border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50 inline-flex items-center gap-1.5",
                     isActive
-                      ? "text-accent"
-                      : "text-foreground/65 hover:text-foreground",
+                      ? activeToneClass
+                      : cn("border-transparent text-foreground/65", hoverToneClass),
                   )}
                 >
                   {item.name}
@@ -601,12 +746,6 @@ export function LayoutHeader({
                       25H2
                     </span>
                   )}
-                  <div
-                    className={cn(
-                      "absolute bottom-0 left-1/2 -translate-x-1/2 h-0.5 bg-accent transition-all duration-300",
-                      isActive ? "w-4" : "w-0",
-                    )}
-                  />
                 </NextLink>
               );
             })}
@@ -941,15 +1080,9 @@ export function LayoutHeader({
                             />
                           </div>
                           <div className="flex-1 min-w-0 flex flex-col">
-                            <h4 className="font-sans text-sm font-bold text-foreground line-clamp-1 group-hover:text-accent transition-colors leading-tight">
+                            <h4 className="font-sans text-sm font-bold text-foreground line-clamp-2 group-hover:text-accent transition-colors leading-tight">
                               {item.title}
                             </h4>
-                            <div className="mt-1">
-                              <CategoryBadge
-                                category={dataItem?.category}
-                                type={item.type}
-                              />
-                            </div>
                           </div>
                         </NextLink>
                         <Button
@@ -1020,14 +1153,23 @@ export function LayoutHeader({
                     </div>
                     {results.length > 0 ? (
                       <ul className="space-y-1 pt-1">
-                        {results.map((item) => {
+                        {results.map((item, idx) => {
                           const resolvedHero = getResolvedImage(item);
                           return (
                             <li key={`${item.type}-${item.slug}`}>
                               <NextLink
                                 href={item.href}
-                                className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-accent/10 transition-all group"
-                                onClick={() => setActiveView("none")}
+                                data-result-index={idx}
+                                className={cn(
+                                  "flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all group",
+                                  activeIndex === idx
+                                    ? "bg-accent/15 ring-1 ring-accent/20"
+                                    : "hover:bg-accent/10",
+                                )}
+                                onClick={() => {
+                                  setActiveView("none");
+                                  setActiveIndex(-1);
+                                }}
                               >
                                 <div className="w-13 h-9.75 relative rounded-md overflow-hidden bg-muted shrink-0 border border-border/50">
                                   <Image
@@ -1039,18 +1181,12 @@ export function LayoutHeader({
                                   />
                                 </div>
                                 <div className="flex-1 min-w-0">
-                                  <h4 className="font-sans text-sm font-bold text-foreground line-clamp-1 group-hover:text-accent transition-colors leading-tight">
+                                  <h4 className="font-sans text-sm font-bold text-foreground line-clamp-2 group-hover:text-accent transition-colors leading-tight">
                                     <HighlightMatch
                                       text={item.title}
                                       query={query}
                                     />
                                   </h4>
-                                  <div className="mt-1">
-                                    <CategoryBadge
-                                      category={item.category}
-                                      type={item.type}
-                                    />
-                                  </div>
                                 </div>
                                 <ChevronRight className="h-3.5 w-3.5 text-muted-foreground/30 group-hover:text-accent transition-all group-hover:translate-x-1" />
                               </NextLink>
@@ -1076,34 +1212,37 @@ export function LayoutHeader({
                         {mounted ? timeLabel : ""}
                       </p>
                       <div className="px-2 space-y-1">
-                        {quickPicks.map((item) => {
+                        {quickPicks.map((item, idx) => {
                           const resolvedHero = getResolvedImage(item);
                           return (
                             <NextLink
                               key={item.slug}
                               href={item.href}
-                              className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-accent/10 transition-all group"
-                              onClick={() => setActiveView("none")}
+                              data-result-index={idx}
+                              className={cn(
+                                "flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all group",
+                                activeIndex === idx
+                                  ? "bg-accent/15 ring-1 ring-accent/20"
+                                  : "hover:bg-accent/10",
+                              )}
+                              onClick={() => {
+                                setActiveView("none");
+                                setActiveIndex(-1);
+                              }}
                             >
                               <div className="w-13 h-9.75 relative rounded-md overflow-hidden bg-muted shrink-0 border border-border/50">
                                 <Image
                                   src={resolvedHero}
                                   alt=""
                                   fill
-                                  className="object-cover "
+                                  className="object-cover"
                                   sizes="52px"
                                 />
                               </div>
                               <div className="flex-1 min-w-0">
-                                <h4 className="font-sans text-sm font-bold text-foreground line-clamp-1 group-hover:text-accent transition-colors leading-tight">
+                                <h4 className="font-sans text-sm font-bold text-foreground line-clamp-2 group-hover:text-accent transition-colors leading-tight">
                                   {item.title}
                                 </h4>
-                                <div className="mt-1">
-                                  <CategoryBadge
-                                    category={item.category}
-                                    type={item.type}
-                                  />
-                                </div>
                               </div>
                               <ChevronRight className="h-3.5 w-3.5 text-muted-foreground/20 group-hover:text-accent transition-all group-hover:translate-x-1" />
                             </NextLink>

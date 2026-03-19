@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { Hash, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { getBadgeStyle } from "@/components/layout/category-badge";
+import { CategoryBadge } from "@/components/layout/category-badge";
 
 interface ArticleTagsProps {
   tags: string[];
@@ -59,32 +59,27 @@ export function ArticleTags({
         </Link>
       </div>
 
-      <div className="mt-5 flex flex-wrap gap-2.5">
-        {tags.map((tag) => {
-          const style = getBadgeStyle(tag);
-          return (
-            <Link
-              key={tag}
-              href={`${linkPrefix}/tags/${encodeURIComponent(tag.toLowerCase())}`}
-              className={cn(
-                "group inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1",
-                "text-[10px] font-bold uppercase tracking-wider transition-all duration-200",
-                "hover:-translate-y-0.5 hover:shadow-sm",
-                style.bg,
-                style.text,
-                style.border,
-              )}
-            >
-              <span
-                className={cn(
-                  "inline-flex h-1 w-1 rounded-full transition-colors duration-200",
-                  style.dot,
-                )}
-              />
-              <span>{tag}</span>
-            </Link>
-          );
-        })}
+      <div className="mt-5 border-t border-primary/10 pt-4 sm:pt-5">
+        <div className="flex flex-wrap gap-2">
+          {tags.map((tag) => {
+            return (
+              <Link
+                key={tag}
+                href={`${linkPrefix}/tags/${encodeURIComponent(tag.toLowerCase())}`}
+                className="group inline-flex"
+              >
+                <CategoryBadge
+                  label={tag}
+                  size="xs"
+                  className={cn(
+                    "transition-all duration-200",
+                    "group-hover:-translate-y-0.5 group-hover:shadow-sm group-hover:border-primary/25",
+                  )}
+                />
+              </Link>
+            );
+          })}
+        </div>
       </div>
     </section>
   );

@@ -174,15 +174,15 @@ export function ArticleRelated({
             </div>
 
             <div className="mb-2">
-              <CategoryBadge category={item.frontmatter.category} type={type} />
+              <CategoryBadge category={item.frontmatter.category} type={type} size="xs" />
             </div>
             <h3
-              className="font-display font-bold tracking-tight text-primary transition-colors group-hover:text-accent leading-tight"
+              className="font-display font-semibold tracking-tight text-primary transition-colors group-hover:text-accent leading-tight mb-2"
               style={{ fontSize: "clamp(1rem, 0.95rem + 0.25vw, 1.125rem)" }}
             >
               {item.frontmatter.title}
             </h3>
-            <time className="text-[10px] font-medium text-muted-foreground mt-2 block opacity-60">
+            <time className="text-[10px] font-medium text-muted-foreground block opacity-60">
               {formatRelativeTime(new Date(item.frontmatter.date), locale)}
             </time>
           </Link>
@@ -231,7 +231,7 @@ export function ArticleRelated({
               item.frontmatter.tags
                 .slice(0, 2)
                 .map((tag: string) => (
-                  <CategoryBadge key={tag} category={tag} />
+                  <CategoryBadge key={tag} category={tag} size="xs" />
                 ))}
           </div>
         </div>

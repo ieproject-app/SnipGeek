@@ -14,6 +14,7 @@ import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { AddToReadingListButton } from '@/components/layout/add-to-reading-list-button';
 import type { Dictionary } from '@/lib/get-dictionary';
 import { CategoryBadge } from '@/components/layout/category-badge';
+import { getMulticolorSeed, getMulticolorTheme } from '@/lib/multicolor';
 
 import { ScrollReveal } from '@/components/ui/scroll-reveal';
 import { RevealImage } from '@/components/ui/reveal-image';
@@ -118,13 +119,18 @@ export function HomeTutorials({ posts, title, viewMoreText, dictionary, locale, 
                   href: `${linkPrefix}/blog/${post.slug}`,
                   type: 'blog' as const,
                 };
+                const multicolor = getMulticolorTheme(
+                  getMulticolorSeed(post.slug, post.frontmatter.category, post.frontmatter.title),
+                );
 
                 return (
                   <CarouselItem key={post.slug} className="pl-4 sm:pl-6 md:basis-1/2 lg:basis-1/3 pb-6 pt-2">
                     <article className={cn(
-                      "relative bg-card rounded-lg border border-primary/5 transition-all duration-500 h-full flex flex-col group/card overflow-hidden shadow-md",
+                      "relative bg-card rounded-lg border border-primary/5 transition-all duration-500 h-full flex flex-col group/card overflow-hidden shadow-md ring-1 ring-transparent",
                       "hover:-translate-y-1.5 hover:border-primary/10",
-                      "dark:shadow-black/40"
+                      "dark:shadow-black/40",
+                      multicolor.hoverRing,
+                      multicolor.hoverShadow,
                     )}>
                       <Link href={`${linkPrefix}/blog/${post.slug}`} className="block h-full group">
                         {/* Image container - Tuned to 8:5 for richer card height */}
@@ -141,6 +147,8 @@ export function HomeTutorials({ posts, title, viewMoreText, dictionary, locale, 
                             showSkeleton
                             data-ai-hint={heroImageHint}
                           />
+                          <div className={cn('absolute inset-0 bg-linear-to-t opacity-0 transition-opacity duration-500 group-hover/card:opacity-100', multicolor.overlayGradient)} />
+                          <div className={cn('absolute bottom-0 left-0 right-0 h-0.75 opacity-0 transition-opacity duration-500 group-hover/card:opacity-100', multicolor.accentBar)} />
                           <AddToReadingListButton
                             item={item}
                             dictionary={dictionary}
@@ -152,10 +160,10 @@ export function HomeTutorials({ posts, title, viewMoreText, dictionary, locale, 
                           <div className="mb-2">
                             <CategoryBadge category={post.frontmatter.category || 'Featured'} />
                           </div>
-                          <h3 className="font-display text-base font-semibold text-primary leading-snug group-hover:text-accent transition-colors">
+                          <h3 className={cn('font-display text-base font-semibold text-primary leading-snug transition-colors mb-2', multicolor.hoverTitle)}>
                             {post.frontmatter.title}
                           </h3>
-                          <time className="text-[10px] text-muted-foreground mt-3 block font-medium opacity-60">
+                          <time className="text-[10px] text-muted-foreground block font-medium opacity-60">
                             {formatRelativeTime(new Date(post.frontmatter.date), locale)}
                           </time>
                         </div>
