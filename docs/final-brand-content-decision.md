@@ -2,7 +2,7 @@
 
 Status: Final
 Date: 2026-03-18
-Scope: Brand statement, 3 content types, homepage block mapping
+Scope: Brand statement, 4 content types, homepage block mapping
 
 Implementation status (2026-03-18):
 
@@ -26,7 +26,7 @@ Editorial promise:
 - Troubleshooting: practical diagnosis and fix paths
 - Update Penting: relevant changes with impact context, not just announcements
 
-## 2) Content System Rules (3 Types)
+## 2) Content System Rules (4 Types)
 
 ### A. Series (Step-by-Step)
 Purpose:
@@ -104,6 +104,36 @@ Do not:
 
 - over-expand into long narrative if a short guide is enough
 
+### D. Notes / Catatan
+Purpose:
+Publish concise note-style technical records, quick findings, and compact references that do not need full long-form blog treatment.
+
+Mandatory input:
+
+- key points
+- note intent (`finding`, `reference`, `mini-fix`, or `observation`)
+- target locale (`en`, `id`, or bilingual)
+
+Output expectations:
+
+- practical and compact MDX
+- clear structure with scan-friendly headings
+- direct value without unnecessary narrative expansion
+
+Storage target:
+
+- publish notes in `_notes/{locale}/` at repository root
+
+Do:
+
+- preserve concrete facts, versions, and commands when relevant
+- include short verification/result when applicable
+
+Do not:
+
+- force Notes into long tutorial format
+- place note content in `_posts/` unless it is intentionally promoted into a full article
+
 ## 3) Homepage Block Mapping
 
 Source: component structure in home client and home section components.
@@ -161,6 +191,11 @@ Global:
 - every output must be useful in real user scenarios
 - avoid generic language and filler sections
 
+Content routing:
+
+- Series, News/Update, Tips & Tricks -> `_posts/{locale}/`
+- Notes/Catatan -> `_notes/{locale}/`
+
 Metadata:
 
 - tags must be lowercase kebab-case
@@ -172,6 +207,7 @@ Quality gate before publish:
 - steps are testable
 - troubleshooting paths have decision logic
 - update posts contain impact analysis, not only summary
+- notes remain concise and referenceable
 
 ## 5) Immediate Next Adjustments (Operational)
 

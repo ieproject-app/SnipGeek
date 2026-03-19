@@ -49,6 +49,21 @@ published: true                        # REQUIRED: Must be true to appear in lis
 | Callout / Alert | `<Callout variant="info" title="..."> ... </Callout>` |
 | Zoomable Image | No external library needed — all MDX images already support Lightbox automatically |
 
+### Image Caption and Credit Policy
+- Do NOT force captions on every image. Use captions selectively when they add attribution or essential context.
+- For image groups, prefer `<Gallery caption="...">` and place source/credit in that caption when relevant.
+- For single images, use a one-line italic caption directly under the image only when needed.
+- If an image comes from an external publisher/platform, add explicit credit (example: `Source: OMG Ubuntu`).
+- If the image is a self-captured screenshot, use optional context caption (example: `Screenshot: SnipGeek testing environment`).
+- Decorative or self-explanatory images may be shown without captions to keep the article clean.
+
+### Image Caption Workflow (Required Checklist)
+1. Classify each image: `external source`, `own screenshot`, or `decorative`.
+2. `external source`: caption/credit is REQUIRED.
+3. `own screenshot`: caption is OPTIONAL, but recommended if it clarifies a step.
+4. `decorative`: no caption by default.
+5. Keep caption short, factual, and non-repetitive with alt text.
+
 ### Heading Structure
 - Only use `##` and `###`
 - The system automatically uses these headings to generate the **Table of Contents (TOC)** on the side of each article

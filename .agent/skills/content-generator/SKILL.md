@@ -73,6 +73,16 @@ Use `<kbd>Key</kbd>` for hotkeys: `<kbd>Ctrl</kbd> + <kbd>C</kbd>`.
 - **Format**: Prefer WebP with optimized file size.
 - **Galleries**: Use `<Gallery caption="Optional caption or source">\n  ![Img 1](path1)\n  ![Img 2](path2)\n  ![Img 3](path3)\n</Gallery>` for a full-width 3-image hero-style gallery.
 - **Grids**: Use `<ImageGrid columns="2">\n  ![Img 1](path1)\n  ![Img 2](path2)\n</ImageGrid>` for inline image grouping. **CRITICAL:** `ImageGrid` is STRICTLY INCOMPATIBLE with `<Steps>`. Inside `<Steps>`, you MUST only use single standard images, never grids.
+- **Selective Captions**: Do not add captions to all images. Add captions only for attribution or meaningful context.
+- **External Credits (Required)**: If image source is external, add credit in caption text (for example: `Source: OMG Ubuntu`).
+- **Own Screenshots (Optional Caption)**: Use concise context caption only if it improves comprehension (for example: `Screenshot: SnipGeek test on Ubuntu 26.04`).
+- **No Redundant Captions**: Avoid captions that only repeat the alt text.
+
+### Image Attribution Decision Rule
+1. Identify image origin before writing: `external`, `screenshot`, or `decorative`.
+2. `external`: MUST include credit.
+3. `screenshot`: caption optional.
+4. `decorative`: no caption.
 
 ### 🔴 React Context (className)
 ALWAYS use `className` instead of `class` for all elements. React will throw an error if `class` is used.

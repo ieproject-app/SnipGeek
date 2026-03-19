@@ -6,8 +6,9 @@ import {
   Carousel,
   CarouselContent,
   CarouselItem,
+  type CarouselApi,
 } from '@/components/ui/carousel';
-import { ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn, formatRelativeTime } from '@/lib/utils';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { AddToReadingListButton } from '@/components/layout/add-to-reading-list-button';
@@ -39,6 +40,33 @@ interface HomeTutorialsProps {
 }
 
 export function HomeTutorials({ posts, title, viewMoreText, dictionary, locale, tag }: HomeTutorialsProps) {
+  const [api, setApi] = React.useState<CarouselApi>();
+  const [selectedIndex, setSelectedIndex] = React.useState(0);
+  const [scrollSnaps, setScrollSnaps] = React.useState<number[]>([]);
+  const [canScrollPrev, setCanScrollPrev] = React.useState(false);
+  const [canScrollNext, setCanScrollNext] = React.useState(false);
+
+  React.useEffect(() => {
+    if (!api) return;
+
+    const onSelect = () => {
+      setSelectedIndex(api.selectedScrollSnap());
+      setCanScrollPrev(api.canScrollPrev());
+      setCanScrollNext(api.canScrollNext());
+    };
+
+    setScrollSnaps(api.scrollSnapList());
+    onSelect();
+
+    api.on('select', onSelect);
+    api.on('reInit', onSelect);
+
+    return () => {
+      api.off('select', onSelect);
+      api.off('reInit', onSelect);
+    };
+  }, [api]);
+
   const linkPrefix = locale === 'en' ? '' : `/${locale}`;
   const viewMoreHref = tag ? `${linkPrefix}/tags/${tag.toLowerCase()}` : `${linkPrefix}/blog`;
 
@@ -58,6 +86,7 @@ export function HomeTutorials({ posts, title, viewMoreText, dictionary, locale, 
         {/* Slider */}
         <ScrollReveal direction="up" delay={0.2}>
           <Carousel
+            setApi={setApi}
             opts={{
               align: 'start',
               loop: false,
@@ -137,20 +166,52 @@ export function HomeTutorials({ posts, title, viewMoreText, dictionary, locale, 
               })}
             </CarouselContent>
 
-            {/* Controls & Custom "View More" Style */}
-            <div className="mt-6 flex justify-center">
+            <div className="mt-5 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => api?.scrollPrev()}
+                  disabled={!canScrollPrev}
+                  className="h-8 w-8 rounded-full border border-primary/20 text-primary/70 hover:text-primary hover:border-primary/40 disabled:opacity-35 disabled:cursor-not-allowed inline-flex items-center justify-center transition-colors"
+                  aria-label={locale === 'id' ? 'Slide sebelumnya' : 'Previous slide'}
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </button>
+
+                <div className="flex items-center gap-1.5">
+                  {scrollSnaps.map((_, index) => (
+                    <button
+                      key={`dot-${index}`}
+                      type="button"
+                      onClick={() => api?.scrollTo(index)}
+                      className={cn(
+                        'h-1.5 rounded-full transition-all',
+                        index === selectedIndex
+                          ? 'w-4 bg-primary/70'
+                          : 'w-1.5 bg-primary/25 hover:bg-primary/40',
+                      )}
+                      aria-label={`Go to slide ${index + 1}`}
+                    />
+                  ))}
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => api?.scrollNext()}
+                  disabled={!canScrollNext}
+                  className="h-8 w-8 rounded-full border border-primary/20 text-primary/70 hover:text-primary hover:border-primary/40 disabled:opacity-35 disabled:cursor-not-allowed inline-flex items-center justify-center transition-colors"
+                  aria-label={locale === 'id' ? 'Slide berikutnya' : 'Next slide'}
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </button>
+              </div>
+
               <Link
                 href={viewMoreHref}
-                className="flex items-center gap-2 bg-accent/5 px-3 py-1.5 rounded-full border border-accent/30 hover:bg-accent/10 transition-all group"
+                className="group inline-flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-accent transition-colors"
               >
-                <div className="flex items-center gap-1 pr-2.5 border-r border-accent/20">
-                  <div className="h-1 w-5 bg-accent rounded-full" />
-                  <div className="h-0.75 w-0.75 bg-accent rounded-full" />
-                </div>
-                <span className="text-[10px] font-bold uppercase tracking-wide text-accent/90 group-hover:text-accent transition-all flex items-center gap-1">
-                  {viewMoreText}
-                  <ChevronRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5" />
-                </span>
+                <span>{viewMoreText}</span>
+                <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
               </Link>
             </div>
           </Carousel>

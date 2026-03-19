@@ -1,0 +1,139 @@
+---
+title: "Cara Ganti Nama PC di Windows 11 (Panduan Cepat 4 Langkah)"
+slug: "rename-pc-windows-11"
+translationKey: "rename-pc-windows-11"
+date: "2026-03-18"
+description: "Pelajari cara mengganti nama PC Windows 11 kurang dari 2 menit lewat Settings, verifikasi hasilnya, dan atasi error umum setelah restart."
+heroImage: "/images/_posts/windows11/rename/banner.webp"
+imageAlt: "Desktop Windows 11 menampilkan alur penggantian nama perangkat dari Settings"
+published: true
+featured: false
+tags: ["windows", "windows-11", "tutorial", "device-name", "troubleshooting"]
+category: "Windows"
+---
+
+Kalau setelah install bersih Windows 11 nama perangkat kamu jadi acak seperti `DESKTOP-CFL3R1S`, kamu bisa ganti kurang dari 2 menit: buka **Settings > System > About**, klik **Rename this PC**, masukkan nama baru, lalu restart. Setelah reboot, nama baru akan tampil di daftar perangkat jaringan, halaman perangkat akun Microsoft, dan info sistem lokal.
+
+Ini termasuk pengaturan awal paling penting karena nama perangkat yang jelas bikin manajemen beberapa PC jauh lebih rapi.
+
+## Kenapa Nama PC Perlu Diganti?
+
+Nama PC yang rapi memudahkan pekerjaan harian, terutama saat kamu:
+
+- identifikasi perangkat di **Wi-Fi rumah/kantor**,
+- mapping folder share di LAN,
+- cek perangkat di akun Microsoft,
+- troubleshooting koneksi remote.
+
+Kalau kamu juga mau setup berbagi file antar perangkat, lanjutkan dengan panduan ini setelah rename: [Cara Share Folder di Windows 11 via LAN dan WiFi](/blog/share-folder-windows-11-lan-wifi).
+
+## Prasyarat Sebelum Rename
+
+- Kamu login memakai akun dengan izin **administrator**.
+- Simpan semua pekerjaan aktif, karena proses ini **wajib restart**.
+- Gunakan format nama yang pendek dan jelas (contoh: `OFFICE-EDIT-01`, `LAPTOP-RINA`, `DESKTOP-STUDIO`).
+
+<Callout variant="info" title="Catatan Freshness">
+  Panduan ini diverifikasi untuk Windows 11 23H2 dan 24H2 per Maret 2026. Label menu bisa berubah di build berikutnya, tetapi jalurnya tetap di pengaturan System.
+</Callout>
+
+## Langkah-Langkah Ganti Nama PC di Windows 11
+
+<Steps>
+  <Step>
+    **Buka menu System dengan cepat**
+
+    Klik kanan **Start**, lalu pilih **System**.
+
+    ![Klik kanan Start di Windows 11 lalu pilih System](/images/_posts/windows11/rename/rename-pc1.webp "Buka halaman System dari menu Start")
+    *Jalur tercepat: klik kanan Start -> System.*
+  </Step>
+
+  <Step>
+    **Klik tombol "Rename this PC"**
+
+    Di halaman **System > About**, cari tombol **Rename this PC** di bagian atas dekat nama perangkat saat ini.
+
+    ![Halaman System About Windows 11 dengan tombol Rename this PC disorot](/images/_posts/windows11/rename/rename-pc2.webp "Lokasi tombol Rename this PC")
+    *Di sinilah kamu mulai proses penggantian nama.*
+  </Step>
+
+  <Step>
+    **Masukkan nama baru**
+
+    Ketik nama perangkat yang kamu inginkan, lalu klik **Next**.
+
+    ![Popup Rename your PC di Windows 11 dengan kolom nama perangkat baru](/images/_posts/windows11/rename/rename-pc3.webp "Masukkan nama PC baru")
+    *Gunakan pola nama konsisten jika kamu mengelola banyak perangkat.*
+  </Step>
+
+  <Step>
+    **Restart agar perubahan diterapkan**
+
+    Pilih **Restart now** (atau **Restart later** kalau kamu masih perlu simpan pekerjaan).
+
+    ![Prompt restart Windows 11 setelah proses ganti nama PC](/images/_posts/windows11/rename/rename-pc4.webp "Restart dibutuhkan agar nama baru aktif")
+    *Perubahan nama belum final sampai PC selesai reboot.*
+  </Step>
+</Steps>
+
+## Cara Verifikasi Hasil Rename
+
+Setelah restart, lakukan pengecekan cepat berikut untuk memastikan nama baru aktif penuh.
+
+### Cek 1: Halaman Settings
+
+Masuk ke **Settings > System > About**, lalu pastikan nama perangkat sudah sesuai.
+
+### Cek 2: Output command
+
+Buka Command Prompt, jalankan:
+
+```powershell
+hostname
+```
+
+Contoh output yang benar:
+
+```text
+OFFICE-EDIT-01
+```
+
+(Output di perangkat kamu harus sesuai nama yang barusan kamu set.)
+
+### Cek 3: Visibilitas di jaringan
+
+Dari PC lain dalam jaringan yang sama, pastikan nama baru muncul saat browsing daftar perangkat.
+
+## Error Umum Saat Rename dan Solusi Cepat
+
+### 1) Nama sudah berubah di Settings, tapi di jaringan masih nama lama
+
+- Lakukan restart sekali lagi.
+- Restart router atau reconnect Wi-Fi.
+- Buka ulang tampilan network di File Explorer pada PC klien.
+
+### 2) Tombol rename tidak bisa diklik
+
+- Pastikan login dengan akun administrator.
+- Kalau perangkat milik kantor/sekolah, bisa jadi dibatasi kebijakan IT.
+
+### 3) Nama baru ditolak Windows
+
+- Hapus karakter simbol yang aneh.
+- Gunakan nama yang lebih singkat.
+- Prioritaskan huruf, angka, dan tanda minus agar kompatibel.
+
+## Baca Lanjutan di SnipGeek
+
+- [To-Do Setelah Install Windows 11: Checklist Setup Lengkap](/blog/to-do-after-install-windows11)
+- [Panduan Instalasi Windows 11 dari Nol Sampai Selesai](/blog/clean-install-windows-11-step-by-step-guide)
+- [Cara Share Folder di Windows 11 via LAN dan WiFi](/blog/share-folder-windows-11-lan-wifi)
+- [Cara Aktifkan Auto Dark Mode di Windows 11](/blog/auto-dark-mode-windows-11)
+
+## Referensi Resmi
+
+- [Microsoft Support: Rename your Windows device](https://support.microsoft.com/en-us/windows/rename-your-windows-device-750bc75d-8ff8-e99a-90ab-20f7b48f8f92)
+- [Microsoft Learn: Rename-Computer (PowerShell)](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.management/rename-computer)
+
+Nama perangkat yang jelas akan menghemat waktu setiap kali kamu troubleshooting, berbagi file, atau mengelola banyak PC. Sekali set, workflow harian langsung terasa lebih rapi.

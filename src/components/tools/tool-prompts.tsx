@@ -81,6 +81,7 @@ type ToolPromptsDictionary = {
   contentTypeSeries: string;
   contentTypeNews: string;
   contentTypeTips: string;
+  contentTypeNotes: string;
   seriesPhaseLabel: string;
   seriesArticleLabel: string;
   seriesTargetLabel: string;
@@ -88,6 +89,11 @@ type ToolPromptsDictionary = {
   newsSourceUrlsLabel: string;
   newsAngleLabel: string;
   tipsStandaloneLabel: string;
+  notesIntentLabel: string;
+  notesIntentFinding: string;
+  notesIntentReference: string;
+  notesIntentMiniFix: string;
+  notesIntentObservation: string;
   selectArticleLabel: string;
   searchArticlePlaceholder: string;
   originalContentTitle: string;
@@ -116,7 +122,7 @@ type ToolPromptsDictionary = {
   };
 };
 
-type QuickActionKey = "narrative" | "images" | "metadata" | "polish";
+type QuickActionKey = "readability" | "narrative" | "images" | "metadata" | "polish";
 
 type ValidationIssue = {
   id: string;
@@ -239,8 +245,9 @@ interface ToolPromptsProps {
   locale: string;
 }
 
-type WorkflowContentType = "series" | "news" | "tips";
+type WorkflowContentType = "series" | "news" | "tips" | "notes";
 type SeriesPhase = "phase-1" | "phase-2" | "phase-3" | "phase-4" | "phase-5";
+type NoteIntent = "finding" | "reference" | "mini-fix" | "observation";
 
 const seriesPhaseOptions: Array<{ value: SeriesPhase; label: string }> = [
   { value: "phase-1", label: "Phase 1" },
@@ -253,6 +260,13 @@ const seriesPhaseOptions: Array<{ value: SeriesPhase; label: string }> = [
 const seriesArticleOptions = Array.from({ length: 20 }, (_value, index) =>
   String(index + 1).padStart(2, "0"),
 );
+
+const noteIntentOptions: NoteIntent[] = [
+  "finding",
+  "reference",
+  "mini-fix",
+  "observation",
+];
 
 const seriesBlueprint: Record<
   SeriesPhase,
@@ -523,6 +537,7 @@ export function ToolPrompts({
   const [newsSourceUrls, setNewsSourceUrls] = useState<string[]>([""]);
   const [newsAngle, setNewsAngle] = useState("");
   const [tipsStandalone, setTipsStandalone] = useState(true);
+  const [noteIntent, setNoteIntent] = useState<NoteIntent>("finding");
 
   // ── Article selector (modify mode) ──
   const [selectedSlug, setSelectedSlug] = useState<string>("");
@@ -541,6 +556,10 @@ export function ToolPrompts({
   const [showGallery, setShowGallery] = useState(false);
   const [showSpecs, setShowSpecs] = useState(false);
   const [isIdOnly, setIsIdOnly] = useState(false);
+  const [captionMode, setCaptionMode] = useState<"off" | "auto" | "manual">("auto");
+  const [captionAlignment, setCaptionAlignment] = useState<"left" | "center" | "right">("center");
+  const [captionCoverage, setCaptionCoverage] = useState<"selective" | "all">("selective");
+  const [captionMaxCount, setCaptionMaxCount] = useState("4");
 
   // ── Status flags ──
   const [publishDate, setPublishDate] = useState<string>("");
@@ -582,11 +601,19 @@ export function ToolPrompts({
   const seriesContext = isIndonesianLocale
     ? seriesProfile.context.id
     : seriesProfile.context.en;
+  const selectedArticleType = contentType === "notes" ? "note" : "blog";
+  const noteIntentLabelMap: Record<NoteIntent, string> = {
+    finding: dictionary.notesIntentFinding,
+    reference: dictionary.notesIntentReference,
+    "mini-fix": dictionary.notesIntentMiniFix,
+    observation: dictionary.notesIntentObservation,
+  };
 
   // ── Filtered article list ──
   const articlesForType = useMemo(
-    () => existingArticles.filter((article) => article.type === "blog"),
-    [existingArticles],
+    () =>
+      existingArticles.filter((article) => article.type === selectedArticleType),
+    [existingArticles, selectedArticleType],
   );
 
   const articleStats = useMemo(() => {
@@ -651,9 +678,9 @@ export function ToolPrompts({
     () =>
       existingArticles.find(
         (article) =>
-          article.slug === selectedSlug && article.type === "blog",
+          article.slug === selectedSlug && article.type === selectedArticleType,
       ),
-    [existingArticles, selectedSlug],
+    [existingArticles, selectedArticleType, selectedSlug],
   );
 
   const selectedBlockRows = useMemo(() => {
@@ -724,13 +751,14 @@ export function ToolPrompts({
     if (!selectedSlug) return;
 
     const stillMatchesType = existingArticles.some(
-      (article) => article.slug === selectedSlug && article.type === "blog",
+      (article) =>
+        article.slug === selectedSlug && article.type === selectedArticleType,
     );
 
     if (!stillMatchesType) {
       setSelectedSlug("");
     }
-  }, [existingArticles, selectedSlug]);
+  }, [existingArticles, selectedArticleType, selectedSlug]);
 
   useEffect(() => {
     if (mode !== "modify") {
@@ -811,6 +839,16 @@ export function ToolPrompts({
   }, [generatedPrompt]);
 
   const sourceContent = mode === "modify" ? originalContent : draft;
+  const imageLines = useMemo(
+    () => images.split("\n").filter((line) => line.trim() !== ""),
+    [images],
+  );
+
+  const parsedCaptionMaxCount = useMemo(() => {
+    const parsed = Number.parseInt(captionMaxCount, 10);
+    if (!Number.isFinite(parsed)) return 4;
+    return Math.min(12, Math.max(1, parsed));
+  }, [captionMaxCount]);
 
   const unresolvedMarkers = useMemo(() => {
     const matches = sourceContent.match(/\{\{[^}]+\}\}/g) ?? [];
@@ -929,6 +967,18 @@ export function ToolPrompts({
       });
     }
 
+    if (showImages && imageLines.length > 0) {
+      const heroPath = normalizeImagePath((imageLines[0]?.split("|")[0] ?? "").trim());
+      if (heroPath && sourceContent.includes(heroPath)) {
+        issues.push({
+          id: "hero-image-duplicated",
+          severity: "warning",
+          title: "Hero image path appears in body content",
+          description: "Image 1 is reserved for hero/frontmatter. Remove it from article body unless you intentionally want duplicate rendering.",
+        });
+      }
+    }
+
     if (mode === "create" && contentType === "news") {
       const validUrls = newsSourceUrls.filter((url) => url.trim() !== "");
       if (validUrls.length === 0) {
@@ -967,6 +1017,7 @@ export function ToolPrompts({
     showSpecs,
     sourceContent,
     specsGroups,
+    imageLines,
   ]);
 
   const blockingValidationIssues = useMemo(
@@ -990,6 +1041,18 @@ export function ToolPrompts({
         setShowGallery(!!p.showGallery);
         setShowSpecs(!!p.showSpecs);
         setIsIdOnly(!!p.isIdOnly);
+        setCaptionMode(p.captionMode === "off" || p.captionMode === "manual" ? p.captionMode : "auto");
+        setCaptionAlignment(
+          p.captionAlignment === "left" || p.captionAlignment === "right"
+            ? p.captionAlignment
+            : "center",
+        );
+        setCaptionCoverage(p.captionCoverage === "all" ? "all" : "selective");
+        setCaptionMaxCount(
+          typeof p.captionMaxCount === "string" && p.captionMaxCount.trim() !== ""
+            ? p.captionMaxCount
+            : "4",
+        );
         setIsOutputVisible(p.isOutputVisible !== undefined ? !!p.isOutputVisible : true);
         setCategoryHint(typeof p.categoryHint === "string" ? p.categoryHint : "");
       } catch { }
@@ -1007,6 +1070,10 @@ export function ToolPrompts({
         showGallery,
         showSpecs,
         isIdOnly,
+        captionMode,
+        captionAlignment,
+        captionCoverage,
+        captionMaxCount,
         isOutputVisible,
         categoryHint,
       }),
@@ -1018,6 +1085,10 @@ export function ToolPrompts({
     showGallery,
     showSpecs,
     isIdOnly,
+    captionMode,
+    captionAlignment,
+    captionCoverage,
+    captionMaxCount,
     isOutputVisible,
     categoryHint,
     mounted,
@@ -1034,7 +1105,16 @@ export function ToolPrompts({
         ? "SERIES"
         : contentType === "news"
           ? "NEWS / UPDATE"
-          : "TIPS & TRICKS";
+          : contentType === "tips"
+            ? "TIPS & TRICKS"
+            : "NOTES / CATATAN";
+    const outputFormat = contentType === "notes" ? "TECHNICAL NOTE" : "BLOG POST";
+    const captionAlignmentClass =
+      captionAlignment === "left"
+        ? "text-left"
+        : captionAlignment === "right"
+          ? "text-right"
+          : "text-center";
 
     let prompt = `**INTERNAL CONTENT BRIEF FOR SNIPGEEK AGENT**\n`;
     const activeSkills = ["content-generator", "snipgeek-blog-tone"];
@@ -1042,7 +1122,7 @@ export function ToolPrompts({
 
     prompt += `**1. MODE & TYPE**\n`;
     prompt += `- Action: ${isModify ? "MODIFY EXISTING" : "CREATE NEW"}\n`;
-    prompt += `- Format: BLOG POST\n`;
+    prompt += `- Format: ${outputFormat}\n`;
     prompt += `- Workflow Type: ${contentTypeLabel}\n`;
     prompt += `- Language: ${isIdOnly ? "INDONESIAN ONLY" : "BILINGUAL (ID/EN)"}\n\n`;
 
@@ -1092,16 +1172,51 @@ export function ToolPrompts({
         prompt += `- Standalone: ${tipsStandalone ? "TRUE" : "FALSE"}\n`;
         prompt += `- Goal: Deliver direct, practical, quick-to-apply guidance.\n\n`;
       }
+
+      if (contentType === "notes") {
+        prompt += `**NOTES CONTEXT BLOCK**\n`;
+        prompt += `- Note Intent: ${noteIntentLabelMap[noteIntent]}\n`;
+        prompt += `- Goal: Produce a concise, referenceable note with practical value and minimal filler.\n`;
+        prompt += `- Routing: Save under _notes/{locale}/ (not _posts/{locale}/).\n\n`;
+      }
     }
 
-    const imageLines = images.split("\n").filter((l) => l.trim() !== "");
     if (showImages && imageLines.length > 0) {
       prompt += `**3. ASSETS & MEDIA**\n`;
       imageLines.forEach((line, i) => {
-        const [imgPath, imgAlt] = line.split("|").map(s => s?.trim() || "");
+        const parts = line.split("|").map((s) => s?.trim() || "");
+        const imgPath = parts[0] ?? "";
+        const imgAlt = parts[1] ?? "";
+        const imgCaptionHint = parts[2] ?? "";
         const normalizedPath = normalizeImagePath(imgPath);
-        prompt += `- Image ${i + 1}: "${normalizedPath}" ${imgAlt ? `| Label: "${imgAlt}"` : ""}\n`;
+        if (i === 0) {
+          prompt += `- Image 1 (HERO ONLY): "${normalizedPath}" ${imgAlt ? `| Label: "${imgAlt}"` : ""} | Use only as frontmatter heroImage/banner. Do not insert into article body unless explicitly requested.\n`;
+          return;
+        }
+        prompt += `- Image ${i + 1}: "${normalizedPath}" ${imgAlt ? `| Label: "${imgAlt}"` : ""}${imgCaptionHint ? ` | Caption Hint: "${imgCaptionHint}"` : ""}\n`;
       });
+    }
+
+    if (!isModify && showImages && imageLines.length > 1 && captionMode !== "off") {
+      prompt += `\n**3A. IMAGE CAPTION POLICY**\n`;
+      prompt += `- Caption Mode: ${captionMode.toUpperCase()}\n`;
+      prompt += `- Alignment: ${captionAlignment.toUpperCase()} (${captionAlignmentClass})\n`;
+      prompt += `- Coverage: ${captionCoverage.toUpperCase()}\n`;
+      prompt += `- Maximum Captions: ${parsedCaptionMaxCount}\n`;
+      prompt += `- Hero rule: Never render caption for Image 1 in article body.\n`;
+
+      if (captionMode === "auto") {
+        prompt += `- Auto logic: prioritize captions for evidence-heavy screenshots (settings panels, verification outputs, before/after state, error/fix proof).\n`;
+      }
+
+      if (captionCoverage === "selective") {
+        prompt += `- Selective mode: do not caption every image; caption only images that add technical clarity or proof.\n`;
+      } else {
+        prompt += `- All mode: caption every non-hero body image until max count is reached.\n`;
+      }
+
+      prompt += `- Caption format: add a single caption block directly below the selected image with one concise sentence.\n`;
+      prompt += `- Caption block syntax: <div className="-mt-3 mb-6 ${captionAlignmentClass} text-sm italic text-muted-foreground">...</div>\n`;
     }
 
     if (showDownloads && downloadItems.length > 0) {
@@ -1154,6 +1269,10 @@ export function ToolPrompts({
       prompt += `- Ensure output is MDX-parse-safe (no invalid JS expressions such as raw moustache tokens).\n`;
     }
 
+    if (showImages && imageLines.length > 0) {
+      prompt += `- Hero image rule: Image 1 is reserved for frontmatter heroImage/banner only and must not be repeated inside article body unless explicitly requested.\n`;
+    }
+
     prompt += `\n**9. SEO & HELPFUL CONTENT REQUIREMENTS**\n`;
     prompt += `- Match the primary search intent directly; do not open with generic filler.\n`;
     prompt += `- In the first 120 words, include a concise direct answer/outcome before deep explanation.\n`;
@@ -1166,6 +1285,21 @@ export function ToolPrompts({
     prompt += `- Word-count is not fixed; ensure coverage is complete and non-repetitive for the topic complexity.\n`;
     prompt += `- If the topic is likely to age quickly, include a short freshness note (version/date context) in the narrative.\n`;
 
+    prompt += `\n**10. READABILITY & PARAGRAPH RHYTHM (MANDATORY)**\n`;
+    prompt += `- Target desktop readability: keep most body paragraphs around 3-4 lines in standard article width.\n`;
+    prompt += `- Paragraph length target: ideally 45-85 words (soft cap 90 words).\n`;
+    prompt += `- Maximum 2-3 sentences per paragraph for normal explanatory sections.\n`;
+    prompt += `- One paragraph should carry one core idea only; split mixed ideas into separate paragraphs.\n`;
+    prompt += `- If listing 3+ items, prefer bullets or component blocks over one long paragraph.\n`;
+    prompt += `- After dense technical explanation, insert a short transition paragraph (1 sentence) when helpful for pacing.\n`;
+
+    prompt += `\n**11. FINAL QA CHECKLIST (MUST PASS BEFORE RETURNING OUTPUT)**\n`;
+    prompt += `- No oversized paragraph that breaks desktop reading rhythm unless clearly justified.\n`;
+    prompt += `- No unresolved source markers like {{...}} left in final MDX.\n`;
+    prompt += `- No invalid MDX/HTML structure (unbalanced custom tags/components).\n`;
+    prompt += `- Intro delivers direct answer/outcome early, then expands with practical context.\n`;
+    prompt += `- Sections remain scannable, non-repetitive, and aligned with search intent.\n`;
+
     prompt += `\n---\n\n`;
     if (isModify) {
       prompt += `**ORIGINAL CONTENT:**\n${originalContent || "[MISSING]"}\n\n`;
@@ -1175,6 +1309,8 @@ export function ToolPrompts({
         prompt += `**SERIES KEY POINTS (INPUT):**\n${draft || "[MISSING]"}\n`;
       } else if (contentType === "news") {
         prompt += `**NEWS ANALYSIS NOTES (INPUT):**\n${draft || "[OPTIONAL]"}\n`;
+      } else if (contentType === "notes") {
+        prompt += `**NOTES INPUT (KEY POINTS / RAW FINDINGS):**\n${draft || "[MISSING]"}\n`;
       } else {
         prompt += `**TIPS KEY POINTS (INPUT):**\n${draft || "[MISSING]"}\n`;
       }
@@ -1188,12 +1324,22 @@ export function ToolPrompts({
     if (!isModify && (contentType === "series" || contentType === "tips")) {
       prompt += `Expand the provided key points into complete, practical sections with implementation details, warnings, and checks. `;
     }
+    if (!isModify && contentType === "notes") {
+      prompt += `Convert the input into a compact technical note: keep it concise, factual, and easy to scan, and avoid stretching it into long-form blog narrative. `;
+    }
     if (isModify) {
       prompt += `Treat **MODIFICATION INSTRUCTIONS** as the single source of truth. When instructions include "Target block (line X)", apply edits to those referenced blocks only. For all untouched sections, preserve the original wording, structure, language, and tone exactly as-is. Do not perform global rewrites unless explicitly requested in the instructions. The same rule applies for both English and Indonesian source content. `;
+      prompt += `For readability-only passes in modify mode, prioritize paragraph splits over sentence rewrites: keep claims, facts, and wording intact as much as possible, and only break dense paragraphs into shorter blocks that follow the paragraph rhythm rules. `;
+      prompt += `When splitting paragraphs, do not remove factual details, do not soften key caveats, and do not change technical meaning. `;
     }
     prompt += `If source markers ({{Link n}}, {{Grid n}}, {{Gallery n}}, {{Specs n}}) are present, replace them with concrete MDX output and do not keep marker text in the final file. `;
+    if (!isModify && showImages && imageLines.length > 1 && captionMode !== "off") {
+      prompt += `Apply the Image Caption Policy section deterministically. Avoid captioning decorative/redundant images in selective mode, keep each caption to one sentence, and place it directly under the image using the required class alignment. `;
+    }
     prompt += `For procedural or tutorial sections, use custom MDX components \`<Steps>\` and \`<Step>\` instead of plain numbered markdown lists. `;
+    prompt += `Treat the first uploaded image as hero-only: set it as frontmatter heroImage/banner and do not render it again in article body unless explicitly requested. `;
     prompt += `Ensure all metadata (slugs, translation keys, alt texts) are generated automatically. Tags must never contain spaces and must never produce %20 in URLs. Any tag that would produce %20 is invalid and must be rewritten into lowercase kebab-case (e.g., windows-11, clean-install, ui-design, ubuntu-25-10). Always include 1 platform tag (windows/ubuntu/linux/android/hardware) and 1 versioned tag if the article targets a specific OS version (e.g., windows-11, ubuntu-25-10). Minimum 3 tags, maximum 6 tags per article. `;
+    prompt += `Run a final self-check against the readability rhythm rules and the QA checklist before returning final MDX. `;
     prompt += `Ensure the output is genuinely helpful, intent-focused, and clearly better than a generic rewrite.`;
 
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -1229,6 +1375,12 @@ export function ToolPrompts({
     categoryHint,
     selectedArticle,
     tipsStandalone,
+    noteIntent,
+    noteIntentLabelMap,
+    captionMode,
+    captionAlignment,
+    captionCoverage,
+    parsedCaptionMaxCount,
   ]);
 
   // ── Handlers ──
@@ -1325,6 +1477,9 @@ export function ToolPrompts({
   const applyQuickAction = (action: QuickActionKey) => {
     let text = "";
     switch (action) {
+      case "readability":
+        text = "Readability-only pass: split dense paragraphs to maintain desktop rhythm (target 3-4 lines, ~45-85 words, max 2-3 sentences per paragraph). Preserve facts, claims, technical meaning, and tone. Prefer paragraph breaks over sentence rewrites.";
+        break;
       case "narrative":
         text = dictionary.quickActions.narrative;
         break;
@@ -1350,6 +1505,8 @@ export function ToolPrompts({
   const getQuickActionLabel = useCallback(
     (action: QuickActionKey) => {
       switch (action) {
+        case "readability":
+          return "Readability pass";
         case "narrative":
           return dictionary.quickActions.narrative;
         case "images":
@@ -1490,15 +1647,31 @@ export function ToolPrompts({
                     <Sparkles className="h-4 w-4" />
                   </button>
                 </SnipTooltip>
+                <SnipTooltip label={dictionary.contentTypeNotes} side="top">
+                  <button
+                    type="button"
+                    aria-label={dictionary.contentTypeNotes}
+                    aria-pressed={contentType === "notes"}
+                    onClick={() => setContentType("notes")}
+                    className={cn(
+                      "relative flex items-center justify-center w-10 h-9 rounded-md transition-colors duration-200 z-10",
+                      contentType === "notes" ? "text-primary" : "text-muted-foreground hover:text-primary/70"
+                    )}
+                  >
+                    <FileText className="h-4 w-4" />
+                  </button>
+                </SnipTooltip>
                 <motion.div
-                  className="absolute inset-y-0 w-1/3 bg-background border border-primary/5 rounded-md shadow-sm z-0"
+                  className="absolute inset-y-0 w-1/4 bg-background border border-primary/5 rounded-md shadow-sm z-0"
                   animate={{
                     x:
                       contentType === "series"
                         ? "0%"
                         : contentType === "news"
                           ? "100%"
-                          : "200%",
+                          : contentType === "tips"
+                            ? "200%"
+                            : "300%",
                   }}
                   transition={{ type: "spring", stiffness: 520, damping: 38 }}
                 />
@@ -1960,6 +2133,33 @@ export function ToolPrompts({
                           <Switch checked={tipsStandalone} onCheckedChange={setTipsStandalone} />
                         </div>
                       )}
+
+                      {contentType === "notes" && (
+                        <div className="space-y-3">
+                          <div className="space-y-1.5">
+                            <p className="text-[9px] font-black uppercase tracking-wider text-muted-foreground">
+                              {dictionary.notesIntentLabel}
+                            </p>
+                            <Select value={noteIntent} onValueChange={(value) => setNoteIntent(value as NoteIntent)}>
+                              <SelectTrigger className="h-9 text-xs bg-background/50 border-primary/10">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {noteIntentOptions.map((intent) => (
+                                  <SelectItem key={intent} value={intent}>
+                                    {noteIntentLabelMap[intent]}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <p className="text-[10px] text-muted-foreground">
+                            {isIndonesianLocale
+                              ? "Catatan diarahkan ke _notes/{locale}/ dengan format ringkas, faktual, dan mudah dipindai."
+                              : "Notes are routed to _notes/{locale}/ and should stay concise, factual, and easy to scan."}
+                          </p>
+                        </div>
+                      )}
                     </CardContent>
                   </Card>
                 </ScrollReveal>
@@ -1990,7 +2190,9 @@ export function ToolPrompts({
                             ? "Series Key Points"
                             : contentType === "news"
                               ? "News Notes / Extra Points"
-                              : "Tips Key Points"}
+                              : contentType === "tips"
+                                ? "Tips Key Points"
+                                : "Notes Key Points / Raw Findings"}
                       </CardTitle>
                     </div>
                     {/* Stats row */}
@@ -2018,7 +2220,9 @@ export function ToolPrompts({
                           ? "Paste 5-10 key points for this series article..."
                           : contentType === "news"
                             ? "Optional: paste notable facts, context, or your quick notes..."
-                            : "Paste practical key points for this standalone tips article..."
+                            : contentType === "tips"
+                              ? "Paste practical key points for this standalone tips article..."
+                              : "Paste concise note points, findings, references, or mini-fix steps..."
                     }
                     value={mode === "modify" ? originalContent : draft}
                     onChange={(e) =>
@@ -2103,14 +2307,16 @@ export function ToolPrompts({
                     <CardContent className="p-5 space-y-4">
                       {/* Quick actions */}
                       <div className="flex flex-wrap gap-1.5">
-                        {(["narrative", "images", "metadata", "polish"] as const).map(
+                        {(["readability", "narrative", "images", "metadata", "polish"] as const).map(
                           (action) => (
                             <button
                               key={action}
                               onClick={() => applyQuickAction(action)}
                               className={cn(
                                 "flex items-center gap-1.5 px-3 h-7 rounded-full text-[9px] font-black uppercase tracking-wide transition-all",
-                                action === "polish"
+                                action === "readability"
+                                  ? "bg-sky-500/10 text-sky-500 hover:bg-sky-500/20 border border-sky-500/20"
+                                  : action === "polish"
                                   ? "bg-fuchsia-500/10 text-fuchsia-500 hover:bg-fuchsia-500/20 border border-fuchsia-500/20"
                                   : action === "images"
                                   ? "bg-violet-500/10 text-violet-500 hover:bg-violet-500/20 border border-violet-500/20"
@@ -2185,6 +2391,74 @@ export function ToolPrompts({
                                 focusRing,
                               )}
                             />
+
+                            <div className="mt-4 rounded-lg border border-primary/10 bg-background/35 p-3">
+                              <div className="flex items-center justify-between gap-2">
+                                <p className="text-[9px] font-black uppercase tracking-[0.12em] text-muted-foreground">
+                                  Auto Caption Policy
+                                </p>
+                                <span className="text-[9px] text-muted-foreground/60">
+                                  New article behavior
+                                </span>
+                              </div>
+
+                              <div className="mt-3 grid grid-cols-1 gap-2 md:grid-cols-2">
+                                <div className="space-y-1">
+                                  <p className="text-[9px] font-black uppercase tracking-wider text-muted-foreground">Mode</p>
+                                  <Select value={captionMode} onValueChange={(value) => setCaptionMode(value as "off" | "auto" | "manual") }>
+                                    <SelectTrigger className="h-8 text-[10px] bg-background/60 border-primary/10">
+                                      <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="off">Off</SelectItem>
+                                      <SelectItem value="auto">Auto</SelectItem>
+                                      <SelectItem value="manual">Manual Hint</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+
+                                <div className="space-y-1">
+                                  <p className="text-[9px] font-black uppercase tracking-wider text-muted-foreground">Alignment</p>
+                                  <Select value={captionAlignment} onValueChange={(value) => setCaptionAlignment(value as "left" | "center" | "right") }>
+                                    <SelectTrigger className="h-8 text-[10px] bg-background/60 border-primary/10">
+                                      <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="left">Left</SelectItem>
+                                      <SelectItem value="center">Center</SelectItem>
+                                      <SelectItem value="right">Right</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+
+                                <div className="space-y-1">
+                                  <p className="text-[9px] font-black uppercase tracking-wider text-muted-foreground">Coverage</p>
+                                  <Select value={captionCoverage} onValueChange={(value) => setCaptionCoverage(value as "selective" | "all") }>
+                                    <SelectTrigger className="h-8 text-[10px] bg-background/60 border-primary/10">
+                                      <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="selective">Selective</SelectItem>
+                                      <SelectItem value="all">All Non-Hero</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+
+                                <div className="space-y-1">
+                                  <p className="text-[9px] font-black uppercase tracking-wider text-muted-foreground">Max Captions</p>
+                                  <Input
+                                    value={captionMaxCount}
+                                    onChange={(e) => setCaptionMaxCount(e.target.value.replace(/[^0-9]/g, ""))}
+                                    placeholder="4"
+                                    className="h-8 text-[10px] bg-background/60 border-primary/10"
+                                  />
+                                </div>
+                              </div>
+
+                              <p className="mt-2 text-[10px] text-muted-foreground">
+                                Tip: format image lines as path | alt | caption hint to guide manual caption tone.
+                              </p>
+                            </div>
                           </CardContent>
                         </Card>
                       )}

@@ -112,8 +112,14 @@ For information added after initial publish:
 ### Images
 ```mdx
 ![Short descriptive alt text](/images/path/to/image.webp)
-*Caption: conversational, adds context rather than just repeating the alt text.*
+*Caption (optional): add only when the image needs context or source attribution.*
 ```
+
+Image caption style rules:
+- Do not caption every image. Over-captioning makes articles feel noisy.
+- If image is externally sourced, include a short credit line (example: `Source: OMG Ubuntu`).
+- If image is your own screenshot, optional context line is enough (example: `Screenshot from my test setup`).
+- Keep captions small, factual, and brief. Avoid repeating alt text.
 
 ### Links
 Use descriptive link text — never "click here":
