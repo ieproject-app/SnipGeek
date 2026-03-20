@@ -199,12 +199,23 @@ export function ArticleRelated({
       );
     }
 
-    // Note Style Card matching notes-list-client.tsx
+    // Note Style Card — matching notes-list-client.tsx (with multicolor system)
+    const noteMulticolor = getMulticolorTheme(
+      getMulticolorSeed(item.slug, item.frontmatter.title),
+    );
+
     return (
       <div
         key={item.slug}
-        className="group relative flex flex-col overflow-hidden rounded-xl border bg-card/50 shadow-sm transition-all hover:shadow-lg hover:-translate-y-2 h-full"
+        className={cn(
+          "group relative flex flex-col overflow-hidden rounded-xl border bg-card/50 shadow-sm transition-all hover:shadow-lg hover:-translate-y-2 h-full ring-1 ring-transparent",
+          noteMulticolor.hoverRing,
+          noteMulticolor.hoverShadow,
+        )}
       >
+        {/* Top accent bar — opsi 1, same as notes-list-client */}
+        <div className={cn("absolute top-0 left-0 right-0 h-0.75 opacity-0 transition-opacity duration-500 group-hover:opacity-100 z-10", noteMulticolor.accentBar)} />
+
         <div className="p-6 pb-0 flex flex-row justify-between items-start space-y-0">
           <div className="p-2 bg-muted/50 rounded-lg group-hover:bg-primary/10 transition-colors">
             <StickyNote className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" />
@@ -223,7 +234,10 @@ export function ArticleRelated({
               {formatDate(new Date(item.frontmatter.date))}
             </time>
             <h3
-              className="font-display font-bold tracking-tight text-primary transition-colors group-hover/link:text-accent mb-2 leading-tight"
+              className={cn(
+                "font-display font-bold tracking-tight text-primary transition-colors mb-2 leading-tight",
+                noteMulticolor.hoverTitle,
+              )}
               style={{ fontSize: "clamp(1rem, 0.95rem + 0.25vw, 1.125rem)" }}
             >
               {item.frontmatter.title}

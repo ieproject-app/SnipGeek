@@ -880,9 +880,12 @@ export function LayoutHeader({
                 aria-label="Reading List"
               >
                 <Bookmark
+                  key={readingListItems.length > 0 ? "filled" : "empty"}
                   className={cn(
-                    "h-5 w-5 transition-all duration-300",
-                    readingListItems.length > 0 ? "fill-accent text-accent" : "",
+                    "h-5 w-5 transition-colors duration-300",
+                    readingListItems.length > 0
+                      ? "fill-accent text-accent animate-bookmark-spring"
+                      : "",
                   )}
                 />
                 {mounted && readingListItems.length > 0 && (
@@ -947,11 +950,22 @@ export function LayoutHeader({
               <Button
                 variant="ghost"
                 size="icon"
-                className={cn(navItemClass, "relative inline-flex")}
+                className={cn(
+                  navItemClass,
+                  "relative inline-flex",
+                  isSearchOpen && "animate-search-ping bg-accent/10",
+                )}
                 onClick={() => toggleView("search")}
                 aria-label="Search"
               >
-                <Search className="h-5 w-5 transition-transform group-hover:scale-110 group-hover:rotate-12" />
+                <Search
+                  className={cn(
+                    "h-5 w-5 transition-all duration-300",
+                    isSearchOpen
+                      ? "scale-110 text-accent rotate-12"
+                      : "group-hover:scale-110 group-hover:rotate-12",
+                  )}
+                />
               </Button>
             </SnipTooltip>
           </div>
@@ -1045,16 +1059,18 @@ export function LayoutHeader({
                 </button>
               )}
             </div>
-            <ScrollArea className="max-h-75">
+            <ScrollArea className="max-h-[min(70vh,480px)]">
               <div className="p-2 space-y-1">
                 {readingListItems.length > 0 ? (
                   readingListItems.map((item) => {
                     const dataItem = (searchableData || []).find(
                       (d) => d.slug === item.slug,
                     );
-                    const imgUrl = dataItem
-                      ? getResolvedImage(dataItem as SearchableItem)
-                      : "/images/blank/blank.webp";
+                    const isNote = item.type === "note";
+                    const imgUrl =
+                      !isNote && dataItem
+                        ? getResolvedImage(dataItem as SearchableItem)
+                        : null;
 
                     return (
                       <div
@@ -1062,7 +1078,7 @@ export function LayoutHeader({
                         className={cn(
                           "group flex items-center gap-3 rounded-xl px-3 py-2.5 transition-all [transition-duration:320ms] hover:bg-accent/10",
                           removingSlug === item.slug &&
-                          "opacity-0 -translate-x-2 scale-[0.96] ease-in",
+                            "opacity-0 -translate-x-2 scale-[0.96] ease-in",
                         )}
                       >
                         <NextLink
@@ -1070,16 +1086,31 @@ export function LayoutHeader({
                           className="flex items-center gap-3 flex-1 min-w-0"
                           onClick={() => setActiveView("none")}
                         >
-                          <div className="w-13 h-9.75 relative rounded-md overflow-hidden bg-muted shrink-0 border border-border/50">
-                            <Image
-                              src={imgUrl}
-                              alt=""
-                              fill
-                              className="object-cover"
-                              sizes="52px"
-                            />
+                          {/* Thumbnail: image for blog, icon placeholder for note */}
+                          <div className="w-13 h-9.75 relative rounded-md overflow-hidden bg-muted shrink-0 border border-border/50 flex items-center justify-center">
+                            {imgUrl ? (
+                              <Image
+                                src={imgUrl}
+                                alt=""
+                                fill
+                                className="object-cover"
+                                sizes="52px"
+                              />
+                            ) : (
+                              <StickyNote className="h-5 w-5 text-muted-foreground/40" />
+                            )}
                           </div>
-                          <div className="flex-1 min-w-0 flex flex-col">
+
+                          <div className="flex-1 min-w-0 flex flex-col gap-1">
+                            {/* Type badge */}
+                            <span className={cn(
+                              "inline-flex self-start items-center px-1.5 py-0.5 rounded text-[8px] font-black uppercase tracking-widest leading-none border",
+                              isNote
+                                ? "bg-accent/8 text-accent/70 border-accent/20"
+                                : "bg-primary/5 text-muted-foreground/60 border-primary/10",
+                            )}>
+                              {isNote ? "Note" : "Blog"}
+                            </span>
                             <h4 className="font-sans text-sm font-bold text-foreground line-clamp-2 group-hover:text-accent transition-colors leading-tight">
                               {item.title}
                             </h4>
@@ -1122,13 +1153,21 @@ export function LayoutHeader({
               </div>
             </ScrollArea>
             {readingListItems.length > 0 && (
-              <div className="border-t border-border mt-1 p-1">
+              <div className="border-t border-border mt-1 p-1 flex gap-1">
                 <NextLink
                   href={`${linkPrefix}/blog`}
-                  className="w-full py-2.5 flex items-center justify-center gap-2 font-sans text-[10px] font-black uppercase tracking-wider text-muted-foreground hover:bg-accent/10 hover:text-accent transition-all rounded-lg"
+                  className="flex-1 py-2.5 flex items-center justify-center gap-2 font-sans text-[10px] font-black uppercase tracking-wider text-muted-foreground hover:bg-accent/10 hover:text-accent transition-all rounded-lg"
                   onClick={() => setActiveView("none")}
                 >
-                  Browse all posts <ArrowRight className="h-3 w-3" />
+                  <BookOpen className="h-3 w-3" /> Blog
+                </NextLink>
+                <div className="w-px bg-border/60 my-1.5" />
+                <NextLink
+                  href={`${linkPrefix}/notes`}
+                  className="flex-1 py-2.5 flex items-center justify-center gap-2 font-sans text-[10px] font-black uppercase tracking-wider text-muted-foreground hover:bg-accent/10 hover:text-accent transition-all rounded-lg"
+                  onClick={() => setActiveView("none")}
+                >
+                  <StickyNote className="h-3 w-3" /> Notes
                 </NextLink>
               </div>
             )}
@@ -1328,8 +1367,9 @@ export function LayoutHeader({
                   aria-current={isActive ? "page" : undefined}
                   data-nav-item={item.href.replace("/", "") || "home"}
                   onClick={() => trackSecondaryNavClick(item, index + 1)}
+                  style={{ animationDelay: `${index * 55}ms` }}
                   className={cn(
-                    "group inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full border px-3.5 font-sans text-[10px] font-black uppercase tracking-[0.13em] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50",
+                    "animate-nav-enter group inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full border px-3.5 font-sans text-[10px] font-black uppercase tracking-[0.13em] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50",
                     isActive
                       ? "border-white/80 bg-white text-nav-primary shadow-sm"
                       : cn(
@@ -1350,10 +1390,10 @@ export function LayoutHeader({
       {/* ── Notification Toast Pill (Floating Center, Outside Header bounds) ── */}
       <div
         className={cn(
-          "fixed top-3 left-1/2 z-100 -translate-x-1/2 pointer-events-none transition-all duration-300",
+          "fixed top-3 left-1/2 z-100 -translate-x-1/2 pointer-events-none transition-all duration-500 [transition-timing-function:cubic-bezier(0.34,1.56,0.64,1)]",
           mounted && message
-            ? "opacity-100 translate-y-0"
-            : "opacity-0 -translate-y-8",
+            ? "opacity-100 translate-y-0 blur-0"
+            : "opacity-0 -translate-y-6 blur-sm",
         )}
       >
         <div
