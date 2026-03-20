@@ -1,0 +1,69 @@
+---
+title: "Windows 11 Build 26300: Custom User Folder Names During Setup"
+slug: "windows-11-custom-user-folder-name-setup"
+translationKey: "windows-11-custom-user-folder-name-setup"
+date: "2026-03-21"
+published: true
+featured: false
+heroImage: "/images/_posts/windows11/dev/folder-custom-name/banner005-win11.webp"
+imageAlt: "Windows 11 setup screen showing custom user folder name option"
+tags: ["windows", "windows-11", "dev-channel", "ui-design", "setup"]
+category: "News & Updates"
+---
+
+Finally! Windows 11 now lets you customize your user folder name during setup. This long-awaited feature arrives in Insider Dev Channel build 26300.8068, solving a decades-old frustration where Windows automatically generated folder names from your Microsoft account email.
+
+## #1 The Game-Changing Feature
+
+When setting up Windows 11, you'll now see a "Show user folder name" option on the Device Name screen. This simple addition gives you complete control over your user folder path—no more forced five-letter abbreviations from your email address.
+
+![Windows Settings User Folder Name](/images/_posts/windows11/dev/folder-custom-name/windows-settings-1-user-folder-name-expanded.webp)
+<div className="-mt-3 mb-6 text-center text-sm italic text-muted-foreground">The new user folder name option appears during Windows setup in the Device Name section.</div>
+
+### What This Fixes
+
+Previously, Windows automatically created user folders using the first five characters of your Microsoft account email. For example, if your email was `johnsmith@outlook.com`, your folder became `C:\Users\johns_`. There was no way to change this after installation without complex workarounds.
+
+Now you can set meaningful names like `C:\Users\john_developer` or `C:\Users\creative_studio` right from the start.
+
+## #2 How It Works
+
+The new option appears during the Out-of-Box Experience (OOBE) setup process:
+
+1. **Device Name Screen**: When prompted to name your PC, look for the "Show user folder name" toggle
+2. **Custom Input**: Enable it to reveal a separate field for your user folder name
+3. **Naming Rules**: Your custom name must follow Windows naming conventions:
+   - Letters (a-z, A-Z)
+   - Numbers (0-9)
+   - Hyphens (-) and underscores (_)
+   - No spaces or special characters
+
+This is particularly valuable for developers and power users who frequently navigate via command line or need consistent folder structures across multiple machines.
+
+## #3 Dev Channel Build 26300.8068 Changes
+
+Beyond the user folder customization, this Dev Channel build includes several other improvements:
+
+- **Enhanced Setup Experience**: Refined OOBE flow with better visual hierarchy
+- **Underlying System Updates**: Various bug fixes and performance optimizations
+- **File Explorer Improvements**: Minor UI tweaks for better consistency
+
+The custom folder name feature represents Microsoft's response to years of user feedback. It's a quality-of-life improvement that makes Windows more flexible for professional workflows.
+
+## #4 Availability and Future Rollout
+
+**Current Status**: Available exclusively to Windows Insiders in Dev and Beta Channels
+**Requirements**: Windows 11 Insider Preview Build 26300.8068 or later
+**Expected Timeline**: If testing proceeds smoothly, this feature should reach all users in a future Windows 11 update
+
+## #5 SnipGeek's Take
+
+This change is bigger than it seems. Custom user folder names eliminate a major pain point for developers, IT professionals, and anyone who values clean, predictable file paths. The ability to set meaningful folder names during installation saves hours of post-install configuration and prevents the need for complex user profile migration procedures.
+
+For teams managing multiple development machines, this standardization is a game-changer. No more `C:\Users\johnd_000` variations—just clean, consistent naming from day one.
+
+The feature's appearance in Dev Channel suggests Microsoft is serious about improving the Windows setup experience. We hope this is just the beginning of more user-centric customization options.
+
+---
+
+**Freshness Note**: This feature is currently in Insider Preview testing. Features in Dev Channel may change or be removed before general release. Always check the latest Windows Insider release notes for the most current information.

@@ -9,6 +9,8 @@ import { formatRelativeTime } from "@/lib/utils";
 import { CategoryBadge } from "@/components/layout/category-badge";
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
 import { RevealImage } from "@/components/ui/reveal-image";
+import { getMulticolorSeed, getMulticolorTheme } from "@/lib/multicolor";
+import { cn } from "@/lib/utils";
 import type { Dictionary } from "@/lib/get-dictionary";
 
 type RelatedContentItem = {
@@ -143,13 +145,21 @@ export function ArticleRelated({
     };
 
     if (isBlog) {
+      const multicolor = getMulticolorTheme(
+        getMulticolorSeed(item.slug, item.frontmatter.category, item.frontmatter.title),
+      );
+
       return (
         <div
           key={item.slug}
           className="group relative transition-all duration-500 hover:-translate-y-1"
         >
           <Link href={readingListItem.href} className="block">
-            <div className="relative w-full aspect-8/5 overflow-hidden rounded-xl mb-4 shadow-sm border border-primary/5 bg-primary/5 flex items-center justify-center">
+            <div className={cn(
+              "relative w-full aspect-8/5 overflow-hidden rounded-xl mb-4 shadow-sm transition-all duration-500 border border-primary/5 ring-1 ring-transparent",
+              multicolor.hoverRing,
+              multicolor.hoverShadow,
+            )}>
               {heroImageSrc ? (
                 <RevealImage
                   src={heroImageSrc}
@@ -157,7 +167,7 @@ export function ArticleRelated({
                   fill
                   className="transition-transform duration-700 group-hover:scale-110"
                   wrapperClassName="absolute inset-0"
-                  sizes="(max-width: 768px) 100vw, 300px"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 33vw, 300px"
                   holdUntilLoaded
                   showSkeleton
                   data-ai-hint={heroImageHint}
@@ -165,6 +175,8 @@ export function ArticleRelated({
               ) : (
                 <StickyNote className="h-12 w-12 text-primary/20 transition-transform duration-700 group-hover:scale-110" />
               )}
+              <div className={cn("absolute inset-0 bg-linear-to-t opacity-0 transition-opacity duration-500 group-hover:opacity-100", multicolor.overlayGradient)} />
+              <div className={cn("absolute bottom-0 left-0 right-0 h-0.75 opacity-0 transition-opacity duration-500 group-hover:opacity-100", multicolor.accentBar)} />
               <AddToReadingListButton
                 item={readingListItem}
                 showText={false}
@@ -176,10 +188,7 @@ export function ArticleRelated({
             <div className="mb-2">
               <CategoryBadge category={item.frontmatter.category} type={type} size="xs" />
             </div>
-            <h3
-              className="font-display font-semibold tracking-tight text-primary transition-colors group-hover:text-accent leading-tight mb-2"
-              style={{ fontSize: "clamp(1rem, 0.95rem + 0.25vw, 1.125rem)" }}
-            >
+            <h3 className={cn("font-display text-base sm:text-lg font-semibold tracking-tight text-primary transition-colors leading-tight mb-2", multicolor.hoverTitle)}>
               {item.frontmatter.title}
             </h3>
             <time className="text-[10px] font-medium text-muted-foreground block opacity-60">

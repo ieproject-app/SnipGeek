@@ -1,0 +1,69 @@
+---
+title: "Windows 11 Build 26300: Ganti Nama Folder User Saat Setup"
+slug: "windows-11-custom-user-folder-name-setup"
+translationKey: "windows-11-custom-user-folder-name-setup"
+date: "2026-03-21"
+published: true
+featured: false
+heroImage: "/images/_posts/windows11/dev/folder-custom-name/banner005-win11.webp"
+imageAlt: "Layar setup Windows 11 menampilkan opsi nama folder user kustom"
+tags: ["windows", "windows-11", "dev-channel", "ui-design", "setup"]
+category: "Berita & Update"
+---
+
+Akhirnya! Windows 11 sekarang memungkinkan kamu mengganti nama folder user saat setup. Fitur yang sudah lama ditunggu ini hadir di Insider Dev Channel build 26300.8068, mengatasi frustrasi yang sudah berlangsung puluhan tahun di mana Windows otomatis membuat nama folder dari email akun Microsoft kamu.
+
+## #1 Fitur Perubahan Besar
+
+Saat setup Windows 11, kamu akan melihat opsi "Show user folder name" di layar Device Name. Penambahan sederhana ini memberikan kontrol penuh atas path folder user—tidak lagi dipaksa menggunakan singkatan lima huruf dari email kamu.
+
+![Windows Settings User Folder Name](/images/_posts/windows11/dev/folder-custom-name/windows-settings-1-user-folder-name-expanded.webp)
+<div className="-mt-3 mb-6 text-center text-sm italic text-muted-foreground">Opsi nama folder user baru muncul saat setup Windows di bagian Device Name.</div>
+
+### Apa Yang Diperbaiki
+
+Sebelumnya, Windows otomatis membuat folder user menggunakan lima karakter pertama dari email akun Microsoft kamu. Contohnya, jika email kamu `johnsmith@outlook.com`, folder kamu menjadi `C:\Users\johns_`. Tidak ada cara untuk mengubah ini setelah instalasi tanpa workarounds yang rumit.
+
+Sekarang kamu bisa mengatur nama yang bermakna seperti `C:\Users\john_developer` atau `C:\Users\creative_studio` langsung dari awal.
+
+## #2 Cara Kerjanya
+
+Opsi baru muncul selama proses setup Out-of-Box Experience (OOBE):
+
+1. **Layar Device Name**: Saat diminta menamai PC kamu, cari toggle "Show user folder name"
+2. **Input Kustom**: Aktifkan untuk menampilkan field terpisah untuk nama folder user kamu
+3. **Aturan Penamaan**: nama kustom kamu harus mengikuti konvensi penamaan Windows:
+   - Huruf (a-z, A-Z)
+   - Angka (0-9)
+   - Hyphen (-) dan underscore (_)
+   - Tidak ada spasi atau karakter khusus
+
+Ini sangat berguna untuk developer dan power user yang sering navigasi via command line atau butuh struktur folder yang konsisten di banyak mesin.
+
+## #3 Perubahan Dev Channel Build 26300.8068
+
+Selain kustomisasi folder user, build Dev Channel ini termasuk beberapa peningkatan lain:
+
+- **Setup Experience yang Ditingkatkan**: Alur OOBE yang lebih halus dengan hierarki visual yang lebih baik
+- **Update Sistem Dasar**: Berbagai perbaikan bug dan optimasi performa
+- **Peningkatan File Explorer**: Sedikit tweak UI untuk konsistensi yang lebih baik
+
+Fitur nama folder kustom merepresentasikan respons Microsoft terhadap bertahun-tahun feedback user. Ini adalah peningkatan quality-of-life yang membuat Windows lebih fleksibel untuk workflow profesional.
+
+## #4 Ketersediaan dan Rilis Mendatang
+
+**Status Saat Ini**: Tersedia eksklusif untuk Windows Insiders di Dev dan Beta Channels
+**Persyaratan**: Windows 11 Insider Preview Build 26300.8068 atau lebih baru
+**Timeline Perkiraan**: Jika pengujian berjalan lancar, fitur ini seharusnya mencapai semua user di update Windows 11 mendatang
+
+## #5 SnipGeek's Take
+
+Perubahan ini lebih besar dari yang terlihat. Nama folder user kustom menghilangkan pain point besar untuk developer, profesional IT, dan siapa saja yang menghargai path file yang bersih dan dapat diprediksi. Kemampuan mengatur nama folder yang bermakna selama instalasi menghemat jam konfigurasi pasca-instalasi dan mencegah kebutuhan prosedur migrasi profil user yang rumit.
+
+Untuk tim yang mengelola banyak mesin development, standardisasi ini adalah perubahan besar. Tidak lagi ada variasi `C:\Users\johnd_000`—hanya penamaan yang bersih dan konsisten dari hari pertama.
+
+Kemunculan fitur ini di Dev Channel menunjukkan Microsoft serius meningkatkan pengalaman setup Windows. Kami harap ini hanya awal dari opsi kustomisasi yang lebih berpusat pada user.
+
+---
+
+**Catatan Freshness**: Fitur ini saat ini dalam tahap pengujian Insider Preview. Fitur di Dev Channel dapat berubah atau dihapus sebelum rilis umum. Selalu periksa catatan rilis Windows Insider terbaru untuk informasi terkini.

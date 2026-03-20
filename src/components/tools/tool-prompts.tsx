@@ -1118,7 +1118,8 @@ export function ToolPrompts({
 
     let prompt = `**INTERNAL CONTENT BRIEF FOR SNIPGEEK AGENT**\n`;
     const activeSkills = ["content-generator", "snipgeek-blog-tone"];
-    prompt += `**FOLLOWING SKILLS:** \`${activeSkills.join("`, `")}\`\n\n`;
+    prompt += `**FOLLOWING SKILLS:** \`${activeSkills.join("`, `")}\` \n\n`;
+    prompt += `**IMPORTANT:** Before generating content, you MUST read and understand all referenced skills above. They contain critical standards for MDX formatting, frontmatter requirements, and SnipGeek-specific conventions.\n\n`;
 
     prompt += `**1. MODE & TYPE**\n`;
     prompt += `- Action: ${isModify ? "MODIFY EXISTING" : "CREATE NEW"}\n`;

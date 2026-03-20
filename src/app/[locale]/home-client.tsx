@@ -59,16 +59,17 @@ export function HomeClient({
     .slice(0, 6);
   latestPosts.forEach((p) => seenSlugs.add(p.slug));
 
-  const sliderCategory = "Tutorial";
-  const sliderPosts = allPosts
-    .filter(
-      (post) =>
-        post.frontmatter.published &&
-        !seenSlugs.has(post.slug) &&
-        post.frontmatter.category?.toLowerCase() === sliderCategory.toLowerCase(),
-    )
-    .slice(0, 6);
-  sliderPosts.forEach((p) => seenSlugs.add(p.slug));
+  // --- Manual Tutorial Posts for Modular Learning ---
+  const manualTutorialSlugs = [
+    "how-to-create-windows-11-bootable-usb-rufus",
+    "clean-install-windows-11-step-by-step-guide", 
+    "to-do-after-install-windows11"
+  ];
+  
+  const manualTutorialPosts = allPosts.filter(
+    (post) => post.frontmatter.published && manualTutorialSlugs.includes(post.slug)
+  );
+  manualTutorialPosts.forEach((p) => seenSlugs.add(p.slug));
 
   const topicTag = "Windows";
   const topicPosts = allPosts
@@ -125,6 +126,8 @@ export function HomeClient({
   const transitionDescription = locale === "id"
     ? "Bagian selanjutnya disusun dari praktik ke konteks: tutorial, sorotan topik, update penting, lalu catatan teknis ringkas. Tujuannya agar urutan baca lebih natural, bukan sekadar feed acak."
     : "The next sections are arranged from practice to context: tutorials, topic highlights, key updates, and concise technical notes. This keeps the reading order intentional instead of feeling like a random feed.";
+  const tutorialTitle = locale === "id" ? "Panduan Instalasi Windows 11" : "Windows 11 Installation Guide";
+  const tutorialViewMore = locale === "id" ? "lihat panduan lengkap" : "view complete guide";
   const transitionCta = locale === "id" ? "Lanjut ke Tutorial" : "Continue to Tutorials";
 
   return (
@@ -152,14 +155,14 @@ export function HomeClient({
         ctaHref={`${linkPrefix}/tags/tutorial`}
       />
 
-      {sliderPosts.length > 0 && (
+      {manualTutorialPosts.length > 0 && (
         <HomeTutorials
-          posts={sliderPosts}
-          title={dictionary.home.sliderAndShadow.title}
-          viewMoreText={dictionary.home.sliderAndShadow.viewMore}
+          posts={manualTutorialPosts}
+          title={tutorialTitle}
+          viewMoreText={tutorialViewMore}
           dictionary={dictionary}
           locale={locale}
-          tag={sliderCategory}
+          tag="Installation Guide"
         />
       )}
 
