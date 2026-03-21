@@ -35,9 +35,27 @@ published: true                        # REQUIRED: Must be true to appear in lis
 3. **Use Standard Paths**: For both `heroImage` and article images (`![alt](/images/...)`), always use the standard `/images/` path relative to `public/`.
 4. **Create MDX**: Link the `heroImage` using the ID and ensure `translationKey` is descriptive English kebab-case.
 5. **Place Content in the Correct Collection**:
-   - Blog posts go in `_posts/<locale>/`
-   - Notes go in `_notes/<locale>/`
+   - Blog posts go in `_posts/<locale>/<YYYY-H1 or YYYY-H2>/`
+   - Notes go in `_notes/<locale>/<YYYY-H1 or YYYY-H2>/`
    - Static text-heavy pages go in `_pages/<slug>/<locale>.mdx`
+
+### Semester Sub-Folder Convention (MANDATORY)
+All `_posts` and `_notes` files MUST be placed inside a semester sub-folder, not directly in the locale root.
+
+- **H1** = months January–June → folder name `YYYY-H1`
+- **H2** = months July–December → folder name `YYYY-H2`
+- The semester is determined by the **`date:`** frontmatter field — NOT `updated:`
+- The file slug (URL) comes from the **filename only**, not the folder path — moving a file to a different semester folder does NOT change its URL
+
+**Examples:**
+```
+_posts/en/2026-H1/firebase-studio-sunset.mdx  ← date: 2026-03-18 (March = H1)
+_posts/en/2026-H2/my-new-article.mdx          ← date: 2026-09-01 (September = H2)
+_notes/id/2026-H1/fix-git-push-error.mdx      ← date: 2026-01-10 (January = H1)
+```
+
+> [!IMPORTANT]
+> **NEVER** place `.mdx` files directly in `_posts/<locale>/` or `_notes/<locale>/` without a semester sub-folder. The file reader (`posts.ts`, `notes.ts`) uses recursive scanning to support this structure.
 
 ### Custom Components — NEVER use raw HTML for:
 
