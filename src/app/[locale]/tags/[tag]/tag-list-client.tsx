@@ -141,7 +141,7 @@ export function TagListClient({
                               item={item}
                               dictionary={dictionary}
                               showText={false}
-                              className="absolute top-3 right-3 z-10 text-white bg-black/30 hover:bg-black/50 hover:text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                              className="absolute top-3 right-3 z-10 text-white bg-black/30 hover:bg-black/50 hover:text-white opacity-0 group-hover:opacity-100 [@media(hover:none)]:opacity-100 transition-opacity"
                             />
                           </div>
                           <div className="mb-2">
@@ -216,7 +216,7 @@ export function TagListClient({
                             item={item}
                             showText={false}
                             dictionary={dictionary}
-                            className="text-muted-foreground hover:text-primary z-10 opacity-0 group-hover:opacity-100 transition-opacity shrink-0"
+                            className="text-muted-foreground hover:text-primary z-10 opacity-0 group-hover:opacity-100 [@media(hover:none)]:opacity-100 transition-opacity shrink-0"
                           />
                         </div>
                         <div className="flex flex-1 flex-col p-6 pt-2">

@@ -101,7 +101,7 @@ export function NotesListClient({
                       item={item}
                       showText={false}
                       dictionary={dictionary}
-                      className="text-muted-foreground hover:text-primary z-10 opacity-0 group-hover:opacity-100 transition-opacity shrink-0"
+                      className="text-muted-foreground hover:text-primary z-10 opacity-0 group-hover:opacity-100 [@media(hover:none)]:opacity-100 transition-opacity shrink-0"
                     />
                   </CardHeader>
 

@@ -86,7 +86,7 @@ export function HomeTopics({
                 item={item}
                 dictionary={dictionary}
                 showText={false}
-                className="absolute top-1 right-1 z-20 text-white bg-black/30 hover:bg-black/50 hover:text-white opacity-0 group-hover:opacity-100 transition-opacity h-6 w-6"
+                className="absolute top-1 right-1 z-20 text-white bg-black/30 hover:bg-black/50 hover:text-white opacity-0 group-hover:opacity-100 [@media(hover:none)]:opacity-100 transition-opacity h-6 w-6"
               />
             </div>
             <div className="flex-1 min-w-0 flex flex-col justify-center">
