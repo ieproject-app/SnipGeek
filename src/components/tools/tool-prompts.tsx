@@ -1178,7 +1178,7 @@ export function ToolPrompts({
         prompt += `**NOTES CONTEXT BLOCK**\n`;
         prompt += `- Note Intent: ${noteIntentLabelMap[noteIntent]}\n`;
         prompt += `- Goal: Produce a concise, referenceable note with practical value and minimal filler.\n`;
-        prompt += `- Routing: Save under _notes/{locale}/ (not _posts/{locale}/).\n\n`;
+        prompt += `- Routing: Save under _notes/{locale}/{YYYY-H1 or YYYY-H2}/ based on the article date (not _posts/{locale}/). E.g. _notes/en/2026-H1/slug.mdx for Jan–Jun 2026.\n\n`;
       }
     }
 
@@ -2156,8 +2156,8 @@ export function ToolPrompts({
                           </div>
                           <p className="text-[10px] text-muted-foreground">
                             {isIndonesianLocale
-                              ? "Catatan diarahkan ke _notes/{locale}/ dengan format ringkas, faktual, dan mudah dipindai."
-                              : "Notes are routed to _notes/{locale}/ and should stay concise, factual, and easy to scan."}
+                              ? "Catatan diarahkan ke _notes/{locale}/{YYYY-H1 atau YYYY-H2}/ berdasarkan tanggal artikel. Misal: _notes/id/2026-H1/slug.mdx"
+                              : "Notes are routed to _notes/{locale}/{YYYY-H1 or YYYY-H2}/ based on the article date. E.g. _notes/en/2026-H1/slug.mdx"}
                           </p>
                         </div>
                       )}
