@@ -34,6 +34,7 @@ interface ToolWrapperProps {
   description: string;
   dictionary: Dictionary;
   isPublic?: boolean;
+  requiresCloud?: boolean;
 }
 
 const INTERNAL_TOOL_ALLOWLIST_RAW =
@@ -68,6 +69,7 @@ export function ToolWrapper({
   description,
   dictionary,
   isPublic = false,
+  requiresCloud = true,
 }: ToolWrapperProps) {
   const { user, isUserLoading } = useUser();
   const auth = useAuth();
@@ -114,7 +116,7 @@ export function ToolWrapper({
   if (isPublic) {
     return (
       <div className="space-y-8 animate-in fade-in duration-700">
-        {!isFirebaseInitialized && (
+        {requiresCloud && !isFirebaseInitialized && (
           <div className="p-4 bg-amber-500/10 border-l-4 border-amber-500 rounded-lg text-amber-700">
             <div className="flex items-center gap-3">
               <AlertTriangle className="h-5 w-5" />

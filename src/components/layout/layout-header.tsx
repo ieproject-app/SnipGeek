@@ -5,7 +5,6 @@ import { cn, getLinkPrefix } from "@/lib/utils";
 import {
   Search,
   X,
-  ClipboardPenLine,
   Bookmark,
   Trash2,
   MoreHorizontal,
@@ -471,9 +470,6 @@ export function LayoutHeader({
     () => normalizedPath === (linkPrefix || "/"),
     [linkPrefix, normalizedPath],
   );
-
-  const showDevPromptShortcut =
-    process.env.NODE_ENV === "development" && (isArticleDetailPage || isHomePage);
 
   useEffect(() => {
     if (process.env.NODE_ENV !== "development") return;
@@ -1427,17 +1423,6 @@ export function LayoutHeader({
           </div>
         </div>
       </div>
-
-      {showDevPromptShortcut && (
-        <NextLink
-          href={`${linkPrefix}/tools/prompt-generator`}
-          className="fixed right-4 bottom-5 z-90 inline-flex h-11 items-center gap-2 rounded-full border border-accent/35 bg-background/90 px-3.5 text-[10px] font-black uppercase tracking-[0.12em] text-accent shadow-xl backdrop-blur transition-all hover:-translate-y-0.5 hover:border-accent/55 hover:bg-background"
-          aria-label="Open Prompt Generator"
-        >
-          <ClipboardPenLine className="h-3.5 w-3.5" />
-          Prompt Studio
-        </NextLink>
-      )}
     </>
   );
 }

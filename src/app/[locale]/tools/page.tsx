@@ -85,16 +85,20 @@ export default async function ToolsPage({ params }: { params: Promise<{ locale: 
       badge: pageContent.open_tool,
       badgeVariant: 'secondary' as const,
     },
+    {
+      id: 'random_name',
+      icon: <Shuffle className="h-8 w-8" />,
+      isLink: true,
+      href: `${linkPrefix}/tools/random-name-picker`,
+      badge: pageContent.open_tool,
+      badgeVariant: 'secondary' as const,
+    },
   ];
 
   const devPreviewTools = [
     {
       id: 'number_to_words',
       icon: <Calculator className="h-8 w-8" />,
-    },
-    {
-      id: 'random_name',
-      icon: <Shuffle className="h-8 w-8" />,
     },
   ];
 
