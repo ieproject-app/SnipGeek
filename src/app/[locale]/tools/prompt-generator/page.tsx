@@ -3,7 +3,7 @@ import { getDictionary } from '@/lib/get-dictionary';
 import { i18n, type Locale } from '@/i18n-config';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { ToolPrompts } from '@/components/tools/tool-prompts';
+import { ToolPromptBuilder } from '@/components/tools/tool-prompt-builder';
 import { getSortedPostsData } from '@/lib/posts';
 import { getSortedNotesData } from '@/lib/notes';
 
@@ -65,12 +65,7 @@ export default async function PromptGeneratorPage({ params }: { params: Promise<
   return (
     <div className="w-full">
       <main className="mx-auto max-w-7xl px-4 pt-6 pb-12 sm:px-6 sm:pt-8 sm:pb-16">
-        <ToolPrompts
-          dictionary={pageContent}
-          existingArticles={existingArticles}
-          fullDictionary={dictionary}
-          locale={lang}
-        />
+        <ToolPromptBuilder dictionary={pageContent} fullDictionary={dictionary} existingArticles={existingArticles} locale={lang as Locale} />
       </main>
     </div>
   );
