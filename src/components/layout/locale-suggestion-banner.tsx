@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams, usePathname, useRouter } from "next/navigation";
-import { X } from "lucide-react";
+import { X, Globe } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { Dictionary } from "@/lib/get-dictionary";
 
@@ -128,52 +128,75 @@ export function LocaleSuggestionBanner({
 
   return (
     <div
+      // Sits right below the fixed primary nav (h-16 = top-16).
+      // Uses z-45 so it floats above the secondary nav (z-20) but
+      // below the header's own z-50 overlays.
       className={cn(
-        "pointer-events-none fixed inset-x-0 top-18 z-120 px-3 transition-all duration-200 sm:px-4",
+        "fixed left-0 right-0 z-45 top-16",
+        "transition-all duration-350 ease-out",
         visible
           ? "translate-y-0 opacity-100"
-          : "-translate-y-2 opacity-0",
+          : "-translate-y-full opacity-0 pointer-events-none",
       )}
       aria-hidden={!visible}
+      aria-live="polite"
     >
+      {/* Gradient strip — same visual language as the secondary nav bar */}
       <div
         className={cn(
-          "mx-auto flex w-full max-w-2xl items-start gap-3 rounded-2xl border border-accent/20 bg-background/95 px-4 py-3 shadow-2xl ring-1 ring-black/5 backdrop-blur supports-backdrop-filter:bg-background/85",
-          visible ? "pointer-events-auto" : "pointer-events-none",
+          "w-full border-b border-nav-primary/50",
+          "bg-linear-[140deg] from-[hsl(var(--nav-primary)/0.92)] to-[hsl(var(--accent)/0.60)]",
         )}
       >
-        <div className="min-w-0 flex-1">
-          <p className="text-[13px] font-semibold text-foreground sm:text-sm">
-            {localeSuggestion.title}
-          </p>
-          <p className="mt-1 text-xs leading-relaxed text-muted-foreground sm:text-sm">
-            {localeSuggestion.description}
-          </p>
-          <div className="mt-3 flex flex-wrap items-center gap-2">
-            <button
-              type="button"
-              onClick={handleSwitch}
-              className="inline-flex h-8 items-center justify-center rounded-full bg-accent px-3.5 text-xs font-semibold text-accent-foreground transition-all hover:opacity-90 active:scale-[0.98] sm:h-9 sm:px-4 sm:text-sm"
-            >
-              {localeSuggestion.switch}
-            </button>
-            <button
-              type="button"
-              onClick={handleDismiss}
-              className="inline-flex h-8 items-center justify-center rounded-full border border-border px-3.5 text-xs font-semibold text-foreground/80 transition-all hover:bg-muted active:scale-[0.98] sm:h-9 sm:px-4 sm:text-sm"
-            >
-              {localeSuggestion.stay}
-            </button>
+        <div className="mx-auto max-w-4xl px-4 md:px-6">
+          <div className="flex h-9 items-center justify-between gap-3">
+
+            {/* Left: Globe + label */}
+            <div className="flex items-center gap-2 min-w-0">
+              <Globe
+                className="h-3.5 w-3.5 text-nav-primary-foreground/70 shrink-0"
+                aria-hidden
+              />
+              <p className="font-sans text-[10px] font-black uppercase tracking-[0.13em] text-nav-primary-foreground/80 truncate">
+                {localeSuggestion.title}
+              </p>
+            </div>
+
+            {/* Right: CTA pill + dismiss */}
+            <div className="flex items-center gap-2 shrink-0">
+              {/* Switch button — matches the "active" pill style in secondary nav */}
+              <button
+                type="button"
+                onClick={handleSwitch}
+                className={cn(
+                  "inline-flex items-center justify-center",
+                  "h-6 px-3 rounded-full shrink-0",
+                  "border border-white/80 bg-white text-nav-primary",
+                  "font-sans text-[10px] font-black uppercase tracking-[0.12em]",
+                  "transition-all hover:bg-white/90 active:scale-[0.97]",
+                )}
+              >
+                {localeSuggestion.switch}
+              </button>
+
+              {/* Dismiss — subtle ghost on gradient */}
+              <button
+                type="button"
+                onClick={handleDismiss}
+                className={cn(
+                  "flex h-6 w-6 shrink-0 items-center justify-center rounded-full",
+                  "text-nav-primary-foreground/50",
+                  "hover:text-nav-primary-foreground/90 hover:bg-white/10",
+                  "transition-all active:scale-90",
+                )}
+                aria-label={localeSuggestion.dismiss}
+              >
+                <X className="h-3.5 w-3.5" />
+              </button>
+            </div>
+
           </div>
         </div>
-        <button
-          type="button"
-          onClick={handleDismiss}
-          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-foreground/40 transition-all hover:bg-muted hover:text-foreground/80 active:scale-95"
-          aria-label={localeSuggestion.dismiss}
-        >
-          <X className="h-4 w-4" />
-        </button>
       </div>
     </div>
   );
