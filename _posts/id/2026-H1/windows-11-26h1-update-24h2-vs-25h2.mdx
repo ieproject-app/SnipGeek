@@ -1,0 +1,90 @@
+---
+title: "Windows 11 26H1 Resmi Hadir — Tapi Bukan untuk PC Kamu"
+slug: "windows-11-26h1-update-24h2-vs-25h2"
+translationKey: "windows-11-26h1-core-new"
+date: "2026-03-24"
+category: "Windows"
+tags: ["windows-11", "windows", "windows-update", "kb5085516"]
+description: "Windows 11 26H1 resmi diumumkan Microsoft — tapi dibangun di atas core berbeda dan hanya untuk perangkat Snapdragon X2 terbaru. Ini artinya apa buat pengguna 24H2 dan 25H2 yang masih di jalur mainstream?"
+published: true
+featured: true
+heroImage: "/images/_posts/windows11/windows-update/26h1/banner-hero.webp"
+imageAlt: "Pengumuman Windows 11 26H1 dengan core OS baru yang eksklusif untuk perangkat Snapdragon X2 Series"
+---
+
+Sudah beberapa bulan saya pakai Windows 11 **24H2**, dan jujur saja — belum ada yang cukup menarik buat saya upgrade ke 25H2. Fitur-fitur AI yang katanya lebih dalam di 25H2 belum terlalu terasa gunanya di pemakaian sehari-hari. Bahkan Widget Microsoft pun sudah saya hapus dari taskbar karena memang tidak pernah saya buka.
+
+![Screenshot menghapus Microsoft Widget dari taskbar di Windows 11](/images/_posts/windows11/windows-update/26h1/remove-widget.webp)
+*Dihapus tanpa pikir panjang. Widget panel memang bukan sesuatu yang saya butuhkan setiap hari.*
+
+Jadi ketika kabar muncul bahwa Microsoft sudah mengkonfirmasi **Windows 11 26H1**, saya penasaran — apa ini versi yang akhirnya bikin upgrade terasa perlu? Setelah baca blog resmi Microsoft dan ngulik detailnya, jawabannya ternyata lebih dari sekadar ya atau tidak.
+
+## Windows 11 26H1: Bukan Rilis Biasa
+
+Ini yang penting dipahami — **26H1 bukan sekadar update Windows seperti biasa**. Ini adalah branch baru Windows 11 yang dibangun di atas core OS yang berbeda, dan saat ini hanya tersedia untuk perangkat generasi baru berbasis chipset **Qualcomm Snapdragon X2 Series**.
+
+Kalau kamu pakai 24H2 atau 25H2 di mesin yang sekarang, kamu tidak akan dapat 26H1. Bukan karena dilewati — tapi karena perangkat kamu secara literal berjalan di atas fondasi kode yang berbeda. Microsoft dengan jelas bilang: versi ini untuk *early adopters* dan hardware generasi berikutnya, bukan untuk fleet mainstream yang sudah ada.
+
+<Callout variant="info" title="Siapa yang Dapat 26H1?">
+  Hanya perangkat baru yang shipping dengan chipset Qualcomm Snapdragon X2 Series yang akan menerima Windows 11 26H1. Pengguna 24H2 dan 25H2 di mesin yang sudah ada berada di jalur servicing berbeda dan tidak akan diupgrade ke branch ini.
+</Callout>
+
+Yang menarik — dan sedikit tidak biasa — adalah perangkat 26H1 ternyata **tidak akan mendapat update 26H2 juga**. Karena 26H2 dibangun di atas core yang berbeda lagi (yang sama dengan rilis mainstream umum), tidak ada jalur upgrade yang mulus dari 26H1 ke 26H2. Microsoft belum konfirmasi ke mana 26H1 akhirnya akan menuju — 27H1 jadi kemungkinan, tapi belum ada yang pasti.
+
+Satu hal lagi yang perlu diperhatikan buat IT admin enterprise: **hotpatch update tidak didukung** di 26H1. Artinya tidak ada lagi update tanpa restart untuk perangkat-perangkat itu. Tidak fatal untuk early adopters, tapi perlu dipertimbangkan kalau kamu mengelola banyak device.
+
+## 24H2 vs 25H2 — Di Mana Kebanyakan dari Kita Sekarang
+
+Karena 26H1 tidak datang ke mesin mainstream dalam waktu dekat, pertanyaan yang lebih relevan adalah: **apa worthwhile lompat dari 24H2 ke 25H2?**
+
+Saya masih di 24H2 justru karena alasan ini — perbedaannya belum terasa cukup berarti. Tapi ada beberapa hal yang memang nyata berubah dan worth diketahui.
+
+### Apa yang Benar-benar Datang di 25H2
+
+25H2 lebih terasa seperti update kumulatif yang merangkum berbulan-bulan peningkatan bertahap, bukan overhaul besar. Yang genuinely ada:
+
+- **Fitur Copilot+ PC yang lebih matang** — Recall, Cocreator di Paint, dan Live Captions yang diperbarui lebih stabil di 25H2 dibanding waktu pertama dirilis.
+- **Taskbar yang bisa resize ikon** — Kalau terlalu banyak app terbuka, taskbar sekarang otomatis memperkecil ikon supaya semua tetap kelihatan. Kecil tapi lumayan berguna.
+- **Windows Hello yang didesain ulang** — UI sign-in jadi lebih bersih dan lebih cepat di berbagai alur autentikasi.
+- **Dukungan Wi-Fi 7 enterprise** — Untuk organisasi yang sudah pakai access point Wi-Fi 7, 25H2 membawa dukungan driver-level yang proper.
+- **Windows Backup for Organizations** — IT bisa backup dan restore settings pengguna + app Microsoft Store saat pergantian perangkat.
+- **Dialog privasi yang lebih jelas** — Saat app minta akses kamera atau mikrofon, Windows sekarang meredupkan layar dan memusatkan dialog — jauh lebih sulit diabaikan.
+
+### Kenapa Saya Masih Betah di 24H2
+
+Jujurnya? Sebagian besar fitur Copilot+ itu butuh hardware yang saya tidak punya — chip dengan NPU yang cukup kuat seperti Snapdragon X atau Intel Core Ultra. Di setup Intel standar, 25H2 terasa hampir identik dengan 24H2 dalam penggunaan sehari-hari. Fitur AI yang semua iklannya bilang keren itu tidak aktif tanpa silikon yang tepat.
+
+Sampai ada sesuatu yang genuinely berguna untuk hardware non-Copilot+, saya akan tetap di 24H2 yang stabil dan berjalan mulus.
+
+## KB5085516 — Update Out-of-Band yang Baru Saya Install
+
+Ngomongin soal update — tadi pagi (22 Maret 2026), ada update kecil tapi penting yang turun untuk **baik 24H2 maupun 25H2**: **KB5085516**.
+
+![Layar Windows Update menampilkan KB5085516 yang sudah terinstall](/images/_posts/windows11/windows-update/26h1/update-windows.webp)
+*Diinstall tadi pagi. Layar update langsung konfirmasi nomor KB dan versi build.*
+
+Update ini dikategorikan sebagai **out-of-band (OOB)** — artinya bukan bagian dari siklus Patch Tuesday bulanan yang normal. Ini dirilis khusus untuk memperbaiki satu masalah serius yang muncul pasca update 10 Maret 2026 (KB5079473).
+
+<Callout variant="warning" title="Yang Diperbaiki KB5085516">
+  Setelah update 10 Maret, sebagian pengguna mengalami error **"no Internet"** saat mencoba login ke app menggunakan **akun Microsoft pribadi** — meski perangkat jelas-jelas terhubung ke internet. Layanan seperti Microsoft Teams (Free) dan OneDrive jadi tidak bisa diakses. KB5085516 memperbaiki masalah sign-in ini sepenuhnya.
+</Callout>
+
+Beberapa detail penting:
+
+- **Build yang terdampak:** Windows 11 24H2 (OS Build 26100.8039) dan 25H2 (OS Build 26200.8039)
+- **Scope:** Hanya akun Microsoft pribadi yang terdampak. Akun bisnis lewat Microsoft Entra ID tidak bermasalah.
+- **Update ini bersifat kumulatif** — mencakup semua perbaikan dari KB5079473 plus satu tambahan ini.
+
+Kalau kamu mengaktifkan **"Dapatkan update terbaru sesegera mungkin"** di pengaturan Windows Update, update ini seharusnya sudah turun otomatis. Kalau belum, buka **Settings → Windows Update → Download & install** untuk pasang manual.
+
+Fakta bahwa Microsoft mendorong ini di luar jadwal bulanan cukup berbicara. Bug login yang putus itu menyentuh cukup banyak workflow nyata — Teams Free adalah sesuatu yang banyak orang andalkan — dan menunggu sampai Patch Tuesday April terasa terlalu lama.
+
+## Take Saya
+
+26H1 adalah eksperimen arsitektur yang menarik secara teknis, tapi menyebutnya sebagai rilis Windows mainstream terasa agak berlebihan. Ini branch khusus untuk hardware khusus, dan Microsoft cukup transparan soal itu — yang justru saya hargai. Mereka secara eksplisit bilang: *kalau kamu di enterprise, jangan ubah rencana pengadaan perangkat hanya karena ini.*
+
+Untuk kita-kita yang masih di 24H2 atau 25H2, tidak banyak yang berubah. Mesin kamu tetap di jalur servicing mainstream, terus dapat patch bulanan, dan kalau kamu tidak di hardware Copilot+, upgrade ke 25H2 masih belum cukup compelling.
+
+Satu hal yang konkret: kalau kamu kena bug login pasca update 10 Maret, install KB5085516 hari ini. Kecil, tapi penting.
+
+Kamu sekarang masih di 24H2 atau sudah loncat ke 25H2? Penasaran juga mana yang lebih banyak dipakai pembaca SnipGeek. Komen di bawah ya.
