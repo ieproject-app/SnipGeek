@@ -344,7 +344,7 @@ export function LayoutHeader({
 
   const directLinks = useMemo(
     () => [
-      { name: "Windows 11", href: "/tags/windows-11", icon: Monitor, badge: "25H2" },
+      { name: "Windows 11", href: "/tags/windows-11", icon: Monitor, badge: "24H2" },
       { name: "Ubuntu 26.04", href: ubuntuFocusHref, icon: Terminal, badge: "LTS" },
     ],
     [ubuntuFocusHref],
@@ -723,7 +723,7 @@ export function LayoutHeader({
                   )}
                   {item.name === "Windows 11" && (
                     <span className="text-[8px] font-black uppercase tracking-wide px-1 py-0.5 rounded bg-[#0078D4]/15 text-[#0078D4] border border-[#0078D4]/30 leading-none">
-                      25H2
+                      24H2
                     </span>
                   )}
                 </NextLink>
@@ -811,7 +811,7 @@ export function LayoutHeader({
                         )}
                         {item.name === "Windows 11" && (
                           <span className="text-[8px] font-black uppercase tracking-wide px-1 py-0.5 rounded bg-[#0078D4]/15 text-[#0078D4] border border-[#0078D4]/30 leading-none">
-                            25H2
+                            24H2
                           </span>
                         )}
                       </NextLink>

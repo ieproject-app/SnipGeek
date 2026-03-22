@@ -81,6 +81,9 @@ function InfoPill({ label, value }: { label: string; value: string }) {
 // ──────────────────────────────────────────────────────────────────────────────
 // Crop Preview — CSS overlay + drag to reposition
 // ──────────────────────────────────────────────────────────────────────────────
+type ResizeCorner = "tl" | "tr" | "bl" | "br";
+const MIN_SCALE = 0.15;
+
 interface CropPreviewProps {
   imageSrc: string;
   imageAlt: string;
@@ -90,8 +93,12 @@ interface CropPreviewProps {
   cropY: number;
   cropW: number;
   cropH: number;
+  maxCropW: number;
+  maxCropH: number;
+  cropScale: number;
   canDrag: boolean;
   onReposition: (newOffsetX: number, newOffsetY: number) => void;
+  onResize: (newScale: number, newOffsetX: number, newOffsetY: number) => void;
   currentOffsetX: number;
   currentOffsetY: number;
   maxOffsetX: number;
@@ -110,8 +117,12 @@ function CropPreview({
   cropY,
   cropW,
   cropH,
+  maxCropW,
+  maxCropH,
+  cropScale,
   canDrag,
   onReposition,
+  onResize,
   currentOffsetX,
   currentOffsetY,
   maxOffsetX,
@@ -122,6 +133,9 @@ function CropPreview({
 }: CropPreviewProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const isDraggingRef = useRef(false);
+  // Feature 9: rAF throttle for drag performance
+  const rafRef = useRef<number | null>(null);
+  const pendingMoveRef = useRef<{ clientX: number; clientY: number } | null>(null);
   const dragStartRef = useRef<{
     clientX: number;
     clientY: number;
@@ -157,28 +171,29 @@ function CropPreview({
     [canDrag, currentOffsetX, currentOffsetY],
   );
 
+  // Feature 9: throttle via rAF — store latest pointer, only compute on next frame
   const moveDrag = useCallback(
     (clientX: number, clientY: number) => {
       if (!dragStartRef.current) return;
-
-      const { clientX: sx, clientY: sy, offsetX: ox, offsetY: oy, rectW, rectH } = dragStartRef.current;
-
-      // Display pixel delta → image pixel delta
-      // Dragging right means we want to show more of the LEFT side → offsetX decreases
-      const dpxX = clientX - sx;
-      const dpxY = clientY - sy;
-      const imgPxX = dpxX * (imgW / rectW);
-      const imgPxY = dpxY * (imgH / rectH);
-
-      // Dragging right (dpxX > 0) should move the crop box right → offsetX increases
-      const newOX = maxOffsetX > 0
-        ? Math.max(0, Math.min(1, ox + imgPxX / maxOffsetX))
-        : ox;
-      const newOY = maxOffsetY > 0
-        ? Math.max(0, Math.min(1, oy + imgPxY / maxOffsetY))
-        : oy;
-
-      onReposition(newOX, newOY);
+      pendingMoveRef.current = { clientX, clientY };
+      if (rafRef.current !== null) return;
+      rafRef.current = requestAnimationFrame(() => {
+        rafRef.current = null;
+        if (!dragStartRef.current || !pendingMoveRef.current) return;
+        const { clientX: sx, clientY: sy, offsetX: ox, offsetY: oy, rectW, rectH } = dragStartRef.current;
+        const { clientX: cx, clientY: cy } = pendingMoveRef.current;
+        const dpxX = cx - sx;
+        const dpxY = cy - sy;
+        const imgPxX = dpxX * (imgW / rectW);
+        const imgPxY = dpxY * (imgH / rectH);
+        const newOX = maxOffsetX > 0
+          ? Math.max(0, Math.min(1, ox + imgPxX / maxOffsetX))
+          : ox;
+        const newOY = maxOffsetY > 0
+          ? Math.max(0, Math.min(1, oy + imgPxY / maxOffsetY))
+          : oy;
+        onReposition(newOX, newOY);
+      });
     },
     [imgW, imgH, maxOffsetX, maxOffsetY, onReposition],
   );
@@ -186,15 +201,89 @@ function CropPreview({
   const endDrag = useCallback(() => {
     isDraggingRef.current = false;
     dragStartRef.current = null;
+    pendingMoveRef.current = null;
+    resizeStartRef.current = null;
+    if (rafRef.current !== null) {
+      cancelAnimationFrame(rafRef.current);
+      rafRef.current = null;
+    }
   }, []);
 
-  // Global mouse/touch listeners
+  // ── Corner resize state ──
+  const resizeStartRef = useRef<{
+    corner: ResizeCorner;
+    clientX: number; clientY: number;
+    scale: number; offsetX: number; offsetY: number;
+    rectW: number; rectH: number;
+  } | null>(null);
+
+  const performResize = useCallback(
+    (clientX: number, clientY: number) => {
+      if (!resizeStartRef.current) return;
+      if (rafRef.current !== null) return;
+      rafRef.current = requestAnimationFrame(() => {
+        rafRef.current = null;
+        const r = resizeStartRef.current;
+        if (!r) return;
+        // Display delta → image delta
+        const dpxX = (clientX - r.clientX) * (imgW / r.rectW);
+        const dpxY = (clientY - r.clientY) * (imgH / r.rectH);
+        // Scale sign per corner: positive = grow when dragging outward
+        const sx = (r.corner === "br" || r.corner === "tr") ? 1 : -1;
+        const sy = (r.corner === "br" || r.corner === "bl") ? 1 : -1;
+        const scaleDelta = ((dpxX * sx) / maxCropW + (dpxY * sy) / maxCropH) / 2;
+        const newScale = Math.max(MIN_SCALE, Math.min(1.0, r.scale + scaleDelta));
+        // Old/new crop dimensions in image space
+        const oldCW = Math.round(maxCropW * r.scale);
+        const oldCH = Math.round(maxCropH * r.scale);
+        const newCW = Math.round(maxCropW * newScale);
+        const newCH = Math.round(maxCropH * newScale);
+        const oldMaxX = Math.max(0, imgW - oldCW);
+        const oldMaxY = Math.max(0, imgH - oldCH);
+        const oldCX = Math.round(oldMaxX * r.offsetX);
+        const oldCY = Math.round(oldMaxY * r.offsetY);
+        const newMaxX = Math.max(0, imgW - newCW);
+        const newMaxY = Math.max(0, imgH - newCH);
+        // Anchor opposite corner in image pixel space
+        let newCX = r.corner === "tl" || r.corner === "bl" ? oldCX + oldCW - newCW : oldCX;
+        let newCY = r.corner === "tl" || r.corner === "tr" ? oldCY + oldCH - newCH : oldCY;
+        newCX = Math.max(0, Math.min(newMaxX, newCX));
+        newCY = Math.max(0, Math.min(newMaxY, newCY));
+        const newOX = newMaxX > 0 ? newCX / newMaxX : 0.5;
+        const newOY = newMaxY > 0 ? newCY / newMaxY : 0.5;
+        onResize(newScale, newOX, newOY);
+      });
+    },
+    [imgW, imgH, maxCropW, maxCropH, onResize],
+  );
+
+  // Plain function — OK to mutate refs here (not inside useCallback)
+  function startResize(e: ReactMouseEvent | ReactTouchEvent, corner: ResizeCorner) {
+    e.stopPropagation();
+    e.preventDefault();
+    if (!containerRef.current) return;
+    const rect = containerRef.current.getBoundingClientRect();
+    const clientX = "touches" in e ? e.touches[0].clientX : e.clientX;
+    const clientY = "touches" in e ? e.touches[0].clientY : e.clientY;
+    // eslint-disable-next-line react-hooks/immutability
+    resizeStartRef.current = {
+      corner, clientX, clientY,
+      scale: cropScale, offsetX: currentOffsetX, offsetY: currentOffsetY,
+      rectW: rect.width, rectH: rect.height,
+    };
+  }
+
+  // Global mouse/touch listeners — handles both reposition drag and corner resize
   useEffect(() => {
-    const onMove = (e: MouseEvent) => moveDrag(e.clientX, e.clientY);
+    const onMove = (e: MouseEvent) => {
+      if (resizeStartRef.current) performResize(e.clientX, e.clientY);
+      else moveDrag(e.clientX, e.clientY);
+    };
     const onUp = () => endDrag();
     const onTouchMove = (e: TouchEvent) => {
       e.preventDefault();
-      moveDrag(e.touches[0].clientX, e.touches[0].clientY);
+      if (resizeStartRef.current) performResize(e.touches[0].clientX, e.touches[0].clientY);
+      else moveDrag(e.touches[0].clientX, e.touches[0].clientY);
     };
     window.addEventListener("mousemove", onMove);
     window.addEventListener("mouseup", onUp);
@@ -206,7 +295,7 @@ function CropPreview({
       window.removeEventListener("touchmove", onTouchMove);
       window.removeEventListener("touchend", onUp);
     };
-  }, [moveDrag, endDrag]);
+  }, [moveDrag, endDrag, performResize]);
 
   const handleMouseDown = (e: ReactMouseEvent) => {
     if (!canDrag) return;
@@ -276,23 +365,44 @@ function CropPreview({
 
           {/* Crop border box */}
           <div
-            className="absolute border-2 border-sky-400 pointer-events-none"
+            className="absolute border-2 border-sky-400"
             style={{
               left: `${leftPct}%`,
               top: `${topPct}%`,
               width: `${cropWPct}%`,
               height: `${cropHPct}%`,
+              pointerEvents: "none",
             }}
           >
-            {/* Corner handles */}
-            <span className="absolute top-0 left-0 w-4 h-4 border-t-[3px] border-l-[3px] border-white" />
-            <span className="absolute top-0 right-0 w-4 h-4 border-t-[3px] border-r-[3px] border-white" />
-            <span className="absolute bottom-0 left-0 w-4 h-4 border-b-[3px] border-l-[3px] border-white" />
-            <span className="absolute bottom-0 right-0 w-4 h-4 border-b-[3px] border-r-[3px] border-white" />
+            {/* Corner handles — interactive, pointer-events-auto */}
+            <span
+              className="absolute -top-1 -left-1 w-5 h-5 border-t-[3px] border-l-[3px] border-white rounded-tl cursor-nw-resize hover:border-sky-300 transition-colors"
+              style={{ pointerEvents: "auto" }}
+              onMouseDown={(e) => startResize(e, "tl")}
+              onTouchStart={(e) => startResize(e, "tl")}
+            />
+            <span
+              className="absolute -top-1 -right-1 w-5 h-5 border-t-[3px] border-r-[3px] border-white rounded-tr cursor-ne-resize hover:border-sky-300 transition-colors"
+              style={{ pointerEvents: "auto" }}
+              onMouseDown={(e) => startResize(e, "tr")}
+              onTouchStart={(e) => startResize(e, "tr")}
+            />
+            <span
+              className="absolute -bottom-1 -left-1 w-5 h-5 border-b-[3px] border-l-[3px] border-white rounded-bl cursor-sw-resize hover:border-sky-300 transition-colors"
+              style={{ pointerEvents: "auto" }}
+              onMouseDown={(e) => startResize(e, "bl")}
+              onTouchStart={(e) => startResize(e, "bl")}
+            />
+            <span
+              className="absolute -bottom-1 -right-1 w-5 h-5 border-b-[3px] border-r-[3px] border-white rounded-br cursor-se-resize hover:border-sky-300 transition-colors"
+              style={{ pointerEvents: "auto" }}
+              onMouseDown={(e) => startResize(e, "br")}
+              onTouchStart={(e) => startResize(e, "br")}
+            />
 
-            {/* 16:9 label */}
+            {/* 16:9 label + scale */}
             <span className="absolute bottom-1.5 left-2 px-1.5 py-0.5 rounded bg-black/70 text-sky-400 text-[10px] font-bold font-mono pointer-events-none">
-              16 : 9
+              16 : 9 · {Math.round(cropScale * 100)}%
             </span>
           </div>
 
@@ -392,11 +502,23 @@ export function ToolImageCrop({ dictionary }: ToolImageCropProps) {
   // ── Quality ──
   const [quality, setQuality] = useState(DEFAULT_QUALITY);
 
+  // ── Feature 5: Estimated output size ──
+  const [estimatedSize, setEstimatedSize] = useState<string | null>(null);
+  const estimateTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // ── Feature 6: Smart auto-center ──
+  const [smartCenter, setSmartCenter] = useState(true);
+
+  // ── Crop scale (resize via corner handles, 0.15–1.0, maintains 16:9) ──
+  const [cropScale, setCropScale] = useState(1.0);
+
   // ── Image element ref (used in download) ──
   const imageRef = useRef<HTMLImageElement | null>(null);
 
   // ── Derived values ──
-  const { cropW, cropH } = imgW > 0 ? getCropBox(imgW, imgH) : { cropW: 0, cropH: 0 };
+  const { cropW: maxCropW, cropH: maxCropH } = imgW > 0 ? getCropBox(imgW, imgH) : { cropW: 0, cropH: 0 };
+  const cropW = Math.round(maxCropW * cropScale);
+  const cropH = Math.round(maxCropH * cropScale);
   const maxOffsetX = Math.max(0, imgW - cropW);
   const maxOffsetY = Math.max(0, imgH - cropH);
   const cropX = Math.round(maxOffsetX * offsetX);
@@ -421,8 +543,14 @@ export function ToolImageCrop({ dictionary }: ToolImageCropProps) {
           imageRef.current = img;
           setImgW(img.naturalWidth);
           setImgH(img.naturalHeight);
+          // Feature 6: Smart auto-center — for vertically-cropped images, bias upward
+          // (subjects like faces/heads are usually in the upper portion of the frame)
+          const { cropH: cH } = getCropBox(img.naturalWidth, img.naturalHeight);
+          const mY = Math.max(0, img.naturalHeight - cH);
+          const initY = (smartCenter && mY > 0) ? 0.35 : 0.5;
           setOffsetX(0.5);
-          setOffsetY(0.5);
+          setOffsetY(initY);
+          setEstimatedSize(null);
           setImageSrc(src);
           setFileName(file.name.replace(/\.[^.]+$/, ""));
         };
@@ -430,7 +558,7 @@ export function ToolImageCrop({ dictionary }: ToolImageCropProps) {
       };
       reader.readAsDataURL(file);
     },
-    [notify],
+    [notify, smartCenter, t.invalidImageFile],
   );
 
   const handleFileInput = useCallback(
@@ -513,13 +641,79 @@ export function ToolImageCrop({ dictionary }: ToolImageCropProps) {
     );
   }, [cropH, cropW, cropX, cropY, fileName, imgW, notify, quality, t.downloaded]);
 
-  const handleReset = () => {
+  // Feature 4: preserve quality when resetting — user's quality choice persists
+  const handleReset = useCallback(() => {
     setImageSrc(null);
     setImgW(0); setImgH(0);
     setOffsetX(0.5); setOffsetY(0.5);
-    setQuality(DEFAULT_QUALITY);
+    setCropScale(1.0);
+    setEstimatedSize(null);
     imageRef.current = null;
-  };
+    if (estimateTimerRef.current) clearTimeout(estimateTimerRef.current);
+  }, []);
+
+  const handleResize = useCallback(
+    (newScale: number, newOffsetX: number, newOffsetY: number) => {
+      setCropScale(newScale);
+      setOffsetX(newOffsetX);
+      setOffsetY(newOffsetY);
+    },
+    [],
+  );
+
+  // ── Feature 5: Debounced estimated output size ──
+  useEffect(() => {
+    if (estimateTimerRef.current) clearTimeout(estimateTimerRef.current);
+    if (!imageRef.current || imgW === 0) {
+      // Defer to avoid calling setState synchronously in effect body
+      estimateTimerRef.current = setTimeout(() => setEstimatedSize(null), 0);
+      return () => { if (estimateTimerRef.current) clearTimeout(estimateTimerRef.current); };
+    }
+    estimateTimerRef.current = setTimeout(() => {
+      const img = imageRef.current;
+      if (!img) return;
+      // Use 1/4-resolution canvas for fast non-blocking estimation
+      const SCALE = 4;
+      const estW = Math.round(EXPORT_WIDTH / SCALE);
+      const estH = Math.round(EXPORT_HEIGHT / SCALE);
+      const canvas = document.createElement("canvas");
+      canvas.width = estW;
+      canvas.height = estH;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return;
+      ctx.drawImage(img, cropX, cropY, cropW, cropH, 0, 0, estW, estH);
+      canvas.toBlob(
+        (blob) => { if (blob) setEstimatedSize(formatBytes(blob.size * SCALE * SCALE)); },
+        "image/webp",
+        quality / 100,
+      );
+    }, 500);
+    return () => { if (estimateTimerRef.current) clearTimeout(estimateTimerRef.current); };
+  }, [quality, cropX, cropY, cropW, cropH, imgW]);
+
+  // ── Feature 8: Keyboard shortcuts ──
+  useEffect(() => {
+    if (!imageSrc) return;
+    const STEP = 0.02;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+      switch (e.key) {
+        case "ArrowLeft":  e.preventDefault(); setOffsetX((p) => Math.max(0, p - STEP)); break;
+        case "ArrowRight": e.preventDefault(); setOffsetX((p) => Math.min(1, p + STEP)); break;
+        case "ArrowUp":    e.preventDefault(); setOffsetY((p) => Math.max(0, p - STEP)); break;
+        case "ArrowDown":  e.preventDefault(); setOffsetY((p) => Math.min(1, p + STEP)); break;
+        case "r": case "R":
+          if (!e.ctrlKey && !e.metaKey) { setOffsetX(0.5); setOffsetY(0.5); }
+          break;
+        case "Escape": handleReset(); break;
+        case "d": case "D":
+          if (e.ctrlKey || e.metaKey) { e.preventDefault(); handleDownload(); }
+          break;
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [imageSrc, handleReset, handleDownload]);
 
   // ──────────────────────────────────────────────────────────────────────────
   // Render
@@ -604,7 +798,7 @@ export function ToolImageCrop({ dictionary }: ToolImageCropProps) {
                 )}
               </div>
 
-              {/* Draggable preview */}
+              {/* Draggable + resizable preview */}
               <CropPreview
                 imageSrc={imageSrc}
                 imgW={imgW}
@@ -613,8 +807,12 @@ export function ToolImageCrop({ dictionary }: ToolImageCropProps) {
                 cropY={cropY}
                 cropW={cropW}
                 cropH={cropH}
+                maxCropW={maxCropW}
+                maxCropH={maxCropH}
+                cropScale={cropScale}
                 canDrag={canDrag}
                 onReposition={handleReposition}
+                onResize={handleResize}
                 currentOffsetX={offsetX}
                 currentOffsetY={offsetY}
                 maxOffsetX={maxOffsetX}
@@ -665,9 +863,9 @@ export function ToolImageCrop({ dictionary }: ToolImageCropProps) {
                     />
                   </div>
 
-                  {/* Center button */}
+                  {/* Center + Smart Center toggle */}
                   {canDrag && (
-                    <div className="flex justify-center">
+                    <div className="flex flex-wrap justify-center items-center gap-2">
                       <button
                         type="button"
                         onClick={() => { setOffsetX(0.5); setOffsetY(0.5); }}
@@ -675,6 +873,21 @@ export function ToolImageCrop({ dictionary }: ToolImageCropProps) {
                       >
                         <AlignCenter className="h-3.5 w-3.5" />
                         {t.center}
+                      </button>
+                      {/* Feature 6: Smart Center toggle */}
+                      <button
+                        type="button"
+                        title="Auto-position crop for portrait subjects"
+                        onClick={() => setSmartCenter((v) => !v)}
+                        className={cn(
+                          "flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest border transition-all",
+                          smartCenter
+                            ? "bg-accent/15 border-accent/30 text-accent"
+                            : "border-primary/10 bg-muted/20 text-muted-foreground hover:border-primary/30 hover:text-primary",
+                        )}
+                      >
+                        <Info className="h-3.5 w-3.5" />
+                        Smart Center
                       </button>
                     </div>
                   )}
@@ -716,8 +929,18 @@ export function ToolImageCrop({ dictionary }: ToolImageCropProps) {
                       {" "}—{" "}
                       <span className="font-mono font-bold text-primary">{EXPORT_WIDTH} × {EXPORT_HEIGHT} px</span>.
                       {" "}{t.clientSideInfo}
+                      {/* Feature 5: Estimated size */}
+                      {estimatedSize && (
+                        <>{" "}·{" "}
+                          <span className="font-mono font-bold text-accent">Est. {estimatedSize}</span>
+                        </>
+                      )}
                     </p>
                   </div>
+                  {/* Feature 8: Keyboard hints */}
+                  <p className="text-[9px] text-center text-muted-foreground/35 font-mono tracking-wide select-none pt-1">
+                    ← → ↑ ↓ nudge · R center · Esc clear · Ctrl+D save
+                  </p>
                 </CardContent>
               </Card>
 

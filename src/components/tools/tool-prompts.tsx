@@ -34,7 +34,6 @@ import {
   Calendar,
   Zap,
   Search,
-  Terminal,
   Type,
   Star,
   Hash,
@@ -565,7 +564,6 @@ export function ToolPrompts({
   const [publishDate, setPublishDate] = useState<string>("");
   const [isPublished, setIsPublished] = useState(true);
   const [isFeatured, setIsFeatured] = useState(false);
-  const [isOutputVisible, setIsOutputVisible] = useState(true);
 
   // ── Category hint (optional — AI is free to create a new one) ──
   const [categoryHint, setCategoryHint] = useState("");
@@ -576,6 +574,7 @@ export function ToolPrompts({
   const [imageGridMappings, setImageGridMappings] = useState("");
   const [galleryMappings, setGalleryMappings] = useState("");
   const [specsMappings, setSpecsMappings] = useState("");
+  const [heroImage, setHeroImage] = useState("");
   const [images, setImages] = useState("");
 
   // ── Output ──
@@ -967,14 +966,14 @@ export function ToolPrompts({
       });
     }
 
-    if (showImages && imageLines.length > 0) {
-      const heroPath = normalizeImagePath((imageLines[0]?.split("|")[0] ?? "").trim());
+    if (showImages && heroImage.trim() !== "") {
+      const heroPath = normalizeImagePath((heroImage.split("|")[0] ?? "").trim());
       if (heroPath && sourceContent.includes(heroPath)) {
         issues.push({
           id: "hero-image-duplicated",
           severity: "warning",
           title: "Hero image path appears in body content",
-          description: "Image 1 is reserved for hero/frontmatter. Remove it from article body unless you intentionally want duplicate rendering.",
+          description: "Hero image is reserved for frontmatter. Remove it from article body unless you intentionally want duplicate rendering.",
         });
       }
     }
@@ -1006,6 +1005,7 @@ export function ToolPrompts({
     downloadItems,
     draft,
     galleryMappings,
+    heroImage,
     imageGridMappings,
     mode,
     newsAngle,
@@ -1014,10 +1014,10 @@ export function ToolPrompts({
     showDownloads,
     showGallery,
     showGrids,
+    showImages,
     showSpecs,
     sourceContent,
     specsGroups,
-    imageLines,
   ]);
 
   const blockingValidationIssues = useMemo(
@@ -1053,8 +1053,32 @@ export function ToolPrompts({
             ? p.captionMaxCount
             : "4",
         );
-        setIsOutputVisible(p.isOutputVisible !== undefined ? !!p.isOutputVisible : true);
         setCategoryHint(typeof p.categoryHint === "string" ? p.categoryHint : "");
+      } catch { }
+    }
+    const savedDraft = localStorage.getItem("snipgeek-prompt-draft");
+    if (savedDraft) {
+      try {
+        const d = JSON.parse(savedDraft);
+        if (d.mode === "create" || d.mode === "modify") setMode(d.mode);
+        if (["series", "news", "tips", "notes"].includes(d.contentType)) setContentType(d.contentType);
+        if (typeof d.draft === "string") setDraft(d.draft);
+        if (typeof d.publishDate === "string" && d.publishDate.trim() !== "") setPublishDate(d.publishDate);
+        if (typeof d.heroImage === "string") setHeroImage(d.heroImage);
+        if (typeof d.images === "string") setImages(d.images);
+        if (typeof d.newsAngle === "string") setNewsAngle(d.newsAngle);
+        if (Array.isArray(d.newsSourceUrls) && d.newsSourceUrls.length > 0) setNewsSourceUrls(d.newsSourceUrls);
+        if (typeof d.modInstructions === "string") setModInstructions(d.modInstructions);
+        if (typeof d.seriesPhase === "string" && ["phase-1","phase-2","phase-3","phase-4","phase-5"].includes(d.seriesPhase)) setSeriesPhase(d.seriesPhase as SeriesPhase);
+        if (typeof d.seriesArticleNumber === "string") setSeriesArticleNumber(d.seriesArticleNumber);
+        if (typeof d.noteIntent === "string" && ["finding","reference","mini-fix","observation"].includes(d.noteIntent)) setNoteIntent(d.noteIntent as NoteIntent);
+        if (typeof d.tipsStandalone === "boolean") setTipsStandalone(d.tipsStandalone);
+        if (typeof d.isPublished === "boolean") setIsPublished(d.isPublished);
+        if (typeof d.isFeatured === "boolean") setIsFeatured(d.isFeatured);
+        if (typeof d.imageGridMappings === "string") setImageGridMappings(d.imageGridMappings);
+        if (typeof d.galleryMappings === "string") setGalleryMappings(d.galleryMappings);
+        if (typeof d.specsMappings === "string") setSpecsMappings(d.specsMappings);
+        if (typeof d.selectedSlug === "string") setSelectedSlug(d.selectedSlug);
       } catch { }
     }
   }, []);
@@ -1074,7 +1098,6 @@ export function ToolPrompts({
         captionAlignment,
         captionCoverage,
         captionMaxCount,
-        isOutputVisible,
         categoryHint,
       }),
     );
@@ -1089,10 +1112,73 @@ export function ToolPrompts({
     captionAlignment,
     captionCoverage,
     captionMaxCount,
-    isOutputVisible,
     categoryHint,
     mounted,
   ]);
+
+  // ── Persist draft content (anti-loss) ──
+  useEffect(() => {
+    if (!mounted) return;
+    localStorage.setItem(
+      "snipgeek-prompt-draft",
+      JSON.stringify({
+        mode,
+        contentType,
+        draft,
+        publishDate,
+        heroImage,
+        images,
+        newsAngle,
+        newsSourceUrls,
+        modInstructions,
+        seriesPhase,
+        seriesArticleNumber,
+        noteIntent,
+        tipsStandalone,
+        isPublished,
+        isFeatured,
+        imageGridMappings,
+        galleryMappings,
+        specsMappings,
+        selectedSlug,
+      }),
+    );
+  }, [
+    mode,
+    contentType,
+    draft,
+    publishDate,
+    heroImage,
+    images,
+    newsAngle,
+    newsSourceUrls,
+    modInstructions,
+    seriesPhase,
+    seriesArticleNumber,
+    noteIntent,
+    tipsStandalone,
+    isPublished,
+    isFeatured,
+    imageGridMappings,
+    galleryMappings,
+    specsMappings,
+    selectedSlug,
+    mounted,
+  ]);
+
+  // ── Auto-fill publish date +2 hari untuk create mode ──
+  useEffect(() => {
+    if (mode !== "create") return;
+    setPublishDate((prev) => {
+      if (prev.trim() !== "") return prev;
+      const d = new Date();
+      d.setDate(d.getDate() + 2);
+      const yyyy = d.getFullYear();
+      const mm = String(d.getMonth() + 1).padStart(2, "0");
+      const dd = String(d.getDate()).padStart(2, "0");
+      return `${yyyy}-${mm}-${dd}`;
+    });
+  }, [mode]);
 
   // ── Build prompt ──
   useEffect(() => {
@@ -1182,23 +1268,30 @@ export function ToolPrompts({
       }
     }
 
-    if (showImages && imageLines.length > 0) {
+    const hasHeroImage = showImages && heroImage.trim() !== "";
+    const hasBodyImages = showImages && imageLines.length > 0;
+
+    if (hasHeroImage || hasBodyImages) {
       prompt += `**3. ASSETS & MEDIA**\n`;
-      imageLines.forEach((line, i) => {
-        const parts = line.split("|").map((s) => s?.trim() || "");
-        const imgPath = parts[0] ?? "";
-        const imgAlt = parts[1] ?? "";
-        const imgCaptionHint = parts[2] ?? "";
-        const normalizedPath = normalizeImagePath(imgPath);
-        if (i === 0) {
-          prompt += `- Image 1 (HERO ONLY): "${normalizedPath}" ${imgAlt ? `| Label: "${imgAlt}"` : ""} | Use only as frontmatter heroImage/banner. Do not insert into article body unless explicitly requested.\n`;
-          return;
-        }
-        prompt += `- Image ${i + 1}: "${normalizedPath}" ${imgAlt ? `| Label: "${imgAlt}"` : ""}${imgCaptionHint ? ` | Caption Hint: "${imgCaptionHint}"` : ""}\n`;
-      });
+      if (hasHeroImage) {
+        const heroParts = heroImage.split("|").map((s) => s?.trim() || "");
+        const heroPath = normalizeImagePath(heroParts[0] ?? "");
+        const heroAlt = heroParts[1] ?? "";
+        prompt += `- Hero Image (HERO ONLY): "${heroPath}"${heroAlt ? ` | Label: "${heroAlt}"` : ""} | Use only as frontmatter heroImage/banner. Do not insert into article body unless explicitly requested.\n`;
+      }
+      if (hasBodyImages) {
+        imageLines.forEach((line, i) => {
+          const parts = line.split("|").map((s) => s?.trim() || "");
+          const imgPath = parts[0] ?? "";
+          const imgAlt = parts[1] ?? "";
+          const imgCaptionHint = parts[2] ?? "";
+          const normalizedPath = normalizeImagePath(imgPath);
+          prompt += `- Image ${i + 1}: "${normalizedPath}"${imgAlt ? ` | Label: "${imgAlt}"` : ""}${imgCaptionHint ? ` | Caption Hint: "${imgCaptionHint}"` : ""}\n`;
+        });
+      }
     }
 
-    if (!isModify && showImages && imageLines.length > 1 && captionMode !== "off") {
+    if (!isModify && hasBodyImages && captionMode !== "off") {
       prompt += `\n**3A. IMAGE CAPTION POLICY**\n`;
       prompt += `- Caption Mode: ${captionMode.toUpperCase()}\n`;
       prompt += `- Alignment: ${captionAlignment.toUpperCase()} (${captionAlignmentClass})\n`;
@@ -1270,8 +1363,8 @@ export function ToolPrompts({
       prompt += `- Ensure output is MDX-parse-safe (no invalid JS expressions such as raw moustache tokens).\n`;
     }
 
-    if (showImages && imageLines.length > 0) {
-      prompt += `- Hero image rule: Image 1 is reserved for frontmatter heroImage/banner only and must not be repeated inside article body unless explicitly requested.\n`;
+    if (hasHeroImage) {
+      prompt += `- Hero image rule: Hero Image is reserved for frontmatter heroImage/banner only and must not be repeated inside article body unless explicitly requested.\n`;
     }
 
     prompt += `\n**9. SEO & HELPFUL CONTENT REQUIREMENTS**\n`;
@@ -1294,12 +1387,29 @@ export function ToolPrompts({
     prompt += `- If listing 3+ items, prefer bullets or component blocks over one long paragraph.\n`;
     prompt += `- After dense technical explanation, insert a short transition paragraph (1 sentence) when helpful for pacing.\n`;
 
-    prompt += `\n**11. FINAL QA CHECKLIST (MUST PASS BEFORE RETURNING OUTPUT)**\n`;
+    prompt += `\n**11. HUMAN VOICE & PERSONALITY (MANDATORY)**\n`;
+    prompt += `- Write in **first person** throughout: "I" in English, "saya" in Indonesian. Never use "we" or impersonal phrasing like "users can" or "one should".\n`;
+    prompt += `- Address the reader as **"you"** in English and **"kamu"** in Indonesian. Never use "Anda" or overly formal address forms.\n`;
+    prompt += `- **BANNED generic openers** — never start with or near: "In this article", "This post will cover", "We will discuss", "In artikel ini", "Pada artikel ini", "Artikel ini akan membahas".\n`;
+    prompt += `- **BANNED robotic transitions** — never use: "Furthermore", "In conclusion", "Moreover", "In addition", "It is worth noting", "Selain itu" as a filler opener, "Kesimpulannya" as a standalone transition.\n`;
+    prompt += `- Opening must start with **personal context** — why the author tried this, what problem they were solving — before introducing technical details.\n`;
+    prompt += `- Weave in **honest personal reactions** (moments of doubt, surprise, relief) between technical facts. This is what separates a blog from documentation.\n`;
+    prompt += `- For **narrative and explanatory sections**, prefer prose over bullet lists. Only use bullets for sequential steps, checklists, or 3+ parallel items with no narrative link.\n`;
+    prompt += `- The Indonesian version must be **re-narrated** naturally in Indonesian — not a line-by-line translation of the English. Same meaning, completely native phrasing.\n`;
+    prompt += `- Every sentence must earn its place. No padding. No restating the same point with different words just to fill space.\n`;
+    prompt += `- Close the article with a **light, warm call to action** — invite a comment, mention an alternative, or express a simple hope. Keep it brief and human.\n`;
+
+    prompt += `\n**12. FINAL QA CHECKLIST (MUST PASS BEFORE RETURNING OUTPUT)**\n`;
     prompt += `- No oversized paragraph that breaks desktop reading rhythm unless clearly justified.\n`;
     prompt += `- No unresolved source markers like {{...}} left in final MDX.\n`;
     prompt += `- No invalid MDX/HTML structure (unbalanced custom tags/components).\n`;
     prompt += `- Intro delivers direct answer/outcome early, then expands with practical context.\n`;
     prompt += `- Sections remain scannable, non-repetitive, and aligned with search intent.\n`;
+    prompt += `- Opening is personal and specific — not generic or documentation-style.\n`;
+    prompt += `- No banned openers or robotic transitions appear anywhere in the article.\n`;
+    prompt += `- First person voice is consistent in both English and Indonesian versions.\n`;
+    prompt += `- Indonesian version reads naturally as native Indonesian — not translated from English.\n`;
+    prompt += `- At least one moment of personal reaction (doubt, surprise, realisation) is present in narrative sections.\n`;
 
     prompt += `\n---\n\n`;
     if (isModify) {
@@ -1319,6 +1429,10 @@ export function ToolPrompts({
 
     prompt += `\n---\n**FINAL INSTRUCTION:** Generate the full MDX following the SnipGeek skills assigned above. `;
     prompt += `Use \`snipgeek-blog-tone\` for narrative depth, personal voice, and bilingual storytelling, while ensuring \`content-generator\` technical standards are strictly met. `;
+    prompt += `**Voice enforcement:** Write in first person ("I"/"saya"), address the reader as "you"/"kamu", never open with generic phrases like "In this article" or "Artikel ini akan membahas", and never use robotic transitions like "Furthermore" or "In conclusion". The Indonesian version must be fully re-narrated in native Indonesian — not translated sentence by sentence from English. Include at least one honest personal moment (doubt, surprise, or discovery) in the narrative to make it feel genuine, not polished. `;
+    if (!isModify && contentType !== "notes") {
+      prompt += `Opening paragraph must begin with personal context or a real situation the author experienced — pull the reader in before introducing any technical detail. `;
+    }
     if (!isModify && contentType === "news") {
       prompt += `Fetch all listed source URLs, extract only relevant facts, then rewrite in original SnipGeek voice with a clear "SnipGeek's take" section based on the provided angle. `;
     }
@@ -1334,11 +1448,13 @@ export function ToolPrompts({
       prompt += `When splitting paragraphs, do not remove factual details, do not soften key caveats, and do not change technical meaning. `;
     }
     prompt += `If source markers ({{Link n}}, {{Grid n}}, {{Gallery n}}, {{Specs n}}) are present, replace them with concrete MDX output and do not keep marker text in the final file. `;
-    if (!isModify && showImages && imageLines.length > 1 && captionMode !== "off") {
+    if (!isModify && hasBodyImages && captionMode !== "off") {
       prompt += `Apply the Image Caption Policy section deterministically. Avoid captioning decorative/redundant images in selective mode, keep each caption to one sentence, and place it directly under the image using the required class alignment. `;
     }
     prompt += `For procedural or tutorial sections, use custom MDX components \`<Steps>\` and \`<Step>\` instead of plain numbered markdown lists. `;
-    prompt += `Treat the first uploaded image as hero-only: set it as frontmatter heroImage/banner and do not render it again in article body unless explicitly requested. `;
+    if (hasHeroImage) {
+      prompt += `Set the hero image as frontmatter heroImage/banner and do not render it again in article body unless explicitly requested. `;
+    }
     prompt += `Ensure all metadata (slugs, translation keys, alt texts) are generated automatically. Tags must never contain spaces and must never produce %20 in URLs. Any tag that would produce %20 is invalid and must be rewritten into lowercase kebab-case (e.g., windows-11, clean-install, ui-design, ubuntu-25-10). Always include 1 platform tag (windows/ubuntu/linux/android/hardware) and 1 versioned tag if the article targets a specific OS version (e.g., windows-11, ubuntu-25-10). Minimum 3 tags, maximum 6 tags per article. `;
     prompt += `Run a final self-check against the readability rhythm rules and the QA checklist before returning final MDX. `;
     prompt += `Ensure the output is genuinely helpful, intent-focused, and clearly better than a generic rewrite.`;
@@ -1356,6 +1472,7 @@ export function ToolPrompts({
     isPublished,
     isFeatured,
     isIdOnly,
+    heroImage,
     images,
     contentType,
     downloadItems,
@@ -1382,6 +1499,7 @@ export function ToolPrompts({
     captionAlignment,
     captionCoverage,
     parsedCaptionMaxCount,
+    imageLines,
   ]);
 
   // ── Handlers ──
@@ -1816,14 +1934,38 @@ export function ToolPrompts({
                 label="ID-Only"
                 activeClass="bg-rose-500 text-white border-rose-400 shadow-[0_0_15px_rgba(244,63,94,0.3)]"
               />
-              <div className="w-px h-5 bg-primary/10 mx-0.5" />
-              <FeaturePill
-                active={isOutputVisible}
-                onClick={() => setIsOutputVisible(!isOutputVisible)}
-                icon={Terminal}
-                label={isOutputVisible ? "Hide Output" : "Show Output"}
-                activeClass="bg-primary text-primary-foreground border-primary"
-              />
+            </motion.div>
+
+            {/* Island 4: Copy Brief */}
+            <motion.div
+              initial={{ opacity: 0, y: -8, scale: 0.96 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ duration: 0.35, delay: 0.22, ease: [0.21, 0.47, 0.32, 0.98] }}
+              className="bg-card/50 backdrop-blur-lg border border-primary/10 shadow-sm rounded-xl p-1.5 flex items-center gap-2"
+            >
+              <button
+                onClick={handleCopy}
+                className={cn(
+                  "flex items-center gap-2 px-4 h-9 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all duration-200",
+                  hasBlockingIssues
+                    ? "bg-destructive/15 text-destructive border border-destructive/30 hover:bg-destructive/20"
+                    : isCopied
+                    ? "bg-emerald-500/20 text-emerald-500 border border-emerald-500/30"
+                    : "bg-primary/10 text-primary hover:bg-primary/20 border border-primary/20",
+                )}
+              >
+                {hasBlockingIssues ? (
+                  <AlertTriangle className="h-3.5 w-3.5" />
+                ) : isCopied ? (
+                  <Check className="h-3.5 w-3.5" />
+                ) : (
+                  <Copy className="h-3.5 w-3.5" />
+                )}
+                {hasBlockingIssues ? "Resolve Issues" : isCopied ? dictionary.copiedButton : "Copy Brief"}
+              </button>
+              <span className="text-[9px] font-mono text-muted-foreground/40 pr-1.5">
+                {promptStats.words}w
+              </span>
             </motion.div>
         </div>
 
@@ -1836,10 +1978,7 @@ export function ToolPrompts({
               transition={{
                 layout: { duration: 0.5, ease: [0.21, 0.47, 0.32, 0.98] }
               }}
-              className={cn(
-                "space-y-6 pb-32",
-                isOutputVisible ? "lg:col-span-7" : "lg:col-span-12"
-              )}
+              className="space-y-6 pb-32 lg:col-span-12"
             >
               {/* Select article (modify mode) */}
               {mode === "modify" && (
@@ -2382,18 +2521,39 @@ export function ToolPrompts({
                               path/to/img.webp | Alt text
                             </span>
                           </CardHeader>
-                          <CardContent className="p-5">
-                            <Textarea
-                              placeholder={dictionary.imagesPlaceholder}
-                              value={images}
-                              onChange={(e) => setImages(e.target.value)}
-                              className={cn(
-                                "font-mono text-[11px] bg-background/50 rounded-lg p-4 min-h-22.5",
-                                focusRing,
-                              )}
-                            />
+                          <CardContent className="p-5 space-y-4">
+                            {/* Hero image — dedicated field */}
+                            <div className="space-y-1.5">
+                              <div className="flex items-center gap-2">
+                                <p className="text-[9px] font-black uppercase tracking-wider text-amber-600 dark:text-amber-400">Hero / Banner</p>
+                                <span className="rounded-full bg-amber-500/15 border border-amber-500/30 px-2 py-0.5 text-[8px] font-black uppercase tracking-wide text-amber-600 dark:text-amber-400">HERO</span>
+                              </div>
+                              <Input
+                                placeholder="path/to/hero.webp | Alt text (optional)"
+                                value={heroImage}
+                                onChange={(e) => setHeroImage(e.target.value)}
+                                className={cn(
+                                  "font-mono text-[11px] bg-background/50 border-amber-500/25 focus-visible:border-amber-500/50",
+                                  focusRing,
+                                )}
+                              />
+                              <p className="text-[9px] text-muted-foreground/50">Khusus frontmatter heroImage/banner — tidak dimasukkan ke body artikel.</p>
+                            </div>
+                            {/* Body images */}
+                            <div className="space-y-1.5">
+                              <p className="text-[9px] font-black uppercase tracking-wider text-muted-foreground">Body Images <span className="opacity-40 font-mono normal-case tracking-normal">path | alt | caption hint</span></p>
+                              <Textarea
+                                placeholder={dictionary.imagesPlaceholder}
+                                value={images}
+                                onChange={(e) => setImages(e.target.value)}
+                                className={cn(
+                                  "font-mono text-[11px] bg-background/50 rounded-lg p-4 min-h-22.5",
+                                  focusRing,
+                                )}
+                              />
+                            </div>
 
-                            <div className="mt-4 rounded-lg border border-primary/10 bg-background/35 p-3">
+                            <div className="rounded-lg border border-primary/10 bg-background/35 p-3">
                               <div className="flex items-center justify-between gap-2">
                                 <p className="text-[9px] font-black uppercase tracking-[0.12em] text-muted-foreground">
                                   Auto Caption Policy
@@ -2703,162 +2863,6 @@ export function ToolPrompts({
                 </div>
               </ScrollReveal>
             </motion.div>
-
-            {/* ── RIGHT COLUMN — Generated Prompt ── */}
-            {isOutputVisible && (
-              <motion.div
-                key="output-brief"
-                initial={{ opacity: 0, x: 20, scale: 0.98 }}
-                animate={{ opacity: 1, x: 0, scale: 1 }}
-                exit={{ opacity: 0, x: 20, scale: 0.98, transition: { duration: 0.2 } }}
-                transition={{
-                  duration: 0.4,
-                  ease: [0.21, 0.47, 0.32, 0.98]
-                }}
-                className="lg:col-span-5 h-full z-10"
-              >
-                <ScrollReveal direction="right" delay={0.15} distance={0}>
-                  <div className="sticky top-28">
-                    {/* Terminal card */}
-                    <Card className="border-0 shadow-2xl overflow-hidden ring-1 ring-white/6 rounded-xl bg-[#0d0e11]">
-                      {/* macOS-style title bar */}
-                      <div className="flex items-center gap-2 px-4 py-3 border-b border-white/5 bg-white/1.5">
-                        <div className="flex items-center gap-1.5">
-                          <div className="h-3 w-3 rounded-full bg-[#ff5f57]" />
-                          <div className="h-3 w-3 rounded-full bg-[#ffbd2e]" />
-                          <div className="h-3 w-3 rounded-full bg-[#28c840]" />
-                        </div>
-                        <div className="flex-1 mx-3 h-5 bg-white/4 rounded-md flex items-center px-3 gap-1.5">
-                          <Terminal className="h-2.5 w-2.5 text-white/20" />
-                          <span className="text-[9px] text-white/25 font-mono">
-                            content-brief.md
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* Prompt stats bar */}
-                      <div className="px-5 py-2 border-b border-white/4 flex items-center justify-between">
-                        <span className="text-[9px] font-black uppercase tracking-[0.2em] text-white/20">
-                          Content Brief
-                        </span>
-                        <div className="flex items-center gap-3 text-[9px] font-mono text-white/20">
-                          <span>{promptStats.words}w</span>
-                          <span>{promptStats.chars}c</span>
-                        </div>
-                      </div>
-
-                      {hasUnresolvedMarkers && (
-                        <div className="border-b border-red-500/20 bg-red-500/10 px-5 py-3">
-                          <div className="flex items-start gap-2">
-                            <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-red-400" />
-                            <div className="space-y-1">
-                              <p className="text-[10px] font-black uppercase tracking-[0.18em] text-red-300">
-                                Unresolved Placeholder Markers
-                              </p>
-                              <p className="text-[10px] leading-relaxed text-red-100/80">
-                                Found unsupported placeholder markers in source content. Keep only numbered markers like {"{{Link 1}}"}, {"{{Grid 2}}"}, {"{{Gallery 1}}"}, or {"{{Specs 1}}"}.
-                              </p>
-                              <div className="flex flex-wrap gap-1.5 pt-0.5">
-                                {unresolvedMarkers.map((marker) => (
-                                  <span
-                                    key={marker}
-                                    className="rounded-full border border-red-400/25 bg-red-500/10 px-2 py-1 text-[9px] font-mono text-red-200"
-                                  >
-                                    {marker}
-                                  </span>
-                                ))}
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      )}
-
-                      {validationIssues.length > 0 && (
-                        <div className="border-b border-amber-500/20 bg-amber-500/10 px-5 py-3">
-                          <div className="flex items-start gap-2">
-                            <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-300" />
-                            <div className="space-y-2">
-                              <p className="text-[10px] font-black uppercase tracking-[0.18em] text-amber-100">
-                                Source Validation Check
-                              </p>
-                              <div className="space-y-2">
-                                {validationIssues.map((issue) => (
-                                  <div
-                                    key={issue.id}
-                                    className={cn(
-                                      "rounded-lg border px-3 py-2",
-                                      issue.severity === "error"
-                                        ? "border-red-400/25 bg-red-500/10"
-                                        : "border-amber-300/20 bg-amber-500/8",
-                                    )}
-                                  >
-                                    <p
-                                      className={cn(
-                                        "text-[10px] font-black uppercase tracking-[0.12em]",
-                                        issue.severity === "error" ? "text-red-200" : "text-amber-100",
-                                      )}
-                                    >
-                                      {issue.title}
-                                    </p>
-                                    <p
-                                      className={cn(
-                                        "pt-1 text-[10px] leading-relaxed",
-                                        issue.severity === "error" ? "text-red-50/85" : "text-amber-50/80",
-                                      )}
-                                    >
-                                      {issue.description}
-                                    </p>
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Prompt textarea */}
-                      <ScrollArea className="h-[calc(100vh-260px)] min-h-100">
-                        <Textarea
-                          readOnly
-                          value={generatedPrompt}
-                          className="min-h-150 border-none bg-transparent font-mono text-[11.5px] p-6 resize-none focus-visible:ring-0 leading-relaxed text-slate-300/80 selection:bg-accent/30"
-                        />
-                      </ScrollArea>
-
-                      {/* Bottom action bar */}
-                      <div className="px-5 py-3 border-t border-white/5 bg-white/1 flex items-center justify-between gap-3">
-                        <span className="text-[9px] text-white/20 font-mono">
-                          {mode === "create"
-                            ? `✦ ${contentType} · ${isPublished ? "published" : "draft"}${isFeatured ? " · featured" : ""}`
-                            : `✦ modify · ${selectedSlug || "no article selected"}${selectedArticle ? ` · ${selectedArticle.published ? "live" : "draft"}` : ""}`}
-                        </span>
-                        <button
-                          onClick={handleCopy}
-                          className={cn(
-                            "flex items-center gap-1.5 px-5 h-8 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all duration-200",
-                            hasBlockingIssues
-                              ? "bg-destructive/15 text-destructive border border-destructive/30 hover:bg-destructive/20"
-                              :
-                            isCopied
-                              ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
-                              : "bg-accent/20 text-accent hover:bg-accent/30 border border-accent/20",
-                          )}
-                        >
-                          {hasBlockingIssues ? (
-                            <AlertTriangle className="h-3.5 w-3.5" />
-                          ) : isCopied ? (
-                            <Check className="h-3.5 w-3.5" />
-                          ) : (
-                            <Copy className="h-3.5 w-3.5" />
-                          )}
-                          {hasBlockingIssues ? "Resolve Issues First" : isCopied ? dictionary.copiedButton : "Copy Brief"}
-                        </button>
-                      </div>
-                    </Card>
-                  </div>
-                </ScrollReveal>
-              </motion.div>
-            )}
           </AnimatePresence>
         </div>
       </div>
