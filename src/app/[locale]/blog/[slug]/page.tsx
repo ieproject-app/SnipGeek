@@ -218,24 +218,28 @@ export default async function Page({
               isCentered={true}
             />
 
-            <div className="relative mt-8 mb-12 rounded-xl overflow-hidden shadow-2xl bg-muted group ring-1 ring-primary/5 aspect-video">
+            <div className="relative mt-8 mb-12 flex justify-center w-full">
               {heroSource ? (
-                <RevealImage
-                  src={heroSource.url}
-                  alt={imageAlt || initialPost.frontmatter.title}
-                  fill
-                  className="object-cover transition-transform duration-700 group-hover:scale-105"
-                  wrapperClassName="h-full w-full"
-                  placeholderClassName="rounded-none"
-                  showSkeleton
-                  holdUntilLoaded
-                  revealDurationMs={420}
-                  sizes="(max-width: 1200px) 100vw, 1200px"
-                  priority
-                  data-ai-hint={heroSource.hint}
-                />
+                <div className="relative rounded-xl overflow-hidden shadow-2xl bg-muted group ring-1 ring-primary/5 inline-flex w-full max-w-full">
+                  <RevealImage
+                    src={heroSource.url}
+                    alt={imageAlt || initialPost.frontmatter.title}
+                    width={1200}
+                    height={675} /* These act as fallbacks/hints but are overridden by CSS below */
+                    className="w-full h-auto max-h-[65vh] object-contain bg-black/5 dark:bg-black/20 transition-transform duration-700 group-hover:scale-[1.02]"
+                    wrapperClassName="w-full flex items-center justify-center focus:outline-none"
+                    placeholderClassName="hidden"
+                    showSkeleton
+                    holdUntilLoaded
+                    revealDurationMs={420}
+                    sizes="(max-width: 1200px) 100vw, 1200px"
+                    priority
+                    data-ai-hint={heroSource.hint}
+                    style={{ width: "100%", height: "auto", objectFit: "contain", aspectRatio: "auto" }}
+                  />
+                </div>
               ) : (
-                <div className="w-full h-full flex items-center justify-center bg-primary/5">
+                <div className="w-full aspect-video rounded-xl overflow-hidden shadow-2xl ring-1 ring-primary/5 flex items-center justify-center bg-primary/5 relative z-10">
                   <span className="text-primary/20 font-display text-6xl font-black">
                     SnipGeek
                   </span>
