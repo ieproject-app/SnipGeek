@@ -97,7 +97,7 @@ export const HomeLatest = ({
                         <div className="mb-2">
                             <CategoryBadge category={post.frontmatter.category} />
                         </div>
-                        <h3 className={cn("font-display text-base sm:text-lg font-semibold tracking-tight text-primary transition-colors leading-tight mb-2", multicolor.hoverTitle)}>
+                        <h3 className={cn("font-display text-lg sm:text-base font-semibold tracking-tight text-primary transition-colors leading-tight mb-2", multicolor.hoverTitle)}>
                             {post.frontmatter.title}
                         </h3>
                         <time className="text-[10px] font-medium text-muted-foreground block opacity-60">

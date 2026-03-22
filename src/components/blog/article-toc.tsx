@@ -29,8 +29,15 @@ export function ArticleTOC({
       const target = document.getElementById(headingId);
       if (!target) return;
 
+      // Dynamically measure header height so offset stays correct
+      // whether it has one or two rows (primary nav + secondary nav)
+      const headerEl = document.querySelector("header");
+      const headerHeight = headerEl
+        ? headerEl.getBoundingClientRect().height
+        : 104;
+      const MARGIN = 16;
       const targetTop =
-        target.getBoundingClientRect().top + window.scrollY - 22;
+        target.getBoundingClientRect().top + window.scrollY - headerHeight - MARGIN;
 
       window.scrollTo({
         top: Math.max(targetTop, 0),

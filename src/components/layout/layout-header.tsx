@@ -135,7 +135,7 @@ export function LayoutHeader({
   searchableData: SearchableItem[];
   dictionary: Dictionary;
 }) {
-  const [isVisible, setIsVisible] = useState(true);
+  // Header is always visible (no scroll-hide behaviour)
   const [isScrolled, setIsScrolled] = useState(false);
   const [activeView, setActiveView] = useState<ActiveView>("none");
   const [query, setQuery] = useState("");
@@ -181,10 +181,6 @@ export function LayoutHeader({
   }, []);
 
   useEffect(() => {
-    if (mounted && readingListItems.length > prevCount.current) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setIsVisible(true);
-    }
     prevCount.current = readingListItems.length;
   }, [readingListItems.length, mounted]);
 
@@ -199,7 +195,6 @@ export function LayoutHeader({
       root.style.scrollBehavior = "auto";
       window.scrollTo(0, 0);
       lastScrollY.current = 0;
-      setIsVisible(true);
       setIsScrolled(false);
 
       requestAnimationFrame(() => {
@@ -227,24 +222,12 @@ export function LayoutHeader({
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
       setIsScrolled(currentScrollY > 10);
-
-      if (activeView !== "none") return;
-      const delta = currentScrollY - lastScrollY.current;
-
-      if (currentScrollY < 10) {
-        setIsVisible(true);
-      } else if (delta > 8 && currentScrollY > 64) {
-        setIsVisible(false);
-      } else if (delta < -8) {
-        setIsVisible(true);
-      }
-
       lastScrollY.current = currentScrollY;
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [activeView, message]);
+  }, []);
 
   useEffect(() => {
     if (isSearchOpen) {
@@ -637,10 +620,7 @@ export function LayoutHeader({
         ref={headerRef}
         data-scrolled={isScrolled}
         className={cn(
-          "fixed top-0 left-0 right-0 z-50 w-full bg-background border-b border-border transition-all [transition-timing-function:cubic-bezier(0.4,0,0.2,1)] will-change-transform overflow-visible",
-          isVisible
-            ? "translate-y-0 duration-500"
-            : "-translate-y-full duration-300",
+          "fixed top-0 left-0 right-0 z-50 w-full bg-background border-b border-border overflow-visible transition-shadow duration-300",
           isScrolled && "shadow-sm border-border/90",
         )}
       >
