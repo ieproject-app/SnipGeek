@@ -128,41 +128,36 @@ export function ToolWrapper({
         )}
 
         {user && (
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4 p-4 bg-muted/30 backdrop-blur-sm rounded-2xl border border-primary/5 shadow-inner">
-            <div className="flex items-center gap-4">
-              <Avatar className="h-12 w-12 border-2 border-background shadow-md">
+          <div className="flex items-center justify-between h-12 px-4 bg-muted/20 rounded-xl border border-border/40 overflow-hidden">
+            <div className="flex items-center gap-2.5 min-w-0">
+              <Avatar className="h-7 w-7 shrink-0 border border-border/60 shadow-sm">
                 <AvatarImage
                   src={user.photoURL || ""}
                   alt={user.displayName || "User"}
                 />
-                <AvatarFallback className="bg-primary text-primary-foreground font-black">
+                <AvatarFallback className="bg-primary text-primary-foreground font-black text-[10px]">
                   {user.displayName?.charAt(0) || "U"}
                 </AvatarFallback>
               </Avatar>
-              <div className="space-y-0.5">
-                <div className="flex items-center gap-2">
-                  <p className="text-sm font-black uppercase tracking-tight text-primary">
-                    {user.displayName}
-                  </p>
-                  <Badge
-                    variant="secondary"
-                    className="h-4 px-1.5 text-[8px] font-black uppercase bg-emerald-500/10 text-emerald-600 border-none"
-                  >
-                    <CheckCircle2 className="h-2 w-2 mr-1" /> Verified
-                  </Badge>
-                </div>
-                <p className="text-[10px] font-mono text-muted-foreground opacity-60">
-                  {user.email}
+              <div className="flex items-center gap-2 min-w-0">
+                <p className="text-xs font-black uppercase tracking-tight text-primary truncate max-w-[140px]">
+                  {user.displayName}
                 </p>
+                <Badge
+                  variant="secondary"
+                  className="h-4 px-1.5 text-[8px] font-black uppercase bg-emerald-500/10 text-emerald-600 border-none shrink-0"
+                >
+                  <CheckCircle2 className="h-2 w-2 mr-1" /> Verified
+                </Badge>
               </div>
             </div>
             <Button
               variant="ghost"
               size="sm"
               onClick={handleLogout}
-              className="rounded-full text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-all"
+              className="h-7 px-2.5 rounded-lg text-[10px] font-black uppercase tracking-wider text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-all shrink-0"
             >
-              <LogOut className="h-3.5 w-3.5 mr-2" /> Keluar Akun
+              <LogOut className="h-3 w-3 mr-1.5" /> Keluar
             </Button>
           </div>
         )}
@@ -329,41 +324,36 @@ export function ToolWrapper({
 
   return (
     <div className="space-y-8 animate-in fade-in duration-700">
-      <div className="flex flex-col md:flex-row items-center justify-between gap-4 p-4 bg-muted/30 backdrop-blur-sm rounded-2xl border border-primary/5 shadow-inner">
-        <div className="flex items-center gap-4">
-          <Avatar className="h-12 w-12 border-2 border-background shadow-md">
+      <div className="flex items-center justify-between h-12 px-4 bg-muted/20 rounded-xl border border-border/40 overflow-hidden">
+        <div className="flex items-center gap-2.5 min-w-0">
+          <Avatar className="h-7 w-7 shrink-0 border border-border/60 shadow-sm">
             <AvatarImage
               src={user.photoURL || ""}
               alt={user.displayName || "User"}
             />
-            <AvatarFallback className="bg-primary text-primary-foreground font-black">
+            <AvatarFallback className="bg-primary text-primary-foreground font-black text-[10px]">
               {user.displayName?.charAt(0) || "U"}
             </AvatarFallback>
           </Avatar>
-          <div className="space-y-0.5">
-            <div className="flex items-center gap-2">
-              <p className="text-sm font-black uppercase tracking-tight text-primary">
-                {user.displayName}
-              </p>
-              <Badge
-                variant="secondary"
-                className="h-4 px-1.5 text-[8px] font-black uppercase bg-emerald-500/10 text-emerald-600 border-none"
-              >
-                <CheckCircle2 className="h-2 w-2 mr-1" /> Verified
-              </Badge>
-            </div>
-            <p className="text-[10px] font-mono text-muted-foreground opacity-60">
-              {user.email}
+          <div className="flex items-center gap-2 min-w-0">
+            <p className="text-xs font-black uppercase tracking-tight text-primary truncate max-w-[160px]">
+              {user.displayName}
             </p>
+            <Badge
+              variant="secondary"
+              className="h-4 px-1.5 text-[8px] font-black uppercase bg-emerald-500/10 text-emerald-600 border-none shrink-0"
+            >
+              <CheckCircle2 className="h-2 w-2 mr-1" /> Verified
+            </Badge>
           </div>
         </div>
         <Button
           variant="ghost"
           size="sm"
           onClick={handleLogout}
-          className="rounded-full text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-all"
+          className="h-7 px-2.5 rounded-lg text-[10px] font-black uppercase tracking-wider text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-all shrink-0"
         >
-          <LogOut className="h-3.5 w-3.5 mr-2" /> Keluar Akun
+          <LogOut className="h-3 w-3 mr-1.5" /> Keluar
         </Button>
       </div>
 
