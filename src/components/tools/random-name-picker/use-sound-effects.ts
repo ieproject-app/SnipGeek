@@ -40,7 +40,7 @@ const useSoundEffects = (enabled: boolean = true) => {
     };
   }, []);
 
-  const playSound = useCallback((type: 'tick' | 'winner' | 'error') => {
+  const playSound = useCallback((type: 'tick' | 'winner' | 'error' | 'shuffle') => {
     if (!enabledRef.current || !audioContext) return;
     if (audioContext.state === 'suspended') {
       audioContext.resume();
@@ -75,6 +75,15 @@ const useSoundEffects = (enabled: boolean = true) => {
       gainNode.gain.exponentialRampToValueAtTime(0.00001, audioContext.currentTime + 0.2);
       oscillator.start(audioContext.currentTime);
       oscillator.stop(audioContext.currentTime + 0.2);
+    } else if (type === 'shuffle') {
+      // Short click/blip for slot-machine spin animation
+      const pitchVariation = (Math.random() * 800) + 200;
+      oscillator.type = 'triangle';
+      oscillator.frequency.setValueAtTime(pitchVariation, audioContext.currentTime);
+      gainNode.gain.setValueAtTime(0.05, audioContext.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.00001, audioContext.currentTime + 0.06);
+      oscillator.start(audioContext.currentTime);
+      oscillator.stop(audioContext.currentTime + 0.06);
     }
   }, []); // stable — reads enabled state via ref, not closure
 
@@ -82,8 +91,9 @@ const useSoundEffects = (enabled: boolean = true) => {
   const playCountdownTick = useCallback(() => playSound('tick'), [playSound]);
   const playWinner = useCallback(() => playSound('winner'), [playSound]);
   const playError = useCallback(() => playSound('error'), [playSound]);
+  const playShuffleTick = useCallback(() => playSound('shuffle'), [playSound]);
 
-  return { playTick, playCountdownTick, playWinner, playError };
+  return { playTick, playCountdownTick, playWinner, playError, playShuffleTick };
 };
 
 export default useSoundEffects;

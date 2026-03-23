@@ -81,13 +81,23 @@ const getSeparatorPattern = (sep: SeparatorType): RegExp => {
   }
 };
 
+const cryptoRandom = (): number => {
+  try {
+    const arr = new Uint32Array(1);
+    crypto.getRandomValues(arr);
+    return arr[0] / 4294967296;
+  } catch {
+    return Math.random();
+  }
+};
+
 const sample = (arr: string[], k: number): string[] => {
   const a = [...arr];
   let i = arr.length;
   let n = Math.min(k, i);
   const result = new Array(n);
   while (n--) {
-    const j = Math.floor(Math.random() * i);
+    const j = Math.floor(cryptoRandom() * i);
     result[n] = a[j];
     a.splice(j, 1);
     i--;
@@ -129,6 +139,7 @@ export function RandomNamePicker({ dictionary, fullDictionary }: RandomNamePicke
   const [animationNames, setAnimationNames] = useState<string[]>([]);
   const [showConfetti, setShowConfetti] = useState(false);
   const [isPresentationMode, setIsPresentationMode] = useState(false);
+  const [showFullscreenHint, setShowFullscreenHint] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [savedLists, setSavedLists] = useState<Array<{name: string, names: string[], timestamp: number}>>([]);
   const [showSaveDialog, setShowSaveDialog] = useState(false);
@@ -146,7 +157,7 @@ export function RandomNamePicker({ dictionary, fullDictionary }: RandomNamePicke
 
   // Hooks
   const { toast } = useToast();
-  const { playTick, playCountdownTick, playWinner, playError } = useSoundEffects(isSoundEnabled);
+  const { playTick, playCountdownTick, playWinner, playError, playShuffleTick } = useSoundEffects(isSoundEnabled);
 
   // Parse names from input — memoized to keep stable array references
   const allNames = useMemo(
@@ -187,12 +198,14 @@ export function RandomNamePicker({ dictionary, fullDictionary }: RandomNamePicke
   const numWinnersRef = useRef<number>(numWinners);
   const shuffleDurationRef = useRef<number>(shuffleDuration);
   const handleSelectWinnersRef = useRef<typeof handleSelectWinners>(handleSelectWinners);
+  const playShuffleTickRef = useRef<typeof playShuffleTick>(playShuffleTick);
 
   // Keep animation refs in sync with latest values
   useEffect(() => { availableNamesRef.current = availableNames; }, [availableNames]);
   useEffect(() => { numWinnersRef.current = numWinners; }, [numWinners]);
   useEffect(() => { shuffleDurationRef.current = shuffleDuration; }, [shuffleDuration]);
   useEffect(() => { handleSelectWinnersRef.current = handleSelectWinners; }, [handleSelectWinners]);
+  useEffect(() => { playShuffleTickRef.current = playShuffleTick; }, [playShuffleTick]);
 
   // Load saved data from localStorage
   useEffect(() => {
@@ -274,8 +287,13 @@ export function RandomNamePicker({ dictionary, fullDictionary }: RandomNamePicke
     }, duration);
 
     setAnimationNames(sample(names, nWinners));
+    let tickCount = 0;
     animationIntervalRef.current = setInterval(() => {
       setAnimationNames(sample(availableNamesRef.current, numWinnersRef.current));
+      tickCount++;
+      if (tickCount % 2 === 0) {
+        playShuffleTickRef.current();
+      }
     }, 120);
 
     return () => {
@@ -357,7 +375,7 @@ export function RandomNamePicker({ dictionary, fullDictionary }: RandomNamePicke
   const handleShuffle = () => {
     if (allNames.length === 0) return;
     const sep = separator === 'comma' ? ', ' : separator === 'semicolon' ? '; ' : '\n';
-    const shuffled = [...allNames].sort(() => Math.random() - 0.5);
+    const shuffled = [...allNames].sort(() => cryptoRandom() - 0.5);
     setNamesInput(shuffled.join(sep));
   };
 
@@ -410,6 +428,8 @@ export function RandomNamePicker({ dictionary, fullDictionary }: RandomNamePicke
   const togglePresentationMode = useCallback(() => {
     if (!isPresentationMode) {
       document.documentElement.requestFullscreen().catch(() => {});
+      setShowFullscreenHint(true);
+      setTimeout(() => setShowFullscreenHint(false), 4500);
     } else {
       document.exitFullscreen().catch(() => {});
     }
@@ -494,13 +514,13 @@ export function RandomNamePicker({ dictionary, fullDictionary }: RandomNamePicke
     if (isPickingFinished) {
       return (
         <div className="flex flex-col items-center gap-4 w-full px-4 animate-in fade-in zoom-in-95 duration-500">
-          <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+          <p className="text-xs font-black uppercase tracking-widest text-muted-foreground/70">
             {lastWinners.length === 1 ? t('winnerRevealSingle') : `${lastWinners.length} ${t('winnerRevealPlural')}`}
           </p>
           <div className={cn(
-            "w-full rounded-xl transition-all duration-300",
+            "w-full rounded-2xl transition-all duration-300",
             lastWinners.length === 1
-              ? "flex items-center justify-center py-8 bg-primary/5 border border-primary/20 ring-4 ring-primary/10"
+              ? "flex items-center justify-center py-10 bg-gradient-to-br from-primary/5 via-accent/5 to-primary/5 border border-primary/15 ring-4 ring-accent/10 shadow-lg"
               : "space-y-2"
           )}>
             {renderWinnerList(lastWinners, 'main', false)}
@@ -567,6 +587,9 @@ export function RandomNamePicker({ dictionary, fullDictionary }: RandomNamePicke
             isPresentationMode ? "flex" : "hidden"
           )}
         >
+          {/* Top accent line */}
+          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-accent/40 via-accent to-accent/40" />
+
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
@@ -582,59 +605,82 @@ export function RandomNamePicker({ dictionary, fullDictionary }: RandomNamePicke
           </Tooltip>
 
           {isCountingDown && countdown > 0 && (
-            <div className="animate-countdown-pop text-[20vw] font-bold text-primary font-display leading-none">
+            <div className="animate-countdown-pop text-[20vw] font-bold text-primary font-display leading-none drop-shadow-lg">
               {countdown}
             </div>
           )}
           {isPicking && renderWinnerList(animationNames, 'presentation', true)}
           {isPickingFinished && (
-            <div className="text-center">
-              <p className="text-muted-foreground text-[2vw] mb-2">
+            <div className="text-center animate-in fade-in zoom-in-95 duration-500">
+              <p className="text-muted-foreground text-[2vw] mb-4 uppercase tracking-widest font-sans font-black opacity-60">
                 {lastWinners.length > 1 ? t('winnerRevealPlural') : t('winnerRevealSingle')}
               </p>
               {renderWinnerList(lastWinners, 'presentation', false)}
-              <Button size="lg" className="mt-8" onClick={handlePickWinners}>{t('pickAgain')}</Button>
+              <Button size="lg" className="mt-10 shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all" onClick={handlePickWinners}>{t('pickAgain')}</Button>
             </div>
           )}
           {!isCountingDown && !isPicking && !isPickingFinished && (
-            <div className="text-center">
-              <Award className="w-32 h-32 text-muted-foreground mx-auto mb-4 opacity-30" />
+            <div className="text-center animate-in fade-in zoom-in-95 duration-500">
+              <div className="p-8 rounded-full bg-muted/20 border border-border/40 mb-8 mx-auto w-fit">
+                <Award className="w-24 h-24 text-accent opacity-40" />
+              </div>
               <h2 className="text-4xl font-bold text-muted-foreground font-display mb-8">{t('readyToPick')}</h2>
-              <Button size="lg" onClick={handlePickWinners}>{t('startPicking')}</Button>
+              <Button size="lg" className="shadow-lg shadow-primary/20" onClick={handlePickWinners}>{t('startPicking')}</Button>
             </div>
           )}
+
+          {/* Custom fullscreen exit hint — styled to match site design */}
+          <div
+            className={cn(
+              "absolute bottom-8 left-1/2 -translate-x-1/2 transition-all duration-500",
+              showFullscreenHint
+                ? "opacity-100 translate-y-0"
+                : "opacity-0 translate-y-4 pointer-events-none"
+            )}
+          >
+            <div className="flex items-center gap-3 px-5 py-2.5 bg-background/90 backdrop-blur-md border border-border shadow-2xl rounded-full ring-1 ring-black/5">
+              <div className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse shrink-0" />
+              <p className="font-sans text-xs font-bold text-foreground/70 whitespace-nowrap tracking-wide">
+                snipgeek.com — Tekan{" "}
+                <kbd className="px-1.5 py-0.5 rounded border border-border bg-muted font-mono text-[11px] text-foreground/80">Esc</kbd>
+                {" "}untuk keluar layar penuh
+              </p>
+            </div>
+          </div>
         </div>
 
         {/* Main card */}
         <Card
           ref={cardRef}
-          className={cn("w-full max-w-4xl mx-auto border-border/60 shadow-sm overflow-hidden", isPresentationMode && "hidden")}
+          className={cn("w-full max-w-4xl mx-auto border-border/60 shadow-lg overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-700", isPresentationMode && "hidden")}
         >
+          {/* Top accent gradient bar */}
+          <div className="h-1 w-full bg-gradient-to-r from-accent/40 via-accent to-accent/40" />
 
           <CardContent className="p-0">
 
             {/* Stats bar — full width across both panels */}
-            <div className="flex justify-around text-center px-6 py-3 border-b border-border/40 bg-muted/20">
-              <div>
-                <div className="font-bold text-xl tabular-nums font-mono leading-tight">{allNames.length}</div>
-                <div className="text-[10px] text-muted-foreground uppercase tracking-wider mt-0.5">{t('totalLabel')}</div>
+            <div className="flex justify-around text-center px-6 py-4 border-b border-border/40 bg-gradient-to-r from-muted/5 via-muted/20 to-muted/5">
+              <div className="space-y-0.5">
+                <div className="font-bold text-2xl tabular-nums font-mono leading-tight text-primary">{allNames.length}</div>
+                <div className="text-[10px] text-muted-foreground uppercase tracking-widest">{t('totalLabel')}</div>
               </div>
               <div className="w-px bg-border/50" />
-              <div>
-                <div className="font-bold text-xl tabular-nums font-mono leading-tight">{winners.length}</div>
-                <div className="text-[10px] text-muted-foreground uppercase tracking-wider mt-0.5">{t('selectedLabel')}</div>
+              <div className="space-y-0.5">
+                <div className="font-bold text-2xl tabular-nums font-mono leading-tight text-accent">{winners.length}</div>
+                <div className="text-[10px] text-muted-foreground uppercase tracking-widest">{t('selectedLabel')}</div>
               </div>
               <div className="w-px bg-border/50" />
-              <div>
-                <div className="font-bold text-xl tabular-nums font-mono leading-tight">{availableNames.length}</div>
-                <div className="text-[10px] text-muted-foreground uppercase tracking-wider mt-0.5">{t('availableLabel')}</div>
+              <div className="space-y-0.5">
+                <div className="font-bold text-2xl tabular-nums font-mono leading-tight text-primary">{availableNames.length}</div>
+                <div className="text-[10px] text-muted-foreground uppercase tracking-widest">{t('availableLabel')}</div>
               </div>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-[320px_1fr]">
 
               {/* ── Left panel: Input + Settings + Actions ── */}
-              <div className="flex flex-col border-b lg:border-b-0 lg:border-r border-border/60">
+              <div className="flex flex-col border-b lg:border-b-0 lg:border-r border-border/60 animate-in fade-in slide-in-from-left-4 duration-500">
 
                 {/* Names input */}
                 <div className="p-5 border-b border-border/40">
@@ -774,7 +820,7 @@ export function RandomNamePicker({ dictionary, fullDictionary }: RandomNamePicke
                   <Button
                     onClick={handlePickWinners}
                     disabled={isPicking || isCountingDown || allNames.length === 0 || availableNames.length < numWinners}
-                    className="w-full"
+                    className="w-full shadow-lg shadow-primary/10 hover:shadow-primary/20 transition-all duration-300"
                     size="lg"
                   >
                     {isCountingDown ? (
@@ -814,14 +860,14 @@ export function RandomNamePicker({ dictionary, fullDictionary }: RandomNamePicke
                           <SheetTitle className="text-base">{t('savedLists')}</SheetTitle>
                         </SheetHeader>
                         <ScrollArea className="h-[calc(100vh-80px)]">
-                          <div className="p-5 space-y-3">
+                          <div className="p-4 space-y-3">
                             {savedLists.length === 0 ? (
                               <p className="text-sm text-muted-foreground text-center py-12">{t('noSavedLists')}</p>
                             ) : (
                               savedLists.map((list, i) => (
-                                <div key={i} className="p-3 rounded-lg border border-border/60 bg-muted/20 space-y-2">
-                                  <div className="flex items-start justify-between gap-2">
-                                    <p className="text-sm font-medium leading-tight">{list.name}</p>
+                                <div key={i} className="p-3 rounded-lg border border-border/60 bg-muted/20 space-y-2 overflow-hidden">
+                                  <div className="flex items-start justify-between gap-2 min-w-0">
+                                    <p className="text-sm font-medium leading-tight flex-1 min-w-0 truncate" title={list.name}>{list.name}</p>
                                     <Button
                                       variant="ghost"
                                       size="icon"
@@ -831,7 +877,7 @@ export function RandomNamePicker({ dictionary, fullDictionary }: RandomNamePicke
                                       <Trash2 className="h-3.5 w-3.5" />
                                     </Button>
                                   </div>
-                                  <p className="text-xs text-muted-foreground">
+                                  <p className="text-xs text-muted-foreground truncate">
                                     {list.names.length} {t('names')} · {new Date(list.timestamp).toLocaleDateString()}
                                   </p>
                                   <Button
@@ -901,7 +947,7 @@ export function RandomNamePicker({ dictionary, fullDictionary }: RandomNamePicke
               </div>
 
               {/* ── Right panel: Tabs ── */}
-              <div className="flex flex-col min-h-[520px]">
+              <div className="flex flex-col min-h-[520px] animate-in fade-in slide-in-from-right-4 duration-500">
                 <Tabs defaultValue="winners" className="flex flex-col flex-1">
 
                   {/* Tab bar */}
@@ -1038,7 +1084,7 @@ export function RandomNamePicker({ dictionary, fullDictionary }: RandomNamePicke
             </div>
 
             {/* Mobile-only sticky Pick Winners bar */}
-            <div className="lg:hidden sticky bottom-0 z-10 p-3 bg-background/95 backdrop-blur-sm border-t border-border/40">
+            <div className="lg:hidden sticky bottom-0 z-10 p-3 bg-background/95 backdrop-blur-sm border-t border-border/40 shadow-[0_-4px_16px_hsl(var(--primary)/0.06)]">
               <Button
                 onClick={handlePickWinners}
                 disabled={isPicking || isCountingDown || allNames.length === 0 || availableNames.length < numWinners}
