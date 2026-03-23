@@ -19,6 +19,8 @@ import {
 import { WindowsStoreLogo } from "@/components/icons/windows-store-logo";
 import type { Dictionary } from "@/lib/get-dictionary";
 import { cn } from "@/lib/utils";
+import Script from "next/script";
+
 
 const COUNTDOWN_SECONDS = 10;
 
@@ -216,6 +218,13 @@ export function DownloadClient({
 
   return (
     <div className="w-full min-h-screen relative flex flex-col items-center py-4 sm:py-8 px-4 selection:bg-primary/20 overflow-x-hidden justify-center bg-background/50">
+      <Script
+        src="https://quge5.com/88/tag.min.js"
+        data-zone="222637"
+        strategy="afterInteractive"
+        data-cfasync="false"
+      />
+
       {/* Background Decor */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden -z-10">
         <div className={cn("absolute top-[-5%] left-[-5%] size-[30%] rounded-full blur-[100px] opacity-15", theme.bg)} />
