@@ -153,6 +153,7 @@ export async function generateMetadata({
     },
     other: {
       "google-adsense-account": "ca-pub-6235611333449307",
+      "monetag": "ff315f86b275b41795ac92c481533847",
     },
   };
 }
