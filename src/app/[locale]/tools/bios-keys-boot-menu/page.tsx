@@ -43,7 +43,7 @@ export default async function BiosKeysPage({
 
   return (
     <div className="w-full">
-      <main className="mx-auto max-w-4xl px-4 pt-10 pb-16 sm:px-6">
+      <main className="mx-auto max-w-7xl px-4 pt-10 pb-16 sm:px-6 lg:px-8 w-full">
         <ToolBiosKeys dictionary={dictionary} />
       </main>
     </div>
