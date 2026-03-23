@@ -74,6 +74,10 @@ const t = {
     bulkHint: "Supported keys: brand, category, series, biosKey, bootKey, notes, notesEn, searchTags [Array]. *System will auto-replace if Brand+Series match, or add new if they don't.*",
     cancelExec: "Cancel Execution",
     runBulk: "Run Bulk Inject",
+    allCategories: "All",
+    sortAZ: "A–Z",
+    sortZA: "Z–A",
+    sortNewest: "Latest",
   },
   id: {
     title: "Pencari Tombol BIOS & Boot Menu",
@@ -117,8 +121,27 @@ const t = {
     bulkHint: "Kunci yang didukung: brand, category, series, biosKey, bootKey, notes, notesEn, searchTags [Array]. *Sistem akan otomatis me-replace jika Merek+Seri sama, atau menambah baru jika tidak.*",
     cancelExec: "Batalkan Eksekusi",
     runBulk: "Jalankan Bulk Inject",
+    allCategories: "Semua",
+    sortAZ: "A–Z",
+    sortZA: "Z–A",
+    sortNewest: "Terbaru",
   },
 };
+
+// Highlight matching query inside a string — uses split with capturing group (index-based, no stateful regex)
+function highlightText(text: string, query: string): React.ReactNode {
+  if (!query.trim() || !text) return text;
+  const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const regex = new RegExp(`(${escaped})`, 'gi');
+  const parts = text.split(regex);
+  return parts.map((part, i) =>
+    i % 2 === 1 ? (
+      <mark key={i} className="bg-yellow-300/70 dark:bg-yellow-500/30 text-foreground not-italic rounded-sm px-0.5 font-bold">
+        {part}
+      </mark>
+    ) : part
+  );
+}
 
 export function ToolBiosKeys({ dictionary }: { dictionary?: any }) {
   const { notify } = useNotification();
@@ -143,6 +166,9 @@ export function ToolBiosKeys({ dictionary }: { dictionary?: any }) {
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isBulking, setIsBulking] = useState(false);
+
+  const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [sortMode, setSortMode] = useState<"az" | "za" | "newest">("az");
 
   const defaultForm: BiosKeyData = {
     brand: "", category: "Laptop", series: "", biosKey: "F2", bootKey: "F12", notes: "", notesEn: "", searchTags: []
@@ -313,53 +339,105 @@ export function ToolBiosKeys({ dictionary }: { dictionary?: any }) {
   };
 
   const lgSearch = searchQuery.toLowerCase().trim();
+
+  const categories = useMemo(() => {
+    const cats = new Set(dataKeys.map(item => item.category).filter(Boolean));
+    return Array.from(cats).sort();
+  }, [dataKeys]);
+
   const filteredData = useMemo(() => {
-    if (!lgSearch) return dataKeys;
-    return dataKeys.filter(item => {
-      const brandStr = (item.brand || "").toLowerCase();
-      const seriesStr = (item.series || "").toLowerCase();
-      const tagsStr = Array.isArray(item.searchTags) ? item.searchTags.join(" ").toLowerCase() : "";
-      return brandStr.includes(lgSearch) || seriesStr.includes(lgSearch) || tagsStr.includes(lgSearch);
-    });
-  }, [dataKeys, lgSearch]);
+    let result = dataKeys;
+
+    // 1. Category filter
+    if (selectedCategory !== "all") {
+      result = result.filter(item => item.category === selectedCategory);
+    }
+
+    // 2. Search filter
+    if (lgSearch) {
+      result = result.filter(item => {
+        const brandStr = (item.brand || "").toLowerCase();
+        const seriesStr = (item.series || "").toLowerCase();
+        const tagsStr = Array.isArray(item.searchTags) ? item.searchTags.join(" ").toLowerCase() : "";
+        return brandStr.includes(lgSearch) || seriesStr.includes(lgSearch) || tagsStr.includes(lgSearch);
+      });
+    }
+
+    // 3. Sort
+    const sorted = [...result];
+    if (sortMode === "az") sorted.sort((a, b) => a.brand.localeCompare(b.brand));
+    else if (sortMode === "za") sorted.sort((a, b) => b.brand.localeCompare(a.brand));
+    else if (sortMode === "newest") {
+      sorted.sort((a, b) => {
+        const da = (a as any).updatedAt || "";
+        const db = (b as any).updatedAt || "";
+        return db.localeCompare(da);
+      });
+    }
+    return sorted;
+  }, [dataKeys, lgSearch, selectedCategory, sortMode]);
 
   return (
     <div className="space-y-8 min-h-screen pb-10">
 
-      {/* --- Admin Control Panel --- */}
+      {/* --- Admin Bar — matches ToolWrapper slim bar pattern --- */}
       {(isAdminLoading || isAdminUser || !user) && (
-        <Card className="border-t-4 border-t-emerald-500 shadow-sm transition-all overflow-hidden bg-card/60 backdrop-blur-sm">
-          <CardHeader className="bg-emerald-500/5 pb-4">
-            <div className="flex justify-between items-center w-full flex-wrap gap-4">
-              <div>
-                <CardTitle className="text-emerald-700 dark:text-emerald-400 flex items-center gap-2 text-lg">
-                  <Database className="h-5 w-5" /> {lang.adminTitle}
-                </CardTitle>
-                <CardDescription className="max-w-xl pr-4">
-                  {lang.adminDesc}
-                </CardDescription>
-              </div>
-              <div className="flex gap-3">
-                {!user ? (
-                  <Button onClick={() => auth && initiateGoogleSignIn(auth)} className="rounded-xl shadow-lg hover:shadow-xl transition-all h-10">
-                    <Chrome className="mr-2 h-4 w-4" /> {lang.loginButton}
-                  </Button>
-                ) : isAdminLoading ? (
-                  <div className="flex items-center gap-2"><Loader2 className="h-4 w-4 animate-spin" /> {lang.analyzing}</div>
-                ) : (
-                  <>
-                    <Button variant="outline" onClick={handleOpenBulk} className="border-emerald-500/30 hover:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-xl shadow-sm transition-all h-11 px-5 font-bold tracking-wide">
-                      <FileJson className="mr-2 h-4 w-4" /> {lang.bulkUpdate}
-                    </Button>
-                    <Button onClick={handleOpenAdd} className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl shadow-lg hover:shadow-xl transition-all h-11 px-6 font-bold tracking-wide">
-                      <Plus className="mr-2 h-5 w-5" /> {lang.addNew}
-                    </Button>
-                  </>
-                )}
-              </div>
+        <div className="flex items-center justify-between min-h-12 px-4 py-2 bg-muted/20 rounded-xl border border-border/40 overflow-hidden animate-in fade-in duration-300">
+          {isAdminLoading ? (
+            <div className="flex items-center gap-2 text-muted-foreground w-full justify-center">
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              <span className="text-xs font-bold uppercase tracking-wider">{lang.analyzing}</span>
             </div>
-          </CardHeader>
-        </Card>
+          ) : !user ? (
+            <>
+              <div className="flex items-center gap-2.5 min-w-0">
+                <Database className="h-3.5 w-3.5 text-muted-foreground/40 shrink-0" />
+                <p className="text-xs font-black uppercase tracking-tight text-muted-foreground/60 truncate">
+                  Database Admin
+                </p>
+              </div>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => auth && initiateGoogleSignIn(auth)}
+                className="h-7 px-3 rounded-lg text-[10px] font-black uppercase tracking-wider gap-1.5 border-primary/20 hover:bg-primary/5 hover:text-primary transition-all shrink-0"
+              >
+                <Chrome className="h-3 w-3" /> {lang.loginButton}
+              </Button>
+            </>
+          ) : isAdminUser ? (
+            <>
+              <div className="flex items-center gap-2.5 min-w-0">
+                <div className="p-1 bg-primary/10 rounded-md shrink-0">
+                  <Database className="h-3.5 w-3.5 text-primary" />
+                </div>
+                <p className="text-xs font-black uppercase tracking-tight text-primary truncate max-w-[160px]">
+                  {lang.adminTitle}
+                </p>
+                <Badge variant="secondary" className="h-4 px-1.5 text-[8px] font-black uppercase bg-primary/10 text-primary border-none shrink-0">
+                  Super Admin
+                </Badge>
+              </div>
+              <div className="flex items-center gap-2 shrink-0">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleOpenBulk}
+                  className="h-7 px-2.5 rounded-lg text-[10px] font-black uppercase tracking-wider gap-1.5 text-muted-foreground hover:bg-primary/5 hover:text-primary transition-all"
+                >
+                  <FileJson className="h-3 w-3" /> {lang.bulkUpdate}
+                </Button>
+                <Button
+                  size="sm"
+                  onClick={handleOpenAdd}
+                  className="h-7 px-3 rounded-lg text-[10px] font-black uppercase tracking-wider gap-1.5 shadow-sm shadow-primary/10"
+                >
+                  <Plus className="h-3 w-3" /> {lang.addNew}
+                </Button>
+              </div>
+            </>
+          ) : null}
+        </div>
       )}
 
       {/* --- Hero Header --- */}
@@ -404,6 +482,58 @@ export function ToolBiosKeys({ dictionary }: { dictionary?: any }) {
           </p>
         )}
       </div>
+
+      {/* --- Category Filter Chips + Sort Controls --- */}
+      {dataKeys.length > 0 && (
+        <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between px-1 -mt-1">
+          {/* Category Chips */}
+          <div className="flex flex-wrap gap-2">
+            <button
+              onClick={() => setSelectedCategory("all")}
+              className={cn(
+                "px-3.5 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all border",
+                selectedCategory === "all"
+                  ? "bg-primary text-primary-foreground border-primary shadow-sm shadow-primary/20"
+                  : "bg-muted/60 text-muted-foreground border-border/50 hover:border-primary/30 hover:text-foreground"
+              )}
+            >
+              {lang.allCategories}
+            </button>
+            {categories.map(cat => (
+              <button
+                key={cat}
+                onClick={() => setSelectedCategory(cat)}
+                className={cn(
+                  "px-3.5 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all border",
+                  selectedCategory === cat
+                    ? "bg-primary text-primary-foreground border-primary shadow-sm shadow-primary/20"
+                    : "bg-muted/60 text-muted-foreground border-border/50 hover:border-primary/30 hover:text-foreground"
+                )}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
+
+          {/* Sort Control */}
+          <div className="flex items-center gap-1.5 shrink-0">
+            {(["az", "za", "newest"] as const).map(mode => (
+              <button
+                key={mode}
+                onClick={() => setSortMode(mode)}
+                className={cn(
+                  "px-3 py-1.5 rounded-lg text-xs font-bold transition-all border",
+                  sortMode === mode
+                    ? "bg-foreground text-background border-foreground"
+                    : "bg-transparent text-muted-foreground border-border/50 hover:border-foreground/30 hover:text-foreground"
+                )}
+              >
+                {mode === "az" ? lang.sortAZ : mode === "za" ? lang.sortZA : lang.sortNewest}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="pt-2">
         {isFetching ? (
@@ -460,10 +590,10 @@ export function ToolBiosKeys({ dictionary }: { dictionary?: any }) {
                       </Badge>
                     </div>
                     <CardTitle className={cn("text-2xl font-black text-foreground tracking-tight transition-colors", theme.hoverTitle)}>
-                      {item.brand}
+                      {highlightText(item.brand, searchQuery)}
                     </CardTitle>
                     <CardDescription className="font-semibold text-muted-foreground tracking-wide mt-1 text-sm">
-                      {item.series || lang.allSeries}
+                      {highlightText(item.series || lang.allSeries, searchQuery)}
                     </CardDescription>
                   </CardHeader>
 
@@ -473,22 +603,22 @@ export function ToolBiosKeys({ dictionary }: { dictionary?: any }) {
                     <div className="flex flex-col gap-2.5">
                       {/* BIOS Key Row */}
                       <div className="flex items-center justify-between gap-3 px-4 py-3 rounded-xl bg-background/60 border border-border/40 group-hover:border-primary/20 transition-colors">
-                        <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                        <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-muted-foreground shrink-0">
                           <KeyRound className="h-3.5 w-3.5 opacity-70 shrink-0" />
                           <span>{lang.biosLabel}</span>
                         </div>
-                        <kbd className="inline-flex items-center px-2.5 py-1 text-sm font-bold text-foreground bg-muted border border-b-2 border-border/80 rounded-lg font-mono shadow-sm shrink-0 max-w-[55%] text-right whitespace-nowrap overflow-visible">
+                        <kbd className="inline-flex items-center px-2.5 py-1 text-sm font-bold text-foreground bg-muted border border-b-2 border-border/80 rounded-lg font-mono shadow-sm text-center break-words overflow-hidden min-w-0">
                           {item.biosKey || "-"}
                         </kbd>
                       </div>
 
                       {/* Boot Key Row */}
                       <div className="flex items-center justify-between gap-3 px-4 py-3 rounded-xl bg-background/60 border border-border/40 transition-colors" style={{ borderColor: "rgb(6 182 212 / 0.2)" }}>
-                        <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                        <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-muted-foreground shrink-0">
                           <Keyboard className="h-3.5 w-3.5 opacity-70 shrink-0" />
                           <span>{lang.bootLabel}</span>
                         </div>
-                        <kbd className="inline-flex items-center px-2.5 py-1 text-sm font-bold text-cyan-700 dark:text-cyan-300 bg-cyan-500/10 border border-b-2 border-cyan-500/20 rounded-lg font-mono shadow-sm shrink-0 max-w-[55%] text-right whitespace-nowrap overflow-visible">
+                        <kbd className="inline-flex items-center px-2.5 py-1 text-sm font-bold text-cyan-700 dark:text-cyan-300 bg-cyan-500/10 border border-b-2 border-cyan-500/20 rounded-lg font-mono shadow-sm text-center break-words overflow-hidden min-w-0">
                           {item.bootKey || "-"}
                         </kbd>
                       </div>
