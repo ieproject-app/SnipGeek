@@ -20,6 +20,7 @@ import {
   Image as ImageIcon,
   Shuffle,
   ChevronRight,
+  Monitor,
 } from "lucide-react";
 import { usePathname, useParams, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
@@ -73,6 +74,13 @@ const devTools: DevTool[] = [
     description: "Crop images to 16:9 ratio",
     href: "/tools/image-crop",
     icon: ImageIcon,
+  },
+  {
+    id: "bios-keys",
+    name: "BIOS & Boot Keys",
+    description: "Find BIOS & Boot Menu keys",
+    href: "/tools/bios-keys-boot-menu",
+    icon: Monitor,
   },
 ];
 
