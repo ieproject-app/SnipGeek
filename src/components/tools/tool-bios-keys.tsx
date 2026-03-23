@@ -24,6 +24,7 @@ export interface BiosKeyData {
   biosKey: string;
   bootKey: string;
   notes: string;
+  notesEn?: string;   // English translation of notes (optional)
   searchTags: string[];
 }
 
@@ -59,7 +60,9 @@ const t = {
     fieldSeries: "Product Series / Specific Model (Optional)",
     fieldBiosKey: "BIOS / UEFI Entry Key",
     fieldBootKey: "Boot Device Menu Key",
-    fieldNotes: "Support Notes (Tips / Important Warnings)",
+    fieldNotes: "Notes — Indonesian (ID)",
+    fieldNotesEn: "Notes — English (EN)",
+    fieldNotesEnHint: "If left blank, the Indonesian note above will be shown to English visitors as a fallback.",
     fieldTags: "SEO Search Keywords (comma-separated)",
     fieldTagsHint: "Critical: List all brand name variations so our search and Google can match them instantly.",
     cancel: "Cancel",
@@ -68,7 +71,7 @@ const t = {
     bulkTitle: "Bulk Update / Mass Inject (via JSON)",
     bulkDesc: "Powerful feature to overwrite or inject dozens of new entries at once from Gemini/ChatGPT prompts. Please follow the JSON schema structure.",
     bulkJsonLabel: "JSON Array Script",
-    bulkHint: "Supported keys: brand, category, series, biosKey, bootKey, notes, searchTags [Array]. *System will auto-replace if Brand+Series match, or add new if they don't.*",
+    bulkHint: "Supported keys: brand, category, series, biosKey, bootKey, notes, notesEn, searchTags [Array]. *System will auto-replace if Brand+Series match, or add new if they don't.*",
     cancelExec: "Cancel Execution",
     runBulk: "Run Bulk Inject",
   },
@@ -100,7 +103,9 @@ const t = {
     fieldSeries: "Seri Lini Produk / Tipe Identik (Opsional)",
     fieldBiosKey: "Kunci Masuk BIOS / UEFI",
     fieldBootKey: "Kunci Boot Device Menu",
-    fieldNotes: "Catatan Pendukung (Trik / Peringatan Penting)",
+    fieldNotes: "Catatan — Bahasa Indonesia (ID)",
+    fieldNotesEn: "Catatan — Bahasa Inggris (EN)",
+    fieldNotesEnHint: "Jika dikosongkan, catatan bahasa Indonesia di atas akan tampil sebagai fallback untuk pengunjung versi Inggris.",
     fieldTags: "Katakunci Sorotan SEO (Pisahkan dengan koma)",
     fieldTagsHint: "Ini krusial: Daftarkan semua variasi pemanggilan agar alat Search dan Google mampu mencocokkannya seketika.",
     cancel: "Batal",
@@ -109,7 +114,7 @@ const t = {
     bulkTitle: "Bulk Update / Mass Inject (via JSON)",
     bulkDesc: "Fitur mutakhir untuk menimpa massal atau menyuntikkan puluhan data baru sekaligus hasil dari prompt Gemini/ChatGPT. Harap patuhi struktur skema JSON murni.",
     bulkJsonLabel: "Teks Script Array JSON",
-    bulkHint: "Kunci yang didukung: brand, category, series, biosKey, bootKey, notes, searchTags [Array]. *Sistem akan otomatis me-replace dokumen jika Merek+Seri persis sama, dan menambah baru jika tidak.*",
+    bulkHint: "Kunci yang didukung: brand, category, series, biosKey, bootKey, notes, notesEn, searchTags [Array]. *Sistem akan otomatis me-replace jika Merek+Seri sama, atau menambah baru jika tidak.*",
     cancelExec: "Batalkan Eksekusi",
     runBulk: "Jalankan Bulk Inject",
   },
@@ -140,7 +145,7 @@ export function ToolBiosKeys({ dictionary }: { dictionary?: any }) {
   const [isBulking, setIsBulking] = useState(false);
 
   const defaultForm: BiosKeyData = {
-    brand: "", category: "Laptop", series: "", biosKey: "F2", bootKey: "F12", notes: "", searchTags: []
+    brand: "", category: "Laptop", series: "", biosKey: "F2", bootKey: "F12", notes: "", notesEn: "", searchTags: []
   };
   const [formData, setFormData] = useState<BiosKeyData>(defaultForm);
   const [bulkJsonText, setBulkJsonText] = useState("");
@@ -228,6 +233,7 @@ export function ToolBiosKeys({ dictionary }: { dictionary?: any }) {
         biosKey: formData.biosKey.trim(),
         bootKey: formData.bootKey.trim(),
         notes: formData.notes.trim(),
+        notesEn: formData.notesEn?.trim() || "",
         searchTags: Array.isArray(formData.searchTags) ? formData.searchTags : [],
         updatedAt: new Date().toISOString()
       };
@@ -286,6 +292,7 @@ export function ToolBiosKeys({ dictionary }: { dictionary?: any }) {
           biosKey: String(item.biosKey).trim(),
           bootKey: String(item.bootKey || "").trim(),
           notes: String(item.notes || "").trim(),
+          notesEn: String(item.notesEn || "").trim(),
           searchTags: Array.isArray(item.searchTags) ? item.searchTags : [],
           updatedAt: new Date().toISOString()
         };
@@ -487,25 +494,33 @@ export function ToolBiosKeys({ dictionary }: { dictionary?: any }) {
                       </div>
                     </div>
 
-                    {/* Notes Section — full text, no clamp */}
+                    {/* Notes Section — locale-aware, full text, no clamp */}
                     <div className="mt-auto pt-3 border-t border-border/30">
-                      {item.notes ? (
-                        <div className="flex gap-2.5">
-                          <div className={cn("w-0.5 rounded-full shrink-0 mt-0.5 bg-gradient-to-b", theme.gradient)} />
-                          <div>
-                            <p className="text-[11px] font-black uppercase tracking-widest text-primary/60 mb-1">
-                              {lang.notesLabel}
-                            </p>
-                            <p className="text-[13px] leading-relaxed text-muted-foreground/90 group-hover:text-foreground/80 transition-colors">
-                              {item.notes}
-                            </p>
+                      {(() => {
+                        // For English locale: prefer notesEn, fallback to notes
+                        // For Indonesian locale: always use notes
+                        const displayNote =
+                          locale === "en"
+                            ? (item.notesEn?.trim() || item.notes)
+                            : item.notes;
+                        return displayNote ? (
+                          <div className="flex gap-2.5">
+                            <div className={cn("w-0.5 rounded-full shrink-0 mt-0.5 bg-gradient-to-b", theme.gradient)} />
+                            <div>
+                              <p className="text-[11px] font-black uppercase tracking-widest text-primary/60 mb-1">
+                                {lang.notesLabel}
+                              </p>
+                              <p className="text-[13px] leading-relaxed text-muted-foreground/90 group-hover:text-foreground/80 transition-colors">
+                                {displayNote}
+                              </p>
+                            </div>
                           </div>
-                        </div>
-                      ) : (
-                        <p className="text-[13px] italic text-muted-foreground/40 pl-3">
-                          {lang.noNotes}
-                        </p>
-                      )}
+                        ) : (
+                          <p className="text-[13px] italic text-muted-foreground/40 pl-3">
+                            {lang.noNotes}
+                          </p>
+                        );
+                      })()}
                     </div>
 
                   </CardContent>
@@ -552,7 +567,12 @@ export function ToolBiosKeys({ dictionary }: { dictionary?: any }) {
             </div>
             <div className="space-y-2 md:col-span-2">
               <Label className="font-bold">{lang.fieldNotes}</Label>
-              <Textarea placeholder="E.g. Disable Secure Boot first before..." rows={3} value={formData.notes} onChange={e => setFormData({ ...formData, notes: e.target.value })} />
+              <Textarea placeholder="Cth: Matikan Secure Boot terlebih dahulu sebelum..." rows={3} value={formData.notes} onChange={e => setFormData({ ...formData, notes: e.target.value })} />
+            </div>
+            <div className="space-y-2 md:col-span-2">
+              <Label className="font-bold text-sky-600 dark:text-sky-400">{lang.fieldNotesEn}</Label>
+              <Textarea placeholder="E.g. Disable Secure Boot first before..." rows={3} value={formData.notesEn || ""} onChange={e => setFormData({ ...formData, notesEn: e.target.value })} className="border-sky-500/30" />
+              <p className="text-[11px] text-muted-foreground">{lang.fieldNotesEnHint}</p>
             </div>
             <div className="space-y-2 md:col-span-2">
               <Label className="font-bold">{lang.fieldTags}</Label>
