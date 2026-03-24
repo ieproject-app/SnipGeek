@@ -12,7 +12,8 @@ import {
 import { AddToReadingListButton } from "@/components/layout/add-to-reading-list-button";
 import { CategoryBadge } from "@/components/layout/category-badge";
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
-import { formatRelativeTime, cn } from "@/lib/utils";
+import { cn } from "@/lib/utils";
+import { RelativeTime } from "@/components/ui/relative-time";
 import { getMulticolorSeed, getMulticolorTheme } from "@/lib/multicolor";
 import type { Note, NoteFrontmatter } from "@/lib/notes";
 import type { Dictionary } from "@/lib/get-dictionary";
@@ -147,9 +148,11 @@ export function HomeNotes({
                           <h3 className={cn("font-display text-base font-semibold text-primary leading-snug transition-colors mb-2", multicolor.hoverTitle)}>
                             {note.frontmatter.title}
                           </h3>
-                          <time className="text-[10px] text-muted-foreground/80 block">
-                            {formatRelativeTime(new Date(note.frontmatter.date), locale)}
-                          </time>
+                          <RelativeTime
+                            date={note.frontmatter.date}
+                            locale={locale}
+                            className="text-[10px] text-muted-foreground/80 block"
+                          />
                         </div>
                       </Link>
                     </article>

@@ -219,7 +219,7 @@ export default async function LocaleLayout({
           async
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6235611333449307"
           crossOrigin="anonymous"
-          strategy="afterInteractive"
+          strategy="lazyOnload"
         />
         <FirebaseProviderWrapper>
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem>

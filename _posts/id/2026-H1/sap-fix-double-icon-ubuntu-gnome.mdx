@@ -1,0 +1,135 @@
+---
+title: "SAP GUI for Java Muncul Dua Ikon di Ubuntu? Ini Fix-nya"
+slug: "sap-fix-double-icon-ubuntu-gnome"
+translationKey: "sap-fix-double-icon-ubuntu-gnome"
+date: "2026-03-24"
+category: Linux
+tags:
+  - ubuntu
+  - linux
+  - sap
+  - gnome
+  - troubleshooting
+published: true
+featured: false
+heroImage: "/images/_posts/linux/sap-fix-double-icon/banner-sap.webp"
+imageAlt: "SAP GUI for Java menampilkan dua ikon di dock Ubuntu GNOME"
+description: "SAP GUI for Java muncul dua ikon di dock Ubuntu? Solusinya cukup tambahkan StartupWMClass di file .desktop — masalah klasik window grouping di GNOME."
+---
+
+Pertama kali saya lihat ini, langsung bingung. SAP GUI for Java sudah saya pin di dock GNOME, tapi setiap kali program dibuka, muncul *ikon kedua* tepat di sampingnya — seolah ada dua aplikasi berbeda yang jalan bersamaan. Ditutup, ikon ekstra itu hilang. Dibuka lagi, muncul lagi.
+
+Saya sempat curiga file `.desktop`-nya corrupt, atau jangan-jangan tidak sengaja install dua kali. Ternyata solusinya cuma satu baris.
+
+## Kenapa GNOME Bikin Ikon Kedua?
+
+Ini masalah klasik Java app di GNOME. Setiap kali sebuah aplikasi dibuka, GNOME mencoba mencocokkan window yang muncul dengan launcher-nya — supaya keduanya bisa digabung di dock. Proses ini mengandalkan properti bernama **WM_CLASS**, semacam pengenal window yang di-set oleh aplikasi saat pertama kali jalan.
+
+Kebanyakan aplikasi modern sudah set ini dengan benar. SAP GUI for Java tidak. Jadilah GNOME melihat window asing yang tidak dikenali, menganggapnya aplikasi baru, lalu — dengan niat baik tapi hasilnya menyebalkan — membuat ikon baru di dock.
+
+Solusinya: beritahu GNOME secara eksplisit bahwa WM_CLASS ini milik launcher SAP, lewat properti `StartupWMClass` di dalam file `.desktop`.
+
+<Callout variant="info" title="Berlaku juga di distro lain">
+  Saya ketemu masalah ini di Ubuntu, tapi fix yang sama juga berlaku di semua distro berbasis GNOME — Fedora, Pop!\_OS, Zorin, dan sejenisnya. Kalau kamu pakai Manjaro atau Arch, [proses install SAP GUI-nya](/blog/install-sap-gui-java-manjaro-linux) memang sedikit berbeda, tapi cara fix `.desktop`-nya sama persis.
+</Callout>
+
+## Cara Fix: Tambahkan StartupWMClass
+
+<Steps>
+  <Step>
+    ### Cek WM_CLASS dari Window SAP
+
+    Buka SAP GUI dulu sampai jalan, lalu buka terminal dan jalankan perintah ini:
+
+    ```bash
+    xprop WM_CLASS
+    ```
+
+    Kursor akan berubah jadi crosshair — klik langsung ke window SAP GUI yang sedang aktif. Output-nya akan seperti ini:
+
+    ```
+    WM_CLASS(STRING) = "SAP GUI for Java", "SAP GUI for Java"
+    ```
+
+    Catat nilai itu, khususnya string kedua: `SAP GUI for Java`. Ini yang akan kita pakai.
+  </Step>
+
+  <Step>
+    ### Temukan File .desktop SAP
+
+    Jalankan perintah ini untuk cari lokasi file launcher-nya:
+
+    ```bash
+    find /usr/share/applications ~/.local/share/applications -name "*sap*" -o -name "*SAP*" 2>/dev/null
+    ```
+
+    Di kasus saya, file-nya ada di:
+
+    ```
+    /home/snipgeek/.local/share/applications/SAPGUI7.80.desktop
+    ```
+
+    Kalau muncul lebih dari satu hasil, prioritaskan yang ada di `~/.local/share/applications/` — itu yang di-install SAP secara default untuk user.
+  </Step>
+
+  <Step>
+    ### Edit File .desktop-nya
+
+    Buka dengan nano atau text editor apapun:
+
+    ```bash
+    nano ~/.local/share/applications/SAPGUI7.80.desktop
+    ```
+
+    Di dalam section `[Desktop Entry]`, tambahkan baris ini:
+
+    ```ini
+    StartupWMClass=SAP GUI for Java
+    ```
+
+    Hasil akhir file-nya kira-kira jadi seperti ini:
+
+    ```ini
+    [Desktop Entry]
+    Exec="/home/snipgeek/SAPClients/SAPGUI7.80/bin/guilogon"
+    Type=Application
+    Icon=guilogon2
+    Name=SAP GUI 7.80
+    Categories=X-SAPClients;Office;
+    StartupWMClass=SAP GUI for Java
+    ```
+
+    Simpan dengan <kbd>Ctrl</kbd>+<kbd>O</kbd> → <kbd>Enter</kbd>, lalu keluar dengan <kbd>Ctrl</kbd>+<kbd>X</kbd>.
+
+    ![Terminal menampilkan output xprop dan proses edit file .desktop dengan nano](/images/_posts/linux/sap-fix-double-icon/terminal-view.webp)
+    <div className="-mt-3 mb-6 text-center text-sm italic text-muted-foreground">Menjalankan xprop dan mengedit langsung file .desktop lewat terminal.</div>
+  </Step>
+
+  <Step>
+    ### Refresh dan Test
+
+    Paksa desktop database baca ulang perubahan yang baru dibuat:
+
+    ```bash
+    update-desktop-database ~/.local/share/applications
+    ```
+
+    Lalu **logout dan login kembali** — ini penting. Sekedar reload kadang tidak cukup; GNOME perlu restart sesi penuh untuk benar-benar membaca ulang file `.desktop`.
+
+    Buka SAP GUI lagi. Ikon yang sudah di-pin seharusnya langsung jadi ikon aktif — tidak ada duplikat, tidak ada ikon baru yang muncul sendiri. ✅
+  </Step>
+</Steps>
+
+## Kenapa Ini Sering Terjadi di Java App?
+
+Java app dikompilasi untuk berjalan di atas JVM, dan JVM tidak secara otomatis meneruskan nama aplikasi sebagai window class ke display server. Di situlah akar masalahnya. Window muncul dengan WM_CLASS yang generik atau tidak cocok, dan GNOME tidak punya cara untuk menghubungkannya kembali ke launcher.
+
+Ini bukan bug khusus SAP — DBeaver, IntelliJ IDEA, dan Java desktop app lainnya bisa kena masalah yang sama persis. Begitu kamu tahu triknya, fix ini bisa langsung dipakai untuk app mana pun yang berkelakuan serupa.
+
+<Callout variant="tip" title="Bisa dipakai untuk Java app lain juga">
+  Kalau kamu pakai DBeaver, IntelliJ, atau app Java lain yang punya masalah ikon dobel, cari file `.desktop`-nya dan tambahkan properti `StartupWMClass` yang sama. Jalankan `xprop WM_CLASS` saat app itu aktif untuk dapat nilai yang tepat.
+</Callout>
+
+---
+
+Kalau kamu sudah terlalu lama menatap ikon dobel itu sambil garuk-garuk kepala — semoga ini menghemat waktu yang saya buang waktu itu. Tinggalkan komentar kalau WM_CLASS yang kamu dapat berbeda, atau kalau file `.desktop`-nya berada di lokasi yang tidak biasa.

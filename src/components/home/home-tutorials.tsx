@@ -9,7 +9,8 @@ import {
   type CarouselApi,
 } from '@/components/ui/carousel';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { cn, formatRelativeTime } from '@/lib/utils';
+import { cn } from '@/lib/utils';
+import { RelativeTime } from '@/components/ui/relative-time';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { AddToReadingListButton } from '@/components/layout/add-to-reading-list-button';
 import type { Dictionary } from '@/lib/get-dictionary';
@@ -163,9 +164,11 @@ export function HomeTutorials({ posts, title, viewMoreText, dictionary, locale, 
                           <h3 className={cn('font-display text-base font-semibold text-primary leading-snug transition-colors mb-2', multicolor.hoverTitle)}>
                             {post.frontmatter.title}
                           </h3>
-                          <time className="text-[10px] text-muted-foreground block font-medium opacity-60">
-                            {formatRelativeTime(new Date(post.frontmatter.date), locale)}
-                          </time>
+                          <RelativeTime
+                            date={post.frontmatter.date}
+                            locale={locale}
+                            className="text-[10px] text-muted-foreground block font-medium opacity-60"
+                          />
                         </div>
                       </Link>
                     </article>
