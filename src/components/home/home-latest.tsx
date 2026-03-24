@@ -4,7 +4,8 @@ import React from "react";
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
-import { cn, formatRelativeTime } from "@/lib/utils";
+import { cn } from "@/lib/utils";
+import { RelativeTime } from "@/components/ui/relative-time";
 import { AddToReadingListButton } from "@/components/layout/add-to-reading-list-button";
 import { CategoryBadge } from "@/components/layout/category-badge";
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
@@ -100,9 +101,11 @@ export const HomeLatest = ({
                         <h3 className={cn("font-display text-lg sm:text-base font-semibold tracking-tight text-primary transition-colors leading-tight mb-2", multicolor.hoverTitle)}>
                             {post.frontmatter.title}
                         </h3>
-                        <time className="text-[10px] font-medium text-muted-foreground block opacity-60">
-                            {formatRelativeTime(new Date(post.frontmatter.date), locale)}
-                        </time>
+                        <RelativeTime
+                            date={post.frontmatter.date}
+                            locale={locale}
+                            className="text-[10px] font-medium text-muted-foreground block opacity-60"
+                        />
                     </Link>
                 </div>
             </ScrollReveal>

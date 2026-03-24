@@ -22,6 +22,7 @@ import { RevealImage } from "@/components/ui/reveal-image";
 import { extractHeadings } from "@/lib/mdx-utils";
 import { LayoutBreadcrumbs } from "@/components/layout/layout-breadcrumbs";
 import { resolveHeroImage, getLinkPrefix } from "@/lib/utils";
+import { GoogleAd, InArticleAd } from "@/components/layout/google-ad";
 import remarkGfm from "remark-gfm";
 import rehypeShiki from "@shikijs/rehype";
 
@@ -249,6 +250,9 @@ export default async function Page({
           </header>
 
           <div className="max-w-3xl mx-auto">
+            {/* Slot A — Banner iklan sebelum TOC */}
+            <GoogleAd adSlot="2801053264" className="mb-4" />
+
             <ArticleTOC
               headings={headings}
               title={dictionary.post.toc}
@@ -267,6 +271,9 @@ export default async function Page({
                 }}
               />
             </div>
+
+            {/* Slot B — In-Article Ad setelah konten selesai */}
+            <InArticleAd adSlot="2801053264" />
 
             <ArticleTags
               tags={initialPost.frontmatter.tags || []}
@@ -293,6 +300,9 @@ export default async function Page({
                 imageUrl={heroSource?.url}
               />
             </div>
+
+            {/* Slot C — Banner iklan sebelum komentar */}
+            <GoogleAd adSlot="2801053264" className="mt-8" />
 
             <ArticleComments
               article={{

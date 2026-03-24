@@ -5,7 +5,8 @@ import Link from "next/link";
 import { Post, PostFrontmatter } from "@/lib/posts";
 import { Dictionary } from "@/lib/get-dictionary";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
-import { cn, formatRelativeTime } from "@/lib/utils";
+import { cn } from "@/lib/utils";
+import { RelativeTime } from "@/components/ui/relative-time";
 import { AddToReadingListButton } from "@/components/layout/add-to-reading-list-button";
 import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
 import {
@@ -165,9 +166,11 @@ export function HomeHero({ posts, dictionary, locale, linkPrefix }: HomeHeroProp
                                                     {post.frontmatter.title}
                                                 </h3>
                                                 <div className="flex items-center justify-between mt-1">
-                                                    <time className="text-[10px] font-bold uppercase tracking-tighter text-muted-foreground/60">
-                                                        {formatRelativeTime(new Date(post.frontmatter.date), locale)}
-                                                    </time>
+                                                    <RelativeTime
+                                                        date={post.frontmatter.date}
+                                                        locale={locale}
+                                                        className="text-[10px] font-bold uppercase tracking-tighter text-muted-foreground/60"
+                                                    />
                                                     <div
                                                         className={cn(
                                                             "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all duration-300",
@@ -289,9 +292,11 @@ export function HomeHero({ posts, dictionary, locale, linkPrefix }: HomeHeroProp
                                             </h3>
 
                                             <div className="flex items-center justify-between">
-                                                <div className="text-[10px] font-bold uppercase tracking-tighter text-muted-foreground/60">
-                                                    {formatRelativeTime(new Date(post.frontmatter.date), locale)}
-                                                </div>
+                                                <RelativeTime
+                                                    date={post.frontmatter.date}
+                                                    locale={locale}
+                                                    className="text-[10px] font-bold uppercase tracking-tighter text-muted-foreground/60"
+                                                />
 
                                                 <div className="flex items-center gap-2">
                                                     <AddToReadingListButton
