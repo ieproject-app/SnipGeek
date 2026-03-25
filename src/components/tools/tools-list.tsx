@@ -51,6 +51,8 @@ export function ToolsList({ dictionary, locale, isDevelopment }: ToolsListProps)
   const { notify } = useNotification();
   const pageContent = dictionary.tools;
   const linkPrefix = locale === "en" ? "" : `/${locale}`;
+  const devOnlyToolIds = new Set(["signatories_index", "compress_pdf", "address_label"]);
+  const devOnlyBadgeText = locale === "id" ? "Hanya Internal (Belum Rilis)" : "Internal Only (Unreleased)";
 
   const publicTools: ToolCardConfig[] = [
     {
@@ -140,7 +142,20 @@ export function ToolsList({ dictionary, locale, isDevelopment }: ToolsListProps)
       badgeVariant: "secondary" as const,
       requiresAuth: true,
     },
-  ];
+  ].map((tool) => {
+    // Keep not-ready tools visible as reminders, but avoid 404s in production.
+    if (!isDevelopment && devOnlyToolIds.has(tool.id)) {
+      return {
+        ...tool,
+        isLink: false,
+        href: undefined,
+        badge: devOnlyBadgeText,
+        badgeVariant: "outline" as const,
+      };
+    }
+
+    return tool;
+  });
 
   const handleLogin = async () => {
     if (!auth) return;
