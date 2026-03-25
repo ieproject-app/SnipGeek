@@ -6,6 +6,7 @@ import { FirebaseApp } from 'firebase/app';
 import { Firestore } from 'firebase/firestore';
 import { Auth, User, onAuthStateChanged } from 'firebase/auth';
 import { FirebaseErrorListener } from '@/components/FirebaseErrorListener';
+import { finalizeGoogleRedirectSignIn } from '@/firebase/non-blocking-login';
 
 interface FirebaseProviderProps {
   children: ReactNode;
@@ -61,6 +62,25 @@ export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({
     isUserLoading: !!auth, 
     userError: null,
   });
+
+  const [redirectHandled, setRedirectHandled] = useState(false);
+
+  useEffect(() => {
+    if (!auth || redirectHandled) return;
+
+    let isMounted = true;
+    finalizeGoogleRedirectSignIn(auth)
+      .catch((error) => {
+        console.error('FirebaseProvider: redirect result error:', error);
+      })
+      .finally(() => {
+        if (isMounted) setRedirectHandled(true);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [auth, redirectHandled]);
 
   useEffect(() => {
     if (!auth) {

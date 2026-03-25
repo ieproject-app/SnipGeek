@@ -27,6 +27,7 @@ import { SnipTooltip } from "@/components/ui/snip-tooltip";
 import { getLinkPrefix } from "@/lib/utils";
 import { useAuth, useUser } from "@/firebase";
 import { initiateGoogleSignIn } from "@/firebase/non-blocking-login";
+import { isFirebaseConfigValid } from "@/firebase/config";
 import { signOut } from "firebase/auth";
 import { useNotification } from "@/hooks/use-notification";
 
@@ -69,8 +70,12 @@ export function LayoutFooter({
 
   const handleLogin = async () => {
     if (!auth) {
+      const isDev = process.env.NODE_ENV === "development";
+      const configReady = isFirebaseConfigValid();
       notify(
-        dictionary?.notifications?.authNotReady || "Sistem login belum siap. Silakan coba lagi.",
+        isDev && !configReady
+          ? "Mode dev: Firebase Auth belum dikonfigurasi lengkap (.env.local)."
+          : dictionary?.notifications?.authNotReady || "Sistem login belum siap. Silakan coba lagi.",
         <ShieldAlert className="h-4 w-4" />
       );
       return;
