@@ -94,6 +94,18 @@
       "image_crop": {
         "title": "Image Crop",
         "description": "Crop to 16:9 and export as WebP for hero banners."
+      },
+      "compress_pdf": {
+        "title": "Compress PDF",
+        "description": "Reduce the file size of your PDF documents without significant quality loss."
+      },
+      "signatories_index": {
+        "title": "Signatories Index",
+        "description": "Manage and search a centralized list of document signers."
+      },
+      "address_label": {
+        "title": "Address Label",
+        "description": "Generate professional shipping address labels for envelopes and packages."
       }
     },
     "image_crop": {

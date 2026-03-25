@@ -94,6 +94,18 @@
       "image_crop": {
         "title": "Potong Gambar",
         "description": "Potong ke rasio 16:9 dan ekspor WebP untuk banner hero."
+      },
+      "compress_pdf": {
+        "title": "Kompres PDF",
+        "description": "Perkecil ukuran file PDF Anda tanpa mengurangi kualitas secara signifikan."
+      },
+      "signatories_index": {
+        "title": "Indeks Penandatangan",
+        "description": "Kelola dan cari daftar penandatangan dokumen secara terpusat."
+      },
+      "address_label": {
+        "title": "Label Alamat",
+        "description": "Generate label alamat pengiriman yang rapi untuk amplop dan paket."
       }
     },
     "image_crop": {

@@ -14,7 +14,11 @@ import {
   Crop, 
   Terminal,
   LogOut,
-  Chrome
+  Chrome,
+  FileDown,
+  FileSignature,
+  ScrollText,
+  Sparkles
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
@@ -93,21 +97,57 @@ export function ToolsList({ dictionary, locale, isDevelopment }: ToolsListProps)
 
   const internalTools: ToolCardConfig[] = [
     {
-      id: 'employee_history',
+      id: "employee_history",
       icon: <Briefcase className="h-8 w-8" />,
       isLink: true,
       href: `${linkPrefix}/tools/employee-history`,
       badge: pageContent.open_tool,
-      badgeVariant: 'secondary' as const,
+      badgeVariant: "secondary" as const,
       requiresAuth: true,
     },
     {
-      id: 'number_generator',
+      id: "signatories_index",
+      icon: <FileSignature className="h-8 w-8" />,
+      isLink: true,
+      href: `${linkPrefix}/tools/signatories-index`,
+      badge: pageContent.open_tool,
+      badgeVariant: "secondary" as const,
+      requiresAuth: true,
+    },
+    {
+      id: "compress_pdf",
+      icon: <FileDown className="h-8 w-8" />,
+      isLink: true,
+      href: `${linkPrefix}/tools/compress-pdf`,
+      badge: pageContent.open_tool,
+      badgeVariant: "secondary" as const,
+      requiresAuth: true,
+    },
+    {
+      id: "address_label",
+      icon: <ScrollText className="h-8 w-8" />,
+      isLink: true,
+      href: `${linkPrefix}/tools/address-label-generator`,
+      badge: pageContent.open_tool,
+      badgeVariant: "secondary" as const,
+      requiresAuth: true,
+    },
+    {
+      id: "number_generator",
       icon: <Hash className="h-8 w-8" />,
       isLink: true,
       href: `${linkPrefix}/tools/number-generator`,
       badge: pageContent.open_tool,
-      badgeVariant: 'secondary' as const,
+      badgeVariant: "secondary" as const,
+      requiresAuth: true,
+    },
+    {
+      id: "ai_prompt_generator",
+      icon: <Sparkles className="h-8 w-8 text-accent" />,
+      isLink: true,
+      href: `${linkPrefix}/tools/prompt-generator`,
+      badge: pageContent.new_badge,
+      badgeVariant: "default" as const,
       requiresAuth: true,
     },
   ];

@@ -19,6 +19,7 @@ import {
   Terminal,
   LogOut,
   Chrome,
+  Sparkles,
 } from "lucide-react";
 import { TikTokLogo } from "@/components/icons/tiktok-logo";
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
@@ -244,6 +245,18 @@ export function LayoutFooter({
                     <LogOut className="h-3.5 w-3.5 transition-transform group-hover:scale-120" />
                     <span>Sign Out</span>
                   </button>
+                )}
+                {process.env.NODE_ENV === "development" && (
+                  <>
+                    <div className="w-1 h-1 rounded-full bg-primary/20" />
+                    <Link
+                      href={`${linkPrefix}/tools/prompt-generator`}
+                      className="group flex items-center gap-2 text-[11px] font-black uppercase tracking-widest text-primary/60 hover:text-accent transition-all duration-300"
+                    >
+                      <Sparkles className="h-3.5 w-3.5 transition-transform group-hover:scale-120 group-hover:rotate-12 text-accent" />
+                      <span>AI Generator</span>
+                    </Link>
+                  </>
                 )}
               </nav>
 
