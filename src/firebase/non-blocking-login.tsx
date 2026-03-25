@@ -8,6 +8,7 @@ import {
   GoogleAuthProvider,
   signInWithPopup,
   signInWithRedirect,
+  getRedirectResult,
 } from 'firebase/auth';
 
 /** 
@@ -69,7 +70,30 @@ export async function initiateGoogleSignIn(authInstance: Auth): Promise<void> {
       alert(`Domain ini belum didaftarkan di Firebase Console. Silakan tambahkan domain situs Anda ke: Auth > Settings > Authorized Domains.`);
     }
 
+    if (
+      error.code === 'auth/popup-blocked' ||
+      error.code === 'auth/operation-not-supported-in-this-environment'
+    ) {
+      await signInWithRedirect(authInstance, provider);
+      return;
+    }
+
     console.error("Firebase Auth Error:", error.code, error.message);
+    throw error;
+  }
+}
+
+/**
+ * Finalize Google redirect flow after returning from provider page.
+ * Safe to call on app boot; returns null when no redirect is pending.
+ */
+export async function finalizeGoogleRedirectSignIn(authInstance: Auth) {
+  try {
+    return await getRedirectResult(authInstance);
+  } catch (error: any) {
+    if (error?.code === 'auth/unauthorized-domain') {
+      alert('Domain ini belum didaftarkan di Firebase Console (Authorized Domains).');
+    }
     throw error;
   }
 }
