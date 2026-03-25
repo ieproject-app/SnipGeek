@@ -116,7 +116,7 @@ export function ToolWrapper({
   if (isPublic) {
     return (
       <div className="space-y-8 animate-in fade-in duration-700">
-        {requiresCloud && !isFirebaseInitialized && (
+        {requiresCloud && !isFirebaseInitialized && process.env.NODE_ENV !== 'development' && (
           <div className="p-4 bg-amber-500/10 border-l-4 border-amber-500 rounded-lg text-amber-700">
             <div className="flex items-center gap-3">
               <AlertTriangle className="h-5 w-5" />
@@ -127,40 +127,7 @@ export function ToolWrapper({
           </div>
         )}
 
-        {user && (
-          <div className="flex items-center justify-between h-12 px-4 bg-muted/20 rounded-xl border border-border/40 overflow-hidden">
-            <div className="flex items-center gap-2.5 min-w-0">
-              <Avatar className="h-7 w-7 shrink-0 border border-border/60 shadow-sm">
-                <AvatarImage
-                  src={user.photoURL || ""}
-                  alt={user.displayName || "User"}
-                />
-                <AvatarFallback className="bg-primary text-primary-foreground font-black text-[10px]">
-                  {user.displayName?.charAt(0) || "U"}
-                </AvatarFallback>
-              </Avatar>
-              <div className="flex items-center gap-2 min-w-0">
-                <p className="text-xs font-black uppercase tracking-tight text-primary truncate max-w-[140px]">
-                  {user.displayName}
-                </p>
-                <Badge
-                  variant="secondary"
-                  className="h-4 px-1.5 text-[8px] font-black uppercase bg-emerald-500/10 text-emerald-600 border-none shrink-0"
-                >
-                  <CheckCircle2 className="h-2 w-2 mr-1" /> Verified
-                </Badge>
-              </div>
-            </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleLogout}
-              className="h-7 px-2.5 rounded-lg text-[10px] font-black uppercase tracking-wider text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-all shrink-0"
-            >
-              <LogOut className="h-3 w-3 mr-1.5" /> Keluar
-            </Button>
-          </div>
-        )}
+        {/* User banner hidden for public tools to maintain a clean layout */}
 
         <header className="text-center space-y-3">
           <h1 className="font-display text-4xl font-extrabold tracking-tighter text-primary uppercase">
@@ -180,7 +147,7 @@ export function ToolWrapper({
     );
   }
 
-  if (!isFirebaseInitialized) {
+  if (!isFirebaseInitialized && process.env.NODE_ENV !== 'development') {
     return (
       <div className="max-w-2xl mx-auto py-12 px-4 animate-in fade-in duration-700">
         <Card className="border-destructive/20 bg-destructive/[0.02] p-8 rounded-2xl shadow-xl border-t-4 border-t-destructive">
@@ -250,32 +217,38 @@ export function ToolWrapper({
   if (!user) {
     return (
       <div className="max-w-md mx-auto animate-in fade-in zoom-in-95 duration-500">
-        <Card className="text-center mt-8 border-primary/10 bg-card/50 shadow-xl rounded-2xl overflow-hidden">
-          <div className="h-1.5 w-full bg-accent" />
-          <CardHeader className="pt-10 pb-6 space-y-4">
-            <div className="mx-auto p-4 bg-primary/5 rounded-full w-fit border border-primary/5">
-              <Lock className="h-8 w-8 text-primary opacity-40" />
+        <Card className="text-center mt-8 border-primary/10 bg-card/40 backdrop-blur-md shadow-2xl rounded-3xl overflow-hidden border-t-2 border-t-accent/20">
+          <CardHeader className="pt-12 pb-6 space-y-6">
+            <div className="mx-auto p-4 bg-accent/10 rounded-2xl w-fit border border-accent/20 shadow-inner group">
+              <Lock className="h-10 w-10 text-accent transition-transform group-hover:scale-110" />
             </div>
-            <div className="space-y-1">
-              <CardTitle className="font-display text-2xl font-black uppercase tracking-tighter">
-                {t.restrictedAccess}
+            <div className="space-y-2">
+              <CardTitle className="font-display text-3xl font-black uppercase tracking-tighter text-primary">
+                Member Area
               </CardTitle>
-              <CardDescription className="text-xs uppercase font-bold tracking-widest opacity-60">
-                Internal Team Only
-              </CardDescription>
+              <div className="flex items-center justify-center gap-2">
+                <div className="h-1.5 w-1.5 rounded-full bg-accent animate-pulse" />
+                <CardDescription className="text-[10px] uppercase font-bold tracking-[0.2em] text-muted-foreground">
+                  SnipGeek Internal Access
+                </CardDescription>
+              </div>
             </div>
           </CardHeader>
-          <CardContent className="px-10 pb-12 space-y-8">
-            <p className="text-sm text-muted-foreground leading-relaxed">
-              Silakan login dengan Google untuk mengakses tool {title}.
+          <CardContent className="px-12 pb-14 space-y-8">
+            <p className="text-sm text-muted-foreground leading-relaxed font-medium">
+              You are trying to access <span className="text-primary font-bold italic">{title}</span>. 
+              Please verify your identity to continue.
             </p>
             <Button
               onClick={handleGoogleLogin}
-              className="w-full h-12 rounded-full gap-3 font-black uppercase tracking-widest shadow-lg shadow-primary/10 hover:scale-[1.02] transition-transform"
+              className="w-full h-14 rounded-2xl gap-3 font-black uppercase tracking-widest shadow-xl shadow-primary/10 hover:scale-[1.02] active:scale-[0.98] transition-all bg-primary hover:bg-accent"
             >
               <Chrome className="h-5 w-5" />
               {t.loginWithGoogle}
             </Button>
+            <p className="text-[10px] text-muted-foreground/40 font-bold uppercase tracking-tight">
+              Secure Auth via Google Cloud
+            </p>
           </CardContent>
         </Card>
       </div>

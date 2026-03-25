@@ -380,63 +380,37 @@ export function ToolBiosKeys({ dictionary }: { dictionary?: any }) {
   return (
     <div className="space-y-8 min-h-screen pb-10">
 
-      {/* --- Admin Bar — matches ToolWrapper slim bar pattern --- */}
-      {(isAdminLoading || isAdminUser || !user) && (
+      {/* --- Admin Bar — only visible to active admins --- */}
+      {isAdminUser && !isAdminLoading && (
         <div className="flex items-center justify-between min-h-12 px-4 py-2 bg-muted/20 rounded-xl border border-border/40 overflow-hidden animate-in fade-in duration-300">
-          {isAdminLoading ? (
-            <div className="flex items-center gap-2 text-muted-foreground w-full justify-center">
-              <Loader2 className="h-3.5 w-3.5 animate-spin" />
-              <span className="text-xs font-bold uppercase tracking-wider">{lang.analyzing}</span>
+          <div className="flex items-center gap-2.5 min-w-0">
+            <div className="p-1 bg-primary/10 rounded-md shrink-0">
+              <Database className="h-3.5 w-3.5 text-primary" />
             </div>
-          ) : !user ? (
-            <>
-              <div className="flex items-center gap-2.5 min-w-0">
-                <Database className="h-3.5 w-3.5 text-muted-foreground/40 shrink-0" />
-                <p className="text-xs font-black uppercase tracking-tight text-muted-foreground/60 truncate">
-                  Database Admin
-                </p>
-              </div>
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => auth && initiateGoogleSignIn(auth)}
-                className="h-7 px-3 rounded-lg text-[10px] font-black uppercase tracking-wider gap-1.5 border-primary/20 hover:bg-primary/5 hover:text-primary transition-all shrink-0"
-              >
-                <Chrome className="h-3 w-3" /> {lang.loginButton}
-              </Button>
-            </>
-          ) : isAdminUser ? (
-            <>
-              <div className="flex items-center gap-2.5 min-w-0">
-                <div className="p-1 bg-primary/10 rounded-md shrink-0">
-                  <Database className="h-3.5 w-3.5 text-primary" />
-                </div>
-                <p className="text-xs font-black uppercase tracking-tight text-primary truncate max-w-[160px]">
-                  {lang.adminTitle}
-                </p>
-                <Badge variant="secondary" className="h-4 px-1.5 text-[8px] font-black uppercase bg-primary/10 text-primary border-none shrink-0">
-                  Super Admin
-                </Badge>
-              </div>
-              <div className="flex items-center gap-2 shrink-0">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleOpenBulk}
-                  className="h-7 px-2.5 rounded-lg text-[10px] font-black uppercase tracking-wider gap-1.5 text-muted-foreground hover:bg-primary/5 hover:text-primary transition-all"
-                >
-                  <FileJson className="h-3 w-3" /> {lang.bulkUpdate}
-                </Button>
-                <Button
-                  size="sm"
-                  onClick={handleOpenAdd}
-                  className="h-7 px-3 rounded-lg text-[10px] font-black uppercase tracking-wider gap-1.5 shadow-sm shadow-primary/10"
-                >
-                  <Plus className="h-3 w-3" /> {lang.addNew}
-                </Button>
-              </div>
-            </>
-          ) : null}
+            <p className="text-xs font-black uppercase tracking-tight text-primary truncate max-w-[160px]">
+              {lang.adminTitle}
+            </p>
+            <Badge variant="secondary" className="h-4 px-1.5 text-[8px] font-black uppercase bg-primary/10 text-primary border-none shrink-0">
+              Super Admin
+            </Badge>
+          </div>
+          <div className="flex items-center gap-2 shrink-0">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleOpenBulk}
+              className="h-7 px-2.5 rounded-lg text-[10px] font-black uppercase tracking-wider gap-1.5 text-muted-foreground hover:bg-primary/5 hover:text-primary transition-all"
+            >
+              <FileJson className="h-3 w-3" /> {lang.bulkUpdate}
+            </Button>
+            <Button
+              size="sm"
+              onClick={handleOpenAdd}
+              className="h-7 px-3 rounded-lg text-[10px] font-black uppercase tracking-wider gap-1.5 shadow-sm shadow-primary/10"
+            >
+              <Plus className="h-3 w-3" /> {lang.addNew}
+            </Button>
+          </div>
         </div>
       )}
 

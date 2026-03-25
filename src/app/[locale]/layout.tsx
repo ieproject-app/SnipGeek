@@ -1,7 +1,6 @@
 import { LayoutHeader } from "@/components/layout/layout-header";
 import { LayoutFooter } from "@/components/layout/layout-footer";
 import { LayoutBackToTop } from "@/components/layout/back-to-top";
-import { DevSidebar } from "@/components/layout/dev-sidebar";
 import { i18n, type Locale } from "@/i18n-config";
 import {
   getAllTranslationsMap as getAllPostTranslationsMap,
@@ -241,7 +240,6 @@ export default async function LocaleLayout({
                   translationsMap={translationsMap}
                 />
                 <LayoutBackToTop />
-                <DevSidebar />
 
               </ReadingListProvider>
             </NotificationProvider>

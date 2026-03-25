@@ -56,31 +56,27 @@ export async function getAllTags(locale: string): Promise<TagInfo[]> {
 
     const tagMap = new Map<string, { count: number; types: Set<string> }>();
 
-    posts.forEach((post) => {
-        if (post.frontmatter.tags) {
-            post.frontmatter.tags.forEach((tag) => {
-                const existing = tagMap.get(tag) || { count: 0, types: new Set() };
-                existing.count += 1;
-                existing.types.add("blog");
-                tagMap.set(tag, existing);
-            });
-        }
-    });
+    const processTags = (tags: any[] | undefined, type: "blog" | "note") => {
+        if (tags && Array.isArray(tags)) {
+            tags.forEach((tag) => {
+                if (typeof tag !== "string") return;
+                const normalizedTag = tag.trim().toLowerCase();
+                if (!normalizedTag) return;
 
-    notes.forEach((note) => {
-        if (note.frontmatter.tags) {
-            note.frontmatter.tags.forEach((tag) => {
-                const existing = tagMap.get(tag) || { count: 0, types: new Set() };
+                const existing = tagMap.get(normalizedTag) || { count: 0, types: new Set() };
                 existing.count += 1;
-                existing.types.add("note");
-                tagMap.set(tag, existing);
+                existing.types.add(type);
+                tagMap.set(normalizedTag, existing);
             });
         }
-    });
+    };
+
+    posts.forEach((post) => processTags(post.frontmatter.tags, "blog"));
+    notes.forEach((note) => processTags(note.frontmatter.tags, "note"));
 
     return Array.from(tagMap.entries())
         .map(([name, data]) => ({
-            name,
+            name: name, // Using the normalized lowercase name
             count: data.count,
             type: data.types.has("blog") && data.types.has("note")
                 ? "both"

@@ -69,7 +69,7 @@ export function LocaleSuggestionBanner({
       .find((item) => item.startsWith("NEXT_LOCALE="))
       ?.split("=")[1];
 
-    if (dismissed || preferredLocaleCookie === "id") return;
+    if (dismissed || preferredLocaleCookie === "en") return;
     if (!hasIndonesianPreference()) return;
 
     setVisible(true);

@@ -724,6 +724,7 @@ export function ToolImageCrop({ dictionary }: ToolImageCropProps) {
       description={toolMeta.description}
       dictionary={dictionary}
       isPublic={true}
+      requiresCloud={false}
     >
       <div className="space-y-6 mt-4">
         <AnimatePresence mode="wait">

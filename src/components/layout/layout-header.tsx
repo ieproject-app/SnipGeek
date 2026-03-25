@@ -382,7 +382,14 @@ export function LayoutHeader({
     };
   }, [directLinks, moreItems]);
 
-  const topTagLinks = useMemo(() => {
+  const normalizedPath = useMemo(() => {
+    if (!pathname) return "/";
+    const stripped = pathname.replace(/\/+$/, "");
+    return stripped || "/";
+  }, [pathname]);
+
+  const dynamicTagLinks = useMemo(() => {
+    // 1. Collect all tags and their counts from searchableData
     const tagCount = new Map<string, number>();
     const tagLabel = new Map<string, string>();
 
@@ -399,106 +406,9 @@ export function LayoutHeader({
       });
     });
 
-    const dynamicTagLinks = [...tagCount.entries()]
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 6)
-      .map(([tag]) => ({
-        name: tagLabel.get(tag) || tag,
-        href: `/tags/${encodeURIComponent(tag)}`,
-        icon: Hash,
-      }))
-      .filter((item) => {
-        const normalizedHref = normalizeNavHref(item.href);
-        if (reservedNavHrefs.has(normalizedHref)) return false;
+    // 2. Determine base tags based on current context
+    let pool: { name: string; href: string; icon: any }[] = [];
 
-        const tagKey = getTagKeyFromHref(item.href);
-        if (!tagKey) return true;
-
-        return !reservedTagFamilies.has(getTagFamilyKey(tagKey));
-      })
-      .slice(0, 3);
-
-    if (dynamicTagLinks.length >= 3) {
-      return dynamicTagLinks;
-    }
-
-    const fallbackTags = ["windows", "android", "tutorial", "tips", "review"];
-    const existingHrefs = new Set(dynamicTagLinks.map((item) => item.href));
-    const fallbackLinks = fallbackTags
-      .filter((tag) => {
-        const href = `/tags/${tag}`;
-        if (existingHrefs.has(href)) return false;
-        if (reservedNavHrefs.has(normalizeNavHref(href))) return false;
-        if (reservedTagFamilies.has(getTagFamilyKey(tag))) return false;
-        return true;
-      })
-      .slice(0, 3 - dynamicTagLinks.length)
-      .map((tag) => ({
-        name: tag.charAt(0).toUpperCase() + tag.slice(1),
-        href: `/tags/${tag}`,
-        icon: Hash,
-      }));
-
-    return [...dynamicTagLinks, ...fallbackLinks];
-  }, [reservedNavHrefs, reservedTagFamilies, searchableData]);
-
-  const secondaryLinks = [
-    { name: dictionary.navigation.blog, href: "/blog", icon: BookOpen },
-    { name: dictionary.navigation.notes, href: "/notes", icon: StickyNote },
-    ...topTagLinks,
-  ];
-
-  const normalizedPath = useMemo(() => {
-    if (!pathname) return "/";
-    const stripped = pathname.replace(/\/+$/, "");
-    return stripped || "/";
-  }, [pathname]);
-
-  const isArticleDetailPage = useMemo(() => {
-    const blogDetailPrefix = `${linkPrefix}/blog/`;
-    const noteDetailPrefix = `${linkPrefix}/notes/`;
-
-    return (
-      (normalizedPath.startsWith(blogDetailPrefix) &&
-        !normalizedPath.slice(blogDetailPrefix.length).includes("/")) ||
-      (normalizedPath.startsWith(noteDetailPrefix) &&
-        !normalizedPath.slice(noteDetailPrefix.length).includes("/"))
-    );
-  }, [linkPrefix, normalizedPath]);
-
-  const isHomePage = useMemo(
-    () => normalizedPath === (linkPrefix || "/"),
-    [linkPrefix, normalizedPath],
-  );
-
-  useEffect(() => {
-    if (process.env.NODE_ENV !== "development") return;
-
-    const handlePromptShortcut = (event: KeyboardEvent) => {
-      const isPromptShortcut =
-        event.key.toLowerCase() === "p" &&
-        (event.metaKey || event.ctrlKey) &&
-        event.shiftKey &&
-        !event.altKey;
-
-      if (!isPromptShortcut) return;
-
-      const target = event.target as HTMLElement | null;
-      const isTypingContext = Boolean(
-        target?.closest("input, textarea, [contenteditable='true']"),
-      );
-
-      if (isTypingContext) return;
-
-      event.preventDefault();
-      router.push(`${linkPrefix}/tools/prompt-generator`);
-    };
-
-    window.addEventListener("keydown", handlePromptShortcut);
-    return () => window.removeEventListener("keydown", handlePromptShortcut);
-  }, [linkPrefix, router]);
-
-  const contextualSecondaryLink = useMemo(() => {
     const blogDetailPrefix = `${linkPrefix}/blog/`;
     const noteDetailPrefix = `${linkPrefix}/notes/`;
     const isDetailPage =
@@ -507,76 +417,88 @@ export function LayoutHeader({
       (normalizedPath.startsWith(noteDetailPrefix) &&
         !normalizedPath.slice(noteDetailPrefix.length).includes("/"));
 
-    if (!isDetailPage) return null;
-
-    const currentItem = (searchableData || []).find(
-      (item) => item.href === normalizedPath,
-    );
-
-    if (!currentItem) return null;
-
-    const selectedTag = (currentItem.tags || []).find((tag) => tag.trim());
-
-    if (selectedTag) {
-      const tagLabel = selectedTag.trim();
-      const tagKey = tagLabel.toLowerCase();
-      return {
-        name: tagLabel,
-        href: `/tags/${encodeURIComponent(tagKey)}`,
-        icon: Hash,
-      };
+    if (isDetailPage) {
+      const currentItem = (searchableData || []).find(
+        (item) => item.href === normalizedPath,
+      );
+      if (currentItem) {
+        (currentItem.tags || []).forEach((tag) => {
+          const t = tag.trim();
+          if (t) {
+            pool.push({
+              name: t,
+              href: `/tags/${encodeURIComponent(t.toLowerCase())}`,
+              icon: Hash,
+            });
+          }
+        });
+        if (currentItem.category) {
+          pool.push({
+            name: currentItem.category,
+            href: `/tags/${encodeURIComponent(currentItem.category.toLowerCase())}`,
+            icon: Hash,
+          });
+        }
+      }
     }
 
-    const selectedCategory = currentItem.category?.trim();
-    if (!selectedCategory) return null;
+    // 3. Add popular tags to the pool
+    const popularTags = [...tagCount.entries()]
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 10)
+      .map(([tag]) => ({
+        name: tagLabel.get(tag) || tag,
+        href: `/tags/${encodeURIComponent(tag)}`,
+        icon: Hash,
+      }));
 
-    const categoryKey = selectedCategory.toLowerCase();
-    return {
-      name: selectedCategory,
-      href: `/tags/${encodeURIComponent(categoryKey)}`,
-      icon: Hash,
-    };
-  }, [linkPrefix, normalizedPath, searchableData]);
+    pool = [...pool, ...popularTags];
+
+    // 4. Filter and select top 3
+    const seenHrefs = new Set<string>();
+    const filteredPool = pool.filter((item) => {
+      const normalizedHref = normalizeNavHref(item.href);
+      if (seenHrefs.has(normalizedHref)) return false;
+      if (reservedNavHrefs.has(normalizedHref)) return false;
+      const tagKey = getTagKeyFromHref(item.href);
+      if (tagKey && reservedTagFamilies.has(getTagFamilyKey(tagKey))) return false;
+
+      const lowerTag = (tagKey || item.name).toLowerCase();
+      const hasContent = (searchableData || []).some((article) =>
+        (article.tags || []).some((t) => t.trim().toLowerCase() === lowerTag),
+      );
+
+      if (hasContent) {
+        seenHrefs.add(normalizedHref);
+        return true;
+      }
+      return false;
+    });
+
+    return filteredPool.slice(0, 3);
+  }, [linkPrefix, normalizedPath, reservedNavHrefs, reservedTagFamilies, searchableData]);
 
   const finalSecondaryLinks = useMemo(() => {
-    const merged = contextualSecondaryLink
-      ? [secondaryLinks[0], contextualSecondaryLink, ...secondaryLinks.slice(1)]
-      : secondaryLinks;
+    const baseLinks = [
+      { name: dictionary.navigation.blog, href: "/blog", icon: BookOpen },
+      { name: dictionary.navigation.notes, href: "/notes", icon: StickyNote },
+    ];
+    return [...baseLinks, ...dynamicTagLinks];
+  }, [dictionary.navigation.blog, dictionary.navigation.notes, dynamicTagLinks]);
 
-    const seen = new Set<string>();
-    return merged.filter((item) => {
-      const normalizedHref = normalizeNavHref(item.href);
-      if (reservedNavHrefs.has(normalizedHref)) return false;
-
-      const tagKey = getTagKeyFromHref(item.href);
-      if (tagKey && reservedTagFamilies.has(getTagFamilyKey(tagKey))) {
-        return false;
-      }
-
-      if (seen.has(item.href)) return false;
-      seen.add(item.href);
-      return true;
-    });
-  }, [contextualSecondaryLink, reservedNavHrefs, reservedTagFamilies, secondaryLinks]);
+  const isHomePage = useMemo(
+    () => normalizedPath === (linkPrefix || "/"),
+    [linkPrefix, normalizedPath],
+  );
 
   const getIsActivePath = (href: string) => {
     const localizedHref = `${linkPrefix}${href}` || "/";
-
-    if (href === "/tags") {
-      return pathname === localizedHref;
-    }
-
-    return (
-      pathname === localizedHref || pathname.startsWith(`${localizedHref}/`)
-    );
+    if (href === "/tags") return pathname === localizedHref;
+    return pathname === localizedHref || pathname.startsWith(`${localizedHref}/`);
   };
 
-  const trackSecondaryNavClick = (item: {
-    name: string;
-    href: string;
-  }, position: number) => {
+  const trackSecondaryNavClick = (item: { name: string; href: string }, position: number) => {
     if (typeof window === "undefined") return;
-
     const detail = {
       name: item.name,
       href: item.href,
@@ -584,20 +506,9 @@ export function LayoutHeader({
       locale: currentLocale,
       sourcePath: normalizedPath,
     };
-
-    window.dispatchEvent(
-      new CustomEvent("snipgeek:secondary-nav-click", { detail }),
-    );
-
-    const gtag = (
-      window as typeof window & {
-        gtag?: (...args: unknown[]) => void;
-      }
-    ).gtag;
-
-    if (typeof gtag === "function") {
-      gtag("event", "secondary_nav_click", detail);
-    }
+    window.dispatchEvent(new CustomEvent("snipgeek:secondary-nav-click", { detail }));
+    const gtag = (window as any).gtag;
+    if (typeof gtag === "function") gtag("event", "secondary_nav_click", detail);
   };
 
   const navItemClass =

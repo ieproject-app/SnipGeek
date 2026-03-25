@@ -457,7 +457,7 @@ export function ToolHistory({
         isPublic={false}
       >
         <div className="space-y-12">
-          {(isAdminLoading || isAdminUser || !user) && (
+          {(isAdminLoading || isAdminUser) && (
             <ScrollReveal direction="up" delay={0.05}>
               <Card className="border bg-card/50 rounded-lg overflow-hidden shadow-sm border-primary/10 transition-all duration-300 hover:border-primary/20">
                 <CardHeader className="border-b bg-muted/20">
@@ -472,20 +472,7 @@ export function ToolHistory({
                   </div>
                 </CardHeader>
                 <CardContent className="p-6 space-y-4">
-                  {!user ? (
-                    <div className="flex flex-col items-start gap-3">
-                      <p className="text-sm text-muted-foreground">
-                        Silakan login sebagai admin untuk melakukan inject data.
-                      </p>
-                      <Button
-                        onClick={handleGoogleLogin}
-                        className="rounded-lg"
-                      >
-                        <Chrome className="mr-2 h-4 w-4" />
-                        Login dengan Google
-                      </Button>
-                    </div>
-                  ) : isAdminLoading ? (
+                  {isAdminLoading ? (
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
                       <Loader2 className="h-4 w-4 animate-spin" />
                       Memeriksa hak akses admin...

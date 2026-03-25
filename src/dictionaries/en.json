@@ -63,6 +63,10 @@
     "coming_soon": "Coming Soon",
     "new_badge": "New",
     "tool_list": {
+      "bios_keys": {
+        "title": "BIOS & Boot Menu Keys",
+        "description": "Find the correct BIOS/UEFI setup keys and Boot Menu shortcuts for all major laptop and motherboard brands."
+      },
       "ai_prompt_generator": {
         "title": "AI Article Prompt Generator",
         "description": "Create a structured prompt to request a new article with complete details."
@@ -428,6 +432,8 @@
     "stockInsufficient": "Stock insufficient for {type}",
     "stockEmpty": "Selected period is out of stock",
     "stockGenerated": "Successfully generated {count} numbers",
-    "logoutSuccess": "Signed out successfully"
+    "logoutSuccess": "Signed out successfully",
+    "authNotReady": "Login system is not ready. Please try again.",
+    "loginError": "Failed to sign in. Please check your connection."
   }
 }

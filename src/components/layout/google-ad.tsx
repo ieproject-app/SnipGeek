@@ -83,7 +83,7 @@ export function GoogleAd({
       <div
         className={cn(
           'relative w-full flex items-center justify-center',
-          'border-2 border-dashed border-accent/30 rounded-lg bg-accent/5',
+          'border border-dashed border-primary/20 rounded-lg bg-primary/[0.03]',
           'min-h-[90px] my-4',
           className,
         )}
@@ -113,7 +113,10 @@ export function GoogleAd({
 
   return (
     <div
-      className={cn('overflow-hidden text-center my-4', className)}
+      className={cn(
+        'overflow-hidden text-center my-4 rounded-xl bg-primary/[0.01] border border-primary/[0.03]',
+        className,
+      )}
       aria-label="Advertisement"
     >
       <ins

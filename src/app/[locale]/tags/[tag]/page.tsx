@@ -25,12 +25,12 @@ export async function generateMetadata({
 
   const allPosts = await getSortedPostsData(locale);
   const postsCount = allPosts.filter((p) =>
-    p.frontmatter.tags?.some((t) => t.toLowerCase() === decodedTag.toLowerCase()),
+    p.frontmatter.tags?.some((t) => t.trim().toLowerCase() === decodedTag.toLowerCase()),
   ).length;
 
   const notes = await getRawNotes(locale);
   const notesCount = notes.filter((n) =>
-    n.frontmatter.tags?.some((t) => t.toLowerCase() === decodedTag.toLowerCase()),
+    n.frontmatter.tags?.some((t) => t.trim().toLowerCase() === decodedTag.toLowerCase()),
   ).length;
 
   const totalItems = postsCount + notesCount;
@@ -69,12 +69,12 @@ export default async function TagPage({
 
   const allPosts = await getSortedPostsData(locale);
   const posts = allPosts.filter((p) =>
-    p.frontmatter.tags?.some((t) => t.toLowerCase() === decodedTag),
+    p.frontmatter.tags?.some((t) => t.trim().toLowerCase() === decodedTag),
   );
 
   const notes = await getRawNotes(locale);
   const filteredNotes = notes.filter((n) =>
-    n.frontmatter.tags?.some((t) => t.toLowerCase() === decodedTag),
+    n.frontmatter.tags?.some((t) => t.trim().toLowerCase() === decodedTag),
   );
 
   return (

@@ -34,7 +34,8 @@ const cspDirectives = [
     `https://tpc.googlesyndication.com`,                // AdSense (some formats)
     `https://static.monetag.com`,                       // Monetag
     `https://cdn.monetag.com`,                          // Monetag CDN
-    `https://apis.google.com`,                          // Firebase Auth popup
+    `https://apis.google.com`,                         // Firebase Auth popup
+    `https://*.firebaseapp.com`,                        // Firebase Auth handler
   ].join(" "),
 
   // Styles: self + inline (Tailwind/CSS-in-JS needs unsafe-inline)
@@ -61,7 +62,8 @@ const cspDirectives = [
     `https://www.google.com`,                           // reCAPTCHA
     `https://www.youtube.com`,                          // YouTube embeds
     `https://www.youtube-nocookie.com`,                 // YouTube privacy-enhanced
-    `https://accounts.google.com`,                      // Firebase Auth
+    `https://accounts.google.com`,                     // Firebase Auth
+    `https://*.firebaseapp.com`,                       // Firebase Auth handler
   ].join(" "),
 
   // Connections: Firebase, Analytics, AdSense beacons, Monetag
@@ -69,15 +71,16 @@ const cspDirectives = [
     `connect-src`,
     `'self'`,
     `https://*.googleapis.com`,                         // Firebase Firestore / Auth / Storage
-    `https://*.firebaseio.com`,                         // Firebase Realtime DB
-    `https://*.cloudfunctions.net`,                     // Firebase Functions
-    `https://firebasestorage.googleapis.com`,           // Firebase Storage
-    `https://www.google-analytics.com`,                 // GA4
-    `https://region1.google-analytics.com`,             // GA4 regional
-    `https://pagead2.googlesyndication.com`,            // AdSense
-    `https://adservice.google.com`,                     // AdSense service
-    `wss://*.firebaseio.com`,                           // Firebase realtime (websocket)
-    `https://static.monetag.com`,                       // Monetag
+    `https://*.firebaseio.com`,                        // Firebase Realtime DB
+    `https://*.firebaseapp.com`,                       // Firebase Auth handler
+    `https://*.cloudfunctions.net`,                    // Firebase Functions
+    `https://firebasestorage.googleapis.com`,          // Firebase Storage
+    `https://www.google-analytics.com`,                // GA4
+    `https://region1.google-analytics.com`,            // GA4 regional
+    `https://pagead2.googlesyndication.com`,           // AdSense
+    `https://adservice.google.com`,                    // AdSense service
+    `wss://*.firebaseio.com`,                          // Firebase realtime (websocket)
+    `https://static.monetag.com`,                      // Monetag
   ].join(" "),
 
   // Media (audio/video): self + blob
@@ -126,6 +129,11 @@ const securityHeaders = [
     // Configured to allow Google AdSense, Firebase, Analytics, and YouTube.
     key: "Content-Security-Policy",
     value: contentSecurityPolicy,
+  },
+  {
+    // Required for Firebase/Google Auth popups to communicate back to the opener
+    key: "Cross-Origin-Opener-Policy",
+    value: "same-origin-allow-popups",
   },
 ];
 

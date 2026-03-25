@@ -63,6 +63,10 @@
     "coming_soon": "Segera Hadir",
     "new_badge": "Baru",
     "tool_list": {
+      "bios_keys": {
+        "title": "Tombol BIOS & Boot Menu",
+        "description": "Temukan tombol pengaturan BIOS/UEFI dan pintasan Boot Menu untuk semua merek laptop dan motherboard utama."
+      },
       "ai_prompt_generator": {
         "title": "AI Article Prompt Generator",
         "description": "Buat prompt terstruktur untuk meminta artikel baru dengan detail yang lengkap."
@@ -428,6 +432,8 @@
     "stockInsufficient": "Stok tidak cukup untuk {type}",
     "stockEmpty": "Periode yang dipilih sedang kosong",
     "stockGenerated": "Berhasil generate {count} nomor",
-    "logoutSuccess": "Berhasil keluar"
+    "logoutSuccess": "Berhasil keluar",
+    "authNotReady": "Sistem login belum siap. Silakan coba lagi.",
+    "loginError": "Gagal masuk. Silakan periksa koneksi Anda."
   }
 }

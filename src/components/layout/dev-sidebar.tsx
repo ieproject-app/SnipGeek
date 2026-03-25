@@ -21,6 +21,9 @@ import {
   Shuffle,
   ChevronRight,
   Monitor,
+  FileArchive,
+  ScanSearch,
+  FileInput,
 } from "lucide-react";
 import { usePathname, useParams, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
@@ -81,6 +84,33 @@ const devTools: DevTool[] = [
     description: "Find BIOS & Boot Menu keys",
     href: "/tools/bios-keys-boot-menu",
     icon: Monitor,
+  },
+  {
+    id: "compress-pdf",
+    name: "Compress PDF",
+    description: "Perkecil ukuran file PDF",
+    href: "/tools/compress-pdf",
+    icon: FileArchive,
+    badge: "PDF",
+    isPublic: false,
+  },
+  {
+    id: "signatories-index",
+    name: "Signatories Index",
+    description: "Cari letak ttd pihak via OCR",
+    href: "/tools/signatories-index",
+    icon: ScanSearch,
+    badge: "PDF",
+    isPublic: false,
+  },
+  {
+    id: "address-label-generator",
+    name: "Address Label",
+    description: "Buat label pengiriman PDF",
+    href: "/tools/address-label-generator",
+    icon: FileInput,
+    badge: "Doc",
+    isPublic: false,
   },
 ];
 

@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
@@ -14,11 +16,18 @@ import {
   ShieldAlert,
   Mail,
   FileText,
+  Terminal,
+  LogOut,
+  Chrome,
 } from "lucide-react";
 import { TikTokLogo } from "@/components/icons/tiktok-logo";
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
 import { SnipTooltip } from "@/components/ui/snip-tooltip";
 import { getLinkPrefix } from "@/lib/utils";
+import { useAuth, useUser } from "@/firebase";
+import { initiateGoogleSignIn } from "@/firebase/non-blocking-login";
+import { signOut } from "firebase/auth";
+import { useNotification } from "@/hooks/use-notification";
 
 export function LayoutFooter({
   locale,
@@ -30,32 +39,60 @@ export function LayoutFooter({
   translationsMap: TranslationsMap;
 }) {
   const linkPrefix = getLinkPrefix(locale);
+  const { user } = useUser();
+  const auth = useAuth();
+  const { notify } = useNotification();
+
   const footerNavItems = [
     {
       id: "footer-terms",
       title: dictionary.navigation.terms,
       href: `${linkPrefix}/terms`,
-      icon: <FileText className="h-5 w-5" />,
     },
     {
       id: "footer-privacy",
       title: dictionary.navigation.privacy,
       href: `${linkPrefix}/privacy`,
-      icon: <ShieldCheck className="h-5 w-5" />,
     },
     {
       id: "footer-disclaimer",
       title: dictionary.navigation.disclaimer,
       href: `${linkPrefix}/disclaimer`,
-      icon: <ShieldAlert className="h-5 w-5" />,
     },
     {
       id: "footer-contact",
       title: dictionary.navigation.contact,
       href: `${linkPrefix}/contact`,
-      icon: <Mail className="h-5 w-5" />,
     },
   ];
+
+  const handleLogin = async () => {
+    if (!auth) {
+      notify(
+        dictionary?.notifications?.authNotReady || "Sistem login belum siap. Silakan coba lagi.",
+        <ShieldAlert className="h-4 w-4" />
+      );
+      return;
+    }
+    try {
+      await initiateGoogleSignIn(auth);
+    } catch (error) {
+           notify(
+             dictionary?.notifications?.loginError || "Gagal masuk.",
+             <ShieldAlert className="h-4 w-4" />
+           );
+         }
+  };
+
+  const handleLogout = async () => {
+    if (auth) {
+      await signOut(auth);
+      notify(
+        dictionary?.notifications?.logoutSuccess || "Berhasil keluar.",
+        <LogOut className="h-4 w-4" />
+      );
+    }
+  };
 
   const authorName = "Iwan Efendi";
   const authorAvatar = "/images/profile/profile.png";
@@ -90,7 +127,6 @@ export function LayoutFooter({
         aria-label="Footer details"
         className="relative w-full pt-20 pb-12 bg-card border-t border-primary/5 transition-all duration-300 ease-in-out"
       >
-
         {/* Bisected Avatar */}
         <div className="absolute left-1/2 -translate-x-1/2 top-0 -translate-y-1/2 z-20">
           <ScrollReveal
@@ -180,7 +216,37 @@ export function LayoutFooter({
                 variant="minimal"
               />
             </div>
+            
             <div className="flex flex-col items-center justify-center gap-5 text-center">
+              {/* Added Row: Tools & Admin Login */}
+              <nav className="flex flex-wrap items-center justify-center gap-x-6 gap-y-3">
+                <Link
+                  href={`${linkPrefix}/tools`}
+                  className="group flex items-center gap-2 text-[11px] font-black uppercase tracking-widest text-primary/60 hover:text-accent transition-all duration-300"
+                >
+                  <Terminal className="h-3.5 w-3.5 transition-transform group-hover:scale-120 group-hover:rotate-12" />
+                  <span>{dictionary.navigation.tools || "Tools"}</span>
+                </Link>
+                <div className="w-1 h-1 rounded-full bg-primary/20" />
+                {!user ? (
+                  <button
+                    onClick={handleLogin}
+                    className="group flex items-center gap-2 text-[11px] font-black uppercase tracking-widest text-primary/60 hover:text-accent transition-all duration-300"
+                  >
+                    <Chrome className="h-3.5 w-3.5 transition-transform group-hover:scale-120" />
+                    <span>Admin Portal</span>
+                  </button>
+                ) : (
+                  <button
+                    onClick={handleLogout}
+                    className="group flex items-center gap-2 text-[11px] font-black uppercase tracking-widest text-destructive/60 hover:text-destructive transition-all duration-300"
+                  >
+                    <LogOut className="h-3.5 w-3.5 transition-transform group-hover:scale-120" />
+                    <span>Sign Out</span>
+                  </button>
+                )}
+              </nav>
+
               <nav className="flex flex-wrap items-center justify-center gap-x-6 gap-y-3 px-6 py-2.5 rounded-full bg-muted/20 border border-primary/5 backdrop-blur-sm">
                 {footerNavItems.map((item) => (
                   <Link
@@ -192,6 +258,7 @@ export function LayoutFooter({
                   </Link>
                 ))}
               </nav>
+              
               <small className="font-extrabold tracking-widest text-[10px] uppercase text-primary/30 hover:text-primary transition-colors duration-300">
                 &copy; {new Date().getFullYear()} SnipGeek. All Rights Reserved.
               </small>
