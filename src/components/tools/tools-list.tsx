@@ -18,7 +18,6 @@ import {
   FileDown,
   FileSignature,
   ScrollText,
-  Sparkles
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
@@ -139,15 +138,6 @@ export function ToolsList({ dictionary, locale, isDevelopment }: ToolsListProps)
       href: `${linkPrefix}/tools/number-generator`,
       badge: pageContent.open_tool,
       badgeVariant: "secondary" as const,
-      requiresAuth: true,
-    },
-    {
-      id: "ai_prompt_generator",
-      icon: <Sparkles className="h-8 w-8 text-accent" />,
-      isLink: true,
-      href: `${linkPrefix}/tools/prompt-generator`,
-      badge: pageContent.new_badge,
-      badgeVariant: "default" as const,
       requiresAuth: true,
     },
   ];
