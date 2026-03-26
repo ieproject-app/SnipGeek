@@ -24,7 +24,6 @@ import {
   JetBrains_Mono,
 } from "next/font/google";
 import { cn } from "@/lib/utils";
-import Script from "next/script";
 import { FirebaseProviderWrapper } from "@/components/layout/firebase-provider-wrapper";
 import { LocaleSuggestionBanner } from "@/components/layout/locale-suggestion-banner";
 
@@ -150,9 +149,7 @@ export async function generateMetadata({
         "max-snippet": -1,
       },
     },
-    other: {
-      "google-adsense-account": "ca-pub-6235611333449307",
-    },
+    other: {},
   };
 }
 
@@ -214,12 +211,6 @@ export default async function LocaleLayout({
       suppressHydrationWarning
     >
       <body className="font-sans antialiased fade-in-on-load">
-        <Script
-          async
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6235611333449307"
-          crossOrigin="anonymous"
-          strategy="lazyOnload"
-        />
         <FirebaseProviderWrapper>
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
             <NotificationProvider>
@@ -240,7 +231,6 @@ export default async function LocaleLayout({
                   translationsMap={translationsMap}
                 />
                 <LayoutBackToTop />
-
               </ReadingListProvider>
             </NotificationProvider>
           </ThemeProvider>

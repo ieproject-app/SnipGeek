@@ -1,1 +1,2 @@
-google.com, pub-6235611333449307, DIRECT, f08c47fec0942fa0
+# Temporarily disabled during Ezoic migration.
+# This file will be replaced with Ezoic-managed ads.txt entries.

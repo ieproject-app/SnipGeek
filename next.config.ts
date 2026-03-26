@@ -4,34 +4,27 @@ import type { NextConfig } from "next";
  * Content Security Policy directives.
  *
  * Domains are grouped by purpose:
- * - Google AdSense / Ad Manager
  * - Google Analytics / Tag Manager
  * - Firebase (Firestore, Auth, Storage)
  * - Fonts & static assets
  *
  * References:
- * - https://support.google.com/adsense/answer/10046348
  * - https://developers.google.com/tag-platform/security/guides/csp
  */
 const cspDirectives = [
-  // Only allow same-origin framing (AdSense iframes are handled via frame-src below)
+  // Only allow same-origin framing
   `default-src 'self'`,
 
   // Scripts: self + inline (Next.js needs 'unsafe-inline' for hydration)
-  // AdSense, Tag Manager, Analytics, Monetag
+  // Tag Manager, Analytics, Monetag
   [
     `script-src`,
     `'self'`,
     `'unsafe-inline'`,
     `'unsafe-eval'`,                                    // required by Next.js dev
-    `https://pagead2.googlesyndication.com`,             // AdSense main script
-    `https://partner.googleadservices.com`,              // AdSense partner
-    `https://adservice.google.com`,                     // Ad service
     `https://www.googletagmanager.com`,                 // GTM
     `https://www.google-analytics.com`,                 // GA4
     `https://ssl.google-analytics.com`,                 // GA4 (legacy)
-    `https://www.googletagservices.com`,                // legacy ads
-    `https://tpc.googlesyndication.com`,                // AdSense (some formats)
     `https://static.monetag.com`,                       // Monetag
     `https://cdn.monetag.com`,                          // Monetag CDN
     `https://apis.google.com`,                         // Firebase Auth popup
@@ -53,12 +46,10 @@ const cspDirectives = [
     `https:`,                                            // allows all HTTPS image sources
   ].join(" "),
 
-  // iframes: AdSense ad units, YouTube embeds
+  // iframes: YouTube embeds
   [
     `frame-src`,
     `'self'`,
-    `https://googleads.g.doubleclick.net`,              // AdSense ad frames
-    `https://tpc.googlesyndication.com`,                // AdSense (safeframe)
     `https://www.google.com`,                           // reCAPTCHA
     `https://www.youtube.com`,                          // YouTube embeds
     `https://www.youtube-nocookie.com`,                 // YouTube privacy-enhanced
@@ -66,7 +57,7 @@ const cspDirectives = [
     `https://*.firebaseapp.com`,                       // Firebase Auth handler
   ].join(" "),
 
-  // Connections: Firebase, Analytics, AdSense beacons, Monetag
+  // Connections: Firebase, Analytics, Monetag
   [
     `connect-src`,
     `'self'`,
@@ -77,8 +68,6 @@ const cspDirectives = [
     `https://firebasestorage.googleapis.com`,          // Firebase Storage
     `https://www.google-analytics.com`,                // GA4
     `https://region1.google-analytics.com`,            // GA4 regional
-    `https://pagead2.googlesyndication.com`,           // AdSense
-    `https://adservice.google.com`,                    // AdSense service
     `wss://*.firebaseio.com`,                          // Firebase realtime (websocket)
     `https://static.monetag.com`,                      // Monetag
   ].join(" "),
@@ -126,7 +115,7 @@ const securityHeaders = [
   },
   {
     // Content Security Policy — controls which resources can be loaded.
-    // Configured to allow Google AdSense, Firebase, Analytics, and YouTube.
+    // Configured for Firebase, Analytics, and YouTube.
     key: "Content-Security-Policy",
     value: contentSecurityPolicy,
   },

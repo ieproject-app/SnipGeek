@@ -23,7 +23,7 @@ import { ArticleComments } from "@/components/blog/article-comments";
 import remarkGfm from "remark-gfm";
 import rehypeShiki from "@shikijs/rehype";
 import { resolveHeroImage, getLinkPrefix } from "@/lib/utils";
-import { GoogleAd, InArticleAd } from "@/components/layout/google-ad";
+import { InArticleAd } from "@/components/layout/google-ad";
 
 // Only pre-render known published slugs; unknown/removed slugs should return 404.
 export const dynamicParams = false;
@@ -194,7 +194,7 @@ export default async function Page({
 
           <div className="max-w-3xl mx-auto">
             {/* Slot D — Banner iklan sebelum TOC */}
-            <GoogleAd adSlot="2801053264" className="mb-4" />
+
 
             <ArticleTOC
               headings={headings}
@@ -238,7 +238,7 @@ export default async function Page({
             </div>
 
             {/* Slot F — Banner iklan sebelum komentar */}
-            <GoogleAd adSlot="2801053264" className="mt-8" />
+
 
             <ArticleComments
               article={{
