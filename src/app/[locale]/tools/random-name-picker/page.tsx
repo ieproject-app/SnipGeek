@@ -75,7 +75,7 @@ export async function generateMetadata({
       description: seo.description,
       images: [
         {
-          url: 'https://snipgeek.com/images/footer/about.webp',
+          url: 'https://snipgeek.com/opengraph-image',
           width: 1200,
           height: 630,
           alt: 'Random Name Picker – SnipGeek Tools',
@@ -86,7 +86,7 @@ export async function generateMetadata({
       card: 'summary_large_image',
       title: seo.title,
       description: seo.description,
-      images: ['https://snipgeek.com/images/footer/about.webp'],
+      images: ['https://snipgeek.com/opengraph-image'],
     },
   };
 }

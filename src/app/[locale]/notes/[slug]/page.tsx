@@ -70,7 +70,7 @@ export async function generateMetadata({
     ? heroSource.src.startsWith("http")
       ? heroSource.src
       : `https://snipgeek.com${heroSource.src}`
-    : "https://snipgeek.com/images/footer/about.webp";
+    : "https://snipgeek.com/opengraph-image";
 
   return {
     title: note.frontmatter.title,

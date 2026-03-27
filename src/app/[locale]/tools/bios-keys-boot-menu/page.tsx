@@ -65,7 +65,7 @@ export async function generateMetadata({
       description: content.description,
       images: [
         {
-          url: "https://snipgeek.com/images/footer/about.webp",
+          url: "https://snipgeek.com/opengraph-image",
           width: 1200,
           height: 630,
           alt: content.title,

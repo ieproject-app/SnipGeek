@@ -9,6 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Button } from '@/components/ui/button'
 import { type Dictionary } from '@/lib/get-dictionary'
 import { parse, isValid } from 'date-fns'
+import { id as idLocale } from 'date-fns/locale'
 import { cn } from '@/lib/utils'
 import { Search, FileText, UserCheck, Plus, Trash2, Loader2, Copy, CheckCircle2, Database, AlertTriangle, Chrome } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
@@ -71,11 +72,19 @@ const parseDate = (dateStr: string): Date => {
 
 const tryParseDate = (text: string): Date | null => {
   if (!text) return null;
-  const formats = ['d MMMM yyyy', 'd MMM yyyy', 'd MMMM', 'd MMM', 'd/M/yyyy', 'd/M/yy'];
+  const hasYear = /\b\d{4}\b/.test(text);
+  const formats = hasYear
+    ? ['d MMMM yyyy', 'd MMM yyyy', 'd/M/yyyy', 'd/M/yy']
+    : ['d MMMM', 'd MMM'];
+  const referenceDate = new Date();
+  referenceDate.setHours(0, 0, 0, 0);
   for (const format of formats) {
     try {
-      const parsedDate = parse(text, format, new Date());
-      if (isValid(parsedDate)) return parsedDate;
+      const parsedDate = parse(text, format, referenceDate, { locale: idLocale });
+      if (isValid(parsedDate)) {
+        parsedDate.setHours(0, 0, 0, 0);
+        return parsedDate;
+      }
     } catch { }
   }
   return null;

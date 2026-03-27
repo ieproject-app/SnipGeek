@@ -122,20 +122,11 @@ export async function generateMetadata({
       siteName: "SnipGeek",
       title: homepageTitle,
       description: homepageDescription,
-      images: [
-        {
-          url: "/images/footer/about.webp",
-          width: 1200,
-          height: 630,
-          alt: "SnipGeek - Modern Tech Insights",
-        },
-      ],
     },
     twitter: {
       card: "summary_large_image",
       title: homepageTitle,
       description: homepageDescription,
-      images: ["/images/footer/about.webp"],
       creator: "@iwnefnd",
     },
     robots: {
