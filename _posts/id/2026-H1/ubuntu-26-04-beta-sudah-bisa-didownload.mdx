@@ -1,0 +1,100 @@
+---
+title: "Ubuntu 26.04 Beta Sudah Rilis — Tapi Jangan Buru-Buru Install"
+slug: "ubuntu-26-04-beta-available-download"
+translationKey: "ubuntu-26-04-beta-available-download"
+date: "2026-03-30"
+description: "Beta Ubuntu 26.04 LTS 'Resolute Raccoon' sudah bisa didownload, tapi ada bug nyata di dalamnya. Ini yang berubah, apa yang rusak, dan siapa yang sebaiknya mencobanya."
+heroImage: "/images/_posts/ubuntu/ubuntu-26-04-beta-download/banner.webp"
+imageAlt: "Halaman download beta Ubuntu 26.04 LTS Resolute Raccoon"
+published: true
+featured: true
+tags: ["ubuntu", "ubuntu-26-04", "linux", "beta", "wayland"]
+category: "Linux"
+---
+
+Saya nunggu beta Ubuntu 26.04 ini sambil setengah semangat, setengah khawatir bakal ketemu drama. Begitu image-nya muncul, saya langsung boot dari USB karena penasaran apakah calon LTS ini sudah cukup matang dipakai harian. Ternyata belum lama dipakai, Papers langsung crash, dan dari situ ekspektasi saya langsung turun ke mode realistis.
+
+Jawaban cepatnya begini: **Ubuntu 26.04 LTS Beta sudah tersedia, tapi menurut saya belum aman untuk mesin kerja utama.** Arah besarnya sudah kelihatan bagus lewat GNOME 50, Linux Kernel 7.0, dan transisi Wayland penuh, tapi perilakunya masih terasa seperti beta yang belum rapi.
+
+Ubuntu 26.04 LTS dengan nama kode **Resolute Raccoon** resmi masuk fase beta di akhir Maret 2026. Rilis stabil masih dijadwalkan pada **23 April 2026**, jadi jaraknya tinggal sebentar. Buat saya, menunggu tiga minggu jauh lebih masuk akal daripada menanggung bug kecil yang ganggu ritme kerja tiap hari.
+
+<Callout variant="warning" title="Catatan Freshness">
+Artikel ini ditulis berdasarkan rilis beta Ubuntu 26.04 LTS akhir Maret 2026 dan server rilis resmi Ubuntu. Beberapa detail masih bisa berubah sebelum rilis stabil pada 23 April 2026.
+</Callout>
+
+Kalau kamu ingin gambaran lengkap perubahan di Ubuntu 26.04 di luar status beta-nya, saya sudah tulis rangkuman mendalam tentang [fitur baru dan perubahan besar Ubuntu 26.04 LTS](/blog/ubuntu-26-04-lts-resolute-raccoon-new-features-major-changes).
+
+## Apa yang Dibawa Beta Ini
+
+Kalau kamu ngikutin siklus pre-release-nya, isi beta ini tidak terlalu mengejutkan. Ubuntu 26.04 Beta datang dengan **GNOME 50** di sisi desktop dan **Linux Kernel 7.0** di bawahnya, jadi ini jelas bukan tipe rilis LTS yang cuma ganti kosmetik.
+
+Untuk detail GNOME 50-nya, saya sudah tulis juga kenapa [GNOME 50 bikin Ubuntu 26.04 terasa seperti upgrade besar](/blog/gnome-50-bikin-ubuntu-26-04-terasa-upgrade-besar). Versi singkatnya, ada peningkatan yang benar-benar terasa saat dipakai, bukan cuma bagus di daftar fitur.
+
+Yang bikin saya ngerem justru bukan daftar fiturnya, tapi detail integrasinya yang belum mulus. Dan memang itu fungsi beta: membuka bagian-bagian yang masih kasar sebelum versi final dilepas.
+
+## Soal X11: Sekarang Wayland Saja
+
+Salah satu perubahan besar yang sudah terpanggang ke dalam beta ini adalah keputusan final: **GNOME resmi tidak lagi mendukung sesi desktop X11/Xorg**. Kalau kamu boot ke desktop Ubuntu 26.04 versi default, kamu ada di Wayland. Itu satu-satunya jalur yang didukung sekarang.
+
+Aplikasi lama tidak ditinggalkan begitu saja — mereka tetap bisa berjalan di Wayland lewat **Xwayland**, yang menangani lapisan kompatibilitasnya secara transparan di hampir semua kasus.
+
+<Callout variant="info" title="Masih Butuh X11 Penuh?">
+Kalau Xorg benar-benar tidak bisa digantikan di setup kamu, pertimbangkan **Lubuntu 26.04** yang masih pakai X11 dengan LXQt 2.3.0. Beta Kubuntu (KDE Plasma 6.6) dan Xubuntu (Xfce 4.20.1) juga tersedia kalau kamu lebih suka *desktop environment* yang berbeda.
+</Callout>
+
+Kalau kamu sudah di Ubuntu 25.10, arah ke Wayland ini tentu tidak mengejutkan. Tapi kalau kamu datang dari 24.04 LTS dan berencana upgrade, ini layak diketahui sebelum kamu memutuskan.
+
+## Bug Nyata di Beta Ini
+
+Saya ingin konkret di sini, karena "beta ada bug" tanpa detail sama sekali tidak berguna. Ini masalah spesifik yang sudah dikonfirmasi di Ubuntu 26.04 Beta:
+
+- **Jarak ikon di app folder berantakan** — Buka folder di GNOME *app grid* dan jarak antar ikon langsung kacau sepenuhnya. Murni visual, tapi ini tipe hal yang kamu sadari langsung di setiap sesi.
+- **Document Viewer (Papers) crash saat ink tools diaktifkan** — Aktifkan *tool* anotasi tinta dan langsung crash. Cukup ironis karena anotasi adalah salah satu fitur yang diperkuat di GNOME 50.
+- **Hasil Snap di GNOME Overview tidak konsisten** — Pencarian dari Overview tidak selalu memunculkan aplikasi Snap secara andal. Jenis bug yang bikin penggunaan harian terasa tidak bisa diandalkan.
+
+Tidak ada yang menyebabkan kehilangan data, tapi kombinasinya cukup menjelaskan kenapa build ini masih beta, bukan *release candidate*.
+
+## Pilihan Download
+
+Kalau kamu tetap ingin mencoba — untuk testing, bukan pemakaian harian — beta-nya tersedia di [server rilis Ubuntu](https://releases.ubuntu.com/26.04/).
+
+Pilihan *image* yang tersedia:
+
+- **Desktop ISO (AMD64)** — *Image* live/install standar untuk PC Intel/AMD 64-bit. Minimal 1GB RAM.
+- **Server install image (AMD64)** — Untuk instalasi Ubuntu tanpa tampilan grafis.
+- **WSL image (AMD64)** — *Root filesystem* untuk Windows Subsystem for Linux.
+- **Image ARM dan Raspberry Pi** — *Image* ARM generik dan *image* preinstalled untuk Raspberry Pi juga tersedia di server rilis.
+
+Satu hal yang layak diketahui: kalau kamu install beta dan nanti ingin rilis stabil, tidak perlu install ulang dari awal. Cukup terus install pembaruan yang datang — menjelang 23 April 2026, sistemmu akan sampai di kondisi yang sama persis dengan *fresh install* versi stabil.
+
+## Siapa yang Sebaiknya Coba Beta Ini
+
+<Steps>
+  <Step>
+    ### Developer atau tester yang punya laptop cadangan
+    Persis untuk kondisi seperti ini lah beta dibuat. Boot, uji coba fitur-fiturnya, dan laporkan bug kalau ketemu yang baru. Makin banyak masukan yang Canonical dapat sebelum 23 April, rilis stabilnya bakal makin lancar buat semua orang.
+  </Step>
+
+  <Step>
+    ### Penasaran tapi cuma punya satu mesin
+    Boot dari Live USB tanpa perlu install. Kamu tetep bisa rasakan pengalaman langsung desktopnya, lihat-lihat tampilannya, dan nggak ada risiko sama sekali. Desktop AMD64 ISO udah dukung ini langsung tinggal pakai.
+  </Step>
+
+  <Step>
+    ### Laptop ini buat kerjaan sehari-hari — jangan dulu
+    Tiga minggu itu sebentar kok. Rilis stabilnya bakal muncul 23 April dengan bug yang udah diperbaiki, jalur upgrade yang udah diuji habis, dan restu resmi dari Canonical. Install beta di laptop utama cuma biar merasa lebih awal? Biasanya malah berakhir ribet.
+  </Step>
+</Steps>
+
+## Sudut Pandang SnipGeek
+
+Yang agak lucu, beta ini bikin saya sekaligus makin tertarik dan makin enggan install sekarang. Dari sisi arah pengembangan, saya justru makin yakin Ubuntu 26.04 final punya potensi besar. Tapi dari pengalaman pakai singkat, saya juga makin sadar kalau bug kecil yang kelihatan sepele bisa jadi gangguan besar kalau mesin itu dipakai kerja beneran.
+
+Rencana saya tetap sederhana: tunggu rilis stabil dulu, lalu uji lewat *clean install* di partisi sekunder sebelum menyentuh sistem utama. Kalau kamu masih di Ubuntu 24.04 LTS dan lagi menimbang apakah ini layak di-upgrade, baca dulu [rangkuman fitur Ubuntu 26.04 LTS](/blog/ubuntu-26-04-lts-resolute-raccoon-new-features-major-changes) supaya konteksnya utuh.
+
+Buat saya, nunggu tiga minggu itu keputusan paling waras. Kalau kamu tetap mau coba beta sekarang, anggap saja itu sesi preview, bukan migrasi permanen.
+
+### Referensi
+1. [Ubuntu 26.04 Beta Is Now Available to Download — OMG Ubuntu](https://www.omgubuntu.co.uk/2026/03/ubuntu-26-04-beta-is-now-available-to-download)
+2. [Halaman Download Ubuntu 26.04 LTS Beta — Ubuntu Release Server](https://releases.ubuntu.com/26.04/)
+3. [Ubuntu 26.04 LTS Beta Is Out Now with Linux Kernel 7.0 and GNOME 50 — 9to5Linux](https://9to5linux.com/ubuntu-26-04-lts-beta-is-out-now-with-linux-kernel-7-0-and-gnome-50)

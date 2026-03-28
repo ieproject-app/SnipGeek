@@ -55,6 +55,23 @@ import { ToolWrapper } from "@/components/tools/tool-wrapper";
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
 import type { Dictionary } from "@/lib/get-dictionary";
 
+// Simple debounce hook
+function useDebounce<T>(value: T, delay: number): T {
+  const [debouncedValue, setDebouncedValue] = useState<T>(value);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [value, delay]);
+
+  return debouncedValue;
+}
+
 type DownloadItem = {
   id: string;
   type: "id" | "url";
@@ -577,6 +594,18 @@ export function usePromptLogic({
   const [heroImage, setHeroImage] = useState("");
   const [images, setImages] = useState("");
 
+  // Debounce frequently changing values to reduce prompt recompute frequency
+  const debouncedDraft = useDebounce(draft, 500);
+  const debouncedOriginalContent = useDebounce(originalContent, 500);
+  const debouncedModInstructions = useDebounce(modInstructions, 500);
+  const debouncedNewsAngle = useDebounce(newsAngle, 500);
+  const debouncedNewsSourceUrls = useDebounce(newsSourceUrls, 500);
+  const debouncedHeroImage = useDebounce(heroImage, 300);
+  const debouncedImages = useDebounce(images, 300);
+  const debouncedImageGridMappings = useDebounce(imageGridMappings, 300);
+  const debouncedGalleryMappings = useDebounce(galleryMappings, 300);
+  const debouncedSpecsMappings = useDebounce(specsMappings, 300);
+
   // ── Output ──
   const [generatedPrompt, setGeneratedPrompt] = useState("");
   const [isCopied, setIsCopied] = useState(false);
@@ -639,11 +668,11 @@ export function usePromptLogic({
 
   const specsGroups = useMemo(
     () =>
-      specsMappings
+      debouncedSpecsMappings
         .split(/\n\s*\n/)
         .map((block) => block.trim())
         .filter((block) => block.length > 0),
-    [specsMappings],
+    [debouncedSpecsMappings],
   );
 
   const staleDraftCount = useMemo(
@@ -820,14 +849,13 @@ export function usePromptLogic({
 
   // ── Text stats ──
   const counters = useMemo(() => {
-    const text = mode === "modify" ? originalContent : draft;
+    const text = mode === "modify" ? debouncedOriginalContent : debouncedDraft;
     const nonEmpty = text.trim();
     return {
       chars: text.length,
       words: nonEmpty === "" ? 0 : nonEmpty.split(/\s+/).length,
-      lines: text.split("\n").filter((l) => l.trim() !== "").length,
     };
-  }, [draft, originalContent, mode]);
+  }, [debouncedDraft, debouncedOriginalContent, mode]);
 
   // ── Prompt char count ──
   const promptStats = useMemo(() => {
@@ -838,10 +866,15 @@ export function usePromptLogic({
     };
   }, [generatedPrompt]);
 
-  const sourceContent = mode === "modify" ? originalContent : draft;
+  // Update generatedPrompt when the memoized prompt changes
+  useEffect(() => {
+    setGeneratedPrompt(prompt);
+  }, [prompt]);
+
+  const sourceContent = mode === "modify" ? debouncedOriginalContent : debouncedDraft;
   const imageLines = useMemo(
-    () => images.split("\n").filter((line) => line.trim() !== ""),
-    [images],
+    () => debouncedImages.split("\n").filter((line) => line.trim() !== ""),
+    [debouncedImages],
   );
 
   const parsedCaptionMaxCount = useMemo(() => {
@@ -873,12 +906,12 @@ export function usePromptLogic({
       {
         label: "Grid",
         enabled: showGrids,
-        count: imageGridMappings.split("\n").filter((line) => line.trim() !== "").length,
+        count: debouncedImageGridMappings.split("\n").filter((line) => line.trim() !== "").length,
       },
       {
         label: "Gallery",
         enabled: showGallery,
-        count: galleryMappings.split("\n").filter((line) => line.trim() !== "").length,
+        count: debouncedGalleryMappings.split("\n").filter((line) => line.trim() !== "").length,
       },
       {
         label: "Specs",
@@ -949,7 +982,7 @@ export function usePromptLogic({
       }
     }
 
-    if (showGallery && galleryMappings.trim() !== "" && !/\{\{\s*Gallery\s+\d+\s*\}\}/i.test(sourceContent)) {
+    if (showGallery && debouncedGalleryMappings.trim() !== "" && !/\{\{\s*Gallery\s+\d+\s*\}\}/i.test(sourceContent)) {
       issues.push({
         id: "gallery-unused",
         severity: "warning",
@@ -980,7 +1013,7 @@ export function usePromptLogic({
     }
 
     if (mode === "create" && contentType === "news") {
-      const validUrls = newsSourceUrls.filter((url) => url.trim() !== "");
+      const validUrls = debouncedNewsSourceUrls.filter((url) => url.trim() !== "");
       if (validUrls.length === 0) {
         issues.push({
           id: "news-source-missing",
@@ -990,7 +1023,7 @@ export function usePromptLogic({
         });
       }
 
-      if (newsAngle.trim() === "") {
+      if (debouncedNewsAngle.trim() === "") {
         issues.push({
           id: "news-angle-empty",
           severity: "warning",
@@ -1182,9 +1215,9 @@ export function usePromptLogic({
   }, [mode]);
 
   // ── Build prompt ──
-  useEffect(() => {
+  const prompt = useMemo(() => {
     const isModify = mode === "modify";
-    const normalizedUrls = newsSourceUrls
+    const normalizedUrls = debouncedNewsSourceUrls
       .map((url) => url.trim())
       .filter((url) => url !== "");
     const contentTypeLabel =
@@ -1252,7 +1285,7 @@ export function usePromptLogic({
         } else {
           prompt += `- Source URLs: [MISSING]\n`;
         }
-        prompt += `- Angle: ${newsAngle.trim() || "[NOT PROVIDED]"}\n\n`;
+        prompt += `- Angle: ${debouncedNewsAngle.trim() || "[NOT PROVIDED]"}\n\n`;
       }
 
       if (contentType === "tips") {
@@ -1269,13 +1302,13 @@ export function usePromptLogic({
       }
     }
 
-    const hasHeroImage = showImages && heroImage.trim() !== "";
+    const hasHeroImage = showImages && debouncedHeroImage.trim() !== "";
     const hasBodyImages = showImages && imageLines.length > 0;
 
     if (hasHeroImage || hasBodyImages) {
       prompt += `**3. ASSETS & MEDIA**\n`;
       if (hasHeroImage) {
-        const heroParts = heroImage.split("|").map((s) => s?.trim() || "");
+        const heroParts = debouncedHeroImage.split("|").map((s) => s?.trim() || "");
         const heroPath = normalizeImagePath(heroParts[0] ?? "");
         const heroAlt = heroParts[1] ?? "";
         prompt += `- Hero Image (HERO ONLY): "${heroPath}"${heroAlt ? ` | Label: "${heroAlt}"` : ""} | Use only as frontmatter heroImage/banner. Do not insert into article body unless explicitly requested.\n`;
@@ -1321,9 +1354,9 @@ export function usePromptLogic({
       });
     }
 
-    if (showGrids && imageGridMappings) {
+    if (showGrids && debouncedImageGridMappings) {
       prompt += `\n**5. IMAGE GRIDS**\n`;
-      imageGridMappings.split("\n").filter(l => l.trim()).forEach((line, i) => {
+      debouncedImageGridMappings.split("\n").filter(l => l.trim()).forEach((line, i) => {
         const [config, pathPart] = line.split("|").map(s => s.trim());
         if (config && pathPart) {
           const normalizedPaths = pathPart.split(",").map(p => normalizeImagePath(p.trim())).join(", ");
@@ -1334,9 +1367,9 @@ export function usePromptLogic({
       });
     }
 
-    if (showGallery && galleryMappings) {
+    if (showGallery && debouncedGalleryMappings) {
       prompt += `\n**6. HERO GALLERIES**\n`;
-      galleryMappings.split("\n").filter(l => l.trim()).forEach((line, i) => {
+      debouncedGalleryMappings.split("\n").filter(l => l.trim()).forEach((line, i) => {
         const [caption, pathPart] = line.split("|").map(s => s.trim());
         if (caption && pathPart) {
           const normalizedPaths = pathPart.split(",").map(p => normalizeImagePath(p.trim())).join(", ");
@@ -1349,10 +1382,10 @@ export function usePromptLogic({
       });
     }
 
-    if (showSpecs && specsMappings.trim()) {
+    if (showSpecs && debouncedSpecsMappings.trim()) {
       prompt += `\n**7. SYSTEM REQUIREMENTS (RAW DATA)**\n`;
       prompt += `Parse the following raw text into <SpecList> and <SpecItem> blocks. Each line or block represents a spec group.\n`;
-      prompt += `${specsMappings}\n`;
+      prompt += `${debouncedSpecsMappings}\n`;
       prompt += `(Source markers: {{Specs 1}}, {{Specs 2}}, etc.)\n`;
     }
 
@@ -1414,17 +1447,17 @@ export function usePromptLogic({
 
     prompt += `\n---\n\n`;
     if (isModify) {
-      prompt += `**ORIGINAL CONTENT:**\n${originalContent || "[MISSING]"}\n\n`;
-      prompt += `**MODIFICATION INSTRUCTIONS:**\n${modInstructions || "Follow instructions exactly."}\n`;
+      prompt += `**ORIGINAL CONTENT:**\n${debouncedOriginalContent || "[MISSING]"}\n\n`;
+      prompt += `**MODIFICATION INSTRUCTIONS:**\n${debouncedModInstructions || "Follow instructions exactly."}\n`;
     } else {
       if (contentType === "series") {
-        prompt += `**SERIES KEY POINTS (INPUT):**\n${draft || "[MISSING]"}\n`;
+        prompt += `**SERIES KEY POINTS (INPUT):**\n${debouncedDraft || "[MISSING]"}\n`;
       } else if (contentType === "news") {
-        prompt += `**NEWS ANALYSIS NOTES (INPUT):**\n${draft || "[OPTIONAL]"}\n`;
+        prompt += `**NEWS ANALYSIS NOTES (INPUT):**\n${debouncedDraft || "[OPTIONAL]"}\n`;
       } else if (contentType === "notes") {
-        prompt += `**NOTES INPUT (KEY POINTS / RAW FINDINGS):**\n${draft || "[MISSING]"}\n`;
+        prompt += `**NOTES INPUT (KEY POINTS / RAW FINDINGS):**\n${debouncedDraft || "[MISSING]"}\n`;
       } else {
-        prompt += `**TIPS KEY POINTS (INPUT):**\n${draft || "[MISSING]"}\n`;
+        prompt += `**TIPS KEY POINTS (INPUT):**\n${debouncedDraft || "[MISSING]"}\n`;
       }
     }
 
@@ -1460,31 +1493,30 @@ export function usePromptLogic({
     prompt += `Run a final self-check against the readability rhythm rules and the QA checklist before returning final MDX. `;
     prompt += `Ensure the output is genuinely helpful, intent-focused, and clearly better than a generic rewrite.`;
 
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setGeneratedPrompt(prompt);
+    return prompt;
   }, [
     mode,
-    draft,
-    originalContent,
-    modInstructions,
-    newsAngle,
-    newsSourceUrls,
+    debouncedDraft,
+    debouncedOriginalContent,
+    debouncedModInstructions,
+    debouncedNewsAngle,
+    debouncedNewsSourceUrls,
     publishDate,
     isPublished,
     isFeatured,
     isIdOnly,
-    heroImage,
-    images,
+    debouncedHeroImage,
+    debouncedImages,
     contentType,
     downloadItems,
-    imageGridMappings,
-    galleryMappings,
+    debouncedImageGridMappings,
+    debouncedGalleryMappings,
     showDownloads,
     showGrids,
     showGallery,
     showImages,
     showSpecs,
-    specsMappings,
+    debouncedSpecsMappings,
     selectedSlug,
     seriesArticleNumber,
     seriesContext,

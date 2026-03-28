@@ -11,7 +11,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Database, AlertTriangle, Chrome, Search, KeyRound, Keyboard, Edit, Plus, Trash2, FileJson, Settings2, MonitorDown } from "lucide-react";
+import { Loader2, Database, AlertTriangle, Search, KeyRound, Keyboard, Edit, Plus, Trash2, FileJson, Settings2 } from "lucide-react";
+import { ToolWrapper } from "@/components/tools/tool-wrapper";
 import { useNotification } from "@/hooks/use-notification";
 import { getMulticolorSeed, getMulticolorTheme } from "@/lib/multicolor";
 import { cn } from "@/lib/utils";
@@ -377,8 +378,16 @@ export function ToolBiosKeys({ dictionary }: { dictionary?: any }) {
     return sorted;
   }, [dataKeys, lgSearch, selectedCategory, sortMode]);
 
+  const toolMeta = dictionary?.tools?.tool_list?.bios_keys;
+
   return (
-    <div className="space-y-8 min-h-screen pb-10">
+    <ToolWrapper
+      title={toolMeta?.title || lang.title}
+      description={toolMeta?.description || lang.subtitle}
+      dictionary={dictionary}
+      isPublic={true}
+    >
+    <div className="space-y-8 pb-10">
 
       {/* --- Admin Bar — only visible to active admins --- */}
       {isAdminUser && !isAdminLoading && (
@@ -413,20 +422,6 @@ export function ToolBiosKeys({ dictionary }: { dictionary?: any }) {
           </div>
         </div>
       )}
-
-      {/* --- Hero Header --- */}
-      <div className="flex flex-col items-center text-center gap-3 pt-2">
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/5 border border-primary/10 text-primary text-xs font-bold uppercase tracking-widest mb-1">
-          <MonitorDown className="h-3.5 w-3.5" />
-          BIOS Key Reference Database
-        </div>
-        <h1 className="text-display-sm font-extrabold tracking-tight text-foreground font-display">
-          {lang.title}
-        </h1>
-        <p className="max-w-2xl text-lg text-muted-foreground leading-relaxed">
-          {lang.subtitle}
-        </p>
-      </div>
 
       {/* STICKY SEARCH BAR */}
       <div className="max-w-3xl mx-auto sticky top-24 z-30 pt-2 pb-4">
@@ -739,5 +734,6 @@ export function ToolBiosKeys({ dictionary }: { dictionary?: any }) {
       </Dialog>
 
     </div>
+    </ToolWrapper>
   );
 }
