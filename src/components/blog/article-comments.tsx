@@ -41,7 +41,11 @@ export function ArticleComments({ article, type, locale }: ArticleCommentsProps)
     const isProduction = process.env.NODE_ENV === "production";
     const isCorrectDomain =
       typeof window !== "undefined" &&
-      window.location.hostname === productionHostname;
+      (window.location.hostname === productionHostname ||
+        window.location.hostname.endsWith("." + productionHostname) ||
+        window.location.hostname.includes("firebaseapp.com") ||
+        window.location.hostname.includes("web.app") ||
+        window.location.hostname.includes("hosted.app"));
 
     setIsProductionDomain(isProduction && isCorrectDomain);
 
