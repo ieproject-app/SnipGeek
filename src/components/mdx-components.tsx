@@ -30,6 +30,7 @@ import { ZoomableImage } from "./zoomable-image";
 import { SpecList, SpecItem } from "./mdx/spec-sheet";
 import { Expandable } from "./mdx/expandable";
 import { GalleryLightbox, type GalleryImageItem } from "./mdx/gallery-lightbox";
+import { CopyablePre } from "./mdx/copyable-pre";
 
 type MdxElementProps = {
   children?: React.ReactNode;
@@ -751,7 +752,7 @@ export const mdxComponents = {
   tr: TableRow,
   th: TableHead,
   td: TableCell,
-  pre: MdxPre,
+  pre: CopyablePre,
   hr: MdxHr,
   strong: MdxStrong,
   em: MdxEm,
