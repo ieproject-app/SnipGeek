@@ -92,7 +92,7 @@ export function ArticleComments({ article, type, locale }: ArticleCommentsProps)
         ? "Untuk menjaga thread tetap konsisten, area komentar hanya dimuat di domain produksi."
         : "To keep threads consistent, the comments area only loads on the production domain.",
     openLive: locale === "id" ? "Buka versi live" : "Open live version",
-    tabGiscus: locale === "id" ? "Diskusi" : "Discussion",
+    tabGiscus: "Giscus",
     tabDisqus: "Disqus",
     legacy: "Legacy",
   };
@@ -248,9 +248,6 @@ function TabBar({ activeTab, onGiscus, onDisqus, i18n }: TabBarProps) {
         }`}
       >
         {i18n.tabDisqus}
-        <span className="rounded-full bg-muted px-1.5 py-0.5 text-[9px] font-black tracking-widest text-muted-foreground/70 uppercase">
-          {i18n.legacy}
-        </span>
       </button>
     </div>
   );
