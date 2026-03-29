@@ -44,3 +44,46 @@ env:
     availability:
       - BUILD
       - RUNTIME
+
+  # PDF Tools — Firebase (pdf-signatories-index project)
+  - variable: NEXT_PUBLIC_PDF_FIREBASE_API_KEY
+    value: "***REMOVED***"
+    availability:
+      - BUILD
+      - RUNTIME
+
+  - variable: NEXT_PUBLIC_PDF_FIREBASE_PROJECT_ID
+    value: "pdf-signatories-index"
+    availability:
+      - BUILD
+      - RUNTIME
+
+  - variable: NEXT_PUBLIC_PDF_FIREBASE_APP_ID
+    value: "1:1006635758733:web:12a0343b389648af985ec4"
+    availability:
+      - BUILD
+      - RUNTIME
+
+  - variable: NEXT_PUBLIC_PDF_FIREBASE_STORAGE_BUCKET
+    value: "pdf-signatories-index.appspot.com"
+    availability:
+      - BUILD
+      - RUNTIME
+
+  - variable: NEXT_PUBLIC_PDF_FIREBASE_AUTH_DOMAIN
+    value: "pdf-signatories-index.firebaseapp.com"
+    availability:
+      - BUILD
+      - RUNTIME
+
+  - variable: NEXT_PUBLIC_PDF_FIREBASE_MESSAGING_SENDER_ID
+    value: "1006635758733"
+    availability:
+      - BUILD
+      - RUNTIME
+
+  - variable: NEXT_PUBLIC_PDF_FIREBASE_MEASUREMENT_ID
+    value: "G-41Q3HZZ51P"
+    availability:
+      - BUILD
+      - RUNTIME
