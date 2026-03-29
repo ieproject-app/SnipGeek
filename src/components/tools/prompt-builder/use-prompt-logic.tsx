@@ -1368,8 +1368,18 @@ export function usePromptLogic({
     if (showDownloads && downloadItems.length > 0) {
       prompt += `\n**4. DOWNLOAD LINKS**\n`;
       downloadItems.forEach((item, i) => {
-        prompt += `- Link ${i + 1}: ${item.type.toUpperCase()} -> "${item.value}" (source marker: {{Link ${i + 1}}})\n`;
+        if (item.type === "id") {
+          prompt += `- Link ${i + 1}: ID -> "${item.value}" (source marker: {{Link ${i + 1}}})\n`;
+        } else {
+          prompt += `- Link ${i + 1}: URL -> "${item.value}" (source marker: {{Link ${i + 1}}})\n`;
+        }
       });
+      prompt += `\n**DOWNLOAD COMPONENT RULES (MANDATORY — must follow for every Link above):**\n`;
+      prompt += `- NEVER render download links as plain markdown anchor links (e.g. [text](url)) or raw <a> tags.\n`;
+      prompt += `- ALWAYS use the SnipGeek \`<DownloadButton id="..." />\` component — this renders a proper download card with filename, filesize, and platform icon.\n`;
+      prompt += `- For ID-type links: use the ID directly → \`<DownloadButton id="the-given-id" />\`\n`;
+      prompt += `- For URL-type links: you MUST first register a new entry in \`src/lib/data-downloads.ts\` with a descriptive kebab-case ID, fileName, fileSize (estimate if unknown), externalUrl, and platform. Then reference it in MDX as \`<DownloadButton id="your-new-id" />\`. Include the full \`data-downloads.ts\` entry in your output so the author can paste it.\n`;
+      prompt += `- Place the \`<DownloadButton />\` component exactly where the {{Link n}} marker appears in the source content.\n`;
     }
 
     if (showGrids && debouncedImageGridMappings) {
@@ -1411,6 +1421,10 @@ export function usePromptLogic({
       prompt += `\n**8. PLACEHOLDER RESOLUTION RULES**\n`;
       prompt += `- Treat {{Link n}}, {{Grid n}}, {{Gallery n}}, and {{Specs n}} as source markers only.\n`;
       prompt += `- In FINAL MDX output, resolve every marker into actual content/components at the correct position.\n`;
+      prompt += `- **{{Link n}} → ALWAYS resolves to \`<DownloadButton id="..." />\`** — never a markdown link, never a raw <a> tag. See Section 4 for full rules.\n`;
+      prompt += `- **{{Grid n}} → resolves to \`<ImageGrid columns={N}>\` block** with the mapped images.\n`;
+      prompt += `- **{{Gallery n}} → resolves to \`<Gallery caption="...">\` block** with the mapped images.\n`;
+      prompt += `- **{{Specs n}} → resolves to \`<SpecList>\` / \`<SpecItem>\` blocks** parsed from the raw spec data.\n`;
       prompt += `- Never leave raw {{...}} markers in final output.\n`;
       prompt += `- Ensure output is MDX-parse-safe (no invalid JS expressions such as raw moustache tokens).\n`;
     }

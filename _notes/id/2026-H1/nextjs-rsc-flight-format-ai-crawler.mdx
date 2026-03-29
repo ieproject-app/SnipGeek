@@ -1,0 +1,130 @@
+---
+title: "Kenapa AI Crawler Tidak Bisa Baca Site Next.js App Router"
+slug: "nextjs-rsc-flight-format-ai-crawler"
+translationKey: "nextjs-rsc-flight-format-ai-crawler"
+date: "2026-03-31"
+description: "Next.js App Router tidak menghasilkan HTML biasa — outputnya adalah RSC Flight payload. Crawler yang hanya HTTP fetch biasa seperti Claude web_fetch tidak bisa baca konten. Ini temuan dan solusinya."
+category: "NextJS"
+tags: ["nextjs", "web", "debugging", "ai", "linux"]
+published: true
+intent: "observation"
+---
+
+Saya iseng minta Claude fetch salah satu artikel SnipGeek langsung dari URL-nya. Yang balik cuma title tag. Isi artikel kosong sama sekali.
+
+Reaksi pertama saya: pasti ada yang salah di kode saya.
+
+## Diagnosis Pertama: Client-Side Rendering?
+
+Dugaan awalnya simpel — mungkin halaman artikel masih client-side rendered. HTML yang dikirim server cuma shell kosong, konten baru muncul setelah JavaScript jalan. Ini kesalahan klasik Next.js kalau `"use client"` nyasar ke page component.
+
+Saya minta Antigravity audit seluruh codebase. Hasilnya bersih:
+
+- `[locale]/blog/[slug]/page.tsx` → ✅ Server Component
+- `[locale]/notes/[slug]/page.tsx` → ✅ Server Component
+- MDX dikompilasi server-side via `next-mdx-remote/rsc` → ✅
+- `generateStaticParams` sudah ada → ✅
+
+Semuanya benar. Tapi kalau begitu, kenapa kontennya kosong?
+
+## Diagnosis Kedua: RSC Flight Format
+
+Saya jalankan diagnostic lebih dalam langsung ke URL live:
+
+```bash
+curl -s https://snipgeek.com/notes/how-to-read-ai-build-failed-logs | grep -i 'article\|content\|body\|prose' | head -20
+```
+
+Response-nya **101KB** — bukan halaman kosong. Kata kunci `content`, `article`, `prose` semua ditemukan ratusan kali. Tapi waktu dicek lebih dalam, ini yang saya lihat:
+
+```
+{"className":"text-lg text-foreground/80 prose-content","children":"$L1d"}
+```
+
+`$L1d` bukan teks artikel. Itu referensi ke **React Server Component chunk** — format streaming khusus Next.js App Router yang disebut RSC Flight format. Konten artikelnya ada, tapi terkemas dalam payload yang hanya bisa didecode oleh React runtime.
+
+Konfirmasi:
+
+```bash
+curl -s https://snipgeek.com/notes/how-to-read-ai-build-failed-logs | grep '<p>'
+# Total <p> tags: 0
+# Total <h2> tags: 0
+```
+
+Nol tag HTML biasa. Semua konten ada di dalam RSC payload.
+
+## Ini Bukan Bug — Ini Trade-off Arsitektur
+
+Pages Router lama menghasilkan HTML murni: `<p>`, `<h2>`, konten terbaca langsung di response. App Router beralih ke RSC Flight — format streaming yang dioptimalkan untuk performa hydration, tapi tidak bisa dibaca tanpa React runtime.
+
+Untuk SEO, ini tidak masalah:
+
+| Crawler | Bisa Baca Konten? | Alasan |
+|---|---|---|
+| Googlebot | ✅ | Headless Chrome, render JS penuh |
+| Bingbot | ✅ | Sama — render JS penuh |
+| AI crawler (GPTBot, ClaudeBot) | ⚠️ | Tergantung — ada yang render JS, ada yang tidak |
+| Claude via `web_fetch` | ❌ | Plain HTTP fetch, tanpa eksekusi JavaScript |
+
+Google bisa baca semua artikel. Masalahnya spesifik ke crawler yang hanya mengandalkan plain HTTP tanpa render JavaScript.
+
+## Solusi: API Route untuk Plain JSON
+
+Saya tambah Route Handler di Next.js yang serve konten artikel sebagai plain JSON — tanpa RSC format, tanpa butuh JavaScript:
+
+```
+GET /api/posts/[slug]?locale=en   → JSON artikel bahasa Inggris
+GET /api/posts/[slug]?locale=id   → JSON artikel bahasa Indonesia
+GET /api/notes/[slug]?locale=en   → JSON notes bahasa Inggris
+GET /api/notes/[slug]?locale=id   → JSON notes bahasa Indonesia
+```
+
+Beberapa keputusan yang saya ambil saat implementasi:
+
+- **Locale fallback** — kalau versi `id` belum ada, fallback ke `en` dengan `isFallback: true` di response.
+- **`X-Robots-Tag: noindex`** — supaya API route tidak diindex Google sebagai duplicate dari halaman utama.
+- **`Cache-Control: public, max-age=3600`** — cache response supaya tidak trigger serverless invocation berulang.
+- **`translationUrls`** — field yang berisi URL lengkap untuk tiap locale yang tersedia, berguna untuk tool yang consume API ini.
+
+Setelah deploy, test langsung:
+
+```bash
+curl -s "https://snipgeek.com/api/posts/ubuntu-26-04-beta-sudah-bisa-didownload?locale=id"
+```
+
+Response:
+
+```json
+{
+  "slug": "ubuntu-26-04-beta-sudah-bisa-didownload",
+  "locale": "id",
+  "isFallback": false,
+  "translationAvailable": ["en", "id"],
+  "translationUrls": {
+    "en": "/api/posts/ubuntu-26-04-beta-sudah-bisa-didownload?locale=en",
+    "id": "/api/posts/ubuntu-26-04-beta-sudah-bisa-didownload?locale=id"
+  },
+  "title": "Ubuntu 26.04 Beta Sudah Rilis — Tapi Jangan Buru-Buru Install",
+  "description": "...",
+  "date": "2026-03-30",
+  "tags": ["ubuntu", "linux", "beta"],
+  "content": "\nSaya nunggu beta Ubuntu 26.04 ini sambil setengah semangat..."
+}
+```
+
+Konten artikel terbaca penuh sebagai plain text. Siapapun — termasuk AI, developer, atau tool apapun — bisa baca isi artikel SnipGeek tanpa butuh browser atau JavaScript.
+
+<Callout variant="info" title="Perubahan Aman">
+  API route ini hidup sepenuhnya di namespace `/api/*` — terpisah dan tidak bisa mengganggu routing halaman yang sudah ada. Ini **pure additive change** — tidak menyentuh apapun yang sebelumnya.
+</Callout>
+
+## Langkah Selanjutnya
+
+Yang saya rencanakan berikutnya: implementasi [`llms.txt`](https://llmstxt.org) — standar baru mirip `robots.txt` tapi khusus untuk AI — yang berisi daftar semua URL konten SnipGeek dalam format yang mudah diproses LLM crawler.
+
+Kalau kamu juga punya site Next.js App Router dan frustrasi kenapa AI tidak bisa baca kontennya, coba tambah API route plain JSON seperti ini. Hasilnya langsung terasa.
+
+### Referensi
+1. [Next.js Route Handlers — Next.js Docs](https://nextjs.org/docs/app/building-your-application/routing/route-handlers)
+2. [React Server Components — React Docs](https://react.dev/reference/rsc/server-components)
+3. [llms.txt — Emerging Standard for AI Crawlers](https://llmstxt.org)

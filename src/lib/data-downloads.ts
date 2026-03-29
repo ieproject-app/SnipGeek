@@ -73,6 +73,17 @@ export const downloadLinks: Record<string, DownloadInfo> = {
     externalUrl: 'https://www.mediafire.com/file/c79msd2spof3nqt/L310_x64_224JAUsHomeExportAsiaML.exe/file',
     platform: 'driver'
   },
+  'driver-epson-l310-linux-gdrive': {
+    fileName: 'Epson L310 Inkjet Driver for Linux (.deb)',
+    fileSize: '~5 MB',
+    externalUrl: 'https://drive.google.com/file/d/1h-EcFne-70C6hA07AUpLGzPM--69Hn3y/view?usp=sharing',
+    platform: 'gdrive'
+  },
+  'driver-epson-l310-linux-official': {
+    fileName: 'Epson Linux Driver Search (Official)',
+    externalUrl: 'https://download.ebz.epson.net/dsc/search/01/search/?OSC=LX',
+    platform: 'driver'
+  },
   'driver-epson-l310-official': {
     fileName: 'Epson L310 Official Service Driver',
     fileSize: '2.4 MB',

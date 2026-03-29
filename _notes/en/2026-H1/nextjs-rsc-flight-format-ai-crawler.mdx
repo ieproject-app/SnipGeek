@@ -1,0 +1,132 @@
+---
+title: "Why AI Crawlers Can't Read Next.js App Router Sites"
+slug: "nextjs-rsc-flight-format-ai-crawler"
+translationKey: "nextjs-rsc-flight-format-ai-crawler"
+date: "2026-03-31"
+description: "Next.js App Router doesn't emit plain HTML — it outputs RSC Flight payload. Plain HTTP crawlers like Claude's web_fetch get the structure but not the content. Here's what I found and how I fixed it."
+category: "NextJS"
+tags: ["nextjs", "web", "debugging", "ai", "linux"]
+published: true
+intent: "observation"
+---
+
+I was testing something with Claude — I asked it to fetch one of my SnipGeek articles directly from its URL. It came back with just the title tag. The article body was completely empty.
+
+My first instinct was to blame my own code.
+
+## First Diagnosis: Client-Side Rendering?
+
+The obvious suspect: maybe the article pages were still client-side rendered, sending only a shell HTML and injecting content via JavaScript after load. This is a classic Next.js mistake when `"use client"` ends up on a page component by accident.
+
+I asked Antigravity to audit the full codebase. The result was surprisingly clean:
+
+- `[locale]/blog/[slug]/page.tsx` → ✅ Server Component
+- `[locale]/notes/[slug]/page.tsx` → ✅ Server Component
+- MDX compiled server-side via `next-mdx-remote/rsc` → ✅
+- `generateStaticParams` present → ✅
+
+Everything was correct. So why was the content missing?
+
+## Second Diagnosis: RSC Flight Format
+
+I ran a deeper diagnostic directly against the live URL:
+
+```bash
+curl -s https://snipgeek.com/notes/how-to-read-ai-build-failed-logs | grep -i 'article\|content\|body\|prose' | head -20
+```
+
+The response was **101KB** — not an empty shell. Keywords like `content`, `article`, and `prose` appeared hundreds of times. But when I dug into the actual content, this is what I found:
+
+```
+{"className":"text-lg text-foreground/80 prose-content","children":"$L1d"}
+```
+
+`$L1d` is not article text. It's a reference to a **React Server Component chunk** — Next.js App Router's RSC Flight streaming format. The full article content is there, but encoded as a payload that requires the React runtime to decode into readable HTML.
+
+Confirmation:
+
+```bash
+curl -s https://snipgeek.com/notes/how-to-read-ai-build-failed-logs | grep '<p>'
+# Total <p> tags: 0
+# Total <h2> tags: 0
+```
+
+Zero traditional HTML tags. The content is entirely inside the RSC payload.
+
+## This Isn't a Bug — It's an Architecture Trade-off
+
+The old Pages Router emitted raw HTML: `<p>`, `<h2>`, full readable content in the HTTP response. App Router switched to RSC Flight — a streaming format optimised for hydration performance, but unreadable without React runtime.
+
+For SEO, this is fine:
+
+| Crawler | Can Read Content? | Reason |
+|---|---|---|
+| Googlebot | ✅ | Headless Chrome, full JS render |
+| Bingbot | ✅ | Same — full JS render |
+| AI crawlers (GPTBot, ClaudeBot) | ⚠️ | Depends — some render JS, some don't |
+| Claude via `web_fetch` | ❌ | Plain HTTP fetch, no JS execution |
+
+Google can read everything. The problem is specific to crawlers that rely on plain HTTP without JavaScript rendering.
+
+## The Fix: A Plain JSON API Route
+
+I added Route Handlers in Next.js that serve article content as plain JSON — no RSC format, no JavaScript required:
+
+```
+GET /api/posts/[slug]?locale=en   → English article JSON
+GET /api/posts/[slug]?locale=id   → Indonesian article JSON
+GET /api/notes/[slug]?locale=en   → English note JSON
+GET /api/notes/[slug]?locale=id   → Indonesian note JSON
+```
+
+A few decisions I made during implementation:
+
+- **Locale fallback** — if an `id` version doesn't exist, it falls back to `en` with `isFallback: true` in the response.
+- **`X-Robots-Tag: noindex`** — prevents Google from indexing the API route as a duplicate of the main page.
+- **`Cache-Control: public, max-age=3600`** — caches responses to avoid repeated serverless invocations.
+- **`translationUrls`** — a field listing the full API URL for each available locale, useful for tools consuming the API.
+
+After deploying, a quick test:
+
+```bash
+curl -s "https://snipgeek.com/api/posts/ubuntu-26-04-beta-sudah-bisa-didownload?locale=id"
+```
+
+Response:
+
+```json
+{
+  "slug": "ubuntu-26-04-beta-sudah-bisa-didownload",
+  "locale": "id",
+  "isFallback": false,
+  "translationAvailable": ["en", "id"],
+  "translationUrls": {
+    "en": "/api/posts/ubuntu-26-04-beta-sudah-bisa-didownload?locale=en",
+    "id": "/api/posts/ubuntu-26-04-beta-sudah-bisa-didownload?locale=id"
+  },
+  "title": "Ubuntu 26.04 Beta Sudah Rilis — Tapi Jangan Buru-Buru Install",
+  "description": "...",
+  "date": "2026-03-30",
+  "tags": ["ubuntu", "linux", "beta"],
+  "content": "\nSaya nunggu beta Ubuntu 26.04 ini sambil setengah semangat..."
+}
+```
+
+Full article content, readable as plain text. No browser, no JavaScript needed.
+
+<Callout variant="info" title="Safe Change">
+  This API route lives entirely under `/api/*` — a separate namespace that cannot conflict with or break any existing page routing. It's a **purely additive** change.
+</Callout>
+
+## What's Next
+
+The next step I'm planning: implement [`llms.txt`](https://llmstxt.org) — an emerging standard (similar to `robots.txt` but for AI) that lists all SnipGeek content URLs in a format that LLM crawlers can process easily.
+
+For the curious, the relevant specs are in the [Next.js Route Handlers docs](https://nextjs.org/docs/app/building-your-application/routing/route-handlers) and the [React Server Components reference](https://react.dev/reference/rsc/server-components).
+
+If you hit this same wall with your own Next.js site, adding a plain JSON API route is probably the fastest fix. Let me know if it works for you.
+
+### References
+1. [Next.js Route Handlers — Next.js Docs](https://nextjs.org/docs/app/building-your-application/routing/route-handlers)
+2. [React Server Components — React Docs](https://react.dev/reference/rsc/server-components)
+3. [llms.txt — Emerging Standard for AI Crawlers](https://llmstxt.org)
