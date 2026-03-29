@@ -17,13 +17,11 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   const dictionary = await getDictionary(locale);
-  const currentPrefix = locale === i18n.defaultLocale ? "" : `/${locale}`;
-  const canonicalPath = `${currentPrefix}/blog`;
+  const canonicalPath = `${getLinkPrefix(locale)}/blog`;
 
   const languages: Record<string, string> = {};
   i18n.locales.forEach((loc) => {
-    const prefix = loc === i18n.defaultLocale ? "" : `/${loc}`;
-    languages[loc] = `${prefix}/blog`;
+    languages[loc] = `${getLinkPrefix(loc)}/blog`;
   });
 
   return {

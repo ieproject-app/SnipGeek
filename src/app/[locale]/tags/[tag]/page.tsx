@@ -4,7 +4,7 @@ import { i18n, type Locale } from "@/i18n-config";
 import { getDictionary } from "@/lib/get-dictionary";
 import { TagListClient } from "./tag-list-client";
 import type { Metadata } from "next";
-import { shouldIndexTag } from "@/lib/tags";
+import { shouldIndexTag, getAllTags } from "@/lib/tags";
 import { getLinkPrefix } from "@/lib/utils";
 
 export async function generateMetadata({
@@ -55,8 +55,10 @@ export async function generateMetadata({
 }
 
 export async function generateStaticParams() {
-  const locales = i18n.locales;
-  return locales.map((locale) => ({ locale, tag: "tutorial" }));
+  const tags = await getAllTags(i18n.defaultLocale);
+  return i18n.locales.flatMap((locale) =>
+    tags.map((tag) => ({ locale, tag: tag.name })),
+  );
 }
 
 export default async function TagPage({
