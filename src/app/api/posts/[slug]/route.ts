@@ -1,4 +1,4 @@
-import { getPostData } from "@/lib/posts";
+import { getPostData, getPostTranslation } from "@/lib/posts";
 import { i18n } from "@/i18n-config";
 import type { Locale } from "@/i18n-config";
 import type { NextRequest } from "next/server";
@@ -44,11 +44,51 @@ export async function GET(
     );
   }
 
+  // Build translation availability map.
+  // Default locale always has the article (the fallback source).
+  // Other locales are checked via getPostTranslation using the translationKey.
+  const translationAvailable: string[] = [i18n.defaultLocale];
+  const translationUrls: Record<string, string> = {
+    [i18n.defaultLocale]: `/api/posts/${post.slug}?locale=${i18n.defaultLocale}`,
+  };
+
+  if (post.frontmatter.translationKey) {
+    await Promise.all(
+      i18n.locales
+        .filter((loc) => loc !== i18n.defaultLocale)
+        .map(async (loc) => {
+          if (loc === locale && !post.isFallback) {
+            // Non-default locale was requested directly and isn't a fallback — it exists
+            translationAvailable.push(loc);
+            translationUrls[loc] = `/api/posts/${post.slug}?locale=${loc}`;
+          } else {
+            const translation = await getPostTranslation(
+              post.frontmatter.translationKey,
+              loc,
+            );
+            if (translation) {
+              translationAvailable.push(loc);
+              translationUrls[loc] = `/api/posts/${translation.slug}?locale=${loc}`;
+            }
+          }
+        }),
+    );
+  }
+
+  // Sort to match i18n.locales order: ["en", "id"]
+  translationAvailable.sort(
+    (a, b) =>
+      [...i18n.locales].indexOf(a as Locale) -
+      [...i18n.locales].indexOf(b as Locale),
+  );
+
   return Response.json(
     {
       slug: post.slug,
       locale,
       isFallback: post.isFallback ?? false,
+      translationAvailable,
+      translationUrls,
       title: post.frontmatter.title,
       description: post.frontmatter.description ?? null,
       date: post.frontmatter.date ?? null,
