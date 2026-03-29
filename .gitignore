@@ -27,9 +27,12 @@
 *.tsbuildinfo
 next-env.d.ts
 
-# Sensitive Scripts
-/scripts/serviceAccountKey.json
-/scripts/studio-8697076532-14512-firebase-adminsdk-fbsvc-a3a2b11f23.json
+# Sensitive credentials — never commit these anywhere in the repo
+serviceAccountKey.json
+*firebase-adminsdk*.json
+*-adminsdk-*.json
+*.service-account.json
+*.serviceaccount.json
 
 # Downloaded build logs
 /downloaded-logs-*.json
