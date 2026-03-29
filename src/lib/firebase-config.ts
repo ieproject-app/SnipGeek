@@ -3,15 +3,16 @@ import { initializeApp, getApp, getApps, type FirebaseApp } from "firebase/app";
 import { getStorage, type FirebaseStorage } from "firebase/storage";
 import { getFunctions, type Functions } from "firebase/functions";
 
-// Your web app's Firebase configuration
+// Firebase config for pdf-signatories-index project
+// All values stored in environment variables — never hardcode credentials in source.
 const firebaseConfig = {
-  "projectId": "pdf-signatories-index",
-  "appId": "1:1006635758733:web:12a0343b389648af985ec4",
-  "storageBucket": "pdf-signatories-index.appspot.com",
-  "apiKey": "***REMOVED***",
-  "authDomain": "pdf-signatories-index.firebaseapp.com",
-  "messagingSenderId": "1006635758733",
-  "measurementId": "G-41Q3HZZ51P"
+  projectId: process.env.NEXT_PUBLIC_PDF_FIREBASE_PROJECT_ID || "pdf-signatories-index",
+  appId: process.env.NEXT_PUBLIC_PDF_FIREBASE_APP_ID || "",
+  storageBucket: process.env.NEXT_PUBLIC_PDF_FIREBASE_STORAGE_BUCKET || "",
+  apiKey: process.env.NEXT_PUBLIC_PDF_FIREBASE_API_KEY || "",
+  authDomain: process.env.NEXT_PUBLIC_PDF_FIREBASE_AUTH_DOMAIN || "",
+  messagingSenderId: process.env.NEXT_PUBLIC_PDF_FIREBASE_MESSAGING_SENDER_ID || "",
+  measurementId: process.env.NEXT_PUBLIC_PDF_FIREBASE_MEASUREMENT_ID || "",
 };
 
 
