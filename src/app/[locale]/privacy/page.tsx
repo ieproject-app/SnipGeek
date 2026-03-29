@@ -24,7 +24,7 @@ export async function generateMetadata({
     locale,
     fallbackTitle: "Privacy Policy",
     fallbackDescription:
-      "SnipGeek privacy policy — including Google AdSense advertising, cookies, and how we handle your data.",
+      "SnipGeek privacy policy — covering cookies, analytics, and how we handle your data.",
     robots: { index: true, follow: true },
   });
 }

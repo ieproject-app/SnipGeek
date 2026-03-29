@@ -6,6 +6,7 @@ import { notFound } from 'next/navigation';
 import { ToolPromptBuilder } from '@/components/tools/tool-prompt-builder';
 import { getSortedPostsData } from '@/lib/posts';
 import { getSortedNotesData } from '@/lib/notes';
+import { getAllTags } from '@/lib/tags';
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
@@ -36,8 +37,11 @@ export default async function PromptGeneratorPage({ params }: { params: Promise<
   const dictionary = await getDictionary(lang as Locale);
   const pageContent = dictionary.promptGenerator;
 
-  const posts = await getSortedPostsData(lang, { includeDrafts: true });
-  const notes = await getSortedNotesData(lang, { includeDrafts: true });
+  const [posts, notes, allTags] = await Promise.all([
+    getSortedPostsData(lang, { includeDrafts: true }),
+    getSortedNotesData(lang, { includeDrafts: true }),
+    getAllTags('en'),
+  ]);
 
   const existingArticles = [
     ...posts.map((p) => ({
@@ -62,10 +66,19 @@ export default async function PromptGeneratorPage({ params }: { params: Promise<
     return a.title.localeCompare(b.title);
   });
 
+  // Pass a serializable subset — only name and count are needed by the prompt builder
+  const availableTags = allTags.map(({ name, count }) => ({ name, count }));
+
   return (
     <div className="w-full">
       <main className="mx-auto max-w-7xl px-4 pt-6 pb-12 sm:px-6 sm:pt-8 sm:pb-16">
-        <ToolPromptBuilder dictionary={pageContent} fullDictionary={dictionary} existingArticles={existingArticles} locale={lang as Locale} />
+        <ToolPromptBuilder
+          dictionary={pageContent}
+          fullDictionary={dictionary}
+          existingArticles={existingArticles}
+          availableTags={availableTags}
+          locale={lang as Locale}
+        />
       </main>
     </div>
   );

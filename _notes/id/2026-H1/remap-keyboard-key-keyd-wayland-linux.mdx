@@ -1,0 +1,166 @@
+---
+title: "Remap Tombol Keyboard dengan keyd di Linux Wayland"
+slug: "remap-keyboard-key-keyd-wayland-linux"
+date: "2026-03-29"
+description: "Cara saya meremap tombol yang nganggur di MSI Modern 14 buat langsung buka Claude dengan satu ketukan — menggunakan keyd, cara paling bersih untuk remap key di Linux Wayland."
+translationKey: "remap-keyboard-key-keyd-wayland-linux"
+published: true
+featured: true
+category: "Linux"
+tags: ["linux", "ubuntu", "keyd", "keyboard", "wayland"]
+---
+
+Di sudut kanan bawah keyboard MSI Modern 14 saya, ada satu tombol yang posisinya mepet banget di antara Alt GR dan Fn — tombol yang sejak hari pertama laptop ini saya pakai, belum pernah sekalipun saya pencet. Bukan tombol yang buruk. Cuma... menganggur terus.
+
+Daripada dibiarkan begitu, saya putuskan buat manfaatinnya. Idenya simpel: remap ke <kbd>Super</kbd> + <kbd>2</kbd>, yang sudah saya assign ke Claude di GNOME. Satu ketukan, langsung ke AI yang sekarang jadi andalan saya sehari-hari — nulis, ngoding, debugging. Saya pikir ini urusan lima belas menit.
+
+Ternyata tidak.
+
+## Kenapa keyd?
+
+Di Wayland, `xmodmap` sudah tidak jalan — itu alat lama yang bergantung pada X11. `keyd` bekerja di level kernel input, jadi bebas dari display server mana pun. X11 atau Wayland, sama saja. Sintaks konfigurasinya juga cukup bersih begitu sudah paham polanya.
+
+## Step 1: Install keyd
+
+`keyd` tidak tersedia di repositori apt Ubuntu secara default, jadi harus build dari source:
+
+<Steps>
+  <Step>
+
+### Install dependensi build dan clone repo-nya
+
+```bash
+sudo apt install git make gcc -y
+
+git clone https://github.com/rvaiya/keyd
+cd keyd
+```
+
+  </Step>
+  <Step>
+
+### Build dan install
+
+```bash
+make && sudo make install
+```
+
+  </Step>
+  <Step>
+
+### Aktifkan dan jalankan service-nya
+
+```bash
+sudo systemctl enable keyd
+sudo systemctl start keyd
+```
+
+  </Step>
+  <Step>
+
+### Cek versi untuk memastikan berhasil
+
+```bash
+keyd --version
+# keyd v2.6.0
+```
+
+  </Step>
+</Steps>
+
+## Step 2: Cari Nama Key yang Benar
+
+Jangan tebak-tebakan. Gunakan `keyd monitor` untuk tahu nama persis yang dikenali keyd dari tombol fisik kamu:
+
+```bash
+sudo keyd monitor
+```
+
+Tekan tombolnya. Di kasus saya, outputnya:
+
+```
+keyd virtual keyboard    102nd down
+keyd virtual keyboard    102nd up
+```
+
+Nama keynya adalah `102nd`. Catat ini — akan dipakai di file config.
+
+## Step 3: Buat Config-nya
+
+```bash
+sudo mkdir -p /etc/keyd
+sudo nano /etc/keyd/default.conf
+```
+
+Paste ini:
+
+```ini
+[ids]
+*
+
+[main]
+102nd = M-2
+```
+
+Ada dua hal yang bikin saya nyangkut sebelum ini akhirnya jalan:
+
+| ❌ Salah | ✅ Benar | Alasan |
+|---|---|---|
+| `102key` | `102nd` | Nama key tidak tepat |
+| `meta+2` | `M-2` | keyd pakai singkatan huruf untuk modifier |
+
+Referensi singkatan modifier di keyd:
+
+| Simbol | Modifier |
+|---|---|
+| `M` | Meta / Super (tombol Windows) |
+| `C` | Control |
+| `A` | Alt |
+| `S` | Shift |
+
+## Step 4: Restart dan Verifikasi
+
+```bash
+sudo systemctl restart keyd
+```
+
+Jalankan lagi `keyd monitor`, tekan tombolnya. Kalau remap berhasil, outputnya akan seperti ini:
+
+```
+keyd virtual keyboard    leftmeta down
+keyd virtual keyboard    2 down
+keyd virtual keyboard    2 up
+keyd virtual keyboard    leftmeta up
+```
+
+Kalau `leftmeta` dan `2` sudah muncul bareng seperti itu, artinya remap-nya sukses.
+
+## Step 5: Sambungkan ke GNOME Custom Shortcut
+
+keyd sudah mengirim sinyal yang benar, tapi GNOME tetap butuh tahu mau ngapain dengan sinyal itu. Buka **Settings → Keyboard → Custom Shortcuts**, tambah entri baru:
+
+- **Name:** Claude (atau nama apapun)
+- **Command:** `xdg-open https://claude.ai`
+- **Shortcut:** <kbd>Super</kbd> + <kbd>2</kbd>
+
+<Callout variant="warning" title="Jangan Biarkan Field Command Kosong">
+  keyd akan mengirim sinyal <kbd>Super</kbd> + <kbd>2</kbd> dengan benar, tapi GNOME tidak akan melakukan apa-apa kalau field Command-nya kosong. Pastikan command-nya terisi sebelum save.
+</Callout>
+
+## Config Final
+
+```ini
+[ids]
+*
+
+[main]
+102nd = M-2
+```
+
+Segitu aja config lengkapnya yang jalan. Karena keyd berjalan sebagai systemd service, remap ini langsung aktif otomatis setiap boot — tidak perlu startup script tambahan.
+
+---
+
+Tombol yang dulu menganggur itu sekarang punya satu tujuan yang jelas: buka Claude seketika, dari mana pun saya sedang bekerja di desktop. Kalau kamu punya tombol serupa yang belum kepake, `keyd` adalah cara paling clean buat manfaatinnya di Linux — terutama di Wayland. Pastikan nama key dan sintaks modifier-nya benar dari awal, sisanya tinggal jalan sendiri.
+
+Ada use case lain buat keyd? Cerita di kolom komentar — saya penasaran tombol apa yang kamu remap.

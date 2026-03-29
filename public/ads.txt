@@ -1,2 +1,2 @@
-# Temporarily disabled during Ezoic migration.
-# This file will be replaced with Ezoic-managed ads.txt entries.
+# ads.txt — intentionally empty.
+# No ad network is currently active on this site.

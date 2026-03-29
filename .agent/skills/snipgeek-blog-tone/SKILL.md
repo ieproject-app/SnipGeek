@@ -55,7 +55,9 @@ The reader is addressed as **"you"** (English) / **"kamu"** (Indonesian) — fri
 
 ## Article Structure
 
-### Opening
+> **Scope:** The structure rules below apply to **Blog Posts** (`_posts/`). Technical Notes (`_notes/`) skip the personal opener and go directly to the technical finding or problem statement. Notes are compact and factual, not narrative.
+
+### Opening (Blog Posts only)
 Start with **personal context** — why the author tried this, what problem they were solving. Pull the reader in before introducing any technical details.
 
 **Good opening (English):**
@@ -71,7 +73,7 @@ Start with **personal context** — why the author tried this, what problem they
 - Use `##` and `###` headings to break up long content
 - Each section follows a rhythm: **context → information → personal insight**
 - Weave in personal reactions between technical facts — this is what separates a blog from documentation
-- Use `<details>` for secondary technical content (specs, comparisons) that doesn't need to be immediately visible
+- Use `<Expandable>` for secondary technical content (specs, comparisons) that doesn't need to be immediately visible. **NEVER** use `<details>`/`<summary>`.
 
 ### Closing
 End with a light call to action — invite comments, mention an alternative, or express a simple hope. Keep it brief and warm.
@@ -99,15 +101,17 @@ For information added after initial publish:
 ```
 
 ### Collapsible Technical Content
+Use the custom `<Expandable>` component. **NEVER** use raw `<details>`/`<summary>` — it is not a valid MDX component in SnipGeek and will cause rendering issues.
+
 ```mdx
-<details>
-  <summary>Minimum System Requirements</summary>
-  <ul>
-    <li>2.1+ GHz Intel Processor</li>
-    <li>4GB RAM</li>
-  </ul>
-</details>
+<Expandable title="Minimum System Requirements" icon="info">
+  - 2.1+ GHz Intel Processor
+  - 4GB RAM
+  - 512MB VRAM
+</Expandable>
 ```
+
+Icons available: `info`, `help`, `folder`, `warning`, `tip`.
 
 ### Images
 ```mdx

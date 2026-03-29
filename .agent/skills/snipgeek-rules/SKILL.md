@@ -1,11 +1,14 @@
 ---
 name: snipgeek_rules
-description: Mandatory rules for the SnipGeek project — MDX content standards, content placement, static page workflow, development rules, and UI/design system to prevent build errors, crashes, and structural inconsistency.
+description: Engineering and architecture rules for the SnipGeek project — technical implementation patterns, TypeScript/React conventions, Firebase safety rules, UI design system, hreflang, and build safety. For content writing standards (MDX, frontmatter, tags, folder convention), use the `content-generator` skill instead.
 ---
 
 # SnipGeek Project Rules
 
 These are permanent instructions that MUST be followed at all times when working on the SnipGeek project. All rules are based on real experience and agreed-upon architectural decisions.
+
+> **Scope:** This skill covers **engineering and technical implementation** — React/TypeScript patterns, Firebase, hreflang, build conventions, and the UI design system. 
+> For **content writing standards** (MDX components, frontmatter fields, tag rules, semester folder convention, bilingual requirements), read `content-generator` SKILL.md instead. Do not duplicate content rules here.
 
 ## Canonical Documentation First
 Before making structural decisions, always align with the canonical project documentation in:

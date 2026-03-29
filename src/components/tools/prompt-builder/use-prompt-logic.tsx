@@ -254,11 +254,14 @@ const generateUUID = (): string => {
   });
 };
 
+type AvailableTag = { name: string; count: number };
+
 export interface ToolPromptsProps {
   dictionary: ToolPromptsDictionary;
   existingArticles: ArticleSummary[];
   fullDictionary: Dictionary;
   locale: string;
+  availableTags: AvailableTag[];
 }
 
 type WorkflowContentType = "series" | "news" | "tips" | "notes";
@@ -539,6 +542,7 @@ export function usePromptLogic({
   existingArticles,
   fullDictionary,
   locale,
+  availableTags,
 }: ToolPromptsProps) {
   const [mounted, setMounted] = useState(false);
   const originalContentRef = useRef<HTMLTextAreaElement>(null);
@@ -605,6 +609,10 @@ export function usePromptLogic({
   const debouncedImageGridMappings = useDebounce(imageGridMappings, 300);
   const debouncedGalleryMappings = useDebounce(galleryMappings, 300);
   const debouncedSpecsMappings = useDebounce(specsMappings, 300);
+  // Debounce free-text fields that feed directly into the prompt to reduce
+  // unnecessary recomputes while the user is still typing.
+  const debouncedPublishDate = useDebounce(publishDate, 400);
+  const debouncedCategoryHint = useDebounce(categoryHint, 400);
 
   // ── Output ──
   const [generatedPrompt, setGeneratedPrompt] = useState("");
@@ -866,10 +874,7 @@ export function usePromptLogic({
     };
   }, [generatedPrompt]);
 
-  // Update generatedPrompt when the memoized prompt changes
-  useEffect(() => {
-    setGeneratedPrompt(prompt);
-  }, [prompt]);
+
 
   const sourceContent = mode === "modify" ? debouncedOriginalContent : debouncedDraft;
   const imageLines = useMemo(
@@ -1000,8 +1005,8 @@ export function usePromptLogic({
       });
     }
 
-    if (showImages && heroImage.trim() !== "") {
-      const heroPath = normalizeImagePath((heroImage.split("|")[0] ?? "").trim());
+    if (showImages && debouncedHeroImage.trim() !== "") {
+      const heroPath = normalizeImagePath((debouncedHeroImage.split("|")[0] ?? "").trim());
       if (heroPath && sourceContent.includes(heroPath)) {
         issues.push({
           id: "hero-image-duplicated",
@@ -1037,14 +1042,14 @@ export function usePromptLogic({
   }, [
     contentType,
     downloadItems,
-    draft,
-    galleryMappings,
-    heroImage,
-    imageGridMappings,
+    debouncedDraft,
+    debouncedGalleryMappings,
+    debouncedHeroImage,
+    debouncedImageGridMappings,
     mode,
-    newsAngle,
-    newsSourceUrls,
-    originalContent,
+    debouncedNewsAngle,
+    debouncedNewsSourceUrls,
+    debouncedOriginalContent,
     showDownloads,
     showGallery,
     showGrids,
@@ -1255,8 +1260,8 @@ export function usePromptLogic({
       }
     }
 
-    const finalDate = publishDate
-      ? parseNaturalDate(publishDate)
+    const finalDate = debouncedPublishDate
+      ? parseNaturalDate(debouncedPublishDate)
       : (isModify ? "[KEEP OR UPDATE]" : new Date().toISOString().split("T")[0]);
 
     prompt += `- Date: ${finalDate}\n`;
@@ -1264,7 +1269,20 @@ export function usePromptLogic({
       prompt += `- Updated: ${new Date().toISOString().split("T")[0]}\n`;
     }
     prompt += `- Status: ${isPublished ? "PUBLISHED" : "DRAFT"}${isFeatured ? " | FEATURED" : ""}\n`;
-    prompt += `- Category Hint: ${categoryHint || "[AI: AUTOMATIC]"}\n\n`;
+    prompt += `- Category Hint: ${debouncedCategoryHint || "[AI: AUTOMATIC]"}\n\n`;
+
+    // ── Tag Registry: inject live tag list so AI prefers existing tags ──
+    if (availableTags && availableTags.length > 0) {
+      const tagList = availableTags
+        .filter(t => t.count > 0)
+        .slice(0, 50)
+        .map(t => `${t.name}(${t.count})`)
+        .join(", ");
+      prompt += `**2A. EXISTING TAG REGISTRY**\n`;
+      prompt += `Before inventing new tags, prefer selecting from this live list of tags already used in SnipGeek:\n`;
+      prompt += `${tagList}\n`;
+      prompt += `Format: tag-name(article-count). Higher count = more established tag. Still follow tag rules: kebab-case, min 3, max 6, include 1 platform tag.\n\n`;
+    }
 
     if (!isModify) {
       if (contentType === "series") {
@@ -1501,7 +1519,7 @@ export function usePromptLogic({
     debouncedModInstructions,
     debouncedNewsAngle,
     debouncedNewsSourceUrls,
-    publishDate,
+    debouncedPublishDate,
     isPublished,
     isFeatured,
     isIdOnly,
@@ -1523,7 +1541,7 @@ export function usePromptLogic({
     seriesPhase,
     seriesTarget,
     seriesTone,
-    categoryHint,
+    debouncedCategoryHint,
     selectedArticle,
     tipsStandalone,
     noteIntent,
@@ -1533,7 +1551,13 @@ export function usePromptLogic({
     captionCoverage,
     parsedCaptionMaxCount,
     imageLines,
+    availableTags,
   ]);
+
+  // Update generatedPrompt when the memoized prompt changes
+  useEffect(() => {
+    setGeneratedPrompt(prompt);
+  }, [prompt]);
 
   // ── Handlers ──
   const writeClipboard = useCallback(
@@ -1732,7 +1756,7 @@ export function usePromptLogic({
     generatedPrompt, setGeneratedPrompt, isCopied, setIsCopied, resetPopoverOpen, setResetPopoverOpen, isOriginalLoading, setIsOriginalLoading,
     selectedBlock, setSelectedBlock, selectedBlockLine, setSelectedBlockLine, selectedBlockComment, setSelectedBlockComment,
     originalContentRef, modInstructionsRef, blockComposerRef,
-    dictionary, fullDictionary, existingArticles, locale,
+    dictionary, fullDictionary, existingArticles, locale, availableTags,
     articlesForType, articleStats, urgentDrafts, specsGroups, staleDraftCount, filteredArticles, selectedArticle, selectedBlockRows,
     handleOriginalSelection, addSelectedBlockToInstructions,
     counters, promptStats, imageLines, parsedCaptionMaxCount, unresolvedMarkers, hasUnresolvedMarkers, validationIssues, blockingValidationIssues, hasBlockingIssues,

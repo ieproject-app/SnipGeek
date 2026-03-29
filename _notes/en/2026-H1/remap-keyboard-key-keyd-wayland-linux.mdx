@@ -1,0 +1,166 @@
+---
+title: "Remap Any Keyboard Key with keyd on Linux Wayland"
+slug: "remap-keyboard-key-keyd-wayland-linux"
+date: "2026-03-29"
+description: "How I remapped an unused key on my MSI Modern 14 to launch Claude with one keystroke using keyd — the cleanest way to remap keys on Linux Wayland."
+translationKey: "remap-keyboard-key-keyd-wayland-linux"
+published: true
+featured: true
+category: "Linux"
+tags: ["linux", "ubuntu", "keyd", "keyboard", "wayland"]
+---
+
+There's a key in the bottom-right corner of my MSI Modern 14 keyboard — wedged between Alt GR and Fn — that I had never pressed since the day I got the laptop. Not a bad key. Just... permanently idle.
+
+I decided to change that. The plan was simple: remap it to <kbd>Super</kbd> + <kbd>2</kbd>, which I'd already assigned to open Claude in GNOME. One key press, straight to the AI I use for almost everything — coding, writing, debugging. I figured it would take fifteen minutes.
+
+It did not take fifteen minutes.
+
+## Why keyd?
+
+On Wayland, the classic `xmodmap` approach doesn't work anymore — it depends on X11. `keyd` operates at the kernel input level, so it's completely display-server agnostic. X11, Wayland, doesn't matter. The config syntax is clean once you understand it.
+
+## Step 1: Install keyd
+
+`keyd` isn't in the Ubuntu apt repositories by default, so you'll need to build it from source:
+
+<Steps>
+  <Step>
+
+### Install build dependencies and clone the repo
+
+```bash
+sudo apt install git make gcc -y
+
+git clone https://github.com/rvaiya/keyd
+cd keyd
+```
+
+  </Step>
+  <Step>
+
+### Build and install
+
+```bash
+make && sudo make install
+```
+
+  </Step>
+  <Step>
+
+### Enable and start the system service
+
+```bash
+sudo systemctl enable keyd
+sudo systemctl start keyd
+```
+
+  </Step>
+  <Step>
+
+### Verify the installation
+
+```bash
+keyd --version
+# keyd v2.6.0
+```
+
+  </Step>
+</Steps>
+
+## Step 2: Find the Key Name
+
+Don't guess. Use `keyd monitor` to capture the exact name keyd sees for your physical key:
+
+```bash
+sudo keyd monitor
+```
+
+Press the key. In my case, the output was:
+
+```
+keyd virtual keyboard    102nd down
+keyd virtual keyboard    102nd up
+```
+
+The key name is `102nd`. Write it down — you'll use it in the config file.
+
+## Step 3: Create the Config
+
+```bash
+sudo mkdir -p /etc/keyd
+sudo nano /etc/keyd/default.conf
+```
+
+Paste this:
+
+```ini
+[ids]
+*
+
+[main]
+102nd = M-2
+```
+
+I got tripped up on two things before this worked. Here's what to watch:
+
+| ❌ Wrong | ✅ Correct | Reason |
+|---|---|---|
+| `102key` | `102nd` | Incorrect key name |
+| `meta+2` | `M-2` | keyd uses single-letter modifier shortcuts |
+
+keyd's modifier shorthand:
+
+| Symbol | Modifier |
+|---|---|
+| `M` | Meta / Super (Windows key) |
+| `C` | Control |
+| `A` | Alt |
+| `S` | Shift |
+
+## Step 4: Restart and Verify
+
+```bash
+sudo systemctl restart keyd
+```
+
+Run `keyd monitor` again and press the key. If the remap worked, you'll see:
+
+```
+keyd virtual keyboard    leftmeta down
+keyd virtual keyboard    2 down
+keyd virtual keyboard    2 up
+keyd virtual keyboard    leftmeta up
+```
+
+That output — `leftmeta` followed by `2` — is the confirmation you need.
+
+## Step 5: Connect to GNOME Custom Shortcut
+
+keyd sends the remapped signal, but GNOME still needs to know what to do with it. Open **Settings → Keyboard → Custom Shortcuts** and add a new entry:
+
+- **Name:** Claude (or whatever you want)
+- **Command:** `xdg-open https://claude.ai`
+- **Shortcut:** <kbd>Super</kbd> + <kbd>2</kbd>
+
+<Callout variant="warning" title="Don't Leave the Command Field Empty">
+  keyd will send the correct <kbd>Super</kbd> + <kbd>2</kbd> signal, but GNOME won't respond to it unless a command is actually set. An empty command field means nothing happens.
+</Callout>
+
+## Final Config
+
+```ini
+[ids]
+*
+
+[main]
+102nd = M-2
+```
+
+That's the complete working config. Because keyd runs as a systemd service, this remap persists across every reboot automatically — no startup scripts needed.
+
+---
+
+That idle key now has exactly one job: open Claude instantly, from wherever I am on the desktop. If you have a similar orphaned key on your keyboard, `keyd` is the cleanest way to put it to work on Linux — especially on Wayland. Just make sure the key name and modifier syntax are right from the start, and the rest takes care of itself.
+
+Have a different use case for keyd? I'd love to hear what you mapped. Drop a comment below.

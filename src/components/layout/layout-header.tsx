@@ -336,17 +336,12 @@ export function LayoutHeader({
     }
   }, [activeIndex]);
 
-  const ubuntuFocusHref =
-    currentLocale === "id"
-      ? "/blog/ubuntu-26-04-lts-resolute-raccoon-new-features-major-changes"
-      : "/blog/ubuntu-26-04-lts-resolute-raccoon-new-features-major-changes";
-
   const directLinks = useMemo(
     () => [
       { name: "Windows 11", href: "/tags/windows-11", icon: Monitor, badge: "25H2" },
-      { name: "Ubuntu 26.04", href: ubuntuFocusHref, icon: Terminal, badge: "LTS" },
+      { name: "Ubuntu 26.04", href: "/tags/ubuntu-26-04", icon: Terminal, badge: "LTS" },
     ],
-    [ubuntuFocusHref],
+    [],
   );
 
   // ── Curated Featured Topics — update manually each year ──

@@ -37,7 +37,7 @@ const cspDirectives = [
   // Fonts
   `font-src 'self' https://fonts.gstatic.com`,
 
-  // Images: self + data URIs + all HTTPS (AdSense serves tracking pixels)
+  // Images: self + data URIs + all HTTPS
   [
     `img-src`,
     `'self'`,
