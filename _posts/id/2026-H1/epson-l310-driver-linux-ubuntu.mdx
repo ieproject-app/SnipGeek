@@ -1,0 +1,167 @@
+---
+translationKey: "epson-l310-driver-linux-ubuntu"
+title: "Cara Install Driver Epson L310 di Ubuntu 25.10 — Panduan Lengkap"
+slug: "epson-l310-driver-linux-ubuntu"
+date: "2026-03-31"
+published: true
+featured: false
+heroImage: "/images/_posts/printer/epson/driver-epson-l310/epson-l310-banner.webp"
+imageAlt: "Printer Epson L310 terhubung ke laptop yang menjalankan Ubuntu 25.10"
+description: "Panduan install driver Epson L310 di Ubuntu 25.10 — download paket .deb, atasi error dependency lsb, tambah printer lewat GUI atau terminal, dan cetak halaman tes."
+category: "Printer"
+tags: ["linux", "ubuntu-25-10", "printer", "epson", "driver", "tutorial"]
+---
+
+Saya punya Epson L310 sejak 2018 — dan printer ini masih hidup, masih nyetak, masih setia. Sebelumnya sudah saya tulis soal [cara install driver L310 di Windows](/id/blog/epson-l310-driver-download-installer), dan prosesnya memang mudah sekali di sana: jalankan `.exe`, klik-klik, selesai.
+
+Tapi begitu saya dual-boot ke Ubuntu 25.10 dan butuh cetak sesuatu, langsung ketemu hambatan pertama: driver L310 tidak tersedia di repo Ubuntu sama sekali. Saya sudah menduga ini tidak akan semudah di Windows — tapi saya tidak menyangka akan ada error dependency yang sempat bikin saya panik sejenak.
+
+Ternyata masalahnya sepele. Dan setelah tahu solusinya, total prosesnya cuma sekitar dua puluh menit.
+
+---
+
+## Download Driver Epson L310 untuk Linux
+
+Ada dua sumber download. Saya sarankan pakai Google Drive dulu — website resmi Epson memang tersedia, tapi navigasinya cukup membingungkan dan mudah nyasar ke file yang salah.
+
+<DownloadButton id="driver-epson-l310-linux-gdrive" />
+
+<DownloadButton id="driver-epson-l310-linux-official" />
+
+<Callout variant="info" title="Kalau pakai website Epson resmi">
+  Buka link → ketik `L310` di kolom pencarian → pilih **Epson Inkjet Printer Driver for Linux** → download file `.deb` versi **amd64**.
+</Callout>
+
+Dari mana pun kamu download, hasilnya sama: file `.deb` di folder Downloads. Itu yang akan kita install.
+
+---
+
+## Install Driver-nya
+
+Setelah file ada, ada dua cara install: lewat App Center (GUI, lebih mudah) atau lewat terminal (lebih cepat kalau sudah tahu perintahnya).
+
+### Metode 1: Lewat App Center (GUI)
+
+<Steps>
+  <Step>
+
+  ### Buka Folder Downloads
+  Buka folder Downloads lewat file manager.
+
+  </Step>
+  <Step>
+
+  ### Double-Click File `.deb`
+  App Center Ubuntu akan terbuka otomatis dan menampilkan detail paket driver-nya.
+
+  </Step>
+  <Step>
+
+  ### Klik Install
+  Tekan **Install**, masukkan password kalau diminta, dan tunggu sampai selesai.
+
+  </Step>
+</Steps>
+
+### Metode 2: Lewat Terminal
+
+```bash
+cd ~/Downloads
+sudo dpkg -i epson-inkjet-printer-*.deb
+sudo apt install -f
+```
+
+Perintah `apt install -f` di baris terakhir berguna untuk menyelesaikan dependency yang mungkin tertinggal secara otomatis.
+
+<Callout variant="warning" title="Ubuntu 25.10 — Error Dependency lsb">
+  Kalau kamu pakai Ubuntu 25.10 ke atas, kemungkinan besar akan muncul error seperti ini:
+
+  ```
+  dpkg: dependency problems prevent configuration of epson-inkjet-printer-...
+  epson-inkjet-printer-... depends on lsb; however:
+  ```
+
+  Ini terjadi karena paket `lsb` sudah dihapus dari Ubuntu sejak versi 25.10 — tapi driver Epson belum diperbarui untuk menyesuaikan. Solusinya: paksa install dengan mengabaikan dependency tersebut:
+
+  ```bash
+  sudo dpkg -i --ignore-depends=lsb epson-inkjet-printer-*.deb
+  ```
+
+  Driver tetap berjalan normal tanpa `lsb`. Ini bukan error kritis — hanya sisa dependency lama dari Epson yang belum diupdate.
+</Callout>
+
+---
+
+## Tambah Printer ke Sistem Ubuntu
+
+Driver sudah terinstall, tapi Ubuntu belum tahu printer kamu ada. Kita perlu mendaftarkan printer-nya lewat aplikasi **Print Settings** — dan kalau belum terinstall, install dulu:
+
+```bash
+sudo apt install system-config-printer
+```
+
+Setelah terinstall, buka dan ikuti langkah berikut:
+
+<Steps>
+  <Step>
+
+  ### Buka Print Settings
+  Tekan <kbd>Super</kbd>, ketik **Print Settings**, lalu buka aplikasinya.
+
+  </Step>
+  <Step>
+
+  ### Klik Add
+  Tekan tombol **Add** untuk mulai mendeteksi printer yang terhubung.
+
+  </Step>
+  <Step>
+
+  ### Hubungkan Printer L310
+  Pastikan printer L310 sudah terhubung lewat **kabel USB** dan dalam kondisi **menyala**. Printer akan muncul di daftar secara otomatis.
+
+  </Step>
+  <Step>
+
+  ### Ikuti Wizard
+  Klik **Forward** sampai selesai. Ubuntu akan mencocokkan printer dengan driver Epson yang tadi kamu install.
+
+  </Step>
+  <Step>
+
+  ### Cetak Halaman Tes
+  Setelah wizard selesai, cetak **halaman tes** untuk memastikan semuanya berjalan normal.
+
+  </Step>
+</Steps>
+
+---
+
+## Pengaturan Printer yang Perlu Kamu Tahu
+
+Sama seperti di Windows, kualitas cetak L310 di Linux sangat dipengaruhi oleh mode yang kamu pilih. Saya selalu pakai mode **High** untuk dokumen penting — mode Standard hasilnya jauh lebih pudar.
+
+Buka pengaturan lewat Print Settings → klik kanan printer → **Properties**. Opsi yang paling sering saya ubah:
+
+- **Paper Size**: A4 (biasanya sudah benar secara default)
+- **Color Mode**: Berwarna atau Grayscale
+- **Print Quality**: Standard atau **High** — saya rekomendasikan High untuk hasil terbaik
+- **Orientation**: Portrait atau Landscape
+
+Kalau hasil cetak mulai bergaris atau ada bagian yang kosong, itu biasanya karena nozzle mengering. Pergi ke **Maintenance** → cek dengan **Nozzle Check** dulu, lalu jalankan **Head Cleaning** kalau memang ada masalah. Fungsinya identik dengan menu Maintenance di Windows.
+
+---
+
+## Dari Windows ke Ubuntu, L310 Tetap Setia
+
+Setup di Ubuntu memang butuh beberapa langkah ekstra dibanding Windows. Tapi begitu proses ini selesai, pengalaman cetaknya sama saja — printer jalan normal, kualitas bagus, tanpa drama.
+
+Error dependency `lsb` itu sempat bikin saya mikir ada yang salah. Ternyata cuma masalah paket legacy yang belum di-update sama Epson — dan satu flag `--ignore-depends` langsung beres.
+
+Kalau kamu ketemu error lain yang tidak ada di sini, tulis di kolom komentar ya. Saya akan coba bantu.
+
+---
+
+### Lihat Juga
+- [Download & Install Driver Epson L310 (Windows)](/id/blog/epson-l310-driver-download-installer)
+- [Resetter Epson L4150 / L4160 — Reset Ink Pad Counter](/id/blog/resetter-epson-l4150-l4160)
