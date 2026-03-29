@@ -247,9 +247,15 @@ matchLocale(languages, i18n.locales as string[], i18n.defaultLocale)
 - **DO NOT** arbitrarily change Tailwind colors in UI components
 - All color changes MUST go through `categoryColorMap`
 
-### Disqus (Comments)
-- Only active on the production domain (`snipgeek.com`)
-- It is normal for the comment section to not appear in development mode (IDE) — this is not a bug
+### Comments — Dual System (Giscus + Disqus)
+- Component: `src/components/blog/article-comments.tsx`
+- **Giscus** is the default tab — loads lazily via IntersectionObserver on scroll, works on production domain only (GitHub Discussions backend)
+- **Disqus** is the secondary "Legacy" tab — loads on-demand when the tab is clicked, production-only
+- Giscus theme is automatically synced with `useThemeMode().resolvedTheme` (`dark_dimmed` / `light`)
+- It is normal for both comment systems to not appear in development mode — this is not a bug
+- Env vars required: `NEXT_PUBLIC_GISCUS_REPO_ID`, `NEXT_PUBLIC_GISCUS_CATEGORY_ID`
+- Giscus config: repo `ieproject-app/SnipGeek`, category `Comments`, mapping `pathname`
+- **DO NOT** remove `disqus-react` from `package.json` — still used for the Disqus tab
 
 ### 🔴 Theme Mode — Use `useThemeMode()` Hook (MANDATORY)
 All theme cycling, persistence, and tooltip logic is centralised in `src/hooks/use-theme-mode.ts`.

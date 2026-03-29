@@ -32,3 +32,15 @@ env:
     availability:
       - BUILD
       - RUNTIME
+
+  - variable: NEXT_PUBLIC_GISCUS_REPO_ID
+    value: "R_kgDORdCsvw"
+    availability:
+      - BUILD
+      - RUNTIME
+
+  - variable: NEXT_PUBLIC_GISCUS_CATEGORY_ID
+    value: "DIC_kwDORdCsv84C5jj0"
+    availability:
+      - BUILD
+      - RUNTIME
