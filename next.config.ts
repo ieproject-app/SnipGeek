@@ -29,6 +29,9 @@ const cspDirectives = [
     `https://cdn.monetag.com`,                          // Monetag CDN
     `https://apis.google.com`,                         // Firebase Auth popup
     `https://*.firebaseapp.com`,                        // Firebase Auth handler
+    `https://giscus.app`,                               // Giscus comments
+    `https://*.disqus.com`,                             // Disqus comments
+    `https://*.disquscdn.com`,                          // Disqus CDN
   ].join(" "),
 
   // Styles: self + inline (Tailwind/CSS-in-JS needs unsafe-inline)
@@ -55,6 +58,8 @@ const cspDirectives = [
     `https://www.youtube-nocookie.com`,                 // YouTube privacy-enhanced
     `https://accounts.google.com`,                     // Firebase Auth
     `https://*.firebaseapp.com`,                       // Firebase Auth handler
+    `https://giscus.app`,                               // Giscus comments
+    `https://*.disqus.com`,                             // Disqus comments
   ].join(" "),
 
   // Connections: Firebase, Analytics, Monetag
@@ -70,6 +75,8 @@ const cspDirectives = [
     `https://region1.google-analytics.com`,            // GA4 regional
     `wss://*.firebaseio.com`,                          // Firebase realtime (websocket)
     `https://static.monetag.com`,                      // Monetag
+    `https://giscus.app`,                               // Giscus comments
+    `https://*.disqus.com`,                             // Disqus comments
   ].join(" "),
 
   // Media (audio/video): self + blob
