@@ -27,11 +27,11 @@ env:
       - BUILD
       - RUNTIME
 
-#  - variable: NEXT_PUBLIC_INTERNAL_TOOL_ALLOWLIST
-#    secret: INTERNAL_TOOL_ALLOWLIST
-#    availability:
-#      - BUILD
-#      - RUNTIME
+  - variable: NEXT_PUBLIC_INTERNAL_TOOL_ALLOWLIST
+    secret: INTERNAL_TOOL_ALLOWLIST
+    availability:
+      - BUILD
+      - RUNTIME
 
   - variable: NEXT_PUBLIC_GISCUS_REPO_ID
     value: "R_kgDORdCsvw"
