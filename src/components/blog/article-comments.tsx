@@ -166,7 +166,7 @@ export function ArticleComments({ article, type, locale }: ArticleCommentsProps)
               categoryId={GISCUS_CATEGORY_ID}
               mapping="pathname"
               strict="0"
-              reactionsEnabled="1"
+              reactionsEnabled="0"
               emitMetadata="0"
               inputPosition="bottom"
               theme={giscusTheme}
