@@ -148,7 +148,13 @@ export function ArticleComments({ article, type, locale }: ArticleCommentsProps)
       <div className="mt-4">
         {/* ─── GISCUS TAB ─────────────────────────────────────────────── */}
         <div className={activeTab === "giscus" ? "block" : "hidden"}>
-          {GISCUS_REPO_ID && GISCUS_CATEGORY_ID ? (
+          {!isProductionDomain ? (
+            <DevPlaceholder
+              canonicalUrl={canonicalUrl}
+              i18n={i18n}
+              productionHostname={productionHostname}
+            />
+          ) : GISCUS_REPO_ID && GISCUS_CATEGORY_ID ? (
             <Giscus
               repo={GISCUS_REPO}
               repoId={GISCUS_REPO_ID}

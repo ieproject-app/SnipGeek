@@ -16,7 +16,7 @@ SnipGeek is a bilingual (EN/ID) content platform for publishing technical articl
 - Reading time estimation
 - Fallback to EN when a locale-specific translation does not exist
 - Tag and category system with a colour-coded badge library (`category-badge.tsx`)
-- Disqus comments (production only)
+- Dual comment system: Giscus (default) + Disqus (legacy tab), rendered in production only
 
 ### 🌐 Internationalization (i18n)
 - Two locales: **English (`en`)** — default, no URL prefix — and **Indonesian (`id`)** — `/id/` prefix
@@ -292,7 +292,7 @@ The following HTTP headers are applied to all routes via `next.config.ts`:
 | Animations | Framer Motion + CSS View Transitions API |
 | i18n | Custom middleware + `@formatjs/intl-localematcher` |
 | Ads | Google AdSense (`lazyOnload` strategy) |
-| Comments | Disqus (production only) |
+| Comments | Giscus (default) & Disqus (legacy) |
 | Deployment | Firebase App Hosting (Google Cloud) |
 
 ---
@@ -314,4 +314,4 @@ const storage = getStorage(firebaseApp ?? undefined);
 
 ---
 
-*SnipGeek © 2025 — Iwan Efendi. All Rights Reserved.*
+*SnipGeek © 2026 — Iwan Efendi. All Rights Reserved.*
