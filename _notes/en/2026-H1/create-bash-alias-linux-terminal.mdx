@@ -1,0 +1,91 @@
+---
+title: "Stop Typing `npm run dev`: Create a Bash Alias in Linux"
+slug: "create-bash-alias-linux-terminal"
+translationKey: "create-bash-alias-linux-terminal"
+date: "2026-03-31"
+description: "Learn how to create a simple bash alias in your Linux terminal to save time and avoid typing long commands like npm run dev every single day."
+category: "terminal"
+tags: ["linux", "tutorial", "ubuntu", "setup", "bash"]
+published: true
+---
+
+One of the most repetitive things I do every day is opening a terminal, navigating to my project folder (`cd ~/Documents/SnipGeek`), and running `npm run dev`. It gets tiring to type the exact same string constantly.
+
+In Linux, you can create a bash **alias**—a permanent custom shortcut for any long command. Instead of typing that whole line, I just type `snipgeek` and the local server starts instantly. Here is how you can set it up for your own workflow.
+
+<Steps>
+  <Step>
+  ### Open your `.bashrc` file
+  The `.bashrc` file is a configuration script that Linux runs automatically every time you open a new terminal window. You can edit it directly using `nano`:
+  
+  ```bash
+  nano ~/.bashrc
+  ```
+  </Step>
+
+  <Step>
+  ### Add the alias command
+  Scroll all the way down to the bottom of the file. I usually leave a blank line before adding my custom aliases to keep the file visually structured. Add this exact line:
+  
+  ```bash
+  alias snipgeek="cd ~/Documents/SnipGeek && npm run dev"
+  ```
+  
+  Replace `snipgeek` with whatever shortcut name you prefer, and adjust the folder path to match your actual project repository location.
+  </Step>
+  
+  <Step>
+  ### Save and exit
+  Since we are using `nano`, you need to use keyboard combinations to save your changes:
+  - Press <kbd>Ctrl</kbd> + <kbd>O</kbd> to save.
+  - Press <kbd>Enter</kbd> to confirm the filename.
+  - Press <kbd>Ctrl</kbd> + <kbd>X</kbd> to exit the editor.
+  
+  I used to forget this flow and accidentally close the terminal without saving, so memorizing these shortcuts early is surprisingly helpful.
+  </Step>
+
+  <Step>
+  ### Apply the new configuration
+  By default, the terminal won't recognize your new alias until you close and reopen it. To apply the changes immediately without closing the current window, run:
+  
+  ```bash
+  source ~/.bashrc
+  ```
+  </Step>
+
+  <Step>
+  ### Test your new shortcut
+  Now you are done. From anywhere in your terminal, simply type your alias name:
+  
+  ```bash
+  snipgeek
+  ```
+  
+  ![Alias snipgeek terminal output](/images/_notes/npm-run-shortcut/npm-snipgeek.webp)
+  <div className="-mt-3 mb-6 text-center text-sm italic text-muted-foreground">My terminal quickly jumping to the main project directory and booting up the development server.</div>
+
+  If the directory path is correct, your terminal will instantly jump to the project folder and fire up the development server.
+  </Step>
+</Steps>
+
+<Callout variant="info" title="Using Zsh instead of Bash?">
+  If your system defaults to `zsh` instead of `bash` (you can check by running `echo $SHELL`), the configuration file is different. You need to edit `~/.zshrc` instead of `~/.bashrc`. The rest of the setup is exactly the same.
+</Callout>
+
+## More Alias Ideas
+
+If you have a habit of navigating to your specific folders manually, you can create a simpler alias just for starting the server:
+
+```bash
+alias dev="npm run dev"
+```
+
+You are not limited to one alias. I rely heavily on these short forms during busy days to handle quick Git operations or open my code editor seamlessly:
+
+```bash
+alias gs="git status"
+alias gp="git push"
+alias code.="code ."
+```
+
+Little things like this are what make working in Linux such a joy. You spend two minutes configuring things once, and it smoothly saves you time every single day. Give it a try, and tweak your own terminal space into something that perfectly fits your development habits!

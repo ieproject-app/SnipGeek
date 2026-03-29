@@ -1,0 +1,91 @@
+---
+title: "Bosan Ngetik `npm run dev`? Bikin Bash Alias di Linux"
+slug: "create-bash-alias-linux-terminal"
+translationKey: "create-bash-alias-linux-terminal"
+date: "2026-03-31"
+description: "Pusing mengetik perintah panjang seperti npm run dev berulang kali? Pelajari cara mudah membuat bash alias permanen di terminal Linux."
+category: "terminal"
+tags: ["linux", "tutorial", "ubuntu", "setup", "bash"]
+published: true
+---
+
+Salah satu hal paling berulang yang saya lakukan setiap hari adalah membuka terminal, masuk ke folder project (`cd ~/Documents/SnipGeek`), lalu menjalankan `npm run dev`. Awalnya memang terkesan biasa saja, tapi lama-lama rutinitas ini lumayan bikin capek juga.
+
+Di sistem operasi Linux, kamu bisa membuat bash **alias**—shortcut khusus yang bekerja permanen untuk menggantikan barisan perintah yang terlalu panjang. Sekarang alih-alih mengetik perintah secara utuh, saya cuma perlu mengetik `snipgeek` dan *local server* langsung menyala seketika. Setelan ini sangat mudah, begini cara mengatur alias buat laptopmu sendiri.
+
+<Steps>
+  <Step>
+  ### Buka file `.bashrc`
+  File `.bashrc` adalah skrip konfigurasi bawaan yang Linux jalankan secara otomatis setiap kali kamu membuka jendela terminal baru. Kamu bisa mengeditnya secara langsung menggunakan `nano`:
+  
+  ```bash
+  nano ~/.bashrc
+  ```
+  </Step>
+
+  <Step>
+  ### Tambahkan perintah alias
+  Scroll terus sampai ke baris paling bawah. Saya biasanya sengaja membiarkan satu baris kosong sebelum menambahkan daftar alias supaya kodenya tetap terlihat rapi dan tersetruktur. Tambahkan baris ini:
+  
+  ```bash
+  alias snipgeek="cd ~/Documents/SnipGeek && npm run dev"
+  ```
+  
+  Kamu bebas memodifikasi kata `snipgeek` dengan sebutan shortcut yang kamu mau, lalu sesuaikan awalan folder dengan lokasi penyimpanan projek aslimu.
+  </Step>
+  
+  <Step>
+  ### Simpan dan keluar
+  Karena kita mengedit memakai `nano`, proses menyimpannya memerlukan kombinasi menekan tombol *keyboard*:
+  - Tekan <kbd>Ctrl</kbd> + <kbd>O</kbd> untuk menyimpan.
+  - Tekan <kbd>Enter</kbd> untuk konfirmasi nama file.
+  - Tekan <kbd>Ctrl</kbd> + <kbd>X</kbd> untuk keluar dari teks editor.
+  
+  Dulu saya sempat bingung dan sering tidak sengaja menutup terminal tanpa sempat menyimpan, jadi mengingat kombinasi ini lumayan krusial buat ke depannya.
+  </Step>
+
+  <Step>
+  ### Terapkan konfigurasi baru
+  Secara bawaan, sistem tidak akan menyadari alias yang baru saja kamu tambahkan sampai kamu menutup lalu me-restart jendela terminalmu. Agar efeknya bisa langsung instan, jalankan perintah ini:
+  
+  ```bash
+  source ~/.bashrc
+  ```
+  </Step>
+
+  <Step>
+  ### Uji coba shortcut barumu
+  Selesai! Sekarang cukup ketikkan alias yang tadi sudah kamu buat dari lokasi terminal mana pun:
+  
+  ```bash
+  snipgeek
+  ```
+  
+  ![Eksekusi perintah bash alias snipgeek di dalam terminal](/images/_notes/npm-run-shortcut/npm-snipgeek.webp)
+  <div className="-mt-3 mb-6 text-center text-sm italic text-muted-foreground">Terminal saya memproses perintah masuk ke folder proyek sekaligus menyalakan development server.</div>
+
+  Bila letak foldernya sudah valid dalam file konfigurasimu, prosesnya seketika menuju folder tujuan dan menjalankan program yang diatur sedari tadi.
+  </Step>
+</Steps>
+
+<Callout variant="info" title="Memakai Zsh alih-alih Bash?">
+  Kalau sistem milikmu menetapkan `zsh` bukannya `bash` (bisa dipastikan lewat `echo $SHELL`), maka letak lokasi konfigurasinya bakalan berbeda. Kamu wajib memperbaharui elemen di dalam `~/.zshrc` bukan `~/.bashrc`. Setelah file itu terbuka, semua proses yang di bawahnya itu murni sama saja.
+</Callout>
+
+## Ide Alias Lainnya
+
+Kalau kamu memang mempunyai pola untuk menetapkan sendiri masuk ke dalam file tertentu, silakan buat alias pendek sekadar untuk nyalakan program pendukung:
+
+```bash
+alias dev="npm run dev"
+```
+
+Tentu alias ini tanpa batas tak terhingga jumlahnya. Saat sedang tenggelam dalam padatnya kode serta perombakan fitur revisi, setelan semacam ini bikin urusan buka Git atau teks editor bisa terasa lebih luwes:
+
+```bash
+alias gs="git status"
+alias gp="git push"
+alias code.="code ."
+```
+
+Perbaikan kecil semacam inilah yang membuat pengalaman bekerja dengan ekosistem Linux terasa begitu menyenangkan. Cukup meluangkan waktu dua menit di awal, lalu bisa mengantongi waktu ekstra yang dihemat setiap harinya. Silakan dicoba dan bereksperimenlah untuk meracik ruang terminalmu supaya makin pas dengan pola pemakaian kodingmu sehari-hari!
