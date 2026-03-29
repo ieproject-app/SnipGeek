@@ -5,6 +5,7 @@ import { getDictionary } from "@/lib/get-dictionary";
 import { TagListClient } from "./tag-list-client";
 import type { Metadata } from "next";
 import { shouldIndexTag } from "@/lib/tags";
+import { getLinkPrefix } from "@/lib/utils";
 
 export async function generateMetadata({
   params,
@@ -77,13 +78,60 @@ export default async function TagPage({
     n.frontmatter.tags?.some((t) => t.trim().toLowerCase() === decodedTag),
   );
 
+  const linkPrefix = getLinkPrefix(locale);
+  const canonicalUrl = `https://snipgeek.com${linkPrefix}/tags/${tag}`;
+  const displayTag = decodedTag.toUpperCase();
+
   return (
-    <TagListClient
-      posts={posts}
-      notes={filteredNotes}
-      dictionary={dictionary}
-      locale={locale}
-      decodedTag={decodedTag}
-    />
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "CollectionPage",
+            name: dictionary.tags.title.replace("{tag}", displayTag),
+            description: dictionary.tags.description.replace("{tag}", displayTag),
+            url: canonicalUrl,
+          }),
+        }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            itemListElement: [
+              {
+                "@type": "ListItem",
+                position: 1,
+                name: dictionary.home.breadcrumbHome,
+                item: "https://snipgeek.com" + (linkPrefix || "/"),
+              },
+              {
+                "@type": "ListItem",
+                position: 2,
+                name: dictionary.tags.allTagsTitle,
+                item: `https://snipgeek.com${linkPrefix}/tags`,
+              },
+              {
+                "@type": "ListItem",
+                position: 3,
+                name: displayTag,
+                item: canonicalUrl,
+              },
+            ],
+          }),
+        }}
+      />
+      <TagListClient
+        posts={posts}
+        notes={filteredNotes}
+        dictionary={dictionary}
+        locale={locale}
+        decodedTag={decodedTag}
+      />
+    </>
   );
 }

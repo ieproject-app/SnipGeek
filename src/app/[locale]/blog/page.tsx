@@ -4,6 +4,7 @@ import type { Locale } from "@/i18n-config";
 import { getDictionary } from "@/lib/get-dictionary";
 import { BlogListClient } from "./blog-list-client";
 import type { Metadata } from "next";
+import { getLinkPrefix } from "@/lib/utils";
 
 export async function generateStaticParams() {
   return i18n.locales.map((locale) => ({ locale }));
@@ -46,12 +47,50 @@ export default async function BlogPage({
   const { locale } = await params;
   const initialPosts = await getSortedPostsData(locale);
   const dictionary = await getDictionary(locale);
+  const linkPrefix = getLinkPrefix(locale);
 
   return (
-    <BlogListClient
-      initialPosts={initialPosts}
-      dictionary={dictionary}
-      locale={locale}
-    />
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "CollectionPage",
+            name: dictionary.blog.title,
+            description: dictionary.blog.description,
+            url: `https://snipgeek.com${linkPrefix}/blog`,
+          }),
+        }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            itemListElement: [
+              {
+                "@type": "ListItem",
+                position: 1,
+                name: dictionary.home.breadcrumbHome,
+                item: "https://snipgeek.com" + (linkPrefix || "/"),
+              },
+              {
+                "@type": "ListItem",
+                position: 2,
+                name: dictionary.navigation.blog,
+                item: `https://snipgeek.com${linkPrefix}/blog`,
+              },
+            ],
+          }),
+        }}
+      />
+      <BlogListClient
+        initialPosts={initialPosts}
+        dictionary={dictionary}
+        locale={locale}
+      />
+    </>
   );
 }

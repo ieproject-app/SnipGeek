@@ -57,6 +57,41 @@ export default async function TagsPage({
 
     return (
         <div className="w-full">
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{
+                    __html: JSON.stringify({
+                        "@context": "https://schema.org",
+                        "@type": "CollectionPage",
+                        name: dictionary.tags.allTagsTitle,
+                        description: dictionary.tags.allTagsDescription,
+                        url: `https://snipgeek.com${linkPrefix}/tags`,
+                    }),
+                }}
+            />
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{
+                    __html: JSON.stringify({
+                        "@context": "https://schema.org",
+                        "@type": "BreadcrumbList",
+                        itemListElement: [
+                            {
+                                "@type": "ListItem",
+                                position: 1,
+                                name: dictionary.home.breadcrumbHome,
+                                item: "https://snipgeek.com" + (linkPrefix || "/"),
+                            },
+                            {
+                                "@type": "ListItem",
+                                position: 2,
+                                name: dictionary.tags.allTagsTitle,
+                                item: `https://snipgeek.com${linkPrefix}/tags`,
+                            },
+                        ],
+                    }),
+                }}
+            />
             <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-16 sm:pb-24">
                 <header className="mb-12 text-center">
                     <LayoutBreadcrumbs
