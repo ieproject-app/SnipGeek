@@ -463,7 +463,6 @@ export function ToolHistory({
         title={toolMeta.title}
         description={toolMeta.description}
         dictionary={dictionary}
-        isPublic={false}
       >
         <div className="space-y-12">
           {(isAdminLoading || isAdminUser) && (
