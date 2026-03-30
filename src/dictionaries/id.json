@@ -446,6 +446,72 @@
     "stockGenerated": "Berhasil generate {count} nomor",
     "logoutSuccess": "Berhasil keluar",
     "authNotReady": "Sistem login belum siap. Silakan coba lagi.",
-    "loginError": "Gagal masuk. Silakan periksa koneksi Anda."
+    "loginError": "Gagal masuk. Silakan periksa koneksi Anda.",
+    "limitReached": "Batas penggunaan tercapai. Silakan coba lagi dalam 10 menit."
+  },
+  "laptopServiceEstimator": {
+    "title": "Estimasi Servis Laptop",
+    "description": "Pilih jenis servis & AI akan menghitung biaya secara instan.",
+    "steps": {
+      "a": {
+        "badge": "Langkah Pertama",
+        "title": "Informasi Laptop",
+        "brandLabel": "Merek Laptop",
+        "brandPlaceholder": "cth: Asus, Lenovo, HP...",
+        "modelLabel": "Seri / Model",
+        "modelOptional": "(opsional)",
+        "modelPlaceholder": "cth: VivoBook 14 A416...",
+        "modelHint": "Sertakan seri spesifik agar spek AI lebih akurat."
+      },
+      "b": {
+        "badge": "Keluhan Pelanggan",
+        "title": "Apa Masalahnya?",
+        "labelProblem": "Detail Keluhan",
+        "placeholder": "cth: Laptop lemot, keyboard tidak berfungsi, sering mati sendiri...",
+        "labelHistory": "Riwayat Part / Servis Lab",
+        "placeholderHistory": "cth: Pernah ganti baterai 2023, ganti SSD 1 tahun lalu..."
+      },
+      "c": {
+        "badge": "Layanan Diperlukan",
+        "title": "Pilih Jenis Servis",
+        "selectedCount": "{count}/5 DIPILIH",
+        "priceLabel": "Estimasi Jasa"
+      }
+    },
+    "services": {
+      "thermal": { "label": "Ganti Thermal Paste", "desc": "Aplikasi thermal paste baru untuk CPU/GPU" },
+      "cleaning": { "label": "Cleaning Internal", "desc": "Bersih fan, heatsink, dan debu internal" },
+      "ram": { "label": "Jasa Upgrade RAM", "desc": "Pasang/ganti modul RAM (belum termasuk part)" },
+      "ssd": { "label": "Jasa Upgrade SSD/HDD", "desc": "Pasang storage (include instal OS dasar)" },
+      "os": { "label": "Instal Ulang OS", "desc": "Windows/Linux, include driver & software standar" },
+      "screen": { "label": "Jasa Ganti Layar", "desc": "Bongkar pasang panel (cek ketersediaan part)" },
+      "keyboard": { "label": "Jasa Ganti Keyboard", "desc": "Bongkar pasang keyboard laptop" },
+      "repair": { "label": "Repair Hardware Minor", "desc": "Perbaikan komponen (IC, port, dll)" },
+      "diagnosa_ai": { "label": "Diagnosa & Estimasi AI", "desc": "Pilih ini jika tidak tahu masalahnya" }
+    },
+    "form": {
+      "submit": "Hitung Estimasi dengan AI",
+      "submitHint": "Isi merek laptop dan pilih minimal satu servis untuk melanjutkan.",
+      "loadingTitle": "AI sedang menganalisis...",
+      "loadingDesc": "Mencari spesifikasi laptop dan menghitung estimasi biaya servis."
+    },
+    "result": {
+      "status": "Estimasi Selesai",
+      "verified": "Terverifikasi",
+      "unverified": "Laptop",
+      "unverifiedDesc": "Detail perangkat dikonfirmasi saat konsultasi via WhatsApp.",
+      "specsTitle": "Spesifikasi Umum",
+      "priceDetails": "Rincian Harga Jasa",
+      "totalEstimate": "Total Estimasi",
+      "totalNote": "Biaya jasa saja, belum termasuk part",
+      "disclaimer": "Harga di atas adalah estimasi biaya jasa saja. Harga komponen/spare part belum termasuk. Harga final dikonfirmasi setelah pemeriksaan perangkat secara langsung.",
+      "whatsappButton": "Konsultasi via WhatsApp",
+      "recalculate": "Hitung Ulang",
+      "waGreeting": "Halo, saya mau konsultasi servis laptop mas iwan,",
+      "waProblem": "Kendala:",
+      "waHistoryLabel": "Riwayat:",
+      "waRequired": "Servis yang dibutuhkan:",
+      "waVerifiedLabel": "Laptop Terverifikasi"
+    }
   }
 }

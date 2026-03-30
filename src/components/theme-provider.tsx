@@ -6,6 +6,24 @@ import { ThemeProvider as NextThemesProvider } from "next-themes";
 type ThemeProviderProps = React.ComponentProps<typeof NextThemesProvider>;
 import { STORAGE_KEYS } from "@/lib/constants";
 
+// Suppress the React 19 false-positive warning about <script> tags rendered by
+// next-themes. The library injects the script via DOM APIs — not JSX — so it
+// is safe. This can be removed once next-themes ships a React 19-compatible
+// release that uses <template> instead.
+const _origConsoleError = typeof console !== "undefined" ? console.error.bind(console) : null;
+if (typeof console !== "undefined") {
+  console.error = (...args: unknown[]) => {
+    if (
+      typeof args[0] === "string" &&
+      args[0].includes("script") &&
+      args[0].includes("template tag")
+    ) {
+      return;
+    }
+    _origConsoleError?.(...args);
+  };
+}
+
 export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
   React.useEffect(() => {
     // Check for manual theme override expiration

@@ -446,6 +446,72 @@
     "stockGenerated": "Successfully generated {count} numbers",
     "logoutSuccess": "Signed out successfully",
     "authNotReady": "Login system is not ready. Please try again.",
-    "loginError": "Failed to sign in. Please check your connection."
+    "loginError": "Failed to sign in. Please check your connection.",
+    "limitReached": "Usage limit reached. Please try again in 10 minutes."
+  },
+  "laptopServiceEstimator": {
+    "title": "Laptop Service Estimator",
+    "description": "Select service types & AI will calculate costs instantly.",
+    "steps": {
+      "a": {
+        "badge": "First Step",
+        "title": "Device Identity",
+        "brandLabel": "Laptop Brand",
+        "brandPlaceholder": "e.g., Asus, Lenovo, HP...",
+        "modelLabel": "Series / Model",
+        "modelOptional": "(optional)",
+        "modelPlaceholder": "e.g., VivoBook 14 A416...",
+        "modelHint": "Include specific series (e.g., X441U) for more accurate AI specs."
+      },
+      "b": {
+        "badge": "Customer Complaint",
+        "title": "What's the Problem?",
+        "labelProblem": "Complaint Detail",
+        "placeholder": "e.g., Laptop is slow, keyboard not working, frequent restarts...",
+        "labelHistory": "Parts / Service History",
+        "placeholderHistory": "e.g., Battery replaced 2023, SSD changed 1 year ago..."
+      },
+      "c": {
+        "badge": "Required Service",
+        "title": "Select Service Types",
+        "selectedCount": "{count}/5 SELECTED",
+        "priceLabel": "Service Fee"
+      }
+    },
+    "services": {
+      "thermal": { "label": "Ganti Thermal Paste", "desc": "New thermal paste for CPU/GPU" },
+      "cleaning": { "label": "Cleaning Internal", "desc": "Clean fan, heatsink, and internal dust" },
+      "ram": { "label": "Jasa Upgrade RAM", "desc": "Install/replace RAM (parts not included)" },
+      "ssd": { "label": "Jasa Upgrade SSD/HDD", "desc": "Install storage (includes base OS install)" },
+      "os": { "label": "Instal Ulang OS", "desc": "Windows/Linux, include basic software" },
+      "screen": { "label": "Jasa Ganti Layar", "desc": "Replace screen panel (part check required)" },
+      "keyboard": { "label": "Jasa Ganti Keyboard", "desc": "Replace laptop keyboard" },
+      "diagnosa": { "label": "Diagnosa Hardware", "desc": "Full check and defect identification" },
+      "repair": { "label": "Repair Hardware Minor", "desc": "Minor component fix (IC, ports, etc.)" }
+    },
+    "form": {
+      "submit": "Calculate Estimate with AI",
+      "submitHint": "Enter laptop brand and select at least one service to continue.",
+      "loadingTitle": "AI is analyzing...",
+      "loadingDesc": "Searching for laptop specs and calculating service costs."
+    },
+    "result": {
+      "status": "Estimate Ready",
+      "verified": "Verified",
+      "unverified": "Laptop",
+      "unverifiedDesc": "Device details will be confirmed during consultation via WhatsApp.",
+      "specsTitle": "General Specifications",
+      "priceDetails": "Service Price Details",
+      "totalEstimate": "Total Estimated Cost",
+      "totalNote": "Service fees only, parts not included",
+      "disclaimer": "Prices above are estimated service fees only. Component/spare part prices are not included. Final price will be confirmed after physical device inspection.",
+      "whatsappButton": "Consult via WhatsApp",
+      "recalculate": "Recalculate",
+      "waGreeting": "Hi, I'd like to consult about laptop service with Mas Iwan,",
+      "waProblem": "Complaint:",
+      "waHistoryLabel": "History:",
+      "waRequired": "Services required:",
+      "waVerifiedLabel": "Verified Laptop"
+    }
   }
 }
