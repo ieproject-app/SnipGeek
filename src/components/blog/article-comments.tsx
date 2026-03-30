@@ -1,14 +1,12 @@
 "use client";
 
 import Giscus from "@giscus/react";
-import { DiscussionEmbed } from "disqus-react";
 import { useState, useEffect, useRef } from "react";
 import { MessageSquare, ShieldCheck, ExternalLink } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useThemeMode } from "@/hooks/use-theme-mode";
 
 const productionHostname = "snipgeek.com";
-const disqusShortname = "snipgeek-com";
 
 const GISCUS_REPO = "ieproject-app/SnipGeek" as const;
 const GISCUS_REPO_ID = process.env.NEXT_PUBLIC_GISCUS_REPO_ID || "";
@@ -25,9 +23,7 @@ interface ArticleCommentsProps {
 }
 
 export function ArticleComments({ article, type, locale }: ArticleCommentsProps) {
-  const [activeTab, setActiveTab] = useState<"giscus" | "disqus">("giscus");
   const [giscusVisible, setGiscusVisible] = useState(false);
-  const [disqusLoaded, setDisqusLoaded] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [isProductionDomain, setIsProductionDomain] = useState(false);
   const commentsRef = useRef<HTMLDivElement>(null);
@@ -66,11 +62,6 @@ export function ArticleComments({ article, type, locale }: ArticleCommentsProps)
     return () => observer.disconnect();
   }, []);
 
-  const handleDisqusTabClick = () => {
-    setActiveTab("disqus");
-    setDisqusLoaded(true);
-  };
-
   const canonicalUrl = `https://${productionHostname}/${type}/${article.slug}`;
 
   const i18n = {
@@ -92,25 +83,16 @@ export function ArticleComments({ article, type, locale }: ArticleCommentsProps)
         ? "Untuk menjaga thread tetap konsisten, area komentar hanya dimuat di domain produksi."
         : "To keep threads consistent, the comments area only loads on the production domain.",
     openLive: locale === "id" ? "Buka versi live" : "Open live version",
-    tabGiscus: "Giscus",
-    tabDisqus: "Disqus",
-    legacy: "Legacy",
   };
 
   // ─── Skeleton (before mounted OR waiting for intersection) ───────────────
-  if (!mounted || (!giscusVisible && activeTab === "giscus")) {
+  if (!mounted || !giscusVisible) {
     return (
       <section
         ref={commentsRef}
         className="mt-16 border-t border-primary/10 pt-12 animate-in fade-in duration-700"
       >
         <CommentsHeader title={i18n.discussion} subtitle={i18n.preparing} />
-        <TabBar
-          activeTab={activeTab}
-          onGiscus={() => setActiveTab("giscus")}
-          onDisqus={handleDisqusTabClick}
-          i18n={i18n}
-        />
         <div className="space-y-8 rounded-2xl border border-primary/10 bg-card/40 p-6 shadow-sm mt-4">
           <div className="flex items-start gap-4">
             <Skeleton className="h-10 w-10 shrink-0 rounded-full" data-variant="static" />
@@ -142,62 +124,31 @@ export function ArticleComments({ article, type, locale }: ArticleCommentsProps)
     >
       <CommentsHeader title={i18n.discussion} subtitle={i18n.subtitle} />
 
-      <TabBar
-        activeTab={activeTab}
-        onGiscus={() => setActiveTab("giscus")}
-        onDisqus={handleDisqusTabClick}
-        i18n={i18n}
-      />
-
       <div className="mt-4">
-        {/* ─── GISCUS TAB ─────────────────────────────────────────────── */}
-        <div className={activeTab === "giscus" ? "block" : "hidden"}>
-          {!isProductionDomain ? (
-            <DevPlaceholder
-              canonicalUrl={canonicalUrl}
-              i18n={i18n}
-              productionHostname={productionHostname}
-            />
-          ) : GISCUS_REPO_ID && GISCUS_CATEGORY_ID ? (
-            <Giscus
-              repo={GISCUS_REPO}
-              repoId={GISCUS_REPO_ID}
-              category={GISCUS_CATEGORY}
-              categoryId={GISCUS_CATEGORY_ID}
-              mapping="pathname"
-              strict="0"
-              reactionsEnabled="0"
-              emitMetadata="0"
-              inputPosition="bottom"
-              theme={giscusTheme}
-              lang="id"
-              loading="lazy"
-            />
-          ) : (
-            <EnvMissingNotice />
-          )}
-        </div>
-
-        {/* ─── DISQUS TAB ─────────────────────────────────────────────── */}
-        <div className={activeTab === "disqus" ? "block" : "hidden"}>
-          {disqusLoaded && isProductionDomain ? (
-            <DiscussionEmbed
-              shortname={disqusShortname}
-              config={{
-                url: canonicalUrl,
-                identifier: article.slug,
-                title: article.title,
-                language: locale,
-              }}
-            />
-          ) : disqusLoaded && !isProductionDomain ? (
-            <DevPlaceholder
-              canonicalUrl={canonicalUrl}
-              i18n={i18n}
-              productionHostname={productionHostname}
-            />
-          ) : null}
-        </div>
+        {!isProductionDomain ? (
+          <DevPlaceholder
+            canonicalUrl={canonicalUrl}
+            i18n={i18n}
+            productionHostname={productionHostname}
+          />
+        ) : GISCUS_REPO_ID && GISCUS_CATEGORY_ID ? (
+          <Giscus
+            repo={GISCUS_REPO}
+            repoId={GISCUS_REPO_ID}
+            category={GISCUS_CATEGORY}
+            categoryId={GISCUS_CATEGORY_ID}
+            mapping="pathname"
+            strict="0"
+            reactionsEnabled="0"
+            emitMetadata="0"
+            inputPosition="bottom"
+            theme={giscusTheme}
+            lang="id"
+            loading="lazy"
+          />
+        ) : (
+          <EnvMissingNotice />
+        )}
       </div>
     </section>
   );
@@ -215,40 +166,6 @@ function CommentsHeader({ title, subtitle }: { title: string; subtitle: string }
         <h3 className="text-lg font-semibold tracking-tight text-primary">{title}</h3>
         <p className="text-sm text-muted-foreground">{subtitle}</p>
       </div>
-    </div>
-  );
-}
-
-interface TabBarProps {
-  activeTab: "giscus" | "disqus";
-  onGiscus: () => void;
-  onDisqus: () => void;
-  i18n: { tabGiscus: string; tabDisqus: string; legacy: string };
-}
-
-function TabBar({ activeTab, onGiscus, onDisqus, i18n }: TabBarProps) {
-  return (
-    <div className="flex gap-2">
-      <button
-        onClick={onGiscus}
-        className={`inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-bold uppercase tracking-wider transition-all duration-200 ${
-          activeTab === "giscus"
-            ? "bg-primary text-primary-foreground shadow-sm"
-            : "border border-primary/15 text-muted-foreground hover:border-primary/30 hover:text-primary"
-        }`}
-      >
-        {i18n.tabGiscus}
-      </button>
-      <button
-        onClick={onDisqus}
-        className={`inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-bold uppercase tracking-wider transition-all duration-200 ${
-          activeTab === "disqus"
-            ? "bg-primary text-primary-foreground shadow-sm"
-            : "border border-primary/15 text-muted-foreground hover:border-primary/30 hover:text-primary"
-        }`}
-      >
-        {i18n.tabDisqus}
-      </button>
     </div>
   );
 }

@@ -30,13 +30,10 @@ const cspDirectives = [
     `https://apis.google.com`,                         // Firebase Auth popup
     `https://*.firebaseapp.com`,                        // Firebase Auth handler
     `https://giscus.app`,                               // Giscus comments
-    `https://disqus.com`,                               // Disqus base
-    `https://*.disqus.com`,                             // Disqus comments
-    `https://*.disquscdn.com`,                          // Disqus CDN
   ].join(" "),
 
   // Styles: self + inline (Tailwind/CSS-in-JS needs unsafe-inline)
-  `style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://*.disquscdn.com https://*.disqus.com`,
+  `style-src 'self' 'unsafe-inline' https://fonts.googleapis.com`,
 
   // Fonts
   `font-src 'self' https://fonts.gstatic.com`,
@@ -60,8 +57,6 @@ const cspDirectives = [
     `https://accounts.google.com`,                     // Firebase Auth
     `https://*.firebaseapp.com`,                       // Firebase Auth handler
     `https://giscus.app`,                               // Giscus comments
-    `https://disqus.com`,                               // Disqus base
-    `https://*.disqus.com`,                             // Disqus comments
   ].join(" "),
 
   // Connections: Firebase, Analytics, Monetag
@@ -78,8 +73,6 @@ const cspDirectives = [
     `wss://*.firebaseio.com`,                          // Firebase realtime (websocket)
     `https://static.monetag.com`,                      // Monetag
     `https://giscus.app`,                               // Giscus comments
-    `https://disqus.com`,                               // Disqus base
-    `https://*.disqus.com`,                             // Disqus comments
   ].join(" "),
 
   // Media (audio/video): self + blob
