@@ -16,7 +16,7 @@ SnipGeek is a bilingual (EN/ID) content platform for publishing technical articl
 - Reading time estimation
 - Fallback to EN when a locale-specific translation does not exist
 - Tag and category system with a colour-coded badge library (`category-badge.tsx`)
-- Dual comment system: Giscus (default) + Disqus (legacy tab), rendered in production only
+- Giscus comment system (GitHub Discussions), lazy-loaded on scroll, production-only
 
 ### 🌐 Internationalization (i18n)
 - Two locales: **English (`en`)** — default, no URL prefix — and **Indonesian (`id`)** — `/id/` prefix
@@ -292,7 +292,7 @@ The following HTTP headers are applied to all routes via `next.config.ts`:
 | Animations | Framer Motion + CSS View Transitions API |
 | i18n | Custom middleware + `@formatjs/intl-localematcher` |
 | Ads | Google AdSense (`lazyOnload` strategy) |
-| Comments | Giscus (default) & Disqus (legacy) |
+| Comments | Giscus (GitHub Discussions) |
 | Deployment | Firebase App Hosting (Google Cloud) |
 
 ---
@@ -313,5 +313,23 @@ const storage = getStorage(firebaseApp ?? undefined);
 ```
 
 ---
+---
 
-*SnipGeek © 2026 — Iwan Efendi. All Rights Reserved.*
+## 📄 License
+
+This project uses a **dual license** — please read carefully:
+
+### Source Code — MIT License
+All application code in this repository (under `src/`, config files, etc.) is licensed under the **MIT License**.
+See the [`LICENSE`](./LICENSE) file for the full terms.
+
+### Content — All Rights Reserved
+All written content, articles, and notes — including everything under `_posts/`, `_notes/`, and `_pages/` — are the exclusive intellectual property of **SnipGeek (snipgeek.com)**.
+
+You may **NOT** reproduce, republish, or create derivative works from this content without explicit written permission.
+
+For inquiries: hello@snipgeek.com
+
+---
+
+*SnipGeek &copy; 2026 — Iwan Efendi. All Rights Reserved.*
