@@ -461,7 +461,10 @@
         "modelLabel": "Series / Model",
         "modelOptional": "(optional)",
         "modelPlaceholder": "e.g., VivoBook 14 A416...",
-        "modelHint": "Include specific series (e.g., X441U) for more accurate AI specs."
+        "modelHint": "Include specific series (e.g., X441U) for more accurate AI specs.",
+        "scanLabelBtn": "Scan Laptop Label",
+        "scanOr": "or",
+        "scanHint": "Don't know the model? Upload a photo of the label on the bottom of the laptop."
       },
       "b": {
         "badge": "Customer Complaint",

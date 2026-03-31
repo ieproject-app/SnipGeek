@@ -62,31 +62,37 @@ export async function generateMetadata({
     keywords: seo.keywords,
     alternates: {
       canonical: canonicalPath,
-      languages: {
-        ...languages,
-        'x-default': languages[i18n.defaultLocale] || canonicalPath,
-      },
+      languages: { ...languages, "x-default": languages[i18n.defaultLocale] || currentPrefix },
     },
     openGraph: {
-      type: 'website',
-      url: `https://snipgeek.com${canonicalPath}`,
-      siteName: 'SnipGeek',
+      type: "website",
+      url: `https://snipgeek.com${currentPrefix}/tools/random-name-picker`,
       title: seo.title,
       description: seo.description,
       images: [
         {
-          url: 'https://snipgeek.com/opengraph-image',
+          url: "https://snipgeek.com/opengraph-image",
           width: 1200,
           height: 630,
-          alt: 'Random Name Picker – SnipGeek Tools',
+          alt: seo.title,
         },
       ],
     },
     twitter: {
-      card: 'summary_large_image',
+      card: "summary_large_image",
       title: seo.title,
       description: seo.description,
-      images: ['https://snipgeek.com/opengraph-image'],
+    },
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        "max-video-preview": -1,
+        "max-image-preview": "large",
+        "max-snippet": -1,
+      },
     },
   };
 }

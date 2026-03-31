@@ -16,20 +16,36 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/privacy",
     "/terms",
     "/disclaimer",
+    "/tools",
+  ];
+
+  // Tools routes yang ingin diindeks
+  const toolRoutes = [
+    "laptop-service-estimator",
+    "bios-keys-boot-menu",
+    "spin-wheel",
+    "random-name-picker",
   ];
 
   // 1. Static Routes
   const staticEntries: MetadataRoute.Sitemap = i18n.locales.flatMap(
     (locale) => {
-      return routes.map((route) => {
-        const localePrefix = locale === i18n.defaultLocale ? "" : `/${locale}`;
-        return {
-          url: `${DOMAIN}${localePrefix}${route}`,
-          lastModified: new Date(),
-          changeFrequency: "weekly" as const,
-          priority: route === "" ? 1 : 0.8,
-        };
-      });
+      const localePrefix = locale === i18n.defaultLocale ? "" : `/${locale}`;
+      const mainRoutes = routes.map((route) => ({
+        url: `${DOMAIN}${localePrefix}${route}`,
+        lastModified: new Date(),
+        changeFrequency: "weekly" as const,
+        priority: route === "" ? 1 : route === "/tools" ? 0.9 : 0.8,
+      }));
+      
+      const toolPages = toolRoutes.map((tool) => ({
+        url: `${DOMAIN}${localePrefix}/tools/${tool}`,
+        lastModified: new Date(),
+        changeFrequency: "monthly" as const,
+        priority: 0.7,
+      }));
+      
+      return [...mainRoutes, ...toolPages];
     },
   );
 

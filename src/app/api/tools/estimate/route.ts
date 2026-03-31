@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { checkRateLimit } from '@/lib/rate-limit'
 
 interface LaptopInfo {
   found: boolean
@@ -15,6 +16,9 @@ interface ServiceItem {
   note: string
   min: number
   max: number
+  discounted?: boolean
+  originalMin?: number
+  originalMax?: number
 }
 
 interface EstimateResponse {
@@ -23,6 +27,7 @@ interface EstimateResponse {
   total_min: number
   total_max: number
   notes: string
+  bundleDiscount?: boolean
 }
 
 interface ServiceDefinition {
@@ -133,33 +138,43 @@ const SERVICE_ALIASES: Record<string, string> = {
   'diagnosa & estimasi ai': 'diagnosa',
 }
 
-// ─── In-memory rate limiter ───────────────────────────────────────────────────
-// Max 5 requests per 10 menit per IP
-const RATE_LIMIT_MAX = 5
-const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000 // 10 menit
+// ─── Grup Bongkaran Internal ──────────────────────────────────────────────────
+// Servis yang butuh buka casing laptop — jika dikerjakan bersamaan, 
+// teknisi hanya bongkar 1x sehingga layak diberi diskon jasa.
+const BONGKARAN_GROUP = new Set(['thermal', 'cleaning', 'ram', 'ssd'])
 
-interface RateLimitEntry {
-  count: number
-  resetAt: number
-}
+// Diskon: servis ke-2 = 25% off, servis ke-3+ = 50% off
+function applyBundleDiscount(items: { id: string; service: string; note: string; min: number; max: number }[]): ServiceItem[] {
+  const bongkaranItems = items.filter(i => BONGKARAN_GROUP.has(i.id))
+  const otherItems = items.filter(i => !BONGKARAN_GROUP.has(i.id))
 
-const ipStore = new Map<string, RateLimitEntry>()
+  let bongkaranIdx = 0
+  const discountedBongkaran: ServiceItem[] = bongkaranItems.map((item) => {
+    bongkaranIdx++
+    if (bongkaranItems.length < 2 || bongkaranIdx === 1) {
+      // Pertama atau hanya 1 item bongkaran: harga penuh
+      return { service: item.service, note: item.note, min: item.min, max: item.max }
+    }
+    // Servis ke-2: diskon 25%, ke-3+: diskon 50%
+    const discountRate = bongkaranIdx === 2 ? 0.25 : 0.50
+    const discountedMin = Math.round(item.min * (1 - discountRate))
+    const discountedMax = Math.round(item.max * (1 - discountRate))
+    return {
+      service: item.service,
+      note: item.note ? `${item.note} (Diskon bundel bongkaran -${discountRate * 100}%)` : `Diskon bundel bongkaran -${discountRate * 100}%`,
+      min: discountedMin,
+      max: discountedMax,
+      discounted: true,
+      originalMin: item.min,
+      originalMax: item.max,
+    }
+  })
 
-function checkRateLimit(ip: string): boolean {
-  const now = Date.now()
-  const entry = ipStore.get(ip)
+  const otherMapped: ServiceItem[] = otherItems.map(item => ({
+    service: item.service, note: item.note, min: item.min, max: item.max,
+  }))
 
-  if (!entry || now > entry.resetAt) {
-    ipStore.set(ip, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS })
-    return true
-  }
-
-  if (entry.count >= RATE_LIMIT_MAX) {
-    return false
-  }
-
-  entry.count++
-  return true
+  return [...discountedBongkaran, ...otherMapped]
 }
 
 function normalizeServiceKey(value: string): string | null {
@@ -211,12 +226,16 @@ function buildFallbackEstimate(
   services: string[]
 ): EstimateResponse {
   const inferredServices = inferServices(complaint, history, services)
-  const items = inferredServices.map((service) => ({
+  const rawItems = inferredServices.map((service) => ({
+    id: service.id,
     service: service.label,
     note: service.note,
     min: service.min,
     max: service.max,
   }))
+
+  const items = applyBundleDiscount(rawItems)
+  const hasBundleDiscount = items.some(i => i.discounted)
 
   const total_min = items.reduce((sum, item) => sum + item.min, 0)
   const total_max = items.reduce((sum, item) => sum + item.max, 0)
@@ -228,7 +247,10 @@ function buildFallbackEstimate(
     history
       ? 'Riwayat servis/part sebelumnya ikut dipakai sebagai konteks awal untuk meminimalkan estimasi yang terlalu umum.'
       : 'Jika ada riwayat ganti part atau servis sebelumnya, sampaikan saat konsultasi agar estimasi bisa dipersempit.',
-  ].join(' ')
+    hasBundleDiscount
+      ? 'Diskon bundel bongkaran sudah diterapkan karena beberapa servis dikerjakan dalam satu kali buka casing.'
+      : '',
+  ].filter(Boolean).join(' ')
 
   return {
     laptop: model
@@ -244,6 +266,7 @@ function buildFallbackEstimate(
     total_min,
     total_max,
     notes,
+    bundleDiscount: hasBundleDiscount,
   }
 }
 
@@ -288,7 +311,27 @@ MASTER HARGA JASA (ikuti range ini):
 - Diagnosa & Estimasi: GRATIS
 - Repair Hardware Minor: Rp 150.000 – Rp 350.000
 
-Catatan: Diagnosa & Estimasi WAJIB diberi harga GRATIS, agar pelanggan tidak ragu konsultasi.
+SISTEM DISKON BUNDEL BONGKARAN:
+Servis berikut termasuk dalam SATU GRUP "bongkaran internal" (buka casing laptop):
+- Ganti Thermal Paste
+- Cleaning Internal
+- Jasa Upgrade RAM
+- Jasa Upgrade SSD/HDD
+
+Jika estimasi hasil analisa menghasilkan 2 atau lebih servis dari grup bongkaran di atas, berlakukan DISKON BUNDEL:
+- Servis bongkaran pertama: HARGA PENUH
+- Servis bongkaran ke-2: diskon 25% dari harga min DAN max
+- Servis bongkaran ke-3 dan seterusnya: diskon 50% dari harga min DAN max
+
+Untuk item yang didiskon:
+- Set "discounted": true
+- Isi "originalMin" dan "originalMax" dengan harga asli sebelum diskon
+- Tambahkan keterangan "(Diskon bundel bongkaran -25%)" atau "(Diskon bundel bongkaran -50%)" di akhir field "note"
+Set "bundleDiscount": true pada root JSON jika ada diskon yang diterapkan.
+
+Servis di LUAR grup bongkaran (layar, keyboard, OS, repair, diagnosa) TIDAK dapat diskon bundel.
+
+Catatan: Diagnosa & Estimasi WAJIB diberi harga GRATIS (min: 0, max: 0), agar pelanggan tidak ragu konsultasi.
 Sesuaikan harga dalam range berdasarkan kompleksitas laptop (gaming = lebih kompleks).
 PENTING: Selalu analisa field 'complaint' (keluhan) dan 'history' (riwayat) secara mendalam, baik pelanggan memilih servis tertentu maupun tidak.
 Berdasarkan analisa tersebut, kamu WAJIB menyarankan servis konkrit yang mungkin dibutuhkan (misal: "Ganti Keyboard" atau "Cleaning") ke dalam field 'items' estimasi, meskipun pengguna tidak memilihnya di awal. Berikan alasan kenapa kamu menyarankan servis tersebut di field 'note' per item.
@@ -310,14 +353,18 @@ Balas HANYA dengan JSON berikut — tanpa markdown, tanpa backtick, tanpa teks l
   "items": [
     {
       "service": "nama servis",
-      "note": "catatan singkat atau string kosong",
+      "note": "catatan singkat",
       "min": 50000,
-      "max": 100000
+      "max": 100000,
+      "discounted": false,
+      "originalMin": 50000,
+      "originalMax": 100000
     }
   ],
   "total_min": 200000,
   "total_max": 400000,
-  "notes": "1-2 kalimat catatan untuk pelanggan"
+  "notes": "1-2 kalimat catatan untuk pelanggan",
+  "bundleDiscount": false
 }`
 }
 
@@ -327,8 +374,8 @@ export async function POST(req: NextRequest) {
   const ip =
     req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
 
-  // Rate limit check
-  if (!checkRateLimit(ip)) {
+  // Rate limit check (now persistent via Firestore)
+  if (!(await checkRateLimit(ip))) {
     return NextResponse.json(
       { error: 'Terlalu banyak permintaan. Coba lagi dalam 10 menit.' },
       { status: 429 }
