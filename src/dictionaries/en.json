@@ -451,7 +451,7 @@
   },
   "laptopServiceEstimator": {
     "title": "Laptop Service Estimator",
-    "description": "Select service types & AI will calculate costs instantly.",
+    "description": "Describe the laptop issue and AI will suggest likely service actions with instant cost estimates.",
     "steps": {
       "a": {
         "badge": "First Step",
@@ -472,8 +472,9 @@
         "placeholderHistory": "e.g., Battery replaced 2023, SSD changed 1 year ago..."
       },
       "c": {
-        "badge": "Required Service",
-        "title": "Select Service Types",
+        "badge": "Service Preference",
+        "title": "Select Services If You Already Know",
+        "optionalHint": "Optional. If you are unsure, AI will infer the likely service from your complaint.",
         "selectedCount": "{count}/5 SELECTED",
         "priceLabel": "Service Fee"
       }
@@ -486,12 +487,12 @@
       "os": { "label": "Instal Ulang OS", "desc": "Windows/Linux, include basic software" },
       "screen": { "label": "Jasa Ganti Layar", "desc": "Replace screen panel (part check required)" },
       "keyboard": { "label": "Jasa Ganti Keyboard", "desc": "Replace laptop keyboard" },
-      "diagnosa": { "label": "Diagnosa Hardware", "desc": "Full check and defect identification" },
-      "repair": { "label": "Repair Hardware Minor", "desc": "Minor component fix (IC, ports, etc.)" }
+      "repair": { "label": "Repair Hardware Minor", "desc": "Minor component fix (IC, ports, etc.)" },
+      "diagnosa": { "label": "Diagnosis & Estimate", "desc": "Free, AI will analyze your complaint and suggest the right service" }
     },
     "form": {
       "submit": "Calculate Estimate with AI",
-      "submitHint": "Enter laptop brand and select at least one service to continue.",
+      "submitHint": "Enter the laptop brand and complaint details to continue. Service selection is optional.",
       "loadingTitle": "AI is analyzing...",
       "loadingDesc": "Searching for laptop specs and calculating service costs."
     },

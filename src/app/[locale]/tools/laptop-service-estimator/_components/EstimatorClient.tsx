@@ -20,7 +20,6 @@ import {
   Thermometer,
   Settings,
   Keyboard as KeyboardIcon,
-  Search,
   Sparkles,
 } from 'lucide-react'
 import { ToolWrapper } from '@/components/tools/tool-wrapper'
@@ -54,6 +53,11 @@ interface EstimateResult {
   notes: string
 }
 
+type ServiceCardContent = {
+  label: string
+  desc: string
+}
+
 // ─── Data Servis Static ───────────────────────────────────────────────────────
 const SERVICE_BASE = [
   { id: 'thermal', icon: Thermometer, min: 50000, max: 100000 },
@@ -61,10 +65,9 @@ const SERVICE_BASE = [
   { id: 'ram', icon: MemoryStick, min: 50000, max: 75000 },
   { id: 'ssd', icon: HardDrive, min: 75000, max: 100000 },
   { id: 'os', icon: Settings, min: 50000, max: 150000 },
-  { id: 'screen', icon: Monitor, min: 200000, max: 350000 },
+  { id: 'screen', icon: Monitor, min: 100000, max: 150000 },
   { id: 'keyboard', icon: KeyboardIcon, min: 35000, max: 75000 },
   { id: 'repair', icon: Wrench, min: 150000, max: 350000 },
-  { id: 'diagnosa_ai', icon: Search, min: 50000, max: 100000 },
 ]
 
 // ─── Helper ───────────────────────────────────────────────────────────────────
@@ -82,7 +85,18 @@ interface EstimatorClientProps {
 
 // ─── Component ────────────────────────────────────────────────────────────────
 export function EstimatorClient({ dictionary }: EstimatorClientProps) {
+  // Print-only CSS: hide header, form, etc. only show resultContent
+  useEffect(() => {
+    // Add print CSS only once
+    if (typeof window !== 'undefined' && !document.getElementById('print-estimate-style')) {
+      const style = document.createElement('style');
+      style.id = 'print-estimate-style';
+      style.innerHTML = `@media print { body * { visibility: hidden !important; } .print-estimate, .print-estimate * { visibility: visible !important; } .print-estimate { position: absolute !important; left: 0; top: 0; width: 100vw; background: white; z-index: 9999; } }`;
+      document.head.appendChild(style);
+    }
+  }, []);
   const d = dictionary?.laptopServiceEstimator
+  const servicesDictionary = d?.services as Record<string, ServiceCardContent> | undefined
 
   const [brand, setBrand] = useState('')
   const [model, setModel] = useState('')
@@ -96,8 +110,8 @@ export function EstimatorClient({ dictionary }: EstimatorClientProps) {
   const resultRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    if (step === 'result' && resultRef.current) {
-      resultRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    if (step === 'result') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   }, [step])
 
@@ -110,7 +124,7 @@ export function EstimatorClient({ dictionary }: EstimatorClientProps) {
     )
   }
 
-  const isFormValid = brand.trim() !== '' && selectedServices.length > 0
+  const isFormValid = brand.trim() !== '' && complaint.trim() !== ''
 
   const handleSubmit = async () => {
     if (!isFormValid) return
@@ -120,7 +134,7 @@ export function EstimatorClient({ dictionary }: EstimatorClientProps) {
 
     const serviceLabels = SERVICE_BASE.filter((s) =>
       selectedServices.includes(s.id)
-    ).map((s) => (d.services as any)[s.id].label)
+    ).map((s) => servicesDictionary?.[s.id]?.label ?? s.id)
 
     try {
       const res = await fetch('/api/tools/estimate', {
@@ -305,6 +319,7 @@ export function EstimatorClient({ dictionary }: EstimatorClientProps) {
               <div>
                 <p className="text-[10px] font-black uppercase tracking-[0.2em] text-accent/60 mb-0.5">{d.steps.c.badge}</p>
                 <h2 className="text-h4 font-display font-black text-primary tracking-tight">{d.steps.c.title}</h2>
+                <p className="mt-1 text-xs text-muted-foreground">{d.steps.c.optionalHint}</p>
               </div>
             </div>
             {selectedServices.length > 0 && (
@@ -321,7 +336,7 @@ export function EstimatorClient({ dictionary }: EstimatorClientProps) {
               const isSelected = selectedServices.includes(svc.id)
               const isDisabled = !isSelected && selectedServices.length >= 5
               const SvcIcon = svc.icon
-              const svcData = (d.services as any)[svc.id]
+              const svcData = servicesDictionary?.[svc.id]
               return (
                 <button
                   key={svc.id}
@@ -352,10 +367,10 @@ export function EstimatorClient({ dictionary }: EstimatorClientProps) {
                   </div>
                   <div className="min-w-0 space-y-0.5">
                     <p className="text-[13px] font-bold leading-tight truncate w-full text-foreground">
-                      {svcData.label}
+                      {svcData?.label ?? svc.id}
                     </p>
                     <p className="text-[10px] text-muted-foreground leading-relaxed line-clamp-1">
-                      {svcData.desc}
+                      {svcData?.desc ?? ''}
                     </p>
                   </div>
                   <div className="mt-1 w-full pt-2 border-t border-border/40 flex items-center justify-between">
@@ -411,7 +426,7 @@ export function EstimatorClient({ dictionary }: EstimatorClientProps) {
 
   // ── RESULT ──────────────────────────────────────────────────────────────────
   const resultContent = result ? (
-    <div ref={resultRef} className="space-y-5 animate-in fade-in slide-in-from-bottom-4 duration-500">
+     <div ref={resultRef} className="space-y-5 animate-in fade-in slide-in-from-bottom-4 duration-500 print-estimate">
       <div className="flex items-center justify-center">
         <div className="inline-flex items-center gap-2 text-sm font-semibold text-accent bg-accent/10 px-4 py-1.5 rounded-full border border-accent/20">
           <CheckCircle2 className="w-4 h-4" />
@@ -431,6 +446,9 @@ export function EstimatorClient({ dictionary }: EstimatorClientProps) {
             </p>
             <p className="text-sm font-bold text-foreground truncate mt-0.5">{result.laptop.name}</p>
             {!result.laptop.found && <p className="text-xs text-muted-foreground mt-0.5">{d.result.unverifiedDesc}</p>}
+            {!result.laptop.found && (
+              <p className="text-xs text-destructive mt-0.5 font-semibold">Model tidak terdeteksi, coba isi ulang dengan model lebih spesifik untuk estimasi lebih akurat.</p>
+            )}
           </div>
         </div>
 
@@ -457,7 +475,11 @@ export function EstimatorClient({ dictionary }: EstimatorClientProps) {
                       <spec.icon className="w-3 h-3 shrink-0" />
                       {spec.label}
                     </span>
-                    <span className="text-xs font-semibold text-foreground">{spec.val}</span>
+                    {spec.label === 'Screen' && spec.val && spec.val.includes('/') ? (
+                      <span className="text-xs font-semibold text-foreground">{spec.val.split('/').map(v => v.trim()).join(' / ')}</span>
+                    ) : (
+                      <span className="text-xs font-semibold text-foreground">{spec.val}</span>
+                    )}
                   </div>
                 ))}
               </div>
@@ -479,8 +501,14 @@ export function EstimatorClient({ dictionary }: EstimatorClientProps) {
                 {item.note && <p className="text-xs text-muted-foreground mt-0.5">{item.note}</p>}
               </div>
               <div className="text-right shrink-0">
-                <p className="text-sm font-semibold text-foreground">{fmt(item.min)}</p>
-                <p className="text-xs text-muted-foreground">s/d {fmt(item.max)}</p>
+                {item.service.toLowerCase().includes('diagnosa') && item.min === 0 && item.max === 0 ? (
+                  <span className="inline-block px-2 py-0.5 rounded bg-green-100 text-green-700 text-xs font-bold">FREE</span>
+                ) : (
+                  <>
+                    <p className="text-sm font-semibold text-foreground">{fmt(item.min)}</p>
+                    <p className="text-xs text-muted-foreground">s/d {fmt(item.max)}</p>
+                  </>
+                )}
               </div>
             </div>
           ))}
@@ -505,6 +533,14 @@ export function EstimatorClient({ dictionary }: EstimatorClientProps) {
       )}
 
       <p className="text-xs text-muted-foreground text-center leading-relaxed px-2">{d.result.disclaimer}</p>
+      <p className="text-xs text-accent text-center leading-relaxed px-2 font-semibold mt-2">Konsultasi via WhatsApp gratis, biaya hanya berlaku jika servis dilakukan.</p>
+      <button
+        onClick={() => window.print()}
+        className="w-full flex items-center justify-center gap-2 rounded-xl border border-accent bg-white py-3 px-6 text-sm font-semibold text-accent hover:bg-accent/10 transition-all print:hidden mt-2"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2m-6 0v4m0 0h4m-4 0H8" /></svg>
+        Simpan/Print Estimasi
+      </button>
 
       <button
         onClick={handleWhatsApp}
