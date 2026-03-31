@@ -10,7 +10,7 @@ import type { AddressEntry } from '@/types/address-types';
 import { PlusCircle, Download, Upload, Trash2, Edit, CornerUpLeft, Send } from 'lucide-react';
 import { AddressForm } from './address-form';
 import { useToast } from '@/hooks/use-toast';
-import * as XLSX from 'xlsx';
+import * as ExcelJS from 'exceljs';
 
 interface AddressBookDialogProps {
   isOpen: boolean;
@@ -120,28 +120,66 @@ export function AddressBookDialog({ isOpen, onClose, addressBook, onUpdateBook, 
     setEditingEntry(null);
   };
   
-  const handleExport = () => {
+  const handleExport = async () => {
     if (addressBook.length === 0) {
         toast({ variant: 'destructive', title: t.toast.exportEmpty });
         return;
     }
-    const worksheet = XLSX.utils.json_to_sheet(addressBook.map(({ id, ...rest}) => rest)); // Exclude ID from export
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Address Book');
-    XLSX.writeFile(workbook, 'pdf_tools_address_book.xlsx');
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet('Address Book');
+    
+    // Add headers
+    worksheet.columns = [
+      { header: 'Name', key: 'name', width: 30 },
+      { header: 'Address', key: 'address', width: 50 },
+      { header: 'City', key: 'city', width: 20 },
+      { header: 'State', key: 'state', width: 15 },
+      { header: 'ZIP', key: 'zip', width: 10 },
+      { header: 'Country', key: 'country', width: 20 },
+    ];
+    
+    // Add data
+    addressBook.forEach(({ id, ...rest }) => {
+      worksheet.addRow(rest);
+    });
+    
+    const buffer = await workbook.xlsx.writeBuffer();
+    const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'pdf_tools_address_book.xlsx';
+    a.click();
+    URL.revokeObjectURL(url);
   };
   
-  const handleImport = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImport = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
     const reader = new FileReader();
-    reader.onload = (e) => {
+    reader.onload = async (e) => {
         try {
             const data = new Uint8Array(e.target?.result as ArrayBuffer);
-            const workbook = XLSX.read(data, { type: 'array' });
-            const worksheet = workbook.Sheets[workbook.SheetNames[0]];
-            const json: Omit<AddressEntry, 'id'>[] = XLSX.utils.sheet_to_json(worksheet);
+            const workbook = new ExcelJS.Workbook();
+            await workbook.xlsx.load(data);
+            const worksheet = workbook.getWorksheet(1);
+            const json: Omit<AddressEntry, 'id'>[] = [];
+            
+            worksheet.eachRow((row, rowNumber) => {
+              if (rowNumber === 1) return; // Skip header row
+              const values = row.values as any[];
+              if (values.some(val => val !== null && val !== undefined && val !== '')) {
+                json.push({
+                  name: values[1] || '',
+                  address: values[2] || '',
+                  city: values[3] || '',
+                  state: values[4] || '',
+                  zip: values[5] || '',
+                  country: values[6] || '',
+                });
+              }
+            });
 
             const newEntries: AddressEntry[] = json.map((row, index) => ({
                 id: `imported_${Date.now()}_${index}`,
