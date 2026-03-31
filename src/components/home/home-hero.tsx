@@ -135,7 +135,7 @@ export function HomeHero({ posts, dictionary, locale, linkPrefix }: HomeHeroProp
                                                         fill
                                                         className="transition-transform duration-700 group-hover:scale-[1.06]"
                                                         wrapperClassName="absolute inset-0"
-                                                        sizes="100vw"
+                                                        sizes="(max-width: 640px) calc(100vw - 32px), 50vw"
                                                         priority={index < 4}
                                                         holdUntilLoaded={index < 4}
                                                         initialVisitOnly={index < 4}
