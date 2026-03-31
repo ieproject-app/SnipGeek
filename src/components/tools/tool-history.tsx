@@ -220,7 +220,7 @@ export function ToolHistory({
   }, [firestore, user]);
 
   const fetchFirestoreEmployees = useCallback(async () => {
-    if (!firestore || !user) {
+    if (!firestore) {
       setAllPejabat(fallbackPejabat);
       setIsDatasetLoading(false);
       return;
@@ -253,7 +253,7 @@ export function ToolHistory({
     } finally {
       setIsDatasetLoading(false);
     }
-  }, [firestore, user, fallbackPejabat]);
+  }, [firestore, fallbackPejabat]);
 
   useEffect(() => {
     fetchAdminStatus();
@@ -264,10 +264,10 @@ export function ToolHistory({
   }, [fetchFirestoreEmployees]);
 
   useEffect(() => {
-    if (!firestore || !user) {
+    if (!firestore) {
       setAllPejabat(fallbackPejabat);
     }
-  }, [firestore, user, fallbackPejabat]);
+  }, [firestore, fallbackPejabat]);
 
   useEffect(() => {
     setIsSearching(true);
