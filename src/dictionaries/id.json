@@ -451,7 +451,7 @@
   },
   "laptopServiceEstimator": {
     "title": "Estimasi Servis Laptop",
-    "description": "Pilih jenis servis & AI akan menghitung biaya secara instan.",
+    "description": "Jelaskan keluhan laptop dan AI akan memperkirakan tindakan servis serta biayanya secara instan.",
     "steps": {
       "a": {
         "badge": "Langkah Pertama",
@@ -472,8 +472,9 @@
         "placeholderHistory": "cth: Pernah ganti baterai 2023, ganti SSD 1 tahun lalu..."
       },
       "c": {
-        "badge": "Layanan Diperlukan",
-        "title": "Pilih Jenis Servis",
+        "badge": "Preferensi Servis",
+        "title": "Pilih Servis Jika Sudah Tahu",
+        "optionalHint": "Opsional. Kalau belum yakin, AI akan menyarankan servis dari keluhan yang kamu isi.",
         "selectedCount": "{count}/5 DIPILIH",
         "priceLabel": "Estimasi Jasa"
       }
@@ -486,12 +487,11 @@
       "os": { "label": "Instal Ulang OS", "desc": "Windows/Linux, include driver & software standar" },
       "screen": { "label": "Jasa Ganti Layar", "desc": "Bongkar pasang panel (cek ketersediaan part)" },
       "keyboard": { "label": "Jasa Ganti Keyboard", "desc": "Bongkar pasang keyboard laptop" },
-      "repair": { "label": "Repair Hardware Minor", "desc": "Perbaikan komponen (IC, port, dll)" },
-      "diagnosa_ai": { "label": "Diagnosa & Estimasi AI", "desc": "Pilih ini jika tidak tahu masalahnya" }
+      "repair": { "label": "Repair Hardware Minor", "desc": "Perbaikan komponen (IC, port, dll)" }
     },
     "form": {
       "submit": "Hitung Estimasi dengan AI",
-      "submitHint": "Isi merek laptop dan pilih minimal satu servis untuk melanjutkan.",
+      "submitHint": "Isi merek laptop dan detail keluhan untuk melanjutkan. Pilihan servis bersifat opsional.",
       "loadingTitle": "AI sedang menganalisis...",
       "loadingDesc": "Mencari spesifikasi laptop dan menghitung estimasi biaya servis."
     },
@@ -513,5 +513,9 @@
       "waRequired": "Servis yang dibutuhkan:",
       "waVerifiedLabel": "Laptop Terverifikasi"
     }
+  },
+  "diagnosa": {
+    "label": "Diagnosa & Estimasi",
+    "desc": "Gratis, AI akan menganalisa keluhan dan menyarankan servis yang tepat"
   }
 }
