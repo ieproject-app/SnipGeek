@@ -230,7 +230,17 @@ export function EstimatorClient({ dictionary }: EstimatorClientProps) {
     const waNumber = '6283896392608'
 
     const serviceLines = result.items
-      .map((i) => `\u2022 ${i.service}: ${fmt(i.min)} \u2013 ${fmt(i.max)}`)
+      .map((i) => {
+        if (i.service.toLowerCase().includes('diagnosa') && i.min === 0 && i.max === 0) {
+          return `\u2022 ${i.service}: FREE`
+        } else if (i.discounted) {
+          const originalPrice = `${fmt(i.originalMin || i.min)} \u2013 ${fmt(i.originalMax || i.max)}`
+          const discountedPrice = `${fmt(i.min)} \u2013 ${fmt(i.max)}`
+          return `\u2022 ${i.service}: ~~${originalPrice}~~ → ${discountedPrice} (Diskon ${Math.round((1 - i.min / (i.originalMin || i.min)) * 100)}%)`
+        } else {
+          return `\u2022 ${i.service}: ${fmt(i.min)} \u2013 ${fmt(i.max)}`
+        }
+      })
       .join('\n')
 
     const laptopLabel = result.laptop.found ? d.result.waVerifiedLabel : d.result.unverified
@@ -246,6 +256,13 @@ export function EstimatorClient({ dictionary }: EstimatorClientProps) {
       ].filter(Boolean).join('\n')
       : ''
 
+    // Calculate total original price and discount amount
+    const totalOriginalMin = result.items.reduce((sum, i) => sum + (i.originalMin || i.min), 0)
+    const totalOriginalMax = result.items.reduce((sum, i) => sum + (i.originalMax || i.max), 0)
+    const totalDiscountMin = totalOriginalMin - result.total_min
+    const totalDiscountMax = totalOriginalMax - result.total_max
+    const hasDiscount = totalDiscountMin > 0 || totalDiscountMax > 0
+
     const message =
       `${d.result.waGreeting}\n\n` +
       `${laptopLine}\n` +
@@ -253,7 +270,8 @@ export function EstimatorClient({ dictionary }: EstimatorClientProps) {
       (complaint.trim() ? `${d.result.waProblem} ${complaint.trim()}\n` : '') +
       (history.trim() ? `${d.result.waHistoryLabel} ${history.trim()}\n` : '') +
       `\n${d.result.waRequired}\n${serviceLines}\n\n` +
-      `${d.result.totalEstimate}: ${fmt(result.total_min)} \u2013 ${fmt(result.total_max)}\n\n` +
+      `${d.result.totalEstimate}: ${fmt(result.total_min)} \u2013 ${fmt(result.total_max)}\n` +
+      (hasDiscount ? `💰 *Anda hemat: ${fmt(totalDiscountMin)} \u2013 ${fmt(totalDiscountMax)} dari diskon bundel!*\n\n` : '') +
       (result.notes ? `Catatan AI: ${result.notes}\n\n` : '') +
       `Bisa bantu cek lebih lanjut?`
 
