@@ -291,7 +291,7 @@ export function EstimatorClient({ dictionary }: EstimatorClientProps) {
       (history.trim() ? `${d.result.waHistoryLabel} ${history.trim()}\n` : '') +
       `\n${d.result.waRequired}\n${serviceLines}\n\n` +
       `${d.result.totalEstimate}: ${fmt(result.total_min)} \u2013 ${fmt(result.total_max)}\n` +
-      (hasDiscount ? `💰 *Anda hemat: ${fmt(totalDiscountMin)} \u2013 ${fmt(totalDiscountMax)} dari diskon bundel!*\n\n` : '') +
+      (hasDiscount ? `*Hemat: ${fmt(totalDiscountMin)} \u2013 ${fmt(totalDiscountMax)} dari diskon bundel bongkaran!*\n\n` : '') +
       (result.notes ? `Catatan AI: ${result.notes}\n\n` : '') +
       `Bisa bantu cek lebih lanjut?`
 
