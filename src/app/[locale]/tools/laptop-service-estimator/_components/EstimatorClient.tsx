@@ -11,6 +11,7 @@ import {
   AlertCircle,
   ChevronDown,
   ChevronUp,
+  ChevronRight,
   Cpu,
   MemoryStick,
   HardDrive,
@@ -107,6 +108,7 @@ export function EstimatorClient({ dictionary }: EstimatorClientProps) {
   const [showSpecs, setShowSpecs] = useState(true)
   const [isScanning, setIsScanning] = useState(false)
   const [scannedImage, setScannedImage] = useState<string | null>(null)
+  const [showPriceDetails, setShowPriceDetails] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const resultRef = useRef<HTMLDivElement>(null)
 
@@ -658,6 +660,77 @@ export function EstimatorClient({ dictionary }: EstimatorClientProps) {
             </div>
           ))}
         </div>
+        
+        {/* Expandable Price Details Section */}
+        {result.bundleDiscount && (
+          <div className="border-t border-border/60">
+            <button
+              onClick={() => setShowPriceDetails(!showPriceDetails)}
+              className="w-full flex items-center justify-between px-5 py-3 text-xs font-bold text-muted-foreground hover:text-foreground uppercase tracking-wider transition-colors bg-muted/20"
+            >
+              <span className="flex items-center gap-2">
+                <span>Lihat Detail Diskon</span>
+                <span className="px-2 py-0.5 rounded-full bg-accent/10 text-accent text-[10px] font-normal">
+                  Hemat {fmt(result.items.reduce((sum, i) => sum + ((i.originalMin || i.min) - i.min), 0))}
+                </span>
+              </span>
+              {showPriceDetails ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
+            </button>
+            
+            {showPriceDetails && (
+              <div className="px-5 py-4 space-y-4 bg-accent/5 border-t border-border/40">
+                {/* Explanation */}
+                <div className="flex items-start gap-3">
+                  <Info className="w-4 h-4 text-accent mt-0.5 shrink-0" />
+                  <div className="text-xs text-muted-foreground leading-relaxed">
+                    <p className="font-semibold text-foreground mb-1">Mekanisme Diskon Bundel Bongkaran</p>
+                    <p>Beberapa servis berikut memerlukan pembongkaran casing laptop. Karena dikerjakan bersamaan, Anda hemat biaya jasa bongkar-pasang:</p>
+                    <ul className="mt-2 space-y-1">
+                      <li>• Servis pertama: Harga normal</li>
+                      <li>• Servis kedua: Diskon 25%</li>
+                      <li>• Servis ketiga dan seterusnya: Diskon 50%</li>
+                    </ul>
+                  </div>
+                </div>
+                
+                {/* Detailed Breakdown */}
+                <div className="space-y-2">
+                  <p className="text-xs font-bold text-foreground uppercase tracking-wider">Rincian Harga per Layanan</p>
+                  <div className="space-y-1.5">
+                    {result.items
+                      .filter(item => item.originalMin !== undefined && item.originalMin > item.min)
+                      .map((item, idx) => (
+                        <div key={idx} className="flex items-center justify-between text-xs py-2 border-b border-border/30">
+                          <div className="flex items-center gap-2">
+                            <div className="w-1.5 h-1.5 rounded-full bg-accent" />
+                            <span className="font-medium">{item.service}</span>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <div className="text-right">
+                              <span className="text-muted-foreground line-through">{fmt(item.originalMin)}</span>
+                              <span className="mx-1">→</span>
+                              <span className="font-semibold text-green-600 dark:text-green-400">{fmt(item.min)}</span>
+                            </div>
+                            <span className="px-2 py-0.5 rounded bg-green-100 text-green-700 text-[10px] font-bold">
+                              -{Math.round((1 - item.min / (item.originalMin || item.min)) * 100)}%
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                  </div>
+                </div>
+                
+                {/* Summary */}
+                <div className="flex items-center justify-between pt-3 border-t border-border/60">
+                  <span className="text-xs font-bold text-foreground">Total Penghematan Anda</span>
+                  <span className="text-sm font-black text-green-600 dark:text-green-400">
+                    {fmt(result.items.reduce((sum, i) => sum + ((i.originalMin || i.min) - i.min), 0))}
+                  </span>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
         <div className="flex items-center justify-between gap-4 px-5 py-4 bg-accent/8 border-t border-accent/20">
           <div>
             <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/70">{d.result.totalEstimate}</p>
