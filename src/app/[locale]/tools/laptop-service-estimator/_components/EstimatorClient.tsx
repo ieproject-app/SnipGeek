@@ -109,6 +109,8 @@ export function EstimatorClient({ dictionary }: EstimatorClientProps) {
   const [isScanning, setIsScanning] = useState(false)
   const [scannedImage, setScannedImage] = useState<string | null>(null)
   const [showPriceDetails, setShowPriceDetails] = useState(false)
+  const [cooldownUntil, setCooldownUntil] = useState<number>(0)
+  const [, setTick] = useState(0)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const resultRef = useRef<HTMLDivElement>(null)
 
@@ -117,6 +119,17 @@ export function EstimatorClient({ dictionary }: EstimatorClientProps) {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   }, [step])
+
+  useEffect(() => {
+    if (cooldownUntil <= Date.now()) return
+    const interval = setInterval(() => {
+      if (Date.now() >= cooldownUntil) {
+        clearInterval(interval)
+      }
+      setTick(t => t + 1)
+    }, 1000)
+    return () => clearInterval(interval)
+  }, [cooldownUntil])
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -176,8 +189,11 @@ export function EstimatorClient({ dictionary }: EstimatorClientProps) {
 
   const isFormValid = brand.trim() !== '' && complaint.trim() !== ''
 
+  const cooldownRemaining = Math.max(0, Math.ceil((cooldownUntil - Date.now()) / 1000))
+  const isOnCooldown = cooldownRemaining > 0
+
   const handleSubmit = async () => {
-    if (!isFormValid) return
+    if (!isFormValid || isOnCooldown) return
 
     setStep('loading')
     setError(null)
@@ -209,6 +225,8 @@ export function EstimatorClient({ dictionary }: EstimatorClientProps) {
 
       setResult(data)
       setStep('result')
+      // 30 detik cooldown setelah berhasil generate
+      setCooldownUntil(Date.now() + 30_000)
     } catch {
       setError('Koneksi bermasalah.')
       setStep('form')
@@ -511,20 +529,22 @@ export function EstimatorClient({ dictionary }: EstimatorClientProps) {
         <button
           type="button"
           onClick={handleSubmit}
-          disabled={!isFormValid}
+          disabled={!isFormValid || isOnCooldown}
           className={[
             'w-full flex items-center justify-center gap-2.5 rounded-xl py-4 px-6',
             'text-base font-bold transition-all duration-150',
-            isFormValid
+            isFormValid && !isOnCooldown
               ? 'bg-accent text-accent-foreground hover:opacity-90 active:scale-[0.99] shadow-md shadow-accent/20'
               : 'bg-muted text-muted-foreground cursor-not-allowed',
-          ].join(' ')}
-        >
+          ].join(' ')}>
           <Wrench className="w-5 h-5" />
-          {d.form.submit}
+          {isOnCooldown ? `Tunggu ${cooldownRemaining}s...` : d.form.submit}
         </button>
-        {!isFormValid && (
+        {!isFormValid && !isOnCooldown && (
           <p className="text-center text-xs text-muted-foreground">{d.form.submitHint}</p>
+        )}
+        {isOnCooldown && (
+          <p className="text-center text-xs text-muted-foreground">Mohon tunggu sebelum generate ulang.</p>
         )}
       </div>
     </div>
