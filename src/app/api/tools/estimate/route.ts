@@ -177,6 +177,43 @@ function applyBundleDiscount(items: { id: string; service: string; note: string;
   return [...discountedBongkaran, ...otherMapped]
 }
 
+// ─── Post-process Gemini Response ────────────────────────────────────────────
+// Terapkan applyBundleDiscount ke response Gemini karena Gemini tidak selalu
+// menghitung diskon dengan benar secara konsisten.
+function postProcessGeminiResponse(parsed: EstimateResponse): EstimateResponse {
+  if (!parsed?.items || !Array.isArray(parsed.items)) return parsed
+
+  // Map nama servis → service id menggunakan alias
+  const itemsWithId = parsed.items.map((item) => {
+    const key = normalizeServiceKey(item.service)
+    return {
+      id: key ?? 'unknown',
+      service: item.service,
+      note: item.note ?? '',
+      min: typeof item.min === 'number' ? item.min : 0,
+      max: typeof item.max === 'number' ? item.max : 0,
+    }
+  })
+
+  const processedItems = applyBundleDiscount(itemsWithId)
+  const hasBundleDiscount = processedItems.some(i => i.discounted)
+  const total_min = processedItems.reduce((sum, i) => sum + i.min, 0)
+  const total_max = processedItems.reduce((sum, i) => sum + i.max, 0)
+
+  const notesWithDiscount = hasBundleDiscount && !parsed.notes?.includes('Diskon bundel')
+    ? [parsed.notes, 'Diskon bundel bongkaran sudah diterapkan karena beberapa servis dikerjakan dalam satu kali buka casing.'].filter(Boolean).join(' ')
+    : parsed.notes
+
+  return {
+    ...parsed,
+    items: processedItems,
+    total_min,
+    total_max,
+    notes: notesWithDiscount,
+    bundleDiscount: hasBundleDiscount,
+  }
+}
+
 function normalizeServiceKey(value: string): string | null {
   const normalized = value.trim().toLowerCase()
   return SERVICE_ALIASES[normalized] ?? null
@@ -482,7 +519,7 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    return NextResponse.json(parsed)
+    return NextResponse.json(postProcessGeminiResponse(parsed))
   } catch (err: unknown) {
     clearTimeout(timeout)
     if (err instanceof Error && err.name === 'AbortError') {

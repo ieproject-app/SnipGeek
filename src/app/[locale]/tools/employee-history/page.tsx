@@ -2,6 +2,8 @@ import { getDictionary } from '@/lib/get-dictionary'
 import { Locale } from '@/i18n-config'
 import { ToolHistory } from '@/components/tools/tool-history'
 import type { Metadata } from 'next'
+import fs from 'fs'
+import path from 'path'
 
 export async function generateMetadata({
   params,
@@ -33,10 +35,18 @@ export default async function EmployeeHistoryPage({
   const { locale } = await params;
   const dictionary = await getDictionary(locale)
 
+  const txtPath = path.join(process.cwd(), 'src/app/[locale]/tools/employee-history/riwayat_karyawan.txt')
+  let employeeData = ''
+  try {
+    employeeData = fs.readFileSync(txtPath, 'utf-8')
+  } catch {
+    employeeData = ''
+  }
+
   return (
     <div className="w-full">
       <main className="mx-auto max-w-5xl px-4 pt-10 pb-16 sm:px-6">
-        <ToolHistory dictionary={dictionary} employeeData="" locale={locale} />
+        <ToolHistory dictionary={dictionary} employeeData={employeeData} locale={locale} />
       </main>
     </div>
   );
