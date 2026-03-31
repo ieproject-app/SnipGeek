@@ -461,7 +461,10 @@
         "modelLabel": "Seri / Model",
         "modelOptional": "(opsional)",
         "modelPlaceholder": "cth: VivoBook 14 A416...",
-        "modelHint": "Sertakan seri spesifik agar spek AI lebih akurat."
+        "modelHint": "Sertakan seri spesifik agar spek AI lebih akurat.",
+        "scanLabelBtn": "Scan Label Laptop",
+        "scanOr": "atau",
+        "scanHint": "Tidak tahu modelnya? Unggah foto stiker label di bawah laptop."
       },
       "b": {
         "badge": "Keluhan Pelanggan",
@@ -487,7 +490,8 @@
       "os": { "label": "Instal Ulang OS", "desc": "Windows/Linux, include driver & software standar" },
       "screen": { "label": "Jasa Ganti Layar", "desc": "Bongkar pasang panel (cek ketersediaan part)" },
       "keyboard": { "label": "Jasa Ganti Keyboard", "desc": "Bongkar pasang keyboard laptop" },
-      "repair": { "label": "Repair Hardware Minor", "desc": "Perbaikan komponen (IC, port, dll)" }
+      "repair": { "label": "Repair Hardware Minor", "desc": "Perbaikan komponen (IC, port, dll)" },
+      "diagnosa": { "label": "Diagnosa & Estimasi", "desc": "Gratis, AI akan menganalisa keluhan dan menyarankan servis yang tepat" }
     },
     "form": {
       "submit": "Hitung Estimasi dengan AI",
@@ -513,9 +517,5 @@
       "waRequired": "Servis yang dibutuhkan:",
       "waVerifiedLabel": "Laptop Terverifikasi"
     }
-  },
-  "diagnosa": {
-    "label": "Diagnosa & Estimasi",
-    "desc": "Gratis, AI akan menganalisa keluhan dan menyarankan servis yang tepat"
   }
 }

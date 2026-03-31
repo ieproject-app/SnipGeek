@@ -21,6 +21,9 @@ import {
   Settings,
   Keyboard as KeyboardIcon,
   Sparkles,
+  Camera,
+  X,
+  Upload,
 } from 'lucide-react'
 import { ToolWrapper } from '@/components/tools/tool-wrapper'
 import type { Dictionary } from '@/lib/get-dictionary'
@@ -43,6 +46,9 @@ interface ServiceItem {
   note: string
   min: number
   max: number
+  discounted?: boolean
+  originalMin?: number
+  originalMax?: number
 }
 
 interface EstimateResult {
@@ -51,6 +57,7 @@ interface EstimateResult {
   total_min: number
   total_max: number
   notes: string
+  bundleDiscount?: boolean
 }
 
 type ServiceCardContent = {
@@ -86,15 +93,6 @@ interface EstimatorClientProps {
 // ─── Component ────────────────────────────────────────────────────────────────
 export function EstimatorClient({ dictionary }: EstimatorClientProps) {
   // Print-only CSS: hide header, form, etc. only show resultContent
-  useEffect(() => {
-    // Add print CSS only once
-    if (typeof window !== 'undefined' && !document.getElementById('print-estimate-style')) {
-      const style = document.createElement('style');
-      style.id = 'print-estimate-style';
-      style.innerHTML = `@media print { body * { visibility: hidden !important; } .print-estimate, .print-estimate * { visibility: visible !important; } .print-estimate { position: absolute !important; left: 0; top: 0; width: 100vw; background: white; z-index: 9999; } }`;
-      document.head.appendChild(style);
-    }
-  }, []);
   const d = dictionary?.laptopServiceEstimator
   const servicesDictionary = d?.services as Record<string, ServiceCardContent> | undefined
 
@@ -107,6 +105,9 @@ export function EstimatorClient({ dictionary }: EstimatorClientProps) {
   const [result, setResult] = useState<EstimateResult | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [showSpecs, setShowSpecs] = useState(true)
+  const [isScanning, setIsScanning] = useState(false)
+  const [scannedImage, setScannedImage] = useState<string | null>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
   const resultRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -114,6 +115,53 @@ export function EstimatorClient({ dictionary }: EstimatorClientProps) {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   }, [step])
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    if (!file.type.startsWith('image/')) {
+       setError('Silahkan unggah file gambar.')
+       return
+    }
+
+    // Convert to base64 for preview and API
+    const reader = new FileReader()
+    reader.onload = async (event) => {
+      const base64 = event.target?.result as string
+      setScannedImage(base64)
+      await performScan(base64)
+    }
+    reader.readAsDataURL(file)
+  }
+
+  const performScan = async (base64: string) => {
+    setIsScanning(true)
+    setError(null)
+    try {
+      const res = await fetch('/api/tools/scan-label', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ image: base64 }),
+      })
+      const data = await res.json()
+      if (res.ok && data.brand) {
+        setBrand(data.brand)
+        if (data.model) setModel(data.model)
+      } else {
+        setError(data.error || 'Gagal membaca label. Coba foto lebih jelas.')
+      }
+    } catch {
+      setError('Gagal menghubungkan ke layanan scan.')
+    } finally {
+      setIsScanning(false)
+    }
+  }
+
+  const clearScan = () => {
+    setScannedImage(null)
+    if (fileInputRef.current) fileInputRef.current.value = ''
+  }
 
   // Fallback while dictionary reloads (to prevent HMR crash)
   if (!d) return <div className="p-8 text-center text-sm text-muted-foreground animate-pulse">Memuat form...</div>
@@ -265,6 +313,60 @@ export function EstimatorClient({ dictionary }: EstimatorClientProps) {
               className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm font-medium outline-none focus:border-accent focus:ring-2 focus:ring-accent/20 transition-all"
             />
             <p className="text-xs text-muted-foreground">{d.steps.a.modelHint}</p>
+
+            <div className="pt-2">
+              <div className="flex items-center gap-2 mb-3">
+                <div className="h-px flex-1 bg-border/60" />
+                <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/50">{d.steps.a.scanOr}</span>
+                <div className="h-px flex-1 bg-border/60" />
+              </div>
+
+              {!scannedImage ? (
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={isScanning}
+                  className="w-full flex items-center justify-center gap-2 rounded-xl border border-dashed border-accent/40 bg-accent/5 py-4 px-4 hover:bg-accent/10 transition-all text-xs font-bold text-accent group"
+                >
+                  {isScanning ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <Camera className="w-4 h-4 group-hover:scale-110 transition-transform" />
+                  )}
+                  {isScanning ? 'Menganalisis...' : d.steps.a.scanLabelBtn}
+                </button>
+              ) : (
+                 <div className="relative rounded-xl border border-border bg-muted/30 overflow-hidden p-2 flex items-center gap-3">
+                   <div className="w-12 h-12 rounded-lg overflow-hidden bg-background shrink-0 border border-border">
+                     <img src={scannedImage} alt="Label scan" className="w-full h-full object-cover" />
+                   </div>
+                   <div className="min-w-0 flex-1">
+                     <p className="text-[11px] font-bold text-foreground truncate">Foto label terunggah</p>
+                     <p className="text-[10px] text-muted-foreground leading-tight">{isScanning ? 'Mengekstrak data...' : 'Berhasil dianalisis'}</p>
+                   </div>
+                   {!isScanning && (
+                     <button
+                        type="button"
+                        onClick={clearScan}
+                        className="p-1.5 rounded-lg hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors"
+                     >
+                       <X className="w-4 h-4" />
+                     </button>
+                   )}
+                   {isScanning && <Loader2 className="w-4 h-4 text-accent animate-spin" />}
+                 </div>
+              )}
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleFileChange}
+                className="hidden"
+              />
+              <p className="mt-2 text-[10px] text-muted-foreground italic text-center px-4">
+                {d.steps.a.scanHint}
+              </p>
+            </div>
           </div>
         </div>
       </div>
@@ -331,7 +433,7 @@ export function EstimatorClient({ dictionary }: EstimatorClientProps) {
         </div>
 
         <div className="p-5">
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {SERVICE_BASE.map((svc) => {
               const isSelected = selectedServices.includes(svc.id)
               const isDisabled = !isSelected && selectedServices.length >= 5
@@ -426,13 +528,27 @@ export function EstimatorClient({ dictionary }: EstimatorClientProps) {
 
   // ── RESULT ──────────────────────────────────────────────────────────────────
   const resultContent = result ? (
-     <div ref={resultRef} className="space-y-5 animate-in fade-in slide-in-from-bottom-4 duration-500 print-estimate">
+     <div ref={resultRef} className="space-y-5 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="flex items-center justify-center">
         <div className="inline-flex items-center gap-2 text-sm font-semibold text-accent bg-accent/10 px-4 py-1.5 rounded-full border border-accent/20">
           <CheckCircle2 className="w-4 h-4" />
           {d.result.status}
         </div>
       </div>
+
+      {result.bundleDiscount && (
+        <div className="flex items-start gap-3 rounded-xl border border-green-200 bg-green-50/50 px-4 py-3 dark:border-green-800 dark:bg-green-950/20">
+          <div className="w-4 h-4 rounded-full bg-green-500 flex items-center justify-center shrink-0 mt-0.5">
+            <span className="text-white text-[10px] font-bold">%</span>
+          </div>
+          <div className="min-w-0">
+            <p className="text-sm font-semibold text-green-800 dark:text-green-200">Diskon Bundel Bongkaran Berlaku!</p>
+            <p className="text-xs text-green-600 dark:text-green-400 mt-0.5 leading-relaxed">
+              Beberapa servis dikerjakan sekalian, jadi Anda hemat biaya jasa bongkar-pasang.
+            </p>
+          </div>
+        </div>
+      )}
 
       <div className="rounded-2xl border border-border bg-card overflow-hidden">
         <div className="h-0.5 w-full bg-gradient-to-r from-accent/30 via-accent to-accent/30" />
@@ -503,6 +619,17 @@ export function EstimatorClient({ dictionary }: EstimatorClientProps) {
               <div className="text-right shrink-0">
                 {item.service.toLowerCase().includes('diagnosa') && item.min === 0 && item.max === 0 ? (
                   <span className="inline-block px-2 py-0.5 rounded bg-green-100 text-green-700 text-xs font-bold">FREE</span>
+                ) : item.discounted ? (
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-1 justify-end">
+                      <span className="text-xs text-muted-foreground line-through">{fmt(item.originalMin || item.min)}</span>
+                      <span className="text-sm font-semibold text-green-600 dark:text-green-400">{fmt(item.min)}</span>
+                    </div>
+                    <div className="flex items-center gap-1 justify-end">
+                      <span className="text-xs text-muted-foreground line-through">{fmt(item.originalMax || item.max)}</span>
+                      <span className="text-xs text-muted-foreground">s/d {fmt(item.max)}</span>
+                    </div>
+                  </div>
                 ) : (
                   <>
                     <p className="text-sm font-semibold text-foreground">{fmt(item.min)}</p>
@@ -534,13 +661,7 @@ export function EstimatorClient({ dictionary }: EstimatorClientProps) {
 
       <p className="text-xs text-muted-foreground text-center leading-relaxed px-2">{d.result.disclaimer}</p>
       <p className="text-xs text-accent text-center leading-relaxed px-2 font-semibold mt-2">Konsultasi via WhatsApp gratis, biaya hanya berlaku jika servis dilakukan.</p>
-      <button
-        onClick={() => window.print()}
-        className="w-full flex items-center justify-center gap-2 rounded-xl border border-accent bg-white py-3 px-6 text-sm font-semibold text-accent hover:bg-accent/10 transition-all print:hidden mt-2"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2m-6 0v4m0 0h4m-4 0H8" /></svg>
-        Simpan/Print Estimasi
-      </button>
+      {/* Print button removed */}
 
       <button
         onClick={handleWhatsApp}
