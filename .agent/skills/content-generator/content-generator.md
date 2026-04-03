@@ -164,7 +164,20 @@ If the article targets a specific software version or time-sensitive information
 
 ---
 
-## 12. Final QA Before Output
+## 12. Image Asset Convention
+
+Hero image path must be placed at:
+```
+public/images/_posts/[category]/[subfolder]/[filename].webp
+```
+
+**When committing a new article, always include the image directory in the same commit or the immediately preceding one.** Never commit MDX files pointing to a `heroImage` path without also committing the actual image file.
+
+Run `git status` before committing and check for untracked `public/images/` directories — those must be staged alongside the article files.
+
+---
+
+## 13. Final QA Before Output
 
 - [ ] EN and ID filenames are identical
 - [ ] `translationKey` is identical in both files
@@ -176,3 +189,4 @@ If the article targets a specific software version or time-sensitive information
 - [ ] SEO title 55–65 chars, description 140–160 chars
 - [ ] `### References` section present
 - [ ] Internal links use `/blog/[en-slug]` format
+- [ ] Image file exists at the `heroImage` path and is staged for commit
