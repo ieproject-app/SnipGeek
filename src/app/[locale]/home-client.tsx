@@ -47,9 +47,27 @@ export function HomeClient({
   // --- Deduplication: each section only shows articles not yet shown above ---
   const seenSlugs = new Set<string>();
 
-  const featuredPosts = allPosts
-    .filter((post) => post.frontmatter.published && post.frontmatter.featured)
-    .slice(0, 4);
+  // --- Featured Posts: 2 Linux + 2 Windows 11 ---
+  const linuxTags = new Set(["linux", "ubuntu"]);
+  const windowsTags = new Set(["windows", "windows-11"]);
+  
+  const featuredLinuxPosts = allPosts
+    .filter((post) => 
+      post.frontmatter.published && 
+      post.frontmatter.featured &&
+      post.frontmatter.tags?.some((tag: string) => linuxTags.has(tag.toLowerCase()))
+    )
+    .slice(0, 2);
+  
+  const featuredWindowsPosts = allPosts
+    .filter((post) => 
+      post.frontmatter.published && 
+      post.frontmatter.featured &&
+      post.frontmatter.tags?.some((tag: string) => windowsTags.has(tag.toLowerCase()))
+    )
+    .slice(0, 2);
+  
+  const featuredPosts = [...featuredLinuxPosts, ...featuredWindowsPosts];
   featuredPosts.forEach((p) => seenSlugs.add(p.slug));
 
   const latestPosts = allPosts
