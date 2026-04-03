@@ -727,7 +727,7 @@ export function EstimatorClient({ dictionary }: EstimatorClientProps) {
                           </div>
                           <div className="flex items-center gap-3">
                             <div className="text-right">
-                              <span className="text-muted-foreground line-through">{fmt(item.originalMin)}</span>
+                              <span className="text-muted-foreground line-through">{fmt(item.originalMin || item.min)}</span>
                               <span className="mx-1">→</span>
                               <span className="font-semibold text-green-600 dark:text-green-400">{fmt(item.min)}</span>
                             </div>

@@ -160,10 +160,11 @@ export function AddressBookDialog({ isOpen, onClose, addressBook, onUpdateBook, 
     const reader = new FileReader();
     reader.onload = async (e) => {
         try {
-            const data = new Uint8Array(e.target?.result as ArrayBuffer);
+            const data = e.target?.result as ArrayBuffer;
             const workbook = new ExcelJS.Workbook();
             await workbook.xlsx.load(data);
             const worksheet = workbook.getWorksheet(1);
+            if (!worksheet) return;
             const json: Omit<AddressEntry, 'id'>[] = [];
             
             worksheet.eachRow((row, rowNumber) => {
@@ -171,12 +172,10 @@ export function AddressBookDialog({ isOpen, onClose, addressBook, onUpdateBook, 
               const values = row.values as any[];
               if (values.some(val => val !== null && val !== undefined && val !== '')) {
                 json.push({
-                  name: values[1] || '',
-                  address: values[2] || '',
-                  city: values[3] || '',
-                  state: values[4] || '',
-                  zip: values[5] || '',
-                  country: values[6] || '',
+                  title: values[1] || '',
+                  name: values[2] || '',
+                  phone: values[3] || '',
+                  address: values[4] || '',
                 });
               }
             });

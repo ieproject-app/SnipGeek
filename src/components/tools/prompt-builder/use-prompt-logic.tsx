@@ -862,6 +862,7 @@ export function usePromptLogic({
     return {
       chars: text.length,
       words: nonEmpty === "" ? 0 : nonEmpty.split(/\s+/).length,
+      lines: text.split('\n').length,
     };
   }, [debouncedDraft, debouncedOriginalContent, mode]);
 
