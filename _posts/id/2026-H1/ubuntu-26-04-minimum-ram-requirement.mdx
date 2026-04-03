@@ -1,0 +1,94 @@
+---
+title: "Ubuntu 26.04 LTS Naikkan RAM Minimum ke 6 GB — Ini Alasannya"
+slug: "ubuntu-26-04-minimum-ram-requirement"
+translationKey: "ubuntu-26-04-minimum-ram-requirement"
+date: "2026-03-31"
+description: "Ubuntu 26.04 LTS diam-diam menaikkan RAM minimum dari 4 GB ke 6 GB — pertama kalinya sejak 2019. Ini yang berubah, kenapa keputusan itu masuk akal, dan apa pilihan kalau RAM kamu cuma 4 GB."
+heroImage: "/images/_posts/ubuntu/ram-minimum/minimum-ram-ubuntu.webp"
+imageAlt: "Kebutuhan RAM minimum Ubuntu 26.04 LTS Resolute Raccoon dinaikkan dari 4 GB menjadi 6 GB"
+published: true
+featured: false
+tags: ["ubuntu", "ubuntu-26-04", "linux", "ram", "performance"]
+category: "Linux"
+---
+
+Waktu lagi baca-baca *release notes* Ubuntu 26.04 LTS untuk urusan yang sama sekali berbeda, satu baris ini bikin saya berhenti sejenak: *minimum RAM, 6 GB*. Saya baca dua kali buat memastikan tidak salah lihat. Lalu saya buka halaman Ubuntu 24.04 buat perbandingan. Di sana masih 4 GB. Jadi memang ada perubahan nyata di sini.
+
+Ubuntu 26.04 LTS "Resolute Raccoon" resmi menaikkan kebutuhan RAM minimum untuk desktop dari **4 GB menjadi 6 GB** — kenaikan pertama sejak 2019. Kebutuhan prosesor dan penyimpanan tidak berubah: tetap 2 GHz dual-core 64-bit dan 25 GB ruang kosong.
+
+<Callout variant="info" title="Catatan Versi">
+Perubahan ini berlaku untuk Ubuntu Desktop 26.04 LTS. Kebutuhan Ubuntu Server berbeda dan jauh lebih rendah — penjelasannya ada di bagian akhir artikel ini.
+</Callout>
+
+## Spesifikasi Minimum Resmi Ubuntu 26.04 LTS
+
+Berdasarkan *release notes* resmi, berikut spesifikasi minimum Ubuntu 26.04 LTS Desktop:
+
+| Komponen | Kebutuhan |
+|----------|-----------|
+| **RAM** | 6 GB |
+| **Prosesor** | 2 GHz dual-core (64-bit) |
+| **Penyimpanan** | 25 GB |
+
+Hanya RAM yang berubah. Kebutuhan CPU dan storage diwarisi langsung dari Ubuntu 24.04 LTS tanpa perubahan.
+
+## Betapa Lamanya 4 GB Bertahan
+
+Untuk memahami kenapa perubahan ini cukup berarti, perlu dilihat perjalanan angka RAM minimum Ubuntu dari waktu ke waktu:
+
+| Versi | Tahun | RAM Minimum |
+|-------|-------|-------------|
+| Ubuntu 12.04 LTS (Precise Pangolin) | 2012 | 384 MB / 512 MB |
+| Ubuntu 14.04 LTS (Trusty Tahr) | 2014 | 1 GB |
+| Ubuntu 18.04 LTS (Bionic Beaver) | 2018 → 2019 | 2 GB → 4 GB |
+| Ubuntu 20.04 – 24.04 LTS | 2020–2024 | 4 GB |
+| **Ubuntu 26.04 LTS (Resolute Raccoon)** | **2026** | **6 GB** |
+
+*Catatan: Ubuntu 18.04 awalnya rilis dengan minimum 2 GB, lalu halaman unduhan diperbarui ke 4 GB pada 2019 setelah masukan komunitas. Itulah kenapa banyak tulisan menyebut kenaikan ini sebagai "pertama sejak 2019."*
+
+Angka 4 GB bertahan hampir tujuh tahun sementara cara orang menggunakan komputer berubah sangat jauh selama periode itu.
+
+## Bukan Karena Ubuntu Makin Berat
+
+Hal pertama yang langsung saya pikirkan: *apakah GNOME 50 memang nambah konsumsi RAM sebanyak itu?* Ternyata asumsi itu kurang tepat — setidaknya tidak dalam pengertian yang saya bayangkan.
+
+Menurut Canonical, kenaikan ini bukan cerminan langsung bahwa Ubuntu 26.04 butuh 2 GB lebih banyak hanya untuk booting dan duduk idle. Framing yang mereka dan banyak pihak pakai adalah **"honesty bump"** — koreksi kejujuran. Komponen yang membentuk pengalaman desktop Ubuntu — GNOME dengan berbagai *extension*-nya, browser modern dengan jumlah tab yang realistis, dan kebiasaan multitasking yang sudah kita normalisasi sehari-hari — jauh lebih berat dibanding saat angka 4 GB itu pertama kali ditulis.
+
+Angka 4 GB itu sudah berfungsi lebih sebagai *technical floor*: batas teknis minimum agar installer bisa jalan dan desktop bisa muncul. Bukan gambaran pengalaman pakai yang nyaman. Angka baru 6 GB adalah upaya Canonical menutup celah antara apa yang tertulis di spesifikasi dan apa yang sebenarnya terjadi saat Ubuntu dipakai normal.
+
+## Berarti Ubuntu Butuh Lebih Banyak RAM dari Windows 11?
+
+Di atas kertas, terlihat begitu. Microsoft menetapkan minimum 4 GB untuk Windows 11, yang sekilas membuat Ubuntu 26.04 tampak lebih boros. Tapi ada satu detail yang membuat perbandingan itu jadi tidak apple-to-apple.
+
+Windows 11 juga **mewajibkan TPM 2.0** — *chip* keamanan khusus yang tertanam di *motherboard* untuk menangani operasi kriptografi bagi fitur seperti Windows Hello dan BitLocker. Kenyataan di lapangan: hampir semua mesin yang diproduksi beberapa tahun terakhir dengan TPM 2.0 juga datang dengan minimal 8 GB RAM. Tidak ada yang benar-benar menjalankan Windows 11 di mesin 4 GB di tahun 2026.
+
+Jadi yang terlihat seperti "Windows 11 lebih hemat" sebenarnya adalah Windows 11 mencantumkan angka minimum yang hampir tidak pernah relevan di dunia nyata. Angka 6 GB dari Canonical, meski terasa lebih besar di permukaan, justru lebih transparan soal ekspektasi penggunaan yang sebenarnya.
+
+## Kalau RAM Kamu Cuma 4 GB
+
+Ubuntu 26.04 tetap bisa diinstal di perangkat dengan RAM di bawah 6 GB. Pengalaman pakainya tidak akan seresponsif yang dimaksudkan — bahkan ada yang mencobanya di mesin 2 GB dan berhasil boot, meski sangat lambat. Tapi sistemnya tetap jalan.
+
+Kalau perangkatmu terkunci di 4 GB tanpa opsi upgrade (RAM yang terpatri di *motherboard* itu nyata, dan mengganti seluruh hardware tidak selalu masuk akal), ada beberapa alternatif yang tetap berada dalam ekosistem Ubuntu:
+
+- **[Lubuntu](https://lubuntu.me/)** — *flavor* Ubuntu berbasis LXQt, nyaman dijalankan dengan RAM minimum 1 GB dan direkomendasikan di 2 GB.
+- **Xubuntu** — berbasis XFCE, jauh lebih ringan dari edisi GNOME utama tanpa kehilangan banyak kenyamanan harian.
+- **Setup window manager minimal** — instal sistem base Ubuntu lalu tambahkan i3 atau bspwm di atasnya untuk lingkungan Linux yang fungsional di hardware sangat terbatas.
+
+Untuk **Ubuntu Server 26.04 LTS**, angkanya jauh lebih rendah: installer ISO cukup 1,5 GB RAM, *cloud image* hanya butuh 1 GB, dengan rekomendasi 3 GB untuk *workload* produksi nyata.
+
+## Sudut Pandang SnipGeek
+
+Reaksi pertama saya jujurnya agak kesal — satu lagi angka yang pelan-pelan merayap naik. Tapi setelah saya pikir lebih lanjut, keputusan Canonical ini masuk akal.
+
+Angka 4 GB sudah terlalu lama jadi semacam fiksi yang sopan. Siapa pun yang pernah buka browser di mesin Ubuntu 4 GB belakangan ini tahu apa yang terjadi: buka beberapa tab, buka PDF, nyalakan satu terminal session — dan sistem sudah mulai ngos-ngosan. Angka di spesifikasi resmi itu tidak benar-benar membantu siapa pun, dan malah bisa menipu pengguna baru yang membeli hardware berdasarkan informasi itu.
+
+Enam gigabyte bukan angka yang berlebihan di 2026. Mayoritas mesin yang dijual beberapa tahun terakhir sudah melewatinya. Dan untuk yang belum, ekosistem *flavor* Ubuntu memang ada untuk situasi persis seperti ini — Lubuntu khususnya bukan sekadar pilihan darurat, tapi software yang memang bagus.
+
+Kalau kamu berencana jalankan Ubuntu 26.04 LTS di mesin yang cukup modern, semua ini tidak terlalu berdampak untukmu secara praktis. Rilis stabil dijadwalkan **23 April 2026** dengan dukungan resmi hingga 2031. Untuk gambaran lengkap perubahan lain di rilis ini, saya sudah tulis [rangkuman fitur dan perubahan besar Ubuntu 26.04 LTS](/blog/ubuntu-26-04-lts-resolute-raccoon-new-features-major-changes) dan [detail rilis beta-nya](/blog/ubuntu-26-04-beta-available-download) di artikel terpisah.
+
+Kalau kamu penasaran apakah kondisi RAM yang ada sekarang benar-benar jadi bottleneck — di platform mana pun — artikel [analisis upgrade RAM 20GB ke 32GB](/blog/from-20gb-to-32gb-ram-is-it-worth-it-in-2026) bisa jadi referensi sebelum keputusan hardware berikutnya.
+
+### Referensi
+1. [Ubuntu Quietly Raises Its Minimum System Requirements — OMG! Ubuntu](https://www.omgubuntu.co.uk/2026/04/ubuntu-2604-system-requriments)
+2. [Ubuntu 26.04 LTS Requires More RAM Than Windows 11? — It's FOSS](https://itsfoss.com/news/ubuntu-26-04-minimum-ram-requirement/)
+3. [Ubuntu Server 26.04 LTS System Requirements — Ubuntu Official Docs](https://ubuntu.com/server/docs/reference/installation/system-requirements/)
