@@ -1,4 +1,3 @@
-
 {
   "name": "pdf-tools-backend",
   "description": "Cloud Functions for Firebase, running on Cloud Run",
@@ -19,6 +18,8 @@
     "firebase-functions": "^5.0.1"
   },
   "devDependencies": {
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
     "@typescript-eslint/eslint-plugin": "^5.12.0",
     "@typescript-eslint/parser": "^5.12.0",
     "eslint": "^8.9.0",
