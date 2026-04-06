@@ -61,17 +61,6 @@ const STATIC_DOCUMENT_CATEGORIES: Record<string, { name: string; types: string[]
     'LG.000': { name: 'Justifikasi', types: ['JUSTIFIKASI'] },
 };
 
-function buildDocTypes(categories: Record<string, { name: string; types: string[] }>) {
-    return Object.entries(categories).flatMap(([category, { types }]) =>
-        types.map(type => ({
-            value: `${category}__${type}`,
-            label: `${type} (${category})`,
-            category: category,
-            docType: type
-        }))
-    ).sort((a, b) => a.label.localeCompare(b.label));
-}
-
 type ValueCategory = 'below_500m' | 'above_500m';
 
 interface GenerationRequest {
@@ -173,7 +162,16 @@ export function ToolNumbers({ dictionary }: { dictionary: Dictionary }) {
         return { ...STATIC_DOCUMENT_CATEGORIES, ...dynamic };
     }, [dynamicCategories]);
 
-    const allDocTypes = useMemo(() => buildDocTypes(mergedCategories), [mergedCategories]);
+    const categoryOptions = useMemo(() => {
+        return Object.entries(mergedCategories)
+            .map(([category, { name, types }]) => ({
+                value: category,
+                label: `${name} (${category})`,
+                name,
+                totalTypes: types.length,
+            }))
+            .sort((a, b) => a.name.localeCompare(b.name));
+    }, [mergedCategories]);
 
     const fetchDynamicCategories = useCallback(async () => {
         try {
@@ -266,11 +264,17 @@ export function ToolNumbers({ dictionary }: { dictionary: Dictionary }) {
                 headers['Authorization'] = `Bearer ${token}`;
             }
             const res = await fetch('/api/numbers/generate', { headers });
+            const data = await res.json().catch(() => null);
+
             if (!res.ok) {
-                const data = await res.json().catch(() => null);
+                if (res.status === 503) {
+                    setUserLimit({ count: 0, isLimited: false });
+                    return;
+                }
+
                 throw new Error(data?.error || 'limit check failed');
             }
-            const data = await res.json();
+
             const count = data.dailyCount ?? 0;
             const limit = data.dailyLimit ?? DAILY_LIMIT;
             setUserLimit({ count, isLimited: !data.isAdmin && count >= limit });
@@ -333,75 +337,57 @@ export function ToolNumbers({ dictionary }: { dictionary: Dictionary }) {
 
 
     const fetchStockSummary = useCallback(async () => {
-        if (!firestore) return;
         setIsStockLoading(true);
 
         try {
-            const q = query(
-                collection(firestore, 'availableNumbers'),
-                where("isUsed", "==", false)
-            );
+            const res = await fetch('/api/numbers/stock');
+            const data = await res.json().catch(() => null);
 
-            const querySnapshot = await getDocs(q);
-
-            const periods2025: string[] = [];
-            let currentDate2025 = new Date(2025, 0, 1);
-            const endDate2025 = new Date(2025, 11, 1);
-            while (currentDate2025 <= endDate2025) {
-                periods2025.push(format(currentDate2025, 'yyyy-MM'));
-                currentDate2025 = addMonths(currentDate2025, 1);
+            if (!res.ok) {
+                throw new Error(data?.error || 'Tidak dapat memuat ringkasan stok.');
             }
-            setStockPeriods2025(periods2025);
 
-            const periods2026: string[] = [];
-            let currentDate2026 = new Date(2026, 0, 1);
-            const endDate2026 = new Date(2026, 2, 1);
-            while (currentDate2026 <= endDate2026) {
-                periods2026.push(format(currentDate2026, 'yyyy-MM'));
-                currentDate2026 = addMonths(currentDate2026, 1);
-            }
-            setStockPeriods2026(periods2026);
-
-
-            const categories = Object.keys(mergedCategories);
-            setStockCategories(categories);
-
-            const allPeriods = [...periods2025, ...periods2026];
-            const matrix: StockMatrix = {};
-            categories.forEach(cat => {
-                matrix[cat] = {};
-                allPeriods.forEach(p => {
-                    matrix[cat][p] = 0;
-                });
-            });
-
-            querySnapshot.forEach((doc) => {
-                const data = doc.data();
-                const year = data.year;
-                if (year === 2025 || year === 2026) {
-                    const periodKey = format(new Date(year, data.month - 1), 'yyyy-MM');
-                    if (matrix[data.category] && typeof matrix[data.category][periodKey] !== 'undefined') {
-                        matrix[data.category][periodKey]++;
-                    }
-                }
-            });
-
-            setStockMatrix(matrix);
+            setStockPeriods2025(Array.isArray(data?.periods2025) ? data.periods2025 : []);
+            setStockPeriods2026(Array.isArray(data?.periods2026) ? data.periods2026 : []);
+            setStockCategories(Array.isArray(data?.categories) ? data.categories : Object.keys(mergedCategories));
+            setStockMatrix((data?.matrix ?? {}) as StockMatrix);
 
         } catch (error) {
             console.error("Error fetching stock summary:", error);
-            toast({ variant: "destructive", title: "Gagal Mengambil Stok", description: "Tidak dapat memuat ringkasan stok." });
+            toast({
+                variant: "destructive",
+                title: "Gagal Mengambil Stok",
+                description: getErrorMessage(error, "Tidak dapat memuat ringkasan stok."),
+            });
         } finally {
             setIsStockLoading(false);
         }
-    }, [firestore, toast, mergedCategories]);
+    }, [toast, mergedCategories]);
 
-    const handleDocTypeChange = (id: string, value: string) => {
-        if (!value) return;
-        const [category, docType] = value.split('__');
+    const handleCategoryChange = (id: string, category: string) => {
+        setRequests(prev => prev.map(req => {
+            if (req.id !== id) return req;
+
+            const availableTypes = mergedCategories[category]?.types ?? [];
+            const nextDocType = availableTypes.includes(req.docType) ? req.docType : '';
+
+            return { ...req, category, docType: nextDocType };
+        }));
+    };
+
+    const handleDocTypeChange = (id: string, docType: string) => {
+        if (!docType) return;
+
         setRequests(prev => {
+            const currentRequest = prev.find(req => req.id === id);
+            const category = currentRequest?.category;
+
+            if (!category) {
+                return prev;
+            }
+
             const updated = prev.map(req =>
-                req.id === id ? { ...req, category, docType } : req
+                req.id === id ? { ...req, docType } : req
             );
 
             if (category === 'UM.000' && docType === 'ND UT') {
@@ -654,6 +640,8 @@ export function ToolNumbers({ dictionary }: { dictionary: Dictionary }) {
 
     const totalQuantity = requests.reduce((sum, req) => sum + req.quantity, 0);
     const hasResults = generatedNumbers.length > 0;
+    const successCount = generatedNumbers.filter(result => !result.isError).length;
+    const failedCount = generatedNumbers.filter(result => result.isError).length;
 
     return (
         <ToolWrapper
@@ -669,8 +657,8 @@ export function ToolNumbers({ dictionary }: { dictionary: Dictionary }) {
                         <div className="absolute top-4 left-0 right-0 h-0.5 border-t-2 border-dashed border-primary/20 -z-10" />
 
                         {[
-                            { step: 1, label: "Pilih Jenis & Tanggal", active: !hasResults, done: hasResults },
-                            { step: 2, label: "Generate Nomor", active: !hasResults, done: hasResults },
+                            { step: 1, label: "Pilih Dokumen", active: !hasResults, done: hasResults },
+                            { step: 2, label: "Buat Nomor", active: !hasResults, done: hasResults },
                             { step: 3, label: "Salin Hasil", active: hasResults, done: false }
                         ].map((s) => (
                             <div key={s.step} className="flex flex-col items-center gap-3 bg-background px-4">
@@ -715,8 +703,8 @@ export function ToolNumbers({ dictionary }: { dictionary: Dictionary }) {
                         <Card className="border-primary/10 bg-card/50 shadow-sm overflow-hidden transition-shadow duration-300 hover:shadow-md">
                             <CardHeader className="bg-muted/20 border-b flex flex-col md:flex-row md:items-center justify-between gap-6 p-6">
                                 <div className="space-y-1">
-                                    <CardTitle className="font-display text-xl uppercase tracking-tight">Konfigurasi Permintaan</CardTitle>
-                                    <CardDescription>Tentukan kategori dan periode dokumen yang ingin dibuat. Tool ini bisa dipakai langsung oleh siapa pun yang memiliki link.</CardDescription>
+                                    <CardTitle className="font-display text-xl uppercase tracking-tight">Isi kebutuhan nomor</CardTitle>
+                                    <CardDescription>Pilih dokumen, tentukan tanggal, lalu buat nomor yang Anda perlukan. Semua orang yang memiliki link dapat langsung memakai tool ini.</CardDescription>
                                 </div>
 
                                 {!isAdminUser && (
@@ -727,7 +715,7 @@ export function ToolNumbers({ dictionary }: { dictionary: Dictionary }) {
                                             <div className="bg-background/80 backdrop-blur-sm p-4 rounded-xl border border-primary/5 shadow-inner min-w-45">
                                                 <div className="flex items-center justify-between mb-2">
                                                     <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-1">
-                                                        <Database className="h-3" /> Kuota Hari Ini
+                                                        <Database className="h-3" /> Kuota Publik Hari Ini
                                                     </span>
                                                     <span className="text-[10px] font-bold text-primary">
                                                         {remainingLimit} / {DAILY_LIMIT} tersisa
@@ -746,12 +734,22 @@ export function ToolNumbers({ dictionary }: { dictionary: Dictionary }) {
                                 )}
                             </CardHeader>
                             <CardContent className="space-y-8 p-6">
-                                <div className="rounded-2xl border border-primary/10 bg-primary/[0.03] px-4 py-3 text-sm text-muted-foreground">
-                                    <span className="font-black uppercase tracking-widest text-[10px] text-primary mr-2">Akses publik</span>
-                                    Semua pengguna yang punya link bisa generate nomor tanpa login. Login hanya diperlukan untuk fitur admin seperti injector dan pengaturan lanjutan.
+                                <div className="grid gap-3 md:grid-cols-3">
+                                    <div className="rounded-2xl border border-primary/10 bg-primary/[0.03] px-4 py-3">
+                                        <p className="text-[10px] font-black uppercase tracking-widest text-primary">Tanpa login</p>
+                                        <p className="mt-1 text-sm text-muted-foreground">Generator bisa langsung dipakai oleh siapa pun yang memiliki link.</p>
+                                    </div>
+                                    <div className="rounded-2xl border border-primary/10 bg-primary/[0.03] px-4 py-3">
+                                        <p className="text-[10px] font-black uppercase tracking-widest text-primary">Kuota publik</p>
+                                        <p className="mt-1 text-sm text-muted-foreground">Pengguna umum dapat membuat hingga {DAILY_LIMIT} nomor per hari.</p>
+                                    </div>
+                                    <div className="rounded-2xl border border-primary/10 bg-primary/[0.03] px-4 py-3">
+                                        <p className="text-[10px] font-black uppercase tracking-widest text-primary">Admin opsional</p>
+                                        <p className="mt-1 text-sm text-muted-foreground">Login hanya diperlukan untuk injector dan pengaturan internal.</p>
+                                    </div>
                                 </div>
                                 <div className="space-y-3">
-                                    <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Kategori Nilai Proyek</Label>
+                                    <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Kelompok Nilai Proyek</Label>
                                     <RadioGroup defaultValue="below_500m" value={valueCategory} className="flex flex-wrap items-center gap-6" onValueChange={(value) => setValueCategory(value as ValueCategory)}>
                                         <div className="flex items-center space-x-2 bg-background/50 px-4 py-2 rounded-lg border focus-within:ring-2 focus-within:ring-accent/20 transition-all">
                                             <RadioGroupItem value="below_500m" id="below" className="focus-visible:ring-accent" />
@@ -762,14 +760,19 @@ export function ToolNumbers({ dictionary }: { dictionary: Dictionary }) {
                                             <Label htmlFor="above" className="text-sm">500 Juta atau lebih</Label>
                                         </div>
                                     </RadioGroup>
+                                    <p className="text-xs text-muted-foreground">Saat ini generator publik tersedia untuk dokumen proyek di bawah 500 juta.</p>
                                 </div>
 
                                 <div className="space-y-4">
+                                    <div className="space-y-1">
+                                        <p className="text-[10px] font-black uppercase tracking-widest text-primary">Langkah 1</p>
+                                        <p className="text-sm text-muted-foreground">Pilih kategori terlebih dahulu agar daftar jenis dokumen lebih ringkas, lalu lengkapi tanggal dan jumlahnya.</p>
+                                    </div>
                                     <AnimatePresence>
                                         {requests.map((req, index) => (
                                             <motion.div
                                                 key={req.id}
-                                                className="grid grid-cols-1 md:grid-cols-[auto_2fr_1.5fr_1fr_auto] gap-4 items-end p-4 md:p-5 border-2 border-primary/5 hover:border-primary/15 transition-colors rounded-2xl bg-linear-to-br from-background to-muted/20 shadow-inner"
+                                                className="grid grid-cols-1 md:grid-cols-[auto_1.35fr_1.45fr_1.35fr_1fr_auto] gap-4 items-end p-4 md:p-5 border-2 border-primary/5 hover:border-primary/15 transition-colors rounded-2xl bg-linear-to-br from-background to-muted/20 shadow-inner"
                                                 initial={{ opacity: 0, y: -8, scale: 0.98 }}
                                                 animate={{ opacity: 1, y: 0, scale: 1 }}
                                                 exit={{ opacity: 0, y: -4, scale: 0.97, transition: { duration: 0.15 } }}
@@ -779,17 +782,34 @@ export function ToolNumbers({ dictionary }: { dictionary: Dictionary }) {
                                                     {index + 1}
                                                 </div>
                                                 <div className="space-y-2">
-                                                    <Label className="text-[10px] font-black uppercase text-muted-foreground ml-1">Jenis Dokumen</Label>
-                                                    <Select onValueChange={(v) => handleDocTypeChange(req.id, v)} value={req.category && req.docType ? `${req.category}__${req.docType}` : ''}>
-                                                        <SelectTrigger className="h-11 rounded-lg border-primary/10 focus:ring-accent focus:ring-offset-0"><SelectValue placeholder="Pilih..." /></SelectTrigger>
+                                                    <Label className="text-[10px] font-black uppercase text-muted-foreground ml-1">Kategori Dokumen</Label>
+                                                    <Select onValueChange={(value) => handleCategoryChange(req.id, value)} value={req.category}>
+                                                        <SelectTrigger className="h-11 rounded-lg border-primary/10 focus:ring-accent focus:ring-offset-0"><SelectValue placeholder="Pilih kategori" /></SelectTrigger>
                                                         <SelectContent className="border-primary/10">
-                                                            {allDocTypes.map(typeInfo => (
+                                                            {categoryOptions.map(category => (
                                                                 <SelectItem
-                                                                    key={typeInfo.value}
-                                                                    value={typeInfo.value}
+                                                                    key={category.value}
+                                                                    value={category.value}
                                                                     className="cursor-pointer focus:bg-accent/10 focus:text-accent data-[state=checked]:text-accent data-[state=checked]:font-bold"
                                                                 >
-                                                                    {typeInfo.label}
+                                                                    {category.label} · {category.totalTypes} jenis
+                                                                </SelectItem>
+                                                            ))}
+                                                        </SelectContent>
+                                                    </Select>
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <Label className="text-[10px] font-black uppercase text-muted-foreground ml-1">Jenis Dokumen</Label>
+                                                    <Select onValueChange={(value) => handleDocTypeChange(req.id, value)} value={req.docType} disabled={!req.category}>
+                                                        <SelectTrigger className="h-11 rounded-lg border-primary/10 focus:ring-accent focus:ring-offset-0"><SelectValue placeholder={req.category ? "Pilih jenis dokumen" : "Pilih kategori dulu"} /></SelectTrigger>
+                                                        <SelectContent className="border-primary/10">
+                                                            {(mergedCategories[req.category]?.types ?? []).map(type => (
+                                                                <SelectItem
+                                                                    key={`${req.category}-${type}`}
+                                                                    value={type}
+                                                                    className="cursor-pointer focus:bg-accent/10 focus:text-accent data-[state=checked]:text-accent data-[state=checked]:font-bold"
+                                                                >
+                                                                    {type}
                                                                 </SelectItem>
                                                             ))}
                                                         </SelectContent>
@@ -801,7 +821,7 @@ export function ToolNumbers({ dictionary }: { dictionary: Dictionary }) {
                                                         <PopoverTrigger asChild>
                                                             <Button variant={'outline'} className={cn('w-full h-11 justify-start text-left font-normal rounded-lg border-primary/10 hover:border-primary/30 focus-visible:ring-accent', !req.docDate && 'text-muted-foreground')}>
                                                                 <CalendarIcon className="mr-2 h-4 w-4 text-accent" />
-                                                                {req.docDate ? format(req.docDate, 'd MMM yyyy', { locale: id }) : <span>Pilih tanggal</span>}
+                                                                {req.docDate ? format(req.docDate, 'd MMM yyyy', { locale: id }) : <span>Pilih tanggal dokumen</span>}
                                                             </Button>
                                                         </PopoverTrigger>
                                                         <PopoverContent className="w-auto p-0 border-primary/15 shadow-2xl rounded-2xl overflow-hidden backdrop-blur-sm">
@@ -870,7 +890,7 @@ export function ToolNumbers({ dictionary }: { dictionary: Dictionary }) {
                                         className="w-full md:w-auto h-11 px-6 rounded-full text-primary hover:bg-primary/5 transition-all duration-200 active:scale-95"
                                     >
                                         <PlusCircle className="mr-2 h-4 w-4" />
-                                        Tambah Baris
+                                        Tambah Permintaan
                                     </Button>
 
                                     <Dialog open={isStockDialogOpen} onOpenChange={(isOpen) => {
@@ -880,7 +900,7 @@ export function ToolNumbers({ dictionary }: { dictionary: Dictionary }) {
                                         <DialogTrigger asChild>
                                             <Button variant="secondary" className="w-full md:w-auto h-11 px-6 rounded-full transition-all duration-200 active:scale-95">
                                                 <Database className="mr-2 h-4 w-4 text-accent" />
-                                                Cek Stok Tersedia
+                                                Lihat Stok Tersedia
                                             </Button>
                                         </DialogTrigger>
                                         <DialogContent className="max-w-5xl p-0 overflow-hidden border-primary/10 rounded-2xl shadow-2xl shadow-primary/10">
@@ -997,7 +1017,7 @@ export function ToolNumbers({ dictionary }: { dictionary: Dictionary }) {
                                         </DialogContent>
                                     </Dialog>
 
-                                    <div className="flex-1">
+                                    <div className="flex-1 min-w-0">
                                         <Button
                                             onClick={handleGenerate}
                                             disabled={isGenerating || userLimit.isLimited}
@@ -1007,17 +1027,18 @@ export function ToolNumbers({ dictionary }: { dictionary: Dictionary }) {
                                             )}
                                         >
                                             {isGenerating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Zap className="mr-2 h-4 w-4" />}
-                                            {isGenerating ? 'Memproses...' : `Generate Semua (${totalQuantity} Nomor)`}
+                                            {isGenerating ? 'Sedang Membuat...' : `Buat ${totalQuantity} Nomor`}
                                         </Button>
                                     </div>
                                 </div>
+                                <p className="text-xs text-muted-foreground">Hasil akan muncul di bawah setelah proses selesai, lalu bisa langsung Anda salin.</p>
 
                                 {!isAdminUser && userLimit.isLimited && (
                                     <div className="mt-4 flex items-center gap-4 rounded-xl border border-destructive/20 bg-linear-to-r from-destructive/10 to-destructive/5 p-5 border-l-4 border-l-destructive animate-in slide-in-from-top-2">
                                         <AlertTriangle className="h-6 w-6 shrink-0 text-destructive" />
                                         <div className="space-y-0.5">
-                                            <p className="text-sm font-black text-destructive uppercase tracking-tight">Batas Harian Tercapai</p>
-                                            <p className="text-xs text-destructive/70 font-medium">Kuota akan direset otomatis esok hari pukul 00.00.</p>
+                                            <p className="text-sm font-black text-destructive uppercase tracking-tight">Kuota Publik Hari Ini Sudah Habis</p>
+                                            <p className="text-xs text-destructive/70 font-medium">Silakan coba lagi besok. Kuota akan direset otomatis pukul 00.00.</p>
                                         </div>
                                     </div>
                                 )}
@@ -1035,14 +1056,24 @@ export function ToolNumbers({ dictionary }: { dictionary: Dictionary }) {
                                     <Card className="border-accent/20 bg-accent/5 shadow-xl ring-1 ring-accent/5 overflow-hidden transition-shadow duration-300 hover:shadow-2xl">
                                         <CardHeader className="bg-linear-to-r from-accent/15 to-accent/5 border-b border-accent/10 p-6">
                                             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                                                <div className="flex items-center gap-3">
-                                                    <div className="p-2 bg-accent rounded-xl shadow-lg shadow-accent/30"><CheckCircle className="h-5 w-5 text-white" /></div>
-                                                    <CardTitle className="font-display text-2xl font-black uppercase tracking-tighter">Hasil Generate</CardTitle>
+                                                <div className="space-y-3">
+                                                    <div className="flex items-center gap-3">
+                                                        <div className="p-2 bg-accent rounded-xl shadow-lg shadow-accent/30"><CheckCircle className="h-5 w-5 text-white" /></div>
+                                                        <CardTitle className="font-display text-2xl font-black uppercase tracking-tighter">Hasil Generate</CardTitle>
+                                                    </div>
+                                                    <div className="flex flex-wrap gap-2">
+                                                        <Badge variant="outline" className="rounded-full bg-background/70 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-accent border-accent/20">
+                                                            {successCount} berhasil
+                                                        </Badge>
+                                                        <Badge variant="outline" className="rounded-full bg-background/70 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-muted-foreground border-primary/10">
+                                                            {failedCount} perlu perhatian
+                                                        </Badge>
+                                                    </div>
                                                 </div>
                                                 <div className="flex flex-wrap gap-2">
                                                     <Button variant="outline" size="sm" onClick={copyFullResults} className="rounded-full bg-background/50 h-9 text-[10px] font-black border-accent/20 hover:border-accent transition-all active:scale-95">
                                                         {isCopied === 'full' ? <Check className="mr-2 h-3.5 w-3.5 text-emerald-500" /> : <Copy className="mr-2 h-3.5 w-3.5" />}
-                                                        SALIN LENGKAP
+                                                        SALIN DENGAN DETAIL
                                                     </Button>
                                                     <Button variant="outline" size="sm" onClick={copyNumbersOnly} className="rounded-full bg-background/50 h-9 text-[10px] font-black border-accent/20 hover:border-accent transition-all active:scale-95">
                                                         {isCopied === 'numbers' ? <Check className="mr-2 h-3.5 w-3.5 text-emerald-500" /> : <Hash className="mr-2 h-3.5 w-3.5" />}
@@ -1050,12 +1081,22 @@ export function ToolNumbers({ dictionary }: { dictionary: Dictionary }) {
                                                     </Button>
                                                     <Button variant="secondary" size="sm" onClick={handleReset} className="rounded-full h-9 text-[10px] font-black transition-all active:scale-95">
                                                         <RotateCcw className="mr-2 h-3.5 w-3.5" />
-                                                        ULANGI
+                                                        BUAT LAGI
                                                     </Button>
                                                 </div>
                                             </div>
                                         </CardHeader>
                                         <CardContent className="p-6 space-y-6">
+                                            <div className="grid gap-3 md:grid-cols-2">
+                                                <div className="rounded-2xl border border-accent/10 bg-background/70 px-4 py-3">
+                                                    <p className="text-[10px] font-black uppercase tracking-widest text-accent">Ringkasan</p>
+                                                    <p className="mt-1 text-sm text-muted-foreground">Gunakan tombol salin untuk menyalin semua hasil sekaligus atau salin satu per satu jika diperlukan.</p>
+                                                </div>
+                                                <div className="rounded-2xl border border-primary/10 bg-background/70 px-4 py-3">
+                                                    <p className="text-[10px] font-black uppercase tracking-widest text-primary">Catatan</p>
+                                                    <p className="mt-1 text-sm text-muted-foreground">Baris yang bertanda gagal berarti nomor belum tersedia atau kuota publik sudah habis.</p>
+                                                </div>
+                                            </div>
                                             <div className="space-y-3">
                                                 <ol className="space-y-3">
                                                     {generatedNumbers.map((result, index) => (
@@ -1071,6 +1112,10 @@ export function ToolNumbers({ dictionary }: { dictionary: Dictionary }) {
                                                                         "text-[10px] font-black uppercase tracking-[0.15em]",
                                                                         result.isError ? "text-destructive" : "text-accent"
                                                                     )}>{result.docType}</span>
+                                                                    <Badge variant="outline" className={cn(
+                                                                        "rounded-full px-2 py-0.5 text-[8px] font-black uppercase tracking-widest",
+                                                                        result.isError ? "border-destructive/20 bg-destructive/5 text-destructive" : "border-accent/20 bg-accent/5 text-accent"
+                                                                    )}>{result.isError ? 'Perlu perhatian' : 'Siap disalin'}</Badge>
                                                                     <span className="h-1 w-1 rounded-full bg-muted-foreground/30" />
                                                                     <span className="text-[10px] font-bold text-muted-foreground/60 uppercase">
                                                                         {format(result.date, 'd MMMM yyyy', { locale: id })}
@@ -1102,11 +1147,11 @@ export function ToolNumbers({ dictionary }: { dictionary: Dictionary }) {
                             <CardHeader className="bg-muted/20 border-b p-6">
                                 <div className="flex items-center justify-between">
                                     <div>
-                                        <CardTitle className="font-display text-xl uppercase tracking-tight">Riwayat Hari Ini</CardTitle>
+                                        <CardTitle className="font-display text-xl uppercase tracking-tight">Riwayat Pribadi Hari Ini</CardTitle>
                                         <CardDescription>
                                             {isLoggedIn
-                                                ? 'Daftar nomor yang telah Anda ambil pada hari ini.'
-                                                : 'Riwayat pribadi tersedia setelah login. Penggunaan publik tetap bisa langsung berjalan tanpa login.'}
+                                                ? 'Daftar nomor yang sudah Anda ambil hari ini agar mudah dicek ulang atau disalin kembali.'
+                                                : 'Riwayat pribadi tersedia setelah login. Anda tetap bisa membuat nomor tanpa login seperti biasa.'}
                                         </CardDescription>
                                     </div>
                                     <Button variant="ghost" size="sm" onClick={fetchMyHistory} disabled={isHistoryLoading || !isLoggedIn} className="rounded-full gap-2">
@@ -1121,7 +1166,7 @@ export function ToolNumbers({ dictionary }: { dictionary: Dictionary }) {
                                         <FileSpreadsheet className="h-12 w-12 mx-auto text-muted-foreground/20" />
                                         <div className="space-y-1.5">
                                             <p className="text-sm font-black uppercase tracking-widest text-primary">Login opsional untuk riwayat</p>
-                                            <p className="text-sm text-muted-foreground max-w-xl mx-auto">Generator tetap dapat dipakai bebas oleh siapa pun yang memiliki link. Jika Anda login sebagai admin, Anda juga bisa membuka injector dan pengaturan internal.</p>
+                                            <p className="text-sm text-muted-foreground max-w-xl mx-auto">Generator tetap dapat dipakai bebas oleh siapa pun yang memiliki link. Jika Anda login, riwayat pribadi akan tersimpan dan admin juga bisa membuka injector.</p>
                                         </div>
                                     </div>
                                 ) : isHistoryLoading ? (

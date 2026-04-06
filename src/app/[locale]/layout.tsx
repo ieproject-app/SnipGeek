@@ -10,7 +10,6 @@ import {
   getAllNotesTranslationsMap,
   getSortedNotesData,
 } from "@/lib/notes";
-import "../globals.css";
 import type { Metadata } from "next";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ReadingListProvider } from "@/hooks/use-reading-list";

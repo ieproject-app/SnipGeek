@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import "./globals.css";
 import {
   Bricolage_Grotesque,
   Plus_Jakarta_Sans,
