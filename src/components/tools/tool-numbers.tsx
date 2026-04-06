@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -31,11 +31,11 @@ import {
     FileSpreadsheet
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { format, addMonths } from 'date-fns';
+import { format, addMonths, addDays } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { useToast } from '@/hooks/use-toast';
 import { useFirestore, useUser } from '@/firebase';
-import { collection, query, where, getDocs, runTransaction, doc, limit, getDoc, orderBy, writeBatch } from 'firebase/firestore';
+import { collection, query, where, getDocs, runTransaction, doc, limit, getDoc, orderBy, writeBatch, setDoc, deleteDoc } from 'firebase/firestore';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     Dialog,
@@ -53,21 +53,24 @@ import { Dictionary } from '@/lib/get-dictionary';
 
 const DAILY_LIMIT = 10;
 
-const documentCategories: Record<string, { name: string; types: string[] }> = {
+const STATIC_DOCUMENT_CATEGORIES: Record<string, { name: string; types: string[] }> = {
     'UM.000': { name: 'Umum', types: ['ND UT'] },
     'HK.800': { name: 'Hukum', types: ['BAUT', 'LAUT', 'BA ABD', 'BA REKON'] },
     'HK.820': { name: 'Amandemen', types: ['AMD PERTAMA', 'AMD KEDUA', 'AMD KETIGA', 'AMD KEEMPAT', 'AMD PENUTUP'] },
     'LG.270': { name: 'Penetapan', types: ['PENETAPAN'] },
+    'LG.000': { name: 'Justifikasi', types: ['JUSTIFIKASI'] },
 };
 
-const allDocTypes = Object.entries(documentCategories).flatMap(([category, { types }]) =>
-    types.map(type => ({
-        value: `${category}__${type}`,
-        label: `${type} (${category})`,
-        category: category,
-        docType: type
-    }))
-).sort((a, b) => a.label.localeCompare(b.label));
+function buildDocTypes(categories: Record<string, { name: string; types: string[] }>) {
+    return Object.entries(categories).flatMap(([category, { types }]) =>
+        types.map(type => ({
+            value: `${category}__${type}`,
+            label: `${type} (${category})`,
+            category: category,
+            docType: type
+        }))
+    ).sort((a, b) => a.label.localeCompare(b.label));
+}
 
 type ValueCategory = 'below_500m' | 'above_500m';
 
@@ -81,9 +84,17 @@ interface GenerationRequest {
 
 interface GeneratedResult {
     text: string;
+    rawNumber: string;
     date: Date;
     docType: string;
     isError?: boolean;
+}
+
+interface DynamicCategory {
+    id: string;
+    category: string;
+    name: string;
+    types: string[];
 }
 
 interface StockMatrix {
@@ -138,12 +149,81 @@ export function ToolNumbers({ dictionary }: { dictionary: Dictionary }) {
     const [isLimitLoading, setIsLimitLoading] = useState(true);
     const [isAdminUser, setIsAdminUser] = useState(false);
 
+    // Dynamic categories (admin-configurable, loaded from Firestore)
+    const [dynamicCategories, setDynamicCategories] = useState<DynamicCategory[]>([]);
+    const [newCatCode, setNewCatCode] = useState('');
+    const [newCatName, setNewCatName] = useState('');
+    const [newCatTypes, setNewCatTypes] = useState('');
+    const [isSavingCat, setIsSavingCat] = useState(false);
+
     const { toast } = useToast();
     const { notify } = useNotification();
     const firestore = useFirestore();
     const { user } = useUser();
 
     const toolMeta = dictionary.tools.tool_list.number_generator;
+
+    const mergedCategories = useMemo(() => {
+        const dynamic: Record<string, { name: string; types: string[] }> = {};
+        dynamicCategories.forEach(dc => {
+            dynamic[dc.category] = { name: dc.name, types: dc.types };
+        });
+        return { ...STATIC_DOCUMENT_CATEGORIES, ...dynamic };
+    }, [dynamicCategories]);
+
+    const allDocTypes = useMemo(() => buildDocTypes(mergedCategories), [mergedCategories]);
+
+    const fetchDynamicCategories = useCallback(async () => {
+        if (!firestore) return;
+        try {
+            const q = query(collection(firestore, 'documentTypeConfig'));
+            const snap = await getDocs(q);
+            const cats: DynamicCategory[] = snap.docs.map(d => ({
+                id: d.id,
+                ...(d.data() as Omit<DynamicCategory, 'id'>)
+            }));
+            setDynamicCategories(cats);
+        } catch (error) {
+            console.error('Error fetching dynamic categories:', error);
+        }
+    }, [firestore]);
+
+    const handleSaveDynamicCategory = useCallback(async () => {
+        if (!firestore || !isAdminUser) return;
+        const code = newCatCode.trim().toUpperCase();
+        const name = newCatName.trim();
+        const types = newCatTypes.split(',').map(t => t.trim().toUpperCase()).filter(Boolean);
+        if (!code || !name || types.length === 0) {
+            notify('Isi semua field kategori.', <AlertTriangle className="h-4 w-4" />);
+            return;
+        }
+        setIsSavingCat(true);
+        try {
+            const docRef = doc(firestore, 'documentTypeConfig', code);
+            await setDoc(docRef, { category: code, name, types }, { merge: true });
+            notify(`Kategori ${code} berhasil disimpan.`, <CheckCircle className="h-4 w-4 text-emerald-500" />);
+            setNewCatCode('');
+            setNewCatName('');
+            setNewCatTypes('');
+            await fetchDynamicCategories();
+        } catch (error) {
+            console.error('Error saving category:', error);
+            notify('Gagal menyimpan kategori.', <AlertTriangle className="h-4 w-4" />);
+        } finally {
+            setIsSavingCat(false);
+        }
+    }, [firestore, isAdminUser, newCatCode, newCatName, newCatTypes, notify, fetchDynamicCategories]);
+
+    const handleDeleteDynamicCategory = useCallback(async (catId: string) => {
+        if (!firestore || !isAdminUser) return;
+        try {
+            await deleteDoc(doc(firestore, 'documentTypeConfig', catId));
+            notify(`Kategori ${catId} dihapus.`, <Check className="h-4 w-4" />);
+            await fetchDynamicCategories();
+        } catch (error) {
+            console.error('Error deleting category:', error);
+        }
+    }, [firestore, isAdminUser, notify, fetchDynamicCategories]);
 
     const fetchAdminStatus = useCallback(async () => {
         if (!firestore || !user) {
@@ -217,8 +297,10 @@ export function ToolNumbers({ dictionary }: { dictionary: Dictionary }) {
             const querySnapshot = await getDocs(q);
             const history: GeneratedResult[] = querySnapshot.docs.map(doc => {
                 const data = doc.data();
+                const rawNum = (data.fullNumber as string).replace('{DOCTYPE} ', '');
                 return {
-                    text: data.fullNumber.replace('{DOCTYPE} ', ''),
+                    text: rawNum,
+                    rawNumber: rawNum,
                     docType: data.category,
                     date: new Date(data.assignedDate)
                 };
@@ -238,6 +320,10 @@ export function ToolNumbers({ dictionary }: { dictionary: Dictionary }) {
             fetchMyHistory();
         }
     }, [user, fetchUserLimit, fetchMyHistory]);
+
+    useEffect(() => {
+        fetchDynamicCategories();
+    }, [fetchDynamicCategories]);
 
 
     const fetchStockSummary = useCallback(async () => {
@@ -271,7 +357,7 @@ export function ToolNumbers({ dictionary }: { dictionary: Dictionary }) {
             setStockPeriods2026(periods2026);
 
 
-            const categories = Object.keys(documentCategories);
+            const categories = Object.keys(mergedCategories);
             setStockCategories(categories);
 
             const allPeriods = [...periods2025, ...periods2026];
@@ -302,14 +388,43 @@ export function ToolNumbers({ dictionary }: { dictionary: Dictionary }) {
         } finally {
             setIsStockLoading(false);
         }
-    }, [firestore, toast]);
+    }, [firestore, toast, mergedCategories]);
 
     const handleDocTypeChange = (id: string, value: string) => {
         if (!value) return;
         const [category, docType] = value.split('__');
-        setRequests(prev => prev.map(req =>
-            req.id === id ? { ...req, category, docType } : req
-        ));
+        setRequests(prev => {
+            const updated = prev.map(req =>
+                req.id === id ? { ...req, category, docType } : req
+            );
+
+            if (category === 'UM.000' && docType === 'ND UT') {
+                const ndUtReq = updated.find(r => r.id === id);
+                const baseDate = ndUtReq?.docDate || new Date();
+                const nextDay = addDays(baseDate, 1);
+
+                const autoTypes = [
+                    { category: 'HK.800', docType: 'BAUT' },
+                    { category: 'HK.800', docType: 'LAUT' },
+                    { category: 'HK.800', docType: 'BA ABD' },
+                ];
+
+                const existingKeys = updated.map(r => `${r.category}__${r.docType}`);
+                const toAdd = autoTypes.filter(t => !existingKeys.includes(`${t.category}__${t.docType}`));
+
+                if (toAdd.length > 0) {
+                    const newRows = toAdd.map(t => ({
+                        ...createNewRequest(),
+                        category: t.category,
+                        docType: t.docType,
+                        docDate: nextDay,
+                    }));
+                    return [...updated, ...newRows];
+                }
+            }
+
+            return updated;
+        });
     };
 
     const handleRequestChange = (id: string, field: keyof GenerationRequest, value: GenerationRequest[keyof GenerationRequest]) => {
@@ -373,7 +488,7 @@ export function ToolNumbers({ dictionary }: { dictionary: Dictionary }) {
 
                     if (processQuantity <= 0 && !isAdminUser) {
                         for (let i = 0; i < req.quantity; i++) {
-                            results.push({ text: 'KUOTA HABIS', docType: req.docType, date: req.docDate!, isError: true });
+                            results.push({ text: 'KUOTA HABIS', rawNumber: '', docType: req.docType, date: req.docDate!, isError: true });
                         }
                         continue;
                     }
@@ -399,8 +514,10 @@ export function ToolNumbers({ dictionary }: { dictionary: Dictionary }) {
                             assignedTo: user.email,
                             assignedDate: new Date().toISOString()
                         });
+                        const fullNum = docSnap.data().fullNumber as string;
                         results.push({
-                            text: docSnap.data().fullNumber.replace('{DOCTYPE}', req.docType),
+                            text: fullNum.replace('{DOCTYPE}', req.docType),
+                            rawNumber: fullNum.replace('{DOCTYPE} ', ''),
                             docType: req.docType,
                             date: req.docDate!
                         });
@@ -412,6 +529,7 @@ export function ToolNumbers({ dictionary }: { dictionary: Dictionary }) {
                         for (let i = 0; i < missingCount; i++) {
                             results.push({
                                 text: 'STOK HABIS',
+                                rawNumber: '',
                                 docType: req.docType,
                                 date: req.docDate!,
                                 isError: true
@@ -576,7 +694,7 @@ export function ToolNumbers({ dictionary }: { dictionary: Dictionary }) {
         if (generatedNumbers.length === 0) return;
         const textToCopy = generatedNumbers
             .filter(r => !r.isError)
-            .map(result => result.text)
+            .map(result => result.rawNumber)
             .join('\n');
 
         if (textToCopy === '') {
@@ -605,6 +723,7 @@ export function ToolNumbers({ dictionary }: { dictionary: Dictionary }) {
             title={toolMeta.title}
             description={toolMeta.description}
             dictionary={dictionary}
+            isPublic={true}
         >
             <div className="space-y-10">
                 {/* 1. Stepper Visual */}
@@ -613,20 +732,20 @@ export function ToolNumbers({ dictionary }: { dictionary: Dictionary }) {
                         <div className="absolute top-4 left-0 right-0 h-0.5 border-t-2 border-dashed border-primary/20 -z-10" />
 
                         {[
-                            { step: 1, label: "Pilih Jenis & Tanggal", active: !hasResults },
-                            { step: 2, label: "Generate Nomor", active: !hasResults },
-                            { step: 3, label: "Salin Hasil", active: hasResults }
+                            { step: 1, label: "Pilih Jenis & Tanggal", active: !hasResults, done: hasResults },
+                            { step: 2, label: "Generate Nomor", active: !hasResults, done: hasResults },
+                            { step: 3, label: "Salin Hasil", active: hasResults, done: false }
                         ].map((s) => (
                             <div key={s.step} className="flex flex-col items-center gap-3 bg-background px-4">
                                 <div className={cn(
                                     "w-8 h-8 rounded-full flex items-center justify-center text-xs font-black transition-all duration-500",
-                                    s.active ? "bg-primary text-primary-foreground shadow-lg scale-110" : "bg-muted text-muted-foreground"
+                                    s.done ? "bg-accent text-white scale-105" : s.active ? "bg-primary text-primary-foreground shadow-lg scale-110" : "bg-muted text-muted-foreground"
                                 )}>
-                                    {s.step}
+                                    {s.done ? <Check className="h-3.5 w-3.5" /> : s.step}
                                 </div>
                                 <span className={cn(
-                                    "text-[10px] uppercase tracking-widest font-black text-center max-w-20",
-                                    s.active ? "text-primary" : "text-muted-foreground/40"
+                                    "text-[10px] uppercase tracking-widest font-black text-center max-w-20 transition-colors duration-300",
+                                    s.done ? "text-accent" : s.active ? "text-primary" : "text-muted-foreground/40"
                                 )}>
                                     {s.label}
                                 </span>
@@ -710,9 +829,10 @@ export function ToolNumbers({ dictionary }: { dictionary: Dictionary }) {
                                             <motion.div
                                                 key={req.id}
                                                 className="grid grid-cols-1 md:grid-cols-[auto_2fr_1.5fr_1fr_auto] gap-4 items-end p-4 md:p-5 border-2 border-primary/5 hover:border-primary/15 transition-colors rounded-2xl bg-linear-to-br from-background to-muted/20 shadow-inner"
-                                                initial={{ opacity: 0, y: -10 }}
-                                                animate={{ opacity: 1, y: 0 }}
-                                                exit={{ opacity: 0, scale: 0.95 }}
+                                                initial={{ opacity: 0, y: -8, scale: 0.98 }}
+                                                animate={{ opacity: 1, y: 0, scale: 1 }}
+                                                exit={{ opacity: 0, y: -4, scale: 0.97, transition: { duration: 0.15 } }}
+                                                transition={{ type: 'spring', stiffness: 400, damping: 30 }}
                                             >
                                                 <div className="hidden md:flex items-center justify-center h-11 w-8 rounded-lg bg-primary/10 text-primary font-black text-sm">
                                                     {index + 1}
@@ -721,9 +841,13 @@ export function ToolNumbers({ dictionary }: { dictionary: Dictionary }) {
                                                     <Label className="text-[10px] font-black uppercase text-muted-foreground ml-1">Jenis Dokumen</Label>
                                                     <Select onValueChange={(v) => handleDocTypeChange(req.id, v)} value={req.category && req.docType ? `${req.category}__${req.docType}` : ''}>
                                                         <SelectTrigger className="h-11 rounded-lg border-primary/10 focus:ring-accent focus:ring-offset-0"><SelectValue placeholder="Pilih..." /></SelectTrigger>
-                                                        <SelectContent>
+                                                        <SelectContent className="border-primary/10">
                                                             {allDocTypes.map(typeInfo => (
-                                                                <SelectItem key={typeInfo.value} value={typeInfo.value}>
+                                                                <SelectItem
+                                                                    key={typeInfo.value}
+                                                                    value={typeInfo.value}
+                                                                    className="cursor-pointer focus:bg-accent/10 focus:text-accent data-[state=checked]:text-accent data-[state=checked]:font-bold"
+                                                                >
                                                                     {typeInfo.label}
                                                                 </SelectItem>
                                                             ))}
@@ -959,9 +1083,14 @@ export function ToolNumbers({ dictionary }: { dictionary: Dictionary }) {
                             </CardContent>
                         </Card>
 
-                        <AnimatePresence>
+                        <AnimatePresence mode="wait">
                             {hasResults && (
-                                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="animate-in zoom-in-95 duration-500">
+                                <motion.div
+                                    initial={{ opacity: 0, y: 24, scale: 0.97 }}
+                                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                                    exit={{ opacity: 0, y: 8, scale: 0.98 }}
+                                    transition={{ type: 'spring', stiffness: 350, damping: 30 }}
+                                >
                                     <Card className="border-accent/20 bg-accent/5 shadow-xl ring-1 ring-accent/5 overflow-hidden transition-shadow duration-300 hover:shadow-2xl">
                                         <CardHeader className="bg-linear-to-r from-accent/15 to-accent/5 border-b border-accent/10 p-6">
                                             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -1009,11 +1138,11 @@ export function ToolNumbers({ dictionary }: { dictionary: Dictionary }) {
                                                                 <span className={cn(
                                                                     "font-mono text-lg font-black tracking-tight",
                                                                     result.isError ? "text-destructive/60 italic" : "text-primary"
-                                                                )}>{result.text}</span>
+                                                                )}>{result.isError ? result.text : result.rawNumber}</span>
                                                             </div>
                                                             {!result.isError && (
-                                                                <Button variant="ghost" size="icon" className="h-10 w-10 rounded-xl hover:bg-accent/10 text-accent opacity-0 group-hover:opacity-100 transition-all" onClick={() => copyItem(result.text, index)}>
-                                                                    {copiedIndex === index ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                                                                <Button variant="ghost" size="icon" className="h-10 w-10 rounded-xl hover:bg-accent/10 text-accent shrink-0 transition-all" onClick={() => copyItem(result.rawNumber, index)}>
+                                                                    {copiedIndex === index ? <Check className="h-4 w-4 text-emerald-500" /> : <Copy className="h-4 w-4" />}
                                                                 </Button>
                                                             )}
                                                         </li>
@@ -1130,6 +1259,70 @@ export function ToolNumbers({ dictionary }: { dictionary: Dictionary }) {
                                                 <><Database className="mr-2 h-4 w-4" /> Mulai Injeksi</>
                                             )}
                                         </Button>
+                                    </div>
+
+                                    <div className="pt-6 border-t border-destructive/10 space-y-4">
+                                        <div className="flex items-center justify-between">
+                                            <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Manajemen Tipe Dokumen (Dinamis)</Label>
+                                            <Button variant="ghost" size="sm" onClick={fetchDynamicCategories} className="rounded-full text-[10px] h-7 gap-1.5 text-muted-foreground">
+                                                <RotateCcw className="h-3 w-3" /> Refresh
+                                            </Button>
+                                        </div>
+
+                                        {dynamicCategories.length > 0 && (
+                                            <div className="space-y-2">
+                                                {dynamicCategories.map(dc => (
+                                                    <div key={dc.id} className="flex items-center justify-between px-4 py-2.5 bg-background/50 rounded-xl border border-primary/10">
+                                                        <div className="flex items-center gap-3">
+                                                            <span className="font-mono text-xs font-black text-primary">{dc.category}</span>
+                                                            <span className="text-[10px] text-muted-foreground">{dc.name}</span>
+                                                            <span className="text-[9px] text-muted-foreground/60 font-mono">[{dc.types.join(', ')}]</span>
+                                                        </div>
+                                                        <Button variant="ghost" size="icon" onClick={() => handleDeleteDynamicCategory(dc.id)} className="h-7 w-7 rounded-lg hover:bg-destructive/10 text-destructive/40 hover:text-destructive">
+                                                            <Trash2 className="h-3.5 w-3.5" />
+                                                        </Button>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
+
+                                        <div className="grid grid-cols-1 md:grid-cols-[1fr_1fr_2fr_auto] gap-3 items-end p-4 bg-background/30 rounded-xl border border-dashed border-primary/10">
+                                            <div className="space-y-1.5">
+                                                <Label className="text-[9px] font-black uppercase text-muted-foreground">Kode Kategori</Label>
+                                                <Input
+                                                    placeholder="LG.999"
+                                                    value={newCatCode}
+                                                    onChange={e => setNewCatCode(e.target.value)}
+                                                    className="h-9 rounded-lg border-primary/10 font-mono text-xs focus-visible:ring-destructive/50"
+                                                />
+                                            </div>
+                                            <div className="space-y-1.5">
+                                                <Label className="text-[9px] font-black uppercase text-muted-foreground">Nama Kategori</Label>
+                                                <Input
+                                                    placeholder="Nama"
+                                                    value={newCatName}
+                                                    onChange={e => setNewCatName(e.target.value)}
+                                                    className="h-9 rounded-lg border-primary/10 text-xs focus-visible:ring-destructive/50"
+                                                />
+                                            </div>
+                                            <div className="space-y-1.5">
+                                                <Label className="text-[9px] font-black uppercase text-muted-foreground">Tipe Dokumen (pisah koma)</Label>
+                                                <Input
+                                                    placeholder="TIPE A, TIPE B"
+                                                    value={newCatTypes}
+                                                    onChange={e => setNewCatTypes(e.target.value)}
+                                                    className="h-9 rounded-lg border-primary/10 text-xs focus-visible:ring-destructive/50"
+                                                />
+                                            </div>
+                                            <Button
+                                                onClick={handleSaveDynamicCategory}
+                                                disabled={isSavingCat}
+                                                className="h-9 px-4 rounded-lg bg-primary hover:bg-primary/90 font-black text-[10px] uppercase tracking-widest"
+                                            >
+                                                {isSavingCat ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <PlusCircle className="h-3.5 w-3.5" />}
+                                            </Button>
+                                        </div>
+                                        <p className="text-[9px] text-muted-foreground/50 font-bold uppercase tracking-widest">Kategori baru akan tersedia di dropdown generator tanpa perlu deploy ulang.</p>
                                     </div>
                                 </CardContent>
                             </Card>
