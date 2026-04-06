@@ -127,7 +127,48 @@ export function ToolWrapper({
           </div>
         )}
 
-        {/* User banner hidden for public tools to maintain a clean layout */}
+        {/* Compact auth bar — login button for unauthenticated, user info for logged-in */}
+        {user ? (
+          <div className="flex items-center justify-between h-10 px-3 bg-muted/20 rounded-xl border border-border/40 overflow-hidden">
+            <div className="flex items-center gap-2 min-w-0">
+              <Avatar className="h-6 w-6 shrink-0 border border-border/60 shadow-sm">
+                <AvatarImage src={user.photoURL || ""} alt={user.displayName || "User"} />
+                <AvatarFallback className="bg-primary text-primary-foreground font-black text-[9px]">
+                  {user.displayName?.charAt(0) || "U"}
+                </AvatarFallback>
+              </Avatar>
+              <p className="text-[11px] font-black uppercase tracking-tight text-primary truncate max-w-[160px]">
+                {user.displayName}
+              </p>
+              <Badge
+                variant="secondary"
+                className="h-4 px-1.5 text-[8px] font-black uppercase bg-emerald-500/10 text-emerald-600 border-none shrink-0"
+              >
+                <CheckCircle2 className="h-2 w-2 mr-1" /> Verified
+              </Badge>
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleLogout}
+              className="h-6 px-2 rounded-lg text-[10px] font-black uppercase tracking-wider text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-all shrink-0"
+            >
+              <LogOut className="h-3 w-3 mr-1" /> Keluar
+            </Button>
+          </div>
+        ) : (
+          <div className="flex items-center justify-end">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleGoogleLogin}
+              className="h-7 px-3 rounded-full text-[10px] font-black uppercase tracking-widest text-muted-foreground/50 hover:text-primary hover:bg-primary/5 gap-1.5 transition-all"
+            >
+              <Chrome className="h-3 w-3" />
+              Masuk sebagai Admin
+            </Button>
+          </div>
+        )}
 
         <header className="text-center space-y-3">
           <h1 className="font-display text-4xl font-extrabold tracking-tighter text-primary uppercase">
