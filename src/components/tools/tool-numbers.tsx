@@ -51,7 +51,7 @@ import { useNotification } from '@/hooks/use-notification';
 import { ToolWrapper } from '@/components/tools/tool-wrapper';
 import { Dictionary } from '@/lib/get-dictionary';
 
-const DAILY_LIMIT = 10;
+const DAILY_LIMIT = 15;
 
 const STATIC_DOCUMENT_CATEGORIES: Record<string, { name: string; types: string[] }> = {
     'UM.000': { name: 'Umum', types: ['ND UT'] },
@@ -162,6 +162,8 @@ export function ToolNumbers({ dictionary }: { dictionary: Dictionary }) {
     const { user } = useUser();
 
     const toolMeta = dictionary.tools.tool_list.number_generator;
+    const isLoggedIn = Boolean(user);
+    const remainingLimit = Math.max(0, DAILY_LIMIT - userLimit.count);
 
     const mergedCategories = useMemo(() => {
         const dynamic: Record<string, { name: string; types: string[] }> = {};
@@ -250,7 +252,9 @@ export function ToolNumbers({ dictionary }: { dictionary: Dictionary }) {
     useEffect(() => {
         if (user) {
             fetchAdminStatus();
+            return;
         }
+        setIsAdminUser(false);
     }, [user, fetchAdminStatus]);
 
     const fetchUserLimit = useCallback(async () => {
@@ -262,7 +266,10 @@ export function ToolNumbers({ dictionary }: { dictionary: Dictionary }) {
                 headers['Authorization'] = `Bearer ${token}`;
             }
             const res = await fetch('/api/numbers/generate', { headers });
-            if (!res.ok) throw new Error('limit check failed');
+            if (!res.ok) {
+                const data = await res.json().catch(() => null);
+                throw new Error(data?.error || 'limit check failed');
+            }
             const data = await res.json();
             const count = data.dailyCount ?? 0;
             const limit = data.dailyLimit ?? DAILY_LIMIT;
@@ -314,7 +321,10 @@ export function ToolNumbers({ dictionary }: { dictionary: Dictionary }) {
         fetchUserLimit();
         if (user) {
             fetchMyHistory();
+            return;
         }
+        setMyHistory([]);
+        setIsHistoryLoading(false);
     }, [user, fetchUserLimit, fetchMyHistory]);
 
     useEffect(() => {
@@ -476,6 +486,8 @@ export function ToolNumbers({ dictionary }: { dictionary: Dictionary }) {
                 if (res.status === 429) {
                     notify(`Batas harian (${data.dailyLimit}) tercapai. Coba lagi besok.`, <AlertTriangle className="h-4 w-4" />);
                     setUserLimit({ count: data.dailyLimit, isLimited: true });
+                } else if (res.status === 503) {
+                    notify(data.error || 'Generator sementara belum siap di server. Hubungi admin untuk menyiapkan kredensial Firebase Admin.', <AlertTriangle className="h-4 w-4" />);
                 } else {
                     notify(data.error || 'Generate gagal.', <AlertTriangle className="h-4 w-4" />);
                 }
@@ -704,7 +716,7 @@ export function ToolNumbers({ dictionary }: { dictionary: Dictionary }) {
                             <CardHeader className="bg-muted/20 border-b flex flex-col md:flex-row md:items-center justify-between gap-6 p-6">
                                 <div className="space-y-1">
                                     <CardTitle className="font-display text-xl uppercase tracking-tight">Konfigurasi Permintaan</CardTitle>
-                                    <CardDescription>Tentukan kategori dan periode dokumen yang ingin dibuat.</CardDescription>
+                                    <CardDescription>Tentukan kategori dan periode dokumen yang ingin dibuat. Tool ini bisa dipakai langsung oleh siapa pun yang memiliki link.</CardDescription>
                                 </div>
 
                                 {!isAdminUser && (
@@ -718,14 +730,14 @@ export function ToolNumbers({ dictionary }: { dictionary: Dictionary }) {
                                                         <Database className="h-3" /> Kuota Hari Ini
                                                     </span>
                                                     <span className="text-[10px] font-bold text-primary">
-                                                        {DAILY_LIMIT - userLimit.count} / {DAILY_LIMIT} tersisa
+                                                        {remainingLimit} / {DAILY_LIMIT} tersisa
                                                     </span>
                                                 </div>
                                                 <Progress
-                                                    value={((DAILY_LIMIT - userLimit.count) / DAILY_LIMIT) * 100}
+                                                    value={(remainingLimit / DAILY_LIMIT) * 100}
                                                     className="h-1.5"
                                                     indicatorClassName={cn(
-                                                        (DAILY_LIMIT - userLimit.count) <= 3 ? "bg-destructive" : "bg-accent"
+                                                        remainingLimit <= 3 ? "bg-destructive" : "bg-accent"
                                                     )}
                                                 />
                                             </div>
@@ -734,6 +746,10 @@ export function ToolNumbers({ dictionary }: { dictionary: Dictionary }) {
                                 )}
                             </CardHeader>
                             <CardContent className="space-y-8 p-6">
+                                <div className="rounded-2xl border border-primary/10 bg-primary/[0.03] px-4 py-3 text-sm text-muted-foreground">
+                                    <span className="font-black uppercase tracking-widest text-[10px] text-primary mr-2">Akses publik</span>
+                                    Semua pengguna yang punya link bisa generate nomor tanpa login. Login hanya diperlukan untuk fitur admin seperti injector dan pengaturan lanjutan.
+                                </div>
                                 <div className="space-y-3">
                                     <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Kategori Nilai Proyek</Label>
                                     <RadioGroup defaultValue="below_500m" value={valueCategory} className="flex flex-wrap items-center gap-6" onValueChange={(value) => setValueCategory(value as ValueCategory)}>
@@ -1087,16 +1103,28 @@ export function ToolNumbers({ dictionary }: { dictionary: Dictionary }) {
                                 <div className="flex items-center justify-between">
                                     <div>
                                         <CardTitle className="font-display text-xl uppercase tracking-tight">Riwayat Hari Ini</CardTitle>
-                                        <CardDescription>Daftar nomor yang telah Anda ambil pada hari ini.</CardDescription>
+                                        <CardDescription>
+                                            {isLoggedIn
+                                                ? 'Daftar nomor yang telah Anda ambil pada hari ini.'
+                                                : 'Riwayat pribadi tersedia setelah login. Penggunaan publik tetap bisa langsung berjalan tanpa login.'}
+                                        </CardDescription>
                                     </div>
-                                    <Button variant="ghost" size="sm" onClick={fetchMyHistory} disabled={isHistoryLoading} className="rounded-full gap-2">
+                                    <Button variant="ghost" size="sm" onClick={fetchMyHistory} disabled={isHistoryLoading || !isLoggedIn} className="rounded-full gap-2">
                                         <RotateCcw className={cn("h-3.5 w-3.5", isHistoryLoading && "animate-spin")} />
                                         Refresh
                                     </Button>
                                 </div>
                             </CardHeader>
                             <CardContent className="p-6">
-                                {isHistoryLoading ? (
+                                {!isLoggedIn ? (
+                                    <div className="py-12 text-center border-2 border-dashed rounded-2xl bg-muted/5 space-y-4">
+                                        <FileSpreadsheet className="h-12 w-12 mx-auto text-muted-foreground/20" />
+                                        <div className="space-y-1.5">
+                                            <p className="text-sm font-black uppercase tracking-widest text-primary">Login opsional untuk riwayat</p>
+                                            <p className="text-sm text-muted-foreground max-w-xl mx-auto">Generator tetap dapat dipakai bebas oleh siapa pun yang memiliki link. Jika Anda login sebagai admin, Anda juga bisa membuka injector dan pengaturan internal.</p>
+                                        </div>
+                                    </div>
+                                ) : isHistoryLoading ? (
                                     <div className="py-20 text-center"><Loader2 className="h-10 w-10 animate-spin text-accent mx-auto" /></div>
                                 ) : myHistory.length > 0 ? (
                                     <div className="space-y-3">
