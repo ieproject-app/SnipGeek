@@ -35,7 +35,7 @@ import { format, addMonths, addDays } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { useToast } from '@/hooks/use-toast';
 import { useFirestore, useUser } from '@/firebase';
-import { collection, query, where, getDocs, runTransaction, doc, limit, getDoc, orderBy, writeBatch, setDoc, deleteDoc } from 'firebase/firestore';
+import { collection, query, where, getDocs, doc, getDoc, orderBy, writeBatch, setDoc, deleteDoc } from 'firebase/firestore';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     Dialog,
@@ -248,36 +248,26 @@ export function ToolNumbers({ dictionary }: { dictionary: Dictionary }) {
     }, [user, fetchAdminStatus]);
 
     const fetchUserLimit = useCallback(async () => {
-        if (!firestore || !user || isAdminUser) {
-            setIsLimitLoading(false);
-            return;
-        }
-
         setIsLimitLoading(true);
-        const todayStr = format(new Date(), 'yyyy-MM-dd');
-        const limitRef = doc(firestore, 'userGenerationLimits', user.uid);
-
         try {
-            const docSnap = await getDoc(limitRef);
-
-            if (docSnap.exists()) {
-                const data = docSnap.data();
-                if (data.lastGeneratedDate === todayStr) {
-                    const currentCount = data.dailyCount || 0;
-                    setUserLimit({ count: currentCount, isLimited: currentCount >= DAILY_LIMIT });
-                } else {
-                    setUserLimit({ count: 0, isLimited: false });
-                }
-            } else {
-                setUserLimit({ count: 0, isLimited: false });
+            const headers: Record<string, string> = {};
+            if (user) {
+                const token = await user.getIdToken();
+                headers['Authorization'] = `Bearer ${token}`;
             }
+            const res = await fetch('/api/numbers/generate', { headers });
+            if (!res.ok) throw new Error('limit check failed');
+            const data = await res.json();
+            const count = data.dailyCount ?? 0;
+            const limit = data.dailyLimit ?? DAILY_LIMIT;
+            setUserLimit({ count, isLimited: !data.isAdmin && count >= limit });
         } catch (error) {
-            console.error("Error fetching user limit:", error);
+            console.error('Error fetching user limit:', error);
             setUserLimit({ count: 0, isLimited: false });
         } finally {
             setIsLimitLoading(false);
         }
-    }, [firestore, user, isAdminUser]);
+    }, [user]);
 
     const fetchMyHistory = useCallback(async () => {
         if (!firestore || !user) return;
@@ -315,8 +305,8 @@ export function ToolNumbers({ dictionary }: { dictionary: Dictionary }) {
     }, [firestore, user]);
 
     useEffect(() => {
+        fetchUserLimit();
         if (user) {
-            fetchUserLimit();
             fetchMyHistory();
         }
     }, [user, fetchUserLimit, fetchMyHistory]);
@@ -440,14 +430,9 @@ export function ToolNumbers({ dictionary }: { dictionary: Dictionary }) {
     };
 
     const handleGenerate = async () => {
-        if (!firestore || !user) {
-            notify("Koneksi Gagal: Anda belum login.", <AlertTriangle className="h-4 w-4" />);
-            return;
-        }
-
         for (const req of requests) {
             if (!req.category || !req.docType || !req.docDate || req.quantity < 1) {
-                notify("Input Tidak Lengkap: Periksa kembali baris permintaan.", <AlertTriangle className="h-4 w-4" />);
+                notify('Input Tidak Lengkap: Periksa kembali baris permintaan.', <AlertTriangle className="h-4 w-4" />);
                 return;
             }
         }
@@ -456,119 +441,53 @@ export function ToolNumbers({ dictionary }: { dictionary: Dictionary }) {
         setGeneratedNumbers([]);
 
         try {
-            const generated = await runTransaction(firestore, async (transaction) => {
-                const limitRef = doc(firestore, 'userGenerationLimits', user.uid);
-                const todayStr = format(new Date(), 'yyyy-MM-dd');
-                let currentCount = 0;
-                let newDailyCount = 0;
+            const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+            let idToken: string | undefined;
+            if (user) {
+                idToken = await user.getIdToken();
+            }
 
-                if (!isAdminUser) {
-                    const limitDoc = await transaction.get(limitRef);
-                    if (limitDoc.exists()) {
-                        const limitData = limitDoc.data();
-                        if (limitData.lastGeneratedDate === todayStr) {
-                            currentCount = limitData.dailyCount;
-                        }
-                    }
+            const body = {
+                requests: requests.map(r => ({
+                    category: r.category,
+                    docType: r.docType,
+                    docDate: r.docDate!.toISOString(),
+                    quantity: r.quantity,
+                })),
+                valueCategory,
+                idToken,
+            };
 
-                    if (currentCount >= DAILY_LIMIT) {
-                        throw new Error(`Batas generate harian (${DAILY_LIMIT}) telah tercapai.`);
-                    }
-                }
-
-                const results: GeneratedResult[] = [];
-                let actualGeneratedCount = 0;
-
-                for (const req of requests) {
-                    const year = req.docDate!.getFullYear();
-                    const month = req.docDate!.getMonth() + 1;
-
-                    const remainingQuota = isAdminUser ? 999 : (DAILY_LIMIT - currentCount - actualGeneratedCount);
-                    const processQuantity = Math.min(req.quantity, remainingQuota);
-
-                    if (processQuantity <= 0 && !isAdminUser) {
-                        for (let i = 0; i < req.quantity; i++) {
-                            results.push({ text: 'KUOTA HABIS', rawNumber: '', docType: req.docType, date: req.docDate!, isError: true });
-                        }
-                        continue;
-                    }
-
-                    const numbersRef = collection(firestore, 'availableNumbers');
-                    const q = query(
-                        numbersRef,
-                        where("category", "==", req.category),
-                        where("year", "==", year),
-                        where("month", "==", month),
-                        where("valueCategory", "==", valueCategory),
-                        where("isUsed", "==", false),
-                        limit(processQuantity)
-                    );
-
-                    const querySnapshot = await getDocs(q);
-                    const foundCount = querySnapshot.docs.length;
-
-                    for (const docSnap of querySnapshot.docs) {
-                        const dRef = doc(firestore, 'availableNumbers', docSnap.id);
-                        transaction.update(dRef, {
-                            isUsed: true,
-                            assignedTo: user.email,
-                            assignedDate: new Date().toISOString()
-                        });
-                        const fullNum = docSnap.data().fullNumber as string;
-                        results.push({
-                            text: fullNum.replace('{DOCTYPE}', req.docType),
-                            rawNumber: fullNum.replace('{DOCTYPE} ', ''),
-                            docType: req.docType,
-                            date: req.docDate!
-                        });
-                        actualGeneratedCount++;
-                    }
-
-                    if (foundCount < req.quantity) {
-                        const missingCount = req.quantity - foundCount;
-                        for (let i = 0; i < missingCount; i++) {
-                            results.push({
-                                text: 'STOK HABIS',
-                                rawNumber: '',
-                                docType: req.docType,
-                                date: req.docDate!,
-                                isError: true
-                            });
-                        }
-                    }
-                }
-
-                if (!isAdminUser) {
-                    newDailyCount = currentCount + actualGeneratedCount;
-                    transaction.set(limitRef, { dailyCount: newDailyCount, lastGeneratedDate: todayStr }, { merge: true });
-                }
-
-                return results;
+            const res = await fetch('/api/numbers/generate', {
+                method: 'POST',
+                headers,
+                body: JSON.stringify(body),
             });
 
-            await fetchUserLimit();
-            await fetchMyHistory();
+            const data = await res.json();
 
-            await Promise.all(
-                Array.from(new Set(requests.map(r => `${r.category}|${r.docDate!.getFullYear()}|${r.docDate!.getMonth() + 1}`)))
-                    .map(async (uniqueReqKey) => {
-                        const [category, yearStr, monthStr] = uniqueReqKey.split('|');
-                        const q = query(
-                            collection(firestore, 'availableNumbers'),
-                            where("category", "==", category),
-                            where("year", "==", parseInt(yearStr)),
-                            where("month", "==", parseInt(monthStr)),
-                            where("valueCategory", "==", valueCategory),
-                            where("isUsed", "==", false)
-                        );
-                        const snapshot = await getDocs(q);
-                        const docTypeLabel = requests.find(r => r.category === category)?.docType || category;
-                        return {
-                            label: `${docTypeLabel} (${category}) - ${format(new Date(parseInt(yearStr), parseInt(monthStr) - 1), 'MMM yyyy', { locale: id })}`,
-                            count: snapshot.size,
-                        };
-                    })
-            );
+            if (!res.ok) {
+                if (res.status === 429) {
+                    notify(`Batas harian (${data.dailyLimit}) tercapai. Coba lagi besok.`, <AlertTriangle className="h-4 w-4" />);
+                    setUserLimit({ count: data.dailyLimit, isLimited: true });
+                } else {
+                    notify(data.error || 'Generate gagal.', <AlertTriangle className="h-4 w-4" />);
+                }
+                return;
+            }
+
+            const generated: GeneratedResult[] = (data.results as Array<{
+                text: string; rawNumber: string; date: string; docType: string; isError?: boolean;
+            }>).map(r => ({
+                ...r,
+                date: new Date(r.date),
+            }));
+
+            if (data.dailyLimit !== null) {
+                setUserLimit({ count: data.dailyCount, isLimited: data.dailyCount >= data.dailyLimit });
+            }
+
+            if (user) await fetchMyHistory();
 
             const sortedGenerated = generated.sort((a, b) => a.date.getTime() - b.date.getTime());
             setGeneratedNumbers(sortedGenerated);

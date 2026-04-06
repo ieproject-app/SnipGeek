@@ -43,6 +43,17 @@ service cloud.firestore {
       allow read, write: if isAdmin();
     }
 
+    // IP-based rate limits (written server-side only via Admin SDK — client read denied)
+    match /ipGenerationLimits/{ipHash} {
+      allow read, write: if false; // Admin SDK bypasses rules; no client access needed
+    }
+
+    // Dynamic document type categories (admin-configurable without redeploy)
+    match /documentTypeConfig/{catId} {
+      allow read: if true; // Anyone can read category config
+      allow write: if isAdmin();
+    }
+
     // Employee History Rules
     match /employee_history/{docId} {
       allow read: if isSignedIn();
