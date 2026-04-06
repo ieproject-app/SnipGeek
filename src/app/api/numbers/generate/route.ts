@@ -1,9 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { adminDb, adminAuth } from '@/lib/firebase-admin';
+import { adminDb, adminAuth, assertFirebaseAdminReady } from '@/lib/firebase-admin';
 import { format } from 'date-fns';
 import crypto from 'crypto';
 
-const DAILY_LIMIT = 10;
+const DAILY_LIMIT = 15;
+
+function getAdminServices() {
+    assertFirebaseAdminReady();
+
+    if (!adminDb || !adminAuth) {
+        throw new Error('Layanan Firebase Admin belum tersedia untuk generator nomor.');
+    }
+
+    return { adminDb, adminAuth };
+}
 
 interface GenerationRequestItem {
     category: string;
@@ -32,6 +42,7 @@ function hashIp(ip: string): string {
 
 export async function GET(req: NextRequest) {
     try {
+        const { adminDb, adminAuth } = getAdminServices();
         const ip = getClientIp(req);
         const ipHash = hashIp(ip);
         const todayStr = format(new Date(), 'yyyy-MM-dd');
@@ -60,12 +71,14 @@ export async function GET(req: NextRequest) {
         return NextResponse.json({ dailyCount, dailyLimit: DAILY_LIMIT, isAdmin: false });
     } catch (error) {
         console.error('[GET limit]', error);
-        return NextResponse.json({ dailyCount: 0, dailyLimit: DAILY_LIMIT, isAdmin: false });
+        const message = error instanceof Error ? error.message : 'Generator publik belum siap.';
+        return NextResponse.json({ dailyCount: 0, dailyLimit: DAILY_LIMIT, isAdmin: false, error: message }, { status: 503 });
     }
 }
 
 export async function POST(req: NextRequest) {
     try {
+        const { adminDb, adminAuth } = getAdminServices();
         const body = await req.json();
         const { requests, valueCategory, idToken } = body as {
             requests: GenerationRequestItem[];
@@ -221,6 +234,7 @@ export async function POST(req: NextRequest) {
     } catch (error: unknown) {
         const msg = error instanceof Error ? error.message : 'Terjadi kesalahan.';
         const isLimit = msg.includes('Batas generate harian');
-        return NextResponse.json({ error: msg, limitReached: isLimit }, { status: isLimit ? 429 : 500 });
+        const isServiceUnavailable = msg.includes('Firebase Admin') || msg.includes('generator nomor') || msg.includes('default credentials');
+        return NextResponse.json({ error: msg, limitReached: isLimit }, { status: isLimit ? 429 : isServiceUnavailable ? 503 : 500 });
     }
 }

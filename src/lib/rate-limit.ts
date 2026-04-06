@@ -36,6 +36,10 @@ export async function checkRateLimit(ip: string, config: RateLimitConfig = DEFAU
   const now = Date.now();
 
   try {
+    if (!adminDb) {
+      return checkMemoryLimit(ipHash, config);
+    }
+
     const docRef = adminDb.collection('rate_limits').doc(ipHash);
 
     // ─── Gunakan transaction untuk cegah race condition ───────────────────────

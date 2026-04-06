@@ -1,8 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { adminDb, adminAuth } from '@/lib/firebase-admin';
+import { adminDb, adminAuth, assertFirebaseAdminReady } from '@/lib/firebase-admin';
+
+function getAdminServices() {
+    assertFirebaseAdminReady();
+
+    if (!adminDb || !adminAuth) {
+        throw new Error('Layanan Firebase Admin belum tersedia untuk kategori nomor.');
+    }
+
+    return { adminDb, adminAuth };
+}
 
 export async function GET() {
     try {
+        const { adminDb } = getAdminServices();
         const snap = await adminDb.collection('documentTypeConfig').get();
         const categories = snap.docs.map(d => ({
             id: d.id,
@@ -17,6 +28,7 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
     try {
+        const { adminDb, adminAuth } = getAdminServices();
         const authHeader = req.headers.get('authorization');
         if (!authHeader?.startsWith('Bearer ')) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -44,6 +56,7 @@ export async function POST(req: NextRequest) {
 
 export async function DELETE(req: NextRequest) {
     try {
+        const { adminDb, adminAuth } = getAdminServices();
         const authHeader = req.headers.get('authorization');
         if (!authHeader?.startsWith('Bearer ')) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
