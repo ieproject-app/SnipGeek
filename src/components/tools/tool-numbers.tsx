@@ -35,7 +35,7 @@ import { format, addMonths, addDays } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { useToast } from '@/hooks/use-toast';
 import { useFirestore, useUser } from '@/firebase';
-import { collection, query, where, getDocs, doc, getDoc, orderBy, writeBatch, setDoc, deleteDoc } from 'firebase/firestore';
+import { collection, query, where, getDocs, doc, getDoc, orderBy, writeBatch } from 'firebase/firestore';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     Dialog,
@@ -174,22 +174,18 @@ export function ToolNumbers({ dictionary }: { dictionary: Dictionary }) {
     const allDocTypes = useMemo(() => buildDocTypes(mergedCategories), [mergedCategories]);
 
     const fetchDynamicCategories = useCallback(async () => {
-        if (!firestore) return;
         try {
-            const q = query(collection(firestore, 'documentTypeConfig'));
-            const snap = await getDocs(q);
-            const cats: DynamicCategory[] = snap.docs.map(d => ({
-                id: d.id,
-                ...(d.data() as Omit<DynamicCategory, 'id'>)
-            }));
-            setDynamicCategories(cats);
+            const res = await fetch('/api/numbers/categories');
+            if (!res.ok) return;
+            const data = await res.json();
+            setDynamicCategories(data.categories ?? []);
         } catch (error) {
             console.error('Error fetching dynamic categories:', error);
         }
-    }, [firestore]);
+    }, []);
 
     const handleSaveDynamicCategory = useCallback(async () => {
-        if (!firestore || !isAdminUser) return;
+        if (!user || !isAdminUser) return;
         const code = newCatCode.trim().toUpperCase();
         const name = newCatName.trim();
         const types = newCatTypes.split(',').map(t => t.trim().toUpperCase()).filter(Boolean);
@@ -199,8 +195,13 @@ export function ToolNumbers({ dictionary }: { dictionary: Dictionary }) {
         }
         setIsSavingCat(true);
         try {
-            const docRef = doc(firestore, 'documentTypeConfig', code);
-            await setDoc(docRef, { category: code, name, types }, { merge: true });
+            const token = await user.getIdToken();
+            const res = await fetch('/api/numbers/categories', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify({ category: code, name, types }),
+            });
+            if (!res.ok) throw new Error((await res.json()).error);
             notify(`Kategori ${code} berhasil disimpan.`, <CheckCircle className="h-4 w-4 text-emerald-500" />);
             setNewCatCode('');
             setNewCatName('');
@@ -212,18 +213,23 @@ export function ToolNumbers({ dictionary }: { dictionary: Dictionary }) {
         } finally {
             setIsSavingCat(false);
         }
-    }, [firestore, isAdminUser, newCatCode, newCatName, newCatTypes, notify, fetchDynamicCategories]);
+    }, [user, isAdminUser, newCatCode, newCatName, newCatTypes, notify, fetchDynamicCategories]);
 
     const handleDeleteDynamicCategory = useCallback(async (catId: string) => {
-        if (!firestore || !isAdminUser) return;
+        if (!user || !isAdminUser) return;
         try {
-            await deleteDoc(doc(firestore, 'documentTypeConfig', catId));
+            const token = await user.getIdToken();
+            const res = await fetch(`/api/numbers/categories?id=${encodeURIComponent(catId)}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${token}` },
+            });
+            if (!res.ok) throw new Error((await res.json()).error);
             notify(`Kategori ${catId} dihapus.`, <Check className="h-4 w-4" />);
             await fetchDynamicCategories();
         } catch (error) {
             console.error('Error deleting category:', error);
         }
-    }, [firestore, isAdminUser, notify, fetchDynamicCategories]);
+    }, [user, isAdminUser, notify, fetchDynamicCategories]);
 
     const fetchAdminStatus = useCallback(async () => {
         if (!firestore || !user) {
