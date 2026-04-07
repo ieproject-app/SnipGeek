@@ -26,8 +26,8 @@ function normalizeCategory(category: string): string {
 function getStockCategorySources(category: string): string[] {
     const normalizedCategory = normalizeCategory(category);
 
-    if (normalizedCategory === 'LG.000') {
-        return [...JUSTIFICATION_CATEGORY_FALLBACKS];
+    if ((JUSTIFICATION_CATEGORY_FALLBACKS as readonly string[]).includes(normalizedCategory)) {
+        return [normalizedCategory, ...JUSTIFICATION_CATEGORY_FALLBACKS.filter(c => c !== normalizedCategory)];
     }
 
     return [normalizedCategory];

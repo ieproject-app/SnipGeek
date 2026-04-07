@@ -40,22 +40,17 @@ function normalizeDocType(docType: string): string {
     return docType.trim().toUpperCase();
 }
 
-function getCategorySearchOrder(category: string, docType: string): string[] {
+function getCategorySearchOrder(category: string, _docType: string): string[] {
     const normalizedCategory = normalizeCategory(category);
-    const normalizedDocType = normalizeDocType(docType);
 
-    if (normalizedDocType !== 'JUSTIFIKASI') {
-        return [normalizedCategory];
+    if ((JUSTIFICATION_CATEGORY_FALLBACKS as readonly string[]).includes(normalizedCategory)) {
+        return [
+            normalizedCategory,
+            ...JUSTIFICATION_CATEGORY_FALLBACKS.filter((item) => item !== normalizedCategory),
+        ];
     }
 
-    if (!JUSTIFICATION_CATEGORY_FALLBACKS.includes(normalizedCategory as typeof JUSTIFICATION_CATEGORY_FALLBACKS[number])) {
-        return [normalizedCategory];
-    }
-
-    return [
-        normalizedCategory,
-        ...JUSTIFICATION_CATEGORY_FALLBACKS.filter((item) => item !== normalizedCategory),
-    ];
+    return [normalizedCategory];
 }
 
 function getClientIp(req: NextRequest): string {
