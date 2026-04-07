@@ -669,44 +669,41 @@ export function ToolNumbers({ dictionary }: { dictionary: Dictionary }) {
     const failedCount = generatedNumbers.filter(result => result.isError).length;
 
     const renderStockTable = (periods: string[]) => (
-        <div className="relative max-h-137.5 overflow-auto bg-background">
+        <div className="relative max-h-[500px] overflow-auto bg-background">
             <table className="w-full border-collapse text-[11px]">
                 <thead className="sticky top-0 z-10 bg-background border-b-2 border-primary/10">
                     <tr className="bg-muted/30">
-                        <th className="sticky left-0 z-20 bg-muted/60 backdrop-blur-sm p-4 text-left font-black uppercase tracking-widest text-muted-foreground w-70 border-r border-primary/10">Kategori & Sumber Stok</th>
+                        <th className="sticky left-0 z-20 bg-muted/60 backdrop-blur-sm px-3 py-2 text-left font-black uppercase tracking-widest text-muted-foreground w-44 border-r border-primary/10">Kategori</th>
                         {periods.map(period => (
-                            <th key={period} className="p-3 text-center font-black uppercase tracking-widest text-muted-foreground min-w-24">{format(new Date(period), 'MMM', { locale: id }).toUpperCase()}</th>
+                            <th key={period} className="px-2 py-2 text-center font-black uppercase tracking-widest text-muted-foreground min-w-16">{format(new Date(period), 'MMM', { locale: id }).toUpperCase()}</th>
                         ))}
                     </tr>
                 </thead>
                 <tbody className="divide-y divide-primary/5">
                     {stockCategories.map(category => {
                         const detail = stockCategoryDetailMap[category];
+                        const hasFallback = (detail?.sourceCategories.length ?? 1) > 1;
 
                         return (
-                            <tr key={category} className="group hover:bg-primary/3 transition-colors align-top">
-                                <th className="sticky left-0 bg-background group-hover:bg-primary/3 p-4 text-left border-r border-primary/5 transition-colors w-70">
-                                    <div className="space-y-2">
-                                        <div className="flex flex-wrap items-center gap-2">
-                                            <span className="text-sm font-black tracking-tight text-primary">{detail?.name ?? category}</span>
-                                            <Badge variant="outline" className="rounded-full px-2 py-0.5 text-[9px] font-black uppercase tracking-widest border-primary/15 bg-background/80 text-primary/70">
+                            <tr key={category} className="group hover:bg-primary/3 transition-colors">
+                                <th className="sticky left-0 bg-background group-hover:bg-primary/3 px-3 py-2 text-left border-r border-primary/5 transition-colors w-44">
+                                    <div className="flex flex-col gap-0.5">
+                                        <div className="flex items-center gap-1.5 flex-wrap">
+                                            <span className="text-xs font-black tracking-tight text-primary leading-none">{detail?.name ?? category}</span>
+                                            <Badge variant="outline" className="rounded-full px-1.5 py-0 text-[9px] font-black uppercase tracking-widest border-primary/15 bg-background/80 text-primary/60 leading-4">
                                                 {category}
                                             </Badge>
-                                        </div>
-                                        <div className="space-y-1">
-                                            <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/70">
-                                                Sumber: {detail?.sourceCategories.join(' + ') || category}
-                                            </p>
-                                            {detail && detail.sourceCategories.length > 1 ? (
-                                                <p className="text-[10px] text-muted-foreground">
-                                                    Angka utama memakai stok efektif. Rincian kecil menunjukkan stok asli kategori ini ditambah stok kompatibel.
-                                                </p>
-                                            ) : (
-                                                <p className="text-[10px] text-muted-foreground">
-                                                    Angka utama menunjukkan stok asli kategori ini.
-                                                </p>
+                                            {hasFallback && (
+                                                <Badge className="rounded-full px-1.5 py-0 text-[9px] font-black uppercase tracking-widest bg-accent/10 text-accent border-0 leading-4">
+                                                    Fallback
+                                                </Badge>
                                             )}
                                         </div>
+                                        {hasFallback && (
+                                            <p className="text-[9px] text-muted-foreground/60 font-medium leading-tight">
+                                                {detail?.sourceCategories.join(' + ')}
+                                            </p>
+                                        )}
                                     </div>
                                 </th>
                                 {periods.map(period => {
@@ -716,7 +713,7 @@ export function ToolNumbers({ dictionary }: { dictionary: Dictionary }) {
 
                                     return (
                                         <td key={`${category}-${period}`} className={cn(
-                                            "p-3 text-center font-mono text-xs transition-colors",
+                                            "px-2 py-2 text-center font-mono transition-colors",
                                             effectiveStock === 0
                                                 ? "text-muted-foreground/25"
                                                 : effectiveStock <= 5
@@ -724,13 +721,15 @@ export function ToolNumbers({ dictionary }: { dictionary: Dictionary }) {
                                                     : "text-accent font-bold"
                                         )}>
                                             {effectiveStock === 0 ? (
-                                                <span className="text-muted-foreground/20">—</span>
+                                                <span className="text-muted-foreground/20 text-xs">—</span>
                                             ) : (
-                                                <div className="space-y-1 leading-none">
-                                                    <div className="text-base font-black">{effectiveStock}</div>
-                                                    <div className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/65">
-                                                        {compatibleStock > 0 ? `Asli ${rawStock} + Kompatibel ${compatibleStock}` : `Asli ${rawStock}`}
-                                                    </div>
+                                                <div className="leading-none">
+                                                    <div className="text-sm font-black">{effectiveStock}</div>
+                                                    {hasFallback && compatibleStock > 0 && (
+                                                        <div className="text-[9px] text-muted-foreground/50 font-medium mt-0.5">
+                                                            {rawStock}+{compatibleStock}
+                                                        </div>
+                                                    )}
                                                 </div>
                                             )}
                                         </td>
@@ -1037,20 +1036,6 @@ export function ToolNumbers({ dictionary }: { dictionary: Dictionary }) {
                                                                 <Badge variant="outline" className="rounded-full px-3 py-1 text-[9px] font-black uppercase tracking-widest border-accent/20 bg-background/80 text-accent">
                                                                     {valueCategory === 'below_500m' ? 'Stok proyek di bawah 500 juta' : 'Stok proyek 500 juta atau lebih'}
                                                                 </Badge>
-                                                            </div>
-                                                            <div className="grid gap-3 px-6 py-4 bg-background border-b border-primary/5 md:grid-cols-3">
-                                                                <div className="rounded-2xl border border-primary/10 bg-primary/[0.03] px-4 py-3">
-                                                                    <p className="text-[10px] font-black uppercase tracking-widest text-primary">Angka utama</p>
-                                                                    <p className="mt-1 text-sm text-muted-foreground">Menunjukkan stok efektif yang dipakai generator saat ini.</p>
-                                                                </div>
-                                                                <div className="rounded-2xl border border-primary/10 bg-primary/[0.03] px-4 py-3">
-                                                                    <p className="text-[10px] font-black uppercase tracking-widest text-primary">Rincian kecil</p>
-                                                                    <p className="mt-1 text-sm text-muted-foreground">Menunjukkan stok asli kategori, lalu ditambah stok kompatibel jika ada fallback.</p>
-                                                                </div>
-                                                                <div className="rounded-2xl border border-primary/10 bg-primary/[0.03] px-4 py-3">
-                                                                    <p className="text-[10px] font-black uppercase tracking-widest text-primary">Kasus LG</p>
-                                                                    <p className="mt-1 text-sm text-muted-foreground">`LG.000` dapat membaca stok legacy `LG.270`, jadi tampilannya sekarang dibedakan lebih jelas.</p>
-                                                                </div>
                                                             </div>
                                                             <TabsContent value="2025" className="mt-0">
                                                                 {renderStockTable(stockPeriods2025)}
