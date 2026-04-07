@@ -5,6 +5,8 @@ import crypto from 'crypto';
 
 const DAILY_LIMIT = 15;
 
+const JUSTIFICATION_CATEGORY_FALLBACKS = ['LG.000', 'LG.270'] as const;
+
 function getAdminServices() {
     assertFirebaseAdminReady();
 
@@ -28,6 +30,32 @@ interface GeneratedResult {
     date: string;
     docType: string;
     isError?: boolean;
+}
+
+function normalizeCategory(category: string): string {
+    return category.trim().toUpperCase();
+}
+
+function normalizeDocType(docType: string): string {
+    return docType.trim().toUpperCase();
+}
+
+function getCategorySearchOrder(category: string, docType: string): string[] {
+    const normalizedCategory = normalizeCategory(category);
+    const normalizedDocType = normalizeDocType(docType);
+
+    if (normalizedDocType !== 'JUSTIFIKASI') {
+        return [normalizedCategory];
+    }
+
+    if (!JUSTIFICATION_CATEGORY_FALLBACKS.includes(normalizedCategory as typeof JUSTIFICATION_CATEGORY_FALLBACKS[number])) {
+        return [normalizedCategory];
+    }
+
+    return [
+        normalizedCategory,
+        ...JUSTIFICATION_CATEGORY_FALLBACKS.filter((item) => item !== normalizedCategory),
+    ];
 }
 
 function getClientIp(req: NextRequest): string {
@@ -160,6 +188,8 @@ export async function POST(req: NextRequest) {
                 const docDate = new Date(req.docDate);
                 const year = docDate.getFullYear();
                 const month = docDate.getMonth() + 1;
+                const normalizedDocType = normalizeDocType(req.docType);
+                const categorySearchOrder = getCategorySearchOrder(req.category, req.docType);
 
                 const remaining = isAdmin ? 999 : (DAILY_LIMIT - currentCount - actualGenerated);
                 const processQty = Math.min(req.quantity, remaining);
@@ -171,16 +201,26 @@ export async function POST(req: NextRequest) {
                     continue;
                 }
 
-                const snap = await adminDb.collection('availableNumbers')
-                    .where('category', '==', req.category)
-                    .where('year', '==', year)
-                    .where('month', '==', month)
-                    .where('valueCategory', '==', valueCategory)
-                    .where('isUsed', '==', false)
-                    .limit(processQty)
-                    .get();
+                const matchedDocs: FirebaseFirestore.QueryDocumentSnapshot[] = [];
 
-                for (const docSnap of snap.docs) {
+                for (const category of categorySearchOrder) {
+                    if (matchedDocs.length >= processQty) {
+                        break;
+                    }
+
+                    const query = adminDb.collection('availableNumbers')
+                        .where('category', '==', category)
+                        .where('year', '==', year)
+                        .where('month', '==', month)
+                        .where('valueCategory', '==', valueCategory)
+                        .where('isUsed', '==', false)
+                        .limit(processQty - matchedDocs.length);
+
+                    const snap = await tx.get(query);
+                    matchedDocs.push(...snap.docs);
+                }
+
+                for (const docSnap of matchedDocs) {
                     tx.update(docSnap.ref, {
                         isUsed: true,
                         assignedTo,
@@ -188,17 +228,17 @@ export async function POST(req: NextRequest) {
                     });
                     const fullNum = docSnap.data().fullNumber as string;
                     txResults.push({
-                        text: fullNum.replace('{DOCTYPE}', req.docType),
+                        text: fullNum.replace('{DOCTYPE}', normalizedDocType),
                         rawNumber: fullNum.replace('{DOCTYPE} ', ''),
                         date: req.docDate,
-                        docType: req.docType,
+                        docType: normalizedDocType,
                     });
                     actualGenerated++;
                 }
 
-                const missing = req.quantity - snap.docs.length;
+                const missing = req.quantity - matchedDocs.length;
                 for (let i = 0; i < missing; i++) {
-                    txResults.push({ text: 'STOK HABIS', rawNumber: '', date: req.docDate, docType: req.docType, isError: true });
+                    txResults.push({ text: 'STOK HABIS', rawNumber: '', date: req.docDate, docType: normalizedDocType, isError: true });
                 }
             }
 

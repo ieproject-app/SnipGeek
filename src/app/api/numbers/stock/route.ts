@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { adminDb, assertFirebaseAdminReady } from '@/lib/firebase-admin';
 
 const STATIC_DOCUMENT_CATEGORIES: Record<string, { name: string; types: string[] }> = {
@@ -9,7 +9,29 @@ const STATIC_DOCUMENT_CATEGORIES: Record<string, { name: string; types: string[]
     'LG.000': { name: 'Justifikasi', types: ['JUSTIFIKASI'] },
 };
 
+const JUSTIFICATION_CATEGORY_FALLBACKS = ['LG.000', 'LG.270'] as const;
+
 type StockMatrix = Record<string, Record<string, number>>;
+
+type StockCategoryDetail = {
+    code: string;
+    name: string;
+    sourceCategories: string[];
+};
+
+function normalizeCategory(category: string): string {
+    return category.trim().toUpperCase();
+}
+
+function getStockCategorySources(category: string): string[] {
+    const normalizedCategory = normalizeCategory(category);
+
+    if (normalizedCategory === 'LG.000') {
+        return [...JUSTIFICATION_CATEGORY_FALLBACKS];
+    }
+
+    return [normalizedCategory];
+}
 
 function getAdminDb() {
     assertFirebaseAdminReady();
@@ -31,11 +53,15 @@ function buildPeriods(year: number, startMonth: number, endMonth: number) {
     return periods;
 }
 
-export async function GET() {
+export async function GET(req: NextRequest) {
     try {
         const db = getAdminDb();
+        const requestedValueCategory = req.nextUrl.searchParams.get('valueCategory')?.trim() || 'below_500m';
         const [numbersSnap, dynamicCategoriesSnap] = await Promise.all([
-            db.collection('availableNumbers').where('isUsed', '==', false).get(),
+            db.collection('availableNumbers')
+                .where('isUsed', '==', false)
+                .where('valueCategory', '==', requestedValueCategory)
+                .get(),
             db.collection('documentTypeConfig').get(),
         ]);
 
@@ -51,7 +77,9 @@ export async function GET() {
                 return;
             }
 
-            dynamicCategories[data.category] = {
+             const normalizedCategory = normalizeCategory(data.category);
+
+            dynamicCategories[normalizedCategory] = {
                 name: data.name,
                 types: Array.isArray(data.types) ? data.types : [],
             };
@@ -59,11 +87,14 @@ export async function GET() {
 
         const mergedCategories = { ...STATIC_DOCUMENT_CATEGORIES, ...dynamicCategories };
         const categoryCodes = Object.keys(mergedCategories);
+        const rawMatrix: StockMatrix = {};
         const matrix: StockMatrix = {};
 
         categoryCodes.forEach((category) => {
+            rawMatrix[category] = {};
             matrix[category] = {};
             allPeriods.forEach((period) => {
+                rawMatrix[category][period] = 0;
                 matrix[category][period] = 0;
             });
         });
@@ -75,7 +106,7 @@ export async function GET() {
                 return;
             }
 
-            const category = data.category;
+            const category = normalizeCategory(data.category);
             const year = data.year;
             const month = data.month;
 
@@ -85,23 +116,43 @@ export async function GET() {
 
             const periodKey = `${year}-${String(month).padStart(2, '0')}`;
 
-            if (!matrix[category]) {
+            if (!rawMatrix[category]) {
+                rawMatrix[category] = {};
                 matrix[category] = {};
                 allPeriods.forEach((period) => {
+                    rawMatrix[category][period] = 0;
                     matrix[category][period] = 0;
                 });
                 categoryCodes.push(category);
             }
 
-            if (typeof matrix[category][periodKey] === 'number') {
-                matrix[category][periodKey] += 1;
+            if (typeof rawMatrix[category][periodKey] === 'number') {
+                rawMatrix[category][periodKey] += 1;
             }
         });
+
+        categoryCodes.forEach((category) => {
+            const sourceCategories = getStockCategorySources(category);
+
+            allPeriods.forEach((period) => {
+                matrix[category][period] = sourceCategories.reduce((total, sourceCategory) => {
+                    return total + (rawMatrix[sourceCategory]?.[period] ?? 0);
+                }, 0);
+            });
+        });
+
+        const categoryDetails: StockCategoryDetail[] = categoryCodes.map((category) => ({
+            code: category,
+            name: mergedCategories[category]?.name ?? category,
+            sourceCategories: getStockCategorySources(category),
+        }));
 
         return NextResponse.json({
             periods2025,
             periods2026,
             categories: categoryCodes,
+            categoryDetails,
+            rawMatrix,
             matrix,
         });
     } catch (error) {

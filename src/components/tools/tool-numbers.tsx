@@ -92,6 +92,12 @@ interface StockMatrix {
     };
 }
 
+interface StockCategoryDetail {
+    code: string;
+    name: string;
+    sourceCategories: string[];
+}
+
 interface UserLimit {
     count: number;
     isLimited: boolean;
@@ -99,6 +105,10 @@ interface UserLimit {
 
 const getErrorMessage = (error: unknown, fallback: string) =>
     error instanceof Error ? error.message : fallback;
+
+function normalizeCategory(category: string): string {
+    return category.trim().toUpperCase();
+}
 
 function createNewRequest(): GenerationRequest {
     return {
@@ -123,9 +133,11 @@ export function ToolNumbers({ dictionary }: { dictionary: Dictionary }) {
 
     const [isStockDialogOpen, setIsStockDialogOpen] = useState(false);
     const [stockMatrix, setStockMatrix] = useState<StockMatrix>({});
+    const [stockRawMatrix, setStockRawMatrix] = useState<StockMatrix>({});
     const [stockPeriods2025, setStockPeriods2025] = useState<string[]>([]);
     const [stockPeriods2026, setStockPeriods2026] = useState<string[]>([]);
     const [stockCategories, setStockCategories] = useState<string[]>([]);
+    const [stockCategoryDetails, setStockCategoryDetails] = useState<StockCategoryDetail[]>([]);
     const [isStockLoading, setIsStockLoading] = useState(false);
 
     // Admin Injector states
@@ -157,7 +169,13 @@ export function ToolNumbers({ dictionary }: { dictionary: Dictionary }) {
     const mergedCategories = useMemo(() => {
         const dynamic: Record<string, { name: string; types: string[] }> = {};
         dynamicCategories.forEach(dc => {
-            dynamic[dc.category] = { name: dc.name, types: dc.types };
+            const normalizedCategory = normalizeCategory(dc.category);
+
+            if (STATIC_DOCUMENT_CATEGORIES[normalizedCategory]) {
+                return;
+            }
+
+            dynamic[normalizedCategory] = { name: dc.name, types: dc.types };
         });
         return { ...STATIC_DOCUMENT_CATEGORIES, ...dynamic };
     }, [dynamicCategories]);
@@ -172,6 +190,10 @@ export function ToolNumbers({ dictionary }: { dictionary: Dictionary }) {
             }))
             .sort((a, b) => a.name.localeCompare(b.name));
     }, [mergedCategories]);
+
+    const stockCategoryDetailMap = useMemo(() => {
+        return Object.fromEntries(stockCategoryDetails.map((detail) => [detail.code, detail]));
+    }, [stockCategoryDetails]);
 
     const fetchDynamicCategories = useCallback(async () => {
         try {
@@ -340,7 +362,8 @@ export function ToolNumbers({ dictionary }: { dictionary: Dictionary }) {
         setIsStockLoading(true);
 
         try {
-            const res = await fetch('/api/numbers/stock');
+            const params = new URLSearchParams({ valueCategory });
+            const res = await fetch(`/api/numbers/stock?${params.toString()}`);
             const data = await res.json().catch(() => null);
 
             if (!res.ok) {
@@ -350,6 +373,8 @@ export function ToolNumbers({ dictionary }: { dictionary: Dictionary }) {
             setStockPeriods2025(Array.isArray(data?.periods2025) ? data.periods2025 : []);
             setStockPeriods2026(Array.isArray(data?.periods2026) ? data.periods2026 : []);
             setStockCategories(Array.isArray(data?.categories) ? data.categories : Object.keys(mergedCategories));
+            setStockCategoryDetails(Array.isArray(data?.categoryDetails) ? data.categoryDetails : []);
+            setStockRawMatrix((data?.rawMatrix ?? {}) as StockMatrix);
             setStockMatrix((data?.matrix ?? {}) as StockMatrix);
 
         } catch (error) {
@@ -362,7 +387,7 @@ export function ToolNumbers({ dictionary }: { dictionary: Dictionary }) {
         } finally {
             setIsStockLoading(false);
         }
-    }, [toast, mergedCategories]);
+    }, [toast, mergedCategories, valueCategory]);
 
     const handleCategoryChange = (id: string, category: string) => {
         setRequests(prev => prev.map(req => {
@@ -533,7 +558,7 @@ export function ToolNumbers({ dictionary }: { dictionary: Dictionary }) {
                 const parts = line.split('/');
                 if (parts.length >= 4) {
                     const sequence = parts[0];
-                    const category = parts[1];
+                    const category = normalizeCategory(parts[1]);
                     const dateParts = parts[3].split('-'); // [MM, YYYY]
 
                     if (dateParts.length === 2) {
@@ -642,6 +667,82 @@ export function ToolNumbers({ dictionary }: { dictionary: Dictionary }) {
     const hasResults = generatedNumbers.length > 0;
     const successCount = generatedNumbers.filter(result => !result.isError).length;
     const failedCount = generatedNumbers.filter(result => result.isError).length;
+
+    const renderStockTable = (periods: string[]) => (
+        <div className="relative max-h-137.5 overflow-auto bg-background">
+            <table className="w-full border-collapse text-[11px]">
+                <thead className="sticky top-0 z-10 bg-background border-b-2 border-primary/10">
+                    <tr className="bg-muted/30">
+                        <th className="sticky left-0 z-20 bg-muted/60 backdrop-blur-sm p-4 text-left font-black uppercase tracking-widest text-muted-foreground w-70 border-r border-primary/10">Kategori & Sumber Stok</th>
+                        {periods.map(period => (
+                            <th key={period} className="p-3 text-center font-black uppercase tracking-widest text-muted-foreground min-w-24">{format(new Date(period), 'MMM', { locale: id }).toUpperCase()}</th>
+                        ))}
+                    </tr>
+                </thead>
+                <tbody className="divide-y divide-primary/5">
+                    {stockCategories.map(category => {
+                        const detail = stockCategoryDetailMap[category];
+
+                        return (
+                            <tr key={category} className="group hover:bg-primary/3 transition-colors align-top">
+                                <th className="sticky left-0 bg-background group-hover:bg-primary/3 p-4 text-left border-r border-primary/5 transition-colors w-70">
+                                    <div className="space-y-2">
+                                        <div className="flex flex-wrap items-center gap-2">
+                                            <span className="text-sm font-black tracking-tight text-primary">{detail?.name ?? category}</span>
+                                            <Badge variant="outline" className="rounded-full px-2 py-0.5 text-[9px] font-black uppercase tracking-widest border-primary/15 bg-background/80 text-primary/70">
+                                                {category}
+                                            </Badge>
+                                        </div>
+                                        <div className="space-y-1">
+                                            <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/70">
+                                                Sumber: {detail?.sourceCategories.join(' + ') || category}
+                                            </p>
+                                            {detail && detail.sourceCategories.length > 1 ? (
+                                                <p className="text-[10px] text-muted-foreground">
+                                                    Angka utama memakai stok efektif. Rincian kecil menunjukkan stok asli kategori ini ditambah stok kompatibel.
+                                                </p>
+                                            ) : (
+                                                <p className="text-[10px] text-muted-foreground">
+                                                    Angka utama menunjukkan stok asli kategori ini.
+                                                </p>
+                                            )}
+                                        </div>
+                                    </div>
+                                </th>
+                                {periods.map(period => {
+                                    const effectiveStock = stockMatrix[category]?.[period] ?? 0;
+                                    const rawStock = stockRawMatrix[category]?.[period] ?? 0;
+                                    const compatibleStock = Math.max(0, effectiveStock - rawStock);
+
+                                    return (
+                                        <td key={`${category}-${period}`} className={cn(
+                                            "p-3 text-center font-mono text-xs transition-colors",
+                                            effectiveStock === 0
+                                                ? "text-muted-foreground/25"
+                                                : effectiveStock <= 5
+                                                    ? "text-destructive font-black bg-destructive/5"
+                                                    : "text-accent font-bold"
+                                        )}>
+                                            {effectiveStock === 0 ? (
+                                                <span className="text-muted-foreground/20">—</span>
+                                            ) : (
+                                                <div className="space-y-1 leading-none">
+                                                    <div className="text-base font-black">{effectiveStock}</div>
+                                                    <div className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/65">
+                                                        {compatibleStock > 0 ? `Asli ${rawStock} + Kompatibel ${compatibleStock}` : `Asli ${rawStock}`}
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </td>
+                                    );
+                                })}
+                            </tr>
+                        );
+                    })}
+                </tbody>
+            </table>
+        </div>
+    );
 
     return (
         <ToolWrapper
@@ -914,7 +1015,7 @@ export function ToolNumbers({ dictionary }: { dictionary: Dictionary }) {
                                                             Matriks Stok Nomor
                                                         </DialogTitle>
                                                         <DialogDescription className="text-xs mt-0.5">
-                                                            Ringkasan sisa nomor per kategori · Periode 2025–2026
+                                                            Ringkasan stok efektif dan stok asli per kategori · Periode 2025–2026
                                                         </DialogDescription>
                                                     </div>
                                                 </div>
@@ -933,78 +1034,29 @@ export function ToolNumbers({ dictionary }: { dictionary: Dictionary }) {
                                                                     <TabsTrigger value="2025" className="rounded-lg px-5 text-xs font-black uppercase tracking-widest">2025</TabsTrigger>
                                                                     <TabsTrigger value="2026" className="rounded-lg px-5 text-xs font-black uppercase tracking-widest">2026</TabsTrigger>
                                                                 </TabsList>
+                                                                <Badge variant="outline" className="rounded-full px-3 py-1 text-[9px] font-black uppercase tracking-widest border-accent/20 bg-background/80 text-accent">
+                                                                    {valueCategory === 'below_500m' ? 'Stok proyek di bawah 500 juta' : 'Stok proyek 500 juta atau lebih'}
+                                                                </Badge>
+                                                            </div>
+                                                            <div className="grid gap-3 px-6 py-4 bg-background border-b border-primary/5 md:grid-cols-3">
+                                                                <div className="rounded-2xl border border-primary/10 bg-primary/[0.03] px-4 py-3">
+                                                                    <p className="text-[10px] font-black uppercase tracking-widest text-primary">Angka utama</p>
+                                                                    <p className="mt-1 text-sm text-muted-foreground">Menunjukkan stok efektif yang dipakai generator saat ini.</p>
+                                                                </div>
+                                                                <div className="rounded-2xl border border-primary/10 bg-primary/[0.03] px-4 py-3">
+                                                                    <p className="text-[10px] font-black uppercase tracking-widest text-primary">Rincian kecil</p>
+                                                                    <p className="mt-1 text-sm text-muted-foreground">Menunjukkan stok asli kategori, lalu ditambah stok kompatibel jika ada fallback.</p>
+                                                                </div>
+                                                                <div className="rounded-2xl border border-primary/10 bg-primary/[0.03] px-4 py-3">
+                                                                    <p className="text-[10px] font-black uppercase tracking-widest text-primary">Kasus LG</p>
+                                                                    <p className="mt-1 text-sm text-muted-foreground">`LG.000` dapat membaca stok legacy `LG.270`, jadi tampilannya sekarang dibedakan lebih jelas.</p>
+                                                                </div>
                                                             </div>
                                                             <TabsContent value="2025" className="mt-0">
-                                                                <div className="relative max-h-137.5 overflow-auto bg-background">
-                                                                    <table className="w-full border-collapse text-[11px]">
-                                                                        <thead className="sticky top-0 z-10 bg-background border-b-2 border-primary/10">
-                                                                            <tr className="bg-muted/30">
-                                                                                <th className="sticky left-0 z-20 bg-muted/60 backdrop-blur-sm p-4 text-left font-black uppercase tracking-widest text-muted-foreground w-27.5 border-r border-primary/10">Kategori</th>
-                                                                                {stockPeriods2025.map(period => (
-                                                                                    <th key={period} className="p-3 text-center font-black uppercase tracking-widest text-muted-foreground min-w-16">{format(new Date(period), 'MMM', { locale: id }).toUpperCase()}</th>
-                                                                                ))}
-                                                                            </tr>
-                                                                        </thead>
-                                                                        <tbody className="divide-y divide-primary/5">
-                                                                            {stockCategories.map(category => (
-                                                                                <tr key={category} className="group hover:bg-primary/3 transition-colors">
-                                                                                    <th className="sticky left-0 bg-background group-hover:bg-primary/3 p-4 text-left font-black text-[10px] tracking-widest text-primary/50 border-r border-primary/5 transition-colors">{category}</th>
-                                                                                    {stockPeriods2025.map(period => (
-                                                                                        <td key={`${category}-${period}`} className={cn(
-                                                                                            "p-3 text-center font-mono text-xs transition-colors",
-                                                                                            stockMatrix[category]?.[period] === 0
-                                                                                                ? "text-muted-foreground/25"
-                                                                                                : stockMatrix[category]?.[period] <= 5
-                                                                                                    ? "text-destructive font-black bg-destructive/5"
-                                                                                                    : "text-accent font-bold"
-                                                                                        )}>
-                                                                                            {stockMatrix[category]?.[period] === 0
-                                                                                                ? <span className="text-muted-foreground/20">—</span>
-                                                                                                : stockMatrix[category]?.[period] ?? 0
-                                                                                            }
-                                                                                        </td>
-                                                                                    ))}
-                                                                                </tr>
-                                                                            ))}
-                                                                        </tbody>
-                                                                    </table>
-                                                                </div>
+                                                                {renderStockTable(stockPeriods2025)}
                                                             </TabsContent>
                                                             <TabsContent value="2026" className="mt-0">
-                                                                <div className="relative max-h-137.5 overflow-auto bg-background">
-                                                                    <table className="w-full border-collapse text-[11px]">
-                                                                        <thead className="sticky top-0 z-10 bg-background border-b-2 border-primary/10">
-                                                                            <tr className="bg-muted/30">
-                                                                                <th className="sticky left-0 z-20 bg-muted/60 backdrop-blur-sm p-4 text-left font-black uppercase tracking-widest text-muted-foreground w-27.5 border-r border-primary/10">Kategori</th>
-                                                                                {stockPeriods2026.map(period => (
-                                                                                    <th key={period} className="p-3 text-center font-black uppercase tracking-widest text-muted-foreground min-w-16">{format(new Date(period), 'MMM', { locale: id }).toUpperCase()}</th>
-                                                                                ))}
-                                                                            </tr>
-                                                                        </thead>
-                                                                        <tbody className="divide-y divide-primary/5">
-                                                                            {stockCategories.map(category => (
-                                                                                <tr key={category} className="group hover:bg-primary/3 transition-colors">
-                                                                                    <th className="sticky left-0 bg-background group-hover:bg-primary/3 p-4 text-left font-black text-[10px] tracking-widest text-primary/50 border-r border-primary/5 transition-colors">{category}</th>
-                                                                                    {stockPeriods2026.map(period => (
-                                                                                        <td key={`${category}-${period}`} className={cn(
-                                                                                            "p-3 text-center font-mono text-xs transition-colors",
-                                                                                            stockMatrix[category]?.[period] === 0
-                                                                                                ? "text-muted-foreground/25"
-                                                                                                : stockMatrix[category]?.[period] <= 5
-                                                                                                    ? "text-destructive font-black bg-destructive/5"
-                                                                                                    : "text-accent font-bold"
-                                                                                        )}>
-                                                                                            {stockMatrix[category]?.[period] === 0
-                                                                                                ? <span className="text-muted-foreground/20">—</span>
-                                                                                                : stockMatrix[category]?.[period] ?? 0
-                                                                                            }
-                                                                                        </td>
-                                                                                    ))}
-                                                                                </tr>
-                                                                            ))}
-                                                                        </tbody>
-                                                                    </table>
-                                                                </div>
+                                                                {renderStockTable(stockPeriods2026)}
                                                             </TabsContent>
                                                         </Tabs>
                                                     </div>
