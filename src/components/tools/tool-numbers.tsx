@@ -139,6 +139,7 @@ export function ToolNumbers({ dictionary }: { dictionary: Dictionary }) {
     const [stockCategories, setStockCategories] = useState<string[]>([]);
     const [stockCategoryDetails, setStockCategoryDetails] = useState<StockCategoryDetail[]>([]);
     const [isStockLoading, setIsStockLoading] = useState(false);
+    const [openDatePickerId, setOpenDatePickerId] = useState<string | null>(null);
 
     // Admin Injector states
     const [injectText, setInjectText] = useState('');
@@ -325,13 +326,18 @@ export function ToolNumbers({ dictionary }: { dictionary: Dictionary }) {
 
             const querySnapshot = await getDocs(q);
             const history: GeneratedResult[] = querySnapshot.docs.map(doc => {
-                const data = doc.data();
+                const data = doc.data() as {
+                    fullNumber?: string;
+                    assignedDocType?: string;
+                    category?: string;
+                    assignedDate?: string;
+                };
                 const rawNum = (data.fullNumber as string).replace('{DOCTYPE} ', '');
                 return {
                     text: rawNum,
                     rawNumber: rawNum,
-                    docType: data.category,
-                    date: new Date(data.assignedDate)
+                    docType: data.assignedDocType || data.category || '-',
+                    date: data.assignedDate ? new Date(data.assignedDate) : new Date()
                 };
             });
 
@@ -917,33 +923,54 @@ export function ToolNumbers({ dictionary }: { dictionary: Dictionary }) {
                                                 </div>
                                                 <div className="space-y-2">
                                                     <Label className="text-[10px] font-black uppercase text-muted-foreground ml-1">Tanggal Dokumen</Label>
-                                                    <Popover>
+                                                    <Popover
+                                                        open={openDatePickerId === req.id}
+                                                        onOpenChange={(isOpen) => setOpenDatePickerId(isOpen ? req.id : null)}
+                                                    >
                                                         <PopoverTrigger asChild>
                                                             <Button variant={'outline'} className={cn('w-full h-11 justify-start text-left font-normal rounded-lg border-primary/10 hover:border-primary/30 focus-visible:ring-accent', !req.docDate && 'text-muted-foreground')}>
                                                                 <CalendarIcon className="mr-2 h-4 w-4 text-accent" />
                                                                 {req.docDate ? format(req.docDate, 'd MMM yyyy', { locale: id }) : <span>Pilih tanggal dokumen</span>}
                                                             </Button>
                                                         </PopoverTrigger>
-                                                        <PopoverContent className="w-auto p-0 border-primary/15 shadow-2xl rounded-2xl overflow-hidden backdrop-blur-sm">
+                                                        <PopoverContent className="w-auto p-1.5 border-primary/15 shadow-2xl rounded-xl overflow-hidden backdrop-blur-sm">
                                                             <Calendar
                                                                 mode="single"
                                                                 selected={req.docDate}
-                                                                onSelect={(d) => handleRequestChange(req.id, 'docDate', d)}
+                                                                onSelect={(d) => {
+                                                                    if (!d) return;
+                                                                    handleRequestChange(req.id, 'docDate', d);
+                                                                    setOpenDatePickerId(null);
+                                                                }}
+                                                                className="p-1"
+                                                                classNames={{
+                                                                    month_caption: 'flex justify-center pt-1 pb-1 relative items-center',
+                                                                    caption_label: 'text-xs font-semibold',
+                                                                    weekday: 'text-muted-foreground rounded-md w-8 font-medium text-[11px] text-center',
+                                                                    day: 'h-8 w-8 text-center text-xs p-0 relative [&:has([aria-selected].day-range-end)]:rounded-r-md [&:has([aria-selected].day-outside)]:bg-accent/50 [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20',
+                                                                    day_button: 'h-8 w-8 p-0 font-normal aria-selected:opacity-100',
+                                                                }}
                                                                 initialFocus
-                                                                fixedWeeks={true}
+                                                                fixedWeeks={false}
                                                             />
-                                                            <div className="border-t border-primary/5 px-3 py-2 flex gap-2">
+                                                            <div className="border-t border-primary/5 px-2 pt-2 pb-1 flex gap-1.5">
                                                                 <button
-                                                                    onClick={() => handleRequestChange(req.id, 'docDate', new Date())}
-                                                                    className="flex-1 text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-accent hover:bg-accent/5 rounded-lg py-1.5 transition-colors"
+                                                                    onClick={() => {
+                                                                        handleRequestChange(req.id, 'docDate', new Date());
+                                                                        setOpenDatePickerId(null);
+                                                                    }}
+                                                                    className="flex-1 text-[9px] font-black uppercase tracking-widest text-muted-foreground hover:text-accent hover:bg-accent/5 rounded-md py-1.5 transition-colors"
                                                                 >
                                                                     Hari Ini
                                                                 </button>
                                                                 <button
-                                                                    onClick={() => handleRequestChange(req.id, 'docDate', addMonths(new Date(), 1))}
-                                                                    className="flex-1 text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-accent hover:bg-accent/5 rounded-lg py-1.5 transition-colors"
+                                                                    onClick={() => {
+                                                                        handleRequestChange(req.id, 'docDate', addMonths(new Date(), 1));
+                                                                        setOpenDatePickerId(null);
+                                                                    }}
+                                                                    className="flex-1 text-[9px] font-black uppercase tracking-widest text-muted-foreground hover:text-accent hover:bg-accent/5 rounded-md py-1.5 transition-colors"
                                                                 >
-                                                                    Bulan Depan
+                                                                    +1 Bulan
                                                                 </button>
                                                             </div>
                                                         </PopoverContent>

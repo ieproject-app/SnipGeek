@@ -4,6 +4,7 @@ import { format } from 'date-fns';
 import crypto from 'crypto';
 
 const DAILY_LIMIT = 15;
+const MAX_REQUEST_QUANTITY = 20;
 
 const JUSTIFICATION_CATEGORY_FALLBACKS = ['LG.000', 'LG.270'] as const;
 
@@ -114,8 +115,12 @@ export async function POST(req: NextRequest) {
         }
 
         for (const r of requests) {
-            if (!r.category || !r.docType || !r.docDate || r.quantity < 1) {
+            if (!r.category || !r.docType || !r.docDate || r.quantity < 1 || !Number.isInteger(r.quantity)) {
                 return NextResponse.json({ error: 'Input tidak lengkap.' }, { status: 400 });
+            }
+
+            if (r.quantity > MAX_REQUEST_QUANTITY) {
+                return NextResponse.json({ error: `Maksimal jumlah per permintaan adalah ${MAX_REQUEST_QUANTITY}.` }, { status: 400 });
             }
         }
 
@@ -178,6 +183,8 @@ export async function POST(req: NextRequest) {
 
             const txResults: GeneratedResult[] = [];
             let actualGenerated = 0;
+            const selectedDocIds = new Set<string>();
+            const docsToAssign: Array<{ docRef: FirebaseFirestore.DocumentReference; normalizedDocType: string }> = [];
 
             for (const req of requests) {
                 const docDate = new Date(req.docDate);
@@ -203,30 +210,42 @@ export async function POST(req: NextRequest) {
                         break;
                     }
 
+                    const queryLimit = Math.min(1000, (processQty - matchedDocs.length) + selectedDocIds.size + 20);
+
                     const query = adminDb.collection('availableNumbers')
                         .where('category', '==', category)
                         .where('year', '==', year)
                         .where('month', '==', month)
                         .where('valueCategory', '==', valueCategory)
                         .where('isUsed', '==', false)
-                        .limit(processQty - matchedDocs.length);
+                        .limit(queryLimit);
 
                     const snap = await tx.get(query);
-                    matchedDocs.push(...snap.docs);
+                    for (const docSnap of snap.docs) {
+                        if (selectedDocIds.has(docSnap.id)) {
+                            continue;
+                        }
+
+                        selectedDocIds.add(docSnap.id);
+                        matchedDocs.push(docSnap);
+
+                        if (matchedDocs.length >= processQty) {
+                            break;
+                        }
+                    }
                 }
 
                 for (const docSnap of matchedDocs) {
-                    tx.update(docSnap.ref, {
-                        isUsed: true,
-                        assignedTo,
-                        assignedDate: new Date().toISOString(),
-                    });
                     const fullNum = docSnap.data().fullNumber as string;
                     txResults.push({
                         text: fullNum.replace('{DOCTYPE}', normalizedDocType),
                         rawNumber: fullNum.replace('{DOCTYPE} ', ''),
                         date: req.docDate,
                         docType: normalizedDocType,
+                    });
+                    docsToAssign.push({
+                        docRef: docSnap.ref,
+                        normalizedDocType,
                     });
                     actualGenerated++;
                 }
@@ -236,6 +255,16 @@ export async function POST(req: NextRequest) {
                     txResults.push({ text: 'STOK HABIS', rawNumber: '', date: req.docDate, docType: normalizedDocType, isError: true });
                 }
             }
+
+            const assignedDate = new Date().toISOString();
+            docsToAssign.forEach((item) => {
+                tx.update(item.docRef, {
+                    isUsed: true,
+                    assignedTo,
+                    assignedDate,
+                    assignedDocType: item.normalizedDocType,
+                });
+            });
 
             // Update IP limit counter
             if (!isAdmin && actualGenerated > 0) {
