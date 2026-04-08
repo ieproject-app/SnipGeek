@@ -33,7 +33,7 @@ import type { Dictionary } from "@/lib/get-dictionary";
 import { SnipGeekLogo } from "@/components/icons/snipgeek-logo";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
 import NextLink from "next/link";
-import Image from "next/image";
+import { RevealImage } from "@/components/ui/reveal-image";
 import {
   getBadgeStyle,
 } from "@/components/layout/category-badge";
@@ -971,12 +971,13 @@ export function LayoutHeader({
                           {/* Thumbnail: image for blog, icon placeholder for note */}
                           <div className="w-13 h-9.75 relative rounded-md overflow-hidden bg-muted shrink-0 border border-border/50 flex items-center justify-center">
                             {imgUrl ? (
-                              <Image
+                              <RevealImage
                                 src={imgUrl}
                                 alt=""
                                 fill
                                 className="object-cover"
                                 sizes="52px"
+                                quality={62}
                               />
                             ) : (
                               <StickyNote className="h-5 w-5 text-muted-foreground/40" />
@@ -1093,12 +1094,13 @@ export function LayoutHeader({
                                 }}
                               >
                                 <div className="w-13 h-9.75 relative rounded-md overflow-hidden bg-muted shrink-0 border border-border/50">
-                                  <Image
+                                  <RevealImage
                                     src={resolvedHero}
                                     alt=""
                                     fill
                                     className="object-cover"
                                     sizes="52px"
+                                    quality={62}
                                   />
                                 </div>
                                 <div className="flex-1 min-w-0">
@@ -1152,12 +1154,13 @@ export function LayoutHeader({
                               }}
                             >
                               <div className="w-13 h-9.75 relative rounded-md overflow-hidden bg-muted shrink-0 border border-border/50">
-                                <Image
+                                <RevealImage
                                   src={resolvedHero}
                                   alt=""
                                   fill
                                   className="object-cover"
                                   sizes="52px"
+                                  quality={62}
                                 />
                               </div>
                               <div className="flex-1 min-w-0">
