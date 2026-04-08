@@ -259,6 +259,52 @@ For posts and notes, follow project MDX standards.
 ## Required baseline
 Every content file should be structurally valid and match the collection it belongs to.
 
+---
+
+## 10. Lighthouse-First Workflow
+
+All AI contributors should treat Lighthouse as a release quality gate.
+
+## Default Targets (Mobile)
+
+- Performance: target green whenever feasible, but prioritize directional improvement and stability.
+- Accessibility: keep green (90+), do not regress.
+- Best Practices: keep 100 whenever possible.
+- SEO: keep 100 whenever possible.
+
+## Required Process For Performance Work
+
+1. Start from the latest Lighthouse JSON report in the repository root.
+2. Identify the largest bottleneck first using:
+   - category score
+   - key metrics (LCP, TBT, Interactive)
+   - opportunity savings (ms and bytes)
+3. Implement only high-impact, low-risk changes first.
+4. Rebuild and re-run Lighthouse before additional refactors.
+5. Report deltas clearly: what improved, what stayed flat, and why.
+
+## Prioritization Order
+
+1. Main-thread and JS execution reductions.
+2. LCP improvements (especially hero content and above-the-fold rendering).
+3. Network payload reductions.
+4. Secondary polish (minor audits with tiny savings).
+
+## Do Not
+
+- Chase a perfect score with fragile hacks.
+- Regress accessibility to gain performance.
+- Apply broad rewrites before validating current bottlenecks from JSON evidence.
+
+## Reporting Standard
+
+When asked to review a Lighthouse JSON file, include:
+
+1. Current category scores.
+2. Top 1-3 blockers with concrete numeric impact.
+3. Whether the site is near practical ceiling for its architecture.
+4. A short next-step plan with highest expected ROI.
+
 ### Posts
 Place in:
 - `_posts/en/`
