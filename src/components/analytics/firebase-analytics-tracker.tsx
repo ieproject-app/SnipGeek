@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { Suspense, useEffect, useRef, useState } from 'react';
 import {
   type Analytics,
   getAnalytics,
@@ -13,7 +13,7 @@ import { useFirebaseApp } from '@/firebase';
 
 const hasMeasurementId = Boolean(process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID);
 
-export function FirebaseAnalyticsTracker() {
+function AnalyticsTrackerInner() {
   const firebaseApp = useFirebaseApp();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -59,4 +59,12 @@ export function FirebaseAnalyticsTracker() {
   }, [analytics, pathname, searchParams]);
 
   return null;
+}
+
+export function FirebaseAnalyticsTracker() {
+  return (
+    <Suspense fallback={null}>
+      <AnalyticsTrackerInner />
+    </Suspense>
+  );
 }

@@ -1,5 +1,7 @@
 import type { NextConfig } from "next";
 
+const isProduction = process.env.NODE_ENV === "production";
+
 /**
  * Content Security Policy directives.
  *
@@ -11,26 +13,27 @@ import type { NextConfig } from "next";
  * References:
  * - https://developers.google.com/tag-platform/security/guides/csp
  */
+const scriptSrcDirectives = [
+  `'self'`,
+  `'unsafe-inline'`,
+  ...(isProduction ? [] : [`'unsafe-eval'`]), // needed only for Next.js dev/HMR
+  `https://www.googletagmanager.com`, // GTM
+  `https://www.google-analytics.com`, // GA4
+  `https://ssl.google-analytics.com`, // GA4 (legacy)
+  `https://static.monetag.com`, // Monetag
+  `https://cdn.monetag.com`, // Monetag CDN
+  `https://apis.google.com`, // Firebase Auth popup
+  `https://*.firebaseapp.com`, // Firebase Auth handler
+  `https://giscus.app`, // Giscus comments
+].join(" ");
+
 const cspDirectives = [
   // Only allow same-origin framing
   `default-src 'self'`,
 
   // Scripts: self + inline (Next.js needs 'unsafe-inline' for hydration)
   // Tag Manager, Analytics, Monetag
-  [
-    `script-src`,
-    `'self'`,
-    `'unsafe-inline'`,
-    `'unsafe-eval'`,                                    // required by Next.js dev
-    `https://www.googletagmanager.com`,                 // GTM
-    `https://www.google-analytics.com`,                 // GA4
-    `https://ssl.google-analytics.com`,                 // GA4 (legacy)
-    `https://static.monetag.com`,                       // Monetag
-    `https://cdn.monetag.com`,                          // Monetag CDN
-    `https://apis.google.com`,                         // Firebase Auth popup
-    `https://*.firebaseapp.com`,                        // Firebase Auth handler
-    `https://giscus.app`,                               // Giscus comments
-  ].join(" "),
+  [`script-src`, scriptSrcDirectives].join(" "),
 
   // Styles: self + inline (Tailwind/CSS-in-JS needs unsafe-inline)
   `style-src 'self' 'unsafe-inline' https://fonts.googleapis.com`,
