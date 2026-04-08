@@ -2,7 +2,6 @@
 
 import * as React from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import {
   Carousel,
   CarouselContent,
@@ -12,6 +11,7 @@ import { ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { AddToReadingListButton } from '@/components/layout/add-to-reading-list-button';
+import { RevealImage } from '@/components/ui/reveal-image';
 import type { Dictionary } from '@/lib/get-dictionary';
 
 import { ScrollReveal } from '@/components/ui/scroll-reveal';
@@ -99,12 +99,13 @@ export function HomeUpdates({ posts, title, viewMoreText, dictionary, locale, ta
                       <Link href={`${linkPrefix}/blog/${post.slug}`} className="contents">
                         {/* Thumbnail Container - Responsive 3:2 for denser visual balance */}
                         <div className="relative w-30 h-20 sm:w-36 sm:h-24 shrink-0 overflow-hidden rounded-lg shadow-sm border border-primary/5 mt-0.5">
-                          <Image
+                          <RevealImage
                             src={heroImageSrc}
                             alt={post.frontmatter.imageAlt || post.frontmatter.title}
                             fill
                             className="object-cover transition-transform duration-700 group-hover:scale-110"
                             sizes="(max-width: 640px) 120px, 144px"
+                            quality={64}
                             data-ai-hint={heroImageHint}
                           />
                           <AddToReadingListButton
