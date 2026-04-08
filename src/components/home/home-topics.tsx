@@ -1,10 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { ChevronRight } from "lucide-react";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { AddToReadingListButton } from "@/components/layout/add-to-reading-list-button";
+import { RevealImage } from "@/components/ui/reveal-image";
 import type { Dictionary } from "@/lib/get-dictionary";
 
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
@@ -75,12 +75,13 @@ export function HomeTopics({
             className="flex items-center gap-4 flex-1 min-w-0"
           >
             <div className="relative w-30 h-20 sm:w-36 sm:h-24 shrink-0 overflow-hidden rounded-lg shadow-sm border border-primary/5">
-              <Image
+              <RevealImage
                 src={heroImageSrc}
                 alt={post.frontmatter.imageAlt || post.frontmatter.title}
                 fill
                 className="object-cover transition-transform duration-500 group-hover:scale-110"
                 sizes="(max-width: 640px) 120px, 144px"
+                quality={64}
               />
               <AddToReadingListButton
                 item={item}
