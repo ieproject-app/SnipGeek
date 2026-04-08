@@ -1,6 +1,6 @@
 "use client";
 
-import Image, { type ImageProps } from "next/image";
+import Image, { type ImageLoaderProps, type ImageProps } from "next/image";
 import { useEffect, useMemo, useState } from "react";
 import { cn } from "@/lib/utils";
 
@@ -77,6 +77,21 @@ export function RevealImage({
     [className, imageClassName, shouldHideImage, shouldHold],
   );
 
+  const localImageLoader = useMemo(() => {
+    if (props.loader) return props.loader;
+    if (typeof props.src !== "string") return undefined;
+    if (!props.src.startsWith("/images/")) return undefined;
+
+    return ({ src, width, quality }: ImageLoaderProps) => {
+      const params = new URLSearchParams({
+        src,
+        w: String(width),
+        q: String(quality ?? 68),
+      });
+      return `/api/img?${params.toString()}`;
+    };
+  }, [props.loader, props.src]);
+
   return (
     <div className={cn("relative h-full w-full overflow-hidden", wrapperClassName)}>
       {shouldShowPlaceholder && (
@@ -94,6 +109,7 @@ export function RevealImage({
       <Image
         alt={alt}
         className={mergedImageClassName}
+        loader={localImageLoader}
         priority={priority}
         loading={loading}
         sizes={sizes}
