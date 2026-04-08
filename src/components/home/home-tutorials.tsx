@@ -196,7 +196,7 @@ export function HomeTutorials({ posts, title, viewMoreText, dictionary, locale, 
                       type="button"
                       onClick={() => api?.scrollTo(index)}
                       className={cn(
-                        'h-1.5 rounded-full transition-all',
+                        'relative h-1.5 rounded-full transition-all before:absolute before:-inset-[9px] before:content-[\'\']',
                         index === selectedIndex
                           ? 'w-4 bg-primary/70'
                           : 'w-1.5 bg-primary/25 hover:bg-primary/40',

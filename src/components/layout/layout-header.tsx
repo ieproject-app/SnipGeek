@@ -1002,6 +1002,7 @@ export function LayoutHeader({
                         <Button
                           variant="ghost"
                           size="icon"
+                          aria-label="Remove from reading list"
                           className="h-8 w-8 rounded-full text-destructive opacity-0 group-hover:opacity-100 transition-all translate-x-2 group-hover:translate-x-0"
                           onClick={(e) => {
                             e.preventDefault();
@@ -1318,6 +1319,7 @@ export function LayoutHeader({
           {/* Dismiss */}
           <button
             onClick={clear}
+            aria-label="Dismiss notification"
             className="ml-1 h-6 w-6 rounded-full flex items-center justify-center text-foreground/30 hover:text-foreground/80 hover:bg-muted/80 transition-all active:scale-90"
           >
             <X className="h-3.5 w-3.5" />

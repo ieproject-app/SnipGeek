@@ -270,14 +270,14 @@ export function LayoutFooter({
                   <Link
                     key={item.id}
                     href={item.href}
-                    className="text-[10px] font-black uppercase tracking-widest text-primary/40 hover:text-accent transition-all duration-300"
+                    className="text-[10px] font-black uppercase tracking-widest text-primary/60 hover:text-accent transition-all duration-300"
                   >
                     {item.title}
                   </Link>
                 ))}
               </nav>
               
-              <small className="font-extrabold tracking-widest text-[10px] uppercase text-primary/30 hover:text-primary transition-colors duration-300">
+              <small className="font-extrabold tracking-widest text-[10px] uppercase text-primary/50 hover:text-primary transition-colors duration-300">
                 &copy; {new Date().getFullYear()} SnipGeek. All Rights Reserved.
               </small>
             </div>

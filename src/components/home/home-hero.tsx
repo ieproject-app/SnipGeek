@@ -124,7 +124,7 @@ export function HomeHero({ posts, dictionary, locale, linkPrefix }: HomeHeroProp
                                         <Link
                                             href={`${linkPrefix}/blog/${post.slug}`}
                                             className="block group"
-                                            aria-label={`Read ${post.frontmatter.title}`}
+                                            aria-label={post.frontmatter.title}
                                         >
                                             {/* Image */}
                                             <div className="relative aspect-[3/2] overflow-hidden rounded-t-xl">
@@ -208,7 +208,7 @@ export function HomeHero({ posts, dictionary, locale, linkPrefix }: HomeHeroProp
                                         type="button"
                                         onClick={() => api?.scrollTo(index)}
                                         className={cn(
-                                            "h-1.5 rounded-full transition-all",
+                                            "relative h-1.5 rounded-full transition-all before:absolute before:-inset-[9px] before:content-['']",
                                             index === selectedIndex
                                                 ? "w-4 bg-primary/70"
                                                 : "w-1.5 bg-primary/25 hover:bg-primary/40",
@@ -243,7 +243,7 @@ export function HomeHero({ posts, dictionary, locale, linkPrefix }: HomeHeroProp
                                     isStaggered && "lg:mt-10",
                                 )}
                             >
-                                <Link href={`${linkPrefix}/blog/${post.slug}`} className="block" aria-label={`Read ${post.frontmatter.title}`}>
+                                <Link href={`${linkPrefix}/blog/${post.slug}`} className="block" aria-label={post.frontmatter.title}>
                                     <article className="space-y-5">
                                         {/* Image Block */}
                                         <div
