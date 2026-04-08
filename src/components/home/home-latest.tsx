@@ -78,7 +78,7 @@ export const HomeLatest = ({
                                     fill
                                     className="transition-transform duration-700 group-hover:scale-110"
                                     wrapperClassName="absolute inset-0"
-                                    sizes="(max-width: 768px) calc(100vw - 2rem), (max-width: 1200px) 33vw, 300px"
+                                    sizes="(max-width: 640px) calc(100vw - 2rem), (max-width: 1024px) 50vw, 33vw"
                                     loading={index === 0 ? "eager" : "lazy"}
                                     priority={index === 0}
                                     quality={68}
