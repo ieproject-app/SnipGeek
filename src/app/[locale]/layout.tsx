@@ -46,6 +46,7 @@ const fontSerif = Lora({
   variable: "--gf-serif",
   style: ["normal", "italic"],
   display: "swap",
+  preload: false,
 });
 
 const fontMono = JetBrains_Mono({
@@ -53,6 +54,7 @@ const fontMono = JetBrains_Mono({
   variable: "--gf-mono",
   weight: ["400", "500", "700"],
   display: "swap",
+  preload: false,
 });
 
 const openGraphLocaleMap: Record<Locale, string> = {
