@@ -135,7 +135,7 @@ export function HomeHero({ posts, dictionary, locale, linkPrefix }: HomeHeroProp
                                                         fill
                                                         className="transition-transform duration-700 group-hover:scale-[1.06]"
                                                         wrapperClassName="absolute inset-0"
-                                                        sizes="(max-width: 640px) calc(100vw - 32px), 50vw"
+                                                        sizes="(max-width: 640px) calc(100vw - 32px), (max-width: 1024px) 50vw, 25vw"
                                                         priority={index === 0}
                                                         loading={index === 0 ? "eager" : "lazy"}
                                                         quality={68}
@@ -269,7 +269,7 @@ export function HomeHero({ posts, dictionary, locale, linkPrefix }: HomeHeroProp
                                                     fill
                                                     className="transition-transform duration-1000 ease-out group-hover:scale-[1.06]"
                                                     wrapperClassName="absolute inset-0"
-                                                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+                                                    sizes="(max-width: 640px) calc(100vw - 32px), (max-width: 1024px) 50vw, 25vw"
                                                     priority={index === 0}
                                                     loading={index === 0 ? "eager" : "lazy"}
                                                     quality={68}
