@@ -165,26 +165,28 @@ export default async function LocaleLayout({
   const posts = await getSortedPostsData(locale);
   const notes = await getSortedNotesData(locale);
   const linkPrefix = locale === i18n.defaultLocale ? "" : `/${locale}`;
+  const SEARCHABLE_POST_LIMIT = 80;
+  const SEARCHABLE_NOTE_LIMIT = 40;
+  const QUICK_PICK_IMAGE_LIMIT = 6;
 
-  const searchablePosts = posts.map((post) => ({
+  const searchablePosts = posts.slice(0, SEARCHABLE_POST_LIMIT).map((post, index) => ({
     slug: post.slug,
     title: post.frontmatter.title,
     description: post.frontmatter.description,
     type: "blog" as const,
     href: `${linkPrefix}/blog/${post.slug}`,
-    heroImage: post.frontmatter.heroImage,
-    category: post.frontmatter.category,
+    // Keep hero images only for top quick picks in header search panel.
+    heroImage: index < QUICK_PICK_IMAGE_LIMIT ? post.frontmatter.heroImage : undefined,
     tags: post.frontmatter.tags,
   }));
 
-  const searchableNotes = notes.map((note) => ({
+  const searchableNotes = notes.slice(0, SEARCHABLE_NOTE_LIMIT).map((note, index) => ({
     slug: note.slug,
     title: note.frontmatter.title,
     description: note.frontmatter.description,
     type: "note" as const,
     href: `${linkPrefix}/notes/${note.slug}`,
-    heroImage: note.frontmatter.heroImage,
-    category: note.frontmatter.category,
+    heroImage: index < QUICK_PICK_IMAGE_LIMIT ? note.frontmatter.heroImage : undefined,
     tags: note.frontmatter.tags,
   }));
 

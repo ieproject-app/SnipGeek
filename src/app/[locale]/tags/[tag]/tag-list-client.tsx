@@ -85,7 +85,7 @@ export function TagListClient({
                   <div className="w-full h-0.5 bg-linear-to-r from-accent via-accent/50 to-transparent flex-1" />
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-10">
-                  {displayedPosts.map((post) => {
+                  {displayedPosts.map((post, index) => {
                     const heroImageValue = post.frontmatter.heroImage;
                     let heroImageSrc: string | undefined;
                     let heroImageHint: string | undefined;
@@ -133,7 +133,10 @@ export function TagListClient({
                                 }
                                 fill
                                 className="object-cover transition-transform duration-700 group-hover:scale-110"
-                                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 33vw, 300px"
+                                sizes="(max-width: 768px) calc(100vw - 2rem), (max-width: 1200px) 33vw, 300px"
+                                loading={index === 0 ? "eager" : "lazy"}
+                                priority={index === 0}
+                                quality={68}
                                 data-ai-hint={heroImageHint}
                               />
                             )}

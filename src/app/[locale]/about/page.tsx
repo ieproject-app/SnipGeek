@@ -75,7 +75,7 @@ export default async function AboutPage({
   const { content } = await getPageContent("about", locale);
   const dictionary = await getDictionary(locale);
   const data = cvData[locale] || cvData.en;
-  const authorAvatar = "/images/profile/profile.png";
+  const authorAvatar = "/images/profile/profile.webp";
   const learningRole =
     locale === "id"
       ? "Terus belajar, merapikan proses, dan membangun hal-hal yang berguna."
