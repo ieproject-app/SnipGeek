@@ -165,8 +165,8 @@ export default async function LocaleLayout({
   const posts = await getSortedPostsData(locale);
   const notes = await getSortedNotesData(locale);
   const linkPrefix = locale === i18n.defaultLocale ? "" : `/${locale}`;
-  const SEARCHABLE_POST_LIMIT = 80;
-  const SEARCHABLE_NOTE_LIMIT = 40;
+  const SEARCHABLE_POST_LIMIT = 40;
+  const SEARCHABLE_NOTE_LIMIT = 20;
   const QUICK_PICK_IMAGE_LIMIT = 6;
 
   const searchablePosts = posts.slice(0, SEARCHABLE_POST_LIMIT).map((post, index) => ({
