@@ -27,6 +27,7 @@ export function RevealImage({
   priority,
   loading,
   sizes,
+  loader: providedLoader,
   ...props
 }: RevealImageProps) {
   const [isLoaded, setIsLoaded] = useState(false);
@@ -78,7 +79,7 @@ export function RevealImage({
   );
 
   const localImageLoader = useMemo(() => {
-    if (props.loader) return props.loader;
+    if (providedLoader) return providedLoader;
     if (typeof props.src !== "string") return undefined;
     if (!props.src.startsWith("/images/")) return undefined;
 
@@ -90,7 +91,7 @@ export function RevealImage({
       });
       return `/api/img?${params.toString()}`;
     };
-  }, [props.loader, props.src]);
+  }, [providedLoader, props.src]);
 
   return (
     <div className={cn("relative h-full w-full overflow-hidden", wrapperClassName)}>
