@@ -134,6 +134,7 @@ export function RevealImage({
 
     const params = new URLSearchParams({
       src: normalizedSrc,
+      w: "800",
       q: "68",
     });
     return `/api/img?${params.toString()}`;
