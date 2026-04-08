@@ -29,6 +29,11 @@ functions/package-lock.json
 *.tsbuildinfo
 next-env.d.ts
 
+# Firebase debug logs
+firebase-debug.log
+firestore-debug.log
+ui-debug.log
+
 # Sensitive credentials — never commit these anywhere in the repo
 serviceAccountKey.json
 *firebase-adminsdk*.json

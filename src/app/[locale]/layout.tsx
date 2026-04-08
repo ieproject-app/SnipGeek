@@ -25,6 +25,7 @@ import {
 import { cn } from "@/lib/utils";
 import { FirebaseProviderWrapper } from "@/components/layout/firebase-provider-wrapper";
 import { LocaleSuggestionBanner } from "@/components/layout/locale-suggestion-banner";
+import { FirebaseAnalyticsTracker } from "@/components/analytics/firebase-analytics-tracker";
 
 const fontDisplay = Bricolage_Grotesque({
   subsets: ["latin"],
@@ -202,6 +203,7 @@ export default async function LocaleLayout({
     >
       <body className="font-sans antialiased fade-in-on-load">
         <FirebaseProviderWrapper>
+          <FirebaseAnalyticsTracker />
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
             <NotificationProvider>
               <ReadingListProvider>
