@@ -171,9 +171,9 @@ export function LocaleSuggestionBanner({
                 className={cn(
                   "inline-flex items-center justify-center",
                   "h-6 px-3 rounded-full shrink-0",
-                  "border border-white/80 bg-white text-nav-primary",
+                  "border border-white/80 bg-nav-primary text-nav-primary-foreground",
                   "font-sans text-[10px] font-black uppercase tracking-[0.12em]",
-                  "transition-all hover:bg-white/90 active:scale-[0.97]",
+                  "transition-all hover:bg-nav-primary/90 active:scale-[0.97]",
                 )}
               >
                 {localeSuggestion.switch}

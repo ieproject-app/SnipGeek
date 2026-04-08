@@ -29,6 +29,7 @@ export function RevealImage({
   sizes,
   src,
   unoptimized,
+  width,
   loader: providedLoader,
   ...props
 }: RevealImageProps) {
@@ -134,11 +135,11 @@ export function RevealImage({
 
     const params = new URLSearchParams({
       src: normalizedSrc,
-      w: "800",
+      w: width ? String(Math.min(Number(width), 1200)) : "640",
       q: "68",
     });
     return `/api/img?${params.toString()}`;
-  }, [providedLoader, src]);
+  }, [providedLoader, src, width]);
 
   return (
     <div className={cn("relative h-full w-full overflow-hidden", wrapperClassName)}>
@@ -163,6 +164,7 @@ export function RevealImage({
         priority={priority}
         loading={loading}
         sizes={sizes}
+        width={width}
         onLoad={() => setIsLoaded(true)}
         {...props}
         style={{
