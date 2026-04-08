@@ -100,7 +100,7 @@ export function LanguageSwitcher(props: {
                   "text-[10px] font-black uppercase tracking-[0.2em] transition-all duration-300",
                   isActive
                     ? "text-accent"
-                    : "text-primary/30 hover:text-primary/60",
+                    : "text-primary/60 hover:text-primary/80",
                 )}
               >
                 {locale}
