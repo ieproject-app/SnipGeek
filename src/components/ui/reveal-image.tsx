@@ -27,6 +27,8 @@ export function RevealImage({
   priority,
   loading,
   sizes,
+  src,
+  unoptimized,
   loader: providedLoader,
   ...props
 }: RevealImageProps) {
@@ -40,7 +42,7 @@ export function RevealImage({
 
   useEffect(() => {
     setIsLoaded(false);
-  }, [props.src]);
+  }, [src]);
 
   useEffect(() => {
     if (!initialVisitOnly) {
@@ -80,13 +82,13 @@ export function RevealImage({
 
   const localImageLoader = useMemo(() => {
     if (providedLoader) return providedLoader;
-    if (typeof props.src !== "string") return undefined;
+    if (typeof src !== "string") return undefined;
 
     const normalizedSrc = (() => {
-      if (props.src.startsWith("/images/")) return props.src;
-      if (/^https?:\/\//i.test(props.src)) {
+      if (src.startsWith("/images/")) return src;
+      if (/^https?:\/\//i.test(src)) {
         try {
-          const parsed = new URL(props.src);
+          const parsed = new URL(src);
           if (parsed.pathname.startsWith("/images/")) {
             return `${parsed.pathname}${parsed.search}`;
           }
@@ -107,7 +109,35 @@ export function RevealImage({
       });
       return `/api/img?${params.toString()}`;
     };
-  }, [providedLoader, props.src]);
+  }, [providedLoader, src]);
+
+  const directLocalOptimizedSrc = useMemo(() => {
+    if (providedLoader) return undefined;
+    if (typeof src !== "string") return undefined;
+
+    const normalizedSrc = (() => {
+      if (src.startsWith("/images/")) return src;
+      if (/^https?:\/\//i.test(src)) {
+        try {
+          const parsed = new URL(src);
+          if (parsed.pathname.startsWith("/images/")) {
+            return `${parsed.pathname}${parsed.search}`;
+          }
+        } catch {
+          return undefined;
+        }
+      }
+      return undefined;
+    })();
+
+    if (!normalizedSrc) return undefined;
+
+    const params = new URLSearchParams({
+      src: normalizedSrc,
+      q: "68",
+    });
+    return `/api/img?${params.toString()}`;
+  }, [providedLoader, src]);
 
   return (
     <div className={cn("relative h-full w-full overflow-hidden", wrapperClassName)}>
@@ -125,8 +155,10 @@ export function RevealImage({
 
       <Image
         alt={alt}
+        src={directLocalOptimizedSrc ?? src}
         className={mergedImageClassName}
         loader={localImageLoader}
+        unoptimized={Boolean(directLocalOptimizedSrc) || unoptimized}
         priority={priority}
         loading={loading}
         sizes={sizes}
