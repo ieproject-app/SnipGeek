@@ -81,11 +81,27 @@ export function RevealImage({
   const localImageLoader = useMemo(() => {
     if (providedLoader) return providedLoader;
     if (typeof props.src !== "string") return undefined;
-    if (!props.src.startsWith("/images/")) return undefined;
+
+    const normalizedSrc = (() => {
+      if (props.src.startsWith("/images/")) return props.src;
+      if (/^https?:\/\//i.test(props.src)) {
+        try {
+          const parsed = new URL(props.src);
+          if (parsed.pathname.startsWith("/images/")) {
+            return `${parsed.pathname}${parsed.search}`;
+          }
+        } catch {
+          return undefined;
+        }
+      }
+      return undefined;
+    })();
+
+    if (!normalizedSrc) return undefined;
 
     return ({ src, width, quality }: ImageLoaderProps) => {
       const params = new URLSearchParams({
-        src,
+        src: src.startsWith("/images/") ? src : normalizedSrc,
         w: String(width),
         q: String(quality ?? 68),
       });
