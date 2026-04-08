@@ -179,14 +179,18 @@ export function HomeNotes({
                       key={`dot-${index}`}
                       type="button"
                       onClick={() => api?.scrollTo(index)}
-                      className={cn(
-                        "relative h-1.5 rounded-full transition-all before:absolute before:-inset-[9px] before:content-['']",
-                        index === selectedIndex
-                          ? "w-4 bg-primary/70"
-                          : "w-1.5 bg-primary/25 hover:bg-primary/40",
-                      )}
+                      className="h-6 w-6 inline-flex items-center justify-center rounded-full"
                       aria-label={`Go to slide ${index + 1}`}
-                    />
+                    >
+                      <span
+                        className={cn(
+                          "rounded-full transition-all",
+                          index === selectedIndex
+                            ? "h-1.5 w-4 bg-primary/70"
+                            : "h-1.5 w-1.5 bg-primary/25 hover:bg-primary/40",
+                        )}
+                      />
+                    </button>
                   ))}
                 </div>
 

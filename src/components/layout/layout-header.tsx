@@ -872,6 +872,7 @@ export function LayoutHeader({
             <Button
               variant="ghost"
               size="icon"
+              aria-label="Close search"
               className="rounded-full h-10 w-10 hover:bg-accent/10 text-foreground/40 hover:text-accent"
               onClick={() => {
                 setActiveView("none");
@@ -907,6 +908,7 @@ export function LayoutHeader({
             <Button
               variant="ghost"
               size="icon"
+              aria-label="Close reading list"
               className="rounded-full h-10 w-10 hover:bg-transparent text-foreground/40 hover:text-foreground"
               onClick={() => {
                 setActiveView("none");

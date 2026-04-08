@@ -64,7 +64,6 @@ export const HomeLatest = ({
                     <Link
                         href={`${linkPrefix}/blog/${post.slug}`}
                         className="block"
-                        aria-label={post.frontmatter.title}
                     >
                         <div className={cn(
                             "relative w-full aspect-8/5 overflow-hidden rounded-xl mb-4 shadow-sm transition-all duration-500 border border-primary/5 ring-1 ring-transparent",

@@ -124,7 +124,6 @@ export function HomeHero({ posts, dictionary, locale, linkPrefix }: HomeHeroProp
                                         <Link
                                             href={`${linkPrefix}/blog/${post.slug}`}
                                             className="block group"
-                                            aria-label={post.frontmatter.title}
                                         >
                                             {/* Image */}
                                             <div className="relative aspect-[3/2] overflow-hidden rounded-t-xl">
@@ -171,7 +170,7 @@ export function HomeHero({ posts, dictionary, locale, linkPrefix }: HomeHeroProp
                                                     <RelativeTime
                                                         date={post.frontmatter.date}
                                                         locale={locale}
-                                                        className="text-[10px] font-bold uppercase tracking-tighter text-muted-foreground/60"
+                                                        className="text-[10px] font-bold uppercase tracking-tighter text-muted-foreground/80"
                                                     />
                                                     <div
                                                         className={cn(
@@ -207,14 +206,18 @@ export function HomeHero({ posts, dictionary, locale, linkPrefix }: HomeHeroProp
                                         key={`dot-${index}`}
                                         type="button"
                                         onClick={() => api?.scrollTo(index)}
-                                        className={cn(
-                                            "relative h-1.5 rounded-full transition-all before:absolute before:-inset-[9px] before:content-['']",
-                                            index === selectedIndex
-                                                ? "w-4 bg-primary/70"
-                                                : "w-1.5 bg-primary/25 hover:bg-primary/40",
-                                        )}
+                                        className="h-6 w-6 inline-flex items-center justify-center rounded-full"
                                         aria-label={`Go to slide ${index + 1}`}
-                                    />
+                                    >
+                                        <span
+                                            className={cn(
+                                                "rounded-full transition-all",
+                                                index === selectedIndex
+                                                    ? "h-1.5 w-4 bg-primary/70"
+                                                    : "h-1.5 w-1.5 bg-primary/25 hover:bg-primary/40",
+                                            )}
+                                        />
+                                    </button>
                                 ))}
                             </div>
 
@@ -243,7 +246,7 @@ export function HomeHero({ posts, dictionary, locale, linkPrefix }: HomeHeroProp
                                     isStaggered && "lg:mt-10",
                                 )}
                             >
-                                <Link href={`${linkPrefix}/blog/${post.slug}`} className="block" aria-label={post.frontmatter.title}>
+                                <Link href={`${linkPrefix}/blog/${post.slug}`} className="block">
                                     <article className="space-y-5">
                                         {/* Image Block */}
                                         <div
@@ -299,7 +302,7 @@ export function HomeHero({ posts, dictionary, locale, linkPrefix }: HomeHeroProp
                                                 <RelativeTime
                                                     date={post.frontmatter.date}
                                                     locale={locale}
-                                                    className="text-[10px] font-bold uppercase tracking-tighter text-muted-foreground/60"
+                                                    className="text-[10px] font-bold uppercase tracking-tighter text-muted-foreground/80"
                                                 />
 
                                                 <div className="flex items-center gap-2">
