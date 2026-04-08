@@ -101,7 +101,7 @@ export function LayoutFooter({
   };
 
   const authorName = "Iwan Efendi";
-  const authorAvatar = "/images/profile/profile.png";
+  const authorAvatar = "/images/profile/profile.webp";
 
   const socialLinks = [
     {

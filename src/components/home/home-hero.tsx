@@ -136,9 +136,11 @@ export function HomeHero({ posts, dictionary, locale, linkPrefix }: HomeHeroProp
                                                         className="transition-transform duration-700 group-hover:scale-[1.06]"
                                                         wrapperClassName="absolute inset-0"
                                                         sizes="(max-width: 640px) calc(100vw - 32px), 50vw"
-                                                        priority={index < 4}
-                                                        holdUntilLoaded={index < 4}
-                                                        initialVisitOnly={index < 4}
+                                                        priority={index === 0}
+                                                        loading={index === 0 ? "eager" : "lazy"}
+                                                        quality={68}
+                                                        holdUntilLoaded={index === 0}
+                                                        initialVisitOnly={index === 0}
                                                         showSkeleton
                                                         data-ai-hint={heroImageHint}
                                                     />
@@ -268,9 +270,11 @@ export function HomeHero({ posts, dictionary, locale, linkPrefix }: HomeHeroProp
                                                     className="transition-transform duration-1000 ease-out group-hover:scale-[1.06]"
                                                     wrapperClassName="absolute inset-0"
                                                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
-                                                    priority={index < 4}
-                                                    holdUntilLoaded={index < 4}
-                                                    initialVisitOnly={index < 4}
+                                                    priority={index === 0}
+                                                    loading={index === 0 ? "eager" : "lazy"}
+                                                    quality={68}
+                                                    holdUntilLoaded={index === 0}
+                                                    initialVisitOnly={index === 0}
                                                     showSkeleton
                                                     data-ai-hint={heroImageHint}
                                                 />

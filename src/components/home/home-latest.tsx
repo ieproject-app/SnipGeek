@@ -78,9 +78,12 @@ export const HomeLatest = ({
                                     fill
                                     className="transition-transform duration-700 group-hover:scale-110"
                                     wrapperClassName="absolute inset-0"
-                                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 33vw, 300px"
-                                    holdUntilLoaded={index < 3}
-                                    initialVisitOnly={index < 3}
+                                    sizes="(max-width: 768px) calc(100vw - 2rem), (max-width: 1200px) 33vw, 300px"
+                                    loading={index === 0 ? "eager" : "lazy"}
+                                    priority={index === 0}
+                                    quality={68}
+                                    holdUntilLoaded={index === 0}
+                                    initialVisitOnly={index === 0}
                                     showSkeleton
                                     data-ai-hint={heroImageHint}
                                 />

@@ -6,7 +6,6 @@ import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { cn, formatRelativeTime } from "@/lib/utils";
 import { AddToReadingListButton } from "@/components/layout/add-to-reading-list-button";
 import { CategoryBadge } from "@/components/layout/category-badge";
-import { ScrollReveal } from "@/components/ui/scroll-reveal";
 import { RevealImage } from "@/components/ui/reveal-image";
 import { Button } from "@/components/ui/button";
 import { ChevronDown } from "lucide-react";
@@ -99,59 +98,59 @@ export function BlogListClient({
             };
 
             return (
-              <ScrollReveal key={post.slug} delay={index * 0.05} direction="up">
-                <div className="group relative transition-all duration-500 hover:-translate-y-1">
-                  <Link
-                    href={`${linkPrefix}/blog/${post.slug}`}
-                    className="block"
-                    aria-label={`Read more about ${post.frontmatter.title}`}
-                  >
-                    <div className={cn(
-                      "relative w-full aspect-8/5 overflow-hidden rounded-xl mb-4 shadow-sm transition-all duration-500 border border-primary/5 ring-1 ring-transparent",
-                      multicolor.hoverRing,
-                      multicolor.hoverShadow,
-                    )}>
-                      {heroImageSrc && (
-                        <RevealImage
-                          src={heroImageSrc}
-                          alt={
-                            post.frontmatter.imageAlt || post.frontmatter.title
-                          }
-                          fill
-                          className="transition-transform duration-700 group-hover:scale-110"
-                          wrapperClassName="absolute inset-0"
-                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 33vw, 300px"
-                          priority={index < 3}
-                          holdUntilLoaded={index < 3}
-                          showSkeleton
-                          data-ai-hint={heroImageHint}
-                        />
-                      )}
-                      <div className={cn("absolute inset-0 bg-linear-to-t opacity-0 transition-opacity duration-500 group-hover:opacity-100", multicolor.overlayGradient)} />
-                      <div className={cn("absolute bottom-0 left-0 right-0 h-0.75 opacity-0 transition-opacity duration-500 group-hover:opacity-100", multicolor.accentBar)} />
-                      <AddToReadingListButton
-                        item={item}
-                        dictionary={dictionary}
-                        showText={false}
-                        className="absolute top-3 right-3 z-10 text-white bg-black/30 hover:bg-black/50 hover:text-white opacity-0 group-hover:opacity-100 [@media(hover:none)]:opacity-100 transition-opacity"
+              <div key={post.slug} className="group relative transition-all duration-500 hover:-translate-y-1">
+                <Link
+                  href={`${linkPrefix}/blog/${post.slug}`}
+                  className="block"
+                  aria-label={`Read more about ${post.frontmatter.title}`}
+                >
+                  <div className={cn(
+                    "relative w-full aspect-8/5 overflow-hidden rounded-xl mb-4 shadow-sm transition-all duration-500 border border-primary/5 ring-1 ring-transparent",
+                    multicolor.hoverRing,
+                    multicolor.hoverShadow,
+                  )}>
+                    {heroImageSrc && (
+                      <RevealImage
+                        src={heroImageSrc}
+                        alt={
+                          post.frontmatter.imageAlt || post.frontmatter.title
+                        }
+                        fill
+                        className="transition-transform duration-700 group-hover:scale-110"
+                        wrapperClassName="absolute inset-0"
+                        sizes="(max-width: 768px) calc(100vw - 2rem), (max-width: 1200px) 33vw, 300px"
+                        loading={index === 0 ? "eager" : "lazy"}
+                        priority={index === 0}
+                        quality={68}
+                        holdUntilLoaded={index === 0}
+                        showSkeleton
+                        data-ai-hint={heroImageHint}
                       />
-                    </div>
+                    )}
+                    <div className={cn("absolute inset-0 bg-linear-to-t opacity-0 transition-opacity duration-500 group-hover:opacity-100", multicolor.overlayGradient)} />
+                    <div className={cn("absolute bottom-0 left-0 right-0 h-0.75 opacity-0 transition-opacity duration-500 group-hover:opacity-100", multicolor.accentBar)} />
+                    <AddToReadingListButton
+                      item={item}
+                      dictionary={dictionary}
+                      showText={false}
+                      className="absolute top-3 right-3 z-10 text-white bg-black/30 hover:bg-black/50 hover:text-white opacity-0 group-hover:opacity-100 [@media(hover:none)]:opacity-100 transition-opacity"
+                    />
+                  </div>
 
-                    <div className="mb-2">
-                      <CategoryBadge category={post.frontmatter.category} size="xs" />
-                    </div>
-                    <h3 className={cn("font-display text-lg sm:text-base font-semibold tracking-tight text-primary transition-colors leading-tight mb-2", multicolor.hoverTitle)}>
-                      {post.frontmatter.title}
-                    </h3>
-                    <time className="text-[10px] font-medium text-muted-foreground block opacity-60">
-                      {formatRelativeTime(
-                        new Date(post.frontmatter.date),
-                        locale,
-                      )}
-                    </time>
-                  </Link>
-                </div>
-              </ScrollReveal>
+                  <div className="mb-2">
+                    <CategoryBadge category={post.frontmatter.category} size="xs" />
+                  </div>
+                  <h3 className={cn("font-display text-lg sm:text-base font-semibold tracking-tight text-primary transition-colors leading-tight mb-2", multicolor.hoverTitle)}>
+                    {post.frontmatter.title}
+                  </h3>
+                  <time className="text-[10px] font-medium text-muted-foreground block opacity-60">
+                    {formatRelativeTime(
+                      new Date(post.frontmatter.date),
+                      locale,
+                    )}
+                  </time>
+                </Link>
+              </div>
             );
           })}
         </section>
