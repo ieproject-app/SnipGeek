@@ -10,30 +10,52 @@ import type { Note, NoteFrontmatter } from "@/lib/notes";
 import type { Dictionary } from "@/lib/get-dictionary";
 
 // Below-fold sections: code-split so their JS is not in the initial bundle
-const HomeTransitionNote = dynamic(() =>
-  import("@/components/home/home-transition-note").then((m) => ({
-    default: m.HomeTransitionNote,
-  }))
+function SectionPlaceholder({ minHeight }: { minHeight: string }) {
+  return <div aria-hidden="true" style={{ minHeight }} />;
+}
+
+const createSectionLoader = (minHeight: string) => {
+  function SectionLoader() {
+    return <SectionPlaceholder minHeight={minHeight} />;
+  }
+
+  return SectionLoader;
+};
+
+const HomeTransitionNote = dynamic(
+  () =>
+    import("@/components/home/home-transition-note").then((m) => ({
+      default: m.HomeTransitionNote,
+    })),
+  { loading: createSectionLoader("120px") }
 );
-const HomeTutorials = dynamic(() =>
-  import("@/components/home/home-tutorials").then((m) => ({
-    default: m.HomeTutorials,
-  }))
+const HomeTutorials = dynamic(
+  () =>
+    import("@/components/home/home-tutorials").then((m) => ({
+      default: m.HomeTutorials,
+    })),
+  { loading: createSectionLoader("400px") }
 );
-const HomeTopics = dynamic(() =>
-  import("@/components/home/home-topics").then((m) => ({
-    default: m.HomeTopics,
-  }))
+const HomeTopics = dynamic(
+  () =>
+    import("@/components/home/home-topics").then((m) => ({
+      default: m.HomeTopics,
+    })),
+  { loading: createSectionLoader("400px") }
 );
-const HomeUpdates = dynamic(() =>
-  import("@/components/home/home-updates").then((m) => ({
-    default: m.HomeUpdates,
-  }))
+const HomeUpdates = dynamic(
+  () =>
+    import("@/components/home/home-updates").then((m) => ({
+      default: m.HomeUpdates,
+    })),
+  { loading: createSectionLoader("400px") }
 );
-const HomeNotes = dynamic(() =>
-  import("@/components/home/home-notes").then((m) => ({
-    default: m.HomeNotes,
-  }))
+const HomeNotes = dynamic(
+  () =>
+    import("@/components/home/home-notes").then((m) => ({
+      default: m.HomeNotes,
+    })),
+  { loading: createSectionLoader("400px") }
 );
 
 /**
@@ -61,8 +83,8 @@ function LazySection({ children, minHeight }: { children: React.ReactNode; minHe
   }, []);
 
   return (
-    <div ref={ref} style={!visible ? { minHeight: minHeight ?? "200px" } : undefined}>
-      {visible ? children : null}
+    <div ref={ref}>
+      {visible ? children : <SectionPlaceholder minHeight={minHeight ?? "200px"} />}
     </div>
   );
 }
