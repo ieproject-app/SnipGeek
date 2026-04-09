@@ -166,26 +166,22 @@ export default async function LocaleLayout({
   const linkPrefix = locale === i18n.defaultLocale ? "" : `/${locale}`;
   const SEARCHABLE_POST_LIMIT = 24;
   const SEARCHABLE_NOTE_LIMIT = 8;
-  const QUICK_PICK_IMAGE_LIMIT = 3;
 
-  const searchablePosts = posts.slice(0, SEARCHABLE_POST_LIMIT).map((post, index) => ({
+  const searchablePosts = posts.slice(0, SEARCHABLE_POST_LIMIT).map((post) => ({
     slug: post.slug,
     title: post.frontmatter.title,
     description: post.frontmatter.description,
     type: "blog" as const,
     href: `${linkPrefix}/blog/${post.slug}`,
-    // Keep hero images only for top quick picks in header search panel.
-    heroImage: index < QUICK_PICK_IMAGE_LIMIT ? post.frontmatter.heroImage : undefined,
     tags: post.frontmatter.tags,
   }));
 
-  const searchableNotes = notes.slice(0, SEARCHABLE_NOTE_LIMIT).map((note, index) => ({
+  const searchableNotes = notes.slice(0, SEARCHABLE_NOTE_LIMIT).map((note) => ({
     slug: note.slug,
     title: note.frontmatter.title,
     description: note.frontmatter.description,
     type: "note" as const,
     href: `${linkPrefix}/notes/${note.slug}`,
-    heroImage: index < QUICK_PICK_IMAGE_LIMIT ? note.frontmatter.heroImage : undefined,
     tags: note.frontmatter.tags,
   }));
 
