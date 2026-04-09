@@ -1,6 +1,5 @@
 import { LayoutHeader } from "@/components/layout/layout-header";
 import { LayoutFooter } from "@/components/layout/layout-footer";
-import { LayoutBackToTop } from "@/components/layout/back-to-top";
 import { i18n, type Locale } from "@/i18n-config";
 import {
   getAllTranslationsMap as getAllPostTranslationsMap,
@@ -24,8 +23,8 @@ import {
 } from "next/font/google";
 import { cn } from "@/lib/utils";
 import { FirebaseProviderWrapper } from "@/components/layout/firebase-provider-wrapper";
-import { LocaleSuggestionBanner } from "@/components/layout/locale-suggestion-banner";
 import { FirebaseAnalyticsTracker } from "@/components/analytics/firebase-analytics-tracker";
+import { LayoutDeferredUi } from "@/components/layout/layout-deferred-ui";
 
 const fontDisplay = Bricolage_Grotesque({
   subsets: ["latin"],
@@ -165,9 +164,9 @@ export default async function LocaleLayout({
   const posts = await getSortedPostsData(locale);
   const notes = await getSortedNotesData(locale);
   const linkPrefix = locale === i18n.defaultLocale ? "" : `/${locale}`;
-  const SEARCHABLE_POST_LIMIT = 40;
-  const SEARCHABLE_NOTE_LIMIT = 20;
-  const QUICK_PICK_IMAGE_LIMIT = 6;
+  const SEARCHABLE_POST_LIMIT = 24;
+  const SEARCHABLE_NOTE_LIMIT = 8;
+  const QUICK_PICK_IMAGE_LIMIT = 3;
 
   const searchablePosts = posts.slice(0, SEARCHABLE_POST_LIMIT).map((post, index) => ({
     slug: post.slug,
@@ -215,7 +214,7 @@ export default async function LocaleLayout({
                   searchableData={searchableData}
                   dictionary={dictionary}
                 />
-                <LocaleSuggestionBanner
+                <LayoutDeferredUi
                   locale={locale}
                   dictionary={dictionary}
                   translationsMap={translationsMap}
@@ -226,7 +225,6 @@ export default async function LocaleLayout({
                   dictionary={dictionary}
                   translationsMap={translationsMap}
                 />
-                <LayoutBackToTop />
               </ReadingListProvider>
             </NotificationProvider>
           </ThemeProvider>

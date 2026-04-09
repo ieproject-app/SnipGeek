@@ -8,7 +8,6 @@ import { cn } from "@/lib/utils";
 import { RelativeTime } from "@/components/ui/relative-time";
 import { AddToReadingListButton } from "@/components/layout/add-to-reading-list-button";
 import { CategoryBadge } from "@/components/layout/category-badge";
-import { ScrollReveal } from "@/components/ui/scroll-reveal";
 import { RevealImage } from "@/components/ui/reveal-image";
 import { getMulticolorSeed, getMulticolorTheme } from "@/lib/multicolor";
 import type { Post, PostFrontmatter } from "@/lib/posts";
@@ -59,58 +58,56 @@ export const HomeLatest = ({
         );
 
         return (
-            <ScrollReveal key={post.slug} direction="up" delay={index * 0.1}>
-                <div className="group relative transition-all duration-500 hover:-translate-y-1">
-                    <Link
-                        href={`${linkPrefix}/blog/${post.slug}`}
-                        className="block"
-                    >
-                        <div className={cn(
-                            "relative w-full aspect-8/5 overflow-hidden rounded-xl mb-4 shadow-sm transition-all duration-500 border border-primary/5 ring-1 ring-transparent",
-                            multicolor.hoverRing,
-                            multicolor.hoverShadow,
-                        )}>
-                            {heroImageSrc && (
-                                <RevealImage
-                                    src={heroImageSrc}
-                                    alt={post.frontmatter.imageAlt || post.frontmatter.title}
-                                    fill
-                                    className="transition-transform duration-700 group-hover:scale-110"
-                                    wrapperClassName="absolute inset-0"
-                                    sizes="(max-width: 640px) calc(100vw - 2rem), (max-width: 1024px) 50vw, 33vw"
-                                    loading={index === 0 ? "eager" : "lazy"}
-                                    priority={index === 0}
-                                    quality={68}
-                                    holdUntilLoaded={index === 0}
-                                    initialVisitOnly={index === 0}
-                                    showSkeleton
-                                    data-ai-hint={heroImageHint}
-                                />
-                            )}
-                            <div className={cn("absolute inset-0 bg-linear-to-t opacity-0 transition-opacity duration-500 group-hover:opacity-100", multicolor.overlayGradient)} />
-                            <div className={cn("absolute bottom-0 left-0 right-0 h-0.75 opacity-0 transition-opacity duration-500 group-hover:opacity-100", multicolor.accentBar)} />
-                            <AddToReadingListButton
-                                item={item}
-                                dictionary={dictionary}
-                                showText={false}
-                                className="absolute top-3 right-3 z-10 text-white bg-black/30 hover:bg-black/50 hover:text-white opacity-0 group-hover:opacity-100 [@media(hover:none)]:opacity-100 transition-opacity"
+            <div key={post.slug} className="group relative transition-all duration-500 hover:-translate-y-1">
+                <Link
+                    href={`${linkPrefix}/blog/${post.slug}`}
+                    className="block"
+                >
+                    <div className={cn(
+                        "relative w-full aspect-8/5 overflow-hidden rounded-xl mb-4 shadow-sm transition-all duration-500 border border-primary/5 ring-1 ring-transparent",
+                        multicolor.hoverRing,
+                        multicolor.hoverShadow,
+                    )}>
+                        {heroImageSrc && (
+                            <RevealImage
+                                src={heroImageSrc}
+                                alt={post.frontmatter.imageAlt || post.frontmatter.title}
+                                fill
+                                className="transition-transform duration-700 group-hover:scale-110"
+                                wrapperClassName="absolute inset-0"
+                                sizes="(max-width: 640px) calc(100vw - 2rem), (max-width: 1024px) 50vw, 33vw"
+                                loading={index === 0 ? "eager" : "lazy"}
+                                priority={index === 0}
+                                quality={68}
+                                holdUntilLoaded={index === 0}
+                                initialVisitOnly={index === 0}
+                                showSkeleton
+                                data-ai-hint={heroImageHint}
                             />
-                        </div>
-
-                        <div className="mb-2">
-                            <CategoryBadge category={post.frontmatter.category} />
-                        </div>
-                        <h3 className={cn("font-display text-lg sm:text-base font-semibold tracking-tight text-primary transition-colors leading-tight mb-2", multicolor.hoverTitle)}>
-                            {post.frontmatter.title}
-                        </h3>
-                        <RelativeTime
-                            date={post.frontmatter.date}
-                            locale={locale}
-                            className="text-[10px] font-medium text-muted-foreground block opacity-60"
+                        )}
+                        <div className={cn("absolute inset-0 bg-linear-to-t opacity-0 transition-opacity duration-500 group-hover:opacity-100", multicolor.overlayGradient)} />
+                        <div className={cn("absolute bottom-0 left-0 right-0 h-0.75 opacity-0 transition-opacity duration-500 group-hover:opacity-100", multicolor.accentBar)} />
+                        <AddToReadingListButton
+                            item={item}
+                            dictionary={dictionary}
+                            showText={false}
+                            className="absolute top-3 right-3 z-10 text-white bg-black/30 hover:bg-black/50 hover:text-white opacity-0 group-hover:opacity-100 [@media(hover:none)]:opacity-100 transition-opacity"
                         />
-                    </Link>
-                </div>
-            </ScrollReveal>
+                    </div>
+
+                    <div className="mb-2">
+                        <CategoryBadge category={post.frontmatter.category} />
+                    </div>
+                    <h3 className={cn("font-display text-lg sm:text-base font-semibold tracking-tight text-primary transition-colors leading-tight mb-2", multicolor.hoverTitle)}>
+                        {post.frontmatter.title}
+                    </h3>
+                    <RelativeTime
+                        date={post.frontmatter.date}
+                        locale={locale}
+                        className="text-[10px] font-medium text-muted-foreground block opacity-60"
+                    />
+                </Link>
+            </div>
         );
     };
 
@@ -118,19 +115,13 @@ export const HomeLatest = ({
 
     return (
         <section className="container max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 overflow-hidden">
-            <ScrollReveal direction="up">
-                <h2 className="text-3xl font-bold font-display tracking-tighter text-primary mb-10 text-center">
-                    {dictionary.home.latestPosts}
-                </h2>
-            </ScrollReveal>
+            <h2 className="text-3xl font-bold font-display tracking-tighter text-primary mb-10 text-center">
+                {dictionary.home.latestPosts}
+            </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-8 mb-12">
                 {posts.map((post, index) => renderLatestCard(post, index))}
             </div>
-            <ScrollReveal
-                delay={0.3}
-                direction="up"
-                className="flex justify-center"
-            >
+            <div className="flex justify-center">
                 <Link
                     href={`${linkPrefix}/blog`}
                     className="flex items-center gap-2 bg-accent/5 px-3 py-1.5 rounded-full border border-accent/30 hover:bg-accent/10 transition-all group"
@@ -144,7 +135,7 @@ export const HomeLatest = ({
                         <ChevronRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5" />
                     </span>
                 </Link>
-            </ScrollReveal>
+            </div>
         </section>
     );
 };
