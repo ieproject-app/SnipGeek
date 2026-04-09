@@ -165,6 +165,7 @@ export function LayoutHeader({
   const params = useParams();
   const router = useRouter();
   const prevCount = useRef(readingListItems.length);
+  const hasHandledInitialPathname = useRef(false);
 
   const isSearchOpen = activeView === "search";
   const isMenuOpen = activeView === "menu";
@@ -187,6 +188,12 @@ export function LayoutHeader({
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setActiveView("none");
     setQuery("");
+
+    if (!hasHandledInitialPathname.current) {
+      hasHandledInitialPathname.current = true;
+      return;
+    }
+
     if (typeof window !== "undefined") {
       const root = document.documentElement;
       const previousScrollBehavior = root.style.scrollBehavior;
