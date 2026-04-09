@@ -28,6 +28,7 @@ export const HomeLatest = ({
     linkPrefix,
 }: HomeLatestProps) => {
     const renderLatestCard = (post: Post<PostFrontmatter>, index: number) => {
+        const isLcpCandidate = index === 0;
         const heroImageValue = post.frontmatter.heroImage;
         let heroImageSrc: string | undefined;
         let heroImageHint: string | undefined;
@@ -58,8 +59,7 @@ export const HomeLatest = ({
             getMulticolorSeed(post.slug, post.frontmatter.category, post.frontmatter.title),
         );
 
-        return (
-            <ScrollReveal key={post.slug} direction="up" delay={index * 0.1}>
+        const card = (
                 <div className="group relative transition-all duration-500 hover:-translate-y-1">
                     <Link
                         href={`${linkPrefix}/blog/${post.slug}`}
@@ -78,13 +78,13 @@ export const HomeLatest = ({
                                     className="transition-transform duration-700 group-hover:scale-110"
                                     wrapperClassName="absolute inset-0"
                                     sizes="(max-width: 640px) calc(100vw - 2rem), (max-width: 1024px) 50vw, 33vw"
-                                    loading={index === 0 ? "eager" : "lazy"}
-                                    priority={index === 0}
-                                    fetchPriority={index === 0 ? "high" : undefined}
+                                    loading={isLcpCandidate ? "eager" : "lazy"}
+                                    priority={isLcpCandidate}
+                                    fetchPriority={isLcpCandidate ? "high" : undefined}
                                     quality={68}
-                                    holdUntilLoaded={index === 0}
-                                    initialVisitOnly={index === 0}
-                                    showSkeleton
+                                    holdUntilLoaded={!isLcpCandidate}
+                                    initialVisitOnly={!isLcpCandidate}
+                                    showSkeleton={!isLcpCandidate}
                                     data-ai-hint={heroImageHint}
                                 />
                             )}
@@ -111,6 +111,15 @@ export const HomeLatest = ({
                         />
                     </Link>
                 </div>
+        );
+
+        if (isLcpCandidate) {
+            return <div key={post.slug}>{card}</div>;
+        }
+
+        return (
+            <ScrollReveal key={post.slug} direction="up" delay={index * 0.1}>
+                {card}
             </ScrollReveal>
         );
     };
