@@ -80,6 +80,7 @@ export const HomeLatest = ({
                                     sizes="(max-width: 640px) calc(100vw - 2rem), (max-width: 1024px) 50vw, 33vw"
                                     loading={index === 0 ? "eager" : "lazy"}
                                     priority={index === 0}
+                                    fetchPriority={index === 0 ? "high" : undefined}
                                     quality={68}
                                     holdUntilLoaded={index === 0}
                                     initialVisitOnly={index === 0}
