@@ -15,12 +15,6 @@ import {
 } from "@/components/layout/category-badge";
 import { RevealImage } from "@/components/ui/reveal-image";
 import { getMulticolorSeed, getMulticolorTheme } from "@/lib/multicolor";
-import {
-    Carousel,
-    CarouselContent,
-    CarouselItem,
-    type CarouselApi,
-} from "@/components/ui/carousel";
 
 interface HomeHeroProps {
     posts: Post<PostFrontmatter>[];
@@ -35,34 +29,39 @@ interface HomeHeroProps {
  * Desktop (sm+): Original 4-column staggered grid.
  */
 export function HomeHero({ posts, dictionary, locale, linkPrefix }: HomeHeroProps) {
-    const [api, setApi] = React.useState<CarouselApi>();
     const [selectedIndex, setSelectedIndex] = React.useState(0);
-    const [scrollSnaps, setScrollSnaps] = React.useState<number[]>([]);
-    const [canScrollPrev, setCanScrollPrev] = React.useState(false);
-    const [canScrollNext, setCanScrollNext] = React.useState(false);
+    const [hasInteractedWithMobileCarousel, setHasInteractedWithMobileCarousel] = React.useState(false);
+    const mobileScrollerRef = React.useRef<HTMLDivElement>(null);
+    const mobileItemRefs = React.useRef<Array<HTMLDivElement | null>>([]);
 
     React.useEffect(() => {
-        if (!api) return;
+        const scroller = mobileScrollerRef.current;
+        if (!scroller) return;
 
-        const onSelect = () => {
-            setSelectedIndex(api.selectedScrollSnap());
-            setCanScrollPrev(api.canScrollPrev());
-            setCanScrollNext(api.canScrollNext());
+        const updateSelectedIndex = () => {
+            const currentScrollLeft = scroller.scrollLeft;
+            let closestIndex = 0;
+            let closestDistance = Number.POSITIVE_INFINITY;
+
+            mobileItemRefs.current.forEach((item, index) => {
+                if (!item) return;
+                const distance = Math.abs(item.offsetLeft - currentScrollLeft);
+                if (distance < closestDistance) {
+                    closestDistance = distance;
+                    closestIndex = index;
+                }
+            });
+
+            setSelectedIndex(closestIndex);
         };
 
-        setScrollSnaps(api.scrollSnapList());
-        onSelect();
-
-        api.on("select", onSelect);
-        api.on("reInit", onSelect);
+        updateSelectedIndex();
+        scroller.addEventListener("scroll", updateSelectedIndex, { passive: true });
 
         return () => {
-            api.off("select", onSelect);
-            api.off("reInit", onSelect);
+            scroller.removeEventListener("scroll", updateSelectedIndex);
         };
-    }, [api]);
-
-    if (posts.length === 0) return null;
+    }, [posts.length]);
 
     // Build per-post data once, reused by both mobile carousel and desktop grid
     const postData = posts.map((post, index) => {
@@ -100,20 +99,52 @@ export function HomeHero({ posts, dictionary, locale, linkPrefix }: HomeHeroProp
         return { post, index, heroImageSrc, heroImageHint, rawCategory, multicolor, item };
     });
 
+    const scrollSnaps = React.useMemo(
+        () => Array.from({ length: postData.length }, (_, index) => index),
+        [postData.length],
+    );
+
+    const canScrollPrev = selectedIndex > 0;
+    const canScrollNext = selectedIndex < postData.length - 1;
+
+    const activateMobileCarousel = React.useCallback(() => {
+        if (!hasInteractedWithMobileCarousel) {
+            setHasInteractedWithMobileCarousel(true);
+        }
+    }, [hasInteractedWithMobileCarousel]);
+
+    const scrollToMobileIndex = React.useCallback(
+        (index: number) => {
+            activateMobileCarousel();
+            const target = mobileItemRefs.current[index];
+            if (!target) return;
+            target.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "start" });
+            setSelectedIndex(index);
+        },
+        [activateMobileCarousel],
+    );
+
+    if (posts.length === 0) return null;
+
     return (
         <section className="py-12 sm:py-16 bg-card border-b border-primary/5">
             <div className="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
                 {/* ── MOBILE: Carousel (hidden on sm+) ── */}
                 <div className="sm:hidden">
-                    <Carousel
-                        setApi={setApi}
-                        opts={{ align: "start", loop: false }}
-                        className="w-full"
+                    <div
+                        ref={mobileScrollerRef}
+                        className="flex w-full snap-x snap-mandatory overflow-x-auto scroll-smooth [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+                        onTouchStart={activateMobileCarousel}
                     >
-                        <CarouselContent className="-ml-4">
-                            {postData.map(({ post, index, heroImageSrc, heroImageHint, rawCategory, multicolor, item }) => (
-                                <CarouselItem key={post.slug} className="pl-4 pb-4 pt-1">
+                        {postData.map(({ post, index, heroImageSrc, heroImageHint, rawCategory, multicolor, item }) => (
+                            <div
+                                key={post.slug}
+                                ref={(node) => {
+                                    mobileItemRefs.current[index] = node;
+                                }}
+                                className="min-w-full shrink-0 grow-0 snap-start pb-4 pt-1"
+                            >
                                     <article
                                         className={cn(
                                             "relative bg-card rounded-xl border border-primary/5 transition-all duration-500 flex flex-col group/card overflow-hidden shadow-md ring-1 ring-transparent",
@@ -128,21 +159,25 @@ export function HomeHero({ posts, dictionary, locale, linkPrefix }: HomeHeroProp
                                             {/* Image */}
                                             <div className="relative aspect-[3/2] overflow-hidden rounded-t-xl">
                                                 {heroImageSrc && (
-                                                    <RevealImage
-                                                        src={heroImageSrc}
-                                                        alt={post.frontmatter.imageAlt || post.frontmatter.title}
-                                                        fill
-                                                        className="transition-transform duration-700 group-hover:scale-[1.06]"
-                                                        wrapperClassName="absolute inset-0"
-                                                        sizes="(max-width: 640px) calc(100vw - 32px), (max-width: 1024px) 50vw, 25vw"
-                                                        priority={index === 0}
-                                                        loading={index === 0 ? "eager" : "lazy"}
-                                                        quality={68}
-                                                        holdUntilLoaded={index === 0}
-                                                        initialVisitOnly={index === 0}
-                                                        showSkeleton
-                                                        data-ai-hint={heroImageHint}
-                                                    />
+                                                    index === 0 || hasInteractedWithMobileCarousel ? (
+                                                        <RevealImage
+                                                            src={heroImageSrc}
+                                                            alt={post.frontmatter.imageAlt || post.frontmatter.title}
+                                                            fill
+                                                            className="transition-transform duration-700 group-hover:scale-[1.06]"
+                                                            wrapperClassName="absolute inset-0"
+                                                            sizes="(max-width: 640px) calc(100vw - 32px), (max-width: 1024px) 50vw, 25vw"
+                                                            priority={index === 0}
+                                                            loading={index === 0 ? "eager" : "lazy"}
+                                                            quality={68}
+                                                            holdUntilLoaded={index === 0}
+                                                            initialVisitOnly={index === 0}
+                                                            showSkeleton
+                                                            data-ai-hint={heroImageHint}
+                                                        />
+                                                    ) : (
+                                                        <div className="absolute inset-0 bg-muted" aria-hidden="true" />
+                                                    )
                                                 )}
                                                 <div className={cn("absolute inset-0 bg-linear-to-t opacity-0 transition-opacity duration-500 group-hover/card:opacity-100", multicolor.overlayGradient)} />
                                                 <div className={cn("absolute bottom-0 left-0 right-0 h-0.75 opacity-0 transition-opacity duration-500 group-hover/card:opacity-100", multicolor.accentBar)} />
@@ -184,15 +219,15 @@ export function HomeHero({ posts, dictionary, locale, linkPrefix }: HomeHeroProp
                                             </div>
                                         </Link>
                                     </article>
-                                </CarouselItem>
-                            ))}
-                        </CarouselContent>
+                            </div>
+                        ))}
+                    </div>
 
                         {/* Carousel controls: prev/next + dots */}
                         <div className="mt-4 flex items-center gap-2">
                             <button
                                 type="button"
-                                onClick={() => api?.scrollPrev()}
+                                onClick={() => scrollToMobileIndex(selectedIndex - 1)}
                                 disabled={!canScrollPrev}
                                 className="h-8 w-8 rounded-full border border-primary/20 text-primary/70 hover:text-primary hover:border-primary/40 disabled:opacity-35 disabled:cursor-not-allowed inline-flex items-center justify-center transition-colors"
                                 aria-label={locale === "id" ? "Slide sebelumnya" : "Previous slide"}
@@ -205,7 +240,7 @@ export function HomeHero({ posts, dictionary, locale, linkPrefix }: HomeHeroProp
                                     <button
                                         key={`dot-${index}`}
                                         type="button"
-                                        onClick={() => api?.scrollTo(index)}
+                                        onClick={() => scrollToMobileIndex(index)}
                                         className="h-6 w-6 inline-flex items-center justify-center rounded-full"
                                         aria-label={`Go to slide ${index + 1}`}
                                     >
@@ -223,7 +258,7 @@ export function HomeHero({ posts, dictionary, locale, linkPrefix }: HomeHeroProp
 
                             <button
                                 type="button"
-                                onClick={() => api?.scrollNext()}
+                                onClick={() => scrollToMobileIndex(selectedIndex + 1)}
                                 disabled={!canScrollNext}
                                 className="h-8 w-8 rounded-full border border-primary/20 text-primary/70 hover:text-primary hover:border-primary/40 disabled:opacity-35 disabled:cursor-not-allowed inline-flex items-center justify-center transition-colors"
                                 aria-label={locale === "id" ? "Slide berikutnya" : "Next slide"}
@@ -231,7 +266,6 @@ export function HomeHero({ posts, dictionary, locale, linkPrefix }: HomeHeroProp
                                 <ChevronRight className="h-4 w-4" />
                             </button>
                         </div>
-                    </Carousel>
                 </div>
 
                 {/* ── DESKTOP: Original 4-column staggered grid (hidden on mobile) ── */}
