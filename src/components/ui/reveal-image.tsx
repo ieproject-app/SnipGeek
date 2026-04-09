@@ -1,8 +1,18 @@
 "use client";
 
 import Image, { type ImageLoaderProps, type ImageProps } from "next/image";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
+
+/**
+ * Module-level cache of image sources that have already loaded during this
+ * session. Prevents skeleton flash when the same image is rendered again
+ * (e.g. Back navigation, HMR, scroll-triggered remount).
+ */
+const loadedSources = new Set<string>();
+
+const useIsomorphicLayoutEffect =
+  typeof window !== "undefined" ? useLayoutEffect : useEffect;
 
 interface RevealImageProps extends Omit<ImageProps, "onLoad"> {
   wrapperClassName?: string;
@@ -33,17 +43,24 @@ export function RevealImage({
   loader: providedLoader,
   ...props
 }: RevealImageProps) {
-  const [isLoaded, setIsLoaded] = useState(false);
+  const srcKey = typeof src === "string" ? src : "";
+  const [isLoaded, setIsLoaded] = useState(() => loadedSources.has(srcKey));
   const [hasMounted, setHasMounted] = useState(false);
   const [shouldHold, setShouldHold] = useState(holdUntilLoaded);
+  const wrapperRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setHasMounted(true);
   }, []);
 
   useEffect(() => {
-    setIsLoaded(false);
-  }, [src]);
+    // When src changes, check the global cache first before resetting.
+    if (loadedSources.has(srcKey)) {
+      setIsLoaded(true);
+    } else {
+      setIsLoaded(false);
+    }
+  }, [srcKey]);
 
   useEffect(() => {
     if (!initialVisitOnly) {
@@ -64,21 +81,28 @@ export function RevealImage({
     }
   }, [holdUntilLoaded, initialVisitOnly]);
 
+  // Synchronously detect images already in browser cache (before paint).
+  useIsomorphicLayoutEffect(() => {
+    if (isLoaded) return;
+    const img = wrapperRef.current?.querySelector("img");
+    if (img?.complete && img.naturalWidth > 0) {
+      setIsLoaded(true);
+      if (srcKey) loadedSources.add(srcKey);
+    }
+  }, [srcKey]);
+
   const shouldHideImage = shouldHold && !isLoaded;
   const shouldShowPlaceholder = !isLoaded && (!hasMounted || shouldHold || showSkeleton);
 
   const mergedImageClassName = useMemo(
     () =>
       cn(
-        "object-cover will-change-transform",
-        shouldHold
-          ? "transition-opacity ease-out"
-          : "transition-opacity duration-300 ease-out",
+        "object-cover",
         shouldHideImage ? "opacity-0" : "opacity-100",
         className,
         imageClassName,
       ),
-    [className, imageClassName, shouldHideImage, shouldHold],
+    [className, imageClassName, shouldHideImage],
   );
 
   const localImageLoader = useMemo(() => {
@@ -142,7 +166,7 @@ export function RevealImage({
   }, [providedLoader, src, width]);
 
   return (
-    <div className={cn("relative h-full w-full overflow-hidden", wrapperClassName)}>
+    <div ref={wrapperRef} className={cn("relative h-full w-full overflow-hidden", wrapperClassName)}>
       {shouldShowPlaceholder && (
         <div
           className={cn(
@@ -165,11 +189,14 @@ export function RevealImage({
         loading={loading}
         sizes={sizes}
         width={width}
-        onLoad={() => setIsLoaded(true)}
+        onLoad={() => {
+          setIsLoaded(true);
+          if (srcKey) loadedSources.add(srcKey);
+        }}
         {...props}
         style={{
           ...(props.style ?? {}),
-          transitionDuration: `${revealDurationMs}ms`,
+          transition: `opacity ${shouldHold ? revealDurationMs : 300}ms ease-out`,
         }}
       />
     </div>
