@@ -110,6 +110,8 @@
     },
     "image_crop": {
       "invalidImageFile": "Silakan unggah file gambar yang valid.",
+      "imageLoadError": "Gagal memuat gambar. File mungkin rusak.",
+      "downloadError": "Gagal membuat WebP. Silakan coba lagi.",
       "downloaded": "Diunduh: {filename} ({size})",
       "dropTitle": "Letakkan gambar di sini",
       "dropDescription": "atau klik untuk menjelajah - PNG, JPG, dan WebP didukung.",

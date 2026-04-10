@@ -25,7 +25,6 @@ import {
   RefreshCw,
   AlignCenter,
   Crop,
-  Info,
   CheckCircle2,
   X,
   GripHorizontal,
@@ -76,33 +75,6 @@ function InfoPill({ label, value }: { label: string; value: string }) {
         {label}
       </span>
       <span className="text-sm font-black text-primary font-mono">{value}</span>
-    </div>
-  );
-}
-
-// ──────────────────────────────────────────────────────────────────────────────
-// WASM Loading Progress
-// ──────────────────────────────────────────────────────────────────────────────
-function WasmLoadingIndicator({
-  progress,
-  useFallback,
-}: {
-  progress: number;
-  useFallback: boolean;
-}) {
-  if (useFallback) {
-    return (
-      <div className="flex items-center gap-2 text-[10px] text-amber-600 bg-amber-500/10 px-3 py-1.5 rounded-full">
-        <Info className="h-3 w-3" />
-        <span>Using basic mode</span>
-      </div>
-    );
-  }
-
-  return (
-    <div className="flex items-center gap-2 text-[10px] text-muted-foreground">
-      <Loader2 className="h-3 w-3 animate-spin" />
-      <span>Loading optimizer... {progress}%</span>
     </div>
   );
 }
