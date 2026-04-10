@@ -34,6 +34,20 @@ export async function generateMetadata({
         "x-default": languages[i18n.defaultLocale] || canonicalPath,
       },
     },
+    openGraph: {
+      type: "website",
+      url: `https://snipgeek.com${canonicalPath}`,
+      title: dictionary.blog.title,
+      description: dictionary.blog.description,
+      images: [
+        {
+          url: "https://snipgeek.com/images/logo/logo.svg",
+          width: 512,
+          height: 512,
+          alt: "SnipGeek Blog",
+        },
+      ],
+    },
   };
 }
 

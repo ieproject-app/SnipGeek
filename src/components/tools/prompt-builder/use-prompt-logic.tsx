@@ -1437,7 +1437,9 @@ export function usePromptLogic({
     prompt += `\n**9. SEO & HELPFUL CONTENT REQUIREMENTS**\n`;
     prompt += `- Match the primary search intent directly; do not open with generic filler.\n`;
     prompt += `- In the first 120 words, include a concise direct answer/outcome before deep explanation.\n`;
-    prompt += `- Generate a strong SEO title (target ~55-65 chars) and meta description (target ~140-160 chars) that align with user intent.\n`;
+    prompt += `- Generate a strong SEO title (target ~55-65 chars) and meta description (STRICT: 50–165 chars, no exceptions — the deploy check blocks anything outside this range).\n`;
+    prompt += `- Meta description must be a single sentence or two short clauses. No filler opener like "A guide to..." or "This article covers...". Start with the core value or outcome directly.\n`;
+    prompt += `- Description checklist: (1) under 165 chars including spaces, (2) contains the primary keyword naturally, (3) reads as a complete thought, not a truncated sentence.\n`;
     prompt += `- Keep one clear H1 and build scannable H2/H3 sections with practical progression.\n`;
     prompt += `- For tutorial/procedural posts, include: prerequisites, step-by-step actions, verification/check results, and common error fixes.\n`;
     prompt += `- Add 2-4 internal links to relevant SnipGeek content clusters (windows/ubuntu/tutorial/troubleshooting) where naturally useful.\n`;
@@ -1467,6 +1469,7 @@ export function usePromptLogic({
     prompt += `- Close the article with a **light, warm call to action** — invite a comment, mention an alternative, or express a simple hope. Keep it brief and human.\n`;
 
     prompt += `\n**12. FINAL QA CHECKLIST (MUST PASS BEFORE RETURNING OUTPUT)**\n`;
+    prompt += `- Frontmatter \`description\` field is present, 50–165 chars, and does NOT start with a filler phrase.\n`;
     prompt += `- No oversized paragraph that breaks desktop reading rhythm unless clearly justified.\n`;
     prompt += `- No unresolved source markers like {{...}} left in final MDX.\n`;
     prompt += `- No invalid MDX/HTML structure (unbalanced custom tags/components).\n`;

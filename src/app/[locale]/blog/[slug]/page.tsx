@@ -19,7 +19,7 @@ import { ArticleRelated } from "@/components/blog/article-related";
 import { ArticleTOC } from "@/components/blog/article-toc";
 import { ArticleTags } from "@/components/blog/article-tags";
 import { RevealImage } from "@/components/ui/reveal-image";
-import { extractHeadings } from "@/lib/mdx-utils";
+import { extractHeadings, stripMdxSyntax } from "@/lib/mdx-utils";
 import { LayoutBreadcrumbs } from "@/components/layout/layout-breadcrumbs";
 import { resolveHeroImage, getLinkPrefix } from "@/lib/utils";
 import remarkGfm from "remark-gfm";
@@ -75,6 +75,7 @@ export async function generateMetadata({
   return {
     title: post.frontmatter.title,
     description: post.frontmatter.description,
+    keywords: post.frontmatter.tags?.length ? post.frontmatter.tags : undefined,
     alternates: {
       canonical: canonicalPath,
       languages: {
@@ -95,14 +96,17 @@ export async function generateMetadata({
           alt: post.frontmatter.title,
         },
       ],
-      publishedTime: post.frontmatter.date,
-      modifiedTime: post.frontmatter.updated ?? post.frontmatter.date,
+      publishedTime: new Date(post.frontmatter.date).toISOString(),
+      modifiedTime: new Date(post.frontmatter.updated ?? post.frontmatter.date).toISOString(),
     },
     twitter: {
       card: "summary_large_image",
       title: post.frontmatter.title,
       description: post.frontmatter.description,
       images: [ogImageUrl],
+    },
+    other: {
+      "og:locale": locale === "id" ? "id_ID" : "en_US",
     },
   };
 }
@@ -147,7 +151,7 @@ export default async function Page({
     };
 
   const headings = extractHeadings(initialPost.content || "");
-  const wordCount = (initialPost.content || "").trim().split(/\s+/).length || 0;
+  const wordCount = stripMdxSyntax(initialPost.content || "").split(/\s+/).filter(Boolean).length;
   const readingTime = Math.max(1, Math.ceil(wordCount / 200));
 
   const itemForMeta = {
@@ -161,23 +165,24 @@ export default async function Page({
   const breadcrumbSegments = [
     { label: dictionary.home.breadcrumbHome, href: linkPrefix || "/" },
     { label: dictionary.navigation.blog, href: `${linkPrefix}/blog` },
-    { label: initialPost.frontmatter.category || "Blog" },
+    { label: initialPost.frontmatter.category || "Blog", href: initialPost.frontmatter.category ? `${linkPrefix}/blog?category=${encodeURIComponent(initialPost.frontmatter.category)}` : `${linkPrefix}/blog` },
+    { label: initialPost.frontmatter.title },
   ];
 
   const allPosts = await getSortedPostsData(locale);
+  const currentTags = initialPost.frontmatter.tags ?? [];
+  const currentCategory = initialPost.frontmatter.category;
   const initialRelatedContent = allPosts
-    .filter((p) => p.slug !== slug);
+    .filter((p) => p.slug !== slug)
+    .filter((p) => {
+      if (currentCategory && p.frontmatter.category === currentCategory) return true;
+      if (currentTags.length > 0 && p.frontmatter.tags?.some((t: string) => currentTags.includes(t))) return true;
+      return false;
+    });
 
-  const heroSourceOg = resolveHeroImage(
-    initialPost.frontmatter.heroImage,
-    initialPost.frontmatter.imageAlt,
-    initialPost.frontmatter.title,
-  );
-  const ogImageUrl = heroSourceOg
-    ? heroSourceOg.src.startsWith("http")
-      ? heroSourceOg.src
-      : `https://snipgeek.com${heroSourceOg.src}`
-    : "https://snipgeek.com/images/blank/blank.webp";
+  const ogImageUrl = heroSource.url.startsWith("http")
+    ? heroSource.url
+    : `https://snipgeek.com${heroSource.url}`;
 
   const canonicalPath =
     locale === i18n.defaultLocale ? `/blog/${slug}` : `/${locale}/blog/${slug}`;
@@ -197,7 +202,7 @@ export default async function Page({
         </div>
       )}
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-16 sm:pb-24">
-        <article>
+        <article aria-label={initialPost.frontmatter.title}>
           <header className="mb-12 text-center">
             <LayoutBreadcrumbs
               segments={breadcrumbSegments}
@@ -310,13 +315,14 @@ export default async function Page({
         dangerouslySetInnerHTML={{
           __html: JSON.stringify({
             "@context": "https://schema.org",
-            "@type": "Article",
+            "@type": "BlogPosting",
             "headline": initialPost.frontmatter.title,
             "description": initialPost.frontmatter.description,
             "image": ogImageUrl,
-            "datePublished": initialPost.frontmatter.date,
-            "dateModified":
-              initialPost.frontmatter.updated || initialPost.frontmatter.date,
+            "datePublished": new Date(initialPost.frontmatter.date).toISOString(),
+            "dateModified": new Date(initialPost.frontmatter.updated || initialPost.frontmatter.date).toISOString(),
+            "inLanguage": locale === "id" ? "id" : "en",
+            "wordCount": wordCount,
             "author": {
               "@type": "Person",
               "name": "Iwan Efendi",

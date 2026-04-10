@@ -8,15 +8,6 @@ const hasMeasurementId = Boolean(process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
 type FirebaseAnalyticsModule = typeof import('firebase/analytics');
 type AnalyticsInstance = import('firebase/analytics').Analytics;
 
-declare global {
-  interface Window {
-    requestIdleCallback?: (
-      callback: (deadline: { didTimeout: boolean; timeRemaining: () => number }) => void,
-      options?: { timeout: number },
-    ) => number;
-    cancelIdleCallback?: (id: number) => void;
-  }
-}
 
 function AnalyticsTrackerInner() {
   const firebaseApp = useFirebaseApp();

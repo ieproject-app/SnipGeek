@@ -1,5 +1,6 @@
 import Link from "next/link";
 import React from "react";
+import { slugifyHeading } from "@/lib/mdx-utils";
 import {
   Table,
   TableHeader,
@@ -67,16 +68,11 @@ const extractText = (children: React.ReactNode): string => {
     .join("");
 };
 
-// Helper to generate IDs for TOC
+// Helper to generate IDs for TOC — uses same slugify logic as extractHeadings
 const generateId = (children: React.ReactNode) => {
   const text = extractText(children);
-
   if (!text) return undefined;
-
-  return text
-    .toLowerCase()
-    .replace(/[^\w\s-]/g, "")
-    .replace(/\s+/g, "-");
+  return slugifyHeading(text);
 };
 
 const collectGalleryImages = (
@@ -155,6 +151,10 @@ const CustomImage = ({
   let normalizedSrc = src;
   if (normalizedSrc.startsWith("public/")) {
     normalizedSrc = normalizedSrc.replace("public/", "/");
+  }
+
+  if (process.env.NODE_ENV === "development" && (!alt || alt.trim() === "")) {
+    console.warn(`[SEO] Image missing alt text: ${normalizedSrc}`);
   }
 
   return (

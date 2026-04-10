@@ -27,6 +27,7 @@ export function ArticleMeta({ frontmatter, item, locale, dictionary, readingTime
   const linkPrefix = locale === i18n.defaultLocale ? '' : `/${locale}`;
 
   const relativeTimeStr = formatRelativeTime(new Date(displayDate), locale);
+  const isoDate = new Date(displayDate).toISOString();
   const timeLabel = isUpdated ? (locale === 'id' ? 'Diperbarui ' : 'Updated ') : '';
   const compactDateStr = new Date(displayDate).toLocaleDateString(locale, {
     day: 'numeric',
@@ -65,7 +66,7 @@ export function ArticleMeta({ frontmatter, item, locale, dictionary, readingTime
           <div className="flex flex-wrap items-center gap-x-2 gap-y-1.5 text-xs sm:text-sm font-medium text-white/90">
             <span className="font-bold text-white">{authorName}</span>
             <span className="opacity-40 hidden sm:inline">•</span>
-            <time className="inline-flex items-center gap-1.5">
+            <time dateTime={isoDate} className="inline-flex items-center gap-1.5">
               <CalendarDays className="h-3.5 w-3.5 opacity-80" />
               <span className="hidden sm:inline">{timeLabel}{relativeTimeStr}</span>
               <span className="sm:hidden">{compactTimeLabel}{compactDateStr}</span>
@@ -97,7 +98,7 @@ export function ArticleMeta({ frontmatter, item, locale, dictionary, readingTime
         <div className="flex flex-wrap items-center gap-x-2 gap-y-1.5 text-xs sm:text-sm font-medium text-muted-foreground">
           <span className="text-primary font-bold">{authorName}</span>
           <span className="opacity-30 hidden sm:inline">•</span>
-          <time className="inline-flex items-center gap-1.5">
+          <time dateTime={isoDate} className="inline-flex items-center gap-1.5">
             <CalendarDays className="h-3.5 w-3.5 opacity-70" />
             <span className="hidden sm:inline">{timeLabel}{relativeTimeStr}</span>
             <span className="sm:hidden">{compactTimeLabel}{compactDateStr}</span>
