@@ -29,15 +29,17 @@ import {
   CheckCircle2,
   X,
   GripHorizontal,
+  Loader2,
 } from "lucide-react";
+import { useImageCompress } from "@/hooks/use-image-compress";
 
 // ──────────────────────────────────────────────────────────────────────────────
 // Constants
 // ──────────────────────────────────────────────────────────────────────────────
 const TARGET_RATIO = 16 / 9;
-const DEFAULT_QUALITY = 85;
 const EXPORT_WIDTH = 1920;
 const EXPORT_HEIGHT = 1080;
+const MAX_TARGET_SIZE_KB = 120; // Target max file size
 
 // ──────────────────────────────────────────────────────────────────────────────
 // Helpers
@@ -74,6 +76,33 @@ function InfoPill({ label, value }: { label: string; value: string }) {
         {label}
       </span>
       <span className="text-sm font-black text-primary font-mono">{value}</span>
+    </div>
+  );
+}
+
+// ──────────────────────────────────────────────────────────────────────────────
+// WASM Loading Progress
+// ──────────────────────────────────────────────────────────────────────────────
+function WasmLoadingIndicator({
+  progress,
+  useFallback,
+}: {
+  progress: number;
+  useFallback: boolean;
+}) {
+  if (useFallback) {
+    return (
+      <div className="flex items-center gap-2 text-[10px] text-amber-600 bg-amber-500/10 px-3 py-1.5 rounded-full">
+        <Info className="h-3 w-3" />
+        <span>Using basic mode</span>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex items-center gap-2 text-[10px] text-muted-foreground">
+      <Loader2 className="h-3 w-3 animate-spin" />
+      <span>Loading optimizer... {progress}%</span>
     </div>
   );
 }
@@ -133,7 +162,6 @@ function CropPreview({
 }: CropPreviewProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const isDraggingRef = useRef(false);
-  // Feature 9: rAF throttle for drag performance
   const rafRef = useRef<number | null>(null);
   const pendingMoveRef = useRef<{ clientX: number; clientY: number } | null>(null);
   const dragStartRef = useRef<{
@@ -146,12 +174,21 @@ function CropPreview({
   } | null>(null);
 
   // % positions for the overlay divs
-  const topPct   = (cropY / imgH) * 100;
+  const topPct = (cropY / imgH) * 100;
   const bottomPct = ((imgH - cropY - cropH) / imgH) * 100;
-  const leftPct  = (cropX / imgW) * 100;
+  const leftPct = (cropX / imgW) * 100;
   const rightPct = ((imgW - cropX - cropW) / imgW) * 100;
   const cropWPct = (cropW / imgW) * 100;
   const cropHPct = (cropH / imgH) * 100;
+
+  // Cleanup RAF on unmount
+  useEffect(() => {
+    return () => {
+      if (rafRef.current !== null) {
+        cancelAnimationFrame(rafRef.current);
+      }
+    };
+  }, []);
 
   // ── Drag helpers ──
   const startDrag = useCallback(
@@ -168,10 +205,10 @@ function CropPreview({
         rectH: rect.height,
       };
     },
-    [canDrag, currentOffsetX, currentOffsetY],
+    [canDrag, currentOffsetX, currentOffsetY]
   );
 
-  // Feature 9: throttle via rAF — store latest pointer, only compute on next frame
+  // rAF throttle for drag performance
   const moveDrag = useCallback(
     (clientX: number, clientY: number) => {
       if (!dragStartRef.current) return;
@@ -195,14 +232,13 @@ function CropPreview({
         onReposition(newOX, newOY);
       });
     },
-    [imgW, imgH, maxOffsetX, maxOffsetY, onReposition],
+    [imgW, imgH, maxOffsetX, maxOffsetY, onReposition]
   );
 
   const endDrag = useCallback(() => {
     isDraggingRef.current = false;
     dragStartRef.current = null;
     pendingMoveRef.current = null;
-    resizeStartRef.current = null;
     if (rafRef.current !== null) {
       cancelAnimationFrame(rafRef.current);
       rafRef.current = null;
@@ -225,15 +261,12 @@ function CropPreview({
         rafRef.current = null;
         const r = resizeStartRef.current;
         if (!r) return;
-        // Display delta → image delta
         const dpxX = (clientX - r.clientX) * (imgW / r.rectW);
         const dpxY = (clientY - r.clientY) * (imgH / r.rectH);
-        // Scale sign per corner: positive = grow when dragging outward
         const sx = (r.corner === "br" || r.corner === "tr") ? 1 : -1;
         const sy = (r.corner === "br" || r.corner === "bl") ? 1 : -1;
         const scaleDelta = ((dpxX * sx) / maxCropW + (dpxY * sy) / maxCropH) / 2;
         const newScale = Math.max(MIN_SCALE, Math.min(1.0, r.scale + scaleDelta));
-        // Old/new crop dimensions in image space
         const oldCW = Math.round(maxCropW * r.scale);
         const oldCH = Math.round(maxCropH * r.scale);
         const newCW = Math.round(maxCropW * newScale);
@@ -244,7 +277,6 @@ function CropPreview({
         const oldCY = Math.round(oldMaxY * r.offsetY);
         const newMaxX = Math.max(0, imgW - newCW);
         const newMaxY = Math.max(0, imgH - newCH);
-        // Anchor opposite corner in image pixel space
         let newCX = r.corner === "tl" || r.corner === "bl" ? oldCX + oldCW - newCW : oldCX;
         let newCY = r.corner === "tl" || r.corner === "tr" ? oldCY + oldCH - newCH : oldCY;
         newCX = Math.max(0, Math.min(newMaxX, newCX));
@@ -254,10 +286,9 @@ function CropPreview({
         onResize(newScale, newOX, newOY);
       });
     },
-    [imgW, imgH, maxCropW, maxCropH, onResize],
+    [imgW, imgH, maxCropW, maxCropH, onResize]
   );
 
-  // Plain function — OK to mutate refs here (not inside useCallback)
   function startResize(e: ReactMouseEvent | ReactTouchEvent, corner: ResizeCorner) {
     e.stopPropagation();
     e.preventDefault();
@@ -265,7 +296,6 @@ function CropPreview({
     const rect = containerRef.current.getBoundingClientRect();
     const clientX = "touches" in e ? e.touches[0].clientX : e.clientX;
     const clientY = "touches" in e ? e.touches[0].clientY : e.clientY;
-    // eslint-disable-next-line react-hooks/immutability
     resizeStartRef.current = {
       corner, clientX, clientY,
       scale: cropScale, offsetX: currentOffsetX, offsetY: currentOffsetY,
@@ -273,13 +303,16 @@ function CropPreview({
     };
   }
 
-  // Global mouse/touch listeners — handles both reposition drag and corner resize
+  // Global mouse/touch listeners
   useEffect(() => {
     const onMove = (e: MouseEvent) => {
       if (resizeStartRef.current) performResize(e.clientX, e.clientY);
       else moveDrag(e.clientX, e.clientY);
     };
-    const onUp = () => endDrag();
+    const onUp = () => {
+      resizeStartRef.current = null;
+      endDrag();
+    };
     const onTouchMove = (e: TouchEvent) => {
       e.preventDefault();
       if (resizeStartRef.current) performResize(e.touches[0].clientX, e.touches[0].clientY);
@@ -318,14 +351,13 @@ function CropPreview({
             canDrag ? "cursor-grab active:cursor-grabbing" : "cursor-default",
           )}
           style={{
-            maxWidth: '100%',
-            maxHeight: '55vh',
+            maxWidth: "100%",
+            maxHeight: "55vh",
             aspectRatio: `${imgW} / ${imgH}`,
           }}
           onMouseDown={handleMouseDown}
           onTouchStart={handleTouchStart}
         >
-          {/* Base image */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={imageSrc}
@@ -334,33 +366,18 @@ function CropPreview({
             draggable={false}
           />
 
-          {/* Top dark overlay */}
+          {/* Overlays */}
           {topPct > 0.01 && (
-            <div
-              className="absolute left-0 right-0 top-0 bg-black/65 pointer-events-none"
-              style={{ height: `${topPct}%` }}
-            />
+            <div className="absolute left-0 right-0 top-0 bg-black/65 pointer-events-none" style={{ height: `${topPct}%` }} />
           )}
-          {/* Bottom dark overlay */}
           {bottomPct > 0.01 && (
-            <div
-              className="absolute left-0 right-0 bottom-0 bg-black/65 pointer-events-none"
-              style={{ height: `${bottomPct}%` }}
-            />
+            <div className="absolute left-0 right-0 bottom-0 bg-black/65 pointer-events-none" style={{ height: `${bottomPct}%` }} />
           )}
-          {/* Left dark overlay */}
           {leftPct > 0.01 && (
-            <div
-              className="absolute left-0 bg-black/65 pointer-events-none"
-              style={{ top: `${topPct}%`, width: `${leftPct}%`, height: `${cropHPct}%` }}
-            />
+            <div className="absolute left-0 bg-black/65 pointer-events-none" style={{ top: `${topPct}%`, width: `${leftPct}%`, height: `${cropHPct}%` }} />
           )}
-          {/* Right dark overlay */}
           {rightPct > 0.01 && (
-            <div
-              className="absolute right-0 bg-black/65 pointer-events-none"
-              style={{ top: `${topPct}%`, width: `${rightPct}%`, height: `${cropHPct}%` }}
-            />
+            <div className="absolute right-0 bg-black/65 pointer-events-none" style={{ top: `${topPct}%`, width: `${rightPct}%`, height: `${cropHPct}%` }} />
           )}
 
           {/* Crop border box */}
@@ -374,7 +391,7 @@ function CropPreview({
               pointerEvents: "none",
             }}
           >
-            {/* Corner handles — interactive, pointer-events-auto */}
+            {/* Corner handles */}
             <span
               className="absolute -top-1 -left-1 w-5 h-5 border-t-[3px] border-l-[3px] border-white rounded-tl cursor-nw-resize hover:border-sky-300 transition-colors"
               style={{ pointerEvents: "auto" }}
@@ -406,7 +423,7 @@ function CropPreview({
             </span>
           </div>
 
-          {/* Drag hint (only when draggable) */}
+          {/* Drag hint */}
           {canDrag && (
             <div className="absolute top-3 left-1/2 -translate-x-1/2 flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/60 backdrop-blur-sm pointer-events-none">
               <GripHorizontal className="h-3.5 w-3.5 text-white/80" />
@@ -438,12 +455,17 @@ interface ToolImageCropProps {
 
 export function ToolImageCrop({ dictionary }: ToolImageCropProps) {
   const { notify } = useNotification();
+  const { loading: compressLoading, progress: compressProgress, error: compressError, encodeWithAutoQuality } = useImageCompress();
+
   const toolMeta = dictionary?.tools?.tool_list?.image_crop || {
     title: "Image Crop",
     description: "Crop to 16:9 and export as WebP.",
   };
+
   const t = dictionary?.tools?.image_crop || {
     invalidImageFile: "Please upload a valid image file.",
+    imageLoadError: "Failed to load image. File may be corrupted.",
+    downloadError: "Failed to generate WebP. Please try again.",
     downloaded: "Downloaded: {filename} ({size})",
     dropTitle: "Drop image here",
     dropDescription: "or click to browse - PNG, JPG, and WebP supported.",
@@ -457,18 +479,13 @@ export function ToolImageCrop({ dictionary }: ToolImageCropProps) {
     vertical: "Vertical",
     noAdjustment: "no adjustment",
     center: "Center",
-    webpQuality: "WebP Quality",
-    qualityHigh: "Lossless-class",
-    qualityBalanced: "Balanced",
-    qualitySmall: "Small size",
-    defaultLabel: "85% default",
-    outputLabel: "Output:",
-    clientSideInfo: "100% client-side, no upload.",
-    downloadButton: "Download WebP",
-    loadAnother: "Load Another Image",
     dragHint: "Drag to reposition",
     removeImage: "Remove image",
     previewAlt: "Crop preview",
+    downloadButton: "Download WebP",
+    loadAnother: "Load Another Image",
+    outputLabel: "Output:",
+    clientSideInfo: "100% client-side, no upload.",
     howTo: [
       {
         step: "01",
@@ -494,26 +511,42 @@ export function ToolImageCrop({ dictionary }: ToolImageCropProps) {
   const [imgH, setImgH] = useState(0);
   const [fileName, setFileName] = useState("output");
   const [isDragging, setIsDragging] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [estimatedSize, setEstimatedSize] = useState<string | null>(null);
 
   // ── Crop position (0–1) ──
   const [offsetX, setOffsetX] = useState(0.5);
   const [offsetY, setOffsetY] = useState(0.5);
 
-  // ── Quality ──
-  const [quality, setQuality] = useState(DEFAULT_QUALITY);
-
-  // ── Feature 5: Estimated output size ──
-  const [estimatedSize, setEstimatedSize] = useState<string | null>(null);
-  const estimateTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  // ── Feature 6: Smart auto-center ──
-  const [smartCenter, setSmartCenter] = useState(true);
-
-  // ── Crop scale (resize via corner handles, 0.15–1.0, maintains 16:9) ──
+  // ── Crop scale ──
   const [cropScale, setCropScale] = useState(1.0);
 
-  // ── Image element ref (used in download) ──
+  // ── Refs ──
   const imageRef = useRef<HTMLImageElement | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const sourceFileRef = useRef<File | null>(null);
+  const estimateTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const objectUrlRef = useRef<string | null>(null);
+
+  // ── Cleanup function ──
+  const cleanupImage = useCallback(() => {
+    // Revoke object URL if exists
+    if (objectUrlRef.current) {
+      URL.revokeObjectURL(objectUrlRef.current);
+      objectUrlRef.current = null;
+    }
+    // Clear image ref
+    if (imageRef.current) {
+      imageRef.current.onload = null;
+      imageRef.current.onerror = null;
+      imageRef.current = null;
+    }
+    // Clear estimate timer
+    if (estimateTimerRef.current) {
+      clearTimeout(estimateTimerRef.current);
+      estimateTimerRef.current = null;
+    }
+  }, []);
 
   // ── Derived values ──
   const { cropW: maxCropW, cropH: maxCropH } = imgW > 0 ? getCropBox(imgW, imgH) : { cropW: 0, cropH: 0 };
@@ -535,30 +568,40 @@ export function ToolImageCrop({ dictionary }: ToolImageCropProps) {
         notify(t.invalidImageFile, <X className="h-4 w-4 text-destructive" />);
         return;
       }
+
+      // Cleanup previous
+      cleanupImage();
+      sourceFileRef.current = file;
+
       const reader = new FileReader();
       reader.onload = (e) => {
         const src = e.target?.result as string;
+        if (!src) return;
+
         const img = new Image();
         img.onload = () => {
           imageRef.current = img;
           setImgW(img.naturalWidth);
           setImgH(img.naturalHeight);
-          // Feature 6: Smart auto-center — for vertically-cropped images, bias upward
-          // (subjects like faces/heads are usually in the upper portion of the frame)
-          const { cropH: cH } = getCropBox(img.naturalWidth, img.naturalHeight);
-          const mY = Math.max(0, img.naturalHeight - cH);
-          const initY = (smartCenter && mY > 0) ? 0.35 : 0.5;
           setOffsetX(0.5);
-          setOffsetY(initY);
+          setOffsetY(0.5);
+          setCropScale(1.0);
           setEstimatedSize(null);
           setImageSrc(src);
           setFileName(file.name.replace(/\.[^.]+$/, ""));
         };
+        img.onerror = () => {
+          notify(t.imageLoadError, <X className="h-4 w-4 text-destructive" />);
+          cleanupImage();
+        };
         img.src = src;
+      };
+      reader.onerror = () => {
+        notify(t.invalidImageFile, <X className="h-4 w-4 text-destructive" />);
       };
       reader.readAsDataURL(file);
     },
-    [notify, smartCenter, t.invalidImageFile],
+    [notify, t.invalidImageFile, t.imageLoadError, cleanupImage]
   );
 
   const handleFileInput = useCallback(
@@ -567,7 +610,7 @@ export function ToolImageCrop({ dictionary }: ToolImageCropProps) {
       if (file) loadImage(file);
       e.target.value = "";
     },
-    [loadImage],
+    [loadImage]
   );
 
   // ── Global Paste Support ──
@@ -596,7 +639,7 @@ export function ToolImageCrop({ dictionary }: ToolImageCropProps) {
       const file = e.dataTransfer.files?.[0];
       if (file) loadImage(file);
     },
-    [loadImage],
+    [loadImage]
   );
 
   const handleDragOver = (e: DragEvent<HTMLDivElement>) => { e.preventDefault(); setIsDragging(true); };
@@ -607,50 +650,164 @@ export function ToolImageCrop({ dictionary }: ToolImageCropProps) {
     setOffsetY(newOY);
   }, []);
 
-  // ── Download ──
-  const handleDownload = useCallback(() => {
+  const handleBrowseFiles = useCallback(() => {
+    fileInputRef.current?.click();
+  }, []);
+
+  // ── Download with auto-quality canvas encoding ──
+  const handleDownload = useCallback(async () => {
     const img = imageRef.current;
     if (!img || imgW === 0) return;
 
-    const offscreen = document.createElement("canvas");
-    offscreen.width = EXPORT_WIDTH;
-    offscreen.height = EXPORT_HEIGHT;
-    const ctx = offscreen.getContext("2d");
-    if (!ctx) return;
+    const sourceFile = sourceFileRef.current;
+    const sourceIsWebP = sourceFile?.type === "image/webp";
+    const sourceSizeKB = sourceFile ? sourceFile.size / 1024 : null;
+    const sourceSizeBytes = sourceFile?.size ?? null;
 
-    ctx.drawImage(img, cropX, cropY, cropW, cropH, 0, 0, EXPORT_WIDTH, EXPORT_HEIGHT);
-    offscreen.toBlob(
-      (blob) => {
-        if (!blob) return;
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = `${fileName}-1920x1080.webp`;
-        a.click();
-        URL.revokeObjectURL(url);
-        const downloadedName = `${fileName}-1920x1080.webp`;
-        notify(
-          t.downloaded
+    const primaryTargetKB = sourceIsWebP && sourceSizeKB
+      ? Math.min(MAX_TARGET_SIZE_KB, Math.max(1, Math.floor(sourceSizeKB - 2)))
+      : MAX_TARGET_SIZE_KB;
+    const primaryMaxQuality = sourceIsWebP ? 80 : 85;
+    const primaryMinQuality = sourceIsWebP ? 20 : 45;
+
+    setIsProcessing(true);
+
+    try {
+      // Create canvas at export size
+      const canvas = document.createElement("canvas");
+      canvas.width = EXPORT_WIDTH;
+      canvas.height = EXPORT_HEIGHT;
+      const ctx = canvas.getContext("2d", { alpha: false });
+      if (!ctx) throw new Error("Canvas context failed");
+
+      // Draw cropped image scaled to export size
+      ctx.drawImage(img, cropX, cropY, cropW, cropH, 0, 0, EXPORT_WIDTH, EXPORT_HEIGHT);
+
+      // Encode with automatic quality search to stay under target size
+      const { blob: compressedBlob, finalQuality } = await encodeWithAutoQuality(
+        canvas,
+        primaryTargetKB,
+        primaryMaxQuality,
+        primaryMinQuality
+      );
+
+      let outputBlob = compressedBlob;
+      if (!outputBlob && sourceIsWebP && sourceFile) {
+        outputBlob = sourceFile;
+      }
+
+      if (!outputBlob) {
+        outputBlob = await new Promise<Blob | null>((resolve) => {
+          try {
+            canvas.toBlob((blob) => resolve(blob), "image/png");
+          } catch (error) {
+            console.warn("[ImageCrop] PNG fallback toBlob threw:", error);
+            resolve(null);
+          }
+        });
+      }
+
+      if (!outputBlob) {
+        notify(t.downloadError, <X className="h-4 w-4 text-destructive" />);
+        return;
+      }
+
+      let outputQuality = finalQuality;
+      const outputIsSourceFallback = !!sourceIsWebP && !!sourceFile && outputBlob === sourceFile;
+
+      if (sourceIsWebP && sourceFile && outputBlob.type !== "image/webp") {
+        outputBlob = sourceFile;
+      }
+
+      if (
+        sourceIsWebP &&
+        sourceSizeBytes !== null &&
+        outputBlob.size >= sourceSizeBytes
+      ) {
+        const retryPolicies = [
+          { targetKB: Math.max(1, Math.floor(sourceSizeKB ? sourceSizeKB * 0.85 : primaryTargetKB)), maxQuality: 70, minQuality: 10 },
+          { targetKB: Math.max(1, Math.floor(sourceSizeKB ? sourceSizeKB * 0.75 : primaryTargetKB)), maxQuality: 60, minQuality: 5 },
+        ];
+
+        for (const policy of retryPolicies) {
+          const retryResult = await encodeWithAutoQuality(canvas, policy.targetKB, policy.maxQuality, policy.minQuality);
+
+          if (retryResult.blob && retryResult.blob.size < outputBlob.size) {
+            outputBlob = retryResult.blob;
+            outputQuality = retryResult.finalQuality;
+          }
+
+          if (outputBlob.size < sourceSizeBytes) {
+            break;
+          }
+        }
+      }
+
+      // Check size warning
+      const sizeKB = outputBlob.size / 1024;
+      const isLarge = sizeKB > MAX_TARGET_SIZE_KB;
+      const isSmallerThanSource = sourceSizeBytes !== null ? outputBlob.size < sourceSizeBytes : true;
+      
+      const outputExt = outputBlob.type.includes("jpeg")
+        ? "jpg"
+        : outputBlob.type.includes("png")
+          ? "png"
+          : "webp";
+
+      console.log(`[ImageCrop] Generated ${outputBlob.type || "image/webp"}: ${sizeKB.toFixed(1)}KB at ${outputQuality}% quality`, {
+        sourceIsWebP,
+        sourceSizeKB: sourceSizeKB?.toFixed(1),
+        isSmallerThanSource,
+        outputIsSourceFallback,
+      });
+
+      if (outputIsSourceFallback) {
+        console.warn("[ImageCrop] Preserved original WebP source because the re-encoded result was not smaller.", {
+          sourceSizeKB: sourceSizeKB?.toFixed(1),
+        });
+      }
+
+      // Download
+      const url = URL.createObjectURL(outputBlob);
+      objectUrlRef.current = url;
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${fileName}-1920x1080.${outputExt}`;
+      a.click();
+
+      // Notify with size info
+      const downloadedName = `${fileName}-1920x1080.${outputExt}`;
+      notify(
+        <span>
+          {t.downloaded
             .replace("{filename}", downloadedName)
-            .replace("{size}", formatBytes(blob.size)),
-          <CheckCircle2 className="h-4 w-4 text-emerald-400" />,
-        );
-      },
-      "image/webp",
-      quality / 100,
-    );
-  }, [cropH, cropW, cropX, cropY, fileName, imgW, notify, quality, t.downloaded]);
+            .replace("{size}", formatBytes(outputBlob.size))}
+          {isLarge && (
+            <span className="text-amber-500 ml-1">(&gt;{MAX_TARGET_SIZE_KB}KB)</span>
+          )}
+        </span>,
+        <CheckCircle2 className="h-4 w-4 text-emerald-400" />
+      );
+    } catch (err) {
+      console.error("Download failed:", err);
+      notify(t.downloadError, <X className="h-4 w-4 text-destructive" />);
+    } finally {
+      setIsProcessing(false);
+    }
+  }, [cropH, cropW, cropX, cropY, fileName, imgW, notify, t.downloaded, t.downloadError, encodeWithAutoQuality]);
 
-  // Feature 4: preserve quality when resetting — user's quality choice persists
+  // ── Reset ──
   const handleReset = useCallback(() => {
+    cleanupImage();
     setImageSrc(null);
-    setImgW(0); setImgH(0);
-    setOffsetX(0.5); setOffsetY(0.5);
+    setImgW(0);
+    setImgH(0);
+    sourceFileRef.current = null;
+    setOffsetX(0.5);
+    setOffsetY(0.5);
     setCropScale(1.0);
     setEstimatedSize(null);
-    imageRef.current = null;
-    if (estimateTimerRef.current) clearTimeout(estimateTimerRef.current);
-  }, []);
+  }, [cleanupImage]);
 
   const handleResize = useCallback(
     (newScale: number, newOffsetX: number, newOffsetY: number) => {
@@ -658,21 +815,22 @@ export function ToolImageCrop({ dictionary }: ToolImageCropProps) {
       setOffsetX(newOffsetX);
       setOffsetY(newOffsetY);
     },
-    [],
+    []
   );
 
-  // ── Feature 5: Debounced estimated output size ──
+  // ── Debounced estimated output size ──
   useEffect(() => {
     if (estimateTimerRef.current) clearTimeout(estimateTimerRef.current);
     if (!imageRef.current || imgW === 0) {
-      // Defer to avoid calling setState synchronously in effect body
       estimateTimerRef.current = setTimeout(() => setEstimatedSize(null), 0);
       return () => { if (estimateTimerRef.current) clearTimeout(estimateTimerRef.current); };
     }
+
     estimateTimerRef.current = setTimeout(() => {
       const img = imageRef.current;
       if (!img) return;
-      // Use 1/4-resolution canvas for fast non-blocking estimation
+
+      // Use 1/4-resolution canvas for fast estimation
       const SCALE = 4;
       const estW = Math.round(EXPORT_WIDTH / SCALE);
       const estH = Math.round(EXPORT_HEIGHT / SCALE);
@@ -681,27 +839,34 @@ export function ToolImageCrop({ dictionary }: ToolImageCropProps) {
       canvas.height = estH;
       const ctx = canvas.getContext("2d");
       if (!ctx) return;
+
       ctx.drawImage(img, cropX, cropY, cropW, cropH, 0, 0, estW, estH);
       canvas.toBlob(
-        (blob) => { if (blob) setEstimatedSize(formatBytes(blob.size * SCALE * SCALE)); },
+        (blob) => {
+          if (blob) {
+            const estimatedBytes = blob.size * SCALE * SCALE;
+            setEstimatedSize(formatBytes(estimatedBytes));
+          }
+        },
         "image/webp",
-        quality / 100,
+        0.8 // estimate at 80% quality
       );
     }, 500);
-    return () => { if (estimateTimerRef.current) clearTimeout(estimateTimerRef.current); };
-  }, [quality, cropX, cropY, cropW, cropH, imgW]);
 
-  // ── Feature 8: Keyboard shortcuts ──
+    return () => { if (estimateTimerRef.current) clearTimeout(estimateTimerRef.current); };
+  }, [cropX, cropY, cropW, cropH, imgW]);
+
+  // ── Keyboard shortcuts ──
   useEffect(() => {
     if (!imageSrc) return;
     const STEP = 0.02;
     const onKey = (e: KeyboardEvent) => {
       if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
       switch (e.key) {
-        case "ArrowLeft":  e.preventDefault(); setOffsetX((p) => Math.max(0, p - STEP)); break;
+        case "ArrowLeft": e.preventDefault(); setOffsetX((p) => Math.max(0, p - STEP)); break;
         case "ArrowRight": e.preventDefault(); setOffsetX((p) => Math.min(1, p + STEP)); break;
-        case "ArrowUp":    e.preventDefault(); setOffsetY((p) => Math.max(0, p - STEP)); break;
-        case "ArrowDown":  e.preventDefault(); setOffsetY((p) => Math.min(1, p + STEP)); break;
+        case "ArrowUp": e.preventDefault(); setOffsetY((p) => Math.max(0, p - STEP)); break;
+        case "ArrowDown": e.preventDefault(); setOffsetY((p) => Math.min(1, p + STEP)); break;
         case "r": case "R":
           if (!e.ctrlKey && !e.metaKey) { setOffsetX(0.5); setOffsetY(0.5); }
           break;
@@ -715,6 +880,13 @@ export function ToolImageCrop({ dictionary }: ToolImageCropProps) {
     return () => window.removeEventListener("keydown", onKey);
   }, [imageSrc, handleReset, handleDownload]);
 
+  // ── Cleanup on unmount ──
+  useEffect(() => {
+    return () => {
+      cleanupImage();
+    };
+  }, [cleanupImage]);
+
   // ──────────────────────────────────────────────────────────────────────────
   // Render
   // ──────────────────────────────────────────────────────────────────────────
@@ -726,7 +898,85 @@ export function ToolImageCrop({ dictionary }: ToolImageCropProps) {
       isPublic={true}
       requiresCloud={false}
     >
-      <div className="space-y-6 mt-4">
+      <div className="space-y-5 mt-4">
+        {/* Top bar - towebp-like file actions */}
+        <div className="sticky top-3 z-20 flex flex-col gap-3 rounded-[24px] border border-white/10 bg-background/70 px-4 py-4 shadow-[0_12px_40px_-20px_rgba(0,0,0,0.45)] backdrop-blur-xl supports-[backdrop-filter]:bg-background/60 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center gap-3 text-xs text-muted-foreground">
+            <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-primary/10 text-primary ring-1 ring-primary/10">
+              <Crop className="h-4 w-4" />
+            </div>
+            <div className="space-y-0.5">
+              <p className="font-black uppercase tracking-[0.24em] text-primary">Image Crop</p>
+              <p className="text-[11px] text-muted-foreground">Client-side crop · auto WebP · target ≤120KB</p>
+            </div>
+          </div>
+          <div className="flex flex-wrap items-center gap-2 sm:justify-end">
+            <Button
+              type="button"
+              onClick={handleBrowseFiles}
+              size="sm"
+              variant="outline"
+              className="rounded-full gap-2 font-bold uppercase tracking-widest border-primary/15 bg-background/70"
+            >
+              <Upload className="h-3.5 w-3.5" />
+              Add Files
+            </Button>
+            {imageSrc && (
+              <Button
+                type="button"
+                onClick={handleDownload}
+                disabled={isProcessing}
+                size="sm"
+                className="rounded-full gap-2 font-black uppercase tracking-widest bg-primary text-primary-foreground shadow-lg shadow-primary/20 hover:bg-primary/90"
+              >
+                {isProcessing ? (
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                ) : (
+                  <Download className="h-3.5 w-3.5" />
+                )}
+                {isProcessing ? "Processing..." : t.downloadButton}
+              </Button>
+            )}
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleReset}
+              size="sm"
+              className="rounded-full gap-2 font-bold uppercase tracking-widest border-primary/15 bg-background/70"
+            >
+              <X className="h-3.5 w-3.5" />
+              Clear Queue
+            </Button>
+          </div>
+        </div>
+
+        <input
+          ref={fileInputRef}
+          id="image-upload-input"
+          type="file"
+          accept="image/*"
+          className="sr-only"
+          onChange={handleFileInput}
+        />
+
+        {/* Compression Progress/Error */}
+        {compressLoading && (
+          <div className="flex justify-center">
+            <div className="flex items-center gap-2 text-[10px] text-primary bg-primary/10 px-3 py-1.5 rounded-full">
+              <Loader2 className="h-3 w-3 animate-spin" />
+              <span>Compressing... {Math.round(compressProgress)}%</span>
+            </div>
+          </div>
+        )}
+        {compressError && (
+          <div className="flex justify-center">
+            <div className="flex items-center gap-2 text-[10px] text-destructive bg-destructive/10 px-3 py-1.5 rounded-full">
+              <X className="h-3 w-3" />
+              <span>Error: {compressError}</span>
+            </div>
+          </div>
+        )}
+
         <AnimatePresence mode="wait">
           {!imageSrc ? (
             <motion.div
@@ -742,40 +992,33 @@ export function ToolImageCrop({ dictionary }: ToolImageCropProps) {
                   onDragOver={handleDragOver}
                   onDragLeave={handleDragLeave}
                   className={cn(
-                    "relative flex flex-col items-center justify-center gap-5 rounded-2xl border-2 border-dashed transition-all duration-300 py-16 px-8 text-center",
+                    "relative flex flex-col items-center justify-center gap-4 rounded-[28px] border border-dashed transition-all duration-300 py-16 px-6 text-center min-h-[280px] bg-gradient-to-b from-background to-muted/20 shadow-[0_18px_60px_-28px_rgba(0,0,0,0.45)]",
                     isDragging
                       ? "border-accent bg-accent/5 scale-[1.01]"
-                      : "border-primary/15 bg-muted/20 hover:border-primary/40 hover:bg-muted/30",
+                      : "border-primary/10 hover:border-primary/30 hover:bg-muted/30",
                   )}
                 >
-                  <div className="p-5 rounded-full bg-primary/5 border border-primary/10">
-                    <Upload className="h-10 w-10 text-primary/50" />
+                  <div className="flex h-16 w-16 items-center justify-center rounded-[22px] bg-primary/10 text-primary ring-1 ring-primary/10 shadow-sm">
+                    <Upload className="h-8 w-8 text-primary/60" />
                   </div>
                   <div className="space-y-1">
-                    <p className="font-black text-primary uppercase tracking-tight text-lg">
+                    <p className="font-black text-primary uppercase tracking-[0.18em] text-base">
                       {t.dropTitle}
                     </p>
-                    <p className="text-sm text-muted-foreground md:max-w-[280px] mx-auto">
+                    <p className="text-xs text-muted-foreground md:max-w-[280px] mx-auto leading-relaxed">
                       {t.dropDescription}
                       <br className="hidden sm:block" />
                       <span className="hidden sm:inline">({t.pasteHint})</span>
                     </p>
                   </div>
-                  <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-accent/10 border border-accent/20">
-                    <Crop className="h-3.5 w-3.5 text-accent" />
-                    <span className="text-xs font-bold text-accent uppercase tracking-widest">
+                  <div className="flex items-center gap-2 rounded-full border border-accent/20 bg-accent/10 px-3 py-1.5 backdrop-blur-sm">
+                    <Crop className="h-3 w-3 text-accent" />
+                    <span className="text-[10px] font-bold text-accent uppercase tracking-widest">
                       {t.outputBadge} · {EXPORT_WIDTH}x{EXPORT_HEIGHT}
                     </span>
                   </div>
                 </div>
               </label>
-              <input
-                id="image-upload-input"
-                type="file"
-                accept="image/*"
-                className="sr-only"
-                onChange={handleFileInput}
-              />
             </motion.div>
           ) : (
             <motion.div
@@ -784,10 +1027,10 @@ export function ToolImageCrop({ dictionary }: ToolImageCropProps) {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.25 }}
-              className="space-y-5"
+              className="space-y-4"
             >
               {/* Stats */}
-              <div className="flex flex-wrap justify-center gap-3">
+              <div className="flex flex-wrap justify-center gap-2">
                 <InfoPill label={t.original} value={`${imgW} × ${imgH}`} />
                 <InfoPill label={t.ratio} value={(imgW / imgH).toFixed(3)} />
                 <InfoPill label={t.target} value={`${EXPORT_WIDTH} × ${EXPORT_HEIGHT}`} />
@@ -799,7 +1042,7 @@ export function ToolImageCrop({ dictionary }: ToolImageCropProps) {
                 )}
               </div>
 
-              {/* Draggable + resizable preview */}
+              {/* Draggable + resizable preview - more compact */}
               <CropPreview
                 imageSrc={imageSrc}
                 imgW={imgW}
@@ -824,12 +1067,11 @@ export function ToolImageCrop({ dictionary }: ToolImageCropProps) {
                 onReset={handleReset}
               />
 
-              {/* Fine-tune sliders + quality */}
-              <Card className="rounded-2xl border-primary/10 bg-card/50">
-                <CardContent className="p-5 space-y-5">
-
+              {/* Fine-tune sliders - Simplified & compact */}
+              <Card className="rounded-[28px] border border-white/10 bg-background/75 shadow-[0_18px_60px_-36px_rgba(0,0,0,0.5)] backdrop-blur-xl">
+                <CardContent className="p-5 space-y-4">
                   {/* Horizontal slider */}
-                  <div className={cn("space-y-2", !canSlideX && "opacity-35 pointer-events-none")}>
+                  <div className={cn("space-y-1.5", !canSlideX && "opacity-35 pointer-events-none")}>
                     <div className="flex items-center justify-between">
                       <span className="text-xs font-black uppercase tracking-widest text-muted-foreground">
                         {t.horizontal}
@@ -847,7 +1089,7 @@ export function ToolImageCrop({ dictionary }: ToolImageCropProps) {
                   </div>
 
                   {/* Vertical slider */}
-                  <div className={cn("space-y-2", !canSlideY && "opacity-35 pointer-events-none")}>
+                  <div className={cn("space-y-1.5", !canSlideY && "opacity-35 pointer-events-none")}>
                     <div className="flex items-center justify-between">
                       <span className="text-xs font-black uppercase tracking-widest text-muted-foreground">
                         {t.vertical}
@@ -864,118 +1106,61 @@ export function ToolImageCrop({ dictionary }: ToolImageCropProps) {
                     />
                   </div>
 
-                  {/* Center + Smart Center toggle */}
+                  {/* Center button */}
                   {canDrag && (
-                    <div className="flex flex-wrap justify-center items-center gap-2">
+                    <div className="flex justify-center">
                       <button
                         type="button"
                         onClick={() => { setOffsetX(0.5); setOffsetY(0.5); }}
-                        className="flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest text-muted-foreground border border-primary/10 bg-muted/20 hover:border-primary/30 hover:text-primary hover:bg-muted/40 transition-all"
+                        className="flex items-center gap-1.5 rounded-full border border-primary/10 bg-muted/20 px-4 py-1.5 text-xs font-black uppercase tracking-widest text-muted-foreground transition-all hover:border-primary/30 hover:bg-muted/40 hover:text-primary"
                       >
                         <AlignCenter className="h-3.5 w-3.5" />
                         {t.center}
                       </button>
-                      {/* Feature 6: Smart Center toggle */}
-                      <button
-                        type="button"
-                        title="Auto-position crop for portrait subjects"
-                        onClick={() => setSmartCenter((v) => !v)}
-                        className={cn(
-                          "flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest border transition-all",
-                          smartCenter
-                            ? "bg-accent/15 border-accent/30 text-accent"
-                            : "border-primary/10 bg-muted/20 text-muted-foreground hover:border-primary/30 hover:text-primary",
-                        )}
-                      >
-                        <Info className="h-3.5 w-3.5" />
-                        Smart Center
-                      </button>
                     </div>
                   )}
 
-                  <div className="h-px bg-primary/5" />
+                  <div className="h-px bg-gradient-to-r from-transparent via-primary/10 to-transparent" />
 
-                  {/* WebP quality */}
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-1.5">
-                        <ImageIcon className="h-3.5 w-3.5 text-muted-foreground" />
-                        <span className="text-xs font-black uppercase tracking-widest text-muted-foreground">
-                          {t.webpQuality}
-                        </span>
+                  {/* Output info - Simplified, no quality slider */}
+                  <div className="rounded-2xl border border-primary/5 bg-muted/20 p-3">
+                    <div className="flex items-start gap-2.5">
+                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary ring-1 ring-primary/10">
+                        <ImageIcon className="h-4 w-4" />
                       </div>
-                      <div className="flex items-center gap-1">
-                        <span className="text-sm font-black text-accent font-mono">{quality}%</span>
-                        <span className="text-[10px] text-muted-foreground">
-                          {quality >= 90 ? `· ${t.qualityHigh}` : quality >= 75 ? `· ${t.qualityBalanced}` : `· ${t.qualitySmall}`}
-                        </span>
+                      <div className="text-[11px] leading-relaxed text-muted-foreground">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className="font-mono font-bold text-primary">{fileName}-1920x1080.webp</span>
+                          <span className="rounded-full bg-accent/10 px-2 py-0.5 font-mono text-[10px] font-bold uppercase tracking-widest text-accent">
+                            auto quality
+                          </span>
+                        </div>
+                        <p className="mt-1 font-mono text-primary">
+                          {EXPORT_WIDTH} × {EXPORT_HEIGHT} px · ≤{MAX_TARGET_SIZE_KB}KB
+                          {estimatedSize && <span className="text-accent"> · Est. {estimatedSize}</span>}
+                        </p>
+                        <p className="mt-1 text-[10px] text-muted-foreground/70">{t.clientSideInfo}</p>
                       </div>
-                    </div>
-                    <Slider
-                      value={[quality]}
-                      onValueChange={([v]) => setQuality(v)}
-                      min={40} max={100} step={1}
-                    />
-                    <div className="flex justify-between text-[9px] text-muted-foreground/60 font-mono">
-                      <span>40%</span><span>{t.defaultLabel}</span><span>100%</span>
                     </div>
                   </div>
 
-                  {/* Info */}
-                  <div className="flex items-start gap-2 p-3 rounded-xl bg-muted/30 border border-primary/5">
-                    <Info className="h-3.5 w-3.5 shrink-0 mt-0.5 text-muted-foreground" />
-                    <p className="text-[11px] text-muted-foreground leading-relaxed">
-                      {t.outputLabel}{" "}
-                      <span className="font-mono font-bold text-primary">{fileName}-1920x1080.webp</span>
-                      {" "}—{" "}
-                      <span className="font-mono font-bold text-primary">{EXPORT_WIDTH} × {EXPORT_HEIGHT} px</span>.
-                      {" "}{t.clientSideInfo}
-                      {/* Feature 5: Estimated size */}
-                      {estimatedSize && (
-                        <>{" "}·{" "}
-                          <span className="font-mono font-bold text-accent">Est. {estimatedSize}</span>
-                        </>
-                      )}
-                    </p>
-                  </div>
-                  {/* Feature 8: Keyboard hints */}
-                  <p className="text-[9px] text-center text-muted-foreground/35 font-mono tracking-wide select-none pt-1">
-                    ← → ↑ ↓ nudge · R center · Esc clear · Ctrl+D save
+                  {/* Keyboard hints */}
+                  <p className="text-[9px] text-center text-muted-foreground/40 font-mono tracking-wide select-none">
+                    ←→↑↓ nudge · R center · Esc clear · Ctrl+D save
                   </p>
                 </CardContent>
               </Card>
-
-              {/* Actions */}
-              <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                <Button
-                  onClick={handleDownload}
-                  size="lg"
-                  className="rounded-full gap-2.5 font-black uppercase tracking-widest shadow-lg shadow-primary/10 hover:scale-[1.02] transition-transform"
-                >
-                  <Download className="h-4 w-4" />
-                  {t.downloadButton}
-                </Button>
-                <Button
-                  variant="outline"
-                  size="lg"
-                  onClick={handleReset}
-                  className="rounded-full gap-2 font-bold uppercase tracking-widest border-primary/15 hover:border-primary/40"
-                >
-                  <RefreshCw className="h-4 w-4" />
-                  {t.loadAnother}
-                </Button>
-              </div>
             </motion.div>
           )}
         </AnimatePresence>
 
-        {/* How-to */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
+        {/* How-to - Simplified */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
           {t.howTo.map((s: { step: string; title: string; desc: string }) => (
-            <div key={s.step} className="p-4 rounded-xl bg-background border border-primary/5 space-y-1.5">
-              <span className="text-3xl font-black text-primary/10">{s.step}</span>
-              <p className="text-xs font-black uppercase tracking-tight text-primary">{s.title}</p>
-              <p className="text-[11px] leading-relaxed text-muted-foreground">{s.desc}</p>
+            <div key={s.step} className="p-3 rounded-xl bg-background border border-primary/5 space-y-1">
+              <span className="text-2xl font-black text-primary/10">{s.step}</span>
+              <p className="text-[11px] font-black uppercase tracking-tight text-primary">{s.title}</p>
+              <p className="text-[10px] leading-relaxed text-muted-foreground">{s.desc}</p>
             </div>
           ))}
         </div>
@@ -983,3 +1168,4 @@ export function ToolImageCrop({ dictionary }: ToolImageCropProps) {
     </ToolWrapper>
   );
 }
+

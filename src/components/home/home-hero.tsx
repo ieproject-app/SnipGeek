@@ -1,6 +1,5 @@
 "use client";
 
-import * as React from "react";
 import Link from "next/link";
 import { Post, PostFrontmatter } from "@/lib/posts";
 import { Dictionary } from "@/lib/get-dictionary";
@@ -8,7 +7,7 @@ import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { cn } from "@/lib/utils";
 import { RelativeTime } from "@/components/ui/relative-time";
 import { AddToReadingListButton } from "@/components/layout/add-to-reading-list-button";
-import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import {
     CategoryBadge,
     simplifyCategoryLabel,
@@ -29,40 +28,6 @@ interface HomeHeroProps {
  * Desktop (sm+): Original 4-column staggered grid.
  */
 export function HomeHero({ posts, dictionary, locale, linkPrefix }: HomeHeroProps) {
-    const [selectedIndex, setSelectedIndex] = React.useState(0);
-    const [hasInteractedWithMobileCarousel, setHasInteractedWithMobileCarousel] = React.useState(false);
-    const mobileScrollerRef = React.useRef<HTMLDivElement>(null);
-    const mobileItemRefs = React.useRef<Array<HTMLDivElement | null>>([]);
-
-    React.useEffect(() => {
-        const scroller = mobileScrollerRef.current;
-        if (!scroller) return;
-
-        const updateSelectedIndex = () => {
-            const currentScrollLeft = scroller.scrollLeft;
-            let closestIndex = 0;
-            let closestDistance = Number.POSITIVE_INFINITY;
-
-            mobileItemRefs.current.forEach((item, index) => {
-                if (!item) return;
-                const distance = Math.abs(item.offsetLeft - currentScrollLeft);
-                if (distance < closestDistance) {
-                    closestDistance = distance;
-                    closestIndex = index;
-                }
-            });
-
-            setSelectedIndex(closestIndex);
-        };
-
-        updateSelectedIndex();
-        scroller.addEventListener("scroll", updateSelectedIndex, { passive: true });
-
-        return () => {
-            scroller.removeEventListener("scroll", updateSelectedIndex);
-        };
-    }, [posts.length]);
-
     // Build per-post data once, reused by both mobile carousel and desktop grid
     const postData = posts.map((post, index) => {
         const heroImageValue = post.frontmatter.heroImage;
@@ -99,173 +64,84 @@ export function HomeHero({ posts, dictionary, locale, linkPrefix }: HomeHeroProp
         return { post, index, heroImageSrc, heroImageHint, rawCategory, multicolor, item };
     });
 
-    const scrollSnaps = React.useMemo(
-        () => Array.from({ length: postData.length }, (_, index) => index),
-        [postData.length],
-    );
-
-    const canScrollPrev = selectedIndex > 0;
-    const canScrollNext = selectedIndex < postData.length - 1;
-
-    const activateMobileCarousel = React.useCallback(() => {
-        if (!hasInteractedWithMobileCarousel) {
-            setHasInteractedWithMobileCarousel(true);
-        }
-    }, [hasInteractedWithMobileCarousel]);
-
-    const scrollToMobileIndex = React.useCallback(
-        (index: number) => {
-            activateMobileCarousel();
-            const target = mobileItemRefs.current[index];
-            if (!target) return;
-            target.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "start" });
-            setSelectedIndex(index);
-        },
-        [activateMobileCarousel],
-    );
-
     if (posts.length === 0) return null;
 
     return (
         <section className="py-12 sm:py-16 bg-card border-b border-primary/5">
             <div className="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-                {/* ── MOBILE: Carousel (hidden on sm+) ── */}
-                <div className="sm:hidden">
-                    <div
-                        ref={mobileScrollerRef}
-                        className="flex w-full snap-x snap-mandatory overflow-x-auto scroll-smooth [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
-                        onTouchStart={activateMobileCarousel}
-                    >
-                        {postData.map(({ post, index, heroImageSrc, heroImageHint, rawCategory, multicolor, item }) => (
-                            <div
-                                key={post.slug}
-                                ref={(node) => {
-                                    mobileItemRefs.current[index] = node;
-                                }}
-                                className="min-w-full shrink-0 grow-0 snap-start pb-4 pt-1"
-                            >
-                                    <article
-                                        className={cn(
-                                            "relative bg-card rounded-xl border border-primary/5 transition-all duration-500 flex flex-col group/card overflow-hidden shadow-md ring-1 ring-transparent",
-                                            multicolor.hoverRing,
-                                            multicolor.hoverShadow,
-                                        )}
-                                    >
-                                        <Link
-                                            href={`${linkPrefix}/blog/${post.slug}`}
-                                            className="block group"
-                                        >
-                                            {/* Image */}
-                                            <div className="relative aspect-[3/2] overflow-hidden rounded-t-xl">
-                                                {heroImageSrc && (
-                                                    index === 0 || hasInteractedWithMobileCarousel ? (
-                                                        <RevealImage
-                                                            src={heroImageSrc}
-                                                            alt={post.frontmatter.imageAlt || post.frontmatter.title}
-                                                            fill
-                                                            className="transition-transform duration-700 group-hover:scale-[1.06]"
-                                                            wrapperClassName="absolute inset-0"
-                                                            sizes="(max-width: 640px) calc(100vw - 32px), (max-width: 1024px) 50vw, 25vw"
-                                                            priority={index === 0}
-                                                            loading={index === 0 ? "eager" : "lazy"}
-                                                            quality={68}
-                                                            holdUntilLoaded={index === 0}
-                                                            initialVisitOnly={index === 0}
-                                                            showSkeleton
-                                                            data-ai-hint={heroImageHint}
-                                                        />
-                                                    ) : (
-                                                        <div className="absolute inset-0 bg-muted" aria-hidden="true" />
-                                                    )
-                                                )}
-                                                <div className={cn("absolute inset-0 bg-linear-to-t opacity-0 transition-opacity duration-500 group-hover/card:opacity-100", multicolor.overlayGradient)} />
-                                                <div className={cn("absolute bottom-0 left-0 right-0 h-0.75 opacity-0 transition-opacity duration-500 group-hover/card:opacity-100", multicolor.accentBar)} />
-                                                <AddToReadingListButton
-                                                    item={item}
-                                                    dictionary={dictionary}
-                                                    showText={false}
-                                                    className="absolute top-2 right-2 z-20 text-white bg-black/30 hover:bg-black/50 hover:text-white opacity-0 group-hover/card:opacity-100 [@media(hover:none)]:opacity-100 transition-opacity"
-                                                />
-                                            </div>
-
-                                            {/* Caption */}
-                                            <div className="p-5 flex flex-col gap-2">
-                                                <div>
-                                                    <CategoryBadge
-                                                        category={rawCategory}
-                                                        size="xs"
-                                                        className="shadow-sm"
-                                                    />
-                                                </div>
-                                                <h3 className={cn("font-display text-xl font-bold leading-snug text-primary transition-colors duration-300", multicolor.hoverTitle)}>
-                                                    {post.frontmatter.title}
-                                                </h3>
-                                                <div className="flex items-center justify-between mt-1">
-                                                    <RelativeTime
-                                                        date={post.frontmatter.date}
-                                                        locale={locale}
-                                                        className="text-[10px] font-bold uppercase tracking-tighter text-muted-foreground/80"
-                                                    />
-                                                    <div
-                                                        className={cn(
-                                                            "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all duration-300",
-                                                            multicolor.readingButtonTone,
-                                                        )}
-                                                    >
-                                                        READ <ArrowRight className="h-3.5 w-3.5" />
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </Link>
-                                    </article>
-                            </div>
-                        ))}
-                    </div>
-
-                        {/* Carousel controls: prev/next + dots */}
-                        <div className="mt-4 flex items-center gap-2">
-                            <button
-                                type="button"
-                                onClick={() => scrollToMobileIndex(selectedIndex - 1)}
-                                disabled={!canScrollPrev}
-                                className="h-8 w-8 rounded-full border border-primary/20 text-primary/70 hover:text-primary hover:border-primary/40 disabled:opacity-35 disabled:cursor-not-allowed inline-flex items-center justify-center transition-colors"
-                                aria-label={locale === "id" ? "Slide sebelumnya" : "Previous slide"}
-                            >
-                                <ChevronLeft className="h-4 w-4" />
-                            </button>
-
-                            <div className="flex items-center gap-1.5">
-                                {scrollSnaps.map((_, index) => (
-                                    <button
-                                        key={`dot-${index}`}
-                                        type="button"
-                                        onClick={() => scrollToMobileIndex(index)}
-                                        className="h-6 w-6 inline-flex items-center justify-center rounded-full"
-                                        aria-label={`Go to slide ${index + 1}`}
-                                    >
-                                        <span
-                                            className={cn(
-                                                "rounded-full transition-all",
-                                                index === selectedIndex
-                                                    ? "h-1.5 w-4 bg-primary/70"
-                                                    : "h-1.5 w-1.5 bg-primary/25 hover:bg-primary/40",
-                                            )}
+                {/* ── MOBILE: Simple stacked cards (hidden on sm+) ── */}
+                <div className="sm:hidden grid grid-cols-1 gap-4">
+                    {postData.map(({ post, index, heroImageSrc, heroImageHint, rawCategory, multicolor, item }) => (
+                        <article
+                            key={post.slug}
+                            className={cn(
+                                "relative bg-card rounded-xl border border-primary/5 transition-all duration-500 flex flex-col group/card overflow-hidden shadow-md ring-1 ring-transparent",
+                                multicolor.hoverRing,
+                                multicolor.hoverShadow,
+                            )}
+                        >
+                            <Link href={`${linkPrefix}/blog/${post.slug}`} className="block group">
+                                <div className="relative aspect-[16/10] overflow-hidden rounded-t-xl">
+                                    {heroImageSrc ? (
+                                        <RevealImage
+                                            src={heroImageSrc}
+                                            alt={post.frontmatter.imageAlt || post.frontmatter.title}
+                                            fill
+                                            className="transition-transform duration-700 group-hover:scale-[1.04]"
+                                            wrapperClassName="absolute inset-0"
+                                            sizes="(max-width: 640px) 100vw, 100vw"
+                                            priority={index === 0}
+                                            loading={index === 0 ? "eager" : "lazy"}
+                                            quality={68}
+                                            holdUntilLoaded={index === 0}
+                                            initialVisitOnly={index === 0}
+                                            showSkeleton
+                                            data-ai-hint={heroImageHint}
                                         />
-                                    </button>
-                                ))}
-                            </div>
+                                    ) : (
+                                        <div className="absolute inset-0 bg-muted" aria-hidden="true" />
+                                    )}
+                                    <div className={cn("absolute inset-0 bg-linear-to-t opacity-0 transition-opacity duration-500 group-hover/card:opacity-100", multicolor.overlayGradient)} />
+                                    <div className={cn("absolute bottom-0 left-0 right-0 h-0.75 opacity-0 transition-opacity duration-500 group-hover/card:opacity-100", multicolor.accentBar)} />
+                                    <AddToReadingListButton
+                                        item={item}
+                                        dictionary={dictionary}
+                                        showText={false}
+                                        className="absolute top-2 right-2 z-20 text-white bg-black/30 hover:bg-black/50 hover:text-white opacity-100 transition-opacity"
+                                    />
+                                </div>
 
-                            <button
-                                type="button"
-                                onClick={() => scrollToMobileIndex(selectedIndex + 1)}
-                                disabled={!canScrollNext}
-                                className="h-8 w-8 rounded-full border border-primary/20 text-primary/70 hover:text-primary hover:border-primary/40 disabled:opacity-35 disabled:cursor-not-allowed inline-flex items-center justify-center transition-colors"
-                                aria-label={locale === "id" ? "Slide berikutnya" : "Next slide"}
-                            >
-                                <ChevronRight className="h-4 w-4" />
-                            </button>
-                        </div>
+                                <div className="p-4 flex flex-col gap-2">
+                                    <div>
+                                        <CategoryBadge
+                                            category={rawCategory}
+                                            size="xs"
+                                            className="shadow-sm"
+                                        />
+                                    </div>
+                                    <h3 className={cn("font-display text-lg font-bold leading-snug text-primary transition-colors duration-300", multicolor.hoverTitle)}>
+                                        {post.frontmatter.title}
+                                    </h3>
+                                    <div className="flex items-center justify-between gap-3 mt-1">
+                                        <RelativeTime
+                                            date={post.frontmatter.date}
+                                            locale={locale}
+                                            className="text-[10px] font-bold uppercase tracking-tighter text-muted-foreground/80"
+                                        />
+                                        <div
+                                            className={cn(
+                                                "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all duration-300",
+                                                multicolor.readingButtonTone,
+                                            )}
+                                        >
+                                            READ <ArrowRight className="h-3.5 w-3.5" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </Link>
+                        </article>
+                    ))}
                 </div>
 
                 {/* ── DESKTOP: Original 4-column staggered grid (hidden on mobile) ── */}
