@@ -81,8 +81,32 @@ export default async function AboutPage({
       ? "Terus belajar, merapikan proses, dan membangun hal-hal yang berguna."
       : "Always learning, refining workflows, and building useful things.";
 
+  const currentPrefix = locale === i18n.defaultLocale ? "" : `/${locale}`;
+
   return (
     <div className="w-full">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Person",
+            "name": "Iwan Efendi",
+            "url": `https://snipgeek.com${currentPrefix}/about`,
+            "image": "https://snipgeek.com/images/profile/profile.webp",
+            "jobTitle": "Tech Writer & Web Developer",
+            "worksFor": {
+              "@type": "Organization",
+              "name": "SnipGeek",
+              "url": "https://snipgeek.com",
+            },
+            "sameAs": [
+              "https://snipgeek.com",
+            ],
+            "knowsLanguage": ["en", "id"],
+          }),
+        }}
+      />
       <main className="mx-auto max-w-5xl px-4 pt-8 pb-14 sm:px-6 lg:px-8">
         <ScrollReveal direction="down">
           <section className="relative overflow-hidden rounded-3xl border border-primary/10 bg-linear-to-br from-primary/6 via-background to-accent/6 p-8 md:p-12">

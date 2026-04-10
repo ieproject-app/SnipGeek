@@ -17,7 +17,7 @@ import { ArticleShare } from "@/components/blog/article-share";
 import { ArticleRelated } from "@/components/blog/article-related";
 import { ArticleTOC } from "@/components/blog/article-toc";
 import { ArticleTags } from "@/components/blog/article-tags";
-import { extractHeadings } from "@/lib/mdx-utils";
+import { extractHeadings, stripMdxSyntax } from "@/lib/mdx-utils";
 import { LayoutBreadcrumbs } from "@/components/layout/layout-breadcrumbs";
 import { ArticleComments } from "@/components/blog/article-comments";
 import remarkGfm from "remark-gfm";
@@ -74,6 +74,7 @@ export async function generateMetadata({
   return {
     title: note.frontmatter.title,
     description: note.frontmatter.description,
+    keywords: note.frontmatter.tags?.length ? note.frontmatter.tags : undefined,
     alternates: {
       canonical: canonicalPath,
       languages: {
@@ -94,14 +95,17 @@ export async function generateMetadata({
           alt: note.frontmatter.title,
         },
       ],
-      publishedTime: note.frontmatter.date,
-      modifiedTime: note.frontmatter.updated ?? note.frontmatter.date,
+      publishedTime: new Date(note.frontmatter.date).toISOString(),
+      modifiedTime: new Date(note.frontmatter.updated ?? note.frontmatter.date).toISOString(),
     },
     twitter: {
       card: "summary_large_image",
       title: note.frontmatter.title,
       description: note.frontmatter.description,
       images: [ogImageUrl],
+    },
+    other: {
+      "og:locale": locale === "id" ? "id_ID" : "en_US",
     },
   };
 }
@@ -132,7 +136,7 @@ export default async function Page({
 
   const linkPrefix = getLinkPrefix(locale);
   const headings = extractHeadings(initialNote.content || "");
-  const wordCount = (initialNote.content || "").trim().split(/\s+/).length || 0;
+  const wordCount = stripMdxSyntax(initialNote.content || "").split(/\s+/).filter(Boolean).length;
   const readingTime = Math.max(1, Math.ceil(wordCount / 200));
 
   const itemForMeta = {
@@ -146,11 +150,19 @@ export default async function Page({
   const breadcrumbSegments = [
     { label: dictionary.home.breadcrumbHome, href: linkPrefix || "/" },
     { label: dictionary.navigation.notes, href: `${linkPrefix}/notes` },
+    { label: initialNote.frontmatter.title },
   ];
 
   const allNotes = await getSortedNotesData(locale);
+  const currentTags = initialNote.frontmatter.tags ?? [];
+  const currentCategory = initialNote.frontmatter.category;
   const initialRelatedContent = allNotes
-    .filter((n) => n.slug !== slug);
+    .filter((n) => n.slug !== slug)
+    .filter((n) => {
+      if (currentCategory && n.frontmatter.category === currentCategory) return true;
+      if (currentTags.length > 0 && n.frontmatter.tags?.some((t: string) => currentTags.includes(t))) return true;
+      return false;
+    });
 
   const heroSourceOg = resolveHeroImage(
     initialNote.frontmatter.heroImage,
@@ -171,7 +183,7 @@ export default async function Page({
   return (
     <div className="w-full">
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-16 sm:pb-24">
-        <article>
+        <article aria-label={initialNote.frontmatter.title}>
           <header className="mb-12 text-center">
             <LayoutBreadcrumbs
               segments={breadcrumbSegments}
@@ -250,9 +262,10 @@ export default async function Page({
             "headline": initialNote.frontmatter.title,
             "description": initialNote.frontmatter.description,
             "image": ogImageUrl,
-            "datePublished": initialNote.frontmatter.date,
-            "dateModified":
-              initialNote.frontmatter.updated || initialNote.frontmatter.date,
+            "datePublished": new Date(initialNote.frontmatter.date).toISOString(),
+            "dateModified": new Date(initialNote.frontmatter.updated || initialNote.frontmatter.date).toISOString(),
+            "inLanguage": locale === "id" ? "id" : "en",
+            "wordCount": wordCount,
             "author": {
               "@type": "Person",
               "name": "Iwan Efendi",

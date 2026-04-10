@@ -22,7 +22,6 @@ import {
   Smartphone,
   Cpu,
   GraduationCap,
-  type LucideIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -370,7 +369,7 @@ export function LayoutHeader({
     });
 
     // 2. Determine base tags based on current context
-    let pool: { name: string; href: string; icon: LucideIcon }[] = [];
+    let pool: { name: string; href: string; icon: React.ComponentType<{ className?: string }> }[] = [];
 
     const blogDetailPrefix = `${linkPrefix}/blog/`;
     const noteDetailPrefix = `${linkPrefix}/notes/`;

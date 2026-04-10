@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "check": "node scripts/pre-deploy-check.mjs",
+    "predeploy": "node scripts/pre-deploy-check.mjs"
   },
   "dependencies": {
     "@formatjs/intl-localematcher": "^0.5.4",

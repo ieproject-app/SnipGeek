@@ -6,6 +6,9 @@ import { i18n } from "@/i18n-config";
 
 const DOMAIN = "https://snipgeek.com";
 
+// Fixed date for static pages — update manually when page content changes
+const STATIC_LAST_MODIFIED = new Date("2026-04-01");
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const routes = [
     "",
@@ -33,14 +36,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       const localePrefix = locale === i18n.defaultLocale ? "" : `/${locale}`;
       const mainRoutes = routes.map((route) => ({
         url: `${DOMAIN}${localePrefix}${route}`,
-        lastModified: new Date(),
+        lastModified: STATIC_LAST_MODIFIED,
         changeFrequency: "weekly" as const,
         priority: route === "" ? 1 : route === "/tools" ? 0.9 : 0.8,
       }));
       
       const toolPages = toolRoutes.map((tool) => ({
         url: `${DOMAIN}${localePrefix}/tools/${tool}`,
-        lastModified: new Date(),
+        lastModified: STATIC_LAST_MODIFIED,
         changeFrequency: "monthly" as const,
         priority: 0.7,
       }));
@@ -61,7 +64,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
           post.frontmatter.updated || post.frontmatter.date,
         ),
         changeFrequency: "monthly" as const,
-        priority: 0.6,
+        priority: post.frontmatter.featured ? 0.8 : 0.6,
       }));
     }),
   );
@@ -104,7 +107,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         .filter(([tag, count]) => shouldIndexTag(tag, count))
         .map(([tag]) => ({
           url: `${DOMAIN}${localePrefix}/tags/${encodeURIComponent(tag)}`,
-          lastModified: new Date(),
+          lastModified: STATIC_LAST_MODIFIED,
           changeFrequency: "weekly" as const,
           priority: 0.4,
         }));
