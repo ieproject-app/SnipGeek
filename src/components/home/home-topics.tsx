@@ -69,7 +69,7 @@ export function HomeTopics({
 
     return (
       <ScrollReveal key={post.slug} direction="up" delay={index * 0.1}>
-        <div className="group relative flex items-center gap-4 py-3 border-b border-primary/5 transition-all duration-300">
+        <div className="group relative flex items-center gap-4 py-3 border-b border-primary/5 transition-all duration-300 hover:bg-primary/[0.02] hover:pl-1">
           <Link
             href={`${linkPrefix}/blog/${post.slug}`}
             className="flex items-center gap-4 flex-1 min-w-0"
@@ -79,7 +79,7 @@ export function HomeTopics({
                 src={heroImageSrc}
                 alt={post.frontmatter.imageAlt || post.frontmatter.title}
                 fill
-                className="object-cover transition-transform duration-500 group-hover:scale-110"
+                className="object-cover transition-transform duration-500"
                 sizes="(max-width: 640px) 120px, 144px"
                 quality={64}
               />
