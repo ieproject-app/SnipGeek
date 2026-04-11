@@ -69,7 +69,7 @@ export function HomeTopics({
 
     return (
       <ScrollReveal key={post.slug} direction="up" delay={index * 0.1}>
-        <div className="group relative flex items-center gap-4 py-3 border-b border-primary/5 transition-all duration-300 hover:bg-primary/[0.02] hover:pl-1">
+        <div className="group relative flex items-center gap-4 py-3 border-b border-primary/5 transition-all duration-300 hover:bg-primary/[0.02]">
           <Link
             href={`${linkPrefix}/blog/${post.slug}`}
             className="flex items-center gap-4 flex-1 min-w-0"
