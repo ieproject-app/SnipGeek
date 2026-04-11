@@ -61,7 +61,6 @@ export function ArticleTOC({
         onClick={() => setIsOpen(!isOpen)}
         className="group flex w-full items-center justify-between p-5 text-left transition-all duration-200 hover:bg-muted/30 active:scale-[0.99]"
         aria-expanded={isOpen}
-        aria-label={title}
       >
         <div className="flex items-center gap-3">
           <div className="rounded-lg bg-primary/10 p-2 transition-transform duration-300 group-hover:rotate-12">

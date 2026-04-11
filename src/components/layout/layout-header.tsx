@@ -502,7 +502,7 @@ export function LayoutHeader({
               <NextLink
                 href="/"
                 className="flex items-center gap-3 group text-foreground hover:text-foreground transition-colors duration-300"
-                aria-label="Back to Site"
+                aria-label="Back to Home"
               >
                 <div className="flex items-center gap-1 shrink-0">
                   <div className="opacity-100 translate-x-0 transition-all duration-300 md:opacity-0 md:-translate-x-1 md:group-hover:opacity-100 md:group-hover:translate-x-0">
@@ -517,7 +517,7 @@ export function LayoutHeader({
                   <span className="font-display text-base font-black tracking-tight leading-tight">
                     Back to Home
                   </span>
-                  <span className="font-sans text-[9px] font-bold uppercase tracking-[0.12em] text-muted-foreground/70 mt-0.5 group-hover:text-foreground/90 transition-colors">
+                  <span className="font-sans text-[9px] font-bold uppercase tracking-[0.12em] text-muted-foreground mt-0.5 group-hover:text-foreground/90 transition-colors">
                     {(params.locale as string) === "en"
                       ? "Return Home"
                       : "Kembali"}
@@ -581,12 +581,12 @@ export function LayoutHeader({
                 >
                   {item.name}
                   {item.name === "Ubuntu 26.04" && (
-                    <span className="text-[8px] font-black uppercase tracking-wide px-1 py-0.5 rounded bg-[#E95420]/15 text-[#E95420] border border-[#E95420]/30 leading-none">
+                    <span className="text-[8px] font-black uppercase tracking-wide px-1 py-0.5 rounded bg-[#E95420]/15 text-[#B7410E] dark:text-[#E95420] border border-[#E95420]/30 leading-none">
                       LTS
                     </span>
                   )}
                   {item.name === "Windows 11" && (
-                    <span className="text-[8px] font-black uppercase tracking-wide px-1 py-0.5 rounded bg-[#0078D4]/15 text-[#0078D4] border border-[#0078D4]/30 leading-none">
+                    <span className="text-[8px] font-black uppercase tracking-wide px-1 py-0.5 rounded bg-[#0078D4]/15 text-[#005A9E] dark:text-[#0078D4] border border-[#0078D4]/30 leading-none">
                       25H2
                     </span>
                   )}
@@ -669,12 +669,12 @@ export function LayoutHeader({
                         <item.icon className="h-4 w-4 text-accent" />
                         {item.name}
                         {item.name === "Ubuntu 26.04" && (
-                          <span className="text-[8px] font-black uppercase tracking-wide px-1 py-0.5 rounded bg-[#E95420]/15 text-[#E95420] border border-[#E95420]/30 leading-none">
+                          <span className="text-[8px] font-black uppercase tracking-wide px-1 py-0.5 rounded bg-[#E95420]/15 text-[#B7410E] dark:text-[#E95420] border border-[#E95420]/30 leading-none">
                             LTS
                           </span>
                         )}
                         {item.name === "Windows 11" && (
-                          <span className="text-[8px] font-black uppercase tracking-wide px-1 py-0.5 rounded bg-[#0078D4]/15 text-[#0078D4] border border-[#0078D4]/30 leading-none">
+                          <span className="text-[8px] font-black uppercase tracking-wide px-1 py-0.5 rounded bg-[#0078D4]/15 text-[#005A9E] dark:text-[#0078D4] border border-[#0078D4]/30 leading-none">
                             25H2
                           </span>
                         )}
