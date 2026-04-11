@@ -6,6 +6,7 @@ import {
   getStaticPageDescription,
   getStaticPageLastUpdated,
   getStaticPageTitle,
+  getStaticPageCanonicalPath,
 } from "@/lib/static-pages";
 import {
   LayoutStaticPageTemplate,
@@ -36,6 +37,7 @@ export default async function PrivacyPage({
 }) {
   const { locale } = await params;
   const { frontmatter, content } = await getStaticPageData("privacy", locale);
+  const canonicalPath = getStaticPageCanonicalPath("privacy", locale);
 
   const title =
     getStaticPageTitle(
@@ -58,6 +60,7 @@ export default async function PrivacyPage({
       }
       icon={resolveStaticPageIcon(frontmatter.icon)}
       maxWidthClassName="max-w-3xl"
+      canonicalUrl={`https://snipgeek.com${canonicalPath}`}
       footerNote={
         locale === "id"
           ? "Kebijakan ini berlaku untuk SnipGeek dan seluruh halamannya."

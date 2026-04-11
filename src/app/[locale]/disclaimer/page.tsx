@@ -6,6 +6,7 @@ import {
   getStaticPageDescription,
   getStaticPageLastUpdated,
   getStaticPageTitle,
+  getStaticPageCanonicalPath,
 } from "@/lib/static-pages";
 import {
   LayoutStaticPageTemplate,
@@ -38,6 +39,7 @@ export default async function DisclaimerPage({
   const { frontmatter, content } = await getStaticPageData(
     "disclaimer",
     locale,
+  const canonicalPath = getStaticPageCanonicalPath("disclaimer", locale);
   );
 
   const title = getStaticPageTitle(frontmatter, "Disclaimer") || "Disclaimer";
@@ -55,7 +57,8 @@ export default async function DisclaimerPage({
         frontmatter.badgeLabel ||
         (locale === "id" ? "Dokumen Resmi" : "Official Document")
       }
-      icon={resolveStaticPageIcon(frontmatter.icon)}
+      icon={resolveStaticPageIcon(f
+      canonicalUrl={`https://snipgeek.com${canonicalPath}`}rontmatter.icon)}
       maxWidthClassName="max-w-3xl"
       footerNote={
         locale === "id"

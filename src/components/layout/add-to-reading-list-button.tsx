@@ -45,6 +45,7 @@ export function AddToReadingListButton({ item, dictionary, showText = true, clas
       variant={showText ? "outline" : "ghost"}
       size={showText ? "sm" : "icon"}
       onClick={handleClick}
+      aria-label={isSaved ? dictionary.readingList.remove : dictionary.readingList.add}
       className={cn(
         !showText && 'h-8 w-8 rounded-full',
         className,

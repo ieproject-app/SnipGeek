@@ -105,6 +105,26 @@ export async function generateStaticPageMetadata({
         "x-default": languages[i18n.defaultLocale] || canonicalPath,
       },
     },
+    openGraph: {
+      type: "website",
+      url: `https://snipgeek.com${canonicalPath}`,
+      title: title || "SnipGeek",
+      description: description,
+      images: [
+        {
+          url: "https://snipgeek.com/opengraph-image",
+          width: 1200,
+          height: 630,
+          alt: title || "SnipGeek",
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: title || "SnipGeek",
+      description: description,
+      images: ["https://snipgeek.com/opengraph-image"],
+    },
   };
 }
 

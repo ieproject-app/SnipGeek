@@ -96,6 +96,7 @@ export function LanguageSwitcher(props: {
               <button
                 type="button"
                 onClick={() => handleLocaleChange(locale as Locale)}
+                aria-label={`Switch to ${locale === "en" ? "English" : "Indonesian"}`}
                 className={cn(
                   "text-[10px] font-black uppercase tracking-[0.2em] transition-all duration-300",
                   isActive
@@ -148,6 +149,7 @@ export function LanguageSwitcher(props: {
                         : "text-foreground/50 hover:text-foreground/80 hover:scale-105 active:scale-95",
                     )}
                     aria-current={isActive ? "page" : undefined}
+                    aria-label={`Switch to ${label}`}
                     onClick={() => handleLocaleChange(locale as Locale)}
                   >
                     {locale.toUpperCase()}
