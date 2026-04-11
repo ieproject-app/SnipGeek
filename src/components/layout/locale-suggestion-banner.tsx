@@ -140,7 +140,7 @@ export function LocaleSuggestionBanner({
       )}
       aria-hidden={!visible}
       aria-live="polite"
-      {...(!visible ? { inert: "" as unknown as boolean } : {})}
+      {...(!visible ? { inert: true } : {})}
     >
       {/* Gradient strip — same visual language as the secondary nav bar */}
       <div
