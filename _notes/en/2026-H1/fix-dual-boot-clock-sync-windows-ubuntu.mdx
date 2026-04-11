@@ -1,0 +1,113 @@
+---
+title: "Fix Dual-Boot Clock Mismatch Between Windows and Ubuntu"
+slug: "fix-dual-boot-clock-sync-windows-ubuntu"
+date: "2026-04-13"
+description: "Fix the clock jumping hours when switching between Windows and Ubuntu by making both OS read hardware RTC as UTC."
+translationKey: "fix-dual-boot-clock-sync-windows-ubuntu"
+published: true
+category: "Linux"
+tags: ["linux", "windows", "ubuntu", "dual-boot", "troubleshooting"]
+---
+
+If you [dual-boot Windows and Ubuntu](/blog/why-dual-boot-still-relevant), you've almost certainly seen this: the clock in Windows suddenly jumps several hours forward or backward right after booting from Ubuntu. It's not a bug — it's a fundamental disagreement between the two operating systems about how to read time from your motherboard.
+
+I spent an embarrassing amount of time thinking my BIOS battery was dying before I realized the actual cause.
+
+## The Root Cause
+
+The problem comes down to how each OS interprets the **RTC (Real-Time Clock)** — the hardware clock on your motherboard.
+
+- **Windows** reads RTC as **local time** (e.g. UTC+7 for WIB)
+- **Ubuntu/Linux** reads RTC as **UTC**, then converts to local time in software
+
+When you boot into Windows after using Ubuntu, Windows reads the UTC-set hardware clock and treats it as local time. If you're in UTC+7, the clock shows 7 hours behind. The fix: make both OS agree to read RTC as UTC.
+
+## Fix: Windows Side (Registry)
+
+Open **PowerShell as Administrator** (<kbd>Win</kbd> + <kbd>X</kbd> → Terminal (Admin)):
+
+<Steps>
+  <Step>
+
+### Add the RealTimeIsUniversal registry key
+
+```powershell
+reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\TimeZoneInformation" /v RealTimeIsUniversal /t REG_DWORD /d 1 /f
+```
+
+  </Step>
+  <Step>
+
+### Verify the registry entry
+
+```powershell
+reg query "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\TimeZoneInformation" /v RealTimeIsUniversal
+```
+
+You should see `0x1` in the output. That confirms Windows will now treat the hardware clock as UTC.
+
+  </Step>
+  <Step>
+
+### Force NTP time sync
+
+```powershell
+net start "Windows Time"
+w32tm /config /manualpeerlist:"time.windows.com" /syncfromflags:manual /reliable:YES /update
+w32tm /resync /force
+```
+
+If `w32tm /resync` fails with "no time data was available", make sure the `/config` command ran first — the order matters.
+
+  </Step>
+  <Step>
+
+### Restart Windows
+
+A reboot is required for the registry change to take full effect.
+
+  </Step>
+</Steps>
+
+## Fix: Ubuntu Side (NTP)
+
+Boot into Ubuntu and enable NTP sync:
+
+```bash
+sudo timedatectl set-ntp true
+```
+
+Verify with:
+
+```bash
+timedatectl status
+```
+
+The output you're looking for:
+
+```
+System clock synchronized: yes
+NTP service: active
+RTC in local TZ: no
+```
+
+The critical line is `RTC in local TZ: no` — that confirms Ubuntu is reading the hardware clock as UTC, which is the correct default.
+
+## Order Doesn't Matter
+
+You can set up either OS first. The fixes are independent of each other. What matters is that **both** are configured — if you only fix one side, the clock drift will come back every time you switch.
+
+## Quick Reference
+
+| OS | Action |
+|---|---|
+| Windows | Add `RealTimeIsUniversal=1` registry key + NTP sync |
+| Ubuntu | Enable NTP + confirm `RTC in local TZ: no` |
+
+---
+
+After both sides are set, the clock stays consistent no matter how often you switch between operating systems. No more manual time corrections. If you're setting up a [dual-boot with a fresh Windows install](/blog/how-to-create-windows-11-bootable-usb-rufus), it's worth doing this right from the start — it's a two-minute fix that saves a lot of minor annoyance.
+
+### References
+1. [Time — ArchWiki](https://wiki.archlinux.org/title/System_time#UTC_in_Microsoft_Windows)
+2. [timedatectl — Ubuntu Manpage](https://manpages.ubuntu.com/manpages/noble/man1/timedatectl.1.html)
