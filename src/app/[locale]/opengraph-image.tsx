@@ -75,19 +75,21 @@ export default async function Image({ params }: { params: Promise<{ locale: Loca
 
         {/* Logo + Brand */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 22, marginBottom: 28 }}>
+          {/* 4-quadrant logo matching favicon */}
           <div
             style={{
-              width: 84,
-              height: 84,
-              borderRadius: 20,
+              width: 80,
+              height: 80,
               display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              background: `linear-gradient(135deg, ${accent}, ${accentDark})`,
-              boxShadow: `0 8px 40px rgba(4, 136, 199, 0.5)`,
+              flexWrap: 'wrap',
+              gap: '4px',
+              filter: 'drop-shadow(0 8px 40px rgba(4, 136, 199, 0.5))',
             }}
           >
-            <span style={{ fontSize: 48, fontWeight: 900, color: 'white' }}>S</span>
+            <div style={{ width: 38, height: 38, borderRadius: '4px 4px 10px 4px', background: 'linear-gradient(135deg, #bae6fd, #0ea5e9)' }} />
+            <div style={{ width: 38, height: 38, borderRadius: '4px 4px 4px 4px', background: 'linear-gradient(135deg, #3b82f6, #1d4ed8)' }} />
+            <div style={{ width: 38, height: 38, borderRadius: '4px 4px 4px 4px', background: 'linear-gradient(135deg, #3b82f6, #1d4ed8)' }} />
+            <div style={{ width: 38, height: 38, borderRadius: '4px 10px 4px 4px', background: 'linear-gradient(135deg, #bae6fd, #0ea5e9)' }} />
           </div>
           <span
             style={{
