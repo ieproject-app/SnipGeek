@@ -1,0 +1,111 @@
+---
+title: "Fix Jam Bergeser Saat Dual-Boot Windows dan Ubuntu"
+slug: "fix-dual-boot-clock-sync-windows-ubuntu"
+date: "2026-04-13"
+description: "Cara mengatasi jam yang loncat beberapa jam saat bergantian boot Windows dan Ubuntu — dengan menyamakan pembacaan RTC ke UTC."
+translationKey: "fix-dual-boot-clock-sync-windows-ubuntu"
+published: true
+category: "Linux"
+tags: ["linux", "windows", "ubuntu", "dual-boot", "troubleshooting"]
+---
+
+Kalau kamu [dual-boot Windows dan Ubuntu](/blog/why-dual-boot-still-relevant), pasti pernah ngalamin ini: habis pakai Ubuntu, boot ke Windows, dan tiba-tiba jamnya mundur atau maju beberapa jam. Awalnya saya kira baterai BIOS sudah lemah — ternyata bukan. Ini murni soal cara dua OS membaca jam hardware yang berbeda.
+
+## Penyebabnya
+
+Masalahnya ada di cara masing-masing OS membaca **RTC (Real-Time Clock)** — jam hardware di motherboard.
+
+- **Windows** membaca RTC sebagai **waktu lokal** (misalnya langsung WIB UTC+7)
+- **Ubuntu/Linux** membaca RTC sebagai **UTC**, lalu dikonversi ke waktu lokal lewat software
+
+Jadi ketika kamu boot ke Windows setelah dari Ubuntu, Windows membaca jam hardware yang sudah di-set dalam UTC — lalu langsung menganggap itu waktu lokal. Kalau kamu di zona UTC+7, jamnya jadi 7 jam lebih awal. Solusinya: buat keduanya sepakat membaca RTC sebagai UTC.
+
+## Fix di Windows (Registry)
+
+Buka **PowerShell as Administrator** (<kbd>Win</kbd> + <kbd>X</kbd> → Terminal (Admin)):
+
+<Steps>
+  <Step>
+
+### Tambahkan registry key RealTimeIsUniversal
+
+```powershell
+reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\TimeZoneInformation" /v RealTimeIsUniversal /t REG_DWORD /d 1 /f
+```
+
+  </Step>
+  <Step>
+
+### Verifikasi registry sudah masuk
+
+```powershell
+reg query "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\TimeZoneInformation" /v RealTimeIsUniversal
+```
+
+Harusnya muncul `0x1`. Itu tanda Windows akan membaca hardware clock sebagai UTC.
+
+  </Step>
+  <Step>
+
+### Paksa sinkronisasi waktu via NTP
+
+```powershell
+net start "Windows Time"
+w32tm /config /manualpeerlist:"time.windows.com" /syncfromflags:manual /reliable:YES /update
+w32tm /resync /force
+```
+
+Kalau `w32tm /resync` error "no time data was available", pastikan perintah `/config` sudah dijalankan duluan — urutannya penting.
+
+  </Step>
+  <Step>
+
+### Restart Windows
+
+Perubahan registry butuh reboot supaya berlaku penuh.
+
+  </Step>
+</Steps>
+
+## Fix di Ubuntu (NTP)
+
+Boot ke Ubuntu, aktifkan NTP:
+
+```bash
+sudo timedatectl set-ntp true
+```
+
+Cek hasilnya:
+
+```bash
+timedatectl status
+```
+
+Output yang kamu cari:
+
+```
+System clock synchronized: yes
+NTP service: active
+RTC in local TZ: no
+```
+
+Yang paling krusial adalah `RTC in local TZ: no` — artinya Ubuntu sudah membaca hardware clock sebagai UTC, sesuai yang diharapkan.
+
+## Urutan Bebas
+
+Mau mulai dari Windows atau Ubuntu duluan, terserah. Kedua fix ini independen satu sama lain. Yang penting **dua-duanya** harus disetup — kalau cuma salah satu, jam bakal bergeser lagi setiap kali ganti OS.
+
+## Ringkasan Cepat
+
+| OS | Yang Dilakukan |
+|---|---|
+| Windows | Tambah registry `RealTimeIsUniversal=1` + sync NTP |
+| Ubuntu | Aktifkan NTP + pastikan `RTC in local TZ: no` |
+
+---
+
+Setelah kedua sisi di-fix, jam di Windows dan Ubuntu tetap konsisten mau seberapa sering pun kamu bolak-balik OS. Gak perlu koreksi manual lagi. Kalau kamu baru mau [setup dual-boot dengan instal ulang Windows](/blog/how-to-create-windows-11-bootable-usb-rufus), langsung aja lakukan ini dari awal — cuma butuh dua menit dan bisa menghindari gangguan kecil yang terus berulang.
+
+### References
+1. [Time — ArchWiki](https://wiki.archlinux.org/title/System_time#UTC_in_Microsoft_Windows)
+2. [timedatectl — Ubuntu Manpage](https://manpages.ubuntu.com/manpages/noble/man1/timedatectl.1.html)
