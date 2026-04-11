@@ -29,11 +29,6 @@ export const INDEXABLE_TAGS = [
     "security",
     "performance",
     "dual-boot",
-    "grub",
-    "uefi",
-    "secure-boot",
-    "partition",
-    "recovery",
 ] as const;
 
 export function shouldIndexTag(tag: string, count: number) {

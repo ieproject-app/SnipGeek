@@ -6,6 +6,7 @@ import { TagListClient } from "./tag-list-client";
 import type { Metadata } from "next";
 import { shouldIndexTag, getAllTags } from "@/lib/tags";
 import { getLinkPrefix } from "@/lib/utils";
+import { notFound } from "next/navigation";
 
 export async function generateMetadata({
   params,
@@ -79,6 +80,11 @@ export default async function TagPage({
   const filteredNotes = notes.filter((n) =>
     n.frontmatter.tags?.some((t) => t.trim().toLowerCase() === decodedTag),
   );
+
+  // Return 404 if tag has no articles
+  if (posts.length === 0 && filteredNotes.length === 0) {
+    notFound();
+  }
 
   const linkPrefix = getLinkPrefix(locale);
   const canonicalUrl = `https://snipgeek.com${linkPrefix}/tags/${tag}`;
