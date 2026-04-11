@@ -9,11 +9,18 @@ import {
   getAllNotesTranslationsMap,
   getSortedNotesData,
 } from "@/lib/notes";
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ReadingListProvider } from "@/hooks/use-reading-list";
 import { NotificationProvider } from "@/hooks/use-notification";
 import { getDictionary } from "@/lib/get-dictionary";
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  themeColor: "#ffffff",
+};
 
 import {
   Bricolage_Grotesque,
@@ -201,6 +208,9 @@ export default async function LocaleLayout({
       suppressHydrationWarning
     >
       <body className="font-sans antialiased fade-in-on-load">
+        <a href="#main-content" className="skip-link">
+          {locale === "id" ? "Lanjut ke konten utama" : "Skip to main content"}
+        </a>
         <FirebaseProviderWrapper>
           <FirebaseAnalyticsTracker />
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
@@ -215,7 +225,7 @@ export default async function LocaleLayout({
                   dictionary={dictionary}
                   translationsMap={translationsMap}
                 />
-                <main>{children}</main>
+                <main id="main-content">{children}</main>
                 <LayoutFooter
                   locale={locale}
                   dictionary={dictionary}

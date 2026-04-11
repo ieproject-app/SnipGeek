@@ -53,9 +53,23 @@ export function LayoutStaticPageTemplate({
   maxWidthClassName = "max-w-3xl",
   contentClassName,
   footerNote,
+  canonicalUrl = "https://snipgeek.com",
 }: StaticPageTemplateProps) {
   return (
     <div className="w-full">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebPage",
+            name: title,
+            description: description,
+            url: canonicalUrl,
+            inLanguage: "en",
+          }),
+        }}
+      />
       <main
         className={cn(
           "mx-auto px-4 pt-12 pb-24 sm:px-6 lg:px-8",

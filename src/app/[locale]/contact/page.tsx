@@ -6,6 +6,7 @@ import {
   getStaticPageDescription,
   getStaticPageLastUpdated,
   getStaticPageTitle,
+  getStaticPageCanonicalPath,
 } from "@/lib/static-pages";
 import {
   LayoutStaticPageTemplate,
@@ -43,6 +44,7 @@ export default async function ContactPage({
   const { frontmatter, content } = await getStaticPageData("contact", locale);
 
   const fallbackTitle = locale === "id" ? "Kontak" : "Contact";
+  const canonicalPath = getStaticPageCanonicalPath("contact", locale);
 
   const title = getStaticPageTitle(frontmatter, fallbackTitle) || fallbackTitle;
   const description = getStaticPageDescription(frontmatter);
@@ -60,6 +62,7 @@ export default async function ContactPage({
       }
       icon={resolveStaticPageIcon(frontmatter.icon)}
       maxWidthClassName="max-w-3xl"
+      canonicalUrl={`https://snipgeek.com${canonicalPath}`}
       footerNote={
         locale === "id"
           ? "Untuk pertanyaan terkait halaman tertentu, sertakan tautan agar kami bisa meninjaunya lebih cepat."
