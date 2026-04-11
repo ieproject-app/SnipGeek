@@ -43,5 +43,6 @@ serviceAccountKey.json
 
 # Downloaded build logs
 /downloaded-logs-*.json
+
 # IDE settings
 .idea/
