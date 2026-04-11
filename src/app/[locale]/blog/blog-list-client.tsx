@@ -116,7 +116,7 @@ export function BlogListClient({
                           post.frontmatter.imageAlt || post.frontmatter.title
                         }
                         fill
-                        className="transition-transform duration-700 group-hover:scale-110"
+                        className="transition-transform duration-700"
                         wrapperClassName="absolute inset-0"
                         sizes="(max-width: 768px) calc(100vw - 2rem), (max-width: 1200px) 33vw, 300px"
                         loading={index === 0 ? "eager" : "lazy"}

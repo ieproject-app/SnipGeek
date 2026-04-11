@@ -88,7 +88,7 @@ export function HomeHero({ posts, dictionary, locale, linkPrefix }: HomeHeroProp
                                             src={heroImageSrc}
                                             alt={post.frontmatter.imageAlt || post.frontmatter.title}
                                             fill
-                                            className="transition-transform duration-700 group-hover:scale-[1.04]"
+                                            className="transition-transform duration-700"
                                             wrapperClassName="absolute inset-0"
                                             sizes="(max-width: 640px) 100vw, 100vw"
                                             priority={index === 0}
@@ -180,7 +180,7 @@ export function HomeHero({ posts, dictionary, locale, linkPrefix }: HomeHeroProp
                                                     src={heroImageSrc}
                                                     alt={post.frontmatter.imageAlt || post.frontmatter.title}
                                                     fill
-                                                    className="transition-transform duration-1000 ease-out group-hover:scale-[1.06]"
+                                                    className="transition-transform duration-1000 ease-out"
                                                     wrapperClassName="absolute inset-0"
                                                     sizes="(max-width: 640px) calc(100vw - 32px), (max-width: 1024px) 50vw, 25vw"
                                                     priority={index === 0}
