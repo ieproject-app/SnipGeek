@@ -165,7 +165,7 @@ export function ArticleRelated({
                   src={heroImageSrc}
                   alt={item.frontmatter.imageAlt || item.frontmatter.title}
                   fill
-                  className="transition-transform duration-700 group-hover:scale-110"
+                  className="transition-transform duration-700"
                   wrapperClassName="absolute inset-0"
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 33vw, 300px"
                   holdUntilLoaded
@@ -173,7 +173,7 @@ export function ArticleRelated({
                   data-ai-hint={heroImageHint}
                 />
               ) : (
-                <StickyNote className="h-12 w-12 text-primary/20 transition-transform duration-700 group-hover:scale-110" />
+                <StickyNote className="h-12 w-12 text-primary/20 transition-transform duration-700" />
               )}
               <div className={cn("absolute inset-0 bg-linear-to-t opacity-0 transition-opacity duration-500 group-hover:opacity-100", multicolor.overlayGradient)} />
               <div className={cn("absolute bottom-0 left-0 right-0 h-0.75 opacity-0 transition-opacity duration-500 group-hover:opacity-100", multicolor.accentBar)} />
