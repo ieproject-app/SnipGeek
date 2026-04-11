@@ -58,30 +58,26 @@ export default function OgImage() {
           }}
         />
 
-        {/* Logo mark */}
+        {/* Logo mark - 4 quadrant design matching favicon */}
         <div
           style={{
             width: "72px",
             height: "72px",
-            borderRadius: "16px",
-            background: "linear-gradient(135deg, #0797de, #38bdf8)",
             display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
+            flexWrap: "wrap",
+            gap: "4px",
             marginBottom: "28px",
-            boxShadow: "0 0 40px #0797de55",
+            filter: "drop-shadow(0 0 40px #0797de55)",
           }}
         >
-          <span
-            style={{
-              color: "#ffffff",
-              fontSize: "36px",
-              fontWeight: "900",
-              letterSpacing: "-2px",
-            }}
-          >
-            S
-          </span>
+          {/* TL: bright cyan */}
+          <div style={{ width: "34px", height: "34px", borderRadius: "4px 4px 10px 4px", background: "linear-gradient(135deg, #bae6fd, #0ea5e9)" }} />
+          {/* TR: royal blue */}
+          <div style={{ width: "34px", height: "34px", borderRadius: "4px 4px 4px 4px", background: "linear-gradient(135deg, #3b82f6, #1d4ed8)" }} />
+          {/* BL: royal blue */}
+          <div style={{ width: "34px", height: "34px", borderRadius: "4px 4px 4px 4px", background: "linear-gradient(135deg, #3b82f6, #1d4ed8)" }} />
+          {/* BR: bright cyan */}
+          <div style={{ width: "34px", height: "34px", borderRadius: "4px 10px 4px 4px", background: "linear-gradient(135deg, #bae6fd, #0ea5e9)" }} />
         </div>
 
         {/* Site name */}
