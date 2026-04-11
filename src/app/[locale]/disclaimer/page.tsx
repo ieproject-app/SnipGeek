@@ -36,11 +36,8 @@ export default async function DisclaimerPage({
   params: Promise<{ locale: Locale }>;
 }) {
   const { locale } = await params;
-  const { frontmatter, content } = await getStaticPageData(
-    "disclaimer",
-    locale,
+  const { frontmatter, content } = await getStaticPageData("disclaimer", locale);
   const canonicalPath = getStaticPageCanonicalPath("disclaimer", locale);
-  );
 
   const title = getStaticPageTitle(frontmatter, "Disclaimer") || "Disclaimer";
 
@@ -57,8 +54,8 @@ export default async function DisclaimerPage({
         frontmatter.badgeLabel ||
         (locale === "id" ? "Dokumen Resmi" : "Official Document")
       }
-      icon={resolveStaticPageIcon(f
-      canonicalUrl={`https://snipgeek.com${canonicalPath}`}rontmatter.icon)}
+      icon={resolveStaticPageIcon(frontmatter.icon)}
+      canonicalUrl={`https://snipgeek.com${canonicalPath}`}
       maxWidthClassName="max-w-3xl"
       footerNote={
         locale === "id"
