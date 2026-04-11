@@ -103,7 +103,7 @@ export function HomeUpdates({ posts, title, viewMoreText, dictionary, locale, ta
                             src={heroImageSrc}
                             alt={post.frontmatter.imageAlt || post.frontmatter.title}
                             fill
-                            className="object-cover transition-transform duration-700 group-hover:scale-110"
+                            className="object-cover transition-transform duration-700"
                             sizes="(max-width: 640px) 120px, 144px"
                             quality={64}
                             data-ai-hint={heroImageHint}

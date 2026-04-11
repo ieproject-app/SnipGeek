@@ -224,10 +224,10 @@ export default async function Page({
             />
           </header>
 
-          {/* Hero image - full-width on mobile, contained on desktop */}
-          <div className="relative -mx-4 sm:-mx-6 lg:-mx-8 mb-12">
+          {/* Hero image - full-width on mobile, rounded on desktop */}
+          <div className="relative -mx-4 sm:-mx-6 lg:mx-0 mb-12">
             {heroSource ? (
-              <div className="relative w-full">
+              <div className="relative w-full lg:max-w-4xl lg:mx-auto lg:rounded-xl lg:overflow-hidden lg:shadow-2xl lg:ring-1 lg:ring-primary/5">
                 <RevealImage
                   src={heroSource.url}
                   alt={imageAlt || initialPost.frontmatter.title}
@@ -246,7 +246,7 @@ export default async function Page({
                 />
               </div>
             ) : (
-              <div className="w-full aspect-video flex items-center justify-center bg-primary/5 relative z-10">
+              <div className="w-full aspect-video lg:max-w-4xl lg:mx-auto lg:rounded-xl lg:overflow-hidden lg:shadow-2xl lg:ring-1 lg:ring-primary/5 flex items-center justify-center bg-primary/5 relative z-10">
                 <span className="text-primary/20 font-display text-6xl font-black">
                   SnipGeek
                 </span>
