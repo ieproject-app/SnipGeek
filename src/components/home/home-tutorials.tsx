@@ -140,7 +140,7 @@ export function HomeTutorials({ posts, title, viewMoreText, dictionary, locale, 
                             src={heroImageSrc}
                             alt={post.frontmatter.imageAlt || post.frontmatter.title}
                             fill
-                            className="transition-transform duration-700 group-hover:scale-110"
+                            className="transition-transform duration-700"
                             wrapperClassName="absolute inset-0"
                             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 33vw, 300px"
                             holdUntilLoaded
