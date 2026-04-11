@@ -4,12 +4,13 @@
   "private": true,
   "scripts": {
     "dev": "NODE_OPTIONS=--max-old-space-size=4096 next dev -p 9003",
-    "build": "next build",
+    "build": "npm run validate:tags && next build",
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "check": "node scripts/pre-deploy-check.mjs",
-    "predeploy": "node scripts/pre-deploy-check.mjs"
+    "predeploy": "node scripts/pre-deploy-check.mjs",
+    "validate:tags": "tsx scripts/validate-tags.ts"
   },
   "dependencies": {
     "@formatjs/intl-localematcher": "^0.5.4",
@@ -87,6 +88,7 @@
     "eslint-config-next": "^16.1.6",
     "postcss": "^8",
     "tailwindcss": "^4.2.1",
+    "tsx": "^4.19.2",
     "typescript": "^5.9.3",
     "vite": "^7.3.1"
   }
