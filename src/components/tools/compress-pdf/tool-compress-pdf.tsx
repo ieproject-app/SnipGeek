@@ -199,10 +199,10 @@ export default function ToolCompressPdf({ locale }: { locale: "id" | "en" }) {
       setStatus('complete');
       setProgress(100);
 
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("An error occurred during the process:", error);
       setStatus('failed');
-      const errorMessage = error.details?.message || error.message || 'An unknown error occurred.';
+      const errorMessage = (error as { details?: { message?: string }; message?: string })?.details?.message || (error as Error)?.message || 'An unknown error occurred.';
       toast({ variant: 'destructive', title: t.toast.compressionFailed, description: t.toast.compressionFailedDesc(errorMessage), duration: 9000 });
     }
   };

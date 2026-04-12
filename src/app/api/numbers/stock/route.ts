@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { adminDb, assertFirebaseAdminReady } from '@/lib/firebase-admin';
+import { getAdminDb, normalizeCategory, getCategorySearchOrder } from '@/lib/api-helpers';
 
 const STATIC_DOCUMENT_CATEGORIES: Record<string, { name: string; types: string[] }> = {
     'UM.000': { name: 'Umum', types: ['ND UT'] },
@@ -9,8 +9,6 @@ const STATIC_DOCUMENT_CATEGORIES: Record<string, { name: string; types: string[]
     'LG.000': { name: 'Justifikasi', types: ['JUSTIFIKASI'] },
 };
 
-const JUSTIFICATION_CATEGORY_FALLBACKS = ['LG.000', 'LG.270'] as const;
-
 type StockMatrix = Record<string, Record<string, number>>;
 
 type StockCategoryDetail = {
@@ -18,30 +16,6 @@ type StockCategoryDetail = {
     name: string;
     sourceCategories: string[];
 };
-
-function normalizeCategory(category: string): string {
-    return category.trim().toUpperCase();
-}
-
-function getStockCategorySources(category: string): string[] {
-    const normalizedCategory = normalizeCategory(category);
-
-    if ((JUSTIFICATION_CATEGORY_FALLBACKS as readonly string[]).includes(normalizedCategory)) {
-        return [normalizedCategory, ...JUSTIFICATION_CATEGORY_FALLBACKS.filter(c => c !== normalizedCategory)];
-    }
-
-    return [normalizedCategory];
-}
-
-function getAdminDb() {
-    assertFirebaseAdminReady();
-
-    if (!adminDb) {
-        throw new Error('Layanan Firebase Admin belum tersedia untuk stok nomor.');
-    }
-
-    return adminDb;
-}
 
 function buildPeriods(year: number, startMonth: number, endMonth: number) {
     const periods: string[] = [];
@@ -65,9 +39,27 @@ export async function GET(req: NextRequest) {
             db.collection('documentTypeConfig').get(),
         ]);
 
-        const periods2025 = buildPeriods(2025, 1, 12);
-        const periods2026 = buildPeriods(2026, 1, 3);
-        const allPeriods = [...periods2025, ...periods2026];
+        // --- Dynamic year/period detection from actual data ---
+        const yearMonths: Record<number, Set<number>> = {};
+
+        numbersSnap.forEach((doc) => {
+            const data = doc.data() as { year?: number; month?: number };
+            if (data.year && data.month) {
+                if (!yearMonths[data.year]) yearMonths[data.year] = new Set();
+                yearMonths[data.year].add(data.month);
+            }
+        });
+
+        // Build full 12-month periods for each discovered year, sorted ascending
+        const discoveredYears = Object.keys(yearMonths).map(Number).sort((a, b) => a - b);
+        const periodsByYear: Record<string, string[]> = {};
+        const allPeriods: string[] = [];
+
+        for (const year of discoveredYears) {
+            const periods = buildPeriods(year, 1, 12);
+            periodsByYear[String(year)] = periods;
+            allPeriods.push(...periods);
+        }
 
         const dynamicCategories: Record<string, { name: string; types: string[] }> = {};
         dynamicCategoriesSnap.forEach((doc) => {
@@ -77,7 +69,7 @@ export async function GET(req: NextRequest) {
                 return;
             }
 
-             const normalizedCategory = normalizeCategory(data.category);
+            const normalizedCategory = normalizeCategory(data.category);
 
             dynamicCategories[normalizedCategory] = {
                 name: data.name,
@@ -107,14 +99,7 @@ export async function GET(req: NextRequest) {
             }
 
             const category = normalizeCategory(data.category);
-            const year = data.year;
-            const month = data.month;
-
-            if (year !== 2025 && year !== 2026) {
-                return;
-            }
-
-            const periodKey = `${year}-${String(month).padStart(2, '0')}`;
+            const periodKey = `${data.year}-${String(data.month).padStart(2, '0')}`;
 
             if (!rawMatrix[category]) {
                 rawMatrix[category] = {};
@@ -132,7 +117,7 @@ export async function GET(req: NextRequest) {
         });
 
         categoryCodes.forEach((category) => {
-            const sourceCategories = getStockCategorySources(category);
+            const sourceCategories = getCategorySearchOrder(category);
 
             allPeriods.forEach((period) => {
                 matrix[category][period] = sourceCategories.reduce((total, sourceCategory) => {
@@ -144,12 +129,13 @@ export async function GET(req: NextRequest) {
         const categoryDetails: StockCategoryDetail[] = categoryCodes.map((category) => ({
             code: category,
             name: mergedCategories[category]?.name ?? category,
-            sourceCategories: getStockCategorySources(category),
+            sourceCategories: getCategorySearchOrder(category),
         }));
 
         return NextResponse.json({
-            periods2025,
-            periods2026,
+            // New dynamic format
+            periodsByYear,
+            years: discoveredYears.map(String),
             categories: categoryCodes,
             categoryDetails,
             rawMatrix,

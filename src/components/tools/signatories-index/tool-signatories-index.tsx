@@ -285,7 +285,7 @@ export default function ToolSignatoriesIndex({ locale }: { locale: "id" | "en" }
             canvas.width = viewport.width;
 
             if (context) {
-              await page.render({ canvasContext: context, viewport } as any).promise;
+              await page.render({ canvasContext: context, viewport, canvas } as Parameters<typeof page.render>[0]).promise;
               const { data: { text } } = await Tesseract.recognize(canvas, 'ind+eng', {
                 logger: m => {
                    if (m.status === 'recognizing text') {

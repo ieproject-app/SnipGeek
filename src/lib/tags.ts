@@ -51,7 +51,7 @@ export async function getAllTags(locale: string): Promise<TagInfo[]> {
 
     const tagMap = new Map<string, { count: number; types: Set<string> }>();
 
-    const processTags = (tags: any[] | undefined, type: "blog" | "note") => {
+    const processTags = (tags: string[] | undefined, type: "blog" | "note") => {
         if (tags && Array.isArray(tags)) {
             tags.forEach((tag) => {
                 if (typeof tag !== "string") return;

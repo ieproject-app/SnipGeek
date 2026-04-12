@@ -25,6 +25,7 @@ type StaticPageTemplateProps = {
   maxWidthClassName?: string;
   contentClassName?: string;
   footerNote?: string;
+  canonicalUrl?: string;
 };
 
 const iconMap: Record<string, IconComponent> = {

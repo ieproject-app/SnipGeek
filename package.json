@@ -10,7 +10,9 @@
     "typecheck": "tsc --noEmit",
     "check": "node scripts/pre-deploy-check.mjs",
     "predeploy": "node scripts/pre-deploy-check.mjs",
-    "validate:tags": "tsx scripts/validate-tags.ts"
+    "validate:tags": "tsx scripts/validate-tags.ts",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@formatjs/intl-localematcher": "^0.5.4",
@@ -76,6 +78,8 @@
     "@eslint/eslintrc": "^3.3.5",
     "@tailwindcss/postcss": "^4.2.1",
     "@tailwindcss/vite": "^4.2.2",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
     "@types/fast-levenshtein": "^0.0.4",
     "@types/file-saver": "^2.0.7",
     "@types/negotiator": "^0.6.3",
@@ -86,10 +90,12 @@
     "depcheck": "^1.4.7",
     "eslint": "^9.39.4",
     "eslint-config-next": "^16.1.6",
+    "happy-dom": "^20.8.9",
     "postcss": "^8.5.8",
     "tailwindcss": "^4.2.1",
     "tsx": "^4.19.2",
     "typescript": "^5.9.3",
-    "vite": "^7.3.2"
+    "vite": "^7.3.2",
+    "vitest": "^4.1.4"
   }
 }

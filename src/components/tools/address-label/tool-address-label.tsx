@@ -296,7 +296,7 @@ export default function ToolAddressLabel({ locale }: { locale: "id" | "en" }) {
       const senderPart = sender.name.split(' ')[0] || 'pengirim';
       const receiverPart = receiver.name.split(' ')[0] || 'penerima';
       const fileName = `Label_${senderPart}_ke_${receiverPart}.pdf`.replace(/\s/g, '_');
-      saveAs(new Blob([pdfBytes as any], { type: 'application/pdf' }), fileName);
+      saveAs(new Blob([new Uint8Array(pdfBytes)], { type: 'application/pdf' }), fileName);
 
     } catch (e) {
       console.error(e);

@@ -191,7 +191,7 @@ function structuralSearch({ name, pageNumber, pageTextItems }: Omit<SearchParams
 
 // --- Main Export ---
 
-export const searchStrategies: Record<SearchMode, (params: any) => SearchResult[]> & { reconstructTextFromItems: typeof reconstructTextFromItems } = {
+export const searchStrategies: Record<SearchMode, (params: SearchParams) => SearchResult[]> & { reconstructTextFromItems: typeof reconstructTextFromItems } = {
   fast: fastSearch,
   accurate: accurateSearch,
   structural: structuralSearch,

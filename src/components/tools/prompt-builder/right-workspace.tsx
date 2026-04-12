@@ -147,7 +147,7 @@ function ModInstructionsCard() {
              ))}
            </div>
            <Textarea
-             ref={modInstructionsRef as any}
+             ref={modInstructionsRef as React.Ref<HTMLTextAreaElement>}
              placeholder={dictionary.modInstructionsPlaceholder || "Write specific changes to implement..."}
              value={modInstructions}
              onChange={(e) => setModInstructions(e.target.value)}

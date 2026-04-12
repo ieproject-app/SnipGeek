@@ -1,22 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { adminDb, adminAuth, assertFirebaseAdminReady } from '@/lib/firebase-admin';
+import { getAdminServices, verifyAdminFromRequest, normalizeCategory, normalizeDocType, getCategorySearchOrder } from '@/lib/api-helpers';
 import { format } from 'date-fns';
 import crypto from 'crypto';
 
 const DAILY_LIMIT = 15;
 const MAX_REQUEST_QUANTITY = 20;
-
-const JUSTIFICATION_CATEGORY_FALLBACKS = ['LG.000', 'LG.270'] as const;
-
-function getAdminServices() {
-    assertFirebaseAdminReady();
-
-    if (!adminDb || !adminAuth) {
-        throw new Error('Layanan Firebase Admin belum tersedia untuk generator nomor.');
-    }
-
-    return { adminDb, adminAuth };
-}
 
 interface GenerationRequestItem {
     category: string;
@@ -33,27 +21,6 @@ interface GeneratedResult {
     isError?: boolean;
 }
 
-function normalizeCategory(category: string): string {
-    return category.trim().toUpperCase();
-}
-
-function normalizeDocType(docType: string): string {
-    return docType.trim().toUpperCase();
-}
-
-function getCategorySearchOrder(category: string, _docType: string): string[] {
-    const normalizedCategory = normalizeCategory(category);
-
-    if ((JUSTIFICATION_CATEGORY_FALLBACKS as readonly string[]).includes(normalizedCategory)) {
-        return [
-            normalizedCategory,
-            ...JUSTIFICATION_CATEGORY_FALLBACKS.filter((item) => item !== normalizedCategory),
-        ];
-    }
-
-    return [normalizedCategory];
-}
-
 function getClientIp(req: NextRequest): string {
     const forwarded = req.headers.get('x-forwarded-for');
     if (forwarded) return forwarded.split(',')[0].trim();
@@ -66,23 +33,14 @@ function hashIp(ip: string): string {
 
 export async function GET(req: NextRequest) {
     try {
-        const { adminDb, adminAuth } = getAdminServices();
+        const { adminDb } = getAdminServices();
         const ip = getClientIp(req);
         const ipHash = hashIp(ip);
         const todayStr = format(new Date(), 'yyyy-MM-dd');
 
-        const authHeader = req.headers.get('authorization');
-        let isAdmin = false;
+        const adminCheck = await verifyAdminFromRequest(req);
 
-        if (authHeader?.startsWith('Bearer ')) {
-            try {
-                const decoded = await adminAuth.verifyIdToken(authHeader.slice(7));
-                const adminSnap = await adminDb.collection('roles_admin').doc(decoded.uid).get();
-                isAdmin = adminSnap.exists && adminSnap.data()?.role === 'admin';
-            } catch { /* invalid token */ }
-        }
-
-        if (isAdmin) {
+        if (adminCheck.isAdmin) {
             return NextResponse.json({ dailyCount: 0, dailyLimit: null, isAdmin: true });
         }
 
@@ -103,6 +61,7 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
     try {
         const { adminDb, adminAuth } = getAdminServices();
+
         const body = await req.json();
         const { requests, valueCategory, idToken } = body as {
             requests: GenerationRequestItem[];
@@ -111,7 +70,7 @@ export async function POST(req: NextRequest) {
         };
 
         if (!requests?.length || !valueCategory) {
-            return NextResponse.json({ error: 'Invalid request body.' }, { status: 400 });
+            return NextResponse.json({ error: 'Body permintaan tidak valid.' }, { status: 400 });
         }
 
         for (const r of requests) {
@@ -191,7 +150,7 @@ export async function POST(req: NextRequest) {
                 const year = docDate.getFullYear();
                 const month = docDate.getMonth() + 1;
                 const normalizedDocType = normalizeDocType(req.docType);
-                const categorySearchOrder = getCategorySearchOrder(req.category, req.docType);
+                const categorySearchOrder = getCategorySearchOrder(req.category);
 
                 const remaining = isAdmin ? 999 : (DAILY_LIMIT - currentCount - actualGenerated);
                 const processQty = Math.min(req.quantity, remaining);

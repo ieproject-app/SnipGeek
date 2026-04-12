@@ -2,9 +2,7 @@
 'use client';
 import {
   Auth,
-  signInAnonymously,
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
+  AuthError,
   GoogleAuthProvider,
   signInWithPopup,
   signInWithRedirect,
@@ -20,21 +18,6 @@ function isMobileOrTablet(): boolean {
   return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua);
 }
 
-/** Initiate anonymous sign-in (non-blocking). */
-export function initiateAnonymousSignIn(authInstance: Auth): void {
-  signInAnonymously(authInstance);
-}
-
-/** Initiate email/password sign-up (non-blocking). */
-export function initiateEmailSignUp(authInstance: Auth, email: string, password: string): void {
-  createUserWithEmailAndPassword(authInstance, email, password);
-}
-
-/** Initiate email/password sign-in (non-blocking). */
-export function initiateEmailSignIn(authInstance: Auth, email: string, password: string): void {
-  signInWithEmailAndPassword(authInstance, email, password);
-}
-
 /** 
  * Initiate Google sign-in (non-blocking). 
  * Automatically switches to Redirect on mobile for better UX.
@@ -47,8 +30,9 @@ export async function initiateGoogleSignIn(authInstance: Auth): Promise<void> {
   if (isMobileOrTablet()) {
     try {
       await signInWithRedirect(authInstance, provider);
-    } catch (error: any) {
-      console.error("Firebase Auth Redirect Error:", error.code, error.message);
+    } catch (error: unknown) {
+      const authError = error as AuthError;
+      console.error("Firebase Auth Redirect Error:", authError.code, authError.message);
       throw error;
     }
     return;
@@ -57,28 +41,29 @@ export async function initiateGoogleSignIn(authInstance: Auth): Promise<void> {
   // CRITICAL: Call signInWithPopup directly for desktop users.
   try {
     await signInWithPopup(authInstance, provider);
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const authError = error as AuthError;
     if (
-      error.code === 'auth/popup-closed-by-user' || 
-      error.code === 'auth/cancelled-popup-request'
+      authError.code === 'auth/popup-closed-by-user' || 
+      authError.code === 'auth/cancelled-popup-request'
     ) {
       // User cancelled, safe to ignore.
       return;
     }
     
-    if (error.code === 'auth/unauthorized-domain') {
+    if (authError.code === 'auth/unauthorized-domain') {
       alert(`Domain ini belum didaftarkan di Firebase Console. Silakan tambahkan domain situs Anda ke: Auth > Settings > Authorized Domains.`);
     }
 
     if (
-      error.code === 'auth/popup-blocked' ||
-      error.code === 'auth/operation-not-supported-in-this-environment'
+      authError.code === 'auth/popup-blocked' ||
+      authError.code === 'auth/operation-not-supported-in-this-environment'
     ) {
       await signInWithRedirect(authInstance, provider);
       return;
     }
 
-    console.error("Firebase Auth Error:", error.code, error.message);
+    console.error("Firebase Auth Error:", authError.code, authError.message);
     throw error;
   }
 }
@@ -90,8 +75,9 @@ export async function initiateGoogleSignIn(authInstance: Auth): Promise<void> {
 export async function finalizeGoogleRedirectSignIn(authInstance: Auth) {
   try {
     return await getRedirectResult(authInstance);
-  } catch (error: any) {
-    if (error?.code === 'auth/unauthorized-domain') {
+  } catch (error: unknown) {
+    const authError = error as AuthError;
+    if (authError?.code === 'auth/unauthorized-domain') {
       alert('Domain ini belum didaftarkan di Firebase Console (Authorized Domains).');
     }
     throw error;

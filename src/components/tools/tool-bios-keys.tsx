@@ -16,6 +16,7 @@ import { ToolWrapper } from "@/components/tools/tool-wrapper";
 import { useNotification } from "@/hooks/use-notification";
 import { getMulticolorSeed, getMulticolorTheme } from "@/lib/multicolor";
 import { cn } from "@/lib/utils";
+import type { Dictionary } from "@/lib/get-dictionary";
 
 export interface BiosKeyData {
   id?: string;
@@ -27,6 +28,7 @@ export interface BiosKeyData {
   notes: string;
   notesEn?: string;   // English translation of notes (optional)
   searchTags: string[];
+  updatedAt?: string;
 }
 
 const COLLECTION_NAME = "bios_keys";
@@ -144,14 +146,14 @@ function highlightText(text: string, query: string): React.ReactNode {
   );
 }
 
-export function ToolBiosKeys({ dictionary }: { dictionary?: any }) {
+export function ToolBiosKeys({ dictionary }: { dictionary?: Dictionary }) {
   const { notify } = useNotification();
   const auth = useAuth();
   const firestore = useFirestore();
   const { user } = useUser();
 
   // Detect locale from dictionary context (fallback to "en")
-  const locale: "en" | "id" = (dictionary?.locale || dictionary?._locale || "en") as "en" | "id";
+  const locale: "en" | "id" = ((dictionary as unknown as Record<string, unknown>)?.locale as string || "en") === "id" ? "id" : "en";
   const lang = t[locale] || t.en;
 
   const [isAdminUser, setIsAdminUser] = useState(false);
@@ -307,9 +309,9 @@ export function ToolBiosKeys({ dictionary }: { dictionary?: any }) {
       const collectionRef = collection(firestore, COLLECTION_NAME);
       const batch = writeBatch(firestore);
 
-      parsedData.forEach((item: any, index: number) => {
+      parsedData.forEach((item: Record<string, unknown>, index: number) => {
         if (!item.brand || !item.biosKey) return;
-        const docId = item.id || sanitizeId(item.brand, item.series || String(index));
+        const docId = (item.id as string) || sanitizeId(String(item.brand), String(item.series || index));
         const docRef = doc(collectionRef, docId);
 
         const payload = {
@@ -331,9 +333,9 @@ export function ToolBiosKeys({ dictionary }: { dictionary?: any }) {
       setIsBulkModalOpen(false);
       await fetchKeys();
 
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error(error);
-      notify(`Bulk Update Failed: ${error.message}`, <AlertTriangle className="h-4 w-4" />);
+      notify(`Bulk Update Failed: ${error instanceof Error ? error.message : String(error)}`, <AlertTriangle className="h-4 w-4" />);
     } finally {
       setIsBulking(false);
     }
@@ -370,8 +372,8 @@ export function ToolBiosKeys({ dictionary }: { dictionary?: any }) {
     else if (sortMode === "za") sorted.sort((a, b) => b.brand.localeCompare(a.brand));
     else if (sortMode === "newest") {
       sorted.sort((a, b) => {
-        const da = (a as any).updatedAt || "";
-        const db = (b as any).updatedAt || "";
+        const da = a.updatedAt || "";
+        const db = b.updatedAt || "";
         return db.localeCompare(da);
       });
     }
@@ -384,7 +386,7 @@ export function ToolBiosKeys({ dictionary }: { dictionary?: any }) {
     <ToolWrapper
       title={toolMeta?.title || lang.title}
       description={toolMeta?.description || lang.subtitle}
-      dictionary={dictionary}
+      dictionary={dictionary!}
       isPublic={true}
     >
     <div className="space-y-8 pb-10">
@@ -675,7 +677,7 @@ export function ToolBiosKeys({ dictionary }: { dictionary?: any }) {
             </div>
             <div className="space-y-2 md:col-span-2">
               <Label className="font-bold">{lang.fieldTags}</Label>
-              <Input placeholder="msi, katana, b11mou, bios key" value={Array.isArray(formData.searchTags) ? formData.searchTags.join(', ') : formData.searchTags} onChange={e => setFormData({ ...formData, searchTags: e.target.value.split(',').map(s => s.trim()).filter(Boolean) as any })} />
+              <Input placeholder="msi, katana, b11mou, bios key" value={Array.isArray(formData.searchTags) ? formData.searchTags.join(', ') : formData.searchTags} onChange={e => setFormData({ ...formData, searchTags: e.target.value.split(',').map(s => s.trim()).filter(Boolean) })} />
               <p className="text-[11px] text-muted-foreground">{lang.fieldTagsHint}</p>
             </div>
           </div>
