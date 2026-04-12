@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { usePrompt } from "./index";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -8,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
 import { DownloadIdPicker, getDraftAgeDays, parseNaturalDate } from "./use-prompt-logic";
-import { Search, FileText, Sparkles, Plus, Trash2, Copy, Settings2, ImageIcon, Download, Grid3X3, GalleryHorizontal } from "lucide-react";
+import { Search, FileText, Sparkles, Plus, Trash2, Copy, Settings2, ImageIcon, Download, Grid3X3, GalleryHorizontal, Import } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export function LeftConfig() {
@@ -509,18 +510,12 @@ function TechnicalTabsCard() {
             )}
 
             {showGallery && (
-               <TabsContent value="gallery" className="space-y-3 m-0 border-none outline-none">
-                 <Textarea placeholder={"Optional caption | path1.webp, path2.webp"} value={galleryMappings} onChange={(e) => setGalleryMappings(e.target.value)} className={cn("min-h-24 bg-background/50 p-3 font-mono text-[11px]", focusRing)} />
-                 {galleryMappings.trim() && (
-                    <div className="flex flex-wrap gap-1 mt-2">
-                       {galleryMappings.split("\n").filter((l: string) => l.trim()).map((_, i: number) => (
-                         <button key={i} onClick={() => copyGalleryCaller(i)} className="flex items-center gap-1 rounded-md border border-fuchsia-500/20 bg-fuchsia-500/10 px-2 py-1 font-mono text-[9px] text-fuchsia-500 transition-colors hover:bg-fuchsia-500/20">
-                           <Copy className="h-2.5 w-2.5" /> {`{{Gallery ${i + 1}}}`}
-                         </button>
-                       ))}
-                    </div>
-                 )}
-               </TabsContent>
+               <GalleryTab
+                 galleryMappings={galleryMappings}
+                 setGalleryMappings={setGalleryMappings}
+                 copyGalleryCaller={copyGalleryCaller}
+                 focusRing={focusRing}
+               />
             )}
 
             {showSpecs && (
@@ -541,5 +536,137 @@ function TechnicalTabsCard() {
         </Tabs>
       </Card>
     </ScrollReveal>
+  );
+}
+
+// ── Gallery Tab with Quick Import ──────────────────────────────────────────
+function GalleryTab({
+  galleryMappings,
+  setGalleryMappings,
+  copyGalleryCaller,
+  focusRing,
+}: {
+  galleryMappings: string;
+  setGalleryMappings: (v: string) => void;
+  copyGalleryCaller: (i: number) => void;
+  focusRing: string;
+}) {
+  const [importPaths, setImportPaths] = useState("");
+  const [showImport, setShowImport] = useState(false);
+
+  const handleGenerate = () => {
+    const paths = importPaths
+      .split("\n")
+      .map((l) => l.trim())
+      .filter(Boolean);
+    if (paths.length === 0) return;
+
+    // Group into chunks of 3
+    const galleries: string[] = [];
+    for (let i = 0; i < paths.length; i += 3) {
+      const chunk = paths.slice(i, i + 3);
+      galleries.push(chunk.join(", "));
+    }
+
+    // Append to existing mappings (or set fresh)
+    const existing = galleryMappings.trim();
+    const result = existing
+      ? existing + "\n" + galleries.join("\n")
+      : galleries.join("\n");
+    setGalleryMappings(result);
+    setImportPaths("");
+    setShowImport(false);
+  };
+
+  const pathLines = importPaths.split("\n").map((l) => l.trim()).filter(Boolean);
+  const previewCount = Math.ceil(pathLines.length / 3);
+
+  return (
+    <TabsContent value="gallery" className="space-y-3 m-0 border-none outline-none">
+      {/* Quick Import toggle */}
+      <div className="flex items-center justify-between">
+        <button
+          type="button"
+          onClick={() => setShowImport(!showImport)}
+          className={cn(
+            "inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-[9px] font-black uppercase tracking-wider transition-colors",
+            showImport
+              ? "border-fuchsia-500/40 bg-fuchsia-500/15 text-fuchsia-500"
+              : "border-primary/15 text-muted-foreground hover:border-fuchsia-500/30 hover:text-fuchsia-500"
+          )}
+        >
+          <Import className="h-3 w-3" /> Quick Import
+        </button>
+        {!showImport && galleryMappings.trim() && (
+          <span className="text-[9px] text-muted-foreground">
+            {galleryMappings.split("\n").filter((l: string) => l.trim()).length} gallery(s)
+          </span>
+        )}
+      </div>
+
+      {/* Quick Import area */}
+      {showImport && (
+        <div className="rounded-lg border border-fuchsia-500/20 bg-fuchsia-500/5 p-3 space-y-2.5">
+          <p className="text-[9px] font-black uppercase tracking-wider text-fuchsia-600 dark:text-fuchsia-400">
+            Paste paths (1 per line) — auto-grouped per 3
+          </p>
+          <Textarea
+            placeholder={
+              "public/images/_posts/apps/example/img-1.webp\npublic/images/_posts/apps/example/img-2.webp\npublic/images/_posts/apps/example/img-3.webp"
+            }
+            value={importPaths}
+            onChange={(e) => setImportPaths(e.target.value)}
+            className={cn(
+              "min-h-28 bg-background/60 p-3 font-mono text-[11px] border-fuchsia-500/15",
+              focusRing
+            )}
+          />
+          {pathLines.length > 0 && (
+            <p className="text-[10px] text-muted-foreground">
+              {pathLines.length} image{pathLines.length !== 1 ? "s" : ""} → {previewCount} gallery(s)
+              {pathLines.length % 3 !== 0 && (
+                <span className="ml-1 text-amber-500">
+                  (last gallery: {pathLines.length % 3} image{pathLines.length % 3 !== 1 ? "s" : ""})
+                </span>
+              )}
+            </p>
+          )}
+          <button
+            type="button"
+            onClick={handleGenerate}
+            disabled={pathLines.length === 0}
+            className="inline-flex h-8 items-center gap-1.5 rounded-full border border-fuchsia-500/30 bg-fuchsia-500/15 px-4 text-[9px] font-black uppercase tracking-wider text-fuchsia-600 transition-colors hover:bg-fuchsia-500/25 disabled:cursor-not-allowed disabled:opacity-40 dark:text-fuchsia-400"
+          >
+            <GalleryHorizontal className="h-3 w-3" /> Generate {previewCount > 0 ? previewCount : ""} Gallery{previewCount !== 1 ? "s" : ""}
+          </button>
+        </div>
+      )}
+
+      {/* Main gallery mappings textarea */}
+      <Textarea
+        placeholder={"Optional caption | path1.webp, path2.webp, path3.webp"}
+        value={galleryMappings}
+        onChange={(e) => setGalleryMappings(e.target.value)}
+        className={cn("min-h-24 bg-background/50 p-3 font-mono text-[11px]", focusRing)}
+      />
+
+      {/* Gallery caller buttons */}
+      {galleryMappings.trim() && (
+        <div className="flex flex-wrap gap-1 mt-2">
+          {galleryMappings
+            .split("\n")
+            .filter((l: string) => l.trim())
+            .map((_, i: number) => (
+              <button
+                key={i}
+                onClick={() => copyGalleryCaller(i)}
+                className="flex items-center gap-1 rounded-md border border-fuchsia-500/20 bg-fuchsia-500/10 px-2 py-1 font-mono text-[9px] text-fuchsia-500 transition-colors hover:bg-fuchsia-500/20"
+              >
+                <Copy className="h-2.5 w-2.5" /> {`{{Gallery ${i + 1}}}`}
+              </button>
+            ))}
+        </div>
+      )}
+    </TabsContent>
   );
 }

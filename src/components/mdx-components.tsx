@@ -274,6 +274,9 @@ export const Gallery = ({
     );
   }
 
+  const childCount = React.Children.toArray(children).length;
+  const gridCols = childCount === 2 ? "sm:grid-cols-2" : "sm:grid-cols-3";
+
   return (
     <div
       className={cn(
@@ -283,7 +286,7 @@ export const Gallery = ({
       )}
       {...props}
     >
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 [&>p]:contents [&>span]:contents [&_span.block]:my-0! [&_span.block]:w-full [&_img]:my-0! [&_img]:rounded-xl [&_img]:w-full hover:[&_img]:shadow-md transition-shadow">
+      <div className={cn("grid grid-cols-1 gap-4 [&>p]:contents [&>span]:contents [&_span.block]:my-0! [&_span.block]:w-full [&_img]:my-0! [&_img]:rounded-xl [&_img]:w-full hover:[&_img]:shadow-md transition-shadow", gridCols)}>
         {children}
       </div>
       {caption && (

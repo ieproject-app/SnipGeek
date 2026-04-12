@@ -115,7 +115,7 @@ export function GalleryLightbox({
         className,
       )}
     >
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+      <div className={cn("grid grid-cols-1 gap-4", total === 2 ? "sm:grid-cols-2" : "sm:grid-cols-3")}>
         {images.map((image, index) => (
           <button
             key={`${image.src}-${index}`}
