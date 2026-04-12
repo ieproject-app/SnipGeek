@@ -45,7 +45,7 @@ export default async function ToolsPage({ params }: { params: Promise<{ locale: 
 
   return (
     <div className="w-full">
-      <main className="mx-auto max-w-5xl px-4 pt-10 pb-16 lg:px-8">
+      <main className="mx-auto max-w-4xl px-4 pt-10 pb-16 md:px-6">
         <ScrollReveal direction="down">
           <header className="mb-16 text-center space-y-4">
             <h1 className="font-display text-5xl font-black tracking-tight text-primary md:text-6xl uppercase">
