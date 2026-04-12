@@ -35,7 +35,7 @@ export default async function EmployeeHistoryPage({
 
   return (
     <div className="w-full">
-      <main className="mx-auto max-w-5xl px-4 pt-10 pb-16 sm:px-6">
+      <main className="mx-auto max-w-4xl px-4 pt-10 pb-16 md:px-6">
         <ToolHistory dictionary={dictionary} employeeData="" locale={locale} />
       </main>
     </div>

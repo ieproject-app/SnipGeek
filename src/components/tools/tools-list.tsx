@@ -13,8 +13,6 @@ import {
   Dices, 
   Crop, 
   Terminal,
-  LogOut,
-  Chrome,
   FileDown,
   FileSignature,
   ScrollText,
@@ -23,11 +21,8 @@ import { cn } from "@/lib/utils";
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { useUser, useAuth } from "@/firebase";
-import { initiateGoogleSignIn } from "@/firebase/non-blocking-login";
-import { Button } from "@/components/ui/button";
+import { useUser } from "@/firebase";
 import type { Dictionary } from "@/lib/get-dictionary";
-import { useNotification } from "@/hooks/use-notification";
 
 type ToolCardConfig = {
   id: string;
@@ -47,8 +42,6 @@ interface ToolsListProps {
 
 export function ToolsList({ dictionary, locale, isDevelopment }: ToolsListProps) {
   const { user, isUserLoading } = useUser();
-  const auth = useAuth();
-  const { notify } = useNotification();
   const pageContent = dictionary.tools;
   const linkPrefix = locale === "en" ? "" : `/${locale}`;
   const devOnlyToolIds = new Set(["signatories_index", "compress_pdf", "address_label"]);
@@ -157,15 +150,6 @@ export function ToolsList({ dictionary, locale, isDevelopment }: ToolsListProps)
     return tool;
   });
 
-  const handleLogin = async () => {
-    if (!auth) return;
-    try {
-      await initiateGoogleSignIn(auth);
-    } catch (error) {
-      notify("Login failed. Please try again.", <Lock className="h-4 w-4" />);
-    }
-  };
-
   const renderCard = (
     tool: ToolCardConfig,
     isClickable: boolean = false
@@ -267,70 +251,49 @@ export function ToolsList({ dictionary, locale, isDevelopment }: ToolsListProps)
         </div>
       </section>
 
-      {/* Internal Tools / Member Area Section */}
-      <section className="relative">
-        <ScrollReveal direction="right">
-          <div className="flex items-center gap-4 mb-8">
-            <div className="flex items-center gap-3 shrink-0">
-              <div className={cn("p-2 rounded-xl transition-colors duration-500", user ? "bg-emerald-500/10" : "bg-amber-500/10")}>
-                <Lock className={cn("h-5 w-5 transition-colors duration-500", user ? "text-emerald-500" : "text-amber-500")} />
-              </div>
-              <div className="flex flex-col">
-                <h2 className="text-2xl font-black font-display text-primary uppercase tracking-tighter">
-                  {pageContent.internal_section}
-                </h2>
-                <div className="flex items-center gap-2 mt-0.5">
-                  <div className={cn("h-1.5 w-1.5 rounded-full animate-pulse", user ? "bg-emerald-500" : "bg-amber-500")} />
-                  <p className="text-[10px] uppercase font-bold tracking-widest text-muted-foreground/60 italic">
-                    {user ? "Member Lounge Active" : "Authorized Team Only"}
-                  </p>
+      {/* Internal Tools / Member Area Section — only visible when logged in */}
+      {(user || isUserLoading) && (
+        <section className="relative">
+          <ScrollReveal direction="right">
+            <div className="flex items-center gap-4 mb-8">
+              <div className="flex items-center gap-3 shrink-0">
+                <div className="p-2 rounded-xl bg-emerald-500/10">
+                  <Lock className="h-5 w-5 text-emerald-500" />
+                </div>
+                <div className="flex flex-col">
+                  <h2 className="text-2xl font-black font-display text-primary uppercase tracking-tighter">
+                    {pageContent.internal_section}
+                  </h2>
+                  <div className="flex items-center gap-2 mt-0.5">
+                    <div className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                    <p className="text-[10px] uppercase font-bold tracking-widest text-muted-foreground/60 italic">
+                      Member Lounge Active
+                    </p>
+                  </div>
                 </div>
               </div>
+              <div className="h-px bg-primary/5 flex-1" />
             </div>
-            <div className="h-px bg-primary/5 flex-1" />
-          </div>
-        </ScrollReveal>
-
-        {!user && !isUserLoading ? (
-          <ScrollReveal direction="up" delay={0.1}>
-            <Card className="border-dashed border-2 border-primary/10 bg-primary/[0.01] overflow-hidden group hover:border-primary/20 transition-all duration-500">
-              <CardContent className="flex flex-col items-center justify-center py-16 px-6 text-center space-y-6">
-                <div className="p-4 bg-background rounded-full shadow-lg border border-primary/5 group-hover:scale-110 transition-transform duration-500">
-                  <Chrome className="h-8 w-8 text-primary/40" />
-                </div>
-                <div className="max-w-sm space-y-2">
-                  <h3 className="text-xl font-bold tracking-tight text-primary">Member Login Required</h3>
-                  <p className="text-sm text-muted-foreground font-medium">
-                    Please log in to your SnipGeek account to unlock our secure internal utilities and dashboard.
-                  </p>
-                </div>
-                <Button 
-                  onClick={handleLogin}
-                  className="rounded-full px-8 py-6 h-auto font-black uppercase tracking-widest gap-3 shadow-xl hover:scale-105 transition-all"
-                >
-                  <Chrome className="h-5 w-5" />
-                  Continue with Google
-                </Button>
-              </CardContent>
-            </Card>
           </ScrollReveal>
-        ) : isUserLoading ? (
-          <div className="flex flex-col items-center justify-center py-20 gap-4">
-             <div className="h-10 w-10 rounded-full border-4 border-primary/10 border-t-accent animate-spin" />
-             <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40 animate-pulse">
-               Verifying Access...
-             </p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 items-stretch animate-in fade-in slide-in-from-bottom-4 duration-700">
-            {internalTools.map((tool, index) => (
-              <ScrollReveal key={tool.id} delay={index * 0.1} direction="up">
-                {renderCard(tool, tool.isLink)}
-              </ScrollReveal>
-            ))}
-          </div>
-        )}
-      </section>
+
+          {isUserLoading ? (
+            <div className="flex flex-col items-center justify-center py-20 gap-4">
+               <div className="h-10 w-10 rounded-full border-4 border-primary/10 border-t-accent animate-spin" />
+               <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40 animate-pulse">
+                 Verifying Access...
+               </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 items-stretch animate-in fade-in slide-in-from-bottom-4 duration-700">
+              {internalTools.map((tool, index) => (
+                <ScrollReveal key={tool.id} delay={index * 0.1} direction="up">
+                  {renderCard(tool, tool.isLink)}
+                </ScrollReveal>
+              ))}
+            </div>
+          )}
+        </section>
+      )}
 
       {/* Dev Preview Tools Section */}
       {isDevelopment && (

@@ -127,8 +127,8 @@ export function ToolWrapper({
           </div>
         )}
 
-        {/* Compact auth bar — login button for unauthenticated, user info for logged-in */}
-        {user ? (
+        {/* Compact auth bar — only visible when logged in */}
+        {user && (
           <div className="flex items-center justify-between h-10 px-3 bg-muted/20 rounded-xl border border-border/40 overflow-hidden">
             <div className="flex items-center gap-2 min-w-0">
               <Avatar className="h-6 w-6 shrink-0 border border-border/60 shadow-sm">
@@ -154,18 +154,6 @@ export function ToolWrapper({
               className="h-6 px-2 rounded-lg text-[10px] font-black uppercase tracking-wider text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-all shrink-0"
             >
               <LogOut className="h-3 w-3 mr-1" /> Keluar
-            </Button>
-          </div>
-        ) : (
-          <div className="flex items-center justify-end">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleGoogleLogin}
-              className="h-7 px-3 rounded-full text-[10px] font-black uppercase tracking-widest text-muted-foreground/50 hover:text-primary hover:bg-primary/5 gap-1.5 transition-all"
-            >
-              <Chrome className="h-3 w-3" />
-              Masuk sebagai Admin
             </Button>
           </div>
         )}
