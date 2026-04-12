@@ -47,3 +47,4 @@ serviceAccountKey.json
 
 # IDE settings
 .idea/
+*.code-workspace
