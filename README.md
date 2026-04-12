@@ -10,18 +10,28 @@ SnipGeek is a bilingual (EN/ID) content platform for publishing technical articl
 
 ### 📝 Blog & Notes
 - MDX-powered articles and short-form notes with full syntax highlighting (via Shiki, `github-dark` theme)
-- **Zoomable Images**: Interactive image previews with click-to-exit functionality.
-- **Download Buttons**: Custom MDX components for software/file downloads.
+- **Zoomable Images**: Interactive image previews with click-to-exit functionality
+- **Download Buttons**: Custom MDX components for software/file downloads
+- **Copyable Code Blocks**: One-click copy for all code snippets (`copyable-pre.tsx`)
+- **Expandable Sections**: Collapsible content blocks for long details (`expandable.tsx`)
+- **Gallery Lightbox**: Multi-image viewer with lightbox overlay (`gallery-lightbox.tsx`)
+- **Spec Sheets**: Structured data tables for product/hardware specs (`spec-sheet.tsx`)
 - Table of Contents auto-generated from `##` and `###` headings
 - Reading time estimation
 - Fallback to EN when a locale-specific translation does not exist
 - Tag and category system with a colour-coded badge library (`category-badge.tsx`)
+- Dedicated tag index page (`/tags`) and per-tag listing (`/tags/[tag]`)
 - Giscus comment system (GitHub Discussions), lazy-loaded on scroll, production-only
+
+### 📥 Download Pages
+- Dedicated download routes (`/download/[slug]`) for software and driver packages
+- Download metadata managed via `src/lib/data-downloads.ts`
 
 ### 🌐 Internationalization (i18n)
 - Two locales: **English (`en`)** — default, no URL prefix — and **Indonesian (`id`)** — `/id/` prefix
 - Locale detection via `Accept-Language` header with cookie-based persistence (`NEXT_LOCALE`)
 - Client-side locale switching with `router.push(..., { scroll: false })` — no page reload, no scroll jump
+- **Locale Suggestion Banner**: Prompts visitors to switch to their preferred language (`locale-suggestion-banner.tsx`)
 - `hreflang` alternates on every public page for SEO
 
 ### 🎨 Theme System (3-mode)
@@ -32,6 +42,7 @@ SnipGeek is a bilingual (EN/ID) content platform for publishing technical articl
 
 ### 🔍 Search
 - Full client-side search across all blog posts and notes, built into the header
+- Multiple search strategies (`src/lib/search-strategies.ts`) with fuzzy matching via `fast-levenshtein`
 - Highlights matching substrings in results
 
 ### 📚 Reading List
@@ -39,13 +50,30 @@ SnipGeek is a bilingual (EN/ID) content platform for publishing technical articl
 - Accessible from the header at any time
 
 ### 🛠️ Tools
-| Tool | Access | Status |
+
+#### Public (no login required)
+| Tool | Route | Status |
 |---|---|---|
-| AI Article Prompt Generator | Internal | ✅ Live |
-| Employee History (Riwayat Karyawan) | Internal | ✅ Live |
-| Number Generator | Internal | ✅ Live |
-| Number to Words | Public | 🚧 Coming Soon |
-| Random Name Generator | Public | 🚧 Coming Soon |
+| BIOS Keys & Boot Menu | `/tools/bios-keys-boot-menu` | ✅ Live |
+| Spin Wheel | `/tools/spin-wheel` | ✅ Live |
+| Image Crop & Compress | `/tools/image-crop` | ✅ Live |
+| Random Name Picker | `/tools/random-name-picker` | ✅ Live |
+
+#### Internal (Google login required)
+| Tool | Route | Status |
+|---|---|---|
+| Employee History (Riwayat Karyawan) | `/tools/employee-history` | ✅ Live |
+| Number Generator | `/tools/number-generator` | ✅ Live |
+| Prompt Generator | `/tools/prompt-generator` | ✅ Live |
+| Signatories Index | `/tools/signatories-index` | 🚧 Unreleased |
+| Compress PDF | `/tools/compress-pdf` | 🚧 Unreleased |
+| Address Label Generator | `/tools/address-label-generator` | 🚧 Unreleased |
+| Laptop Service Estimator | `/tools/laptop-service-estimator` | 🚧 Unreleased |
+
+#### Coming Soon
+| Tool | Status |
+|---|---|
+| Number to Words | 🚧 In Development |
 
 ### 📢 Notification Bar
 - Custom status-bar notification system (`useNotification`) shown in the header
@@ -70,10 +98,12 @@ npm run dev        # starts on http://localhost:9003 (Turbopack)
 ### Other Scripts
 
 ```bash
-npm run build      # production build
-npm run start      # serve the production build
-npm run typecheck  # tsc --noEmit (no build artefacts)
-npm run lint       # ESLint
+npm run build          # production build (runs tag validation first)
+npm run start          # serve the production build
+npm run typecheck      # tsc --noEmit (no build artefacts)
+npm run lint           # ESLint
+npm run validate:tags  # validate all MDX tag metadata
+npm run check          # pre-deploy checks (image sizes, etc.)
 ```
 
 ---
@@ -91,10 +121,15 @@ NEXT_PUBLIC_FIREBASE_API_KEY=your_api_key
 NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
 NEXT_PUBLIC_FIREBASE_PROJECT_ID=your_project_id
 NEXT_PUBLIC_FIREBASE_APP_ID=your_app_id
+NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=your_measurement_id
 
 # Optional: restrict internal tools to specific Google accounts/domains
 # Example: alice@snipgeek.com,bob@gmail.com,@telkomakses.co.id
 NEXT_PUBLIC_INTERNAL_TOOL_ALLOWLIST=
+
+# Giscus (GitHub Discussions comments)
+NEXT_PUBLIC_GISCUS_REPO_ID=your_repo_id
+NEXT_PUBLIC_GISCUS_CATEGORY_ID=your_category_id
 ```
 
 If `NEXT_PUBLIC_INTERNAL_TOOL_ALLOWLIST` is empty, internal tools remain accessible to any authenticated Google account (legacy behavior). If set, only matching emails/domains can access non-public tools.
@@ -117,42 +152,95 @@ The project is deployed via **Firebase App Hosting**. Environment variables for 
 ```
 src/
 ├── app/
-│   ├── [locale]/               # All public pages (blog, notes, tools, about, …)
+│   ├── [locale]/               # All public pages
 │   │   ├── blog/
 │   │   │   ├── [slug]/         # Individual post page (MDX rendered server-side)
 │   │   │   └── page.tsx        # Blog list
 │   │   ├── notes/
 │   │   │   └── [slug]/         # Individual note page
-│   │   ├── tools/              # Tool pages (prompt-generator, employee-history, …)
+│   │   ├── tools/              # Tool pages (bios-keys, spin-wheel, image-crop, …)
+│   │   ├── download/[slug]/    # Software/driver download pages
+│   │   ├── tags/               # Tag index + per-tag post listing
+│   │   ├── login/              # Login page
+│   │   ├── about/              # About page
+│   │   ├── contact/            # Contact page
+│   │   ├── privacy/            # Privacy policy
+│   │   ├── disclaimer/         # Disclaimer
+│   │   ├── terms/              # Terms of service
 │   │   └── layout.tsx          # Locale layout — fonts, ThemeProvider, Header, Footer
+│   ├── api/                    # API routes (numbers, posts, notes, tools, img, dev)
 │   ├── globals.css             # Tailwind 4 CSS (CSS variables for light/dark)
 │   ├── not-found.tsx           # 404 page (ThemeProvider-aware, correct fonts)
 │   ├── robots.ts
-│   └── sitemap.ts
+│   ├── sitemap.ts
+│   ├── opengraph-image.tsx     # Dynamic OG image generation
+│   └── twitter-image.tsx       # Dynamic Twitter card image generation
 ├── components/
-│   ├── layout/                 # layout-header.tsx, layout-footer.tsx, layout-breadcrumbs.tsx
-│   ├── blog/                   # article-meta.tsx, article-share.tsx, article-related.tsx, article-toc.tsx, article-tags.tsx
-│   ├── home/                   # home-hero.tsx, home-latest.tsx, home-topics.tsx, home-tutorials.tsx, home-updates.tsx
-│   ├── ui/                     # Shadcn/UI primitives + custom (SnipTooltip, Skeleton, …)
-│   └── icons/                  # Custom SVG icons (XLogo, TikTokLogo, SnipGeekLogo)
+│   ├── layout/                 # Header, Footer, Breadcrumbs, ThemeSwitcher, LanguageSwitcher,
+│   │                           #   LocaleSuggestionBanner, BackToTop, SearchPanel, StaticPageTemplate,
+│   │                           #   FirebaseProviderWrapper, AddToReadingListButton, CategoryBadge
+│   ├── blog/                   # article-meta, article-share, article-related, article-toc,
+│   │                           #   article-tags, article-comments
+│   ├── home/                   # home-hero, home-latest, home-notes, home-topics,
+│   │                           #   home-tutorials, home-updates, home-transition-note
+│   ├── tools/                  # tool-wrapper, tools-list, tool-bios-keys, tool-history,
+│   │                           #   tool-numbers, tool-image-crop, tool-prompt-builder,
+│   │                           #   tool-random-name-picker, + address-label/, compress-pdf/,
+│   │                           #   pdf/, prompt-builder/, random-name-picker/, signatories-index/
+│   ├── mdx/                    # Custom MDX components: copyable-pre, expandable,
+│   │                           #   gallery-lightbox, spec-sheet
+│   ├── ui/                     # 40+ Shadcn/UI primitives + custom (SnipTooltip, Skeleton,
+│   │                           #   ScrollReveal, RevealImage, RelativeTime, …)
+│   ├── icons/                  # Custom SVG icons: XLogo, TikTokLogo, SnipGeekLogo,
+│   │                           #   PinterestLogo, WindowsStoreLogo
+│   ├── analytics/              # Firebase Analytics tracker (client-side page_view logging)
+│   ├── admin/                  # Admin/dev components
+│   ├── mdx-components.tsx      # Global MDX component registry
+│   ├── zoomable-image.tsx      # Click-to-zoom image overlay
+│   └── theme-provider.tsx      # next-themes ThemeProvider wrapper
 ├── dictionaries/
 │   ├── en.json                 # English strings
 │   └── id.json                 # Indonesian strings (must always be in sync with en.json)
-├── firebase/                   # Firebase singleton init, auth, firestore, storage helpers
+├── firebase/
+│   ├── config.ts               # Firebase singleton init (memoizedServices pattern)
+│   ├── index.ts                # Re-exports (useUser, useAuth, etc.)
+│   ├── provider.tsx            # FirebaseProvider context
+│   ├── client-provider.tsx     # Client-side Firebase provider
+│   ├── non-blocking-login.tsx  # Non-blocking Google sign-in flow
+│   ├── non-blocking-updates.tsx# Non-blocking Firestore update helpers
+│   ├── error-emitter.ts        # Firebase error event emitter
+│   ├── errors.ts               # Typed Firebase error handling
+│   ├── storage.ts              # Firebase Storage helpers
+│   └── firestore/              # Firestore collection helpers
 ├── hooks/
 │   ├── use-theme-mode.ts       # Centralised theme cycling + persistence logic
 │   ├── use-reading-list.tsx    # Reading list context + localStorage persistence
 │   ├── use-notification.tsx    # Status bar notification context
-│   └── use-mobile.tsx
+│   ├── use-image-compress.ts   # Client-side image compression hook (browser-image-compression)
+│   ├── use-toast.ts            # Shadcn toast hook (for complex UI toasts only)
+│   └── use-mobile.tsx          # Mobile breakpoint detection
 ├── lib/
 │   ├── constants.ts            # localStorage key constants (STORAGE_KEYS)
 │   ├── utils.ts                # cn(), getLinkPrefix(), resolveHeroImage(), formatRelativeTime()
 │   ├── posts.ts                # MDX post utilities (read, sort, translate)
 │   ├── notes.ts                # MDX notes utilities
+│   ├── pages.ts                # Static page utilities
+│   ├── static-pages.ts         # Static page route generation
+│   ├── tags.ts                 # Tag registry and utilities
 │   ├── mdx-utils.ts            # extractHeadings() for ToC
 │   ├── get-dictionary.ts       # Async dictionary loader
 │   ├── placeholder-images.ts   # Typed wrapper for placeholder-images.json
-│   └── placeholder-images.json # Image placeholder registry (id → imageUrl + hint)
+│   ├── placeholder-images.json # Image placeholder registry (id → imageUrl + hint)
+│   ├── data-downloads.ts       # Download page metadata (drivers, software)
+│   ├── cv-data.ts              # CV/resume data for internal tools
+│   ├── firebase-admin.ts       # Firebase Admin SDK init (server-side)
+│   ├── firebase-config.ts      # Firebase client config helper
+│   ├── search-strategies.ts    # Search algorithms (fuzzy, exact, etc.)
+│   ├── slugify.ts              # URL slug utilities
+│   ├── multicolor.ts           # Multi-colour generation utilities
+│   └── rate-limit.ts           # API rate limiting
+├── i18n-config.ts              # Locale definitions (en, id)
+├── proxy.ts                    # Proxy utilities
 └── middleware.ts               # Locale detection + cookie-based redirect/rewrite
 ```
 
@@ -160,12 +248,25 @@ src/
 
 ```
 _posts/
-├── en/   # English MDX posts
-└── id/   # Indonesian MDX posts
+├── en/
+│   └── 2026-H1/   # English MDX posts (period-based subdirectories)
+└── id/
+    └── 2026-H1/   # Indonesian MDX posts
 
 _notes/
 ├── en/
+│   └── 2026-H1/
 └── id/
+    └── 2026-H1/
+
+_pages/              # Static pages (about, contact, privacy, disclaimer, terms)
+├── about/
+│   ├── en.mdx
+│   └── id.mdx
+├── contact/
+├── disclaimer/
+├── privacy/
+└── terms/
 ```
 
 ---
@@ -196,11 +297,19 @@ tags: ["Windows", "PowerShell"]
 - Use only `##` (H2) and `###` (H3) — these are automatically parsed into the Table of Contents
 - Never use `#` (H1) inside content — the page `<h1>` is the article title
 
+### Bilingual Post Rules
+- **Filenames must be identical** between EN and ID versions — the filename IS the URL slug
+- EN: `_posts/en/2026-H1/my-post.mdx` → `/blog/my-post`
+- ID: `_posts/id/2026-H1/my-post.mdx` → `/id/blog/my-post`
+- Identical fields across EN/ID: `slug`, `translationKey`, `tags`, `category`, `heroImage`, `date`, `published`, `featured`
+- Translated fields: `title`, `description`, `imageAlt`
+
 ### Content Workflow
 1. Check `src/lib/placeholder-images.json` for a suitable hero image `id`
 2. If none fits, add a new entry to the JSON first
-3. Create the MDX file in `_posts/en/` (and optionally `_posts/id/` with the same `translationKey`)
+3. Create the MDX file in `_posts/en/2026-H1/` (and optionally the ID version with the same filename)
 4. Set `published: false` while drafting — the Dev Tools draft panel shows all unpublished files
+5. Run `npm run validate:tags` to ensure tag metadata is valid before pushing
 
 ---
 
@@ -237,6 +346,7 @@ tags: ["Windows", "PowerShell"]
 | Icons | Lucide React only — never guess icon names |
 | Badges | Use `CategoryBadge` — never create colours ad-hoc |
 | Notifications | `useNotification()` — never `useToast()` for short feedback |
+| Tool headers | Always use `ToolWrapper` — never create custom hero sections |
 
 ---
 
@@ -274,6 +384,8 @@ The following HTTP headers are applied to all routes via `next.config.ts`:
 | `Referrer-Policy` | `strict-origin-when-cross-origin` |
 | `Permissions-Policy` | camera, mic, geolocation, interest-cohort blocked |
 | `Strict-Transport-Security` | 1 year, includeSubDomains |
+| `Content-Security-Policy` | Comprehensive CSP covering Firebase, GA4, Giscus, YouTube, Monetag |
+| `Cross-Origin-Opener-Policy` | `same-origin-allow-popups` (required for Firebase/Google Auth popups) |
 
 ---
 
@@ -288,9 +400,16 @@ The following HTTP headers are applied to all routes via `next.config.ts`:
 | Fonts | Bricolage Grotesque, Plus Jakarta Sans, Lora, JetBrains Mono |
 | Content | MDX via `next-mdx-remote` v6 |
 | Syntax Highlighting | Shiki (`github-dark` theme) |
-| Auth & DB | Firebase v11 (Auth + Firestore) |
+| Auth & DB | Firebase v11 (Auth + Firestore + Storage) |
 | Animations | Framer Motion + CSS View Transitions API |
+| Charts | Recharts |
+| Forms | React Hook Form + Zod validation |
+| PDF | pdf-lib (generation) + pdfjs-dist (parsing) |
+| OCR | Tesseract.js |
+| Image Processing | Sharp (server) + browser-image-compression (client) |
+| Spreadsheets | ExcelJS |
 | i18n | Custom middleware + `@formatjs/intl-localematcher` |
+| Analytics | Firebase Analytics (client-side page_view) |
 | Ads | Google AdSense (`lazyOnload` strategy) |
 | Comments | Giscus (GitHub Discussions) |
 | Deployment | Firebase App Hosting (Google Cloud) |
@@ -312,7 +431,6 @@ const handleSubmit = async () => {
 const storage = getStorage(firebaseApp ?? undefined);
 ```
 
----
 ---
 
 ## 📄 License
