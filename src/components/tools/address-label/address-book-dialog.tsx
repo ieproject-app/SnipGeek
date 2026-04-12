@@ -169,13 +169,13 @@ export function AddressBookDialog({ isOpen, onClose, addressBook, onUpdateBook, 
             
             worksheet.eachRow((row, rowNumber) => {
               if (rowNumber === 1) return; // Skip header row
-              const values = row.values as any[];
+              const values = row.values as (string | number | undefined | null)[];
               if (values.some(val => val !== null && val !== undefined && val !== '')) {
                 json.push({
-                  title: values[1] || '',
-                  name: values[2] || '',
-                  phone: values[3] || '',
-                  address: values[4] || '',
+                  title: String(values[1] ?? ''),
+                  name: String(values[2] ?? ''),
+                  phone: String(values[3] ?? ''),
+                  address: String(values[4] ?? ''),
                 });
               }
             });

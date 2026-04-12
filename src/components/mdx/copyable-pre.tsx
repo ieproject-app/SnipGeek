@@ -28,7 +28,7 @@ export function CopyablePre({
     try {
       await navigator.clipboard.writeText(text);
       setCopied(true);
-      notify("Copied to Clipboard", <Check className="h-4 w-4" />);
+      notify("Copied ✓", <Check className="h-4 w-4" />);
       setTimeout(() => setCopied(false), 2000);
     } catch {
       // Fallback for older browsers
@@ -41,7 +41,7 @@ export function CopyablePre({
       document.execCommand("copy");
       document.body.removeChild(textarea);
       setCopied(true);
-      notify("Copied to Clipboard", <Check className="h-4 w-4" />);
+      notify("Copied ✓", <Check className="h-4 w-4" />);
       setTimeout(() => setCopied(false), 2000);
     }
   };

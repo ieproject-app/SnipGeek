@@ -223,7 +223,10 @@
       "startingIn": "Starting in",
       "allCleared": "All Cleared",
       "less": "Less",
-      "export": "Export"
+      "export": "Export",
+      "saveListDesc": "Enter a name for this list to save it for later use.",
+      "errorLoadSavedData": "Could not load saved data.",
+      "errorEnterListName": "Please enter a name for the list."
     },
     "systemNotReady": {
       "title": "System Not Ready",

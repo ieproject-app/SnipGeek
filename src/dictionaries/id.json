@@ -223,7 +223,10 @@
       "startingIn": "Mulai dalam",
       "allCleared": "Semua Dihapus",
       "less": "Kurang",
-      "export": "Ekspor"
+      "export": "Ekspor",
+      "saveListDesc": "Masukkan nama untuk menyimpan daftar ini.",
+      "errorLoadSavedData": "Gagal memuat data tersimpan.",
+      "errorEnterListName": "Masukkan nama untuk daftar."
     },
     "systemNotReady": {
       "title": "SISTEM BELUM SIAP",

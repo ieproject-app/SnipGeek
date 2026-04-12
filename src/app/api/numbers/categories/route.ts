@@ -1,15 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { adminDb, adminAuth, assertFirebaseAdminReady } from '@/lib/firebase-admin';
-
-function getAdminServices() {
-    assertFirebaseAdminReady();
-
-    if (!adminDb || !adminAuth) {
-        throw new Error('Layanan Firebase Admin belum tersedia untuk kategori nomor.');
-    }
-
-    return { adminDb, adminAuth };
-}
+import { getAdminServices, requireAdmin } from '@/lib/api-helpers';
 
 export async function GET() {
     try {
@@ -28,17 +18,10 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
     try {
-        const { adminDb, adminAuth } = getAdminServices();
-        const authHeader = req.headers.get('authorization');
-        if (!authHeader?.startsWith('Bearer ')) {
-            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-        }
-        const decoded = await adminAuth.verifyIdToken(authHeader.slice(7));
-        const adminSnap = await adminDb.collection('roles_admin').doc(decoded.uid).get();
-        if (!adminSnap.exists || adminSnap.data()?.role !== 'admin') {
-            return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-        }
+        const denied = await requireAdmin(req);
+        if (denied) return denied;
 
+        const { adminDb } = getAdminServices();
         const body = await req.json();
         const { category, name, types } = body as { category: string; name: string; types: string[] };
 
@@ -56,17 +39,10 @@ export async function POST(req: NextRequest) {
 
 export async function DELETE(req: NextRequest) {
     try {
-        const { adminDb, adminAuth } = getAdminServices();
-        const authHeader = req.headers.get('authorization');
-        if (!authHeader?.startsWith('Bearer ')) {
-            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-        }
-        const decoded = await adminAuth.verifyIdToken(authHeader.slice(7));
-        const adminSnap = await adminDb.collection('roles_admin').doc(decoded.uid).get();
-        if (!adminSnap.exists || adminSnap.data()?.role !== 'admin') {
-            return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-        }
+        const denied = await requireAdmin(req);
+        if (denied) return denied;
 
+        const { adminDb } = getAdminServices();
         const { searchParams } = new URL(req.url);
         const catId = searchParams.get('id');
         if (!catId) return NextResponse.json({ error: 'Missing id' }, { status: 400 });

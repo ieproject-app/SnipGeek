@@ -8,7 +8,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
-import { DownloadIdPicker, getDraftAgeDays, parseNaturalDate } from "./use-prompt-logic";
+import { DownloadIdPicker, getDraftAgeDays, parseNaturalDate, type ArticleSummary } from "./use-prompt-logic";
 import { Search, FileText, Sparkles, Plus, Trash2, Copy, Settings2, ImageIcon, Download, Grid3X3, GalleryHorizontal, Import } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -88,7 +88,7 @@ function ArticleSelectorCard() {
                   Total {articleStats.draft} draft · {staleDraftCount} stale (&ge;30d)
                 </p>
                 <div className="mt-2 flex flex-wrap gap-1.5">
-                  {urgentDrafts.map((article: any) => {
+                  {urgentDrafts.map((article: ArticleSummary) => {
                     const ageDays = getDraftAgeDays(article.date);
                     const isStale = ageDays !== null && ageDays >= 30;
 
@@ -129,7 +129,7 @@ function ArticleSelectorCard() {
                   No articles found.
                 </p>
               )}
-              {filteredArticles.map((article: any) => (
+              {filteredArticles.map((article: ArticleSummary) => (
                 <button
                   key={article.slug}
                   onClick={() => setSelectedSlug(article.slug)}
@@ -202,12 +202,12 @@ function WorkflowContextCard() {
             <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
               <div className="space-y-1.5">
                 <p className="text-[9px] font-black uppercase tracking-wider text-muted-foreground">{dictionary.seriesPhaseLabel}</p>
-                <Select value={seriesPhase} onValueChange={(v) => setSeriesPhase(v as any)}>
+                <Select value={seriesPhase} onValueChange={(v: string) => setSeriesPhase(v as typeof seriesPhase)}>
                   <SelectTrigger className="h-9 border-primary/10 bg-background/50 text-xs">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {seriesPhaseOptions.map((p: any) => (
+                    {seriesPhaseOptions.map((p) => (
                       <SelectItem key={p.value} value={p.value}>{p.label}</SelectItem>
                     ))}
                   </SelectContent>
@@ -292,7 +292,7 @@ function WorkflowContextCard() {
             <div className="space-y-3">
               <div className="space-y-1.5">
                 <p className="text-[9px] font-black uppercase tracking-wider text-muted-foreground">{dictionary.notesIntentLabel}</p>
-                <Select value={noteIntent} onValueChange={(v) => setNoteIntent(v as any)}>
+                <Select value={noteIntent} onValueChange={(v: string) => setNoteIntent(v as typeof noteIntent)}>
                   <SelectTrigger className="h-9 border-primary/10 bg-background/50 text-xs">
                     <SelectValue />
                   </SelectTrigger>
@@ -413,7 +413,7 @@ function TechnicalTabsCard() {
                    <div className="mt-3 grid grid-cols-2 gap-2">
                       <div className="space-y-1">
                         <p className="text-[9px] font-black uppercase tracking-wider text-muted-foreground">Mode</p>
-                        <Select value={captionMode} onValueChange={setCaptionMode as any}>
+                        <Select value={captionMode} onValueChange={(v: string) => setCaptionMode(v as typeof captionMode)}>
                           <SelectTrigger className="h-8 border-primary/10 bg-background/60 text-[10px]">
                             <SelectValue />
                           </SelectTrigger>
@@ -426,7 +426,7 @@ function TechnicalTabsCard() {
                       </div>
                       <div className="space-y-1">
                         <p className="text-[9px] font-black uppercase tracking-wider text-muted-foreground">Alignment</p>
-                        <Select value={captionAlignment} onValueChange={setCaptionAlignment as any}>
+                        <Select value={captionAlignment} onValueChange={(v: string) => setCaptionAlignment(v as typeof captionAlignment)}>
                           <SelectTrigger className="h-8 border-primary/10 bg-background/60 text-[10px]">
                             <SelectValue />
                           </SelectTrigger>
@@ -439,7 +439,7 @@ function TechnicalTabsCard() {
                       </div>
                       <div className="space-y-1">
                         <p className="text-[9px] font-black uppercase tracking-wider text-muted-foreground">Coverage</p>
-                        <Select value={captionCoverage} onValueChange={setCaptionCoverage as any}>
+                        <Select value={captionCoverage} onValueChange={(v: string) => setCaptionCoverage(v as typeof captionCoverage)}>
                           <SelectTrigger className="h-8 border-primary/10 bg-background/60 text-[10px]">
                             <SelectValue />
                           </SelectTrigger>
@@ -464,9 +464,9 @@ function TechnicalTabsCard() {
 
             {showDownloads && (
               <TabsContent value="downloads" className="space-y-3 m-0 border-none outline-none">
-                 {downloadItems.map((item: any, index: number) => (
+                 {downloadItems.map((item, index) => (
                    <div key={item.id} className="flex items-center gap-2 rounded-lg border border-primary/5 bg-background/30 p-2">
-                     <Select value={item.type} onValueChange={(val) => updateDownloadItem(item.id, { type: val as any, value: "" })}>
+                     <Select value={item.type} onValueChange={(val: string) => updateDownloadItem(item.id, { type: val as "id" | "url", value: "" })}>
                        <SelectTrigger className="h-7 w-15 border-primary/10 text-[9px]">
                          <SelectValue />
                        </SelectTrigger>

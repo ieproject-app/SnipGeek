@@ -68,7 +68,7 @@ export function ToolWrapper({
   title,
   description,
   dictionary,
-  isPublic = true,
+  isPublic = false,
   requiresCloud = true,
 }: ToolWrapperProps) {
   const { user, isUserLoading } = useUser();

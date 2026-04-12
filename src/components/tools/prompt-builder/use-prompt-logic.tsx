@@ -78,7 +78,7 @@ type DownloadItem = {
   value: string;
 };
 
-type ArticleSummary = {
+export type ArticleSummary = {
   slug: string;
   title: string;
   type: "blog" | "note";
