@@ -1,0 +1,185 @@
+---
+title: "Fix Canon PIXMA MP258 Error P08 with a Manual Button Reset"
+slug: "canon-mp258-error-p08-manual-reset"
+translationKey: "canon-mp258-error-p08-manual-reset"
+date: "2026-04-12"
+description: "Canon MP258 Error P08 locks the printer mid-session. Here's how to do a manual button reset yourself before spending money on a new cartridge."
+heroImage: "/images/_posts/printer/canon/mp258/banner_blog.webp"
+imageAlt: "Canon PIXMA MP258 printer displaying Error P08 with step-by-step manual button reset guide"
+published: true
+featured: false
+tags: ["hardware", "printer", "tutorial", "troubleshooting", "error-fix"]
+category: "Hardware"
+---
+
+The printer was showing the usual "1" on the LED — standby, all clear, ready to go. I sent the print job. Three seconds in, it stopped completely, and the LED switched to **P08**. Every button I pressed after that did nothing. My first assumption was something mechanical: a stuck component, maybe a broken gear. That assumption was entirely wrong.
+
+**Error P08 on the Canon PIXMA MP258 is a color cartridge fault** — either the cartridge ran too hot and triggered a protective shutdown, or its internal chip detected an error and reported it to the printer firmware. Either way, the printer locks itself and stops responding. The most direct fix is swapping the color cartridge for a new one. But if you want to rule out a temporary fault before spending money, the two-stage manual reset below clears P08 without software, without downloads, and without opening the printer.
+
+---
+
+## What Causes Error P08
+
+P08 on the MP258 isn't a waste ink counter issue — it's specifically tied to the **color cartridge**. Two things tend to trigger it:
+
+- **Overheating** — the cartridge gets too hot during a long or ink-heavy print session, and the printer shuts down to protect the mechanism
+- **Chip fault detection** — the cartridge's electronic chip reports an internal problem to the printer's firmware
+
+The printer can't distinguish between a temporary heat spike and a cartridge that's genuinely failing. Once it receives the fault signal, it locks completely. That's why the manual reset has a chance to work: it clears the stored fault state and lets the cartridge attempt to operate again from a clean starting point.
+
+If P08 returns quickly after a successful reset, that's the printer confirming the cartridge hardware itself is the problem — not a recoverable glitch.
+
+---
+
+## Replace the Cartridge First If You Can
+
+If you have a spare color cartridge within reach, swap it out before going through the reset. A replacement cartridge solves P08 immediately in almost every case, and it takes under a minute. No sequences, no press counts, no timing.
+
+Only reach for the manual reset if you don't have a spare, or if you want to confirm whether this is a temporary fault before committing to a purchase.
+
+<Callout variant="warning" title="Before You Begin">
+  The reset uses a two-stage button sequence. Each stage must be followed exactly — the correct buttons, in the correct order, with the correct press count. A wrong count means starting that stage over from the beginning. Go slowly and count out loud if it helps.
+</Callout>
+
+---
+
+## Stage 1: Enter Initial Mode (LED Shows "0")
+
+Stage 1 puts the printer into its initial service state. You'll know it worked when the LED displays **"0"** at the end of the sequence.
+
+<Steps>
+  <Step>
+
+  ### Turn the Printer Off
+
+  While the printer is still showing the P08 error, press the <kbd>POWER</kbd> button to turn it off. **Keep the power cable plugged into the wall** — do not unplug it yet.
+
+  </Step>
+  <Step>
+
+  ### Hold STOP/RESET
+
+  Press and **hold** the <kbd>STOP/RESET</kbd> button. Keep it held.
+
+  </Step>
+  <Step>
+
+  ### Add POWER While Holding STOP/RESET
+
+  While still holding <kbd>STOP/RESET</kbd>, press and **hold** the <kbd>POWER</kbd> button. Both buttons are now held simultaneously.
+
+  </Step>
+  <Step>
+
+  ### Release STOP/RESET Only
+
+  Keep <kbd>POWER</kbd> held. Release <kbd>STOP/RESET</kbd> — and only <kbd>STOP/RESET</kbd>.
+
+  </Step>
+  <Step>
+
+  ### Press STOP/RESET Exactly 2 Times
+
+  With <kbd>POWER</kbd> still held, tap <kbd>STOP/RESET</kbd> exactly **2 times**. Count each press deliberately.
+
+  </Step>
+  <Step>
+
+  ### Release Both Buttons Together
+
+  Release <kbd>POWER</kbd> and <kbd>STOP/RESET</kbd> simultaneously. The printer will run briefly. The LED should now display **"0"** — Stage 1 is complete.
+
+  </Step>
+  <Step>
+
+  ### Turn the Printer Off
+
+  Press <kbd>POWER</kbd> to turn the printer off. Keep the power cable connected and proceed directly to Stage 2.
+
+  </Step>
+</Steps>
+
+---
+
+## Stage 2: Full Reset (LED Shows "1")
+
+Run Stage 2 immediately after Stage 1. Do not unplug the printer between the two stages.
+
+<Steps>
+  <Step>
+
+  ### Hold STOP/RESET Again
+
+  Press and **hold** the <kbd>STOP/RESET</kbd> button.
+
+  </Step>
+  <Step>
+
+  ### Add POWER While Holding STOP/RESET
+
+  While still holding <kbd>STOP/RESET</kbd>, press and **hold** the <kbd>POWER</kbd> button.
+
+  </Step>
+  <Step>
+
+  ### Release STOP/RESET Only
+
+  Keep <kbd>POWER</kbd> held. Release <kbd>STOP/RESET</kbd>.
+
+  </Step>
+  <Step>
+
+  ### Press STOP/RESET Exactly 4 Times
+
+  With <kbd>POWER</kbd> still held, tap <kbd>STOP/RESET</kbd> exactly **4 times**.
+
+  </Step>
+  <Step>
+
+  ### Release Both Buttons Together
+
+  Release both buttons simultaneously. The printer will run briefly again. The LED should now display **"1"** — the normal standby state.
+
+  </Step>
+  <Step>
+
+  ### Power Off and Unplug — This Step Matters
+
+  Press <kbd>POWER</kbd> to turn the printer off, then **unplug the power cable from the wall outlet**. Leave the printer unplugged for **2–5 minutes**. This allows all temporary fault data to clear from the printer's memory. Skipping this step reduces the reset's chance of sticking.
+
+  </Step>
+  <Step>
+
+  ### Reconnect and Power On
+
+  Plug the power cable back in and turn the printer on. The LED should display "1" cleanly, with no error code.
+
+  </Step>
+</Steps>
+
+---
+
+## Did the Reset Work?
+
+Send a test print once the printer is back in standby mode. If the job completes without stopping, the fault has been cleared and the printer is good to go.
+
+I'll be honest — when I first read about this method, a pure button-sequence reset with zero software felt like it shouldn't work. It seemed too simple for something that had just bricked the printer mid-job. But it worked, and it genuinely takes less time than hunting down a utility, disabling antivirus alerts, and running an installer. When it works, it works cleanly.
+
+If P08 comes back immediately or after just a few pages, the reset still gave you a useful answer: the problem is in the cartridge hardware. That's not a failure — that's confirmation you need a replacement, not a software fix.
+
+---
+
+## If the Error Keeps Coming Back
+
+A recurring P08 after a successful reset is a clear sign the color cartridge is failing. Replacing it is the only reliable path forward at that point. When you buy a replacement, any compatible cartridge for the MP258 — original Canon or a quality third-party alternative — should clear the error permanently.
+
+One thing worth trying before giving up on the reset: if the printer was under heavy use before the error appeared, let it sit off and unplugged for 20–30 minutes before running the sequence again. A cooled cartridge is less likely to immediately re-trigger the thermal fault, which gives the reset a better chance of holding.
+
+If you're dealing with a different Canon model showing a similar error, the [Canon E500/E510 Error P07 reset](/blog/canon-e500-e510-error-p07-fix-service-tool-v3400) uses a software tool rather than button presses, but the underlying logic is the same. And if you have an Epson printer with a "Service Required" lockout, I covered the full counter reset for the [Epson L4150 and L4160](/blog/resetter-epson-l4150-l4160) separately.
+
+---
+
+If the two-stage sequence cleared P08 for you — or if it confirmed your cartridge was done — either way you now know what to do next. Drop a comment if you got stuck at a specific step. Stage 1 is where the press count tends to go sideways, and it's almost always a quick fix once you know exactly where the sequence broke.
+
+### References
+1. [Canon PIXMA MP258 Product Support — Canon Asia](https://www.canon-asia.com/consumer/products/printers/pixma-mp258.html)

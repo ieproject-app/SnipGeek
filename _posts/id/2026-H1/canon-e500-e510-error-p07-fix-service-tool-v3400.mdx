@@ -1,0 +1,175 @@
+---
+title: "Cara Reset Error P07 Canon E500/E510 dengan Service Tool v3400"
+slug: "canon-e500-e510-error-p07-fix-service-tool-v3400"
+translationKey: "canon-e500-e510-error-p07-fix-service-tool-v3400"
+date: "2026-04-14"
+description: "Error P07 pada Canon E500/E510 tanda penampung tinta sudah penuh. Reset sendiri dalam menit pakai Service Tool v3400 di Windows — tanpa perlu ke teknisi."
+heroImage: "/images/_posts/printer/canon/e510-e500/banner-e510-canon.webp"
+imageAlt: "Panduan reset error P07 printer Canon PIXMA E500 dan E510 menggunakan Service Tool v3400"
+published: true
+featured: false
+tags: ["windows", "printer", "tutorial", "troubleshooting", "driver"]
+category: "Hardware"
+---
+
+Saya lagi ngeprint dokumen penting dan tinggal beberapa lembar lagi — tiba-tiba printer berhenti total. Layar LCD menampilkan **Error P07**, tombol apapun tidak mempan. Panik sebentar, lalu saya mulai browsing dan mulai khawatir ada komponen yang rusak secara fisik. Ternyata tidak. Masalahnya jauh lebih sederhana dari yang saya kira, dan solusinya tidak butuh teknisi sama sekali.
+
+**Error P07** di Canon E500 dan E510 berarti penghitung internal waste ink sudah mencapai batasnya. Printer tidak akan mau beroperasi sampai counter itu direset secara manual. Solusinya: gunakan **Canon Service Tool v3400** di Windows, dan selesai dalam waktu kurang dari lima menit.
+
+---
+
+## Apa Itu Error P07?
+
+Canon E500 dan E510 pada dasarnya adalah printer yang hampir identik — desain mirip, mekanisme sama, dan masalah yang sama juga. Keduanya memakai sistem penghitung tinta internal yang akan memunculkan P07 begitu angkanya menyentuh batas maksimum.
+
+Ini bukan kerusakan hardware. Canon sengaja membangun sistem ini sebagai pengaman supaya tinta pembuang tidak meluap dan merusak komponen internal printer. Begitu counter penuh, printer mengunci dirinya sendiri. Mereset counter itu sepenuhnya valid untuk dilakukan — apalagi kalau busa fisik di dalamnya masih punya kapasitas, yang hampir selalu terjadi di maxout pertama.
+
+---
+
+## Sebelum Mulai
+
+Siapkan dulu hal-hal berikut sebelum masuk ke langkah teknisnya:
+
+- Printer Canon E500 atau E510 yang sudah terhubung ke PC Windows via USB
+- Beberapa lembar kertas kosong di tray printer
+- Antivirus (termasuk Windows Defender) dinonaktifkan sementara — tool ini hampir pasti akan dianggap virus oleh antivirus, padahal bukan
+- **Service Tool v3400** sudah didownload dan diekstrak (link tersedia di bagian berikutnya)
+
+---
+
+## Langkah 1: Masuk ke Service Mode Printer
+
+Service Mode adalah mode tersembunyi yang memungkinkan software reset berkomunikasi langsung dengan counter internal printer. Tanpa masuk mode ini terlebih dahulu, tool reset tidak akan bisa melakukan apa-apa. Urutan tombol di bawah harus diikuti persis — satu langkah terlewat, semua harus diulang dari awal.
+
+<Steps>
+  <Step>
+
+  ### Matikan Printer
+
+  Tekan tombol <kbd>POWER</kbd> untuk mematikan printer. Pastikan kabel power tetap terpasang ke stopkontak.
+
+  </Step>
+  <Step>
+
+  ### Tahan Tombol STOP/RESET
+
+  Tekan dan **tahan** tombol <kbd>STOP/RESET</kbd>. Jangan dilepas dulu.
+
+  </Step>
+  <Step>
+
+  ### Tekan dan Tahan POWER Juga
+
+  Sambil masih menahan <kbd>STOP/RESET</kbd>, tekan dan **tahan** tombol <kbd>POWER</kbd> sekalian. Sekarang kedua tombol tertahan bersamaan.
+
+  </Step>
+  <Step>
+
+  ### Lepas STOP/RESET Saja
+
+  Tetap tahan <kbd>POWER</kbd>. Lepaskan <kbd>STOP/RESET</kbd> saja.
+
+  </Step>
+  <Step>
+
+  ### Tekan STOP/RESET 6 Kali
+
+  Dengan <kbd>POWER</kbd> masih ditahan, tekan <kbd>STOP/RESET</kbd> tepat **6 kali**. Lampu indikator akan berganti antara oranye dan hijau di setiap tekanan — itu tanda printer merespons dengan benar.
+
+  </Step>
+  <Step>
+
+  ### Lepas Kedua Tombol Bersamaan
+
+  Setelah tekanan ke-6, lepas <kbd>POWER</kbd> dan <kbd>STOP/RESET</kbd> secara bersamaan.
+
+  Printer sekarang sudah masuk Service Mode. Kalau Windows menampilkan notifikasi "installing new device", abaikan saja — itu normal.
+
+  </Step>
+</Steps>
+
+Kalau printer langsung menyala seperti biasa tanpa ada perubahan, cabut kabel listriknya, tunggu beberapa detik, lalu ulangi urutan dari awal. Kunci suksesnya ada di ketepatan urutan, bukan kecepatan menekan tombol.
+
+---
+
+## Langkah 2: Reset Counter dengan Service Tool v3400
+
+### Download Aplikasinya
+
+Download Service Tool v3400 lewat salah satu link di bawah ini:
+
+<DownloadButton id="canon-servicetool-v3400-gdrive" />
+<DownloadButton id="canon-servicetool-v3400-mediafire" />
+
+<Callout variant="warning" title="Peringatan Antivirus">
+  Tool seperti ini hampir selalu dideteksi sebagai ancaman oleh antivirus — termasuk Windows Defender — meski filenya bersih. Nonaktifkan antivirus kamu sementara sebelum mengekstrak dan menjalankan file-nya. Belum tahu caranya? Saya sudah tulis panduannya: [cara menonaktifkan Windows Defender sementara di Windows 11](/blog/disable-windows-defender-windows-11).
+</Callout>
+
+### Jalankan Proses Reset
+
+Setelah file diekstrak, ikuti langkah-langkah berikut:
+
+<Steps>
+  <Step>
+
+  ### Siapkan Kertas di Tray
+
+  Masukkan beberapa lembar kertas kosong ke tray printer. Proses reset kemungkinan akan mencetak satu lembar sebagai konfirmasi, jadi kertas harus sudah ada di dalamnya.
+
+  </Step>
+  <Step>
+
+  ### Buka Service Tool v3400
+
+  Double-click file `.exe`-nya. Tidak perlu instalasi — aplikasi langsung terbuka.
+
+  </Step>
+  <Step>
+
+  ### Reset Counter Main
+
+  Di bagian **Ink Absorber Counter**, buka dropdown dan pilih **"Main"**. Klik tombol **Set** di sebelahnya.
+
+  </Step>
+  <Step>
+
+  ### Reset Counter Main_Black
+
+  Masih di bagian **Ink Absorber Counter** yang sama, buka dropdown lagi dan pilih **"Main_Black"**. Klik **Set** sekali lagi.
+
+  </Step>
+  <Step>
+
+  ### Klik Tombol EEPROM
+
+  Klik tombol **EEPROM**. Printer mungkin akan langsung mencetak satu halaman singkat — itu konfirmasi bahwa penulisan EEPROM berhasil. Biarkan sampai selesai.
+
+  </Step>
+  <Step>
+
+  ### Restart Printer
+
+  Tekan <kbd>POWER</kbd> untuk mematikan printer, lalu nyalakan kembali.
+
+  </Step>
+</Steps>
+
+---
+
+## Cek Hasilnya
+
+Setelah printer menyala kembali, tidak seharusnya ada kode error di layar. Coba kirim halaman uji cetak dari PC. Kalau print berhasil masuk dan tercetak normal, reset sudah berhasil.
+
+Kalau P07 langsung muncul lagi begitu printer dinyalakan, kemungkinan printer belum benar-benar masuk Service Mode di Langkah 1. Ulangi urutan tombolnya dengan lebih hati-hati, lalu jalankan tool-nya lagi.
+
+---
+
+## Catatan Soal Busa Tinta
+
+Mereset counter memang memperpanjang usia pakai printer secara software, tapi busa fisik di dalamnya tetap terus menyerap tinta. Setelah beberapa kali reset dalam kurun beberapa tahun, kamu mungkin mulai melihat bekas tinta di bagian bawah printer — itu tanda busa fisiknya sudah benar-benar perlu diganti, bukan sekadar direset lagi. Untuk pemakaian rumahan yang tidak terlalu intens, satu kali reset biasanya cukup untuk bertahun-tahun ke depan.
+
+Kalau kamu punya printer Epson dengan masalah serupa — biasanya muncul notifikasi "Service Required" — prosesnya berbeda tapi sama-sama bisa diselesaikan sendiri. Saya sudah bahas lengkap untuk [Epson L4150 dan L4160](/blog/resetter-epson-l4150-l4160) kalau itu yang kamu cari.
+
+---
+
+Reset berhasil, atau malah nyangkut di salah satu langkah? Cerita di kolom komentar — urutan Service Mode-nya yang paling sering bikin bingung, dan biasanya langsung bisa dibantu kalau kamu jelaskan persis di mana prosesnya berhenti.
