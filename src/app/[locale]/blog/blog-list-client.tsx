@@ -38,6 +38,11 @@ export function BlogListClient({
   const displayedPosts = allPosts.slice(0, visibleCount);
   const hasMore = visibleCount < allPosts.length;
   const remainingCount = Math.min(POSTS_PER_PAGE, allPosts.length - visibleCount);
+  const allLinksTitle = locale === "id" ? "Indeks Semua Artikel" : "All Article Links";
+  const allLinksDescription =
+    locale === "id"
+      ? "Daftar ringkas semua URL artikel untuk pembaca, crawler, dan navigasi cepat."
+      : "A compact index of every article URL for readers, crawlers, and quick navigation.";
 
   const handleLoadMore = () => {
     setVisibleCount((prev) => prev + POSTS_PER_PAGE);
@@ -172,6 +177,31 @@ export function BlogListClient({
             </Button>
           </div>
         )}
+
+        <section className="mt-16 border-t border-primary/10 pt-10" aria-labelledby="all-article-links-heading">
+          <div className="mb-6 max-w-2xl">
+            <h2 id="all-article-links-heading" className="font-display text-2xl font-extrabold tracking-tight text-primary">
+              {allLinksTitle}
+            </h2>
+            <p className="mt-2 text-sm text-muted-foreground">
+              {allLinksDescription}
+            </p>
+          </div>
+          <nav aria-label={allLinksTitle}>
+            <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {allPosts.map((post) => (
+                <li key={`all-${post.slug}`}>
+                  <Link
+                    href={`${linkPrefix}/blog/${post.slug}`}
+                    className="block rounded-lg border border-primary/8 px-3 py-3 text-sm font-medium text-primary transition-colors hover:bg-muted/30"
+                  >
+                    <span className="line-clamp-2">{post.frontmatter.title}</span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        </section>
       </main>
     </div>
   );

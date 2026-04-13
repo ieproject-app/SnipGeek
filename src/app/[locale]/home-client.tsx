@@ -2,6 +2,7 @@
 
 import React, { useMemo, useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
+import Link from "next/link";
 // Above-fold sections: loaded immediately
 import { HomeHero } from "@/components/home/home-hero";
 import { HomeLatest } from "@/components/home/home-latest";
@@ -10,8 +11,12 @@ import type { Note, NoteFrontmatter } from "@/lib/notes";
 import type { Dictionary } from "@/lib/get-dictionary";
 
 // Below-fold sections: code-split so their JS is not in the initial bundle
-function SectionPlaceholder({ minHeight }: { minHeight: string }) {
-  return <div aria-hidden="true" style={{ minHeight }} />;
+function SectionPlaceholder({ minHeight, children }: { minHeight: string; children?: React.ReactNode }) {
+  return (
+    <div style={{ minHeight }}>
+      {children}
+    </div>
+  );
 }
 
 const createSectionLoader = (minHeight: string) => {
@@ -63,7 +68,123 @@ const HomeNotes = dynamic(
  * viewport. This prevents JavaScript for below-fold sections from being
  * evaluated during the critical loading window.
  */
-function LazySection({ children, minHeight }: { children: React.ReactNode; minHeight?: string }) {
+function SectionPreview({
+  title,
+  description,
+  href,
+  hrefLabel,
+  items,
+  minHeight,
+}: {
+  title: string;
+  description?: string;
+  href?: string;
+  hrefLabel?: string;
+  items: Array<{ title: string; href: string; meta?: string }>;
+  minHeight: string;
+}) {
+  return (
+    <section className="container max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pb-12 sm:pb-14" style={{ minHeight }}>
+      <div className="rounded-2xl border border-primary/10 bg-card/40 px-5 py-6 shadow-sm">
+        <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <h2 className="font-display text-2xl font-extrabold tracking-tight text-primary">
+              {title}
+            </h2>
+            {description && (
+              <p className="mt-1 text-sm text-muted-foreground">
+                {description}
+              </p>
+            )}
+          </div>
+          {href && hrefLabel && (
+            <Link
+              href={href}
+              className="text-sm font-medium text-accent transition-colors hover:text-primary"
+            >
+              {hrefLabel}
+            </Link>
+          )}
+        </div>
+
+        <ul className="space-y-3">
+          {items.map((item) => (
+            <li key={item.href}>
+              <Link
+                href={item.href}
+                className="block rounded-lg border border-primary/8 px-4 py-3 transition-colors hover:bg-muted/30"
+              >
+                <span className="block text-sm font-semibold text-primary">
+                  {item.title}
+                </span>
+                {item.meta && (
+                  <span className="mt-1 block text-xs text-muted-foreground">
+                    {item.meta}
+                  </span>
+                )}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  );
+}
+
+function TransitionPreview({
+  eyebrow,
+  title,
+  subtitle,
+  description,
+  ctaText,
+  ctaHref,
+  minHeight,
+}: {
+  eyebrow: string;
+  title: string;
+  subtitle: string;
+  description: string;
+  ctaText?: string;
+  ctaHref?: string;
+  minHeight: string;
+}) {
+  return (
+    <section className="container max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pb-12 sm:pb-14" style={{ minHeight }}>
+      <div className="rounded-2xl border border-dashed border-primary/20 bg-card/50 px-5 py-6 shadow-sm">
+        <p className="text-[10px] font-black uppercase tracking-[0.16em] text-accent/85">
+          {eyebrow}
+        </p>
+        <h2 className="mt-2 font-display text-2xl font-extrabold tracking-tight text-primary">
+          {title}
+        </h2>
+        <p className="mt-1 text-sm text-muted-foreground">
+          {subtitle}
+        </p>
+        <p className="mt-4 text-sm leading-relaxed text-foreground/85">
+          {description}
+        </p>
+        {ctaText && ctaHref && (
+          <Link
+            href={ctaHref}
+            className="mt-4 inline-flex text-sm font-medium text-accent transition-colors hover:text-primary"
+          >
+            {ctaText}
+          </Link>
+        )}
+      </div>
+    </section>
+  );
+}
+
+function LazySection({
+  children,
+  minHeight,
+  fallback,
+}: {
+  children: React.ReactNode;
+  minHeight?: string;
+  fallback?: React.ReactNode;
+}) {
   const ref = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
 
@@ -84,7 +205,7 @@ function LazySection({ children, minHeight }: { children: React.ReactNode; minHe
 
   return (
     <div ref={ref}>
-      {visible ? children : <SectionPlaceholder minHeight={minHeight ?? "200px"} />}
+      {visible ? children : <SectionPlaceholder minHeight={minHeight ?? "200px"}>{fallback}</SectionPlaceholder>}
     </div>
   );
 }
@@ -224,6 +345,18 @@ export function HomeClient({
   const tutorialTitle = locale === "id" ? "Panduan Instalasi Windows 11" : "Windows 11 Installation Guide";
   const tutorialViewMore = locale === "id" ? "lihat panduan lengkap" : "view complete guide";
   const transitionCta = locale === "id" ? "Lanjut ke Tutorial" : "Continue to Tutorials";
+  const previewPosts = (posts: Post<PostFrontmatter>[], limit = 3) =>
+    posts.slice(0, limit).map((post) => ({
+      title: post.frontmatter.title,
+      href: `${linkPrefix}/blog/${post.slug}`,
+      meta: post.frontmatter.category || post.frontmatter.description,
+    }));
+  const previewNotes = (notes: Note<NoteFrontmatter>[], limit = 3) =>
+    notes.slice(0, limit).map((note) => ({
+      title: note.frontmatter.title,
+      href: `${linkPrefix}/notes/${note.slug}`,
+      meta: note.frontmatter.description,
+    }));
 
   return (
     <div className="w-full">
@@ -243,7 +376,20 @@ export function HomeClient({
       />
 
       {/* ── BELOW FOLD: code-split + deferred until near viewport ── */}
-      <LazySection minHeight="120px">
+      <LazySection
+        minHeight="120px"
+        fallback={
+          <TransitionPreview
+            eyebrow={transitionEyebrow}
+            title={transitionTitle}
+            subtitle={transitionSubtitle}
+            description={transitionDescription}
+            ctaText={transitionCta}
+            ctaHref={`${linkPrefix}/tags/tutorial`}
+            minHeight="120px"
+          />
+        }
+      >
         <HomeTransitionNote
           eyebrow={transitionEyebrow}
           title={transitionTitle}
@@ -255,7 +401,19 @@ export function HomeClient({
       </LazySection>
 
       {manualTutorialPosts.length > 0 && (
-        <LazySection minHeight="400px">
+        <LazySection
+          minHeight="400px"
+          fallback={
+            <SectionPreview
+              title={tutorialTitle}
+              description={locale === "id" ? "Pratinjau cepat artikel tutorial yang sudah tersedia tanpa menunggu interaksi JavaScript." : "Quick server-rendered preview of tutorial articles before the interactive section loads."}
+              href={`${linkPrefix}/blog`}
+              hrefLabel={tutorialViewMore}
+              items={previewPosts(manualTutorialPosts)}
+              minHeight="400px"
+            />
+          }
+        >
           <HomeTutorials
             posts={manualTutorialPosts}
             title={tutorialTitle}
@@ -268,7 +426,19 @@ export function HomeClient({
       )}
 
       {topicPosts.length > 0 && (
-        <LazySection minHeight="400px">
+        <LazySection
+          minHeight="400px"
+          fallback={
+            <SectionPreview
+              title={focusTopicsTitle}
+              description={locale === "id" ? "Sorotan artikel bertopik Windows dan Ubuntu yang tetap muncul di HTML server-rendered." : "Highlighted Windows and Ubuntu articles that remain visible in the server-rendered HTML."}
+              href={`${linkPrefix}/blog`}
+              hrefLabel={dictionary.home.viewAllPosts}
+              items={previewPosts(topicPosts)}
+              minHeight="400px"
+            />
+          }
+        >
           <HomeTopics
             posts={topicPosts}
             title={focusTopicsTitle}
@@ -283,7 +453,19 @@ export function HomeClient({
       )}
 
       {updatePosts.length > 0 && (
-        <LazySection minHeight="400px">
+        <LazySection
+          minHeight="400px"
+          fallback={
+            <SectionPreview
+              title={updatesTitle}
+              description={locale === "id" ? "Artikel pembaruan sistem yang dipublikasikan sebagai preview SSR untuk crawler dan pembaca cepat." : "System update articles exposed as SSR previews for crawlers and fast readers."}
+              href={`${linkPrefix}/blog`}
+              hrefLabel={updatesViewMore}
+              items={previewPosts(updatePosts)}
+              minHeight="400px"
+            />
+          }
+        >
           <HomeUpdates
             posts={updatePosts}
             title={updatesTitle}
@@ -297,7 +479,19 @@ export function HomeClient({
       )}
 
       {latestNotes.length > 0 && (
-        <LazySection minHeight="400px">
+        <LazySection
+          minHeight="400px"
+          fallback={
+            <SectionPreview
+              title={notesTitle}
+              description={locale === "id" ? "Catatan teknis terbaru tetap terlihat di HTML awal meski section interaktif ditunda." : "Latest technical notes stay visible in the initial HTML even while the interactive section is deferred."}
+              href={`${linkPrefix}/notes`}
+              hrefLabel={notesViewMore}
+              items={previewNotes(latestNotes)}
+              minHeight="400px"
+            />
+          }
+        >
           <HomeNotes
             notes={latestNotes}
             title={notesTitle}

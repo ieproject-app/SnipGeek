@@ -41,6 +41,11 @@ export function NotesListClient({
   const displayedNotes = allNotes.slice(0, visibleCount);
   const hasMore = visibleCount < allNotes.length;
   const remainingCount = Math.min(NOTES_PER_PAGE, allNotes.length - visibleCount);
+  const allLinksTitle = locale === "id" ? "Indeks Semua Catatan" : "All Note Links";
+  const allLinksDescription =
+    locale === "id"
+      ? "Daftar ringkas semua URL catatan untuk pembaca, crawler, dan navigasi cepat."
+      : "A compact index of every note URL for readers, crawlers, and quick navigation.";
 
   const handleLoadMore = () => {
     setVisibleCount((prev) => prev + NOTES_PER_PAGE);
@@ -157,6 +162,31 @@ export function NotesListClient({
             </Button>
           </div>
         )}
+
+        <section className="mt-16 border-t border-primary/10 pt-10" aria-labelledby="all-note-links-heading">
+          <div className="mb-6 max-w-2xl">
+            <h2 id="all-note-links-heading" className="font-display text-2xl font-extrabold tracking-tight text-primary">
+              {allLinksTitle}
+            </h2>
+            <p className="mt-2 text-sm text-muted-foreground">
+              {allLinksDescription}
+            </p>
+          </div>
+          <nav aria-label={allLinksTitle}>
+            <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {allNotes.map((note) => (
+                <li key={`all-${note.slug}`}>
+                  <Link
+                    href={`${linkPrefix}/notes/${note.slug}`}
+                    className="block rounded-lg border border-primary/8 px-3 py-3 text-sm font-medium text-primary transition-colors hover:bg-muted/30"
+                  >
+                    <span className="line-clamp-2">{note.frontmatter.title}</span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        </section>
       </main>
     </div>
   );

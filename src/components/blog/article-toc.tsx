@@ -16,7 +16,7 @@ export function ArticleTOC({
   title,
   locale = "en",
 }: ArticleTOCProps) {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(true);
 
   const handleHeadingClick = (
     event: React.MouseEvent<HTMLAnchorElement>,
