@@ -741,7 +741,7 @@ export function LayoutHeader({
             </SnipTooltip>
 
             {/* 3. Theme Toggle (light → dark → system) */}
-            <SnipTooltip label={themeTooltipLabel} side="bottom">
+            <SnipTooltip label={mounted ? themeTooltipLabel : "Ganti Tema"} side="bottom">
               <button
                 type="button"
                 className={cn(navItemClass, "group/theme relative inline-flex")}

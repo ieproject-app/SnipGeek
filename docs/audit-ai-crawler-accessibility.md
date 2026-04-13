@@ -1,386 +1,305 @@
-# Audit AI Crawler Accessibility — SnipGeek
+Promp "I need you to audit why article content is not visible in server-rendered HTML on this Next.js App Router blog (SnipGeek).
 
-> Tanggal audit: 2025-07  
-> Auditor: AI Code Review  
-> Konteks: Blog Next.js + Firebase App Hosting, bilingual EN/ID, konten MDX
+## Symptom
+When fetching the article URL directly (e.g. /blog/rename-pc-windows-11), the raw HTML only contains the page title and skip link. No article body content is present. This means AI crawlers and search bots that don't execute JavaScript cannot read the content.
+
+However, the JSON route handler at /api/posts/[slug]?locale=en returns full article content correctly.
+
+## Stack
+- Next.js App Router (latest)
+- MDX for article content
+- Firebase App Hosting
+- Bilingual (id/en) via locale param
+
+## What to check and fix
+
+1. **Article page component** (`app/blog/[slug]/page.tsx` or similar)
+   - Is it marked as `"use client"`? If yes, that's the problem — move data fetching to a server component
+   - Is the MDX content rendered inside a client component wrapper? Identify which component causes CSR
+
+2. **MDX rendering**
+   - How is MDX compiled and rendered? (next-mdx-remote, @next/mdx, contentlayer, etc.)
+   - If using `next-mdx-remote`, are you using the `/rsc` import for server components?
+   - Check if MDXRemote or equivalent is inside a client boundary
+
+3. **Data fetching**
+   - Is article content fetched client-side (useEffect, SWR, React Query)? If yes, move it to async server component with direct file/MDX read
+   - Check if fetch calls to /api/posts/ are being made from the client side
+
+4. **Layout and Suspense boundaries**
+   - Check if article content is wrapped in <Suspense> with a fallback that hides content from initial HTML
+   - Check if any parent layout is "use client"
+
+5. **generateStaticParams / generateMetadata**
+   - Is generateStaticParams implemented for /blog/[slug]? 
+   - Is generateMetadata returning correct title and description from MDX frontmatter?
+
+6. **Quick SSR test**
+   - Run: curl -s https://snipgeek.com/blog/rename-pc-windows-11 | grep -o '.\{100\}' | head -50
+   - If article body text is absent, confirm which component in the tree is causing client-side only rendering
+
+## Goal
+Article body content (h1, h2, paragraphs) must be present in the raw server-rendered HTML without JavaScript execution. Fix should not break the existing /api/posts/ route handler.
+
+Please start by identifying the article page component file and trace the rendering path from page.tsx down to where MDX content is rendered."
+
+Audit dibawah ini by VsCode.
+
+I’m starting by tracing the blog route render path from the App Router page file to the MDX renderer so we can pinpoint exactly where SSR content disappears. I’ll locate the page component and the components it delegates to first.
+
+Ran terminal command:  set -e
+cd /home/iwan-efendi/Documents/SnipGeek
+rg --files src/app | rg 'blog/.*/page\.tsx|blog/\[slug\]/page\.tsx|\[locale\]/blog/\[slug\]/page\.tsx'
+rg -n "MDXRemote|next-mdx-remote|use client|Suspense|api/posts|generateStaticParams|generateMetadata" src/app src/components src/lib | head -200
+
+I found no direct match on the first pattern, so next I’m listing all blog-related route files to find the actual slug page location and continue the trace.
+
+Ran terminal command:  cd /home/iwan-efendi/Documents/SnipGeek
+rg --files src/app | rg 'blog|post|slug|\[locale\]'
+
+Ripgrep isn’t installed in this environment, so I’m switching to workspace file search tools to continue the same trace without changing anything.
+
+Searched for files matching `**/src/app/**/*blog*`, 1 match
+
+Searched for files matching `**/src/app/**/*[[]slug[]]*`, no matches
+
+Searched for files matching `**/src/app/**/page.tsx`, 20 matches
+
+I’ve located the article route at [src/app/[locale]/blog/[slug]/page.tsx](src/app/[locale]/blog/[slug]/page.tsx); next I’ll read it and follow each import to the MDX renderer and any client boundaries.
+
+Read [](file:///home/iwan-efendi/Documents/SnipGeek/src/app/%5Blocale%5D/blog/%5Bslug%5D/page.tsx#1-1), lines 1 to 260
+
+Read [](file:///home/iwan-efendi/Documents/SnipGeek/src/app/%5Blocale%5D/layout.tsx)
+
+Read [](file:///home/iwan-efendi/Documents/SnipGeek/src/components/mdx-components.tsx#1-1), lines 1 to 260
+
+I confirmed the page itself is a server component so far; now I’m reading the remainder of the article page and key imported wrappers to identify where MDX enters a client boundary or Suspense fallback.
+
+Read [](file:///home/iwan-efendi/Documents/SnipGeek/src/app/%5Blocale%5D/blog/%5Bslug%5D/page.tsx#261-261), lines 261 to 384
+
+Searched for regex `^"use client"|MDXRemote|Suspense|dynamic\(|ssr:\s*false|useEffect|/api/posts` (`**/src/components/**`), 20 results
+
+Read [](file:///home/iwan-efendi/Documents/SnipGeek/src/components/layout/firebase-provider-wrapper.tsx)
+
+Read [](file:///home/iwan-efendi/Documents/SnipGeek/src/components/layout/layout-deferred-ui.tsx)
+
+I found a high-confidence culprit: the locale layout wraps all page content in a dynamic `ssr: false` provider, which can strip server HTML for the article body. I’ll now validate that with a live curl check and finish tracing MDX/data flow for the full audit checklist.
+
+Ran terminal command:  cd /home/iwan-efendi/Documents/SnipGeek
+curl -s https://snipgeek.com/blog/rename-pc-windows-11 | grep -o '.\{100\}' | head -50
+
+Searched for files matching `**/src/app/**/api/posts/**/*.ts`, 2 matches
+
+Searched for regex `MDXRemote|next-mdx-remote|compileMDX|serialize|remark|rehype` (`**/src/lib/**`), 1 result
+
+Read [](file:///home/iwan-efendi/Documents/SnipGeek/src/firebase/provider.tsx)
+
+Next I’m verifying how article content is sourced and checking the API route and post loader to confirm data exists server-side while page HTML is withheld.
+
+Ran terminal command:  cd /home/iwan-efendi/Documents/SnipGeek
+curl -s https://snipgeek.com/blog/rename-pc-windows-11 | grep -i "<article\|<h1\|How to Rename Your PC\|Step" | head -40
+printf "\n--- API excerpt ---\n"
+curl -s "https://snipgeek.com/api/posts/rename-pc-windows-11?locale=en" | head -c 500
+
+Read [](file:///home/iwan-efendi/Documents/SnipGeek/src/app/api/posts/%5Bslug%5D/markdown/route.ts)
+
+Read [](file:///home/iwan-efendi/Documents/SnipGeek/src/lib/posts.ts)
+
+Read [](file:///home/iwan-efendi/Documents/SnipGeek/src/app/api/posts/%5Bslug%5D/route.ts)
+
+I’ve confirmed the API route serves full article content from server-side file reads; now I’m retrying the HTML/API diff check with smaller commands and then I’ll map exactly why the page response omits body markup.
+
+Ran terminal command:  cd /home/iwan-efendi/Documents/SnipGeek
+curl -s https://snipgeek.com/blog/rename-pc-windows-11 | grep -i "<article\|<h1\|How to Rename Your PC\|Step" | head -40
+
+Ran terminal command:  cd /home/iwan-efendi/Documents/SnipGeek
+curl -s "https://snipgeek.com/api/posts/rename-pc-windows-11?locale=en" | head -c 1200
+
+Searched for regex `use client|dynamic\(|ssr:\s*false|Suspense` (`**/src/app/**`), 16 results
+
+Ran terminal command:  cd /home/iwan-efendi/Documents/SnipGeek
+html=$(curl -s https://snipgeek.com/blog/rename-pc-windows-11)
+printf "%s" "$html" | grep -o "Skip to main content" | head -1 || true
+printf "%s" "$html" | grep -o "id="main-content"" | head -1 || true
+printf "%s" "$html" | grep -o "<article" | head -1 || true
+printf "%s" "$html" | grep -o "Why Renaming Your PC Matters" | head -1 || true
+
+I validated the shell-only symptom in DOM markers (`main-content` and `<article>` are absent), but I also found article text embedded somewhere in the HTML payload. I’ll pinpoint whether that text is only inside serialized RSC/Flight scripts rather than actual rendered markup.
+
+Ran terminal command:  cd /home/iwan-efendi/Documents/SnipGeek
+curl -s https://snipgeek.com/blog/rename-pc-windows-11 > /tmp/snip_blog.html
+awk 'BEGIN{IGNORECASE=1} /Why Renaming Your PC Matters/{print NR":"$0; exit}' /tmp/snip_blog.html
+awk 'BEGIN{IGNORECASE=1} /Skip to main content/{print NR":"$0; exit}' /tmp/snip_blog.html
+awk 'BEGIN{IGNORECASE=1} /<article/{print NR":"$0; exit}' /tmp/snip_blog.html || true
+awk 'BEGIN{IGNORECASE=1} /id="main-content"/{print NR":"$0; exit}' /tmp/snip_blog.html || true
+wc -l /tmp/snip_blog.html
+sed -n '1,220p' /tmp/snip_blog.html | cat
+
+Ran terminal command:  cd /home/iwan-efendi/Documents/SnipGeek
+curl -s https://snipgeek.com/blog/rename-pc-windows-11 > /tmp/snip_blog.html
+python3 - <<'PY'
+from pathlib import Path
+s=Path('/tmp/snip_blog.html').read_text(errors='ignore')
+for needle in ['Skip to main content','id="main-content"','<article','Why Renaming Your PC Matters','self.__next_f']:
+    i=s.find(needle)
+    print(needle, i)
+    if i!=-1:
+        start=max(0,i-160); end=min(len(s),i+260)
+        print(s[start:end].replace('\n',' ')[:420])
+        print('---')
+PY
+
+Searched for regex `ssr:\s*false|BAILOUT_TO_CLIENT_SIDE_RENDERING|dynamic\(` (`**/src/**`), 12 results
+
+Read [](file:///home/iwan-efendi/Documents/SnipGeek/src/firebase/index.ts)
+
+Read [](file:///home/iwan-efendi/Documents/SnipGeek/src/firebase/client-provider.tsx)
+
+Read [](file:///home/iwan-efendi/Documents/SnipGeek/src/components/layout/layout-header.tsx#1-1), lines 1 to 220
+
+Searched for regex `/api/posts|api/posts` (`**/src/**`), 13 results
+
+Searched for regex `Suspense|fallback` (`**/src/app/[locale]/**`), no results
+
+I’ve completed the trace and now I’m gathering exact line-level references for the final audit report, including the client bailout source and MDX server-render callsite.
+
+Searched for text `FirebaseProviderWrapper|LayoutDeferredUi|<main id="main-content">|Skip to main content` (`**/src/app/[locale]/layout.tsx`), no results
+
+Searched for regex `ssr: false|dynamic\(` (`**/src/components/layout/firebase-provider-wrapper.tsx`), 2 results
+
+Searched for regex `MDXRemote|next-mdx-remote/rsc|generateStaticParams|generateMetadata|getPostData\(|dynamicParams` (`**/src/app/[locale]/blog/[slug]/page.tsx`), no results
+
+Searched for text `"use client"` (`**/src/app/[locale]/blog/[slug]/page.tsx`), no results
+
+Searched for regex `FirebaseProviderWrapper|LayoutDeferredUi|main-content|skip-link` (`SnipGeek` · `src/app/[locale]/layout.tsx`), no results
+
+Searched for regex `MDXRemote|next-mdx-remote/rsc|generateStaticParams|generateMetadata|getPostData\(|dynamicParams` (`SnipGeek` · `src/app/[locale]/blog/[slug]/page.tsx`), no results
+
+Searched for text `"use client"` (`SnipGeek` · `src/app/[locale]/blog/[slug]/page.tsx`), no results
+
+Ran terminal command:  cd /home/iwan-efendi/Documents/SnipGeek
+nl -ba src/app/'[locale]'/layout.tsx | sed -n '1,240p'
+printf "\n----\n"
+nl -ba src/app/'[locale]'/blog/'[slug]'/page.tsx | sed -n '1,360p'
+printf "\n----\n"
+nl -ba src/components/layout/firebase-provider-wrapper.tsx | sed -n '1,120p'
+
+Read [](file:///home/iwan-efendi/.config/Code/User/workspaceStorage/5086663e7019eab7b311e9c26f6fc8db/GitHub.copilot-chat/chat-session-resources/b1a6024f-9ca4-4724-9ac4-aafcd964be03/call_WAFshDYvh0Q9hOTymMlWFhif__vscode-1776059985215/content.txt#1-1), lines 1 to 320
+
+Read [](file:///home/iwan-efendi/.config/Code/User/workspaceStorage/5086663e7019eab7b311e9c26f6fc8db/GitHub.copilot-chat/chat-session-resources/b1a6024f-9ca4-4724-9ac4-aafcd964be03/call_WAFshDYvh0Q9hOTymMlWFhif__vscode-1776059985215/content.txt#321-321), lines 321 to 675
+
+Ran terminal command:  cd /home/iwan-efendi/Documents/SnipGeek
+nl -ba src/components/layout/layout-deferred-ui.tsx | sed -n '1,120p'
+
+Read [](file:///home/iwan-efendi/Documents/SnipGeek/src/app/layout.tsx)
+
+I’ve isolated the likely regression point; before finalizing I’m checking whether Firebase init is SSR-safe, since that explains why `ssr: false` may have been introduced in the first place.
+
+Read [](file:///home/iwan-efendi/Documents/SnipGeek/src/components/blog/article-toc.tsx)
+
+Read [](file:///home/iwan-efendi/Documents/SnipGeek/src/firebase/config.ts)
+
+Read [](file:///home/iwan-efendi/Documents/SnipGeek/src/components/blog/article-comments.tsx#1-1), lines 1 to 220
+
+Ran terminal command:  cd /home/iwan-efendi/Documents/SnipGeek
+curl -s https://snipgeek.com/blog/rename-pc-windows-11 | grep -o "BAILOUT_TO_CLIENT_SIDE_RENDERING" | head -1 || true
+
+Read memory [](file:///home/iwan-efendi/.config/Code/User/workspaceStorage/5086663e7019eab7b311e9c26f6fc8db/GitHub.copilot-chat/memory-tool/memories/repo/snippet-facts.md)
+
+Hasil audit tanpa perubahan kode:
+
+1. Temuan utama (penyebab paling kuat)
+- Route artikel memang dirender dari server component di [src/app/[locale]/blog/[slug]/page.tsx](src/app/[locale]/blog/[slug]/page.tsx#L133), bukan client page.
+- Tetapi seluruh isi halaman dibungkus oleh komponen client-only yang di-load dengan SSR dimatikan:
+  - Wrapper dipakai di [src/app/[locale]/layout.tsx](src/app/[locale]/layout.tsx#L214)
+  - Children artikel ada di [src/app/[locale]/layout.tsx](src/app/[locale]/layout.tsx#L228)
+  - Definisi wrapper ada di firebase-provider-wrapper.tsx
+  - Flag pemicu bailout ada di firebase-provider-wrapper.tsx
+- Ini sangat konsisten dengan gejala kamu: HTML awal hanya shell (title + skip link), lalu konten artikel jatuh ke client rendering.
+
+2. Bukti dari fetch production
+- Di HTML production ada marker Next bailout: BAILOUT_TO_CLIENT_SIDE_RENDERING.
+- Skip link muncul, tapi marker DOM konten utama seperti id="main-content" dan tag article tidak muncul sebagai HTML final saat initial response.
+- Teks artikel memang terlihat di payload sebagai data RSC/Flight script, bukan sebagai markup artikel yang sudah jadi di HTML body.
+
+3. Cek komponen artikel dan MDX
+- File artikel tidak punya use client: [src/app/[locale]/blog/[slug]/page.tsx](src/app/[locale]/blog/[slug]/page.tsx#L1)
+- MDX dirender pakai varian server next-mdx-remote/rsc:
+  - Import di [src/app/[locale]/blog/[slug]/page.tsx](src/app/[locale]/blog/[slug]/page.tsx#L13)
+  - Render di [src/app/[locale]/blog/[slug]/page.tsx](src/app/[locale]/blog/[slug]/page.tsx#L273)
+- Jadi pipeline MDX-nya sendiri sudah benar untuk SSR.
+
+4. Cek data fetching
+- Konten artikel diambil langsung dari server via getPostData di [src/app/[locale]/blog/[slug]/page.tsx](src/app/[locale]/blog/[slug]/page.tsx#L139)
+- Tidak ada pola useEffect atau fetch client ke /api/posts untuk body artikel.
+- API route memang sehat dan mengembalikan content penuh:
+  - [src/app/api/posts/[slug]/route.ts](src/app/api/posts/[slug]/route.ts#L1)
+  - Loader konten file-based via engine di posts.ts
+
+5. Cek Suspense dan parent layout
+- Tidak ada Suspense fallback pada tree artikel yang menjelaskan hilangnya konten.
+- Parent layout [src/app/[locale]/layout.tsx](src/app/[locale]/layout.tsx) adalah server component, tapi memasukkan boundary client-only yang men-disable SSR untuk subtree utama.
+
+6. generateStaticParams dan generateMetadata
+- Sudah ada dan terimplementasi:
+  - generateMetadata: [src/app/[locale]/blog/[slug]/page.tsx](src/app/[locale]/blog/[slug]/page.tsx#L31)
+  - generateStaticParams: [src/app/[locale]/blog/[slug]/page.tsx](src/app/[locale]/blog/[slug]/page.tsx#L122)
+  - dynamicParams false: [src/app/[locale]/blog/[slug]/page.tsx](src/app/[locale]/blog/[slug]/page.tsx#L29)
+- Metadata bukan sumber masalah ini.
+
+Kesimpulan
+- Akar masalah bukan di MDX article page, melainkan di layout-level client bailout akibat dynamic import dengan ssr false yang membungkus seluruh children halaman. Ini membuat konten artikel tidak hadir sebagai HTML SSR yang dapat langsung dibaca crawler non-JS.
+- Endpoint /api/posts tetap aman dan tidak perlu diubah.
+
+Kalau kamu mau, langkah berikutnya saya bisa kasih patch plan minimal-risk (tanpa eksekusi dulu) supaya body artikel kembali muncul di raw HTML sambil mempertahankan fitur Firebase client-only.
 
 ---
 
-## Ringkasan Eksekutif
+## Fix Applied (Cascade Re-Audit — 13 Apr 2026)
 
-Artikel SnipGeek **sudah ter-render di sisi server** via `MDXRemote/rsc` — artinya konten teks sudah ada di HTML sebelum JavaScript berjalan. Namun ada **tiga masalah utama** yang berpotensi mempersulit AI crawler membaca konten:
+### Perubahan yang dilakukan
 
-1. JSON API yang sudah dibangun khusus untuk AI crawler justru **diblokir sendiri** di `robots.txt`
-2. Beberapa elemen UI menyembunyikan konten via CSS (`opacity: 0`, `max-h-0`) di SSR awal
-3. Tidak ada panduan eksplisit untuk AI crawler modern (`llms.txt`, entri bot-spesifik)
+**1. `src/components/layout/firebase-provider-wrapper.tsx`** — Menghapus `dynamic()` dengan `ssr: false`
 
----
-
-## 1. `robots.txt` (via `src/app/robots.ts`)
-
-### Kode Saat Ini
-
-```ts
-// src/app/robots.ts
-export default function robots(): MetadataRoute.Robots {
-  return {
-    rules: {
-      userAgent: '*',
-      allow: '/',
-      disallow: ['/api/', '/_next/'],
-    },
-    sitemap: 'https://snipgeek.com/sitemap.xml',
-  };
-}
+Sebelum:
+```tsx
+const FirebaseClientProvider = dynamic(() =>
+  import('@/firebase').then((mod) => mod.FirebaseClientProvider),
+  { ssr: false }
+);
 ```
 
-### Temuan
-
-| Aspek | Status | Keterangan |
-|---|---|---|
-| Semua bot diizinkan ke `/blog/*` | ✅ Baik | ClaudeBot, GPTBot, PerplexityBot tidak diblokir |
-| `Disallow: /api/` | ❌ **Kritis** | Memblokir `/api/posts/[slug]` dan `/api/notes/[slug]` yang dibuat khusus untuk AI |
-| Tidak ada entri bot-spesifik | ⚠️ Netral | Tidak ada aturan untuk GPTBot, ClaudeBot, Applebot, dll. secara eksplisit |
-| Sitemap ter-link | ✅ Baik | `https://snipgeek.com/sitemap.xml` tersedia |
-
-### Ironi Kritis
-
-Di dalam kodebase sudah ada dua JSON API endpoint dengan komentar eksplisit:
-
-```ts
-// src/app/api/posts/[slug]/route.ts
-/**
- * Returns raw article data as JSON for AI crawlers and HTTP fetchers
- * that cannot execute JavaScript.
- */
+Sesudah:
+```tsx
+import { FirebaseClientProvider } from '@/firebase/client-provider';
 ```
 
-API ini mengembalikan konten artikel lengkap dalam format JSON yang bersih — ideal untuk AI. Namun `robots.ts` memerintahkan semua crawler untuk **tidak masuk ke `/api/`**, sehingga endpoint ini secara praktis tertutup untuk crawler yang patuh pada `robots.txt`.
+Alasan aman: `initializeFirebase()` di `firebase/config.ts` sudah punya guard `typeof window === 'undefined'` yang return null services saat SSR. Semua consumer `useFirebase()` juga handle null gracefully.
 
----
+**2. `src/app/[locale]/blog/loading.tsx`** — Direname ke `_loading.tsx.bak`
 
-## 2. Server-Rendered HTML — Halaman Artikel (`/blog/[slug]`)
+**3. `src/app/[locale]/blog/[slug]/loading.tsx`** — Direname ke `_loading.tsx.bak`
 
-### Status: ✅ LULUS
+Alasan: `loading.tsx` membuat Suspense boundary otomatis yang menempatkan konten halaman ke `<div hidden id="S:x">`, sehingga crawler tanpa JS hanya melihat skeleton fallback. Untuk halaman SSG statis, ini tidak diperlukan.
 
-Halaman artikel menggunakan `MDXRemote` dari `next-mdx-remote/rsc` (versi React Server Component). Ini berarti **seluruh teks artikel sudah ada di HTML** sebelum JavaScript berjalan — cara yang benar untuk crawler.
+### Hasil verifikasi (localhost `next start`)
 
-```ts
-// src/app/[locale]/blog/[slug]/page.tsx
-// page.tsx adalah Server Component (tidak ada "use client")
-<div className="text-lg text-foreground/80 prose-content">
-  <MDXRemote
-    source={initialPost.content || ""}
-    components={mdxComponents}
-    options={{ mdxOptions: { remarkPlugins: [remarkGfm], ... } }}
-  />
-</div>
+```
+✅ <article> in initial visible DOM
+✅ prose-content in initial visible DOM
+✅ id=main-content present
+✅ <h1> present
+✅ <h2> present
+✅ No hidden replacement divs
+✅ Text: "Why Renaming Your PC Matters"
+✅ Text: "DESKTOP-"
+✅ Text: "Rename this PC"
+✅ prose-content is real DOM (not in script)
+✅ 3x BAILOUT markers ALL before main-content (dari LayoutDeferredUi leaf components — tidak mempengaruhi konten)
 ```
 
-### Detail Per Elemen
-
-| Elemen | Ada di SSR HTML? | Catatan |
-|---|---|---|
-| Body text artikel (paragraf, list, blockquote) | ✅ Ya | `MDXRemote/rsc` = Server Component |
-| `<h1>` judul artikel | ✅ Ya | Dirender dari `page.tsx` (Server Component) |
-| `<h2>`, `<h3>` heading dalam konten | ✅ Ya | Bagian dari MDX render |
-| `ArticleTOC` (daftar isi) | ⚠️ Di HTML tapi tersembunyi | `useState(false)` → `max-h-0 opacity-0` saat SSR |
-| `ArticleRelated` | ⚠️ Di HTML tapi `opacity: 0` | `ScrollReveal` (framer-motion) set opacity 0 di SSR |
-| `RevealImage` gambar hero | ✅ `<img>` ada di HTML | Tapi dengan class `opacity-0` sampai JS load |
-| JSON-LD `BlogPosting` schema | ✅ Lengkap | Termasuk `headline`, `datePublished`, `author`, `publisher` |
-| `<article aria-label="...">` wrapper | ✅ Ya | Semantik HTML sudah benar |
-
-### Detail `ArticleTOC` yang Perlu Diperhatikan
-
-```ts
-// src/components/blog/article-toc.tsx
-export function ArticleTOC({ headings }: ArticleTOCProps) {
-  const [isOpen, setIsOpen] = useState(false); // ← server render: false (tertutup)
-  // ...
-  <div className={cn(
-    "overflow-hidden transition-all duration-300 ease-out",
-    isOpen
-      ? "max-h-250 translate-y-0 opacity-100"
-      : "max-h-0 -translate-y-2 opacity-0", // ← heading links tersembunyi di SSR
-  )}>
-```
-
-Link heading di dalam TOC memang ada di HTML, tapi dengan `max-h-0` dan `opacity-0`. Sebagian besar text crawler masih bisa membacanya dari source HTML, tapi tidak visually accessible.
-
----
-
-## 3. Server-Rendered HTML — Homepage (`/`)
-
-### Status: ⚠️ SEBAGIAN — Hanya above-fold yang ter-render
-
-```ts
-// src/app/[locale]/home-client.tsx
-function LazySection({ children, minHeight }) {
-  const [visible, setVisible] = useState(false); // ← server: false
-  
-  useEffect(() => {
-    // IntersectionObserver — hanya berjalan di browser, tidak di server
-    const observer = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting) setVisible(true);
-    }, { rootMargin: "300px" });
-    observer.observe(ref.current);
-  }, []);
-
-  return (
-    <div ref={ref}>
-      {visible ? children : <SectionPlaceholder minHeight={minHeight} />}
-      //                     ↑ yang dirender server: div aria-hidden kosong
-    </div>
-  );
-}
-```
-
-### Konten per Section
-
-| Section | Ada di SSR HTML? | Alasan |
-|---|---|---|
-| `HomeHero` — featured posts (judul + link) | ✅ Ya | Tidak dibungkus `LazySection` |
-| `HomeLatest` — 6 artikel terbaru (judul + link) | ✅ Ya | Tidak dibungkus `LazySection` |
-| `HomeTransitionNote` | ❌ Tidak | `LazySection` → render `<div aria-hidden="true">` kosong |
-| `HomeTutorials` | ❌ Tidak | `LazySection` → render `<div aria-hidden="true">` kosong |
-| `HomeTopics` | ❌ Tidak | `LazySection` → render `<div aria-hidden="true">` kosong |
-| `HomeUpdates` | ❌ Tidak | `LazySection` → render `<div aria-hidden="true">` kosong |
-| `HomeNotes` | ❌ Tidak | `LazySection` → render `<div aria-hidden="true">` kosong |
-
-`LazySection` dirancang untuk optimasi Lighthouse (mengurangi TBT / main-thread work). Efek sampingnya: sekitar 70% konten homepage tidak masuk ke HTML yang dibaca crawler.
-
----
-
-## 4. Server-Rendered HTML — Blog List (`/blog`)
-
-### Status: ⚠️ TERBATAS — Hanya 9 artikel pertama
-
-```ts
-// src/app/[locale]/blog/blog-list-client.tsx
-const POSTS_PER_PAGE = 9;
-
-export function BlogListClient({ initialPosts }: ...) {
-  const [visibleCount, setVisibleCount] = useState(POSTS_PER_PAGE); // ← server: 9
-  
-  const displayedPosts = allPosts.slice(0, visibleCount); // hanya 9 artikel di SSR
-  
-  // Tombol "Load More" membutuhkan JavaScript
-  const handleLoadMore = () => setVisibleCount((prev) => prev + POSTS_PER_PAGE);
-}
-```
-
-Dengan 34+ artikel yang sudah dipublish, AI crawler hanya bisa melihat 9 artikel pertama dari halaman `/blog`. Sisanya terkunci di balik interaksi JavaScript.
-
----
-
-## 5. Meta Tags
-
-### Status: ✅ SANGAT BAIK
-
-```ts
-// src/app/[locale]/layout.tsx
-robots: {
-  index: true,
-  follow: true,
-  googleBot: {
-    index: true,
-    follow: true,
-    "max-video-preview": -1,
-    "max-image-preview": "large",
-    "max-snippet": -1,  // izinkan snippet penuh — sangat baik untuk AI
-  },
-},
-```
-
-### Checklist Meta Tags
-
-| Tag / Elemen | Status | Catatan |
-|---|---|---|
-| `<title>` per halaman | ✅ | Diset via `generateMetadata` |
-| `<meta name="description">` | ✅ | Unik per halaman |
-| `<meta name="keywords">` | ✅ | Ada di halaman artikel (dari frontmatter `tags`) |
-| OpenGraph `og:title`, `og:description` | ✅ | Lengkap |
-| OpenGraph `og:type: article` | ✅ | Diset di artikel |
-| OpenGraph `og:image` | ✅ | Hero image per artikel |
-| OpenGraph `publishedTime`, `modifiedTime` | ✅ | Diset dari frontmatter |
-| Twitter Card `summary_large_image` | ✅ | |
-| `canonical` URL | ✅ | Per locale |
-| `hreflang` alternates EN/ID | ✅ | Termasuk `x-default` |
-| `robots: index, follow` | ✅ | Di layout utama |
-| `max-snippet: -1` | ✅ | Snippet tidak dipotong |
-| JSON-LD `BlogPosting` | ✅ | `headline`, `description`, `image`, `datePublished`, `dateModified`, `author`, `publisher`, `wordCount` |
-| JSON-LD `BreadcrumbList` | ✅ | Di setiap artikel |
-| JSON-LD `WebSite` + `SearchAction` | ✅ | Di homepage |
-| JSON-LD `Organization` | ✅ | Di homepage |
-| `llms.txt` | ❌ | Tidak ada — standar baru untuk AI crawler |
-
----
-
-## 6. Ironi API — Temuan Paling Kritis
-
-Kodebase sudah memiliki infrastruktur JSON API lengkap untuk AI, tapi ada tiga lapis sinyal yang saling bertentangan:
-
-### Endpoint yang Ada
-
-**`GET /api/posts/[slug]?locale=en`** → Mengembalikan:
-```json
-{
-  "slug": "...",
-  "locale": "en",
-  "title": "...",
-  "description": "...",
-  "date": "...",
-  "updated": "...",
-  "tags": [...],
-  "category": "...",
-  "content": "... full markdown content ..."
-}
-```
-
-**`GET /api/notes/[slug]?locale=en`** → Struktur serupa untuk catatan.
-
-### Tiga Lapis Blocking
-
-| Lapis | Mekanisme | Efek |
-|---|---|---|
-| 1 | `robots.ts` → `disallow: ['/api/']` | Crawler yang patuh pada `robots.txt` diperintahkan tidak masuk ke endpoint ini |
-| 2 | `X-Robots-Tag: noindex` di response header | Endpoint diminta untuk tidak diindeks sebagai hasil pencarian, meski ini tidak identik dengan larangan membaca konten |
-| 3 | Komentar kode bertentangan dengan robots.txt | Niat implementasi “AI-friendly JSON” tidak dieksekusi secara konsisten |
-
----
-
-## 7. `ScrollReveal` dan `opacity: 0` di SSR
-
-Beberapa section menggunakan `ScrollReveal` dari framer-motion yang menerapkan `opacity: 0` sebagai inline style di SSR awal:
-
-```ts
-// src/components/ui/scroll-reveal.tsx
-<motion.div
-  initial={shouldAnimate ? { opacity: 0, ...initialOffset } : false}
-  animate={{ opacity: 1, ... }}
->
-  {children}
-</motion.div>
-```
-
-Komponen yang terdampak: `ArticleRelated`, `HomeTutorials`, `HomeTopics`.
-
-Teks konten tetap ada di HTML source, tapi dengan `style="opacity: 0"` sebagai inline style. Sebagian besar AI text crawler akan tetap membacanya dari raw HTML, tapi crawler yang mengevaluasi rendered state mungkin melewatinya.
-
----
-
-## 8. Tidak Ada Proxy/Middleware Blocking Tambahan
-
-**Status: ✅ Baik**
-
-Tidak ditemukan file `src/middleware.ts`, tetapi ada file `src/proxy.ts` yang berfungsi sebagai layer routing. Dari implementasinya, route `/api`, `/_next`, dan file statis langsung dilewatkan (`NextResponse.next()`), dan tidak ada bot-blocking, rate limiting berbasis User-Agent, atau challenge tambahan di layer ini. Jadi crawler tetap bebas mengakses route HTML yang tidak diblokir oleh `robots.txt`.
-
----
-
-## 9. Sitemap
-
-### Status: ✅ SANGAT BAIK
-
-```ts
-// src/app/sitemap.ts
-// Mencakup:
-// - Semua static routes (home, blog, notes, about, tools, dll.)
-// - Semua blog posts per locale dengan lastModified dari frontmatter
-// - Semua notes per locale
-// - Tag pages (yang memenuhi ambang batas shouldIndexTag)
-// - Tool pages
-```
-
-| Aspek | Status |
-|---|---|
-| Semua artikel ter-include | ✅ |
-| `lastModified` dari frontmatter `updated` / `date` | ✅ |
-| `priority` berbeda per tipe konten | ✅ (`featured: 0.8`, normal: `0.6`) |
-| Bilingual EN/ID dengan locale prefix yang benar | ✅ |
-| Tool pages di-include | ✅ |
-| Tag pages (selective) | ✅ |
-
----
-
-## Diagnosis: Mengapa Claude Tidak Bisa Membaca Artikel?
-
-> Catatan: bagian ini adalah **hipotesis operasional berbasis audit statis**, bukan hasil pengujian live terhadap bot Claude.
-
-### Kemungkinan Penyebab (Urut Prioritas)
-
-**1. JSON API diblokir (Paling Mungkin)**
-API yang paling ideal untuk dibaca Claude — `/api/posts/[slug]` yang mengembalikan clean JSON — tidak bisa diakses karena `Disallow: /api/` di robots.txt. ClaudeBot yang patuh terhadap robots.txt akan skip endpoint ini.
-
-**2. HTML artikel mungkin terlalu kompleks untuk sebagian URL reader AI**
-Meskipun konten ada di SSR HTML, halaman artikel tetap dibungkus boilerplate aplikasi: script hydration Next.js, inisialisasi client, font, dan elemen UI lain. Ini **masuk akal sebagai hipotesis**, tetapi tidak bisa dipastikan tanpa uji fetch langsung ke URL produksi.
-
-**3. Tidak ada `llms.txt` sebagai panduan**
-Situs modern yang ingin AI-friendly menyediakan `/llms.txt` yang berisi daftar URL konten bersih. Tanpa ini, AI crawler harus menebak struktur konten dari sitemap biasa.
-
-**4. `ArticleTOC` collapsed di SSR**
-Heading-heading artikel ada di HTML tapi dengan `opacity: 0` dan `max-h: 0`. Beberapa crawler yang mengevaluasi rendered state bisa melewatkan ini sebagai "hidden content".
-
----
-
-## Rekomendasi
-
-> ⚠️ Ini adalah dokumen audit saja — belum ada perubahan kode yang dilakukan.
-
-### Prioritas Tinggi 🔴
-
-1. **Buka akses `/api/posts/` dan `/api/notes/` di robots.ts**
-   - Ubah `disallow: ['/api/']` menjadi lebih spesifik: hanya blokir route yang benar-benar private
-   - Atau buat pengecualian eksplisit untuk `/api/posts/` dan `/api/notes/`
-
-2. **Pertahankan atau tinjau ulang `X-Robots-Tag` di API route dengan tujuan yang jelas**
-  - Header `noindex` tetap masuk akal jika endpoint JSON tidak ingin tampil di hasil pencarian
-  - Fokus utama tetap membuka akses crawl; `noindex` tidak otomatis berarti bot AI tidak boleh membaca kontennya
-
-3. **Tambahkan entri bot-spesifik di robots.ts**
-   ```
-   GPTBot, ClaudeBot, PerplexityBot, Applebot, Bytespider
-   ```
-   Bisa digunakan untuk memberi izin spesifik ke `/api/posts/` hanya untuk bot-bot ini
-
-### Prioritas Sedang 🟡
-
-4. **Buat file `/public/llms.txt`**
-   - Format sederhana: daftar URL artikel yang ingin dibuat tersedia untuk AI
-   - Lihat referensi: [llmstxt.org](https://llmstxt.org)
-
-5. **Tambahkan `<link rel="alternate" type="application/json">` di artikel**
-   - Beri tahu crawler bahwa ada versi JSON tersedia di `/api/posts/[slug]`
-
-### Prioritas Rendah 🟢
-
-6. **`ArticleTOC` — pertimbangkan `useState(true)` untuk SSR**
-   - TOC terbuka secara default → heading links langsung visible di SSR HTML
-   - User bisa menutupnya secara manual (UX tidak terlalu berubah)
-
-7. **Homepage `LazySection` — pertimbangkan server-render judul section**
-   - Minimal render teks judul section dan beberapa link di SSR
-   - Konten penuh tetap lazy-loaded untuk performa
-
-8. **Blog list — pertimbangkan sitemap sebagai sumber utama untuk crawler**
-   - Sitemap sudah lengkap dengan semua URL artikel
-   - Crawler yang baik akan menggunakan sitemap, bukan crawl blog list
-
----
-
-## Ringkasan Skor
-
-| Area | Skor | Keterangan |
-|---|---|---|
-| `robots.txt` untuk HTML pages | 8/10 | Permisif dan benar, tapi blokir API sendiri |
-| `robots.txt` untuk AI API | 2/10 | Blokir endpoint yang dibuat khusus untuk AI |
-| Sitemap | 10/10 | Sangat lengkap dan well-structured |
-| Meta tags & Schema.org | 9/10 | Lengkap, `max-snippet: -1` adalah nilai plus |
-| SSR artikel (body text) | 9/10 | `MDXRemote/rsc` sudah benar |
-| SSR homepage | 4/10 | Sebagian besar konten tidak ter-render di SSR |
-| SSR blog list | 5/10 | Hanya 9 dari 34+ artikel visible tanpa JS |
-| AI-specific guidance (`llms.txt`) | 0/10 | Tidak ada |
-| **Overall AI Accessibility** | **6/10** | Fondasi sudah kuat, perlu beberapa perbaikan kritis |
-
----
-
-*Audit ini dilakukan secara statis dengan membaca kode sumber. Tidak ada perubahan kode yang dilakukan. Untuk validasi lebih lanjut, perlu test langsung ke URL produksi, termasuk fetch ke endpoint HTML dan JSON sebagai crawler yang patuh pada `robots.txt`.*
+### Yang tidak diubah
+- `/api/posts/` route handler — tetap aman
+- `generateStaticParams` dan `generateMetadata` — tetap berfungsi
+- MDX rendering pipeline (`next-mdx-remote/rsc`) — tidak dimodifikasi
+- Notes route `loading.tsx` — tidak diubah (terpisah dari blog)
