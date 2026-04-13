@@ -60,6 +60,12 @@ export default async function BlogPage({
   const initialPosts = await getSortedPostsData(locale);
   const dictionary = await getDictionary(locale);
   const linkPrefix = getLinkPrefix(locale);
+  const itemListElement = initialPosts.map((post, index) => ({
+    "@type": "ListItem",
+    position: index + 1,
+    url: `https://snipgeek.com${linkPrefix}/blog/${post.slug}`,
+    name: post.frontmatter.title,
+  }));
 
   return (
     <>
@@ -72,6 +78,23 @@ export default async function BlogPage({
             name: dictionary.blog.title,
             description: dictionary.blog.description,
             url: `https://snipgeek.com${linkPrefix}/blog`,
+            mainEntity: {
+              "@type": "ItemList",
+              numberOfItems: itemListElement.length,
+              itemListElement,
+            },
+          }),
+        }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "ItemList",
+            name: dictionary.blog.title,
+            numberOfItems: itemListElement.length,
+            itemListElement,
           }),
         }}
       />

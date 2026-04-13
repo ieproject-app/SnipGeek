@@ -60,6 +60,12 @@ export default async function NotesPage({
   const initialNotes = await getSortedNotesData(locale);
   const dictionary = await getDictionary(locale);
   const linkPrefix = getLinkPrefix(locale);
+  const itemListElement = initialNotes.map((note, index) => ({
+    "@type": "ListItem",
+    position: index + 1,
+    url: `https://snipgeek.com${linkPrefix}/notes/${note.slug}`,
+    name: note.frontmatter.title,
+  }));
 
   return (
     <>
@@ -72,6 +78,23 @@ export default async function NotesPage({
             name: dictionary.notes.title,
             description: dictionary.notes.description,
             url: `https://snipgeek.com${linkPrefix}/notes`,
+            mainEntity: {
+              "@type": "ItemList",
+              numberOfItems: itemListElement.length,
+              itemListElement,
+            },
+          }),
+        }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "ItemList",
+            name: dictionary.notes.title,
+            numberOfItems: itemListElement.length,
+            itemListElement,
           }),
         }}
       />

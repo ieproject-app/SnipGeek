@@ -5,6 +5,7 @@ import type { Locale } from "@/i18n-config";
 import { getDictionary } from "@/lib/get-dictionary";
 import { HomeClient } from "./home-client";
 import type { Metadata } from "next";
+import { getLinkPrefix } from "@/lib/utils";
 
 export async function generateMetadata({
   params,
@@ -46,8 +47,125 @@ export default async function Home({
   const initialPosts = await getSortedPostsData(locale);
   const initialNotes = await getSortedNotesData(locale);
   const dictionary = await getDictionary(locale);
+  const linkPrefix = getLinkPrefix(locale);
   const canonicalUrl =
     locale === i18n.defaultLocale ? "https://snipgeek.com" : `https://snipgeek.com/${locale}`;
+  const windowsUbuntuTags = new Set(["windows", "ubuntu", "linux", "dual-boot"]);
+  const linuxTags = new Set(["linux", "ubuntu"]);
+  const windowsTags = new Set(["windows", "windows-11"]);
+
+  const allPosts = [...initialPosts].sort(
+    (a, b) =>
+      new Date(b.frontmatter.date).getTime() -
+      new Date(a.frontmatter.date).getTime(),
+  );
+  const latestNotes = [...initialNotes]
+    .sort(
+      (a, b) =>
+        new Date(b.frontmatter.date).getTime() -
+        new Date(a.frontmatter.date).getTime(),
+    )
+    .slice(0, 6);
+  const seenSlugs = new Set<string>();
+
+  const featuredLinuxPosts = allPosts
+    .filter(
+      (post) =>
+        post.frontmatter.published &&
+        post.frontmatter.featured &&
+        post.frontmatter.tags?.some((tag: string) => linuxTags.has(tag.toLowerCase())),
+    )
+    .slice(0, 2);
+  const featuredWindowsPosts = allPosts
+    .filter(
+      (post) =>
+        post.frontmatter.published &&
+        post.frontmatter.featured &&
+        post.frontmatter.tags?.some((tag: string) => windowsTags.has(tag.toLowerCase())),
+    )
+    .slice(0, 2);
+  const featuredPosts = [...featuredLinuxPosts, ...featuredWindowsPosts];
+  featuredPosts.forEach((post) => seenSlugs.add(post.slug));
+
+  const latestPosts = allPosts
+    .filter((post) => post.frontmatter.published && !seenSlugs.has(post.slug))
+    .slice(0, 6);
+  latestPosts.forEach((post) => seenSlugs.add(post.slug));
+
+  const manualTutorialSlugs = [
+    "how-to-create-windows-11-bootable-usb-rufus",
+    "clean-install-windows-11-step-by-step-guide",
+    "to-do-after-install-windows11",
+  ];
+  const manualTutorialPosts = allPosts.filter(
+    (post) =>
+      post.frontmatter.published && manualTutorialSlugs.includes(post.slug),
+  );
+  manualTutorialPosts.forEach((post) => seenSlugs.add(post.slug));
+
+  const topicPosts = allPosts
+    .filter(
+      (post) =>
+        post.frontmatter.published &&
+        !seenSlugs.has(post.slug) &&
+        post.frontmatter.tags?.some((tag: string) => windowsUbuntuTags.has(tag.toLowerCase())),
+    )
+    .slice(0, 8);
+  topicPosts.forEach((post) => seenSlugs.add(post.slug));
+
+  const primaryUpdatePosts = allPosts
+    .filter(
+      (post) =>
+        post.frontmatter.published &&
+        !seenSlugs.has(post.slug) &&
+        post.frontmatter.tags?.some((tag: string) => windowsUbuntuTags.has(tag.toLowerCase())) &&
+        (((post.frontmatter.category || "").toLowerCase().includes("update")) ||
+          post.frontmatter.tags?.some((tag: string) => {
+            const normalized = tag.toLowerCase();
+            return normalized === "update" || normalized === "news";
+          })),
+    )
+    .slice(0, 6);
+  const updateFallback = allPosts.filter(
+    (post) =>
+      post.frontmatter.published &&
+      !seenSlugs.has(post.slug) &&
+      post.frontmatter.tags?.some((tag: string) => windowsUbuntuTags.has(tag.toLowerCase())),
+  );
+  const updatePosts = [
+    ...primaryUpdatePosts,
+    ...updateFallback.filter(
+      (post) => !primaryUpdatePosts.some((picked) => picked.slug === post.slug),
+    ),
+  ].slice(0, 6);
+
+  const toBlogItems = (posts: typeof allPosts, name: string, id: string) => ({
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "@id": `${canonicalUrl}#${id}`,
+    name,
+    numberOfItems: posts.length,
+    itemListElement: posts.map((post, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      url: `https://snipgeek.com${linkPrefix}/blog/${post.slug}`,
+      name: post.frontmatter.title,
+    })),
+  });
+
+  const latestNotesJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "@id": `${canonicalUrl}#latest-notes`,
+    name: locale === "id" ? "Catatan Teknis Terbaru" : "Latest Technical Notes",
+    numberOfItems: latestNotes.length,
+    itemListElement: latestNotes.map((note, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      url: `https://snipgeek.com${linkPrefix}/notes/${note.slug}`,
+      name: note.frontmatter.title,
+    })),
+  };
 
   const websiteJsonLd = {
     "@context": "https://schema.org",
@@ -94,6 +212,14 @@ export default async function Home({
     "description": dictionary.home.description,
     "isPartOf": { "@type": "WebSite", "url": "https://snipgeek.com" },
     "inLanguage": locale === "id" ? "id-ID" : "en-US",
+    "mainEntity": [
+      { "@id": `${canonicalUrl}#featured-posts` },
+      { "@id": `${canonicalUrl}#latest-posts` },
+      { "@id": `${canonicalUrl}#tutorial-posts` },
+      { "@id": `${canonicalUrl}#topic-posts` },
+      { "@id": `${canonicalUrl}#update-posts` },
+      { "@id": `${canonicalUrl}#latest-notes` },
+    ],
   };
 
   return (
@@ -109,6 +235,70 @@ export default async function Home({
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(
+            toBlogItems(
+              featuredPosts,
+              locale === "id" ? "Artikel Unggulan" : "Featured Posts",
+              "featured-posts",
+            ),
+          ),
+        }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(
+            toBlogItems(
+              latestPosts,
+              dictionary.home.latestPosts,
+              "latest-posts",
+            ),
+          ),
+        }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(
+            toBlogItems(
+              manualTutorialPosts,
+              locale === "id" ? "Panduan Instalasi Windows 11" : "Windows 11 Installation Guide",
+              "tutorial-posts",
+            ),
+          ),
+        }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(
+            toBlogItems(
+              topicPosts,
+              locale === "id" ? "Sorotan Windows & Ubuntu" : "Windows & Ubuntu Highlights",
+              "topic-posts",
+            ),
+          ),
+        }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(
+            toBlogItems(
+              updatePosts,
+              locale === "id" ? "Update Penting Sistem" : "Important System Updates",
+              "update-posts",
+            ),
+          ),
+        }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(latestNotesJsonLd) }}
       />
       <HomeClient
         initialPosts={initialPosts}

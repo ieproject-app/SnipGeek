@@ -40,6 +40,7 @@ export async function generateMetadata({
 
   const linkPrefix = getLinkPrefix(locale);
   const canonicalPath = `${linkPrefix}/blog/${slug}`;
+  const jsonAlternate = `https://snipgeek.com/api/posts/${post.slug}?locale=${locale}`;
 
   // Build hreflang alternates by checking if translations exist for each locale
   const languages: Record<string, string> = {};
@@ -82,6 +83,9 @@ export async function generateMetadata({
         ...languages,
         "x-default": languages[i18n.defaultLocale] || canonicalPath,
       },
+      types: {
+        "application/json": jsonAlternate,
+      },
     },
     openGraph: {
       type: "article",
@@ -107,6 +111,7 @@ export async function generateMetadata({
     },
     other: {
       "og:locale": locale === "id" ? "id_ID" : "en_US",
+      "ai:content-json": jsonAlternate,
     },
   };
 }
