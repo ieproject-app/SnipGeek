@@ -20,12 +20,12 @@ export async function GET() {
 
       const postLines = posts.map(
         (post) =>
-          `- ${post.frontmatter.title}\n  HTML: ${DOMAIN}${localePrefix}/blog/${post.slug}\n  JSON: ${DOMAIN}/api/posts/${post.slug}?locale=${locale}`,
+          `- ${post.frontmatter.title}\n  HTML: ${DOMAIN}${localePrefix}/blog/${post.slug}\n  JSON: ${DOMAIN}/api/posts/${post.slug}?locale=${locale}\n  Markdown: ${DOMAIN}/api/posts/${post.slug}/markdown?locale=${locale}`,
       );
 
       const noteLines = notes.map(
         (note) =>
-          `- ${note.frontmatter.title}\n  HTML: ${DOMAIN}${localePrefix}/notes/${note.slug}\n  JSON: ${DOMAIN}/api/notes/${note.slug}?locale=${locale}`,
+          `- ${note.frontmatter.title}\n  HTML: ${DOMAIN}${localePrefix}/notes/${note.slug}\n  JSON: ${DOMAIN}/api/notes/${note.slug}?locale=${locale}\n  Markdown: ${DOMAIN}/api/notes/${note.slug}/markdown?locale=${locale}`,
       );
 
       return [
@@ -49,6 +49,8 @@ export async function GET() {
     `- Notes index: ${DOMAIN}/notes`,
     `- Machine-readable articles: ${DOMAIN}/api/posts/{slug}?locale={locale}`,
     `- Machine-readable notes: ${DOMAIN}/api/notes/{slug}?locale={locale}`,
+    `- Plain Markdown articles: ${DOMAIN}/api/posts/{slug}/markdown?locale={locale}`,
+    `- Plain Markdown notes: ${DOMAIN}/api/notes/{slug}/markdown?locale={locale}`,
     "",
     ...sections,
     "",

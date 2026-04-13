@@ -40,6 +40,7 @@ export async function generateMetadata({
   const linkPrefix = getLinkPrefix(locale);
   const canonicalPath = `${linkPrefix}/notes/${slug}`;
   const jsonAlternate = `https://snipgeek.com/api/notes/${note.slug}?locale=${locale}`;
+  const markdownAlternate = `https://snipgeek.com/api/notes/${note.slug}/markdown?locale=${locale}`;
 
   // Build hreflang alternates by checking if translations exist for each locale
   const languages: Record<string, string> = {};
@@ -84,6 +85,7 @@ export async function generateMetadata({
       },
       types: {
         "application/json": jsonAlternate,
+        "text/markdown": markdownAlternate,
       },
     },
     openGraph: {
@@ -111,6 +113,7 @@ export async function generateMetadata({
     other: {
       "og:locale": locale === "id" ? "id_ID" : "en_US",
       "ai:content-json": jsonAlternate,
+      "ai:content-markdown": markdownAlternate,
     },
   };
 }
