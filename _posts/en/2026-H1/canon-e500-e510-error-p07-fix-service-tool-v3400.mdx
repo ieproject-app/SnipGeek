@@ -1,0 +1,175 @@
+---
+title: "Fix Canon E500/E510 Error P07 with Service Tool v3400 on Windows"
+slug: "canon-e500-e510-error-p07-fix-service-tool-v3400"
+translationKey: "canon-e500-e510-error-p07-fix-service-tool-v3400"
+date: "2026-04-14"
+description: "Fix Canon E500/E510 Error P07 in minutes — reset the waste ink counter using Service Tool v3400 on Windows without sending the printer to a technician."
+heroImage: "/images/_posts/printer/canon/e510-e500/banner-e510-canon.webp"
+imageAlt: "Canon PIXMA E500 and E510 inkjet printer with Error P07 waste ink counter reset guide"
+published: true
+featured: false
+tags: ["windows", "printer", "tutorial", "troubleshooting", "driver"]
+category: "Hardware"
+---
+
+The printer had been working fine all morning. Then, mid-document, it just stopped — the LCD blinked **Error P07** and refused to do anything else. My first instinct was that something had failed mechanically: a clogged head, a snapped gear, something that would mean a repair shop. I was already mentally calculating the cost. Turns out it was a software counter, and the fix took less than five minutes.
+
+**Error P07** on the Canon E500 and E510 means the printer's internal waste ink counter has hit its maximum value. The printer tracks how much ink the waste pads absorb over time, and once that number maxes out, it locks itself down — even if the pads still have physical capacity. The counter is a software safeguard, not a hardware failure, and you can reset it yourself using **Canon Service Tool v3400** on Windows.
+
+---
+
+## What Error P07 Actually Means
+
+The Canon E500 and E510 are nearly identical printers — same mechanism, same internals, same quirks. Both use the same counter system, and both display P07 in the same way when the limit is reached.
+
+This is not a sign that your printer is broken. Canon builds the counter in to prevent waste ink from overflowing and damaging internal components. Once it trips, the printer refuses to operate until the counter is manually zeroed. In most cases — especially on a first-time maxout — the physical pads still have room, and a reset is entirely safe to do.
+
+---
+
+## Before You Start
+
+Have these ready before going through the steps:
+
+- A Canon E500 or E510 connected to your Windows PC via USB
+- A few sheets of blank paper loaded in the printer tray
+- Windows Defender (or any other antivirus) temporarily disabled — the resetter tool triggers false positives almost universally
+- **Service Tool v3400** downloaded and extracted (links in the next section)
+
+---
+
+## Step 1: Enter Printer Service Mode
+
+Service Mode is a hidden diagnostic state that gives the reset tool direct access to the printer's internal counter. Without it, the software has no way to communicate with the printer correctly. This button sequence is the most critical part of the entire process — follow it exactly.
+
+<Steps>
+  <Step>
+
+  ### Turn the Printer Off
+
+  Press the <kbd>POWER</kbd> button to turn the printer off. Leave the power cable plugged into the wall socket.
+
+  </Step>
+  <Step>
+
+  ### Hold the STOP/RESET Button
+
+  Press and **hold** the <kbd>STOP/RESET</kbd> button. Do not release it yet.
+
+  </Step>
+  <Step>
+
+  ### Add POWER While Holding STOP/RESET
+
+  While still holding <kbd>STOP/RESET</kbd>, press and **hold** the <kbd>POWER</kbd> button as well. Both buttons are now held simultaneously.
+
+  </Step>
+  <Step>
+
+  ### Release STOP/RESET Only
+
+  Keep the <kbd>POWER</kbd> button held. Release <kbd>STOP/RESET</kbd> — and only <kbd>STOP/RESET</kbd>.
+
+  </Step>
+  <Step>
+
+  ### Press STOP/RESET Six Times
+
+  With <kbd>POWER</kbd> still held, tap <kbd>STOP/RESET</kbd> exactly **6 times**. The indicator light alternates between orange and green with each press — that's the expected response and confirms the printer is receiving the signal.
+
+  </Step>
+  <Step>
+
+  ### Release Both Buttons Together
+
+  After the sixth press, release <kbd>POWER</kbd> and <kbd>STOP/RESET</kbd> at the same time.
+
+  The printer is now in Service Mode. If Windows shows an "installing new device" notification on your screen, ignore it — that's normal and doesn't require any action.
+
+  </Step>
+</Steps>
+
+If the printer just powers on normally without any change, unplug the power cable, wait a few seconds, and try the sequence again from the beginning. The order matters more than how fast you press — take it steady.
+
+---
+
+## Step 2: Reset the Counter with Service Tool v3400
+
+### Download the Application
+
+If you don't have the resetter yet, grab it from one of the links below:
+
+<DownloadButton id="canon-servicetool-v3400-gdrive" />
+<DownloadButton id="canon-servicetool-v3400-mediafire" />
+
+<Callout variant="warning" title="Antivirus Warning">
+  Service tools like this are almost always flagged as threats by antivirus software — including Windows Defender — even when the file is completely clean. Temporarily disable your antivirus before extracting and running the file. If you're not sure how, I have a step-by-step walkthrough on [disabling Windows Defender temporarily on Windows 11](/blog/disable-windows-defender-windows-11).
+</Callout>
+
+### Run the Reset Process
+
+With the printer in Service Mode and the application extracted, go through these steps:
+
+<Steps>
+  <Step>
+
+  ### Load Paper in the Tray
+
+  Place a few sheets of blank paper in the printer. The reset process may automatically print one confirmation page — you need paper ready for that.
+
+  </Step>
+  <Step>
+
+  ### Launch Service Tool v3400
+
+  Double-click the `.exe` file to open the application. No installation is required — it runs directly.
+
+  </Step>
+  <Step>
+
+  ### Reset the Main Counter
+
+  In the **Ink Absorber Counter** section, open the dropdown menu and select **"Main"**. Click the **Set** button next to it.
+
+  </Step>
+  <Step>
+
+  ### Reset the Main_Black Counter
+
+  Still in the same **Ink Absorber Counter** section, open the dropdown again and select **"Main_Black"**. Click **Set** once more.
+
+  </Step>
+  <Step>
+
+  ### Write the Reset to EEPROM
+
+  Click the **EEPROM** button. The printer may print a short test page at this point — that's the EEPROM write confirmation. Let it finish completely before doing anything else.
+
+  </Step>
+  <Step>
+
+  ### Power Cycle the Printer
+
+  Press <kbd>POWER</kbd> to turn the printer off, then turn it back on.
+
+  </Step>
+</Steps>
+
+---
+
+## Checking That It Worked
+
+After the printer restarts, the display should be clear — no blinking error code, no locked state. Send a test print from your PC. If the job goes through and prints normally, the reset was successful.
+
+If P07 reappears immediately after the printer powers back on, the printer most likely didn't fully enter Service Mode during Step 1 — this is the most common reason the reset doesn't take. Go back to the beginning of Step 1, repeat the button sequence carefully, and run the reset tool again.
+
+---
+
+## One Thing Worth Keeping in Mind
+
+Resetting the counter gives the printer a clean slate on the software side, but the physical waste pads are still accumulating ink with every print job. After several resets spread over a few years, you may start noticing ink staining the underside of the printer — at that point, the pads genuinely need replacing, not just another counter reset. For typical home printing volumes, one reset usually buys several more years of normal use without any issue.
+
+If you have an Epson printer dealing with a similar counter-based lockout — usually shown as a "Service Required" message — the fix works on the same principle but uses different software. I covered the full process for the [Epson L4150 and L4160](/blog/resetter-epson-l4150-l4160) if that's relevant to you.
+
+---
+
+If the reset worked, or if you ran into a snag at a specific step, leave a comment below. The Service Mode sequence is where most people get stuck the first time — and knowing exactly where it went wrong usually makes it a quick fix.
