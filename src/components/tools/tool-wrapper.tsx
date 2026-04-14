@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useUser, useAuth, isFirebaseInitialized } from "@/firebase";
 import { initiateGoogleSignIn } from "@/firebase/non-blocking-login";
 import { signOut } from "firebase/auth";
@@ -74,6 +74,11 @@ export function ToolWrapper({
   const { user, isUserLoading } = useUser();
   const auth = useAuth();
   const { notify } = useNotification();
+  const [isHydrated, setIsHydrated] = useState(false);
+
+  useEffect(() => {
+    setIsHydrated(true);
+  }, []);
 
   const t = dictionary?.tools?.systemNotReady || {
     title: "SISTEM BELUM SIAP",
@@ -102,7 +107,7 @@ export function ToolWrapper({
     }
   };
 
-  if (isUserLoading) {
+  if (isHydrated && isUserLoading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
         <Loader2 className="h-10 w-10 animate-spin text-accent" />
