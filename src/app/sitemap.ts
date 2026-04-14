@@ -14,12 +14,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "",
     "/blog",
     "/notes",
+    "/tags",
     "/about",
     "/contact",
     "/privacy",
     "/terms",
     "/disclaimer",
-    "/tools",
   ];
 
   // Tools routes yang ingin diindeks
@@ -38,7 +38,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         url: `${DOMAIN}${localePrefix}${route}`,
         lastModified: STATIC_LAST_MODIFIED,
         changeFrequency: "weekly" as const,
-        priority: route === "" ? 1 : route === "/tools" ? 0.9 : 0.8,
+        priority: route === "" ? 1 : 0.8,
       }));
       
       const toolPages = toolRoutes.map((tool) => ({
@@ -93,21 +93,32 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       const notes = await getSortedNotesData(locale);
       const allItems = [...posts, ...notes];
 
-      const tagCounts: Record<string, number> = {};
+      const tagData: Record<string, { count: number; latestDate: Date }> = {};
       allItems.forEach((item) => {
+        const itemDate = new Date(
+          item.frontmatter.updated || item.frontmatter.date,
+        );
         item.frontmatter.tags?.forEach((tag: string) => {
           const lowerTag = tag.toLowerCase();
-          tagCounts[lowerTag] = (tagCounts[lowerTag] || 0) + 1;
+          const existing = tagData[lowerTag];
+          if (!existing) {
+            tagData[lowerTag] = { count: 1, latestDate: itemDate };
+          } else {
+            existing.count += 1;
+            if (itemDate > existing.latestDate) {
+              existing.latestDate = itemDate;
+            }
+          }
         });
       });
 
       const localePrefix = locale === i18n.defaultLocale ? "" : `/${locale}`;
 
-      return Object.entries(tagCounts)
-        .filter(([tag, count]) => shouldIndexTag(tag, count))
-        .map(([tag]) => ({
+      return Object.entries(tagData)
+        .filter(([tag, { count }]) => shouldIndexTag(tag, count))
+        .map(([tag, { latestDate }]) => ({
           url: `${DOMAIN}${localePrefix}/tags/${encodeURIComponent(tag)}`,
-          lastModified: STATIC_LAST_MODIFIED,
+          lastModified: latestDate,
           changeFrequency: "weekly" as const,
           priority: 0.4,
         }));
