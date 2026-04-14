@@ -79,6 +79,7 @@ export default function NotFound() {
           name="description"
           content="Sorry, the page you're looking for doesn't exist. Find tutorials and technical notes at SnipGeek."
         />
+        <meta name="robots" content="noindex, nofollow" />
       </head>
       <body className="font-sans antialiased bg-background text-foreground">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>

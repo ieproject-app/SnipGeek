@@ -103,6 +103,8 @@ export async function generateMetadata({
       ],
       publishedTime: new Date(note.frontmatter.date).toISOString(),
       modifiedTime: new Date(note.frontmatter.updated ?? note.frontmatter.date).toISOString(),
+      authors: ["Iwan Efendi"],
+      tags: note.frontmatter.tags?.length ? note.frontmatter.tags : undefined,
     },
     twitter: {
       card: "summary_large_image",
@@ -112,6 +114,7 @@ export async function generateMetadata({
     },
     other: {
       "og:locale": locale === "id" ? "id_ID" : "en_US",
+      "article:author": "https://snipgeek.com/about",
       "ai:content-json": jsonAlternate,
       "ai:content-markdown": markdownAlternate,
     },
@@ -274,6 +277,7 @@ export default async function Page({
             "dateModified": new Date(initialNote.frontmatter.updated || initialNote.frontmatter.date).toISOString(),
             "inLanguage": locale === "id" ? "id" : "en",
             "wordCount": wordCount,
+            ...(currentTags.length > 0 ? { "keywords": currentTags } : {}),
             "author": {
               "@type": "Person",
               "name": "Iwan Efendi",
