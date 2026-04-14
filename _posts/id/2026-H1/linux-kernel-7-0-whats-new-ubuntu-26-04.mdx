@@ -1,0 +1,102 @@
+---
+title: "Kernel Linux 7.0 Resmi Rilis — Ini yang Baru untuk Ubuntu 26.04"
+slug: "linux-kernel-7-0-whats-new-ubuntu-26-04"
+translationKey: "linux-kernel-7-0-whats-new-ubuntu-26-04"
+date: "2026-04-16"
+description: "Linux 7.0 jadi kernel default Ubuntu 26.04 LTS, dengan swap lebih cepat, Intel TSX aktif kembali, dan performa filesystem yang lebih baik."
+heroImage: "/images/_posts/linux/linux-7/banner-linux.webp"
+imageAlt: "Banner rilis kernel Linux 7.0 dengan maskot penguin Tux"
+published: true
+featured: true
+tags: ["linux", "ubuntu-26-04", "ubuntu", "performance", "hardware"]
+category: "Linux"
+---
+
+Saya sedang pantau jadwal rilis [Ubuntu 26.04 LTS](/blog/ubuntu-26-04-lts-resolute-raccoon-new-features-major-changes) ketika kabar ini muncul tepat waktu — Linus Torvalds menandai Linux 7.0 pada 12 April, cuma hitungan hari sebelum Ubuntu 26.04 resmi tersedia untuk publik. Kernel inilah yang akan jadi fondasi Ubuntu LTS untuk dua tahun ke depan, jadi isi dalamnya jauh lebih penting dari sekadar lompatan nomor versi 6.x ke 7.0.
+
+Ringkasnya: pengelolaan memori lebih baik, filesystem lebih cepat, Intel TSX diaktifkan kembali untuk CPU modern, dan perbaikan hardware laptop yang cukup detail. Berikut hal-hal yang benar-benar relevan buat kamu yang berencana pakai Ubuntu 26.04.
+
+## Swap dan Memori Jadi Lebih Cepat
+
+Perbaikan subsistem swap yang dimulai sejak Linux 6.18 berlanjut di versi ini. Phase II dari rework swap table mempercepat proses membaca data kembali dari swap ke RAM saat memori sedang penuh.
+
+Pengujian nyata dengan workload Redis persistence menunjukkan peningkatan throughput sampai **20%** ketika banyak proses berbagi memori yang sama di swap. Di desktop biasa, angkanya memang lebih kecil — tapi catatan patch memastikan hasilnya konsisten lebih baik atau minimal sama di semua skenario yang diuji.
+
+Kalau kamu pakai Zram dengan backing device, ada bonus juga. Kernel sekarang bisa menulis data terkompresi Zram langsung ke disk tanpa perlu dekompresi dulu. Satu langkah lebih sedikit saat RAM penuh — dan ini terasa nyata di mesin dengan memori terbatas, apalagi mengingat [Ubuntu 26.04 menaikkan syarat minimum RAM-nya](/blog/ubuntu-26-04-minimum-ram-requirement).
+
+## Perbaikan Filesystem di Banyak Sisi
+
+EXT4 — filesystem default Ubuntu — mendapat peningkatan performa write untuk operasi direct I/O bersamaan. Kalau kamu sering jalankan backup tool, build system, atau download manager yang menulis ke disk secara paralel, ini perbaikan kecil tapi nyata.
+
+Driver NTFS3 dapat delayed allocation, operasi berbasis iomap, dan readahead lebih baik untuk scan direktori besar. Berguna kalau kamu dual-boot dengan Windows atau sesekali colok drive lama berformat Windows.
+
+XFS mendapat fitur yang cukup mencolok: **self-healing**. Framework pelaporan error filesystem baru di Linux 7.0 memungkinkan daemon systemd di background melakukan perbaikan otomatis saat kerusakan metadata terdeteksi — bahkan di drive yang sedang dipasang dan dipakai. Sebagian besar pengguna desktop Ubuntu tetap di EXT4 dan tidak akan merasakan ini langsung, tapi sebagai infrastruktur ini cukup mengesankan.
+
+exFAT juga memperbaiki pembacaan multi-cluster secara sekuensial, dengan peningkatan sekitar 10% pada drive berukuran cluster kecil. Manfaatnya lebih terasa di USB drive lama atau berkapasitas rendah.
+
+## Intel TSX Kembali Aktif — untuk CPU yang Tepat
+
+Yang ini menarik perhatian saya. Intel Transactional Synchronization Extensions (TSX) sudah dimatikan total di semua CPU yang mendukungnya sejak 2019, setelah ditemukan kerentanan bernama TSX Asynchronous Abort yang menyerang prosesor Core generasi ke-6 sampai ke-9.
+
+Linux 7.0 mengubah pengaturan default ke "auto." Kernel sekarang secara dinamis mengaktifkan TSX di CPU yang tidak rentan — kebanyakan generasi ke-10 ke atas — sambil tetap menonaktifkannya di chip yang terdampak. Kalau kamu pakai desktop Intel modern atau workstation Xeon, workload multi-threaded bisa dapat peningkatan performa tanpa kamu perlu melakukan apa-apa.
+
+Pikiran pertama saya: tujuh tahun TSX dibiarkan mati di hardware yang sebenarnya aman itu cukup lama. Tapi ya, lebih baik terlambat daripada tidak sama sekali.
+
+## Driver Grafis: Lama dan Baru
+
+GPU AMD GCN 1.0 dan GCN 1.1 — seperti seri Radeon HD 7000 dan HD 8000 — yang sudah dipindahkan ke driver amdgpu modern di Linux 6.19 mendapat perbaikan stabilitas lanjutan di sini. Kalau kamu masih pakai kartu grafis era itu, kernel ini membuat transisinya lebih mulus.
+
+Di sisi NVIDIA, driver open-source NVK mengembalikan dukungan large page untuk performa lebih baik. Driver Xe dari Intel mengekspos lebih banyak sensor suhu, dan GPU Arc B-series (Battlemage) sekarang bisa masuk D3cold — mode hemat daya PCIe terdalam — yang artinya konsumsi daya lebih rendah saat idle.
+
+Komputer single-board berbasis Rockchip RK3588 dan RK3576 seperti Orange Pi 5 mendapat hardware-accelerated decoding H.264/H.265 di mainline kernel, berkat kontribusi Collabora. Sebelumnya ini butuh vendor BSP kernel dari Rockchip. Boot [Ubuntu 26.04 LTS](/blog/ubuntu-26-04-beta-available-download) di perangkat itu, dan kamu langsung dapat playback 4K yang mulus dari pertama nyala.
+
+## Pengguna Laptop Dapat Perhatian Serius
+
+Linux 7.0 membawa perbaikan hardware laptop yang menurut saya cukup menyeluruh:
+
+- **ASUS ROG/TUF** mendapat kontrol backlight lebih baik, pengaturan kecerahan RGB, dan tombol Fn+F5 untuk kontrol kipas
+- **HP Victus S** mendapat kontrol kipas manual lewat driver HP WMI
+- **Lenovo Legion** (termasuk Legion Go) sekarang mengekspos kecepatan kipas dan suhu melalui HWMON
+- **TUXEDO InfinityBook Gen7** bisa mengatur configurable Total Graphics Power untuk GPU NVIDIA 3000
+
+Kernel ini juga menghapus `laptop_mode`, fitur hemat daya dari era kernel 2.6 saat hard disk masih berputar. Developer kernel Johannes Weiner bilang terus terang: *"the juice doesn't appear worth the squeeze anymore"* — sekarang SSD sudah mendominasi laptop.
+
+## Perubahan Lain yang Perlu Diketahui
+
+Di luar fitur utama, beberapa perubahan kecil juga menarik:
+
+- **Rust resmi permanen** di kernel — bukan lagi eksperimental
+- **Pembuatan thread 10–16% lebih cepat** berkat perbaikan alokasi PID
+- **Operasi buka/tutup file 4–16% lebih cepat** di mesin multi-core
+- **BPF filtering untuk io_uring** memungkinkan admin melakukan sandbox tanpa menonaktifkan io_uring sepenuhnya
+- **Controller gitar Rock Band 4 PS4/PS5** sekarang bisa dipakai via Bluetooth
+- **Keyboard solar Logitech K980** didukung penuh lewat Bluetooth
+- **Dukungan Apple Silicon USB Type-C PHY** terus berkembang
+- **Tanda tangan post-quantum ML-DSA** ditambahkan, penandatanganan modul SHA-1 dihapus
+- **Persiapan awal WiFi 8** (Ultra High Reliability) dimulai
+
+Progres dukungan Qualcomm Snapdragon X2 Elite juga berlanjut dengan dukungan PHY, meskipun pengalaman Linux di laptop Snapdragon masih butuh waktu untuk benar-benar mulus.
+
+## Cara Mendapatkan Linux 7.0
+
+Kalau kamu berencana install Ubuntu 26.04 LTS, kernel 7.0 sudah langsung tersedia — tidak perlu langkah tambahan. Pengguna Ubuntu 24.04 LTS akan menerimanya sebagai update backport di Juli, yang akan menjadi kernel baru terakhir dari Canonical untuk rilis tersebut.
+
+<Callout variant="warning" title="Belum di 26.04?">
+  Kalau kamu masih di Ubuntu 25.10, kernel 7.0 tidak akan datang lewat update standar. Kamu perlu mainline kernel PPA atau instalasi manual — dan build mainline dari Canonical tidak menyertakan driver spesifik Ubuntu serta tidak mendapat dukungan resmi. Kalau sistemmu berjalan lancar, jangan ganti kernel hanya demi nomor versi.
+</Callout>
+
+## SnipGeek's Take
+
+Jujur, waktu pertama kali lihat "Linux 7.0" saya sempat berharap lompatan nomor versi besar ini menandakan sesuatu yang dramatis. Ternyata tidak — dan itu tidak masalah. Linus sendiri pernah bilang penomoran versi itu sifatnya sewenang-wenang, yang penting isinya.
+
+Yang paling saya apresiasi dari rilis ini adalah ketelitian di hal-hal praktis. Perbaikan swap melanjutkan fondasi kuat dari 6.18, framework pelaporan error filesystem akhirnya menyeragamkan sesuatu yang selama ini tidak konsisten, dan perhatian terhadap driver laptop menunjukkan bahwa komunitas kernel benar-benar peduli dengan perangkat yang dipakai orang sehari-hari.
+
+Khusus untuk Ubuntu 26.04, ini kernel fondasi yang sangat solid. Antara [tampilan baru GNOME 50](/blog/gnome-50-makes-ubuntu-26-04-feel-like-a-big-upgrade) dan kernel yang lebih efisien menangani memori, operasi file, dan beban GPU — pengalaman keseluruhan harusnya terasa lebih responsif dibanding 24.04.
+
+Kalau kamu berencana upgrade bulan ini, kernel ini saja sudah jadi alasan bagus untuk optimis. Dan kalau kamu punya GPU Radeon lama atau SBC Rockchip yang sudah lama menganggur — mungkin ini waktu yang tepat untuk menghidupkannya lagi dan lihat apa yang bisa dilakukan Linux 7.0.
+
+### References
+
+1. [Linux 7.0: faster swap, Intel TSX & Rock Band 4 controller support — OMG! Ubuntu](https://www.omgubuntu.co.uk/2026/04/linux-7-0-kernel-features)
+2. [Linux 7.0 Released to Be Default Kernel in Ubuntu 26.04 & Fedora 44 — Ubuntu Handbook](https://ubuntuhandbook.org/index.php/2026/04/linux-7-0-released-default-ubuntu-26-04/)
+3. [Linux 7.0 Changelog — KernelNewbies](https://kernelnewbies.org/Linux_7.0)

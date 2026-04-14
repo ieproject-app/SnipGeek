@@ -1,0 +1,102 @@
+---
+title: "Linux Kernel 7.0 Is Here — What It Means for Ubuntu 26.04"
+slug: "linux-kernel-7-0-whats-new-ubuntu-26-04"
+translationKey: "linux-kernel-7-0-whats-new-ubuntu-26-04"
+date: "2026-04-16"
+description: "Linux 7.0 ships as the default kernel in Ubuntu 26.04 LTS, bringing faster swap, Intel TSX re-enablement, and improved filesystem performance."
+heroImage: "/images/_posts/linux/linux-7/banner-linux.webp"
+imageAlt: "Linux kernel 7.0 release banner with Tux penguin mascot"
+published: true
+featured: true
+tags: ["linux", "ubuntu-26-04", "ubuntu", "performance", "hardware"]
+category: "Linux"
+---
+
+I was checking the [Ubuntu 26.04 LTS release timeline](/blog/ubuntu-26-04-lts-resolute-raccoon-new-features-major-changes) when the kernel news dropped right on cue — Linus Torvalds tagged Linux 7.0 on April 12, barely days before Ubuntu 26.04 goes public. This is the kernel that will power Ubuntu's next LTS cycle, so what's inside it matters far more than the jump from 6.x to 7.0.
+
+The headline: better memory handling, faster filesystems, Intel TSX re-enabled for modern CPUs, and a surprisingly thorough round of laptop hardware polish. Here's what actually matters if you're a desktop user planning to ride the 26.04 wave.
+
+## Swap and Memory Got Meaningfully Faster
+
+The swap subsystem overhaul that started in Linux 6.18 continues here with Phase II of the swap table rework. It speeds up how data moves back from swap into RAM when memory is under pressure.
+
+Real-world testing with Redis persistence workloads showed up to **20% better throughput** when multiple processes share swapped-out memory. On a regular desktop, the gains are more modest — but the patch notes confirm results that are consistently better or at worst identical across all tested scenarios.
+
+If you're running Zram with a backing device, there's a nice bonus. The kernel can now write zram-compressed data directly to disk without decompressing first. That's one fewer step when RAM fills up — something that genuinely matters on machines with limited memory, especially given [Ubuntu 26.04's raised minimum RAM requirement](/blog/ubuntu-26-04-minimum-ram-requirement).
+
+## Filesystem Improvements Across the Board
+
+EXT4 — the default filesystem on Ubuntu — picks up better write performance for concurrent direct I/O writes. If you run backup tools, build systems, or download managers that write to disk simultaneously, this is a quiet but real improvement.
+
+The NTFS3 driver gets delayed allocation, iomap-based file operations, and better readahead for large directory scans. Handy if you dual-boot with Windows or occasionally plug in an old Windows-formatted external drive.
+
+XFS picks up a standout feature: **self-healing**. A new generic filesystem error reporting framework in Linux 7.0 lets a background systemd daemon automate repairs when metadata corruption is detected — even on mounted, in-use drives. Most Ubuntu desktop users stay on EXT4 and won't see this directly, but as infrastructure it's genuinely impressive.
+
+exFAT improves multi-cluster sequential reads, showing about a 10% speedup on drives with small clusters. That mostly helps older or lower-capacity USB drives rather than modern high-capacity ones.
+
+## Intel TSX Is Back — For the Right CPUs
+
+This one caught my eye. Intel Transactional Synchronization Extensions (TSX) have been blanket-disabled on all capable CPUs since 2019, when a vulnerability called TSX Asynchronous Abort was found affecting 6th through 9th gen Core processors.
+
+Linux 7.0 changes the default to "auto." The kernel now dynamically enables TSX on CPUs that aren't vulnerable — most 10th gen and newer — while keeping it off on affected chips. If you're running a modern Intel desktop or Xeon workstation, multi-threaded workloads could see a modest performance bump without you lifting a finger.
+
+My first thought was: seven years of TSX sitting dormant on safe hardware is a long time to leave performance on the table. Better late than never, I suppose.
+
+## Graphics Drivers: Old and New
+
+The old AMD GCN 1.0 and GCN 1.1-era Radeon GPUs — think HD 7000 and HD 8000 series — that migrated to the modern amdgpu driver in Linux 6.19 get further stability fixes here. If you're still using one of those cards, this kernel smooths out the transition.
+
+NVIDIA's open-source NVK driver restores large page support for improved performance. Intel's Xe graphics driver exposes more temperature sensors, and Arc B-series (Battlemage) GPUs now properly enter D3cold — the deepest PCIe power-saving state — which means lower idle power consumption.
+
+Rockchip RK3588 and RK3576-based single-board computers like the Orange Pi 5 gain mainline hardware-accelerated H.264/H.265 video decoding, courtesy of Collabora. Previously this required Rockchip's vendor BSP kernel. Boot [Ubuntu 26.04 LTS](/blog/ubuntu-26-04-beta-available-download) on one, and you'll get smooth 4K playback from the first boot.
+
+## Laptop Users Get Real Attention
+
+Linux 7.0 delivers a surprisingly thorough batch of laptop-specific improvements:
+
+- **ASUS ROG/TUF laptops** get better backlight control, RGB brightness handling, and Fn+F5 fan control
+- **HP Victus S** gains manual fan control via the HP WMI driver
+- **Lenovo Legion** laptops and handhelds (including Legion Go) now expose fan speeds and temperatures through HWMON
+- **TUXEDO InfinityBook Gen7** can manage configurable Total Graphics Power for NVIDIA 3000 GPUs
+
+The kernel also removes `laptop_mode`, a power-saving feature dating back to the 2.6 era when spinning hard disks were the norm. Kernel developer Johannes Weiner said it plainly: *"the juice doesn't appear worth the squeeze anymore"* now that SSDs dominate laptops.
+
+## Other Changes Worth Knowing
+
+Beyond the headline features, several smaller changes stood out to me:
+
+- **Rust support is permanent** — no longer experimental in the kernel
+- **Thread creation is 10–16% faster** thanks to PID allocation improvements
+- **File open/close operations are 4–16% quicker** on multi-core machines
+- **BPF filtering for io_uring** lets admins sandbox operations without disabling io_uring entirely
+- **Rock Band 4 PS4/PS5 guitar controllers** now work via Bluetooth
+- **Logitech K980 solar keyboard** fully supported over Bluetooth
+- **Apple Silicon USB Type-C PHY support** continues to improve
+- **ML-DSA post-quantum signatures** added, SHA-1 module signing removed
+- **Initial WiFi 8 (Ultra High Reliability) prep** begins
+
+Progress on Qualcomm's Snapdragon X2 Elite continues with PHY support landing, though the dream of a flawless Linux Snapdragon laptop is still a work in progress.
+
+## How to Get Linux 7.0
+
+If you're installing Ubuntu 26.04 LTS, kernel 7.0 comes out of the box — nothing extra to do. Ubuntu 24.04 LTS users will receive it as a backport update in July, which will be the final new kernel version Canonical pushes to that release.
+
+<Callout variant="warning" title="Not on 26.04 Yet?">
+  If you're on Ubuntu 25.10, kernel 7.0 won't arrive through standard updates. You'd need the mainline kernel PPA or manual installation — and Canonical's mainline builds lack Ubuntu-specific drivers and come with zero official support. If your system runs fine, don't swap your kernel just for the version number.
+</Callout>
+
+## SnipGeek's Take
+
+Honestly, when I first saw "Linux 7.0" I half-expected the major version bump to signal something transformative. It doesn't — and that's perfectly fine. Linus himself has said the numbering is arbitrary, and what counts is the substance.
+
+What I appreciate most about this release is the practical polish. The swap improvements build on solid 6.18 groundwork, the filesystem error reporting framework finally standardizes something that's been inconsistent for years, and the laptop driver work shows the kernel community is paying real attention to machines people actually use daily.
+
+For Ubuntu 26.04 specifically, this is a strong foundation kernel. Between [GNOME 50's visual refresh](/blog/gnome-50-makes-ubuntu-26-04-feel-like-a-big-upgrade) and a kernel that handles memory, file operations, and GPU workloads more efficiently, the overall experience should feel noticeably snappier than 24.04 did.
+
+If you're planning to upgrade this month, the kernel alone gives you a reason to feel good about it. And if you've got an old Radeon GPU or a Rockchip SBC collecting dust — now might be a fun time to dust it off and see what Linux 7.0 can do with it.
+
+### References
+
+1. [Linux 7.0: faster swap, Intel TSX & Rock Band 4 controller support — OMG! Ubuntu](https://www.omgubuntu.co.uk/2026/04/linux-7-0-kernel-features)
+2. [Linux 7.0 Released to Be Default Kernel in Ubuntu 26.04 & Fedora 44 — Ubuntu Handbook](https://ubuntuhandbook.org/index.php/2026/04/linux-7-0-released-default-ubuntu-26-04/)
+3. [Linux 7.0 Changelog — KernelNewbies](https://kernelnewbies.org/Linux_7.0)
