@@ -253,5 +253,16 @@ export const downloadLinks: Record<string, DownloadInfo> = {
     fileSize: '1.0 MB',
     externalUrl: 'https://drive.google.com/uc?export=download&id=1343dmLjumTbcw-QfRxTSdC60_fWLz5fu',
     platform: 'doc'
+  },
+  'ubuntu-2604-wallpaper-collection': {
+    fileName: 'Ubuntu 26.04 Resolute Raccoon Wallpaper Collection',
+    externalUrl: 'https://drive.google.com/drive/folders/15ABjpdsI6z4aAHsOY_leA-hT8wD_Pu9X',
+    platform: 'gdrive'
+  },
+  'ubuntu-2604-snapshot-4-iso': {
+    fileName: 'Ubuntu 26.04 Snapshot 4 (Official CD Image)',
+    fileSize: 'Large (Direct link)',
+    externalUrl: 'https://cdimage.ubuntu.com/ubuntu/releases/26.04/snapshot-4/',
+    platform: 'software'
   }
 };
