@@ -356,6 +356,11 @@ export function useToolNumbers() {
             }
         }
 
+        if (totalQuantity > 100) {
+            notify(`Total permintaan (${totalQuantity}) melebihi batas maksimum 100 per request.`);
+            return;
+        }
+
         setIsGenerating(true);
         setGeneratedNumbers([]);
 
