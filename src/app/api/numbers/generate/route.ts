@@ -5,6 +5,7 @@ import crypto from 'crypto';
 
 const DAILY_LIMIT = 15;
 const MAX_REQUEST_QUANTITY = 20;
+const MAX_TOTAL_QUANTITY = 100;
 
 interface GenerationRequestItem {
     category: string;
@@ -27,8 +28,12 @@ function getClientIp(req: NextRequest): string {
     return req.headers.get('x-real-ip') || 'unknown';
 }
 
+// Crypto-random fallback salt generated once per server instance
+const INSTANCE_SALT = crypto.randomBytes(32).toString('hex');
+
 function hashIp(ip: string): string {
-    return crypto.createHash('sha256').update(ip + (process.env.IP_HASH_SALT || 'snipgeek')).digest('hex');
+    const salt = process.env.IP_HASH_SALT || INSTANCE_SALT;
+    return crypto.createHash('sha256').update(ip + salt).digest('hex');
 }
 
 export async function GET(req: NextRequest) {
@@ -81,6 +86,14 @@ export async function POST(req: NextRequest) {
             if (r.quantity > MAX_REQUEST_QUANTITY) {
                 return NextResponse.json({ error: `Maksimal jumlah per permintaan adalah ${MAX_REQUEST_QUANTITY}.` }, { status: 400 });
             }
+        }
+
+        const totalQuantity = requests.reduce((sum, r) => sum + r.quantity, 0);
+        if (totalQuantity > MAX_TOTAL_QUANTITY) {
+            return NextResponse.json(
+                { error: `Total permintaan (${totalQuantity}) melebihi batas maksimum ${MAX_TOTAL_QUANTITY} per request.` },
+                { status: 400 }
+            );
         }
 
         // ─── Resolve caller identity ─────────────────────────────────────────────
