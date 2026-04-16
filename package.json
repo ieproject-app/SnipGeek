@@ -15,7 +15,7 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@formatjs/intl-localematcher": "^0.5.4",
+    "@formatjs/intl-localematcher": "^0.8.2",
     "@giscus/react": "^3.1.0",
     "@google-cloud/vision": "^5.3.5",
     "@hookform/resolvers": "^5.2.2",
