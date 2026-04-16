@@ -1,0 +1,103 @@
+---
+title: "Dual-Boot Windows dan Ubuntu: Mana yang Harus Diinstall Duluan?"
+slug: "install-windows-or-ubuntu-first"
+translationKey: "install-windows-or-ubuntu-first"
+date: "2026-04-17"
+description: "Mau setup dual-boot Windows 11 dan Ubuntu? Simak alasan teknis kenapa urutan instalasi itu penting dan lihat skema partisi terbaik untuk laptop kamu."
+category: "Linux"
+tags: ["windows-11", "ubuntu-25-10", "dual-boot", "linux", "tutorial", "setup"]
+published: true
+featured: false
+heroImage: "/images/_posts/dual-boot/install-windows-or-linux-before/banner-windows-linux.webp"
+imageAlt: "Representasi visual dual-boot Windows dan Ubuntu Linux."
+---
+
+Sore itu saya sempat duduk diam sambil memperhatikan laptop MSI Modern 14 B11MOU kesayangan saya. Rasanya ada yang kurang pas—sistem terasa berantakan dan pembagian partisinya dulu saya buat asal-asalan. Akhirnya saya memutuskan untuk *clean install* semuanya dari nol, memasang Windows 11 25H2 berdampingan dengan Ubuntu 25.10 menggunakan skema partisi yang lebih terencana.
+
+Kalau kamu lagi merencanakan *setup* serupa, ada satu pertanyaan yang hampir pasti muncul: mana yang harus di-*install* duluan? Kelihatannya sepele, tapi salah urutan bisa bikin kamu pusing tujuh keliling cuma buat benerin *bootloader* yang hilang.
+
+## Kenapa Urutan Instalasi Itu Penting Banget?
+
+Jawabannya ada pada si **bootloader**—program kecil yang jalan pertama kali saat laptop dinyalakan untuk kasih kamu pilihan mau masuk ke OS mana.
+
+Masalahnya, Windows installer itu sifatnya "egois". Kalau kamu *install* Ubuntu dulu baru Windows, si Windows akan menimpa GRUB (punya Ubuntu) dengan Windows Boot Manager-nya sendiri. Hasilnya? Partisi Ubuntu kamu masih ada di sana, tapi kamu nggak bisa masuk ke sistemnya karena menu pilihannya hilang ditelan bumi.
+
+Sebaliknya, kalau kamu **install Windows dulu baru Ubuntu**, prosesnya bakal jauh lebih mulus. GRUB milik Ubuntu itu ibarat "tetangga yang baik". Dia secara otomatis akan mendeteksi kalau sudah ada Windows di laptop kamu dan langsung menambahkannya ke menu *boot*. Selesai *install*, kamu langsung bisa pilih mau masuk ke mana tanpa perlu langkah tambahan yang ribet.
+
+## Skema Partisi yang Saya Gunakan
+
+Untuk SSD NVMe 500GB saya, saya ingin *layout* yang stabil tapi tetap fleksibel. Saya bahkan berani menghapus partisi *recovery* bawaan MSI untuk dapat ruang tambahan, toh semua *driver* dan *tools* bisa saya *download* lagi dari *website* resmi MSI kalau butuh.
+
+Berikut adalah tabel partisi yang saya terapkan:
+
+| Partisi | Ukuran | Filesystem | Mount Point | Fungsi |
+| :--- | :--- | :--- | :--- | :--- |
+| `/dev/nvme0n1p1` | 200 MiB | fat32 | `/boot/efi` | EFI System Partition (boot, esp) |
+| `/dev/nvme0n1p2` | 16 MiB | unknown | - | Microsoft Reserved (msftres) |
+| `/dev/nvme0n1p3` | 243.17 GiB | ntfs | - | Windows 11 (Partisi Utama) |
+| `/dev/nvme0n1p4` | 774 MiB | ntfs | - | Recovery Partition (Hidden) |
+| `/dev/nvme0n1p5` | 93.13 GiB | ext4 | `/` | Root (Sistem Linux) |
+| `/dev/nvme0n1p6` | 128.49 GiB | ext4 | `/home` | Home (Data Pribadi) |
+
+![Tampilan partisi di GParted setelah instalasi selesai](/images/_posts/dual-boot/install-windows-or-linux-before/gparted.webp)
+<div className="-mt-3 mb-6 text-center text-sm italic text-muted-foreground">Ini adalah tampilan GParted di laptop saya setelah membagi ruang untuk Windows 11 dan Ubuntu secara proporsional.</div>
+
+Saya sengaja memperbesar partisi EFI jadi 200 MiB. Windows biasanya cuma kasih 100 MiB, yang menurut saya agak sempit kalau kita mau taruh GRUB dan *entry* EFI lainnya. Selain itu, saya memisahkan `/` (Root) dan `/home`. Ini *best practice* klasik di Linux; kalau suatu hari saya mau *install* ulang Ubuntu-nya saja, data pribadi dan proyek-proyek saya di `/home` tetap aman tak tersentuh.
+
+## Memilih Filesystem yang Tepat
+
+Untuk urusan Linux, saya masih tetap setia dengan **ext4**. Memang ada *filesystem* baru seperti Btrfs atau ZFS yang punya fitur keren seperti *snapshot*, tapi ext4 itu ibarat mobil tua yang mesinnya bandel. Sangat stabil, dokumentasinya melimpah, dan kalau ada masalah jauh lebih gampang di-*recover*. Untuk laptop kerja harian, stabilitas adalah segalanya buat saya.
+
+## Hal Wajib Setelah Install Windows (Sebelum Masuk Ubuntu)
+
+Setelah Windows 11 selesai di-*install*, jangan buru-buru colok USB Ubuntu. Ada dua hal krusial yang harus kamu lakukan supaya *dual-boot* kamu nggak bermasalah ke depannya.
+
+Pertama, **matikan Fast Startup**. Fitur ini sebenernya bikin Windows masuk ke mode hibernasi parsial saat dimatikan, yang berakibat partisi NTFS Windows jadi "terkunci". Kalau Ubuntu mencoba mengakses partisi yang terkunci ini, ada risiko data kamu *corrupt*.
+
+Kamu bisa cari ini di **Control Panel → Power Options → Choose what the power buttons do**.
+
+![Mematikan Fast Startup di Power Options Windows 11](/images/_posts/dual-boot/install-windows-or-linux-before/off-startup.webp)
+<div className="-mt-3 mb-6 text-center text-sm italic text-muted-foreground">Pastikan centang "Turn on fast startup" dihilangkan supaya partisi Windows kamu nggak terkunci.</div>
+
+Kedua, saya sarankan matikan sekalian fitur hibernasi lewat Command Prompt (Administrator) dengan perintah:
+
+```cmd
+powercfg /h off
+```
+
+## Urutan Lengkap Instalasi Dual-Boot
+
+<Steps>
+  <Step>
+  ### Backup Data Penting
+  Jangan pernah remehkan langkah ini. Simpan file kamu di OneDrive atau *harddisk* eksternal. Namanya *clean install*, semua data di partisi lama pasti hilang.
+  </Step>
+
+  <Step>
+  ### Install Windows 11 Duluan
+  Gunakan USB *bootable* kamu dan pilih **Custom Installation**. Buat partisi EFI (200 MiB) dan partisi utama Windows (sekitar 240 GiB), biarkan sisanya tetap sebagai ruang kosong (*Unallocated Space*).
+  </Step>
+
+  <Step>
+  ### Selesaikan Setup Windows
+  Masuk ke Windows, *install driver* dasar, dan yang terpenting: matikan Fast Startup dan Hibernasi seperti yang sudah saya jelaskan tadi.
+  </Step>
+
+  <Step>
+  ### Install Ubuntu
+  *Boot* dari USB Ubuntu kamu. Saat sampai di bagian partisi, pilih opsi **"Something else"**. Buat partisi `/` (93 GiB) dan `/home` (sisanya) dari ruang kosong tadi. Pastikan lokasi pemasangan *bootloader* diarahkan ke *drive* utama (misalnya `/dev/nvme0n1`).
+  </Step>
+
+  <Step>
+  ### Perbaiki Sinkronisasi Jam
+  Secara default, Windows dan Linux punya cara beda membaca jam di *hardware*. Hasilnya, tiap kamu ganti OS, jamnya pasti bergeser. Saya sudah buatkan [catatan khusus cara mengatasi masalah jam bergeser ini](/notes/fix-dual-boot-clock-sync-windows-ubuntu).
+  </Step>
+</Steps>
+
+## Catatan Soal Secure Boot
+
+Sebenernya Ubuntu 25.10 sudah mendukung Secure Boot dengan baik. Tapi untuk arsitektur *dual-boot*, saya pribadi lebih suka mematikan **Secure Boot** di BIOS. Ini buat jaga-jaga kalau nanti kamu perlu *install driver* pihak ketiga atau menjalankan VirtualBox, supaya nggak ribet dengan urusan kunci-kunci (*Machine Owner Keys*) yang kadang malah bikin pusing.
+
+Melakukan penyegaran sistem di MSI Modern 14 ini rasanya bikin laptop jadi seperti baru lagi. Windows 11 25H2 tetep bersih untuk urusan kantor, sementara Ubuntu jadi "medan perang" saya untuk *development*. Semoga pengalaman saya ini bermanfaat buat kamu yang lagi mau mencoba *dual-boot*!
+
+Kamu punya cerita seru atau kendala saat coba *dual-boot* belakangan ini? Bagikan di kolom komentar ya, siapa tahu saya atau temen-temen lain bisa bantu.

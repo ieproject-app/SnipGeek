@@ -1,6 +1,6 @@
 import { usePrompt } from "./index";
 import { motion, AnimatePresence } from "framer-motion";
-import { Copy, Trash2, Calendar, Star, Hash, Search, PenLine, Layers, BookOpen, Sparkles, FileText, Check, AlertTriangle, ImageIcon, Download, Grid3X3, GalleryHorizontal, Settings2 } from "lucide-react";
+import { Copy, Trash2, Calendar, Star, Hash, Search, PenLine, Layers, BookOpen, Sparkles, FileText, Check, AlertTriangle, ImageIcon, Download, Grid3X3, GalleryHorizontal, Settings2, EyeOff } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { SnipTooltip } from "@/components/ui/snip-tooltip";
@@ -15,6 +15,7 @@ export function IslandToolbar() {
     publishDate, setPublishDate,
     isPublished, setIsPublished,
     isFeatured, setIsFeatured,
+    isHideFromHome, setIsHideFromHome,
     categoryHint, setCategoryHint,
     showImages, setShowImages,
     showDownloads, setShowDownloads,
@@ -176,6 +177,15 @@ export function IslandToolbar() {
                 </motion.div>
               )}
             </AnimatePresence>
+
+            <div className="flex items-center gap-2 overflow-hidden border-l border-primary/10 pl-2">
+              <SnipTooltip label="Hide From Home" side="bottom">
+                <motion.span animate={isHideFromHome ? { scale: [1, 1.2, 1] } : { scale: 1 }} transition={{ duration: 0.4, ease: "backOut" }} className="flex">
+                  <EyeOff className={cn("h-3.5 w-3.5 transition-colors duration-300", isHideFromHome ? "text-rose-500" : "text-muted-foreground")} />
+                </motion.span>
+              </SnipTooltip>
+              <Switch checked={isHideFromHome} onCheckedChange={setIsHideFromHome} className="scale-75 data-[state=checked]:bg-rose-500" />
+            </div>
 
             <div className="hidden items-center gap-2 border-l border-primary/10 pl-2 xl:flex">
               <Hash className="h-3.5 w-3.5 shrink-0 text-muted-foreground/70" />

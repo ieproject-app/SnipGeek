@@ -54,7 +54,9 @@ export default async function Home({
   const linuxTags = new Set(["linux", "ubuntu"]);
   const windowsTags = new Set(["windows", "windows-11"]);
 
-  const allPosts = [...initialPosts].sort(
+  const allPosts = [...initialPosts]
+    .filter((post) => !post.frontmatter.hideFromHome)
+    .sort(
     (a, b) =>
       new Date(b.frontmatter.date).getTime() -
       new Date(a.frontmatter.date).getTime(),

@@ -14,8 +14,6 @@ const snipgeekConfig = {
 };
 
 let app: FirebaseApp;
-let storage: FirebaseStorage;
-let functions: Functions;
 
 if (getApps().length > 0) {
   app = getApp(); // Reuse the already-initialized SnipGeek app
@@ -23,7 +21,7 @@ if (getApps().length > 0) {
   app = initializeApp(snipgeekConfig);
 }
 
-storage = getStorage(app);
-functions = getFunctions(app, "asia-southeast2");
+const storage: FirebaseStorage = getStorage(app);
+const functions: Functions = getFunctions(app, "asia-southeast2");
 
 export { app, storage, functions };
