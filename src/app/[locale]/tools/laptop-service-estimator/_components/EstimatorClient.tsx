@@ -18,13 +18,10 @@ import {
   Monitor,
   Calendar,
   Info,
-  Thermometer,
-  Settings,
-  Keyboard as KeyboardIcon,
-  Sparkles,
   Camera,
   X,
-  Upload,
+  Copy,
+  Check,
 } from 'lucide-react'
 import { ToolWrapper } from '@/components/tools/tool-wrapper'
 import type { Dictionary } from '@/lib/get-dictionary'
@@ -61,23 +58,6 @@ interface EstimateResult {
   bundleDiscount?: boolean
 }
 
-type ServiceCardContent = {
-  label: string
-  desc: string
-}
-
-// ─── Data Servis Static ───────────────────────────────────────────────────────
-const SERVICE_BASE = [
-  { id: 'thermal', icon: Thermometer, min: 50000, max: 100000 },
-  { id: 'cleaning', icon: Sparkles, min: 75000, max: 150000 },
-  { id: 'ram', icon: MemoryStick, min: 50000, max: 75000 },
-  { id: 'ssd', icon: HardDrive, min: 75000, max: 100000 },
-  { id: 'os', icon: Settings, min: 50000, max: 150000 },
-  { id: 'screen', icon: Monitor, min: 100000, max: 150000 },
-  { id: 'keyboard', icon: KeyboardIcon, min: 35000, max: 75000 },
-  { id: 'repair', icon: Wrench, min: 150000, max: 350000 },
-]
-
 // ─── Helper ───────────────────────────────────────────────────────────────────
 const fmt = (n: number) =>
   new Intl.NumberFormat('id-ID', {
@@ -95,13 +75,11 @@ interface EstimatorClientProps {
 export function EstimatorClient({ dictionary }: EstimatorClientProps) {
   // Print-only CSS: hide header, form, etc. only show resultContent
   const d = dictionary?.laptopServiceEstimator
-  const servicesDictionary = d?.services as Record<string, ServiceCardContent> | undefined
 
   const [brand, setBrand] = useState('')
   const [model, setModel] = useState('')
   const [complaint, setComplaint] = useState('')
   const [history, setHistory] = useState('')
-  const [selectedServices, setSelectedServices] = useState<string[]>([])
   const [step, setStep] = useState<Step>('form')
   const [result, setResult] = useState<EstimateResult | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -109,6 +87,7 @@ export function EstimatorClient({ dictionary }: EstimatorClientProps) {
   const [isScanning, setIsScanning] = useState(false)
   const [scannedImage, setScannedImage] = useState<string | null>(null)
   const [showPriceDetails, setShowPriceDetails] = useState(false)
+  const [copied, setCopied] = useState(false)
   const [cooldownUntil, setCooldownUntil] = useState<number>(0)
   const [, setTick] = useState(0)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -181,13 +160,7 @@ export function EstimatorClient({ dictionary }: EstimatorClientProps) {
   // Fallback while dictionary reloads (to prevent HMR crash)
   if (!d) return <div className="p-8 text-center text-sm text-muted-foreground animate-pulse">Memuat form...</div>
 
-  const toggleService = (id: string) => {
-    setSelectedServices((prev) =>
-      prev.includes(id) ? prev.filter((s) => s !== id) : [...prev, id]
-    )
-  }
-
-  const isFormValid = brand.trim() !== '' && complaint.trim() !== ''
+  const isFormValid = brand.trim() !== '' && model.trim() !== '' && complaint.trim() !== ''
 
   const cooldownRemaining = Math.max(0, Math.ceil((cooldownUntil - Date.now()) / 1000))
   const isOnCooldown = cooldownRemaining > 0
@@ -198,10 +171,6 @@ export function EstimatorClient({ dictionary }: EstimatorClientProps) {
     setStep('loading')
     setError(null)
 
-    const serviceLabels = SERVICE_BASE.filter((s) =>
-      selectedServices.includes(s.id)
-    ).map((s) => servicesDictionary?.[s.id]?.label ?? s.id)
-
     try {
       const res = await fetch('/api/tools/estimate', {
         method: 'POST',
@@ -211,7 +180,6 @@ export function EstimatorClient({ dictionary }: EstimatorClientProps) {
           model: model.trim(),
           complaint: complaint.trim(),
           history: history.trim(),
-          services: serviceLabels,
         }),
       })
 
@@ -238,11 +206,91 @@ export function EstimatorClient({ dictionary }: EstimatorClientProps) {
     setModel('')
     setComplaint('')
     setHistory('')
-    setSelectedServices([])
     setResult(null)
     setError(null)
     setShowSpecs(true)
     setStep('form')
+  }
+
+  const handleCopy = async () => {
+    if (!result) return
+
+    const divider = '─'.repeat(30)
+    const laptopLabel = result.laptop.found ? d.result.verified : d.result.unverified
+
+    const specBlock = result.laptop.found
+      ? [
+          result.laptop.processor ? `  Processor : ${result.laptop.processor}` : '',
+          result.laptop.ram ? `  RAM       : ${result.laptop.ram}` : '',
+          result.laptop.storage ? `  Storage   : ${result.laptop.storage}` : '',
+          result.laptop.display ? `  Layar     : ${result.laptop.display}` : '',
+          result.laptop.year ? `  Tahun     : ${result.laptop.year}` : '',
+        ].filter(Boolean).join('\n')
+      : ''
+
+    const serviceLines = result.items
+      .map((i) => {
+        if (i.service.toLowerCase().includes('diagnosa') && i.min === 0 && i.max === 0) {
+          return `  \u2022 ${i.service}: GRATIS`
+        } else if (i.discounted) {
+          return `  \u2022 ${i.service}: ${fmt(i.min)} \u2013 ${fmt(i.max)} (diskon bundel)`
+        } else {
+          return `  \u2022 ${i.service}: ${fmt(i.min)} \u2013 ${fmt(i.max)}`
+        }
+      })
+      .join('\n')
+
+    const totalOriginalMin = result.items.reduce((sum, i) => sum + (i.originalMin || i.min), 0)
+    const totalOriginalMax = result.items.reduce((sum, i) => sum + (i.originalMax || i.max), 0)
+    const totalDiscountMin = totalOriginalMin - result.total_min
+    const totalDiscountMax = totalOriginalMax - result.total_max
+    const hasDiscount = totalDiscountMin > 0 || totalDiscountMax > 0
+
+    const lines = [
+      `ESTIMASI SERVIS LAPTOP`,
+      `Powered by SnipGeek AI`,
+      divider,
+      ``,
+      `${laptopLabel.toUpperCase()}: ${result.laptop.name}`,
+      specBlock ? `${specBlock}` : '',
+      ``,
+      complaint.trim() ? `Keluhan: ${complaint.trim()}` : '',
+      history.trim() ? `Riwayat: ${history.trim()}` : '',
+      ``,
+      divider,
+      `RINCIAN SERVIS`,
+      divider,
+      serviceLines,
+      ``,
+      hasDiscount ? `Hemat: ${fmt(totalDiscountMin)} \u2013 ${fmt(totalDiscountMax)} (diskon bundel bongkaran)` : '',
+      ``,
+      `TOTAL ESTIMASI: ${fmt(result.total_min)} \u2013 ${fmt(result.total_max)}`,
+      `(Biaya jasa saja, belum termasuk part)`,
+      ``,
+      result.notes ? `Catatan AI: ${result.notes}` : '',
+      ``,
+      divider,
+      `* Harga final dikonfirmasi setelah pemeriksaan langsung.`,
+      `* Konsultasi via WhatsApp gratis.`,
+    ].filter(Boolean).join('\n')
+
+    try {
+      await navigator.clipboard.writeText(lines)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2500)
+    } catch {
+      // Fallback for older browsers
+      const textarea = document.createElement('textarea')
+      textarea.value = lines
+      textarea.style.position = 'fixed'
+      textarea.style.opacity = '0'
+      document.body.appendChild(textarea)
+      textarea.select()
+      document.execCommand('copy')
+      document.body.removeChild(textarea)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2500)
+    }
   }
 
   const handleWhatsApp = () => {
@@ -340,7 +388,7 @@ export function EstimatorClient({ dictionary }: EstimatorClientProps) {
           </div>
           <div className="space-y-1.5">
             <label htmlFor="model" className="block text-sm font-semibold text-foreground">
-              {d.steps.a.modelLabel} <span className="text-muted-foreground font-normal text-xs">{d.steps.a.modelOptional}</span>
+              {d.steps.a.modelLabel} <span className="text-destructive">*</span>
             </label>
             <input
               id="model"
@@ -443,83 +491,6 @@ export function EstimatorClient({ dictionary }: EstimatorClientProps) {
               rows={2}
               className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm font-medium outline-none focus:border-accent focus:ring-2 focus:ring-accent/20 transition-all resize-none"
             />
-          </div>
-        </div>
-      </div>
-
-      {/* Step C */}
-      <div className="rounded-2xl border border-border bg-card overflow-hidden shadow-sm">
-        <div className="h-1.5 w-full bg-gradient-to-r from-accent/40 via-accent to-accent/40" />
-        <div className="px-6 py-5 border-b border-border/60 bg-muted/5">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="w-10 h-10 rounded-2xl bg-accent/10 flex items-center justify-center shrink-0 border border-accent/20 rotate-1">
-                <span className="text-xl font-display font-black text-accent -rotate-1">C</span>
-              </div>
-              <div>
-                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-accent/60 mb-0.5">{d.steps.c.badge}</p>
-                <h2 className="text-h4 font-display font-black text-primary tracking-tight">{d.steps.c.title}</h2>
-                <p className="mt-1 text-xs text-muted-foreground">{d.steps.c.optionalHint}</p>
-              </div>
-            </div>
-            {selectedServices.length > 0 && (
-              <span className="text-xs font-black text-accent bg-accent/10 px-3 py-1 rounded-full border border-accent/20">
-                {d.steps.c.selectedCount.replace('{count}', String(selectedServices.length))}
-              </span>
-            )}
-          </div>
-        </div>
-
-        <div className="p-5">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {SERVICE_BASE.map((svc) => {
-              const isSelected = selectedServices.includes(svc.id)
-              const isDisabled = !isSelected && selectedServices.length >= 5
-              const SvcIcon = svc.icon
-              const svcData = servicesDictionary?.[svc.id]
-              return (
-                <button
-                  key={svc.id}
-                  type="button"
-                  disabled={isDisabled}
-                  onClick={() => toggleService(svc.id)}
-                  className={[
-                    'group relative flex flex-col items-start gap-3 rounded-2xl border p-3.5 text-left transition-all duration-300',
-                    isSelected
-                      ? 'border-accent bg-accent/10 ring-1 ring-accent/30 shadow-md'
-                      : isDisabled
-                        ? 'border-border bg-muted/20 opacity-40 cursor-not-allowed shadow-none'
-                        : 'border-border bg-background hover:border-accent/40 hover:bg-accent/[0.03] hover:translate-y-[-2px] shadow-sm',
-                  ].join(' ')}
-                >
-                  <div className="flex w-full items-start justify-between gap-2">
-                    <div className={[
-                      'w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition-colors',
-                      isSelected ? 'bg-accent text-accent-foreground' : 'bg-accent/10 text-accent group-hover:bg-accent group-hover:text-accent-foreground'
-                    ].join(' ')}>
-                      <SvcIcon className="w-4.5 h-4.5" />
-                    </div>
-                    {isSelected ? (
-                      <CheckCircle2 className="w-5 h-5 text-accent animate-in zoom-in-50" />
-                    ) : (
-                      <div className="w-5 h-5 rounded-full border-2 border-muted-foreground/30 group-hover:border-accent/50" />
-                    )}
-                  </div>
-                  <div className="min-w-0 space-y-0.5">
-                    <p className="text-[13px] font-bold leading-tight truncate w-full text-foreground">
-                      {svcData?.label ?? svc.id}
-                    </p>
-                    <p className="text-[10px] text-muted-foreground leading-relaxed line-clamp-1">
-                      {svcData?.desc ?? ''}
-                    </p>
-                  </div>
-                  <div className="mt-1 w-full pt-2 border-t border-border/40 flex items-center justify-between">
-                    <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/50">{d.steps.c.priceLabel}</span>
-                    <span className="text-[11px] font-black text-primary">{fmt(svc.min).replace(',00', '')}</span>
-                  </div>
-                </button>
-              )
-            })}
           </div>
         </div>
       </div>
@@ -774,13 +745,28 @@ export function EstimatorClient({ dictionary }: EstimatorClientProps) {
       <p className="text-xs text-accent text-center leading-relaxed px-2 font-semibold mt-2">Konsultasi via WhatsApp gratis, biaya hanya berlaku jika servis dilakukan.</p>
       {/* Print button removed */}
 
-      <button
-        onClick={handleWhatsApp}
-        className="w-full flex items-center justify-center gap-3 rounded-xl py-4 px-6 text-base font-bold text-white transition-all shadow-lg shadow-green-500/20 bg-[#25D366] hover:opacity-90 active:scale-[0.99]"
-      >
-        <MessageCircle className="w-5 h-5" />
-        {d.result.whatsappButton}
-      </button>
+      <div className="grid grid-cols-2 gap-3">
+        <button
+          onClick={handleWhatsApp}
+          className="flex items-center justify-center gap-2.5 rounded-xl py-3.5 px-4 text-sm font-bold text-white transition-all shadow-lg shadow-green-500/20 bg-[#25D366] hover:opacity-90 active:scale-[0.99]"
+        >
+          <MessageCircle className="w-4.5 h-4.5" />
+          {d.result.whatsappButton}
+        </button>
+
+        <button
+          onClick={handleCopy}
+          className={[
+            'flex items-center justify-center gap-2.5 rounded-xl py-3.5 px-4 text-sm font-bold transition-all active:scale-[0.99]',
+            copied
+              ? 'bg-green-100 text-green-700 border border-green-200 dark:bg-green-950/30 dark:text-green-400 dark:border-green-800'
+              : 'bg-accent/10 text-accent border border-accent/20 hover:bg-accent/20',
+          ].join(' ')}
+        >
+          {copied ? <Check className="w-4.5 h-4.5" /> : <Copy className="w-4.5 h-4.5" />}
+          {copied ? d.result.copied : d.result.copyButton}
+        </button>
+      </div>
 
       <button
         onClick={handleReset}

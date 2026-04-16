@@ -39,6 +39,7 @@ interface ServiceDefinition {
   keywords: string[]
 }
 
+
 const SERVICE_DEFINITIONS: ServiceDefinition[] = [
   {
     id: 'thermal',
@@ -219,21 +220,9 @@ function normalizeServiceKey(value: string): string | null {
   return SERVICE_ALIASES[normalized] ?? null
 }
 
-function inferServices(complaint: string, history: string, services: string[]): ServiceDefinition[] {
+function inferServices(complaint: string, history: string): ServiceDefinition[] {
   const matched = new Map<string, ServiceDefinition>()
   const context = `${complaint} ${history}`.toLowerCase()
-
-  for (const service of services) {
-    const key = normalizeServiceKey(service)
-    if (!key) {
-      continue
-    }
-
-    const definition = SERVICE_DEFINITIONS.find((item) => item.id === key)
-    if (definition) {
-      matched.set(definition.id, definition)
-    }
-  }
 
   for (const definition of SERVICE_DEFINITIONS) {
     if (definition.id === 'diagnosa') {
@@ -260,9 +249,8 @@ function buildFallbackEstimate(
   model: string,
   complaint: string,
   history: string,
-  services: string[]
 ): EstimateResponse {
-  const inferredServices = inferServices(complaint, history, services)
+  const inferredServices = inferServices(complaint, history)
   const rawItems = inferredServices.map((service) => ({
     id: service.id,
     service: service.label,
@@ -278,9 +266,7 @@ function buildFallbackEstimate(
   const total_max = items.reduce((sum, item) => sum + item.max, 0)
 
   const notes = [
-    services.length === 0
-      ? 'Estimasi ini dibuat otomatis dari keluhan yang Anda tulis, jadi teknisi masih akan mengonfirmasi tindakan paling tepat saat inspeksi.'
-      : 'Estimasi ini menggabungkan servis yang Anda pilih dengan analisa gejala yang Anda tulis.',
+    'Estimasi ini dibuat otomatis dari keluhan yang Anda tulis, jadi teknisi masih akan mengonfirmasi tindakan paling tepat saat inspeksi.',
     history
       ? 'Riwayat servis/part sebelumnya ikut dipakai sebagai konteks awal untuk meminimalkan estimasi yang terlalu umum.'
       : 'Jika ada riwayat ganti part atau servis sebelumnya, sampaikan saat konsultasi agar estimasi bisa dipersempit.',
@@ -290,15 +276,10 @@ function buildFallbackEstimate(
   ].filter(Boolean).join(' ')
 
   return {
-    laptop: model
-      ? {
-          found: true,
-          name: `${brand} ${model}`.trim(),
-        }
-      : {
-          found: false,
-          name: `${brand} (model tidak disebutkan)`,
-        },
+    laptop: {
+      found: true,
+      name: `${brand} ${model}`.trim(),
+    },
     items,
     total_min,
     total_max,
@@ -308,19 +289,17 @@ function buildFallbackEstimate(
 }
 
 // ─── Gemini Prompt Builder ────────────────────────────────────────────────────
-function buildPrompt(brand: string, model: string, complaint: string, history: string, services: string[]): string {
+function buildPrompt(brand: string, model: string, complaint: string, history: string): string {
   return `Kamu adalah asisten estimasi harga servis laptop di toko teknisi Indonesia.
 
 INFORMASI LAPTOP DARI PELANGGAN:
 - Merek: ${brand}
-${model ? `- Seri/Model: ${model}` : '- Seri/Model: tidak disebutkan'}
+- Seri/Model: ${model}
 ${complaint ? `- Keluhan/Kendala: ${complaint}` : '- Keluhan/Kendala: tidak disebutkan'}
 ${history ? `- Riwayat Part/Servis: ${history}` : '- Riwayat Part/Servis: belum ada'}
 
 TUGAS UTAMA — IDENTIFIKASI & ANALISA:
-${
-  model
-    ? `Cari spesifikasi umum untuk "${brand} ${model}". WAJIB tampilkan semua varian utama (misal: prosesor i3/i5/i7, RAM 4/8/16GB, storage SSD/HDD, dan UKURAN LAYAR). Untuk ukuran layar, jika ada beberapa varian (misal: 13.3", 14", 15.6"), tampilkan semua range ukuran layar yang tersedia, bukan hanya yang terbesar. Jika memungkinkan, tulis seperti: "13.3 / 14 / 15.6 inch". Jangan hanya menampilkan satu ukuran saja jika ada lebih dari satu varian.
+Cari spesifikasi umum untuk "${brand} ${model}". WAJIB tampilkan semua varian utama (misal: prosesor i3/i5/i7, RAM 4/8/16GB, storage SSD/HDD, dan UKURAN LAYAR). Untuk ukuran layar, jika ada beberapa varian (misal: 13.3", 14", 15.6"), tampilkan semua range ukuran layar yang tersedia, bukan hanya yang terbesar. Jika memungkinkan, tulis seperti: "13.3 / 14 / 15.6 inch". Jangan hanya menampilkan satu ukuran saja jika ada lebih dari satu varian.
 Wajib isi: processor, RAM default pabrik, storage default pabrik, UKURAN LAYAR (semua varian), tahun rilis.
 ANALISA TEKNIS MATANG: Berdasarkan "Tahun Rilis", "Keluhan", dan "Riwayat Part", berikan analisa di field 'notes'.
 - Jika laptop sudah > 5 tahun, ingatkan risiko hardware lama (misal: thermal paste kering, baterai drop).
@@ -328,14 +307,9 @@ ANALISA TEKNIS MATANG: Berdasarkan "Tahun Rilis", "Keluhan", dan "Riwayat Part",
 - Berikan saran pencegahan yang spesifik untuk model laptop ini (misal: "Seri ini sering bermasalah di engsel, harap hati-hati").
 Jika data persis tidak tersedia, berikan estimasi terbaik berdasarkan seri yang paling mirip.
 Set found: true SELALU jika merek dikenal, bahkan jika hanya estimasi umum.
-JANGAN set found: false hanya karena data tidak lengkap — gunakan nilai estimasi.`
-    : `Model tidak diketahui. Gunakan merek "${brand}" sebagai konteks.
-Set found: false. Isi name dengan "${brand} (model tidak disebutkan)".
-Kosongkan semua field spesifikasi.`
-}
+JANGAN set found: false hanya karena data tidak lengkap — gunakan nilai estimasi.
 
-SERVIS YANG DIPILIH PELANGGAN (opsional):
-${services.length > 0 ? services.map((s) => `- ${s}`).join('\n') : '- Tidak memilih servis tertentu, kamu harus menyimpulkan kebutuhan servis dari keluhan pelanggan'}
+TUGAS: Simpulkan kebutuhan servis SEPENUHNYA dari keluhan dan riwayat pelanggan di atas. Pelanggan TIDAK memilih servis secara manual.
 
 MASTER HARGA JASA (ikuti range ini):
 - Ganti Thermal Paste: Rp 50.000 – Rp 100.000
@@ -370,8 +344,8 @@ Servis di LUAR grup bongkaran (layar, keyboard, OS, repair, diagnosa) TIDAK dapa
 
 Catatan: Diagnosa & Estimasi WAJIB diberi harga GRATIS (min: 0, max: 0), agar pelanggan tidak ragu konsultasi.
 Sesuaikan harga dalam range berdasarkan kompleksitas laptop (gaming = lebih kompleks).
-PENTING: Selalu analisa field 'complaint' (keluhan) dan 'history' (riwayat) secara mendalam, baik pelanggan memilih servis tertentu maupun tidak.
-Berdasarkan analisa tersebut, kamu WAJIB menyarankan servis konkrit yang mungkin dibutuhkan (misal: "Ganti Keyboard" atau "Cleaning") ke dalam field 'items' estimasi, meskipun pengguna tidak memilihnya di awal. Berikan alasan kenapa kamu menyarankan servis tersebut di field 'note' per item.
+PENTING: Selalu analisa field 'complaint' (keluhan) dan 'history' (riwayat) secara mendalam.
+Berdasarkan analisa tersebut, kamu WAJIB menyarankan servis konkrit yang mungkin dibutuhkan (misal: "Ganti Keyboard" atau "Cleaning") ke dalam field 'items' estimasi. Berikan alasan kenapa kamu menyarankan servis tersebut di field 'note' per item.
 
 Jika pelanggan memilih 'Jasa Upgrade SSD/HDD', jangan tambahkan biaya 'Instal Ulang OS' secara terpisah lagi karena sudah satu paket, kecuali pelanggan meminta backup data besar.
 Gunakan field 'notes' untuk memberikan saran teknis singkat berdasarkan 'Keluhan/Kendala' yang diisi pelanggan.
@@ -420,7 +394,7 @@ export async function POST(req: NextRequest) {
   }
 
   // Parse body
-  let body: { brand?: string; model?: string; complaint?: string; history?: string; services?: unknown }
+  let body: { brand?: string; model?: string; complaint?: string; history?: string }
   try {
     body = await req.json()
   } catch {
@@ -430,12 +404,18 @@ export async function POST(req: NextRequest) {
     )
   }
 
-  const { brand, model = '', complaint = '', history = '', services } = body
+  const { brand, model = '', complaint = '', history = '' } = body
 
   // Validasi input
   if (!brand || typeof brand !== 'string' || brand.trim() === '') {
     return NextResponse.json(
       { error: 'Merek laptop wajib diisi.' },
+      { status: 400 }
+    )
+  }
+  if (!model || typeof model !== 'string' || model.trim() === '') {
+    return NextResponse.json(
+      { error: 'Seri/model laptop wajib diisi agar AI bisa menganalisa spesifikasinya.' },
       { status: 400 }
     )
   }
@@ -445,32 +425,16 @@ export async function POST(req: NextRequest) {
       { status: 400 }
     )
   }
-  if (services !== undefined && !Array.isArray(services)) {
-    return NextResponse.json(
-      { error: 'Format pilihan servis tidak valid.' },
-      { status: 400 }
-    )
-  }
-
-  if (Array.isArray(services) && services.length > 5) {
-    return NextResponse.json(
-      { error: 'Maksimal 5 servis per estimasi.' },
-      { status: 400 }
-    )
-  }
 
   const cleanBrand = brand.trim().slice(0, 50)
-  const cleanModel = typeof model === 'string' ? model.trim().slice(0, 80) : ''
-  const cleanComplaint = typeof complaint === 'string' ? complaint.trim().slice(0, 500) : ''
+  const cleanModel = model.trim().slice(0, 80)
+  const cleanComplaint = complaint.trim().slice(0, 500)
   const cleanHistory = typeof history === 'string' ? history.trim().slice(0, 500) : ''
-  const cleanServices = Array.isArray(services)
-    ? services.map((s) => String(s).slice(0, 80))
-    : []
 
   const apiKey = process.env.GEMINI_API_KEY
   if (!apiKey) {
     return NextResponse.json(
-      buildFallbackEstimate(cleanBrand, cleanModel, cleanComplaint, cleanHistory, cleanServices)
+      buildFallbackEstimate(cleanBrand, cleanModel, cleanComplaint, cleanHistory)
     )
   }
 
@@ -487,7 +451,7 @@ export async function POST(req: NextRequest) {
         body: JSON.stringify({
           contents: [
             {
-              parts: [{ text: buildPrompt(cleanBrand, cleanModel, cleanComplaint, cleanHistory, cleanServices) }],
+              parts: [{ text: buildPrompt(cleanBrand, cleanModel, cleanComplaint, cleanHistory) }],
             },
           ],
         }),
@@ -501,7 +465,7 @@ export async function POST(req: NextRequest) {
       const errorText = await geminiRes.text().catch(() => 'no text')
       console.error('[estimate] Gemini error:', geminiRes.status, errorText)
       return NextResponse.json(
-        buildFallbackEstimate(cleanBrand, cleanModel, cleanComplaint, cleanHistory, cleanServices)
+        buildFallbackEstimate(cleanBrand, cleanModel, cleanComplaint, cleanHistory)
       )
     }
 
@@ -515,7 +479,7 @@ export async function POST(req: NextRequest) {
     } catch {
       console.error('Failed to parse JSON:', clean)
       return NextResponse.json(
-        buildFallbackEstimate(cleanBrand, cleanModel, cleanComplaint, cleanHistory, cleanServices)
+        buildFallbackEstimate(cleanBrand, cleanModel, cleanComplaint, cleanHistory)
       )
     }
 
@@ -524,12 +488,12 @@ export async function POST(req: NextRequest) {
     clearTimeout(timeout)
     if (err instanceof Error && err.name === 'AbortError') {
       return NextResponse.json(
-        buildFallbackEstimate(cleanBrand, cleanModel, cleanComplaint, cleanHistory, cleanServices)
+        buildFallbackEstimate(cleanBrand, cleanModel, cleanComplaint, cleanHistory)
       )
     }
     console.error('[estimate] Unexpected error:', err)
     return NextResponse.json(
-      buildFallbackEstimate(cleanBrand, cleanModel, cleanComplaint, cleanHistory, cleanServices)
+      buildFallbackEstimate(cleanBrand, cleanModel, cleanComplaint, cleanHistory)
     )
   }
 }

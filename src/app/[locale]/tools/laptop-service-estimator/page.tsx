@@ -38,8 +38,8 @@ export default async function LaptopServiceEstimatorPage({
 }: {
   params: Promise<{ locale: Locale }>
 }) {
-  const { locale: _locale } = await params
-  const dictionary = await getDictionary('id')
+  const { locale } = await params
+  const dictionary = await getDictionary(locale)
 
   return (
     <div className="w-full">

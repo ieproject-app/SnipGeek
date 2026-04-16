@@ -464,9 +464,8 @@
         "brandLabel": "Merek Laptop",
         "brandPlaceholder": "cth: Asus, Lenovo, HP...",
         "modelLabel": "Seri / Model",
-        "modelOptional": "(opsional)",
         "modelPlaceholder": "cth: VivoBook 14 A416...",
-        "modelHint": "Sertakan seri spesifik agar spek AI lebih akurat.",
+        "modelHint": "Wajib diisi. Sertakan seri spesifik agar AI bisa menganalisa spesifikasi laptop.",
         "scanLabelBtn": "Scan Label Laptop",
         "scanOr": "atau",
         "scanHint": "Tidak tahu modelnya? Unggah foto stiker label di bawah laptop."
@@ -478,29 +477,11 @@
         "placeholder": "cth: Laptop lemot, keyboard tidak berfungsi, sering mati sendiri...",
         "labelHistory": "Riwayat Part / Servis Lab",
         "placeholderHistory": "cth: Pernah ganti baterai 2023, ganti SSD 1 tahun lalu..."
-      },
-      "c": {
-        "badge": "Preferensi Servis",
-        "title": "Pilih Servis Jika Sudah Tahu",
-        "optionalHint": "Opsional. Kalau belum yakin, AI akan menyarankan servis dari keluhan yang kamu isi.",
-        "selectedCount": "{count}/5 DIPILIH",
-        "priceLabel": "Estimasi Jasa"
       }
-    },
-    "services": {
-      "thermal": { "label": "Ganti Thermal Paste", "desc": "Aplikasi thermal paste baru untuk CPU/GPU" },
-      "cleaning": { "label": "Cleaning Internal", "desc": "Bersih fan, heatsink, dan debu internal" },
-      "ram": { "label": "Jasa Upgrade RAM", "desc": "Pasang/ganti modul RAM (belum termasuk part)" },
-      "ssd": { "label": "Jasa Upgrade SSD/HDD", "desc": "Pasang storage (include instal OS dasar)" },
-      "os": { "label": "Instal Ulang OS", "desc": "Windows/Linux, include driver & software standar" },
-      "screen": { "label": "Jasa Ganti Layar", "desc": "Bongkar pasang panel (cek ketersediaan part)" },
-      "keyboard": { "label": "Jasa Ganti Keyboard", "desc": "Bongkar pasang keyboard laptop" },
-      "repair": { "label": "Repair Hardware Minor", "desc": "Perbaikan komponen (IC, port, dll)" },
-      "diagnosa": { "label": "Diagnosa & Estimasi", "desc": "Gratis, AI akan menganalisa keluhan dan menyarankan servis yang tepat" }
     },
     "form": {
       "submit": "Hitung Estimasi dengan AI",
-      "submitHint": "Isi merek laptop dan detail keluhan untuk melanjutkan. Pilihan servis bersifat opsional.",
+      "submitHint": "Isi merek, seri/model, dan detail keluhan laptop untuk melanjutkan.",
       "loadingTitle": "AI sedang menganalisis...",
       "loadingDesc": "Mencari spesifikasi laptop dan menghitung estimasi biaya servis."
     },
@@ -515,6 +496,8 @@
       "totalNote": "Biaya jasa saja, belum termasuk part",
       "disclaimer": "Harga di atas adalah estimasi biaya jasa saja. Harga komponen/spare part belum termasuk. Harga final dikonfirmasi setelah pemeriksaan perangkat secara langsung.",
       "whatsappButton": "Konsultasi via WhatsApp",
+      "copyButton": "Salin Hasil",
+      "copied": "Tersalin!",
       "recalculate": "Hitung Ulang",
       "waGreeting": "Halo, saya mau konsultasi servis laptop mas iwan,",
       "waProblem": "Kendala:",
