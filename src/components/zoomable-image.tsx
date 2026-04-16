@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type ImgHTMLAttributes } from "react";
+import { useState, type ImgHTMLAttributes } from "react";
 import { cn } from "@/lib/utils";
 import {
     Plus,
@@ -32,11 +32,13 @@ export const ZoomableImage = ({
     ...props
 }: ZoomableImageProps) => {
     const [isLoaded, setIsLoaded] = useState(false);
+    const [prevSrc, setPrevSrc] = useState(src);
     const { onLoad: onImageLoad, ...imageProps } = props;
 
-    useEffect(() => {
+    if (src !== prevSrc) {
         setIsLoaded(false);
-    }, [src]);
+        setPrevSrc(src);
+    }
 
     const parseDimension = (value: number | string | undefined) => {
         if (typeof value === "number" && Number.isFinite(value) && value > 0) {
@@ -60,10 +62,10 @@ export const ZoomableImage = ({
     return (
         <Dialog>
             <DialogTrigger asChild>
-                <div className="group relative cursor-zoom-in overflow-hidden rounded-xl ring-1 ring-border/45 transition-[box-shadow,transform] duration-300 hover:shadow-lg hover:ring-border/70">
+                <div className="group relative cursor-zoom-in overflow-hidden rounded-xl ring-1 ring-inset ring-border/45 transition-[box-shadow,transform] duration-300 hover:shadow-lg hover:ring-border/70 transform-gpu bg-transparent">
                     <div
                         className={cn(
-                            "relative w-full overflow-hidden rounded-xl",
+                            "relative w-full overflow-hidden rounded-xl transform-gpu",
                             !reservedAspectRatio && !isLoaded && "min-h-48",
                         )}
                         style={reservedAspectRatio ? { aspectRatio: reservedAspectRatio } : undefined}
@@ -87,7 +89,7 @@ export const ZoomableImage = ({
                             onImageLoad?.(event);
                         }}
                         className={cn(
-                            "relative z-[1] block h-auto w-full rounded-xl transition-[opacity,transform] duration-300 ease-out group-hover:scale-[1.01]",
+                            "relative z-[1] block h-auto w-full object-cover transition-[opacity,transform] duration-300 ease-out group-hover:scale-[1.01]",
                             isLoaded ? "opacity-100" : "opacity-0",
                             className,
                         )}

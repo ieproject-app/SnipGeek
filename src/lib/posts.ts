@@ -17,6 +17,7 @@ export type PostFrontmatter = {
   tags?: string[];
   category?: string;
   authorId?: string;
+  hideFromHome?: boolean;
   [key: string]: unknown;
 };
 

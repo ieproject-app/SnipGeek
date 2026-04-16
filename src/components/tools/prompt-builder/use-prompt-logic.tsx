@@ -585,6 +585,7 @@ export function usePromptLogic({
   const [publishDate, setPublishDate] = useState<string>("");
   const [isPublished, setIsPublished] = useState(true);
   const [isFeatured, setIsFeatured] = useState(false);
+  const [isHideFromHome, setIsHideFromHome] = useState(false);
 
   // ── Category hint (optional — AI is free to create a new one) ──
   const [categoryHint, setCategoryHint] = useState("");
@@ -1069,7 +1070,7 @@ export function usePromptLogic({
 
   // ── Persist feature flags ──
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+     
     setMounted(true);
     const saved = localStorage.getItem("snipgeek-prompt-features");
     if (saved) {
@@ -1115,6 +1116,7 @@ export function usePromptLogic({
         if (typeof d.tipsStandalone === "boolean") setTipsStandalone(d.tipsStandalone);
         if (typeof d.isPublished === "boolean") setIsPublished(d.isPublished);
         if (typeof d.isFeatured === "boolean") setIsFeatured(d.isFeatured);
+        if (typeof d.isHideFromHome === "boolean") setIsHideFromHome(d.isHideFromHome);
         if (typeof d.imageGridMappings === "string") setImageGridMappings(d.imageGridMappings);
         if (typeof d.galleryMappings === "string") setGalleryMappings(d.galleryMappings);
         if (typeof d.specsMappings === "string") setSpecsMappings(d.specsMappings);
@@ -1177,6 +1179,7 @@ export function usePromptLogic({
         tipsStandalone,
         isPublished,
         isFeatured,
+        isHideFromHome,
         imageGridMappings,
         galleryMappings,
         specsMappings,
@@ -1199,6 +1202,7 @@ export function usePromptLogic({
     tipsStandalone,
     isPublished,
     isFeatured,
+    isHideFromHome,
     imageGridMappings,
     galleryMappings,
     specsMappings,
@@ -1269,7 +1273,10 @@ export function usePromptLogic({
     if (isModify) {
       prompt += `- Updated: ${new Date().toISOString().split("T")[0]}\n`;
     }
-    prompt += `- Status: ${isPublished ? "PUBLISHED" : "DRAFT"}${isFeatured ? " | FEATURED" : ""}\n`;
+    prompt += `- Status: ${isPublished ? "PUBLISHED" : "DRAFT"}${isFeatured ? " | FEATURED" : ""}${isHideFromHome ? " | HIDDEN FROM HOME" : ""}\n`;
+    if (isHideFromHome) {
+      prompt += `- Hide From Home: TRUE\n`;
+    }
     prompt += `- Category Hint: ${debouncedCategoryHint || "[AI: AUTOMATIC]"}\n\n`;
 
     // ── Tag Registry: inject live tag list so AI prefers existing tags ──
@@ -1540,6 +1547,7 @@ export function usePromptLogic({
     debouncedPublishDate,
     isPublished,
     isFeatured,
+    isHideFromHome,
     isIdOnly,
     debouncedHeroImage,
     debouncedImages,
@@ -1769,7 +1777,7 @@ export function usePromptLogic({
     originalContent, setOriginalContent, modInstructions, setModInstructions,
     showImages, setShowImages, showDownloads, setShowDownloads, showGrids, setShowGrids, showGallery, setShowGallery, showSpecs, setShowSpecs, isIdOnly, setIsIdOnly,
     captionMode, setCaptionMode, captionAlignment, setCaptionAlignment, captionCoverage, setCaptionCoverage, captionMaxCount, setCaptionMaxCount,
-    publishDate, setPublishDate, isPublished, setIsPublished, isFeatured, setIsFeatured, categoryHint, setCategoryHint, isTechnicalExpanded, setIsTechnicalExpanded,
+    publishDate, setPublishDate, isPublished, setIsPublished, isFeatured, setIsFeatured, isHideFromHome, setIsHideFromHome, categoryHint, setCategoryHint, isTechnicalExpanded, setIsTechnicalExpanded,
     downloadItems, setDownloadItems, imageGridMappings, setImageGridMappings, galleryMappings, setGalleryMappings, specsMappings, setSpecsMappings, heroImage, setHeroImage, images, setImages,
     generatedPrompt, setGeneratedPrompt, isCopied, setIsCopied, resetPopoverOpen, setResetPopoverOpen, isOriginalLoading, setIsOriginalLoading,
     selectedBlock, setSelectedBlock, selectedBlockLine, setSelectedBlockLine, selectedBlockComment, setSelectedBlockComment,

@@ -225,7 +225,9 @@ export function HomeClient({
   const windowsUbuntuTags = new Set(["windows", "ubuntu", "linux", "dual-boot"]);
 
   const allPosts = useMemo(() => {
-    return [...initialPosts].sort(
+    return [...initialPosts]
+      .filter((post) => !post.frontmatter.hideFromHome)
+      .sort(
       (a, b) =>
         new Date(b.frontmatter.date).getTime() -
         new Date(a.frontmatter.date).getTime(),
