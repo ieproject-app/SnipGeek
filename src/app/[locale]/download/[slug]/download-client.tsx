@@ -7,7 +7,6 @@ import { motion, Variants } from "framer-motion";
 import {
   Download,
   Cloud,
-  Github,
   Type,
   Cpu,
   Settings,
@@ -16,6 +15,7 @@ import {
   Lock,
   ArrowRight,
 } from "lucide-react";
+import { GithubLogo } from "@/components/icons/github-logo";
 import { WindowsStoreLogo } from "@/components/icons/windows-store-logo";
 import type { Dictionary } from "@/lib/get-dictionary";
 import { cn } from "@/lib/utils";
@@ -63,7 +63,7 @@ const getPlatformIcon = (
     case "gdrive":
       return <Cloud className={className} />;
     case "github":
-      return <Github className={className} />;
+      return <GithubLogo className={className} />;
     case "font":
       return <Type className={className} />;
     case "driver":

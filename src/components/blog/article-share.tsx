@@ -2,13 +2,13 @@
 
 import { usePathname } from "next/navigation";
 import {
-  Facebook,
-  Linkedin,
   Send,
   MessageCircle,
   Link as LinkIcon,
   Check,
 } from "lucide-react";
+import { FacebookLogo } from "@/components/icons/facebook-logo";
+import { LinkedinLogo } from "@/components/icons/linkedin-logo";
 import { XLogo } from "@/components/icons/x-logo";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
@@ -60,7 +60,7 @@ export function ArticleShare({ title }: ArticleShareProps) {
     {
       id: "facebook",
       label: "Facebook",
-      icon: Facebook,
+      icon: FacebookLogo,
       href: `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`,
       hoverClass: "hover:bg-[#1877F2] hover:text-white",
       shadowClass: "group-hover:shadow-[0_8px_20px_rgba(24,119,242,0.4)]",
@@ -68,7 +68,7 @@ export function ArticleShare({ title }: ArticleShareProps) {
     {
       id: "linkedin",
       label: "LinkedIn",
-      icon: Linkedin,
+      icon: LinkedinLogo,
       href: `https://www.linkedin.com/shareArticle?mini=true&url=${encodedUrl}&title=${encodedTitle}`,
       hoverClass: "hover:bg-[#0A66C2] hover:text-white",
       shadowClass: "group-hover:shadow-[0_8px_20px_rgba(10,102,194,0.4)]",

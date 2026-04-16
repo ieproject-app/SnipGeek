@@ -7,7 +7,8 @@ import { initiateGoogleSignIn } from '@/firebase/non-blocking-login';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { SnipGeekLogo } from '@/components/icons/snipgeek-logo';
-import { Loader2, Chrome, AlertCircle } from 'lucide-react';
+import { Loader2, AlertCircle } from 'lucide-react';
+import { GoogleLogo } from '@/components/icons/google-logo';
 
 export default function LoginPage() {
   const { user, isUserLoading } = useUser();
@@ -85,7 +86,7 @@ export default function LoginPage() {
             className="w-full h-14 font-black uppercase tracking-widest gap-3 shadow-xl shadow-primary/10 rounded-full text-lg transition-transform hover:scale-[1.02] active:scale-[0.98]"
             onClick={handleGoogleLogin}
           >
-            <Chrome className="h-6 w-6" />
+            <GoogleLogo className="h-6 w-6" />
             Lanjut dengan Google
           </Button>
           

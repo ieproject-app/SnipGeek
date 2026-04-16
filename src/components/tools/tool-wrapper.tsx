@@ -16,7 +16,6 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import {
   Loader2,
-  Chrome,
   LogOut,
   Lock,
   AlertTriangle,
@@ -24,6 +23,7 @@ import {
   Terminal,
   ShieldX,
 } from "lucide-react";
+import { GoogleLogo } from "@/components/icons/google-logo";
 import { useNotification } from "@/hooks/use-notification";
 import type { Dictionary } from "@/lib/get-dictionary";
 import { Separator } from "@/components/ui/separator";
@@ -277,7 +277,7 @@ export function ToolWrapper({
               onClick={handleGoogleLogin}
               className="w-full h-14 rounded-2xl gap-3 font-black uppercase tracking-widest shadow-xl shadow-primary/10 hover:scale-[1.02] active:scale-[0.98] transition-all bg-primary hover:bg-accent"
             >
-              <Chrome className="h-5 w-5" />
+              <GoogleLogo className="h-5 w-5" />
               {t.loginWithGoogle}
             </Button>
             <p className="text-[10px] text-muted-foreground/40 font-bold uppercase tracking-tight">

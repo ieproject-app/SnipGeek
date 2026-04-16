@@ -14,7 +14,6 @@ import { buttonVariants } from "@/components/ui/button";
 import {
   Download,
   Cloud,
-  Github,
   Type,
   Cpu,
   Settings,
@@ -25,6 +24,7 @@ import {
   TriangleAlert,
   ShieldAlert,
 } from "lucide-react";
+import { GithubLogo } from "@/components/icons/github-logo";
 import { WindowsStoreLogo } from "@/components/icons/windows-store-logo";
 import { downloadLinks } from "@/lib/data-downloads";
 import { ZoomableImage } from "./zoomable-image";
@@ -116,7 +116,7 @@ const getPlatformIcon = (platform?: string, className?: string) => {
     case "gdrive":
       return <Cloud className={className} />;
     case "github":
-      return <Github className={className} />;
+      return <GithubLogo className={className} />;
     case "font":
       return <Type className={className} />;
     case "driver":

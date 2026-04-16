@@ -8,19 +8,19 @@ import type { Dictionary } from "@/lib/get-dictionary";
 import { LanguageSwitcher } from "./language-switcher";
 import type { TranslationsMap } from "@/lib/posts";
 import {
-  Facebook,
-  Youtube,
-  Instagram,
-  User2,
+  UserRound,
   ShieldCheck,
   ShieldAlert,
   Mail,
   FileText,
   Terminal,
   LogOut,
-  Chrome,
   Sparkles,
 } from "lucide-react";
+import { FacebookLogo } from "@/components/icons/facebook-logo";
+import { YoutubeLogo } from "@/components/icons/youtube-logo";
+import { InstagramLogo } from "@/components/icons/instagram-logo";
+import { GoogleLogo } from "@/components/icons/google-logo";
 import { TikTokLogo } from "@/components/icons/tiktok-logo";
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
 import { SnipTooltip } from "@/components/ui/snip-tooltip";
@@ -105,17 +105,17 @@ export function LayoutFooter({
 
   const socialLinks = [
     {
-      icon: <Facebook className="h-5 w-5" />,
+      icon: <FacebookLogo className="h-5 w-5" />,
       href: "https://www.facebook.com/iwan.efendi.777",
       label: "Facebook",
     },
     {
-      icon: <Youtube className="h-5 w-5" />,
+      icon: <YoutubeLogo className="h-5 w-5" />,
       href: "https://www.youtube.com/@iwantools",
       label: "YouTube",
     },
     {
-      icon: <Instagram className="h-5 w-5" />,
+      icon: <InstagramLogo className="h-5 w-5" />,
       href: "https://www.instagram.com/iwnefnd/",
       label: "Instagram",
     },
@@ -165,7 +165,7 @@ export function LayoutFooter({
                 href={`${linkPrefix}/about`}
                 className="group/btn relative inline-flex items-center gap-2 px-6 py-2 rounded-full bg-primary/10 border border-primary/10 text-primary text-[13px] font-bold transition-all duration-300 hover:bg-primary hover:text-primary-foreground hover:scale-105 active:scale-95 shadow-sm"
               >
-                <User2 className="h-4 w-4" />
+                <UserRound className="h-4 w-4" />
                 <span>{dictionary.footer.viewProfile}</span>
               </Link>
             </div>
@@ -239,7 +239,7 @@ export function LayoutFooter({
                     onClick={handleLogin}
                     className="group flex items-center gap-2 text-[11px] font-black uppercase tracking-widest text-primary/60 hover:text-accent transition-all duration-300"
                   >
-                    <Chrome className="h-3.5 w-3.5 transition-transform group-hover:scale-120" />
+                    <GoogleLogo className="h-3.5 w-3.5 transition-transform group-hover:scale-120" />
                     <span>Admin Portal</span>
                   </button>
                 ) : (
