@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
+import { useForm } from 'react-hook-form'
 import {
   Laptop,
   Wrench,
@@ -58,6 +59,14 @@ interface EstimateResult {
   bundleDiscount?: boolean
 }
 
+// ─── Form Schema ─────────────────────────────────────────────────────────────
+interface EstimatorFormData {
+  brand: string
+  model: string
+  complaint: string
+  history: string
+}
+
 // ─── Helper ───────────────────────────────────────────────────────────────────
 const fmt = (n: number) =>
   new Intl.NumberFormat('id-ID', {
@@ -76,10 +85,39 @@ export function EstimatorClient({ dictionary }: EstimatorClientProps) {
   // Print-only CSS: hide header, form, etc. only show resultContent
   const d = dictionary?.laptopServiceEstimator
 
-  const [brand, setBrand] = useState('')
-  const [model, setModel] = useState('')
-  const [complaint, setComplaint] = useState('')
-  const [history, setHistory] = useState('')
+  const {
+    register,
+    handleSubmit: rhfHandleSubmit,
+    setValue,
+    watch,
+    reset: resetForm,
+    formState: { errors: fieldErrors },
+  } = useForm<EstimatorFormData>({
+    defaultValues: { brand: '', model: '', complaint: '', history: '' },
+    validate: ({ formValues }) => {
+      const { brand, model, complaint } = formValues
+      if (
+        brand.trim().length >= 2 &&
+        model.trim().length >= 2 &&
+        complaint.trim().length >= 1 &&
+        complaint.trim().length < 10
+      ) {
+        return {
+          complaint: {
+            message: 'Jelaskan lebih detail agar estimasi AI lebih akurat (min. 10 karakter).',
+            type: 'formValidate',
+          },
+        }
+      }
+      return true
+    },
+  })
+
+  const brand = watch('brand')
+  const model = watch('model')
+  const complaint = watch('complaint')
+  const history = watch('history')
+
   const [step, setStep] = useState<Step>('form')
   const [result, setResult] = useState<EstimateResult | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -129,6 +167,11 @@ export function EstimatorClient({ dictionary }: EstimatorClientProps) {
     reader.readAsDataURL(file)
   }
 
+  const applyScanResult = (scanBrand: string, scanModel?: string) => {
+    setValue('brand', scanBrand, { shouldValidate: true })
+    if (scanModel) setValue('model', scanModel, { shouldValidate: true })
+  }
+
   const performScan = async (base64: string) => {
     setIsScanning(true)
     setError(null)
@@ -140,8 +183,7 @@ export function EstimatorClient({ dictionary }: EstimatorClientProps) {
       })
       const data = await res.json()
       if (res.ok && data.brand) {
-        setBrand(data.brand)
-        if (data.model) setModel(data.model)
+        applyScanResult(data.brand, data.model)
       } else {
         setError(data.error || 'Gagal membaca label. Coba foto lebih jelas.')
       }
@@ -165,8 +207,8 @@ export function EstimatorClient({ dictionary }: EstimatorClientProps) {
   const cooldownRemaining = Math.max(0, Math.ceil((cooldownUntil - Date.now()) / 1000))
   const isOnCooldown = cooldownRemaining > 0
 
-  const handleSubmit = async () => {
-    if (!isFormValid || isOnCooldown) return
+  const onFormSubmit = async (data: EstimatorFormData) => {
+    if (isOnCooldown) return
 
     setStep('loading')
     setError(null)
@@ -176,22 +218,22 @@ export function EstimatorClient({ dictionary }: EstimatorClientProps) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          brand: brand.trim(),
-          model: model.trim(),
-          complaint: complaint.trim(),
-          history: history.trim(),
+          brand: data.brand.trim(),
+          model: data.model.trim(),
+          complaint: data.complaint.trim(),
+          history: data.history.trim(),
         }),
       })
 
-      const data = await res.json()
+      const json = await res.json()
 
       if (!res.ok) {
-        setError(data.error ?? 'Error')
+        setError(json.error ?? 'Error')
         setStep('form')
         return
       }
 
-      setResult(data)
+      setResult(json)
       setStep('result')
       // 30 detik cooldown setelah berhasil generate
       setCooldownUntil(Date.now() + 30_000)
@@ -202,10 +244,7 @@ export function EstimatorClient({ dictionary }: EstimatorClientProps) {
   }
 
   const handleReset = () => {
-    setBrand('')
-    setModel('')
-    setComplaint('')
-    setHistory('')
+    resetForm()
     setResult(null)
     setError(null)
     setShowSpecs(true)
@@ -349,9 +388,9 @@ export function EstimatorClient({ dictionary }: EstimatorClientProps) {
     )
   }
 
-  // ── FORM ────────────────────────────────────────────────────────────────────
+  // ── FORM ────────────────────────────────────────────────────────────────────────
   const formContent = (
-    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <form onSubmit={rhfHandleSubmit(onFormSubmit)} className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
       {error && (
         <div className="flex items-start gap-3 rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
           <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />
@@ -380,11 +419,11 @@ export function EstimatorClient({ dictionary }: EstimatorClientProps) {
             <input
               id="brand"
               type="text"
-              value={brand}
-              onChange={(e) => setBrand(e.target.value)}
+              {...register('brand', { required: 'Merek laptop wajib diisi.', minLength: { value: 2, message: 'Minimal 2 karakter.' } })}
               placeholder={d.steps.a.brandPlaceholder}
-              className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm font-medium outline-none focus:border-accent focus:ring-2 focus:ring-accent/20 transition-all"
+              className={`w-full rounded-xl border bg-background px-4 py-3 text-sm font-medium outline-none focus:border-accent focus:ring-2 focus:ring-accent/20 transition-all ${fieldErrors.brand ? 'border-destructive' : 'border-border'}`}
             />
+            {fieldErrors.brand && <p className="text-xs text-destructive mt-1">{fieldErrors.brand.message}</p>}
           </div>
           <div className="space-y-1.5">
             <label htmlFor="model" className="block text-sm font-semibold text-foreground">
@@ -393,11 +432,11 @@ export function EstimatorClient({ dictionary }: EstimatorClientProps) {
             <input
               id="model"
               type="text"
-              value={model}
-              onChange={(e) => setModel(e.target.value)}
+              {...register('model', { required: 'Seri/model wajib diisi.', minLength: { value: 2, message: 'Minimal 2 karakter.' } })}
               placeholder={d.steps.a.modelPlaceholder}
-              className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm font-medium outline-none focus:border-accent focus:ring-2 focus:ring-accent/20 transition-all"
+              className={`w-full rounded-xl border bg-background px-4 py-3 text-sm font-medium outline-none focus:border-accent focus:ring-2 focus:ring-accent/20 transition-all ${fieldErrors.model ? 'border-destructive' : 'border-border'}`}
             />
+            {fieldErrors.model && <p className="text-xs text-destructive mt-1">{fieldErrors.model.message}</p>}
             <p className="text-xs text-muted-foreground">{d.steps.a.modelHint}</p>
 
             <div className="pt-2">
@@ -474,19 +513,18 @@ export function EstimatorClient({ dictionary }: EstimatorClientProps) {
             <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">{d.steps.b.labelProblem}</label>
             <textarea
               id="complaint"
-              value={complaint}
-              onChange={(e) => setComplaint(e.target.value)}
+              {...register('complaint', { required: 'Keluhan wajib diisi.' })}
               placeholder={d.steps.b.placeholder}
               rows={2}
-              className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm font-medium outline-none focus:border-accent focus:ring-2 focus:ring-accent/20 transition-all resize-none"
+              className={`w-full rounded-xl border bg-background px-4 py-3 text-sm font-medium outline-none focus:border-accent focus:ring-2 focus:ring-accent/20 transition-all resize-none ${fieldErrors.complaint ? 'border-destructive' : 'border-border'}`}
             />
+            {fieldErrors.complaint && <p className="text-xs text-destructive mt-1">{fieldErrors.complaint.message}</p>}
           </div>
           <div className="space-y-1.5">
             <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">{d.steps.b.labelHistory}</label>
             <textarea
               id="history"
-              value={history}
-              onChange={(e) => setHistory(e.target.value)}
+              {...register('history')}
               placeholder={d.steps.b.placeholderHistory}
               rows={2}
               className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm font-medium outline-none focus:border-accent focus:ring-2 focus:ring-accent/20 transition-all resize-none"
@@ -498,8 +536,7 @@ export function EstimatorClient({ dictionary }: EstimatorClientProps) {
       {/* Submit */}
       <div className="space-y-2">
         <button
-          type="button"
-          onClick={handleSubmit}
+          type="submit"
           disabled={!isFormValid || isOnCooldown}
           className={[
             'w-full flex items-center justify-center gap-2.5 rounded-xl py-4 px-6',
@@ -518,7 +555,7 @@ export function EstimatorClient({ dictionary }: EstimatorClientProps) {
           <p className="text-center text-xs text-muted-foreground">Mohon tunggu sebelum generate ulang.</p>
         )}
       </div>
-    </div>
+    </form>
   )
 
   // ── LOADING ─────────────────────────────────────────────────────────────────

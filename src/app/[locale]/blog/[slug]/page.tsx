@@ -238,13 +238,13 @@ export default async function Page({
           {/* Hero image - full-width on mobile, rounded on desktop */}
           <div className="relative -mx-4 sm:-mx-6 lg:mx-0 mb-12">
             {heroSource ? (
-              <div className="relative w-full lg:max-w-4xl lg:mx-auto lg:rounded-xl lg:overflow-hidden lg:shadow-2xl lg:ring-1 lg:ring-primary/5">
+              <div className="relative w-full lg:max-w-4xl lg:mx-auto lg:rounded-xl lg:overflow-hidden lg:shadow-xl">
                 <RevealImage
                   src={heroSource.url}
                   alt={imageAlt || initialPost.frontmatter.title}
                   width={1200}
                   height={675}
-                  className="w-full h-auto max-h-[65vh] object-contain bg-black/5 dark:bg-black/20"
+                  className="w-full h-auto max-h-[65vh] object-contain"
                   wrapperClassName="w-full flex items-center justify-center focus:outline-none"
                   placeholderClassName="hidden"
                   showSkeleton
@@ -257,7 +257,7 @@ export default async function Page({
                 />
               </div>
             ) : (
-              <div className="w-full aspect-video lg:max-w-4xl lg:mx-auto lg:rounded-xl lg:overflow-hidden lg:shadow-2xl lg:ring-1 lg:ring-primary/5 flex items-center justify-center bg-primary/5 relative z-10">
+              <div className="w-full aspect-video lg:max-w-4xl lg:mx-auto lg:rounded-xl lg:overflow-hidden lg:shadow-xl flex items-center justify-center bg-primary/5 relative z-10">
                 <span className="text-primary/20 font-display text-6xl font-black">
                   SnipGeek
                 </span>
