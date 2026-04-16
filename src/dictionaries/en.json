@@ -464,9 +464,8 @@
         "brandLabel": "Laptop Brand",
         "brandPlaceholder": "e.g., Asus, Lenovo, HP...",
         "modelLabel": "Series / Model",
-        "modelOptional": "(optional)",
         "modelPlaceholder": "e.g., VivoBook 14 A416...",
-        "modelHint": "Include specific series (e.g., X441U) for more accurate AI specs.",
+        "modelHint": "Required. Include specific series so AI can analyze laptop specifications.",
         "scanLabelBtn": "Scan Laptop Label",
         "scanOr": "or",
         "scanHint": "Don't know the model? Upload a photo of the label on the bottom of the laptop."
@@ -478,29 +477,11 @@
         "placeholder": "e.g., Laptop is slow, keyboard not working, frequent restarts...",
         "labelHistory": "Parts / Service History",
         "placeholderHistory": "e.g., Battery replaced 2023, SSD changed 1 year ago..."
-      },
-      "c": {
-        "badge": "Service Preference",
-        "title": "Select Services If You Already Know",
-        "optionalHint": "Optional. If you are unsure, AI will infer the likely service from your complaint.",
-        "selectedCount": "{count}/5 SELECTED",
-        "priceLabel": "Service Fee"
       }
-    },
-    "services": {
-      "thermal": { "label": "Ganti Thermal Paste", "desc": "New thermal paste for CPU/GPU" },
-      "cleaning": { "label": "Cleaning Internal", "desc": "Clean fan, heatsink, and internal dust" },
-      "ram": { "label": "Jasa Upgrade RAM", "desc": "Install/replace RAM (parts not included)" },
-      "ssd": { "label": "Jasa Upgrade SSD/HDD", "desc": "Install storage (includes base OS install)" },
-      "os": { "label": "Instal Ulang OS", "desc": "Windows/Linux, include basic software" },
-      "screen": { "label": "Jasa Ganti Layar", "desc": "Replace screen panel (part check required)" },
-      "keyboard": { "label": "Jasa Ganti Keyboard", "desc": "Replace laptop keyboard" },
-      "repair": { "label": "Repair Hardware Minor", "desc": "Minor component fix (IC, ports, etc.)" },
-      "diagnosa": { "label": "Diagnosis & Estimate", "desc": "Free, AI will analyze your complaint and suggest the right service" }
     },
     "form": {
       "submit": "Calculate Estimate with AI",
-      "submitHint": "Enter the laptop brand and complaint details to continue. Service selection is optional.",
+      "submitHint": "Enter the laptop brand, series/model, and complaint details to continue.",
       "loadingTitle": "AI is analyzing...",
       "loadingDesc": "Searching for laptop specs and calculating service costs."
     },
@@ -515,6 +496,8 @@
       "totalNote": "Service fees only, parts not included",
       "disclaimer": "Prices above are estimated service fees only. Component/spare part prices are not included. Final price will be confirmed after physical device inspection.",
       "whatsappButton": "Consult via WhatsApp",
+      "copyButton": "Copy Result",
+      "copied": "Copied!",
       "recalculate": "Recalculate",
       "waGreeting": "Hi, I'd like to consult about laptop service with Mas Iwan,",
       "waProblem": "Complaint:",
