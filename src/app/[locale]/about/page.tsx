@@ -109,7 +109,7 @@ export default async function AboutPage({
       />
       <main className="mx-auto max-w-5xl px-4 pt-8 pb-14 sm:px-6 lg:px-8">
         <ScrollReveal direction="down">
-          <section className="relative overflow-hidden rounded-3xl border border-primary/10 bg-linear-to-br from-primary/6 via-background to-accent/6 p-8 md:p-12">
+          <section className="relative overflow-hidden rounded-3xl border border-primary/10 bg-linear-to-br from-primary/6 via-background to-accent/6 p-6 sm:p-8 md:p-12">
             <div className="pointer-events-none absolute -top-20 -left-20 h-72 w-72 rounded-full bg-primary/8 blur-3xl" />
             <div className="pointer-events-none absolute -right-20 -bottom-20 h-72 w-72 rounded-full bg-accent/8 blur-3xl" />
 
@@ -151,9 +151,20 @@ export default async function AboutPage({
                     {data.profile.locationLabel}
                   </Badge>
                 </div>
+
+                <div className="mt-5 flex items-center gap-3 rounded-2xl border border-primary/10 bg-card/50 px-4 py-3 lg:hidden">
+                  <Avatar className="h-10 w-10 shrink-0 ring-2 ring-primary/15 ring-offset-2 ring-offset-background">
+                    <AvatarImage src={authorAvatar} alt={data.name} />
+                    <AvatarFallback className="text-sm font-bold">IE</AvatarFallback>
+                  </Avatar>
+                  <div className="min-w-0">
+                    <p className="text-sm font-bold text-primary">{data.name}</p>
+                    <p className="truncate text-xs text-muted-foreground">{learningRole}</p>
+                  </div>
+                </div>
               </div>
 
-              <div className="flex w-full justify-center lg:justify-end">
+              <div className="hidden lg:flex w-full lg:justify-end">
                 <div className="w-full max-w-md">
                   <div className="relative z-10 overflow-visible rounded-3xl border border-primary/12 bg-card/95 px-5 pb-6 pt-5 shadow-xl backdrop-blur-sm sm:px-6 sm:pb-7 sm:pt-6">
                     <MotionDiv
@@ -316,7 +327,7 @@ export default async function AboutPage({
                 </div>
               </div>
 
-              <aside className="lg:sticky lg:top-24">
+              <aside className="hidden lg:block lg:sticky lg:top-24">
                 <div className="relative z-10 overflow-visible rounded-3xl border border-primary/12 bg-card/95 p-5 shadow-sm">
                   <MotionDiv
                     initial={{
@@ -467,7 +478,7 @@ export default async function AboutPage({
             <SectionHeading title={dictionary.about.skills} />
           </ScrollReveal>
 
-          <div className="mt-8 grid grid-cols-1 gap-5 md:grid-cols-3">
+          <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 md:grid-cols-3">
             {data.skills.map((cat, index) => (
               <ScrollReveal key={cat.name} delay={index * 0.08} direction="up">
                 <Card className="relative h-full overflow-hidden rounded-2xl border-primary/10 bg-card/50 transition-all duration-300 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5">
