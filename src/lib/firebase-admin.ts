@@ -8,6 +8,17 @@ const isDevelopment = process.env.NODE_ENV !== 'production';
 
 let adminInitError: Error | null = null;
 
+function parsePrivateKey(raw: string): string {
+  let key = raw.trim();
+  // Strip surrounding double or single quotes added by some env systems
+  if ((key.startsWith('"') && key.endsWith('"')) || (key.startsWith("'") && key.endsWith("'"))) {
+    key = key.slice(1, -1);
+  }
+  // Replace literal \n with real newlines
+  key = key.replace(/\\n/g, '\n');
+  return key;
+}
+
 if (!admin.apps.length) {
   try {
     if (hasServiceAccountEnv) {
@@ -16,7 +27,7 @@ if (!admin.apps.length) {
         credential: admin.credential.cert({
           projectId,
           clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-          privateKey: process.env.FIREBASE_PRIVATE_KEY!.replace(/\\n/g, '\n'),
+          privateKey: parsePrivateKey(process.env.FIREBASE_PRIVATE_KEY!),
         }),
       });
     } else {
