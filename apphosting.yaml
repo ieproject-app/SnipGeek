@@ -3,11 +3,7 @@ runConfig:
   memoryMiB: 512
 
 env:
-  - variable: NEXT_PUBLIC_FIREBASE_API_KEY
-    secret: FIREBASE_API_KEY
-    availability:
-      - BUILD
-      - RUNTIME
+  # NEXT_PUBLIC_FIREBASE_API_KEY is set as a plain env var in Firebase App Hosting console
 
   - variable: NEXT_PUBLIC_FIREBASE_PROJECT_ID
     value: "studio-8697076532-14512"
