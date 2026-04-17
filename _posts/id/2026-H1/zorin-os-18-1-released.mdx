@@ -1,0 +1,209 @@
+---
+title: "Zorin OS 18.1 Resmi Rilis — Apa yang Baru dan Siapa yang Cocok Pakai Ini"
+slug: "zorin-os-18-1-released"
+translationKey: "zorin-os-18-1-released"
+date: "2026-04-19"
+description: "Zorin OS 18.1 hadir dengan Linux 6.17, edisi Lite berbasis Xfce 4.20, tiling window yang lebih pintar, dan LibreOffice 26.2 — update solid untuk semua kalangan."
+category: "Linux"
+tags: ["linux", "distro", "setup", "apps", "dual-boot"]
+published: true
+featured: false
+heroImage: "/images/_posts/distro/zorin-os/zorin-18.1/banner-zorin-os.webp"
+imageAlt: "Banner Zorin OS 18.1 — distribusi Linux yang dibangun di atas Ubuntu 24.04 LTS"
+---
+
+Laptop saya sudah lama jalan dual-boot Ubuntu 25.10 dan Windows 11 — dan setup itu sudah cukup nyaman. Tapi setiap kali Zorin merilis versi baru, ada rasa penasaran yang susah ditahan. Zorin OS itu selalu jadi distro yang saya rekomendasikan ke orang-orang yang mulai bosan dengan Windows tapi belum siap terjun total ke dunia terminal. Jadi waktu 18.1 rilis tanggal 15 April, saya baca release notes-nya dengan cukup serius — dan hasilnya cukup mengejutkan saya.
+
+Zorin OS 18.1 adalah *point release* yang dibangun di atas Ubuntu 24.04 LTS. Versi ini membawa kernel Linux 6.17, **edisi Lite** yang sudah lama dinantikan, peningkatan pada window tiling, LibreOffice 26.2, dan sejumlah penyempurnaan yang diam-diam bikin pengalaman harian jadi lebih mulus. Ini yang perlu kamu tahu.
+
+---
+
+## Apa Saja yang Baru di Zorin OS 18.1
+
+### Window Tiling Makin Pintar
+
+Zorin OS 18 memperkenalkan *Advanced Window Tiling* sebagai salah satu fitur unggulan — fork kustom dari ekstensi GNOME Tiling Shell. Di versi 18.1, fitur ini makin praktis:
+
+- Kamu bisa **mengurutkan ulang tiling layout** dari dialog edit layouts
+- **Semua jendela yang di-tile langsung ke depan** saat kamu switch ke aplikasi tersebut dari taskbar atau dock
+- **Edge tiling yang lebih pintar** — seret jendela ke tepi layar dan ia akan snap ke custom layout-mu, bukan sekadar setengah atau seperempat layar
+
+![Opsi edge tiling pada pengaturan Zorin Appearance di Zorin OS 18.1](/images/_posts/distro/zorin-os/zorin-18.1/edge-tiling-options.webp)
+<div className="-mt-3 mb-6 text-center text-sm italic text-muted-foreground">Edge tiling sekarang snap ke layout custom kamu — bukan lagi sekadar bagi dua layar.</div>
+
+Semua opsi ini tersimpan rapi di Zorin Appearance → Windows. Punya satu tempat yang koheren untuk mengatur semuanya — tanpa harus berburu ekstensi terpisah — itu justru yang paling saya syukuri dari pendekatan Zorin.
+
+### LibreOffice 26.2 Sudah Terpasang dari Awal
+
+Zorin OS 18.1 langsung menyertakan **LibreOffice 26.2** — versi terbaru dari *office suite* ini. Beberapa perubahannya:
+
+- Kompatibilitas lebih baik dengan dokumen Microsoft Office dan Microsoft 365
+- Dukungan native Markdown
+- Objek bentuk konektor di Calc dan Writer
+- Berbagai peningkatan performa
+
+![LibreOffice 26.2 berjalan di Zorin OS 18.1](/images/_posts/distro/zorin-os/zorin-18.1/libreoffice.webp)
+
+Kalau kamu baru pindah dari Windows dan masih perlu berkolaborasi dalam format `.docx` atau `.xlsx`, update ini lumayan mengurangi gesekan yang biasanya muncul di minggu-minggu pertama.
+
+### Database Alternatif Aplikasi Windows Bertambah 40%
+
+Ini salah satu fitur Zorin yang paling saya suka tapi jarang dibicarakan: saat kamu mencoba menjalankan file `.exe`, sistem akan mendeteksinya dan merekomendasikan alternatif Linux terbaik dari Software store. Di versi 18.1, database ini diperluas lebih dari **40%** — kini mencakup **lebih dari 240 aplikasi Windows**.
+
+Misalnya, kamu klik dua kali installer Plex — Zorin akan memberi tahu ada versi Linux native yang tersedia. Untuk Outlook, ia menyarankan Evolution Mail. Bagi pengguna Linux berpengalaman fitur ini mungkin terasa tidak relevan, tapi bagi yang baru migrasi dari Windows, ini persis jenis kemudahan yang membuat minggu pertama tidak terasa berat.
+
+### Penyempurnaan Panel dan Antarmuka
+
+- **Dukungan skrip kanan-ke-kiri** di panel — pengguna bahasa Arab, Hebrew, dan Urdu akan melihat taskbar yang terbalik dengan benar
+- **Toggle ikon tray** — opsi baru di Zorin Appearance → Interface untuk menyembunyikan atau menampilkan ikon tray secara global, atau mengatur ukuran, posisi, dan opasitas tiap ikon secara individual
+- Perbaikan performa dan bug fix di seluruh desktop
+
+### Dukungan Hardware Lebih Luas via Linux Kernel 6.17
+
+Ini yang paling mengejutkan saya. Zorin OS 18.1 menggunakan **Linux kernel 6.17** — kernel yang sama dengan Ubuntu 25.10 saat ini. Dukungan hardware yang baru ditambahkan:
+
+- Kartu grafis NVIDIA (driver yang diperbarui)
+- Grafis Intel Xe3
+- GPU hybrid laptop AMD
+- Laptop Lenovo ThinkPad dan Samsung Galaxy Book
+- Apple Magic Mouse 2 (USB-C) dan Touch Bar di MacBook Pro Intel
+- *Game controller*: PlayStation 5 DualSense, Acer Nitro NGR200, Turtle Beach Recon
+- *Gaming handheld*: ASUS ROG Ally, Lenovo Legion Go, OneXPlayer
+
+Punya kernel yang lebih baru sambil tetap menggunakan fondasi paket Ubuntu 24.04 LTS adalah pertukaran yang cerdas. Kamu dapat kompatibilitas hardware yang lebih luas tanpa harus mengorbankan stabilitas jangka panjang.
+
+---
+
+## Edisi Lite Akhirnya Hadir
+
+Tambahan paling besar di Zorin OS 18.1 adalah hadirnya **edisi Lite** — varian ringan berbasis **Xfce 4.20** yang ditujukan untuk mesin lama dan spesifikasi rendah. Fondasinya sama (Linux 6.17, Mesa 25.3), tapi dioptimalkan untuk hardware yang bakal kesulitan menjalankan GNOME shell penuh.
+
+![Zorin OS 18.1 Lite dengan desktop Xfce](/images/_posts/distro/zorin-os/zorin-18.1/18.1-lite.webp)
+<div className="-mt-3 mb-6 text-center text-sm italic text-muted-foreground">Zorin OS 18.1 Lite — desktop Xfce 4.20, file manager baru, dan tema yang diperbarui.</div>
+
+Yang baru di Lite dibanding versi 17.3:
+
+- **Desktop Xfce 4.20** — membawa perbaikan dari rilis Xfce besar termasuk fondasi Wayland yang lebih baik
+- **File Manager yang didesain ulang** — antarmuka yang lebih ramping, cocok untuk layar kecil
+- **Dukungan fingerprint reader** — daftarkan sidik jari langsung dari Settings untuk autentikasi
+- **Tema desktop yang diperbarui** — tampilan lebih membulat dengan pilihan warna baru Yellow dan Brown
+- **Alat Web Apps** — ubah situs web mana saja menjadi aplikasi desktop mandiri yang muncul di start menu
+
+Ini edisi yang akan langsung saya rekomendasikan untuk mesin dengan 2–4 GB RAM yang masih ingin dipakai produktif.
+
+---
+
+## Spesifikasi Hardware Minimum
+
+<Expandable title="Spesifikasi Resmi Zorin OS 18.1" icon="info">
+
+**Zorin OS 18.1 Core / Pro / Education (GNOME):**
+
+| Spesifikasi | Minimum | Rekomendasi |
+|-------------|---------|-------------|
+| CPU | 1 GHz Dual Core 64-bit | 2 GHz Quad Core 64-bit |
+| RAM | 2 GB | 4 GB |
+| Storage | 15 GB (Core) / 35 GB (Education) / 45 GB (Pro) | SSD lebih disarankan |
+| Layar | 800 × 600 | 1280 × 768 atau lebih tinggi |
+| Arsitektur | 64-bit Intel/AMD | — |
+
+**Zorin OS 18.1 Lite (Xfce):**
+
+| Spesifikasi | Minimum |
+|-------------|---------|
+| CPU | 700 MHz Dual Core |
+| RAM | 512 MB |
+| Storage | 8 GB |
+| Layar | 800 × 600 |
+
+</Expandable>
+
+Angka untuk Lite itu cukup mencolok — minimum RAM hanya 512 MB. Ini menempatkannya di kelas yang sama sekali berbeda dari edisi utama. Kalau kamu punya laptop lama dengan 1–2 GB RAM yang sudah berdebu, Zorin OS Lite adalah salah satu opsi paling realistis untuk menghidupkannya kembali.
+
+---
+
+## Zorin OS 18.1 vs Ubuntu 26.04: Mana yang Cocok untuk Hardware Kamu?
+
+Pertanyaan ini terus muncul, terutama dari pengguna yang punya mesin lama. Jawaban singkatnya: keduanya melayani kebutuhan yang berbeda.
+
+Saya pernah bahas soal [peningkatan RAM minimum Ubuntu 26.04 ke 6 GB](/id/blog/ubuntu-26-04-minimum-ram-requirement) — ini perubahan nyata. Ubuntu GNOME terus melangkah maju, dan ekspektasi hardware minimumnya ikut naik. Zorin OS 18.1 Core juga pakai GNOME, tapi spesifikasi minimumnya cuma 2 GB RAM. Dalam praktik, kamu butuh 4 GB untuk pengalaman yang nyaman di keduanya.
+
+Tapi begitu kamu beralih ke **Zorin OS Lite**, perbandingannya berubah total:
+
+| | Ubuntu 26.04 (GNOME) | Zorin OS 18.1 Core (GNOME) | Zorin OS 18.1 Lite (Xfce) |
+|---|---|---|---|
+| RAM Minimum | 6 GB | 2 GB | 512 MB |
+| Kernel | Linux 7.0 | Linux 6.17 | Linux 6.17 |
+| Desktop | GNOME 50 | GNOME 46 | Xfce 4.20 |
+| Dukungan LTS | Hingga 2031 | Hingga April 2029 | Hingga April 2029 |
+| Ramah Windows | ✗ | ✓ | ✓ |
+
+Kalau mesin kamu punya 8 GB+ RAM dan mau yang paling baru, Ubuntu 26.04 masuk akal. Tapi untuk mesin di kisaran 2–4 GB — apalagi kalau penggunanya baru pindah dari Windows — **Zorin OS 18.1 adalah pilihan yang lebih bijak**. Dan untuk yang di bawah itu, Zorin Lite menangani semuanya.
+
+Ubuntu 26.04 punya jendela dukungan lebih panjang (hingga 2031 vs 2029), tapi selisih dua tahun itu jarang jadi faktor penentu bagi kebanyakan pengguna biasa.
+
+---
+
+## Core, Pro, Lite, atau Education: Edisi Mana yang Tepat?
+
+Zorin OS hadir dalam empat edisi. Ini breakdown jujurnya:
+
+<Expandable title="Perbandingan Edisi Zorin OS" icon="folder">
+
+| Edisi | Harga | Desktop | Untuk Siapa |
+|-------|-------|---------|-------------|
+| **Core** | Gratis | GNOME 46 | Kebanyakan pengguna — pilihan terbaik untuk pindah dari Windows |
+| **Lite** | Gratis | Xfce 4.20 | Hardware lama atau spesifikasi rendah (RAM 2–4 GB ke bawah) |
+| **Education** | Gratis | GNOME 46 | Sekolah dan institusi pendidikan; sudah termasuk aplikasi edukatif |
+| **Pro** | ~£48 (~$48) | GNOME 46 | Layout desktop tambahan, aplikasi lebih banyak, mendukung pengembangan |
+
+</Expandable>
+
+Pendapat jujur saya: **Core adalah pilihan yang tepat untuk hampir semua orang**. Pro membuka beberapa layout desktop ekstra (yang meniru tampilan macOS, Windows XP, dll.) dan beberapa aplikasi tambahan, tapi bukan sesuatu yang benar-benar kamu butuhkan. Kalau kamu menyukai proyek ini dan mau berkontribusi pada pengembangannya, Pro adalah cara yang menyenangkan untuk melakukannya. Kalau anggaran terbatas, Core sudah memberikan pengalaman penuh.
+
+Education perlu diketahui kalau kamu sedang menyiapkan mesin untuk lingkungan kelas atau sekolah — sudah dilengkapi alat pendidikan tanpa harus mencari satu per satu.
+
+---
+
+## Cara Mendapatkan Zorin OS 18.1
+
+**Sudah pakai Zorin OS 18?** Cukup jalankan pembaruan sistem melalui Software Updater, atau lewat terminal:
+
+```bash
+sudo apt update && sudo apt upgrade
+```
+
+**Masih di Zorin OS 17?** Kamu bisa upgrade langsung tanpa menghapus file-file kamu menggunakan alat upgrade Zorin dari Zorin Menu.
+
+**Install baru?** Unduh ISO edisi Core di bawah ini:
+
+import { DownloadButton } from "@/components/ui/download-button";
+
+<DownloadButton
+  href="https://zorin.com/os/download/18/core/"
+  label="Unduh Zorin OS 18.1 Core (Gratis)"
+/>
+
+Untuk unduhan edisi Lite, kunjungi [halaman dukungan Zorin](https://help.zorin.com/docs/getting-started/getting-zorin-os-lite/#download). ISO tersedia untuk perangkat 64-bit Intel/AMD.
+
+<Callout variant="info" title="Jendela Dukungan">
+  Zorin OS 18.1 mendapat pembaruan perangkat lunak dan patch keamanan hingga **April 2029**, selaras dengan siklus dukungan Ubuntu 24.04 LTS. Itu jendela tiga tahun yang stabil dari sekarang.
+</Callout>
+
+---
+
+## Sudut Pandang SnipGeek
+
+Zorin OS 18.1 adalah *point release* yang percaya diri. Tidak ada reinvensi besar, tapi ia mengasah hal-hal yang dari awal sudah membuat Zorin OS menonjol — lapisan kompatibilitas aplikasi Windows, window tiling yang terintegrasi, dan setup GNOME bersih yang tidak perlu kamu oprek sejak hari pertama.
+
+Edisi Lite adalah berita terbesar buat saya secara pribadi. Ada celah nyata di ekosistem Linux untuk distro yang bisa jalan nyaman di 2 GB RAM tanpa memaksamu mengorbankan antarmuka modern. Zorin Lite mengisi celah itu lebih baik dari kebanyakan. Untuk siapa pun yang punya mesin yang akan ditolak Ubuntu 26.04 — Zorin Lite layak dipertimbangkan serius.
+
+Kalau kamu sudah nyaman di Ubuntu, tidak perlu pindah. Tapi kalau kamu sedang membantu seseorang migrasi dari Windows, atau mencari distro yang menangani hardware spesifikasi rendah tanpa drama, **Zorin OS 18.1 adalah salah satu jawaban terbaik yang tersedia sekarang**.
+
+Pernah coba Zorin OS sebelumnya? Saya penasaran apakah kamu pilih Core atau Lite — tulis di kolom komentar ya.
+
+### Referensi
+
+1. [Zorin OS 18.1 Is Released — Blog Resmi Zorin](https://blog.zorin.com/2026/04/15/zorin-os-18.1-is-released/)
+2. [Zorin OS 18.1 Released, New Lite Edition Available — OMG! Ubuntu](https://www.omgubuntu.co.uk/2026/04/zorin-os-18-1-released)
+3. [Zorin OS 18.1 Released with Lite Edition Features Xfce 4.20 — Ubuntu Handbook](https://ubuntuhandbook.org/index.php/2026/04/zorin-os-18-1-released-with-lite-edition-features-xfce-4-20/)

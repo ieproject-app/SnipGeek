@@ -14,6 +14,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { ReadingListProvider } from "@/hooks/use-reading-list";
 import { NotificationProvider } from "@/hooks/use-notification";
 import { getDictionary } from "@/lib/get-dictionary";
+import { LucideProvider } from "lucide-react";
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -211,6 +212,7 @@ export default async function LocaleLayout({
         <a href="#main-content" className="skip-link">
           {locale === "id" ? "Lanjut ke konten utama" : "Skip to main content"}
         </a>
+        <LucideProvider strokeWidth={1.5}>
         <FirebaseProviderWrapper>
           <FirebaseAnalyticsTracker />
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
@@ -235,6 +237,7 @@ export default async function LocaleLayout({
             </NotificationProvider>
           </ThemeProvider>
         </FirebaseProviderWrapper>
+        </LucideProvider>
       </body>
     </html>
   );
