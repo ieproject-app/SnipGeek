@@ -16,7 +16,7 @@
  */
 
 import { readFileSync, existsSync, readdirSync, statSync } from "node:fs";
-import { join, relative, dirname } from "node:path";
+import { join, relative, dirname, basename } from "node:path";
 import { execSync } from "node:child_process";
 
 const ROOT = process.cwd();
@@ -173,5 +173,101 @@ if (warnings > 0) {
   process.exit(1);
 } else {
   console.log("✅ All referenced images are staged. Good to go!\n");
-  process.exit(0);
 }
+
+// ── Bilingual filename sync check ─────────────────────────────────────────────
+// Rule: EN and ID versions of the same post MUST have identical filenames.
+// We check every staged _posts/ MDX file: if its translationKey matches a file
+// in the other locale directory, those two files must share the same basename.
+
+/**
+ * Recursively find all .mdx files under dir.
+ * Returns [{ filePath, slug }] where slug = basename without .mdx extension.
+ */
+function getAllMdxFilesInDir(dir) {
+  const results = [];
+  if (!existsSync(dir)) return results;
+  for (const entry of readdirSync(dir, { withFileTypes: true })) {
+    const full = join(dir, entry.name);
+    if (entry.isDirectory()) {
+      results.push(...getAllMdxFilesInDir(full));
+    } else if (entry.name.endsWith(".mdx")) {
+      results.push({ filePath: full, slug: entry.name.replace(/\.mdx$/, "") });
+    }
+  }
+  return results;
+}
+
+/**
+ * Extract translationKey from MDX frontmatter (fast regex, no YAML parser needed).
+ */
+function extractTranslationKey(content) {
+  const m = content.match(/^translationKey:\s*['"]?([^\s'"]+)['"]?/m);
+  return m ? m[1].trim() : null;
+}
+
+const POSTS_DIR = join(ROOT, "_posts");
+const LOCALES = ["en", "id"];
+
+const stagedPosts = [...staged].filter(
+  (f) => f.startsWith("_posts/") && f.endsWith(".mdx"),
+);
+
+let bilingualErrors = 0;
+
+if (stagedPosts.length > 0) {
+  console.log("🌐 Pre-commit: checking bilingual filename sync...\n");
+
+  // Build a lookup: translationKey → { locale, slug, filePath } for all on-disk posts
+  const diskIndex = new Map(); // translationKey → Map<locale, slug>
+  for (const locale of LOCALES) {
+    const localeDir = join(POSTS_DIR, locale);
+    for (const { filePath, slug } of getAllMdxFilesInDir(localeDir)) {
+      const content = readFileSync(filePath, "utf8");
+      const key = extractTranslationKey(content);
+      if (!key) continue;
+      if (!diskIndex.has(key)) diskIndex.set(key, new Map());
+      diskIndex.get(key).set(locale, slug);
+    }
+  }
+
+  for (const stagedFile of stagedPosts) {
+    // Determine locale from path: _posts/<locale>/...
+    const parts = stagedFile.split("/");
+    const locale = parts[1]; // _posts / <locale> / ...
+    if (!LOCALES.includes(locale)) continue;
+
+    const content = readFileSync(join(ROOT, stagedFile), "utf8");
+    const translationKey = extractTranslationKey(content);
+    if (!translationKey) continue;
+
+    const stagedSlug = basename(stagedFile, ".mdx");
+    const byLocale = diskIndex.get(translationKey);
+    if (!byLocale) continue;
+
+    // Check every other locale that has a matching translationKey on disk
+    for (const [otherLocale, otherSlug] of byLocale) {
+      if (otherLocale === locale) continue;
+      if (otherSlug !== stagedSlug) {
+        console.log(`  ❌ Filename mismatch detected in: ${stagedFile}`);
+        console.log(`     translationKey: "${translationKey}"`);
+        console.log(`     ${locale.padEnd(3)} filename : ${stagedSlug}.mdx`);
+        console.log(`     ${otherLocale.padEnd(3)} filename : ${otherSlug}.mdx`);
+        console.log(`     Fix: rename one file so both locales share the same filename.\n`);
+        bilingualErrors++;
+      }
+    }
+  }
+
+  if (bilingualErrors === 0) {
+    console.log("✅ Bilingual filenames are in sync.\n");
+  }
+}
+
+if (bilingualErrors > 0) {
+  console.log(`❌ ${bilingualErrors} bilingual filename mismatch(es) found.`);
+  console.log(`   Or skip this check with: git commit --no-verify\n`);
+  process.exit(1);
+}
+
+process.exit(0);
