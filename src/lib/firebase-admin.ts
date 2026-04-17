@@ -1,17 +1,22 @@
 import * as admin from 'firebase-admin';
 
 const projectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID;
+const isDevelopment = process.env.NODE_ENV !== 'production';
+
+// K_SERVICE is automatically set by Cloud Run (Firebase App Hosting).
+// On Cloud Run, use Application Default Credentials (ADC) — no key needed.
+const isCloudRun = Boolean(process.env.K_SERVICE);
+
 const hasServiceAccountEnv = Boolean(
   process.env.FIREBASE_PRIVATE_KEY && process.env.FIREBASE_CLIENT_EMAIL,
 );
-const isDevelopment = process.env.NODE_ENV !== 'production';
 
 let adminInitError: Error | null = null;
 
 function parsePrivateKey(raw: string): string {
   let key = raw.trim();
 
-  // Strip surrounding double or single quotes added by some env systems
+  // Strip surrounding quotes added by some env systems
   if ((key.startsWith('"') && key.endsWith('"')) || (key.startsWith("'") && key.endsWith("'"))) {
     key = key.slice(1, -1);
   }
@@ -19,9 +24,8 @@ function parsePrivateKey(raw: string): string {
   // Replace literal \n with real newlines
   key = key.replace(/\\n/g, '\n');
 
-  // If the key is raw base64 without PEM headers, wrap it
+  // If raw base64 without PEM headers, wrap it
   if (!key.includes('-----BEGIN')) {
-    // Remove any whitespace/newlines in the base64 content, then re-chunk at 64 chars
     const base64 = key.replace(/\s+/g, '');
     const lines = base64.match(/.{1,64}/g) || [];
     key = `-----BEGIN PRIVATE KEY-----\n${lines.join('\n')}\n-----END PRIVATE KEY-----\n`;
@@ -32,7 +36,11 @@ function parsePrivateKey(raw: string): string {
 
 if (!admin.apps.length) {
   try {
-    if (hasServiceAccountEnv) {
+    if (isCloudRun) {
+      // Firebase App Hosting (Cloud Run): use ADC via attached service account — no key needed
+      admin.initializeApp({ projectId });
+    } else if (hasServiceAccountEnv) {
+      // Local development: use explicit service account credentials
       admin.initializeApp({
         projectId,
         credential: admin.credential.cert({
@@ -66,7 +74,7 @@ export function assertFirebaseAdminReady() {
 
   if (initError) {
     if (isDevelopment && !hasServiceAccountEnv) {
-      throw new Error('Firebase Admin belum siap di local development. Isi FIREBASE_CLIENT_EMAIL dan FIREBASE_PRIVATE_KEY agar generator publik bisa mengakses Firestore.');
+      throw new Error('Firebase Admin belum siap di local development. Isi FIREBASE_CLIENT_EMAIL dan FIREBASE_PRIVATE_KEY di .env.local.');
     }
 
     throw new Error(`Firebase Admin tidak siap: ${initError.message}`);
