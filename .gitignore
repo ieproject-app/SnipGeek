@@ -42,8 +42,10 @@ serviceAccountKey.json
 *.service-account.json
 *.serviceaccount.json
 
-# Downloaded build logs
+# Downloaded build logs (root and any subdirectory)
 /downloaded-logs-*.json
+src/github/downloaded-logs-*.json
+**/downloaded-logs-*.json
 
 # IDE settings
 .idea/
