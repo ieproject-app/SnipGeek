@@ -58,17 +58,21 @@ SnipGeek is a bilingual (EN/ID) content platform for publishing technical articl
 | Spin Wheel | `/tools/spin-wheel` | ✅ Live |
 | Image Crop & Compress | `/tools/image-crop` | ✅ Live |
 | Random Name Picker | `/tools/random-name-picker` | ✅ Live |
+| Laptop Service Estimator | `/tools/laptop-service-estimator` | ✅ Live |
 
 #### Internal (Google login required)
 | Tool | Route | Status |
 |---|---|---|
 | Employee History (Riwayat Karyawan) | `/tools/employee-history` | ✅ Live |
 | Number Generator | `/tools/number-generator` | ✅ Live |
-| Prompt Generator | `/tools/prompt-generator` | ✅ Live |
 | Signatories Index | `/tools/signatories-index` | 🚧 Unreleased |
 | Compress PDF | `/tools/compress-pdf` | 🚧 Unreleased |
 | Address Label Generator | `/tools/address-label-generator` | 🚧 Unreleased |
-| Laptop Service Estimator | `/tools/laptop-service-estimator` | 🚧 Unreleased |
+
+#### Dev-Only (development mode only)
+| Tool | Route | Status |
+|---|---|---|
+| Prompt Generator | `/tools/prompt-generator` | � Dev Only |
 
 #### Coming Soon
 | Tool | Status |
@@ -104,6 +108,8 @@ npm run typecheck      # tsc --noEmit (no build artefacts)
 npm run lint           # ESLint
 npm run validate:tags  # validate all MDX tag metadata
 npm run check          # pre-deploy checks (image sizes, etc.)
+npm run test           # run Vitest test suite (once)
+npm run test:watch     # run Vitest in watch mode
 ```
 
 ---
@@ -169,6 +175,7 @@ src/
 │   │   ├── terms/              # Terms of service
 │   │   └── layout.tsx          # Locale layout — fonts, ThemeProvider, Header, Footer
 │   ├── api/                    # API routes (numbers, posts, notes, tools, img, dev)
+│   ├── llms.txt/               # Dynamic /llms.txt route for AI crawler accessibility
 │   ├── globals.css             # Tailwind 4 CSS (CSS variables for light/dark)
 │   ├── not-found.tsx           # 404 page (ThemeProvider-aware, correct fonts)
 │   ├── robots.ts
@@ -186,7 +193,8 @@ src/
 │   ├── tools/                  # tool-wrapper, tools-list, tool-bios-keys, tool-history,
 │   │                           #   tool-numbers, tool-image-crop, tool-prompt-builder,
 │   │                           #   tool-random-name-picker, + address-label/, compress-pdf/,
-│   │                           #   pdf/, prompt-builder/, random-name-picker/, signatories-index/
+│   │                           #   numbers/, pdf/, prompt-builder/, random-name-picker/,
+│   │                           #   signatories-index/, image-crop/, employee-history/
 │   ├── mdx/                    # Custom MDX components: copyable-pre, expandable,
 │   │                           #   gallery-lightbox, spec-sheet
 │   ├── ui/                     # 40+ Shadcn/UI primitives + custom (SnipTooltip, Skeleton,
@@ -229,6 +237,8 @@ src/
 │   ├── tags.ts                 # Tag registry and utilities
 │   ├── mdx-utils.ts            # extractHeadings() for ToC
 │   ├── get-dictionary.ts       # Async dictionary loader
+│   ├── content-engine.ts       # Shared MDX file helpers (MdxFileEntry, frontmatter reading)
+│   ├── api-helpers.ts          # Shared API route helpers and response utilities
 │   ├── placeholder-images.ts   # Typed wrapper for placeholder-images.json
 │   ├── placeholder-images.json # Image placeholder registry (id → imageUrl + hint)
 │   ├── data-downloads.ts       # Download page metadata (drivers, software)
@@ -239,9 +249,12 @@ src/
 │   ├── slugify.ts              # URL slug utilities
 │   ├── multicolor.ts           # Multi-colour generation utilities
 │   └── rate-limit.ts           # API rate limiting
+├── types/
+│   ├── address-types.ts        # Type definitions for address label tool
+│   ├── pdf-types.ts            # Type definitions for PDF tools
+│   └── lucide-react.d.ts       # Type augmentation for Lucide React
 ├── i18n-config.ts              # Locale definitions (en, id)
-├── proxy.ts                    # Proxy utilities
-└── middleware.ts               # Locale detection + cookie-based redirect/rewrite
+└── proxy.ts                    # Locale detection + cookie-based redirect/rewrite (replaces middleware.ts in Next.js 16)
 ```
 
 ### Content Directories
@@ -393,22 +406,26 @@ The following HTTP headers are applied to all routes via `next.config.ts`:
 
 | Layer | Technology |
 |---|---|
-| Framework | Next.js 16 (App Router, Turbopack) |
-| Language | TypeScript 5 |
+| Framework | Next.js 16.2.3 (App Router, Turbopack) |
+| Language | TypeScript 6 |
 | Styling | Tailwind CSS 4 + Shadcn/UI |
 | Icons | Lucide React |
 | Fonts | Bricolage Grotesque, Plus Jakarta Sans, Lora, JetBrains Mono |
 | Content | MDX via `next-mdx-remote` v6 |
 | Syntax Highlighting | Shiki (`github-dark` theme) |
-| Auth & DB | Firebase v11 (Auth + Firestore + Storage) |
+| Auth & DB | Firebase v12 (Auth + Firestore + Storage) |
 | Animations | Framer Motion + CSS View Transitions API |
 | Charts | Recharts |
 | Forms | React Hook Form + Zod validation |
+| Date Utilities | date-fns |
 | PDF | pdf-lib (generation) + pdfjs-dist (parsing) |
-| OCR | Tesseract.js |
+| OCR | Tesseract.js (client) + `@google-cloud/vision` (server) |
 | Image Processing | Sharp (server) + browser-image-compression (client) |
 | Spreadsheets | ExcelJS |
-| i18n | Custom middleware + `@formatjs/intl-localematcher` |
+| Carousel | Embla Carousel React |
+| Confetti | react-confetti |
+| Testing | Vitest + `@testing-library/react` + happy-dom |
+| i18n | Custom proxy + `@formatjs/intl-localematcher` |
 | Analytics | Firebase Analytics (client-side page_view) |
 | Ads | Google AdSense (`lazyOnload` strategy) |
 | Comments | Giscus (GitHub Discussions) |
