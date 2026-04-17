@@ -10,12 +10,23 @@ let adminInitError: Error | null = null;
 
 function parsePrivateKey(raw: string): string {
   let key = raw.trim();
+
   // Strip surrounding double or single quotes added by some env systems
   if ((key.startsWith('"') && key.endsWith('"')) || (key.startsWith("'") && key.endsWith("'"))) {
     key = key.slice(1, -1);
   }
+
   // Replace literal \n with real newlines
   key = key.replace(/\\n/g, '\n');
+
+  // If the key is raw base64 without PEM headers, wrap it
+  if (!key.includes('-----BEGIN')) {
+    // Remove any whitespace/newlines in the base64 content, then re-chunk at 64 chars
+    const base64 = key.replace(/\s+/g, '');
+    const lines = base64.match(/.{1,64}/g) || [];
+    key = `-----BEGIN PRIVATE KEY-----\n${lines.join('\n')}\n-----END PRIVATE KEY-----\n`;
+  }
+
   return key;
 }
 
