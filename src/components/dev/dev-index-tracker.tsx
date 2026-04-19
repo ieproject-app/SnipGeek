@@ -77,7 +77,7 @@ export function DevIndexTracker() {
         onClick={() => setIsOpen((v) => !v)}
         aria-label="Toggle Dev Index Tracker"
         className={cn(
-          "fixed bottom-5 right-5 z-[9999] flex h-10 w-10 items-center justify-center rounded-full shadow-lg transition-all duration-200",
+          "fixed bottom-24 right-5 z-[9999] flex h-10 w-10 items-center justify-center rounded-full shadow-lg transition-all duration-200",
           "bg-neutral-900 text-neutral-100 ring-1 ring-white/10 hover:ring-white/30 hover:scale-105 active:scale-95",
           isOpen && "rotate-90"
         )}
