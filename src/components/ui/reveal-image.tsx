@@ -186,6 +186,7 @@ export function RevealImage({
         loader={localImageLoader}
         unoptimized={Boolean(directLocalOptimizedSrc) || unoptimized}
         priority={priority}
+        fetchPriority={priority ? "high" : undefined}
         loading={loading}
         sizes={sizes}
         width={width}
