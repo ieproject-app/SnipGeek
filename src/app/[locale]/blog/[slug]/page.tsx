@@ -18,6 +18,7 @@ import { ArticleShare } from "@/components/blog/article-share";
 import { ArticleRelated } from "@/components/blog/article-related";
 import { ArticleTOC } from "@/components/blog/article-toc";
 import { ArticleTags } from "@/components/blog/article-tags";
+import { ArticleLead } from "@/components/blog/article-lead";
 import { RevealImage } from "@/components/ui/reveal-image";
 import { extractHeadings, stripMdxSyntax } from "@/lib/mdx-utils";
 import { LayoutBreadcrumbs } from "@/components/layout/layout-breadcrumbs";
@@ -264,6 +265,8 @@ export default async function Page({
               </div>
             )}
           </div>
+
+          <ArticleLead description={initialPost.frontmatter.description} />
 
           <div className="max-w-3xl mx-auto">
             <ArticleTOC

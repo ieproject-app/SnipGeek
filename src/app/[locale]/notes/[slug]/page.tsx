@@ -17,6 +17,7 @@ import { ArticleShare } from "@/components/blog/article-share";
 import { ArticleRelated } from "@/components/blog/article-related";
 import { ArticleTOC } from "@/components/blog/article-toc";
 import { ArticleTags } from "@/components/blog/article-tags";
+import { ArticleLead } from "@/components/blog/article-lead";
 import { extractHeadings, stripMdxSyntax } from "@/lib/mdx-utils";
 import { LayoutBreadcrumbs } from "@/components/layout/layout-breadcrumbs";
 import { ArticleComments } from "@/components/blog/article-comments";
@@ -212,6 +213,7 @@ export default async function Page({
               isOverlay={false}
               isCentered={true}
             />
+            <ArticleLead description={initialNote.frontmatter.description} />
           </header>
 
           <div className="max-w-3xl mx-auto">

@@ -18,9 +18,10 @@ interface ArticleMetaProps {
   readingTime?: number;
   isOverlay?: boolean;
   isCentered?: boolean;
+  hideDivider?: boolean;
 }
 
-export function ArticleMeta({ frontmatter, item, locale, dictionary, readingTime, isOverlay = false, isCentered = false }: ArticleMetaProps) {
+export function ArticleMeta({ frontmatter, item, locale, dictionary, readingTime, isOverlay = false, isCentered = false, hideDivider = false }: ArticleMetaProps) {
   const authorName = "Iwan Efendi";
   const displayDate = frontmatter.updated || frontmatter.date;
   const isUpdated = !!frontmatter.updated;
@@ -88,7 +89,7 @@ export function ArticleMeta({ frontmatter, item, locale, dictionary, readingTime
 
   // Standalone Style (Normal page header)
   return (
-    <div className="py-4 mb-8 border-b border-primary/5">
+    <div className={cn("py-4 mb-8", !hideDivider && "border-b border-primary/5")}>
       <div className={cn(
         "flex gap-3 sm:gap-6",
         isCentered
