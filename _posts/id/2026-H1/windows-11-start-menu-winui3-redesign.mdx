@@ -1,0 +1,87 @@
+---
+title: "Start Menu Windows 11 Dirombak ke WinUI 3: Makin Fleksibel"
+slug: "windows-11-start-menu-winui3-redesign"
+translationKey: "windows-11-start-menu-winui3-redesign"
+date: "2026-04-21"
+updated: "2026-04-21"
+description: "Microsoft merombak ulang Start Menu Windows 11 di atas WinUI 3, dengan opsi ukuran, toggle per seksi, dan respons jauh lebih cepat saat sibuk."
+category: "Windows"
+tags: ["windows", "windows-11", "ui-design", "start-menu"]
+published: true
+featured: true
+heroImage: "/images/_posts/windows11/start-menu-winui3/banner-start-menu.webp"
+imageAlt: "Tampilan Start Menu Windows 11 versi baru yang dibangun di atas framework WinUI 3"
+---
+
+Saya sudah cukup lama "berdamai" dengan Start Menu Windows 11 apa adanya. Di laptop utama, menu ini sering telat muncul beberapa detik kalau CPU lagi sibuk, dan kalau saya langsung ngetik pencarian, satu atau dua huruf pertama suka hilang entah ke mana. Jadi waktu muncul bocoran kalau Microsoft bakal membangun ulang Start Menu dari nol di atas WinUI 3, reaksi pertama saya bukan excited, tapi pelan-pelan bilang "akhirnya."
+
+Supaya kamu yang buru-buru langsung dapat poinnya: Microsoft sedang membangun ulang Start Menu Windows 11 dari dasar di atas framework **WinUI 3**. Targetnya adalah Start Menu yang tetap responsif saat sistem sedang berat, memberi kamu opsi memilih tampilan kecil atau besar, serta bisa mematikan seksi tertentu yang memang jarang kamu pakai. Bentuknya tetap familiar, tapi akhirnya bisa dibentuk sesuai cara kerja masing-masing orang.
+
+## Bukan Sekadar Ganti Wajah
+
+Perubahan paling penting justru ada di bagian yang tidak kelihatan. Start Menu baru ini ditulis ulang di atas **WinUI 3**, framework modern yang memang sedang didorong Microsoft untuk jadi fondasi baru Windows. Menurut Zac Bowden dari Windows Central, langkah ini adalah bagian dari proyek internal bernama sandi **Windows K2** — fokusnya mengembalikan Windows 11 jadi sistem yang cepat, ringan, dan stabil, bukan sekadar koleksi ikon baru.
+
+Pilihan framework ini penting karena Start Menu sekarang masih menyeret lapisan UI lama. Saat resource sistem sudah penuh, lapisan itu yang paling terasa lemot. Rebuild ini harusnya melepas beban tadi dan menaruh Start di fondasi responsif yang sama dengan bagian shell lain yang juga sedang dirapikan dalam [upaya kualitas besar Windows 11 di 2026](/blog/windows-11-quality-2026-update).
+
+## Bisa Diubah Ukurannya, dan Bagian yang Nggak Kepakai Bisa Dimatikan
+
+Saat ini, Windows yang memutuskan apakah kamu dapat Start versi kecil atau besar, dan keputusannya cuma berdasar ukuran layar. Versi baru akhirnya mengembalikan keputusan itu ke pengguna. Di Settings, kamu bakal bisa memilih sendiri antara layout **kecil** atau **besar**, tidak peduli apa kata Windows soal layar kamu.
+
+Yang buat saya lebih menarik justru opsi toggle per seksi. Kalau kamu sama sekali tidak butuh feed Recommended, kamu bisa mematikannya dengan satu klik. Begitu juga untuk bagian Pinned, kategori aplikasi, bahkan daftar All Apps kalau memang tidak pernah kamu pakai. Start jadi terasa modular — lebih mirip panel yang kamu atur sendiri daripada layout yang tinggal kamu terima.
+
+<Callout variant="info" title="Catatan Versi">
+  Detail ini sebagian besar berasal dari bocoran dan uji coba Insider. Posisi tepat setiap toggle di Settings masih bisa berubah sebelum akhirnya tiba di kanal stabil.
+</Callout>
+
+## Tetap Cepat Meski PC Lagi Ngos-ngosan
+
+Bagian paling senyap dari pengumuman ini justru yang paling berdampak: performa. Start Menu baru dirancang untuk tetap responsif meski CPU sudah 100% kepakai — momen yang justru paling sering bikin Start sekarang diam membeku. Kotak pencarian di dalamnya juga dapat perlakuan yang sama, jadi kamu bisa langsung pencet tombol Start dan langsung ngetik tanpa kehilangan huruf pertama.
+
+Satu perbaikan ini saja, buat saya, nilainya lebih besar daripada perombakan visual apa pun. Kebanyakan orang memang tidak "melihat" Start — mereka meraihnya. Menu yang selalu terbuka dan dengerin saat sistem lagi sibuk adalah fitur yang paling saya tunggu.
+
+## Jalan-Jalan Desain yang Tidak Jadi Dipakai
+
+Yang tidak saya kira adalah Microsoft justru membagikan proses desainnya secara terbuka. Di blog desain mereka, tim Windows bercerita bagaimana Start dieksplorasi ulang untuk 2026 — mulai dari coretan di whiteboard, prototipe kertas yang digantung dari lantai sampai langit-langit, studi bersama lebih dari 300 pengguna Windows 11, sampai sesi co-creation langsung.
+
+Banyak dari arah desain awal itu tidak jadi dirilis. Gambar di bawah adalah beberapa konsep eksplorasi yang sempat dicoba Microsoft sebelum akhirnya memilih desain final yang kamu lihat di bagian hero artikel ini.
+
+<Gallery caption="Eksplorasi awal Start Menu Windows 11 yang tidak jadi dipakai (Sumber: Microsoft Design).">
+  ![Konsep eksplorasi Start Menu Windows 11 nomor 1 dengan tata letak non-final](/images/_posts/windows11/start-menu-winui3/exploration1.webp)
+  ![Konsep eksplorasi Start Menu Windows 11 nomor 2 dengan struktur alternatif](/images/_posts/windows11/start-menu-winui3/exploration2.webp)
+  ![Konsep eksplorasi Start Menu Windows 11 nomor 3 dengan susunan panel eksperimental](/images/_posts/windows11/start-menu-winui3/exploration3.webp)
+</Gallery>
+
+Membandingkannya berdampingan dengan desain final ternyata cukup melegakan. Beberapa eksplorasi terasa sangat berani — tile media yang besar, integrasi telepon yang lebih dominan, tata letak app yang diacak total. Desain finalnya jauh lebih tenang, dan menurut saya memang itu yang paling tepat. Start itu objek muscle memory; terlalu berani malah bikin pengguna tersesat.
+
+## Empat Prinsip yang Bertahan Sampai Akhir
+
+Tim desain meringkas proses panjang ini ke empat prinsip utama. Ini yang menjelaskan kenapa menu final terlihat tidak ekstrem, meski kode di baliknya ditulis ulang total:
+
+- **Aplikasi selalu dalam jangkauan** — pinned, installed, dan app baru harus langsung terlihat tanpa perlu gali-gali.
+- **Punya rasa "milik kamu"** — Start harus terasa tumbuh di meja kamu, bukan meja orang lain.
+- **Mempercepat hari** — setiap piksel harus berguna; aksi harian harus makin ringkas.
+- **Hormati ikon legendanya** — tiga dekade muscle memory perlu dihargai. *Update*, bukan *upend*.
+
+Dua eksplorasi lain di bawah ini agak lebih "upend" dibanding "update" — dari sini kelihatan kenapa arah ini akhirnya diparkir demi desain final.
+
+<Gallery caption="Konsep Start Menu tambahan yang sempat dieksplorasi tapi tidak dipakai (Sumber: Microsoft Design).">
+  ![Konsep eksplorasi Start Menu Windows 11 nomor 4 dengan struktur lebih eksperimental](/images/_posts/windows11/start-menu-winui3/exploration4.webp)
+  ![Konsep eksplorasi Start Menu Windows 11 nomor 5 dengan arah visual alternatif](/images/_posts/windows11/start-menu-winui3/exploration5.webp)
+</Gallery>
+
+Pengalaman finalnya tetap mempertahankan titik masuk yang sama dan siluet yang sama, tapi menambah rekomendasi dinamis, tampilan All Apps yang lebih kaya (kategori, grid, atau A-Z), integrasi konten ponsel yang lebih lembut, dan opsi personalisasi yang benar-benar menghormati ruang layar kamu.
+
+## Sudut Pandang SnipGeek: Rebuild yang Menyasar Titik Sakit yang Tepat
+
+Saya sudah sering dengar janji manis soal Start Menu, dan kebanyakan cuma kosmetik. Kali ini terasa beda karena sekaligus menyentuh tiga hal yang sulit dipalsukan begitu rilis: migrasi framework, target performa, dan model kustomisasi yang jelas.
+
+Yang bikin saya yakin adalah cerita soal toggle-nya. Kalau Microsoft benar-benar membiarkan kamu mematikan Recommended, mematikan Pinned, dan memilih sendiri layout-nya, keluhan lama soal Start yang "maunya sendiri" akhirnya dijawab secara serius. Dan kalau kamu tipe yang suka menyusun PC baru dengan rapi, update ini cocok banget dipasangkan dengan [cara mengganti nama PC di Windows 11](/blog/rename-pc-windows-11) dan [hal-hal yang wajib dilakukan setelah instal Windows 11](/blog/to-do-after-install-windows11) — supaya Start akhirnya benar-benar mengikuti cara kamu memakai komputer sendiri.
+
+Tanggal rilis pastinya belum ada. Hampir pasti akan muncul lebih dulu di build Windows Insider, lalu masuk ke rilis kualitas 2026 secara lebih luas.
+
+Dari semua perubahan ini, bagian mana yang paling kamu tunggu — toggle per seksi, layout yang bisa dipilih, atau sekadar Start Menu yang berhenti memakan huruf pertama kamu? Coba tulis di kolom komentar, saya penasaran titik sakit mana yang paling sering kamu rasakan.
+
+### Referensi
+1. [Microsoft plans major Start menu upgrades for Windows 11 — Windows Central](https://www.windowscentral.com/microsoft/windows-11/microsoft-plans-major-start-menu-upgrades-for-windows-11-with-better-customization-and-performance-users-will-soon-be-able-to-resize-and-toggle-off-entire-areas-of-start)
+2. [Start, fresh — Redesigning the Windows Start menu for you — Microsoft Design](https://microsoft.design/articles/start-fresh-redesigning-windows-start-menu/)
+3. [Hot: Microsoft Siapkan Perombakan Ulang Start Menu Windows 11 — WinPoin](https://winpoin.com/hot-microsoft-siapkan-perombakan-ulang-start-menu-windows-11/)
