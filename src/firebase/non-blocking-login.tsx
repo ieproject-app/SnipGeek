@@ -29,6 +29,7 @@ export async function initiateGoogleSignIn(authInstance: Auth): Promise<void> {
   // Use Redirect on mobile as it's more reliable.
   if (isMobileOrTablet()) {
     try {
+      try { sessionStorage.setItem('sg_pending_google_redirect', '1'); } catch {}
       await signInWithRedirect(authInstance, provider);
     } catch (error: unknown) {
       const authError = error as AuthError;
@@ -59,6 +60,7 @@ export async function initiateGoogleSignIn(authInstance: Auth): Promise<void> {
       authError.code === 'auth/popup-blocked' ||
       authError.code === 'auth/operation-not-supported-in-this-environment'
     ) {
+      try { sessionStorage.setItem('sg_pending_google_redirect', '1'); } catch {}
       await signInWithRedirect(authInstance, provider);
       return;
     }
@@ -73,9 +75,24 @@ export async function initiateGoogleSignIn(authInstance: Auth): Promise<void> {
  * Safe to call on app boot; returns null when no redirect is pending.
  */
 export async function finalizeGoogleRedirectSignIn(authInstance: Auth) {
+  // Only call getRedirectResult when a redirect is actually pending.
+  // Calling it unconditionally loads https://apis.google.com/js/api.js and
+  // the gapi iframe on every page load, which sets third-party cookies
+  // (COMPASS, __Secure-OSID, __Host-3PLSID) and tanks Lighthouse
+  // "Best Practices" (third-party-cookies + inspector-issues audits).
+  if (typeof window === 'undefined') return null;
+  let pending = false;
   try {
-    return await getRedirectResult(authInstance);
+    pending = sessionStorage.getItem('sg_pending_google_redirect') === '1';
+  } catch {}
+  if (!pending) return null;
+
+  try {
+    const result = await getRedirectResult(authInstance);
+    try { sessionStorage.removeItem('sg_pending_google_redirect'); } catch {}
+    return result;
   } catch (error: unknown) {
+    try { sessionStorage.removeItem('sg_pending_google_redirect'); } catch {}
     const authError = error as AuthError;
     if (authError?.code === 'auth/unauthorized-domain') {
       alert('Domain ini belum didaftarkan di Firebase Console (Authorized Domains).');

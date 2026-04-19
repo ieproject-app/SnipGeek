@@ -141,9 +141,34 @@ const nextConfig: NextConfig = {
         headers: securityHeaders,
       },
       {
+        // Long-cache immutable Next.js build assets (hashed filenames).
+        // These are content-hashed so they can be cached forever.
+        source: "/_next/static/:path*",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
+          },
+        ],
+      },
+      {
+        // Next.js image optimizer output — safe to cache long at the CDN.
+        source: "/_next/image",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
+          },
+        ],
+      },
+      {
         // Cache pre-rendered HTML pages at CDN level for 1 hour.
-        // API routes set their own Cache-Control which takes precedence.
-        source: "/((?!api/).*)",
+        // Exclude:
+        //  - /api/*            (routes set their own Cache-Control)
+        //  - /_next/*          (build assets use the long-cache rule above)
+        //  - any file with an extension (fonts, images, manifests, etc.)
+        // This prevents accidentally shortening Cache-Control on immutable assets.
+        source: "/((?!api/|_next/|.*\\..*).*)",
         headers: [
           {
             key: "Cache-Control",

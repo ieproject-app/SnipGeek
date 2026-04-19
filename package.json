@@ -74,6 +74,14 @@
     "tesseract.js": "^7.0.0",
     "zod": "^4.3.6"
   },
+  "browserslist": [
+    "Chrome >= 93",
+    "Edge >= 93",
+    "Firefox >= 90",
+    "Safari >= 15",
+    "iOS >= 15",
+    "not dead"
+  ],
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.5",
     "@tailwindcss/postcss": "^4.2.1",
