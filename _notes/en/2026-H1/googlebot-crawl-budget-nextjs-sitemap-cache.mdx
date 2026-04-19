@@ -1,0 +1,120 @@
+---
+title: "Optimizing Googlebot Crawl Budget for Next.js on Firebase"
+slug: "googlebot-crawl-budget-nextjs-sitemap-cache"
+date: "2026-04-19"
+description: "Cache your sitemap, set stable lastModified dates, and add s-maxage headers to protect Googlebot's crawl budget without blocking article re-crawls."
+translationKey: "googlebot-crawl-budget-nextjs-sitemap-cache"
+published: true
+tags: ["nextjs", "firebase", "seo", "performance"]
+category: "Development"
+---
+
+Someone asked me whether deploying the site several times a day would drain Googlebot's crawl budget — and whether doing that repeatedly could eventually get the site de-prioritized in search. My honest first instinct was to say "probably not," but I realized I'd never actually verified the setup from first principles. So I audited it properly. The answer turned out to be reassuring, but three things still needed fixing.
+
+## How Crawl Budget Actually Works
+
+Googlebot doesn't re-crawl everything every time you push a new deploy. What it actually watches are:
+
+- **`lastModified`** in your sitemap — if the date hasn't changed for a URL, Googlebot doesn't treat it as a priority
+- **Server response time** — if pages are slow or the origin is under load, Google backs off the crawl rate
+- **Content change signals** — over time, pages that rarely change get visited less often
+
+So the real risk isn't "you deployed five times today." It's having a sitemap that accidentally signals freshness when nothing changed, or having an uncached sitemap endpoint that hammers the origin on every bot visit.
+
+## What Was Already Protecting the Budget
+
+The SSG setup with `generateStaticParams` and `dynamicParams = false` on blog and note pages was already the best possible starting point. All pages are pre-rendered at build time, so Googlebot gets immediate HTML without waiting for server compute. Fast response = more efficient crawl.
+
+The sitemap was also using real frontmatter dates (`updated || date`) for every blog post and note. That means Googlebot gets an accurate freshness signal for content pages. When a post actually changes and you update the `updated` field, the date changes in the sitemap and re-crawl gets queued automatically.
+
+The `/_next/` path was also correctly disallowed in `robots.txt`, so Googlebot never wastes budget on thousands of JS chunks and build assets.
+
+## What Needed Fixing
+
+Three issues were worth addressing.
+
+**No cache on `sitemap.xml`.** The sitemap route reads every MDX file, computes tag data, and builds the full entry list on every request. With multiple crawlers fetching it regularly (Googlebot, GPTBot, ClaudeBot, etc.), that's avoidable repeated origin work.
+
+**No `Cache-Control` for HTML pages.** Without an explicit CDN-level cache header, Firebase App Hosting's default behavior for pre-rendered pages is uncertain. If the CDN isn't caching those responses, every Googlebot visit is an origin hit.
+
+**Info pages on `"weekly"` change frequency.** Pages like `/about`, `/privacy`, and `/disclaimer` almost never change. Signaling `"weekly"` is inaccurate and nudges Google to allocate budget toward pages that rarely need re-indexing.
+
+## The Three Fixes
+
+<Steps>
+<Step>
+
+### Cache the sitemap with ISR
+
+Added `export const revalidate = 3600` to `src/app/sitemap.ts`. Next.js now serves a cached version for up to one hour before recomputing. The full MDX scan only runs once per hour at most, regardless of how many bots fetch `/sitemap.xml`.
+
+```ts
+// Cache sitemap for 1 hour to avoid recomputing on every crawler request
+export const revalidate = 3600;
+```
+
+</Step>
+<Step>
+
+### Correct change frequency for info pages
+
+Split the routes in `sitemap.ts` into two groups. Discovery pages (`/`, `/blog`, `/notes`, `/tags`) stay at `"weekly"`. Info pages move to `"monthly"` with a lower priority of `0.5`.
+
+```ts
+const contentRoutes = ["", "/blog", "/notes", "/tags"];
+const infoRoutes = ["/about", "/contact", "/privacy", "/terms", "/disclaimer"];
+```
+
+</Step>
+<Step>
+
+### Add CDN-level cache headers for HTML pages
+
+Added a new rule in `next.config.ts` that sets `Cache-Control` for all non-API routes. This tells Cloud CDN (Firebase App Hosting) to cache pre-rendered HTML for 1 hour, then serve stale while refreshing for up to 24 hours in the background.
+
+```ts
+{
+  source: "/((?!api/).*)",
+  headers: [
+    {
+      key: "Cache-Control",
+      value: "public, s-maxage=3600, stale-while-revalidate=86400",
+    },
+  ],
+},
+```
+
+API routes explicitly set their own `Cache-Control` in their response handlers, so they're not affected.
+
+</Step>
+</Steps>
+
+## Triggering Re-Crawl for Updated Articles
+
+This was already working — it just wasn't documented anywhere. When you update an article, add or update the `updated` field in frontmatter:
+
+```yaml
+date: "2026-01-15"
+updated: "2026-04-19"
+```
+
+The sitemap reads `post.frontmatter.updated || post.frontmatter.date` for `lastModified`. When Googlebot fetches the sitemap next and sees the new date for that URL, it schedules a re-crawl. No manual action, no Search Console submission needed.
+
+<Callout variant="info" title="Tool Pages">
+Tool pages like `/tools/spin-wheel` use a hardcoded `STATIC_LAST_MODIFIED` constant in `sitemap.ts`. Update that date manually when a tool changes significantly — otherwise Googlebot has no signal to re-visit it.
+</Callout>
+
+## Key Takeaways
+
+- **Deploy frequency doesn't directly drain crawl budget** — `lastModified` stability is what matters
+- **Cache the sitemap** to prevent repeated full MDX scans on every bot request
+- **Set `s-maxage` on HTML pages** — don't rely on Firebase App Hosting's default CDN behavior
+- **Differentiate `changeFrequency`** between discovery pages and static info pages
+- **Use `updated:` frontmatter** to explicitly signal content changes to Googlebot
+
+### References
+
+1. [Sitemaps: Manage your sitemaps — Google Search Central](https://developers.google.com/search/docs/crawling-indexing/sitemaps/build-sitemap)
+2. [Large site owner's guide to managing your crawl budget — Google Search Central](https://developers.google.com/search/docs/crawling-indexing/large-site-managing-crawl-budget)
+3. [sitemap.ts — Next.js App Router API Reference](https://nextjs.org/docs/app/api-reference/file-conventions/metadata/sitemap)
+4. [Firebase App Hosting overview](https://firebase.google.com/docs/app-hosting)

@@ -140,6 +140,17 @@ const nextConfig: NextConfig = {
         source: "/(.*)",
         headers: securityHeaders,
       },
+      {
+        // Cache pre-rendered HTML pages at CDN level for 1 hour.
+        // API routes set their own Cache-Control which takes precedence.
+        source: "/((?!api/).*)",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, s-maxage=3600, stale-while-revalidate=86400",
+          },
+        ],
+      },
     ];
   },
   async redirects() {

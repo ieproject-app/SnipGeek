@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import {
   Shuffle, Settings, List, Sparkles,
   Layout, Volume2, VolumeX, Repeat, Trophy,
@@ -62,6 +62,7 @@ export function SpinWheelClient({ locale }: SpinWheelClientProps) {
   const [timerInterval, setTimerInterval] = useState(10);
   const [timerCountdown, setTimerCountdown] = useState<number | null>(null);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const triggerSpinRef = useRef<(() => void) | null>(null);
 
   // Design
   const [wheelTitle, setWheelTitle] = useState(
@@ -154,7 +155,7 @@ export function SpinWheelClient({ locale }: SpinWheelClientProps) {
         setTimerCountdown(remaining);
         const valid = entries.map(e => e.trim()).filter(Boolean);
         if (!isSpinning && valid.length >= 2) {
-          window.dispatchEvent(new KeyboardEvent("keydown", { code: "Space", bubbles: true }));
+          triggerSpinRef.current?.();
         }
       }
     }, 1000);
@@ -180,7 +181,7 @@ export function SpinWheelClient({ locale }: SpinWheelClientProps) {
 
   // ── Render ────────────────────────────────────────────────────────────────────
 
-  const filteredEntries = entries.map(e => e.trim()).filter(Boolean);
+  const filteredEntries = useMemo(() => entries.map(e => e.trim()).filter(Boolean), [entries]);
 
   return (
     <TooltipProvider delayDuration={300}>
@@ -222,6 +223,7 @@ export function SpinWheelClient({ locale }: SpinWheelClientProps) {
               templateContext={templateContext}
               wheelTitle={wheelTitle}
               wheelDesc={wheelDesc}
+              triggerSpinRef={triggerSpinRef}
               settings={{ spinDuration, isMuted, volume, isIdleSpinEnabled, isRaffleMode }}
               labels={{
                 spinButton: t.spinButton,

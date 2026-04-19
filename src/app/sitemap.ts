@@ -4,23 +4,20 @@ import { getSortedNotesData } from "@/lib/notes";
 import { shouldIndexTag } from "@/lib/tags";
 import { i18n } from "@/i18n-config";
 
+// Cache sitemap for 1 hour to avoid recomputing on every crawler request
+export const revalidate = 3600;
+
 const DOMAIN = "https://snipgeek.com";
 
 // Fixed date for static pages — update manually when page content changes
 const STATIC_LAST_MODIFIED = new Date("2026-04-01");
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const routes = [
-    "",
-    "/blog",
-    "/notes",
-    "/tags",
-    "/about",
-    "/contact",
-    "/privacy",
-    "/terms",
-    "/disclaimer",
-  ];
+  // Content/discovery pages — change whenever new posts or notes are added
+  const contentRoutes = ["", "/blog", "/notes", "/tags"];
+
+  // Info pages — rarely change; no need to signal weekly crawl
+  const infoRoutes = ["/about", "/contact", "/privacy", "/terms", "/disclaimer"];
 
   // Tools routes yang ingin diindeks
   const toolRoutes = [
@@ -34,21 +31,29 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticEntries: MetadataRoute.Sitemap = i18n.locales.flatMap(
     (locale) => {
       const localePrefix = locale === i18n.defaultLocale ? "" : `/${locale}`;
-      const mainRoutes = routes.map((route) => ({
+
+      const contentPages = contentRoutes.map((route) => ({
         url: `${DOMAIN}${localePrefix}${route}`,
         lastModified: STATIC_LAST_MODIFIED,
         changeFrequency: "weekly" as const,
         priority: route === "" ? 1 : 0.8,
       }));
-      
+
+      const infoPages = infoRoutes.map((route) => ({
+        url: `${DOMAIN}${localePrefix}${route}`,
+        lastModified: STATIC_LAST_MODIFIED,
+        changeFrequency: "monthly" as const,
+        priority: 0.5,
+      }));
+
       const toolPages = toolRoutes.map((tool) => ({
         url: `${DOMAIN}${localePrefix}/tools/${tool}`,
         lastModified: STATIC_LAST_MODIFIED,
         changeFrequency: "monthly" as const,
-        priority: 0.7,
+        priority: 0.8,
       }));
-      
-      return [...mainRoutes, ...toolPages];
+
+      return [...contentPages, ...infoPages, ...toolPages];
     },
   );
 

@@ -1,0 +1,120 @@
+---
+title: "Optimasi Crawl Budget Googlebot di Next.js dan Firebase App Hosting"
+slug: "googlebot-crawl-budget-nextjs-sitemap-cache"
+date: "2026-04-19"
+description: "Cara menjaga crawl budget Googlebot tetap efisien di Next.js: cache sitemap, tanggal lastModified yang stabil, dan header s-maxage untuk HTML pages."
+translationKey: "googlebot-crawl-budget-nextjs-sitemap-cache"
+published: true
+tags: ["nextjs", "firebase", "seo", "performance"]
+category: "Development"
+---
+
+Ada pertanyaan yang cukup bikin saya berpikir ulang: apakah kalau kita deploy situs beberapa kali sehari, crawl budget Googlebot bisa terkuras? Dan kalau terlalu sering, apakah Google bisa menganggap situs kita spam? Pertanyaan ini terdengar sepele, tapi saya sadar belum pernah benar-benar memverifikasi setup dari awal. Jadi saya audit seluruhnya. Hasilnya menggembirakan — tapi ada tiga hal yang memang harus diperbaiki.
+
+## Cara Kerja Crawl Budget yang Sebenarnya
+
+Googlebot tidak langsung crawl ulang semua halaman setiap kali ada deploy baru. Yang sebenarnya diperhatikannya adalah:
+
+- **`lastModified`** di sitemap — kalau tanggalnya tidak berubah, URL itu tidak dianggap prioritas
+- **Kecepatan respons server** — server yang lambat atau sibuk membuat Google mengurangi laju crawl secara otomatis
+- **Sinyal perubahan konten** — halaman yang jarang berubah lama-lama dikunjungi lebih jarang juga
+
+Jadi risiko utamanya bukan soal "sudah deploy lima kali hari ini." Masalah nyatanya adalah sitemap yang secara tidak sengaja mengirim sinyal kesegaran padahal konten tidak berubah, atau endpoint sitemap yang tidak di-cache sehingga setiap kunjungan bot memukul origin.
+
+## Yang Sudah Melindungi Crawl Budget
+
+Setup SSG dengan `generateStaticParams` dan `dynamicParams = false` di halaman blog dan notes sudah menjadi fondasi yang paling solid. Semua halaman di-render sebelum ada request masuk, jadi Googlebot langsung dapat HTML — cepat, tanpa perlu menunggu server compute. Respons cepat berarti crawl lebih efisien.
+
+Sitemap juga sudah menggunakan tanggal frontmatter yang nyata (`updated || date`) untuk setiap artikel. Artinya Googlebot dapat sinyal kesegaran yang akurat. Kalau sebuah artikel diperbarui dan field `updated` diisi, tanggal di sitemap berubah dan re-crawl otomatis terjadwal.
+
+Path `/_next/` juga sudah diblokir di `robots.txt`, sehingga Googlebot tidak pernah buang-buang budget untuk mengkrawl ribuan chunk JS dan aset build.
+
+## Yang Perlu Diperbaiki
+
+Ada tiga masalah yang layak ditangani.
+
+**Sitemap tidak di-cache.** Route `/sitemap.xml` membaca semua file MDX, menghitung data tag, dan membangun daftar entry lengkap pada setiap request. Dengan banyak crawler yang fetch secara rutin (Googlebot, GPTBot, ClaudeBot, dll.), ini berarti server terkena beban yang sebenarnya bisa dihindari.
+
+**Tidak ada `Cache-Control` untuk HTML pages.** Tanpa header CDN yang eksplisit, perilaku default Firebase App Hosting untuk halaman pre-rendered tidak terprediksi. Kalau CDN tidak men-cache respons tersebut, setiap kunjungan Googlebot langsung mengenai origin.
+
+**Info pages pakai `changeFrequency: "weekly"`.** Halaman seperti `/about`, `/privacy`, dan `/disclaimer` hampir tidak pernah berubah. Memberikan sinyal `"weekly"` itu tidak akurat dan mendorong Google mengalokasikan budget ke halaman yang jarang perlu di-indeks ulang.
+
+## Tiga Perbaikan yang Diterapkan
+
+<Steps>
+<Step>
+
+### Cache sitemap dengan ISR
+
+Tambahkan `export const revalidate = 3600` di `src/app/sitemap.ts`. Next.js akan menyajikan versi cache selama satu jam sebelum recompute. Scan MDX lengkap hanya berjalan sekali per jam, tidak peduli berapa banyak bot yang fetch `/sitemap.xml`.
+
+```ts
+// Cache sitemap for 1 hour to avoid recomputing on every crawler request
+export const revalidate = 3600;
+```
+
+</Step>
+<Step>
+
+### Pisahkan change frequency info pages
+
+Pisahkan routes di `sitemap.ts` menjadi dua kelompok. Discovery pages (`/`, `/blog`, `/notes`, `/tags`) tetap `"weekly"`. Info pages turun ke `"monthly"` dengan priority `0.5`.
+
+```ts
+const contentRoutes = ["", "/blog", "/notes", "/tags"];
+const infoRoutes = ["/about", "/contact", "/privacy", "/terms", "/disclaimer"];
+```
+
+</Step>
+<Step>
+
+### Tambah header CDN untuk HTML pages
+
+Tambahkan rule baru di `next.config.ts` yang menetapkan `Cache-Control` untuk semua route non-API. Ini memberitahu Cloud CDN (Firebase App Hosting) untuk men-cache HTML pre-rendered selama 1 jam, lalu menyajikan konten lama sambil me-refresh di background hingga 24 jam.
+
+```ts
+{
+  source: "/((?!api/).*)",
+  headers: [
+    {
+      key: "Cache-Control",
+      value: "public, s-maxage=3600, stale-while-revalidate=86400",
+    },
+  ],
+},
+```
+
+API routes sudah menetapkan `Cache-Control` sendiri di response handler-nya, jadi tidak terpengaruh.
+
+</Step>
+</Steps>
+
+## Cara Memicu Re-Crawl untuk Artikel yang Diperbarui
+
+Ini sebenarnya sudah bekerja — hanya belum terdokumentasi. Kalau kamu memperbarui artikel, isi atau perbarui field `updated` di frontmatter:
+
+```yaml
+date: "2026-01-15"
+updated: "2026-04-19"
+```
+
+Sitemap membaca `post.frontmatter.updated || post.frontmatter.date` sebagai `lastModified`. Saat Googlebot berikutnya fetch sitemap dan melihat tanggal baru untuk URL tersebut, ia akan menjadwalkan re-crawl. Tidak perlu aksi manual, tidak perlu submit ulang ke Search Console.
+
+<Callout variant="info" title="Halaman Tool">
+Halaman tool seperti `/tools/spin-wheel` menggunakan konstanta `STATIC_LAST_MODIFIED` yang hardcoded di `sitemap.ts`. Perbarui tanggal itu secara manual kalau sebuah tool mengalami perubahan signifikan — kalau tidak, Googlebot tidak punya sinyal untuk mengunjunginya ulang.
+</Callout>
+
+## Poin Penting
+
+- **Frekuensi deploy tidak langsung menguras crawl budget** — stabilitas `lastModified` yang menentukan
+- **Cache sitemap** agar server tidak membaca ulang semua MDX pada setiap request bot
+- **Set `s-maxage` untuk HTML pages** — jangan bergantung pada perilaku default CDN Firebase App Hosting
+- **Bedakan `changeFrequency`** antara discovery pages dan info pages yang jarang berubah
+- **Gunakan field `updated:` di frontmatter** untuk memberi sinyal perubahan konten ke Googlebot secara eksplisit
+
+### Referensi
+
+1. [Mengelola sitemap — Google Search Central](https://developers.google.com/search/docs/crawling-indexing/sitemaps/build-sitemap)
+2. [Panduan crawl budget untuk pemilik situs besar — Google Search Central](https://developers.google.com/search/docs/crawling-indexing/large-site-managing-crawl-budget)
+3. [sitemap.ts — Next.js App Router API Reference](https://nextjs.org/docs/app/api-reference/file-conventions/metadata/sitemap)
+4. [Firebase App Hosting overview](https://firebase.google.com/docs/app-hosting)

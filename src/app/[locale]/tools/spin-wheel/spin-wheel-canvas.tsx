@@ -21,6 +21,7 @@ interface SpinWheelCanvasProps {
   templateContext?: string; // e.g. "quran" | "prayers" | "misc" | undefined
   wheelTitle: string;
   wheelDesc: string;
+  triggerSpinRef?: React.MutableRefObject<(() => void) | null>;
   settings: {
     spinDuration: number;
     isMuted: boolean;
@@ -49,15 +50,18 @@ const IDLE_SPEED = 0.0015;
 const WINNER_POPUP_DELAY_MS = 520;
 const POINTER_MAX_ANGLE_DEG = 22;
 
-// Kinematics helper
-// We need to travel `distance` in `duration` seconds, ending at velocity 0.
-// Using v = v0 - a*t, and d = v0*t - 0.5*a*t^2, where a is friction (deceleration)
-// v0 = 2 * d / t
-// a = 2 * d / t^2
-function calculateKinematics(distance: number, duration: number) {
-  const v0 = (2 * distance) / duration;
-  const a = (2 * distance) / (duration * duration);
-  return { v0, a };
+// Spin easing: quintic ease-out gives a natural wheel motion —
+// very high initial velocity that decelerates dramatically toward zero.
+// Position:  pos(p) = D × (1 − (1 − p)⁵)
+// Velocity:  vel(p) = D × 5 × (1 − p)⁴ / T
+const EASING_POWER = 5;
+
+function spinEasedPosition(progress: number, totalDist: number): number {
+  return totalDist * (1 - Math.pow(1 - progress, EASING_POWER));
+}
+
+function spinEasedVelocity(progress: number, totalDist: number, durationSec: number): number {
+  return totalDist * EASING_POWER * Math.pow(1 - progress, EASING_POWER - 1) / durationSec;
 }
 
 // ─── Helper: draw text on arc ───────────────────────────────────────────────────
@@ -194,13 +198,13 @@ function WinnerCard({
   const { emoji, label } = getTemplateWinnerLabel(templateContext);
 
   useEffect(() => {
-    const t = setTimeout(() => setVisible(true), 30);
+    const t = setTimeout(() => setVisible(true), 20);
     return () => clearTimeout(t);
   }, []);
 
   const handleClose = () => {
     setVisible(false);
-    setTimeout(onClose, 200);
+    setTimeout(onClose, 260);
   };
 
   // In fullscreen: render as absolute overlay inside the wrapper.
@@ -211,77 +215,103 @@ function WinnerCard({
 
   return (
     <div
-      className={`${positionClass} flex items-center justify-center`}
+      className={`${positionClass} flex items-center justify-center p-4`}
       style={{
-        backgroundColor: "rgba(0,0,0,0.55)",
-        backdropFilter: "blur(8px)",
-        WebkitBackdropFilter: "blur(8px)",
-        transition: "opacity 0.2s ease",
+        background: `radial-gradient(ellipse at 50% 45%, ${winnerColor}28 0%, rgba(0,0,0,0.68) 62%)`,
+        backdropFilter: "blur(10px)",
+        WebkitBackdropFilter: "blur(10px)",
+        transition: "opacity 0.26s ease",
         opacity: visible ? 1 : 0,
       }}
       onClick={(e) => { if (e.target === e.currentTarget) handleClose(); }}
     >
       <div
-        className="relative mx-4 rounded-3xl border overflow-hidden shadow-2xl"
+        className="relative w-full overflow-hidden"
         style={{
-          maxWidth: 440,
-          width: "100%",
-          background: "hsl(var(--card) / 0.75)",
-          backdropFilter: "blur(24px)",
-          WebkitBackdropFilter: "blur(24px)",
-          borderColor: `${winnerColor}40`,
-          transform: visible ? "translateY(0) scale(1)" : "translateY(24px) scale(0.95)",
-          transition: "transform 0.35s cubic-bezier(0.34,1.56,0.64,1), opacity 0.2s ease",
+          maxWidth: 420,
+          borderRadius: 28,
+          border: `1.5px solid ${winnerColor}55`,
+          boxShadow: `0 0 0 1px ${winnerColor}18, 0 28px 80px rgba(0,0,0,0.45), 0 0 70px ${winnerColor}18`,
+          transform: visible ? "translateY(0) scale(1)" : "translateY(36px) scale(0.90)",
+          transition: "transform 0.42s cubic-bezier(0.34,1.56,0.64,1), opacity 0.26s ease",
           opacity: visible ? 1 : 0,
         }}
       >
-        {/* Top color bar */}
-        <div className="h-1.5 w-full" style={{ background: `linear-gradient(90deg, ${winnerColor}, ${winnerColor}88)` }} />
-
-        {/* Close button */}
-        <button
-          onClick={handleClose}
-          className="absolute top-4 right-4 w-8 h-8 rounded-full flex items-center justify-center bg-muted/60 hover:bg-muted text-muted-foreground hover:text-foreground transition-all"
+        {/* ── Rich gradient header ── */}
+        <div
+          className="relative flex flex-col items-center justify-end gap-3 pt-10 pb-6"
+          style={{
+            background: `linear-gradient(160deg, ${winnerColor} 0%, ${winnerColor}cc 55%, ${winnerColor}88 100%)`,
+          }}
         >
-          <X className="w-4 h-4" />
-        </button>
-
-        <div className="p-8 flex flex-col items-center gap-6 text-center">
-          {/* Icon */}
+          {/* Subtle noise overlay */}
           <div
-            className="w-20 h-20 rounded-2xl flex items-center justify-center shadow-lg text-4xl"
-            style={{ background: `${winnerColor}22`, border: `2px solid ${winnerColor}44` }}
+            className="absolute inset-0 opacity-[0.06]"
+            style={{
+              backgroundImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")",
+              backgroundSize: "180px",
+            }}
+          />
+
+          {/* Close button */}
+          <button
+            onClick={handleClose}
+            className="absolute top-3 right-3 w-8 h-8 rounded-full flex items-center justify-center bg-black/20 hover:bg-black/38 text-white/75 hover:text-white transition-all"
+          >
+            <X className="w-4 h-4" />
+          </button>
+
+          {/* Emoji — pops in with spring */}
+          <div
+            className="relative z-10 text-6xl leading-none select-none"
+            style={{
+              filter: "drop-shadow(0 6px 20px rgba(0,0,0,0.30))",
+              animation: "wcEmojiPop 0.55s cubic-bezier(0.34,1.56,0.64,1) 0.06s both",
+            }}
           >
             {emoji}
           </div>
 
           {/* Badge */}
           <span
-            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest"
-            style={{ background: `${winnerColor}22`, color: winnerColor }}
+            className="relative z-10 inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest bg-black/22 text-white/90"
+            style={{ animation: "wcFadeUp 0.38s ease 0.22s both" }}
           >
             <Sparkles className="w-3 h-3" />
             {label}
           </span>
+        </div>
 
+        {/* ── Body ── */}
+        <div
+          className="flex flex-col items-center gap-5 px-7 pt-7 pb-7"
+          style={{ background: "hsl(var(--card))" }}
+        >
           {/* Winner name */}
           <div
-            className="font-display font-black tracking-tight leading-tight wrap-break-word w-full"
+            className="font-display font-black tracking-tight leading-tight break-words text-center w-full"
             style={{
-              fontSize: "clamp(1.75rem, 5vw, 2.5rem)",
+              fontSize: "clamp(2rem, 6vw, 2.75rem)",
               color: winnerColor,
-              textShadow: `0 0 40px ${winnerColor}44`,
+              textShadow: `0 0 24px ${winnerColor}60, 0 0 56px ${winnerColor}28`,
+              animation: "wcFadeUp 0.44s cubic-bezier(0.22,1,0.36,1) 0.16s both",
             }}
           >
             {winner}
           </div>
 
-          {/* Actions */}
-          <div className="flex flex-col sm:flex-row gap-3 w-full">
+          {/* Accent divider */}
+          <div
+            className="w-10 h-0.5 rounded-full"
+            style={{ background: `linear-gradient(90deg, transparent, ${winnerColor}70, transparent)` }}
+          />
+
+          {/* Action buttons */}
+          <div className="flex gap-3 w-full">
             <Button
               variant="outline"
               onClick={() => { onSpinAgain(); handleClose(); }}
-              className="flex-1 h-12 font-bold gap-2 rounded-xl border-primary/20"
+              className="flex-1 h-12 font-bold gap-2 rounded-2xl border-2 transition-all hover:border-primary/30"
             >
               <RotateCcw className="h-4 w-4" />
               Spin Again
@@ -289,14 +319,29 @@ function WinnerCard({
             <Button
               onClick={() => { if (!isRaffleMode) onRemove(); handleClose(); }}
               disabled={isRaffleMode}
-              className="flex-1 h-12 font-bold rounded-xl"
-              style={!isRaffleMode ? { background: winnerColor, color: "#fff" } : {}}
+              className="flex-1 h-12 font-bold rounded-2xl border-0 transition-all"
+              style={!isRaffleMode ? {
+                background: `linear-gradient(135deg, ${winnerColor} 0%, ${winnerColor}cc 100%)`,
+                color: "#fff",
+                boxShadow: `0 4px 18px ${winnerColor}50`,
+              } : {}}
             >
               {labels.removeWinner}
             </Button>
           </div>
         </div>
       </div>
+
+      <style>{`
+        @keyframes wcEmojiPop {
+          from { opacity: 0; transform: scale(0.25) rotate(-18deg); }
+          to   { opacity: 1; transform: scale(1) rotate(0deg); }
+        }
+        @keyframes wcFadeUp {
+          from { opacity: 0; transform: translateY(14px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+      `}</style>
     </div>
   );
 }
@@ -306,7 +351,7 @@ function WinnerCard({
 export function SpinWheelCanvas({
   entries, setEntries, entryColors, isSpinning, setIsSpinning,
   setWinnerHistory, settings, labels, showCountdown, templateContext,
-  wheelTitle, wheelDesc,
+  wheelTitle, wheelDesc, triggerSpinRef,
 }: SpinWheelCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -319,7 +364,6 @@ export function SpinWheelCanvas({
   const dprRef = useRef(1);
   
   // Time-based spin state
-  const spinFromRotRef = useRef(0);
   const pendingWinnerRef = useRef<{ name: string; color: string } | null>(null);
 
   const [winner, setWinner] = useState<string | null>(null);
@@ -334,11 +378,11 @@ export function SpinWheelCanvas({
   // Physics state
   const physicsRef = useRef({
     startRot: 0,
-    initialVelocity: 0,
-    deceleration: 0,
+    totalDist: 0,
     targetRot: 0,
     startTimeMs: 0,
     durationMs: 0,
+    peakVelocity: 0,
   });
   const lastFrameTimeRef = useRef(0);
   const pointerPhysicsRef = useRef({ angle: 0, velocity: 0 });
@@ -478,7 +522,7 @@ export function SpinWheelCanvas({
   }, [syncPointer]);
 
   const kickPointer = useCallback((velocity: number, boundaryCount: number) => {
-    const maxExpectedVel = Math.max(physicsRef.current.initialVelocity, 0.001);
+    const maxExpectedVel = Math.max(physicsRef.current.peakVelocity, 0.001);
     const speedRatio = Math.max(0, Math.min(1, velocity / maxExpectedVel));
     const impulse = (4.5 + (speedRatio * 4.5) + ((1 - speedRatio) * 2.5)) * Math.min(boundaryCount, 2);
     pointerPhysicsRef.current.velocity -= impulse * 2.35;
@@ -535,7 +579,7 @@ export function SpinWheelCanvas({
     if (newBoundaryIdx <= prevBoundaryIdx) return;
 
     const boundaryCount = newBoundaryIdx - prevBoundaryIdx;
-    const maxExpectedVel = Math.max(physicsRef.current.initialVelocity, 0.001);
+    const maxExpectedVel = Math.max(physicsRef.current.peakVelocity, 0.001);
     const speedRatio = Math.max(0, Math.min(1, velocity / maxExpectedVel));
 
     if (!settings.isMuted) {
@@ -546,7 +590,7 @@ export function SpinWheelCanvas({
 
     lastTickRotRef.current = newBoundaryIdx * arcSize;
     kickPointer(velocity, boundaryCount);
-  }, [kickPointer, settings.isMuted, settings.spinDuration, settings.volume, tick]);
+  }, [kickPointer, settings.isMuted, settings.volume, tick]);
 
   // ── Winner effect ──────────────────────────────────────────────────────────────
 
@@ -566,9 +610,9 @@ export function SpinWheelCanvas({
     animIdRef.current = requestAnimationFrame(idleLoop);
   }, [draw, stepPointer]);
 
-  // Velocity-based physics loop (Kinematics).
-  // This simulates actual physical momentum losing energy to friction, causing a 
-  // natural hard stop when velocity reaches 0, plus resistance (drag) hitting the peg.
+  // Easing-based spin loop: quintic ease-out gives a natural wheel motion —
+  // high initial velocity that decelerates dramatically toward zero, spending
+  // most of the spin at speed and only crawling to a stop at the very end.
   const spinLoop = useCallback((time: number) => {
     if (!lastFrameTimeRef.current) lastFrameTimeRef.current = time;
     const dt = Math.max(0.001, (time - lastFrameTimeRef.current) / 1000);
@@ -577,22 +621,13 @@ export function SpinWheelCanvas({
     const items = filtered();
     const n = items.length;
     const arcSize = n > 0 ? (2 * Math.PI) / n : 0;
-    const {
-      startRot,
-      initialVelocity,
-      deceleration,
-      targetRot,
-      startTimeMs,
-      durationMs,
-    } = physicsRef.current;
+    const { startRot, totalDist, targetRot, startTimeMs, durationMs } = physicsRef.current;
     const lastRot = rotRef.current;
     const elapsedMs = Math.max(0, time - startTimeMs);
-    const elapsedSec = Math.min(elapsedMs / 1000, durationMs / 1000);
-    const currentVelocity = Math.max(0, initialVelocity - (deceleration * elapsedSec));
-    const nextRot = Math.min(
-      targetRot,
-      startRot + (initialVelocity * elapsedSec) - (0.5 * deceleration * elapsedSec * elapsedSec),
-    );
+    const progress = Math.min(1, elapsedMs / durationMs);
+    const durationSec = durationMs / 1000;
+    const currentVelocity = spinEasedVelocity(progress, totalDist, durationSec);
+    const nextRot = Math.min(targetRot, startRot + spinEasedPosition(progress, totalDist));
 
     applyBoundaryEffects(lastRot, nextRot, currentVelocity, arcSize);
 
@@ -600,7 +635,7 @@ export function SpinWheelCanvas({
     draw();
     stepPointer(dt);
 
-    if (elapsedMs >= durationMs || nextRot >= targetRot || currentVelocity <= 0.0001) {
+    if (progress >= 1 || nextRot >= targetRot) {
       finishSpin();
       return;
     }
@@ -665,21 +700,18 @@ export function SpinWheelCanvas({
     const extraRotations = Math.round(settings.spinDuration * 1.5) + 2;
     const totalDeltaRad = ((delta + extraRotations * 360) * Math.PI) / 180;
 
-    spinFromRotRef.current = rotRef.current;
     const targetRot = rotRef.current + totalDeltaRad;
-    
-    // ── Kinematic Setup ──
+
+    // ── Easing-based spin setup ──
     const durationSec = settings.spinDuration;
-    // Calculate required initial velocity and deceleration (friction) to exactly hit target
-    const { v0, a } = calculateKinematics(totalDeltaRad, durationSec);
-    
+
     physicsRef.current = {
       startRot: rotRef.current,
-      initialVelocity: v0,
-      deceleration: a,
+      totalDist: totalDeltaRad,
       targetRot: targetRot,
       startTimeMs: performance.now(),
       durationMs: durationSec * 1000,
+      peakVelocity: spinEasedVelocity(0, totalDeltaRad, durationSec),
     };
     pointerPhysicsRef.current.angle = 0;
     pointerPhysicsRef.current.velocity = 0;
@@ -752,6 +784,10 @@ export function SpinWheelCanvas({
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [handleSpin]);
+
+  useEffect(() => {
+    if (triggerSpinRef) triggerSpinRef.current = handleSpin;
+  }, [triggerSpinRef, handleSpin]);
 
   // ── Render ────────────────────────────────────────────────────────────────────
 
