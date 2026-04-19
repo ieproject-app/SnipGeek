@@ -33,6 +33,7 @@ import { cn } from "@/lib/utils";
 import { FirebaseProviderWrapper } from "@/components/layout/firebase-provider-wrapper";
 import { FirebaseAnalyticsTracker } from "@/components/analytics/firebase-analytics-tracker";
 import { LayoutDeferredUi } from "@/components/layout/layout-deferred-ui";
+import { DevIndexTracker } from "@/components/dev/dev-index-tracker";
 
 const fontDisplay = Bricolage_Grotesque({
   subsets: ["latin"],
@@ -228,6 +229,7 @@ export default async function LocaleLayout({
                   translationsMap={translationsMap}
                 />
                 <main id="main-content">{children}</main>
+                {process.env.NODE_ENV === "development" && <DevIndexTracker />}
                 <LayoutFooter
                   locale={locale}
                   dictionary={dictionary}

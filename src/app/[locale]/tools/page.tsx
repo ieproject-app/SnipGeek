@@ -5,9 +5,48 @@ import React from 'react';
 import { ScrollReveal } from '@/components/ui/scroll-reveal';
 import { ToolsList } from '@/components/tools/tools-list';
 
+const DOMAIN = "https://snipgeek.com";
+
+const pageSEO: Record<string, { title: string; description: string; keywords: string[] }> = {
+  en: {
+    title: "Free Online Tools – Image, Randomizer & Reference Utilities | SnipGeek",
+    description:
+      "A collection of free online tools from SnipGeek — crop images to WebP, spin a wheel, pick random names, look up BIOS & Boot Menu keys, estimate laptop service costs, and more. No login required for public tools.",
+    keywords: [
+      "free online tools",
+      "online utilities",
+      "image crop tool",
+      "spin the wheel online",
+      "random name picker",
+      "BIOS key finder",
+      "laptop service estimator",
+      "free web tools",
+      "SnipGeek tools",
+      "browser tools no login",
+    ],
+  },
+  id: {
+    title: "Alat Online Gratis – Gambar, Pengacak & Referensi | SnipGeek",
+    description:
+      "Kumpulan alat online gratis dari SnipGeek — potong gambar ke WebP, putar roda, pilih nama acak, cari tombol BIOS & Boot Menu, estimasi biaya servis laptop, dan lainnya. Tanpa login untuk alat publik.",
+    keywords: [
+      "alat online gratis",
+      "tools online gratis",
+      "potong gambar online",
+      "spin wheel online",
+      "pilih nama acak",
+      "pencari tombol BIOS",
+      "estimasi servis laptop",
+      "alat browser gratis",
+      "tools SnipGeek",
+      "alat web tanpa login",
+    ],
+  },
+};
+
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
-  const dictionary = await getDictionary(locale as Locale);
+  const seo = pageSEO[locale] ?? pageSEO.en;
   const canonicalPath =
     locale === i18n.defaultLocale ? "/tools" : `/${locale}/tools`;
   const languages: Record<string, string> = {};
@@ -17,17 +56,44 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   });
 
   return {
-    title: dictionary.tools.title,
-    description: dictionary.tools.description,
-    robots: {
-      index: false,
-      follow: false,
-    },
+    title: seo.title,
+    description: seo.description,
+    keywords: seo.keywords,
     alternates: {
       canonical: canonicalPath,
       languages: {
         ...languages,
         "x-default": languages[i18n.defaultLocale] || canonicalPath,
+      },
+    },
+    openGraph: {
+      type: "website",
+      url: `${DOMAIN}${canonicalPath}`,
+      title: seo.title,
+      description: seo.description,
+      images: [
+        {
+          url: `${DOMAIN}/opengraph-image`,
+          width: 1200,
+          height: 630,
+          alt: seo.title,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: seo.title,
+      description: seo.description,
+    },
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        "max-video-preview": -1,
+        "max-image-preview": "large",
+        "max-snippet": -1,
       },
     },
   };

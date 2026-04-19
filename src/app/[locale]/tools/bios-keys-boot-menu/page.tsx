@@ -90,6 +90,53 @@ export async function generateMetadata({
   };
 }
 
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What key do I press to enter BIOS on an ASUS laptop?",
+      "acceptedAnswer": { "@type": "Answer", "text": "On most ASUS laptops, press F2 immediately after powering on to enter BIOS/UEFI setup. For the Boot Menu, press F8 or ESC." }
+    },
+    {
+      "@type": "Question",
+      "name": "How do I open the Boot Menu on a Lenovo laptop?",
+      "acceptedAnswer": { "@type": "Answer", "text": "On Lenovo laptops, press F12 during startup to open the Boot Menu. For BIOS/UEFI setup, press F2 or Fn+F2. Some models use the Novo button (small pinhole) to access a recovery menu." }
+    },
+    {
+      "@type": "Question",
+      "name": "What is the BIOS key for Dell laptops?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Press F2 immediately after the Dell logo appears to enter BIOS/UEFI setup. For the One-Time Boot Menu, press F12 instead." }
+    },
+    {
+      "@type": "Question",
+      "name": "How to enter BIOS on HP laptops?",
+      "acceptedAnswer": { "@type": "Answer", "text": "On HP laptops, press F10 to enter BIOS Setup, or press ESC during startup to open the Startup Menu, then select F10 BIOS Setup or F9 Boot Device Options." }
+    },
+    {
+      "@type": "Question",
+      "name": "What key opens BIOS on MSI motherboards and laptops?",
+      "acceptedAnswer": { "@type": "Answer", "text": "For MSI motherboards and most MSI laptops, press DEL (Delete) to enter BIOS/UEFI setup. For the Boot Menu, press F11." }
+    },
+    {
+      "@type": "Question",
+      "name": "What is the Boot Menu key for Acer laptops?",
+      "acceptedAnswer": { "@type": "Answer", "text": "On Acer laptops, press F2 to enter BIOS Setup and F12 to access the Boot Menu. Some models require pressing the key repeatedly right after powering on." }
+    },
+    {
+      "@type": "Question",
+      "name": "How to access BIOS on Gigabyte motherboards?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Press DEL (Delete) to enter BIOS/UEFI on Gigabyte motherboards. For Boot Menu selection, press F12." }
+    },
+    {
+      "@type": "Question",
+      "name": "How do I boot from USB on Apple Mac?",
+      "acceptedAnswer": { "@type": "Answer", "text": "On Apple Mac, hold the Option (⌥) key immediately after pressing the power button to open the Startup Manager and select your boot device. For Apple Silicon Macs, hold the Power button until you see 'Loading startup options'." }
+    },
+  ]
+};
+
 export default async function BiosKeysPage({
   params,
 }: {
@@ -103,6 +150,10 @@ export default async function BiosKeysPage({
 
   return (
     <div className="w-full">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+      />
       <main className="mx-auto max-w-7xl px-4 pt-10 pb-16 sm:px-6 lg:px-8 w-full">
         <ToolBiosKeys dictionary={dictionaryWithLocale} />
       </main>

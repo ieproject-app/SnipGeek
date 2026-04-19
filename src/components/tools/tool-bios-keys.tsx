@@ -4,14 +4,13 @@ import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { useAuth, useFirestore, useUser } from "@/firebase";
 import { collection, doc, getDoc, getDocs, setDoc, deleteDoc, writeBatch } from "firebase/firestore";
 import { initiateGoogleSignIn } from "@/firebase/non-blocking-login";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Database, AlertTriangle, Search, KeyRound, Keyboard, Edit, Plus, Trash2, FileJson, Settings2 } from "lucide-react";
+import { Loader2, Database, AlertTriangle, Search, KeyRound, Keyboard, Edit, Plus, Trash2, FileJson, Settings2, Copy, Check, ChevronRight, ArrowLeft, X, Cpu, Sparkles, CornerDownLeft, Download } from "lucide-react";
 import { ToolWrapper } from "@/components/tools/tool-wrapper";
 import { useNotification } from "@/hooks/use-notification";
 import { getMulticolorSeed, getMulticolorTheme } from "@/lib/multicolor";
@@ -54,6 +53,8 @@ const t = {
     loginButton: "Login for Admin Access",
     analyzing: "Checking access...",
     bulkUpdate: "Bulk Update",
+    exportLabel: "Export",
+    exportHint: "Download all entries as JSON (Bulk-Update compatible)",
     addNew: "Add New Brand",
     editTitle: "Edit Specification Data",
     addTitle: "Add New Brand Entry",
@@ -78,9 +79,18 @@ const t = {
     cancelExec: "Cancel Execution",
     runBulk: "Run Bulk Inject",
     allCategories: "All",
-    sortAZ: "A–Z",
-    sortZA: "Z–A",
-    sortNewest: "Latest",
+    popularTitle: "Popular brands",
+    popularHint: "Jump straight to the most referenced brands",
+    browseAllTitle: "All devices",
+    backToSearch: "Back",
+    relatedTitle: (brand: string) => `Other ${brand} models`,
+    modelCount: (n: number) => `${n} ${n === 1 ? "model" : "models"}`,
+    searchStats: (d: number, b: number) => `${d} devices · ${b} brands`,
+    kbdHint: "to navigate",
+    kbdSelect: "to select",
+    kbdClose: "to close",
+    resultsFor: (q: string) => `Results for "${q}"`,
+    popular: "Popular",
   },
   id: {
     title: "Pencari Tombol BIOS & Boot Menu",
@@ -101,6 +111,8 @@ const t = {
     loginButton: "Login Akses Admin",
     analyzing: "Menganalisis akses...",
     bulkUpdate: "Bulk Update",
+    exportLabel: "Ekspor",
+    exportHint: "Unduh semua data sebagai JSON (kompatibel Bulk Update)",
     addNew: "Tambah Merek Baru",
     editTitle: "Edit Data Spesifikasi",
     addTitle: "Suntik Merek Spesifik Baru",
@@ -125,9 +137,18 @@ const t = {
     cancelExec: "Batalkan Eksekusi",
     runBulk: "Jalankan Bulk Inject",
     allCategories: "Semua",
-    sortAZ: "A–Z",
-    sortZA: "Z–A",
-    sortNewest: "Terbaru",
+    popularTitle: "Merek populer",
+    popularHint: "Langsung buka merek yang paling banyak dicari",
+    browseAllTitle: "Semua perangkat",
+    backToSearch: "Kembali",
+    relatedTitle: (brand: string) => `Model ${brand} lainnya`,
+    modelCount: (n: number) => `${n} model`,
+    searchStats: (d: number, b: number) => `${d} perangkat · ${b} merek`,
+    kbdHint: "untuk navigasi",
+    kbdSelect: "untuk pilih",
+    kbdClose: "untuk tutup",
+    resultsFor: (q: string) => `Hasil untuk "${q}"`,
+    popular: "Populer",
   },
 };
 
@@ -146,6 +167,204 @@ function highlightText(text: string, query: string): React.ReactNode {
   );
 }
 
+// ══════════════════════════════════════════════════════════════
+// DetailView — focused panel shown when a device is selected
+// ══════════════════════════════════════════════════════════════
+interface DetailViewProps {
+  item: BiosKeyData;
+  related: BiosKeyData[];
+  onBack: () => void;
+  onSelectRelated: (item: BiosKeyData) => void;
+  onEdit?: () => void;
+  lang: typeof t.en;
+  locale: "en" | "id";
+  copiedId: string | null;
+  onCopy: (text: string, copyId: string) => void;
+}
+
+function KeyCap({
+  label,
+  value,
+  accent,
+  copied,
+  onCopy,
+  icon,
+}: {
+  label: string;
+  value: string;
+  accent: "primary" | "cyan";
+  copied: boolean;
+  onCopy: () => void;
+  icon: React.ReactNode;
+}) {
+  const accentCls = accent === "primary"
+    ? "text-foreground border-border/70"
+    : "text-cyan-700 dark:text-cyan-300 border-cyan-500/30";
+  const hoverCls = accent === "primary"
+    ? "hover:text-primary hover:bg-primary/10"
+    : "hover:text-cyan-500 hover:bg-cyan-500/10";
+  return (
+    <div className="flex-1 flex flex-col items-center gap-3 p-5 sm:p-6 rounded-2xl border border-border/40 bg-gradient-to-b from-card/80 to-card/30">
+      <div className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/70">
+        {icon} {label}
+      </div>
+      <kbd className={cn(
+        "block font-black font-mono text-3xl sm:text-4xl bg-background border border-b-[6px] rounded-2xl px-6 py-4 sm:px-8 sm:py-5 shadow-lg shadow-black/5 whitespace-nowrap max-w-full overflow-hidden text-ellipsis",
+        accentCls
+      )}>
+        {value || "—"}
+      </kbd>
+      <button
+        onClick={onCopy}
+        className={cn(
+          "inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wider px-3 py-1.5 rounded-md text-muted-foreground/70 transition-all active:scale-95",
+          hoverCls
+        )}
+      >
+        {copied ? <><Check className="h-3.5 w-3.5 text-emerald-500" /> Copied</> : <><Copy className="h-3 w-3" /> Copy</>}
+      </button>
+    </div>
+  );
+}
+
+function DetailView({ item, related, onBack, onSelectRelated, onEdit, lang, locale, copiedId, onCopy }: DetailViewProps) {
+  const seed = getMulticolorSeed(item.brand, item.series);
+  const theme = getMulticolorTheme(seed);
+  const displayNote = locale === "en"
+    ? (item.notesEn?.trim() || item.notes)
+    : item.notes;
+  const hasNote = Boolean(displayNote);
+
+  return (
+    <div className="max-w-4xl mx-auto w-full animate-in fade-in slide-in-from-bottom-2 duration-200">
+      {/* Back bar */}
+      <div className="flex items-center justify-between mb-4">
+        <button
+          onClick={onBack}
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-black uppercase tracking-wider rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
+        >
+          <ArrowLeft className="h-3.5 w-3.5" /> {lang.backToSearch}
+        </button>
+        {onEdit && (
+          <button
+            onClick={onEdit}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-black uppercase tracking-wider rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
+          >
+            <Settings2 className="h-3.5 w-3.5" /> {lang.editTitle.split(" ")[0]}
+          </button>
+        )}
+      </div>
+
+      {/* Hero card */}
+      <div className="relative overflow-hidden rounded-3xl border border-border/50 bg-card/40 shadow-xl shadow-black/5 p-6 sm:p-10">
+        <div className={cn("pointer-events-none absolute -top-20 -right-20 h-60 w-60 rounded-full blur-3xl opacity-20 bg-gradient-to-br", theme.gradient)} />
+
+        <div className="relative">
+          {/* Header */}
+          <div className="flex items-start gap-4 mb-8">
+            <div className={cn("w-1.5 self-stretch rounded-full bg-gradient-to-b min-h-[56px]", theme.gradient)} />
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-2 mb-2 flex-wrap">
+                <Badge variant="secondary" className="uppercase text-[9px] tracking-widest font-black bg-muted/70 text-muted-foreground/80 border-none rounded px-2 py-0.5">
+                  {item.category}
+                </Badge>
+                {item.updatedAt && (
+                  <span className="text-[10px] text-muted-foreground/50 font-medium">
+                    {new Date(item.updatedAt).toLocaleDateString(locale === "id" ? "id-ID" : "en-US", { year: "numeric", month: "short", day: "numeric" })}
+                  </span>
+                )}
+              </div>
+              <h2 className={cn("font-black text-3xl sm:text-4xl uppercase tracking-tight leading-tight text-foreground", theme.hoverTitle)}>
+                {item.brand}
+              </h2>
+              {item.series ? (
+                <p className="text-base text-muted-foreground font-medium mt-1">{item.series}</p>
+              ) : (
+                <p className="text-sm italic text-muted-foreground/50 mt-1">{lang.allSeries}</p>
+              )}
+            </div>
+          </div>
+
+          {/* Keycaps */}
+          <div className="flex flex-col sm:flex-row gap-3 mb-6">
+            <KeyCap
+              label={lang.biosLabel}
+              value={item.biosKey}
+              accent="primary"
+              copied={copiedId === `${item.id}-bios`}
+              onCopy={() => onCopy(item.biosKey, `${item.id}-bios`)}
+              icon={<KeyRound className="h-3 w-3" />}
+            />
+            <KeyCap
+              label={lang.bootLabel}
+              value={item.bootKey}
+              accent="cyan"
+              copied={copiedId === `${item.id}-boot`}
+              onCopy={() => onCopy(item.bootKey, `${item.id}-boot`)}
+              icon={<Keyboard className="h-3 w-3" />}
+            />
+          </div>
+
+          {/* Notes */}
+          {hasNote ? (
+            <div className="flex gap-3 p-4 rounded-xl bg-primary/[0.04] border border-primary/15">
+              <div className={cn("w-0.5 self-stretch rounded-full shrink-0 bg-gradient-to-b", theme.gradient)} />
+              <div className="min-w-0">
+                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/60 mb-1.5">
+                  {lang.notesLabel}
+                </p>
+                <p className="text-[13.5px] leading-relaxed text-foreground/85">
+                  {displayNote}
+                </p>
+              </div>
+            </div>
+          ) : (
+            <p className="text-[12px] italic text-muted-foreground/40 text-center py-2">{lang.noNotes}</p>
+          )}
+        </div>
+      </div>
+
+      {/* Related items */}
+      {related.length > 0 && (
+        <section className="mt-8">
+          <header className="flex items-center gap-2 mb-3 px-1">
+            <Cpu className="h-4 w-4 text-muted-foreground/60" />
+            <h3 className="text-sm font-black uppercase tracking-widest text-foreground">
+              {lang.relatedTitle(item.brand)}
+            </h3>
+            <span className="text-[11px] text-muted-foreground/50 tabular-nums ml-auto">{related.length}</span>
+          </header>
+          <ul className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 rounded-2xl border border-border/40 bg-card/20 p-2">
+            {related.map(r => {
+              const rSeed = getMulticolorSeed(r.brand, r.series);
+              const rTheme = getMulticolorTheme(rSeed);
+              return (
+                <li key={r.id}>
+                  <button
+                    onClick={() => onSelectRelated(r)}
+                    className="group w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-left hover:bg-muted/50 transition-colors"
+                  >
+                    <div className={cn("w-0.5 self-stretch rounded-full shrink-0 bg-gradient-to-b min-h-[28px]", rTheme.gradient)} />
+                    <div className="flex-1 min-w-0">
+                      <p className="font-black text-[12.5px] text-foreground/90 leading-tight truncate">
+                        {r.series || r.brand}
+                      </p>
+                      <p className="text-[10.5px] text-muted-foreground/55 font-medium mt-0.5 truncate">
+                        BIOS: {r.biosKey} · Boot: {r.bootKey || "—"}
+                      </p>
+                    </div>
+                    <ChevronRight className="h-3.5 w-3.5 text-muted-foreground/25 group-hover:text-primary group-hover:translate-x-0.5 transition-all shrink-0" />
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+      )}
+    </div>
+  );
+}
+
 export function ToolBiosKeys({ dictionary }: { dictionary?: Dictionary }) {
   const { notify } = useNotification();
   const auth = useAuth();
@@ -153,7 +372,7 @@ export function ToolBiosKeys({ dictionary }: { dictionary?: Dictionary }) {
   const { user } = useUser();
 
   // Detect locale from dictionary context (fallback to "en")
-  const locale: "en" | "id" = ((dictionary as unknown as Record<string, unknown>)?.locale as string || "en") === "id" ? "id" : "en";
+  const locale: "en" | "id" = ((dictionary as unknown as Record<string, unknown>)?._locale as string || "en") === "id" ? "id" : "en";
   const lang = t[locale] || t.en;
 
   const [isAdminUser, setIsAdminUser] = useState(false);
@@ -171,7 +390,20 @@ export function ToolBiosKeys({ dictionary }: { dictionary?: Dictionary }) {
   const [isBulking, setIsBulking] = useState(false);
 
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
-  const [sortMode, setSortMode] = useState<"az" | "za" | "newest">("az");
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [selectedItem, setSelectedItem] = useState<BiosKeyData | null>(null);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const searchInputRef = React.useRef<HTMLInputElement>(null);
+
+  const handleCopyKey = useCallback((text: string, copyId: string) => {
+    if (!text || text === "-") return;
+    navigator.clipboard.writeText(text).then(() => {
+      setCopiedId(copyId);
+      setTimeout(() => setCopiedId(null), 2000);
+    }).catch(() => {
+      notify(locale === "id" ? "Gagal menyalin." : "Copy failed.");
+    });
+  }, [notify, locale]);
 
   const defaultForm: BiosKeyData = {
     brand: "", category: "Laptop", series: "", biosKey: "F2", bootKey: "F12", notes: "", notesEn: "", searchTags: []
@@ -233,6 +465,37 @@ export function ToolBiosKeys({ dictionary }: { dictionary?: Dictionary }) {
     setFormData({ ...item });
     setIsAddEditModalOpen(true);
   };
+
+  const handleExport = useCallback(() => {
+    if (dataKeys.length === 0) {
+      notify("No data to export", <AlertTriangle className="h-4 w-4" />);
+      return;
+    }
+    // Produce a clean payload matching Bulk Update schema — strip `id` so merge uses brand+series
+    const payload = dataKeys
+      .slice()
+      .sort((a, b) => a.brand.localeCompare(b.brand) || a.series.localeCompare(b.series))
+      .map(({ brand, category, series, biosKey, bootKey, notes, notesEn, searchTags, updatedAt }) => ({
+        brand, category, series, biosKey, bootKey, notes,
+        notesEn: notesEn || "",
+        searchTags: Array.isArray(searchTags) ? searchTags : [],
+        ...(updatedAt ? { updatedAt } : {}),
+      }));
+
+    const json = JSON.stringify(payload, null, 2);
+    const blob = new Blob([json], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const ts = new Date().toISOString().slice(0, 10);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `bios-keys-backup-${ts}.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+
+    notify(<span className="font-medium text-sm text-emerald-500">Exported {payload.length} entries</span>);
+  }, [dataKeys, notify]);
 
   const handleOpenBulk = () => {
     setBulkJsonText("[\n  {\n    \"brand\": \"Brand Name\",\n    \"category\": \"Laptop\",\n    \"series\": \"Series 123\",\n    \"biosKey\": \"F2\",\n    \"bootKey\": \"F12\",\n    \"notes\": \"Special note...\",\n    \"searchTags\": [\"brand\", \"series\"]\n  }\n]");
@@ -366,19 +629,90 @@ export function ToolBiosKeys({ dictionary }: { dictionary?: Dictionary }) {
       });
     }
 
-    // 3. Sort
+    // 3. Sort — when searching, rank exact brand/series prefix matches higher
     const sorted = [...result];
-    if (sortMode === "az") sorted.sort((a, b) => a.brand.localeCompare(b.brand));
-    else if (sortMode === "za") sorted.sort((a, b) => b.brand.localeCompare(a.brand));
-    else if (sortMode === "newest") {
+    if (lgSearch) {
       sorted.sort((a, b) => {
-        const da = a.updatedAt || "";
-        const db = b.updatedAt || "";
-        return db.localeCompare(da);
+        const score = (item: BiosKeyData) => {
+          const brand = (item.brand || "").toLowerCase();
+          const series = (item.series || "").toLowerCase();
+          if (brand === lgSearch) return 0;
+          if (brand.startsWith(lgSearch)) return 1;
+          if (series.startsWith(lgSearch)) return 2;
+          if (brand.includes(lgSearch)) return 3;
+          if (series.includes(lgSearch)) return 4;
+          return 5;
+        };
+        const diff = score(a) - score(b);
+        return diff !== 0 ? diff : a.brand.localeCompare(b.brand);
       });
+    } else {
+      sorted.sort((a, b) => a.brand.localeCompare(b.brand) || a.series.localeCompare(b.series));
     }
     return sorted;
-  }, [dataKeys, lgSearch, selectedCategory, sortMode]);
+  }, [dataKeys, lgSearch, selectedCategory]);
+
+  // Popular brands (idle state) — grouped by brand, top by model count
+  const popularBrands = useMemo(() => {
+    const counts: Record<string, number> = {};
+    dataKeys.forEach(d => {
+      if (selectedCategory !== "all" && d.category !== selectedCategory) return;
+      counts[d.brand] = (counts[d.brand] || 0) + 1;
+    });
+    return Object.entries(counts)
+      .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+      .slice(0, 12)
+      .map(([brand, count]) => ({ brand, count }));
+  }, [dataKeys, selectedCategory]);
+
+  // Related items for detail view (same brand, different model)
+  const relatedItems = useMemo(() => {
+    if (!selectedItem) return [];
+    return dataKeys
+      .filter(d => d.brand === selectedItem.brand && d.id !== selectedItem.id)
+      .slice(0, 8);
+  }, [selectedItem, dataKeys]);
+
+  // Reset active index when search changes
+  useEffect(() => { setActiveIndex(0); }, [lgSearch, selectedCategory]);
+
+  // Keyboard navigation (arrow keys / enter / esc / ⌘K)
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      // ⌘K or Ctrl+K — focus search
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        if (selectedItem) setSelectedItem(null);
+        searchInputRef.current?.focus();
+        return;
+      }
+      if (selectedItem) {
+        if (e.key === 'Escape') setSelectedItem(null);
+        return;
+      }
+      if (!searchQuery) {
+        if (e.key === 'Escape') searchInputRef.current?.blur();
+        return;
+      }
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        setActiveIndex(i => Math.min(i + 1, Math.max(0, filteredData.length - 1)));
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        setActiveIndex(i => Math.max(i - 1, 0));
+      } else if (e.key === 'Enter') {
+        const item = filteredData[activeIndex];
+        if (item) {
+          e.preventDefault();
+          setSelectedItem(item);
+        }
+      } else if (e.key === 'Escape') {
+        setSearchQuery("");
+      }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [searchQuery, filteredData, activeIndex, selectedItem]);
 
   const toolMeta = dictionary?.tools?.tool_list?.bios_keys;
 
@@ -389,7 +723,7 @@ export function ToolBiosKeys({ dictionary }: { dictionary?: Dictionary }) {
       dictionary={dictionary!}
       isPublic={true}
     >
-    <div className="space-y-8 pb-10">
+    <div className="space-y-4 pb-10">
 
       {/* --- Admin Bar — only visible to active admins --- */}
       {isAdminUser && !isAdminLoading && (
@@ -409,6 +743,16 @@ export function ToolBiosKeys({ dictionary }: { dictionary?: Dictionary }) {
             <Button
               variant="ghost"
               size="sm"
+              onClick={handleExport}
+              disabled={dataKeys.length === 0}
+              className="h-7 px-2.5 rounded-lg text-[10px] font-black uppercase tracking-wider gap-1.5 text-muted-foreground hover:bg-emerald-500/10 hover:text-emerald-600 dark:hover:text-emerald-400 transition-all"
+              title={lang.exportHint}
+            >
+              <Download className="h-3 w-3" /> {lang.exportLabel}
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
               onClick={handleOpenBulk}
               className="h-7 px-2.5 rounded-lg text-[10px] font-black uppercase tracking-wider gap-1.5 text-muted-foreground hover:bg-primary/5 hover:text-primary transition-all"
             >
@@ -425,212 +769,260 @@ export function ToolBiosKeys({ dictionary }: { dictionary?: Dictionary }) {
         </div>
       )}
 
-      {/* STICKY SEARCH BAR */}
-      <div className="max-w-3xl mx-auto sticky top-24 z-30 pt-2 pb-4">
-        <div className="relative group">
-          <input
-            type="text"
-            className="w-full rounded-2xl border-2 border-primary/20 bg-background/80 backdrop-blur-xl px-6 py-5 pl-14 shadow-2xl shadow-primary/5 transition-all focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/20 text-lg font-medium placeholder:font-normal placeholder:opacity-60"
-            placeholder={lang.searchPlaceholder}
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-          <div className="absolute inset-y-0 left-0 flex items-center pl-6 pointer-events-none text-muted-foreground">
-            <Search className="h-6 w-6 text-primary/70" />
-          </div>
-          {searchQuery && (
-            <button
-              onClick={() => setSearchQuery("")}
-              className="absolute inset-y-0 right-0 flex items-center pr-5 text-muted-foreground/50 hover:text-foreground transition-colors"
-            >
-              <span className="text-xs font-bold uppercase tracking-wider">Clear</span>
-            </button>
-          )}
+      {/* ═══ COMMAND PALETTE LAYOUT ═══ */}
+      {isFetching ? (
+        <div className="flex flex-col items-center justify-center py-32 text-muted-foreground/50">
+          <Loader2 className="h-10 w-10 animate-spin text-primary/50 mb-3" />
+          <p className="text-sm">{lang.loading}</p>
         </div>
-        {dataKeys.length > 0 && (
-          <p className="text-center text-xs text-muted-foreground/60 mt-2">
-            {filteredData.length} of {dataKeys.length} {locale === "id" ? "perangkat" : "devices"} shown
-          </p>
-        )}
-      </div>
-
-      {/* --- Category Filter Chips + Sort Controls --- */}
-      {dataKeys.length > 0 && (
-        <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between px-1 -mt-1">
-          {/* Category Chips */}
-          <div className="flex flex-wrap gap-2">
-            <button
-              onClick={() => setSelectedCategory("all")}
-              className={cn(
-                "px-3.5 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all border",
-                selectedCategory === "all"
-                  ? "bg-primary text-primary-foreground border-primary shadow-sm shadow-primary/20"
-                  : "bg-muted/60 text-muted-foreground border-border/50 hover:border-primary/30 hover:text-foreground"
-              )}
-            >
-              {lang.allCategories}
-            </button>
-            {categories.map(cat => (
-              <button
-                key={cat}
-                onClick={() => setSelectedCategory(cat)}
-                className={cn(
-                  "px-3.5 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all border",
-                  selectedCategory === cat
-                    ? "bg-primary text-primary-foreground border-primary shadow-sm shadow-primary/20"
-                    : "bg-muted/60 text-muted-foreground border-border/50 hover:border-primary/30 hover:text-foreground"
-                )}
-              >
-                {cat}
-              </button>
-            ))}
-          </div>
-
-          {/* Sort Control */}
-          <div className="flex items-center gap-1.5 shrink-0">
-            {(["az", "za", "newest"] as const).map(mode => (
-              <button
-                key={mode}
-                onClick={() => setSortMode(mode)}
-                className={cn(
-                  "px-3 py-1.5 rounded-lg text-xs font-bold transition-all border",
-                  sortMode === mode
-                    ? "bg-foreground text-background border-foreground"
-                    : "bg-transparent text-muted-foreground border-border/50 hover:border-foreground/30 hover:text-foreground"
-                )}
-              >
-                {mode === "az" ? lang.sortAZ : mode === "za" ? lang.sortZA : lang.sortNewest}
-              </button>
-            ))}
-          </div>
+      ) : dataKeys.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-32 text-muted-foreground text-center px-8 rounded-2xl border border-dashed border-border/40">
+          <AlertTriangle className="h-12 w-12 opacity-15 mb-3" />
+          <h3 className="text-xl font-bold text-foreground">{lang.emptyTitle}</h3>
+          <p className="mt-1 text-sm opacity-70">{lang.emptyDesc}</p>
         </div>
-      )}
+      ) : selectedItem ? (
+        <DetailView
+          item={selectedItem}
+          onBack={() => setSelectedItem(null)}
+          onSelectRelated={(it) => setSelectedItem(it)}
+          onEdit={isAdminUser ? () => handleOpenEdit(selectedItem) : undefined}
+          related={relatedItems}
+          lang={lang}
+          locale={locale}
+          copiedId={copiedId}
+          onCopy={handleCopyKey}
+        />
+      ) : (
+        <>
+          {/* ── Hero Spotlight Search ─────────────────────────── */}
+          <div className="relative max-w-3xl mx-auto w-full pt-2 sm:pt-6">
+            {/* Ambient glow */}
+            <div className="pointer-events-none absolute -inset-x-8 -inset-y-4 bg-gradient-to-br from-primary/10 via-transparent to-cyan-500/10 blur-3xl opacity-70 -z-10" />
 
-      <div className="pt-2">
-        {isFetching ? (
-          <div className="flex flex-col items-center justify-center py-24 opacity-50">
-            <Loader2 className="h-12 w-12 animate-spin text-primary opacity-50 mb-4" />
-            <p className="text-lg">{lang.loading}</p>
-          </div>
-        ) : dataKeys.length === 0 ? (
-          <div className="rounded-3xl border-2 border-dashed bg-card/30 p-16 text-center text-muted-foreground min-h-[400px] flex flex-col justify-center items-center">
-            <AlertTriangle className="h-16 w-16 opacity-20 mb-4" />
-            <h3 className="text-2xl font-bold text-foreground">{lang.emptyTitle}</h3>
-            <p className="mt-2">{lang.emptyDesc}</p>
-          </div>
-        ) : filteredData.length === 0 ? (
-          <div className="text-center py-24 text-muted-foreground">
-            <Search className="h-16 w-16 opacity-10 mx-auto mb-4" />
-            <p className="text-xl">{lang.notFound} <span className="text-foreground font-bold">"{searchQuery}"</span></p>
-            <p className="mt-2 text-sm opacity-60">{lang.notFoundHint}</p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-max px-2">
-            {filteredData.map((item) => {
-              const seed = getMulticolorSeed(item.brand, item.series);
-              const theme = getMulticolorTheme(seed);
-
-              return (
-                <Card
-                  key={item.id}
-                  className={cn(
-                    "group relative overflow-hidden bg-card/40 backdrop-blur-md border border-border/50 shadow-sm transition-all duration-300 flex flex-col rounded-2xl ring-2 ring-transparent",
-                    theme.hoverRing,
-                    theme.hoverShadow
-                  )}
+            <div className={cn(
+              "group relative flex items-center gap-3 sm:gap-4 px-4 sm:px-6 py-4 sm:py-5 bg-background/90 backdrop-blur-md border-2 rounded-2xl shadow-xl shadow-black/5 transition-all",
+              searchQuery ? "border-primary/40 shadow-primary/10" : "border-border/60 hover:border-border"
+            )}>
+              <Search className="h-5 w-5 sm:h-6 sm:w-6 text-muted-foreground/50 shrink-0" />
+              <input
+                ref={searchInputRef}
+                type="text"
+                autoFocus
+                className="flex-1 bg-transparent outline-none text-base sm:text-lg font-medium placeholder:text-muted-foreground/40 min-w-0"
+                placeholder={lang.searchPlaceholder}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery("")}
+                  className="shrink-0 p-1 rounded-md text-muted-foreground/40 hover:text-foreground hover:bg-muted/60 transition-colors"
+                  aria-label="Clear"
                 >
-                  {/* Multicolor top accent bar */}
-                  <div className={cn("absolute top-0 inset-x-0 h-1 bg-gradient-to-r opacity-80 group-hover:opacity-100 transition-opacity", theme.gradient)} />
+                  <X className="h-4 w-4" />
+                </button>
+              )}
+              <kbd className="hidden sm:inline-flex items-center gap-1 shrink-0 px-2 py-1 text-[10px] font-mono font-black bg-muted/70 text-muted-foreground border border-border/60 rounded-md">
+                {searchQuery ? "ESC" : <><span className="text-sm leading-none">⌘</span>K</>}
+              </kbd>
+            </div>
 
-                  {/* Colorful overlay */}
-                  <div className={cn("absolute inset-0 bg-gradient-to-br opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none", theme.overlayGradient)} />
-
-                  {/* Admin Quick Edit Button */}
-                  {isAdminUser && (
-                    <div className="absolute top-3 right-3 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <Button size="icon" variant="secondary" onClick={() => handleOpenEdit(item)} className="h-8 w-8 rounded-full shadow-md bg-background hover:bg-primary/20 border border-primary/10">
-                        <Settings2 className="h-4 w-4 text-foreground/70" />
-                      </Button>
-                    </div>
-                  )}
-
-                  <CardHeader className="p-6 pb-3 relative">
-                    <div className="flex items-center gap-2 mb-3">
-                      <Badge variant="secondary" className="uppercase text-[10px] tracking-widest font-black bg-muted text-muted-foreground w-max border-none rounded-md px-2 py-0.5">
-                        {item.category}
-                      </Badge>
-                    </div>
-                    <CardTitle className={cn("text-2xl font-black text-foreground tracking-tight transition-colors", theme.hoverTitle)}>
-                      {highlightText(item.brand, searchQuery)}
-                    </CardTitle>
-                    <CardDescription className="font-semibold text-muted-foreground tracking-wide mt-1 text-sm">
-                      {highlightText(item.series || lang.allSeries, searchQuery)}
-                    </CardDescription>
-                  </CardHeader>
-
-                  <CardContent className="p-6 pt-2 flex flex-col flex-1 gap-4 relative">
-
-                    {/* Key Display Blocks */}
-                    <div className="flex flex-col gap-2.5">
-                      {/* BIOS Key Row */}
-                      <div className="flex items-center justify-between gap-3 px-4 py-3 rounded-xl bg-background/60 border border-border/40 group-hover:border-primary/20 transition-colors">
-                        <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-muted-foreground shrink-0">
-                          <KeyRound className="h-3.5 w-3.5 opacity-70 shrink-0" />
-                          <span>{lang.biosLabel}</span>
-                        </div>
-                        <kbd className="inline-flex items-center px-2.5 py-1 text-sm font-bold text-foreground bg-muted border border-b-2 border-border/80 rounded-lg font-mono shadow-sm text-center break-words overflow-hidden min-w-0">
-                          {item.biosKey || "-"}
-                        </kbd>
-                      </div>
-
-                      {/* Boot Key Row */}
-                      <div className="flex items-center justify-between gap-3 px-4 py-3 rounded-xl bg-background/60 border border-border/40 transition-colors" style={{ borderColor: "rgb(6 182 212 / 0.2)" }}>
-                        <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-muted-foreground shrink-0">
-                          <Keyboard className="h-3.5 w-3.5 opacity-70 shrink-0" />
-                          <span>{lang.bootLabel}</span>
-                        </div>
-                        <kbd className="inline-flex items-center px-2.5 py-1 text-sm font-bold text-cyan-700 dark:text-cyan-300 bg-cyan-500/10 border border-b-2 border-cyan-500/20 rounded-lg font-mono shadow-sm text-center break-words overflow-hidden min-w-0">
-                          {item.bootKey || "-"}
-                        </kbd>
-                      </div>
-                    </div>
-
-                    {/* Notes Section — locale-aware, full text, no clamp */}
-                    <div className="mt-auto pt-3 border-t border-border/30">
-                      {(() => {
-                        // For English locale: prefer notesEn, fallback to notes
-                        // For Indonesian locale: always use notes
-                        const displayNote =
-                          locale === "en"
-                            ? (item.notesEn?.trim() || item.notes)
-                            : item.notes;
-                        return displayNote ? (
-                          <div className="flex gap-2.5">
-                            <div className={cn("w-0.5 rounded-full shrink-0 mt-0.5 bg-gradient-to-b", theme.gradient)} />
-                            <div>
-                              <p className="text-[11px] font-black uppercase tracking-widest text-primary/60 mb-1">
-                                {lang.notesLabel}
-                              </p>
-                              <p className="text-[13px] leading-relaxed text-muted-foreground/90 group-hover:text-foreground/80 transition-colors">
-                                {displayNote}
-                              </p>
-                            </div>
-                          </div>
-                        ) : (
-                          <p className="text-[13px] italic text-muted-foreground/40 pl-3">
-                            {lang.noNotes}
-                          </p>
-                        );
-                      })()}
-                    </div>
-
-                  </CardContent>
-                </Card>
-              );
-            })}
+            {/* Stats / Kbd hints */}
+            <div className="flex items-center justify-between gap-3 px-2 mt-3 text-[11px] text-muted-foreground/60">
+              <p className="font-medium tabular-nums">
+                {searchQuery
+                  ? <span><span className="text-foreground/70 font-black">{filteredData.length}</span> / {dataKeys.length}</span>
+                  : lang.searchStats(dataKeys.length, new Set(dataKeys.map(d => d.brand)).size)
+                }
+              </p>
+              {searchQuery && filteredData.length > 0 && (
+                <div className="hidden sm:flex items-center gap-3 font-medium">
+                  <span className="inline-flex items-center gap-1">
+                    <kbd className="px-1.5 py-0.5 text-[9px] font-mono bg-muted/60 border border-border/50 rounded">↑↓</kbd>
+                    {lang.kbdHint}
+                  </span>
+                  <span className="inline-flex items-center gap-1">
+                    <kbd className="px-1.5 py-0.5 text-[9px] font-mono bg-muted/60 border border-border/50 rounded inline-flex items-center">
+                      <CornerDownLeft className="h-2.5 w-2.5" />
+                    </kbd>
+                    {lang.kbdSelect}
+                  </span>
+                </div>
+              )}
+            </div>
           </div>
-        )}
-      </div>
+
+          {/* ── Results / Idle ───────────────────────────────── */}
+          {searchQuery ? (
+            <div className="max-w-3xl mx-auto w-full">
+              {filteredData.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-20 text-muted-foreground text-center px-8 rounded-2xl border border-dashed border-border/40">
+                  <Search className="h-12 w-12 opacity-10 mb-3" />
+                  <p className="text-base font-medium">{lang.notFound} <span className="text-foreground font-black">&quot;{searchQuery}&quot;</span></p>
+                  <p className="mt-1 text-sm opacity-60">{lang.notFoundHint}</p>
+                </div>
+              ) : (
+                <>
+                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/50 px-3 pb-2">
+                    {lang.resultsFor(searchQuery)}
+                  </p>
+                  <ul className="flex flex-col gap-1 rounded-2xl border border-border/40 bg-card/20 p-2 max-h-[560px] overflow-y-auto">
+                    {filteredData.map((item, idx) => {
+                      const seed = getMulticolorSeed(item.brand, item.series);
+                      const theme = getMulticolorTheme(seed);
+                      const isActive = activeIndex === idx;
+                      return (
+                        <li key={item.id}>
+                          <button
+                            onClick={() => setSelectedItem(item)}
+                            onMouseEnter={() => setActiveIndex(idx)}
+                            className={cn(
+                              "group w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left transition-all",
+                              isActive ? "bg-primary/10 ring-1 ring-primary/20" : "hover:bg-muted/40"
+                            )}
+                          >
+                            <div className={cn("w-1 self-stretch rounded-full shrink-0 bg-gradient-to-b min-h-[36px]", theme.gradient)} />
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <p className={cn("font-black text-[14px] text-foreground leading-tight", theme.hoverTitle)}>
+                                  {highlightText(item.brand, searchQuery)}
+                                </p>
+                                <Badge variant="secondary" className="uppercase text-[8px] tracking-widest font-black bg-muted/70 text-muted-foreground/80 border-none rounded px-1.5 py-0 h-4">
+                                  {item.category}
+                                </Badge>
+                              </div>
+                              {item.series ? (
+                                <p className="text-[11px] text-muted-foreground/60 font-medium mt-0.5 truncate">
+                                  {highlightText(item.series, searchQuery)}
+                                </p>
+                              ) : (
+                                <p className="text-[10px] italic text-muted-foreground/30 mt-0.5">{lang.allSeries}</p>
+                              )}
+                            </div>
+                            <div className="hidden sm:flex items-center gap-1.5 shrink-0">
+                              <kbd className="font-black font-mono text-[11px] text-foreground bg-background border border-b-2 border-border/60 rounded px-2 py-0.5 whitespace-nowrap">
+                                {item.biosKey || "—"}
+                              </kbd>
+                              <span className="text-muted-foreground/25 text-[9px]">/</span>
+                              <kbd className="font-black font-mono text-[11px] text-cyan-700 dark:text-cyan-300 bg-background border border-b-2 border-cyan-500/25 rounded px-2 py-0.5 whitespace-nowrap">
+                                {item.bootKey || "—"}
+                              </kbd>
+                            </div>
+                            <ChevronRight className={cn(
+                              "h-4 w-4 shrink-0 transition-all",
+                              isActive ? "text-primary translate-x-0.5" : "text-muted-foreground/30"
+                            )} />
+                          </button>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </>
+              )}
+            </div>
+          ) : (
+            <div className="max-w-5xl mx-auto w-full space-y-8 pt-2">
+              {/* Category filter pills */}
+              {categories.length > 0 && (
+                <div className="flex items-center gap-1.5 flex-wrap justify-center">
+                  {[
+                    { key: "all", label: lang.allCategories, count: dataKeys.length },
+                    ...categories.map(cat => ({ key: cat, label: cat, count: dataKeys.filter(d => d.category === cat).length }))
+                  ].map(({ key, label, count }) => (
+                    <button
+                      key={key}
+                      onClick={() => setSelectedCategory(key)}
+                      className={cn(
+                        "px-3 py-1.5 text-[11px] font-black uppercase tracking-wider rounded-full transition-all border",
+                        selectedCategory === key
+                          ? "bg-primary text-primary-foreground border-primary shadow-sm shadow-primary/20"
+                          : "border-border/50 text-muted-foreground/70 hover:text-foreground hover:border-border bg-background/50"
+                      )}
+                    >
+                      {label} <span className="opacity-60 tabular-nums">{count}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              {/* Popular brands tiles */}
+              {popularBrands.length > 0 && (
+                <section>
+                  <header className="flex items-baseline justify-between mb-3 px-1">
+                    <div className="flex items-center gap-2">
+                      <Sparkles className="h-4 w-4 text-primary/60" />
+                      <h3 className="text-sm font-black uppercase tracking-widest text-foreground">{lang.popularTitle}</h3>
+                    </div>
+                    <p className="text-[11px] text-muted-foreground/60 hidden sm:block">{lang.popularHint}</p>
+                  </header>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2.5">
+                    {popularBrands.map(b => {
+                      const seed = getMulticolorSeed(b.brand, "");
+                      const theme = getMulticolorTheme(seed);
+                      return (
+                        <button
+                          key={b.brand}
+                          onClick={() => setSearchQuery(b.brand)}
+                          className="group relative overflow-hidden flex flex-col items-start justify-between gap-3 p-4 rounded-xl border border-border/40 bg-card/40 hover:border-primary/30 hover:bg-card/80 transition-all text-left min-h-[110px]"
+                        >
+                          <div className={cn("absolute -top-8 -right-8 h-24 w-24 rounded-full opacity-0 group-hover:opacity-30 blur-2xl transition-opacity bg-gradient-to-br", theme.gradient)} />
+                          <div className={cn("w-8 h-1 rounded-full bg-gradient-to-r", theme.gradient)} />
+                          <div className="relative">
+                            <p className={cn("font-black text-lg uppercase tracking-tight text-foreground transition-colors", theme.hoverTitle)}>
+                              {b.brand}
+                            </p>
+                            <p className="text-[10px] text-muted-foreground/60 font-bold uppercase tracking-widest mt-0.5">
+                              {lang.modelCount(b.count)}
+                            </p>
+                          </div>
+                          <ChevronRight className="absolute bottom-3 right-3 h-4 w-4 text-muted-foreground/20 group-hover:text-primary group-hover:translate-x-0.5 transition-all" />
+                        </button>
+                      );
+                    })}
+                  </div>
+                </section>
+              )}
+
+              {/* Browse all — compact list */}
+              <section>
+                <header className="flex items-baseline justify-between mb-3 px-1">
+                  <div className="flex items-center gap-2">
+                    <Cpu className="h-4 w-4 text-muted-foreground/60" />
+                    <h3 className="text-sm font-black uppercase tracking-widest text-foreground">{lang.browseAllTitle}</h3>
+                  </div>
+                  <p className="text-[11px] text-muted-foreground/50 tabular-nums">{filteredData.length}</p>
+                </header>
+                <ul className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-1.5 rounded-2xl border border-border/40 bg-card/20 p-2 max-h-[560px] overflow-y-auto">
+                  {filteredData.map(item => {
+                    const seed = getMulticolorSeed(item.brand, item.series);
+                    const theme = getMulticolorTheme(seed);
+                    return (
+                      <li key={item.id}>
+                        <button
+                          onClick={() => setSelectedItem(item)}
+                          className="group w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-left hover:bg-muted/50 transition-colors"
+                        >
+                          <div className={cn("w-0.5 self-stretch rounded-full shrink-0 bg-gradient-to-b min-h-[28px]", theme.gradient)} />
+                          <div className="flex-1 min-w-0">
+                            <p className={cn("font-black text-[12.5px] text-foreground/90 leading-tight truncate transition-colors", theme.hoverTitle)}>
+                              {item.brand}
+                            </p>
+                            <p className="text-[10.5px] text-muted-foreground/55 font-medium mt-0.5 truncate">
+                              {item.series || lang.allSeries}
+                            </p>
+                          </div>
+                          <ChevronRight className="h-3.5 w-3.5 text-muted-foreground/25 group-hover:text-primary group-hover:translate-x-0.5 transition-all shrink-0" />
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </section>
+            </div>
+          )}
+        </>
+      )}
 
       {/* --- Dialog 1: Add/Edit Single Data Form --- */}
       <Dialog open={isAddEditModalOpen} onOpenChange={setIsAddEditModalOpen}>
