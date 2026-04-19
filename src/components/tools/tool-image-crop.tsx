@@ -157,7 +157,7 @@ export function ToolImageCrop({ dictionary }: ToolImageCropProps) {
           ref={fileInputRef}
           id="image-upload-input"
           type="file"
-          accept="image/*"
+          accept="image/*,.avif"
           className="sr-only"
           onChange={handleFileInput}
         />

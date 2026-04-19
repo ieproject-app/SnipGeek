@@ -114,7 +114,7 @@
       "downloadError": "Gagal membuat WebP. Silakan coba lagi.",
       "downloaded": "Diunduh: {filename} ({size})",
       "dropTitle": "Letakkan gambar di sini",
-      "dropDescription": "atau klik untuk menjelajah - PNG, JPG, dan WebP didukung.",
+      "dropDescription": "atau klik untuk menjelajah - PNG, JPG, WebP, dan AVIF didukung.",
       "pasteHint": "Anda juga bisa Ctrl+V / Cmd+V untuk menempel",
       "outputBadge": "Output: 16:9 .webp",
       "original": "Asli",

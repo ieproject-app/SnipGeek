@@ -114,7 +114,7 @@
       "downloadError": "Failed to generate WebP. Please try again.",
       "downloaded": "Downloaded: {filename} ({size})",
       "dropTitle": "Drop image here",
-      "dropDescription": "or click to browse - PNG, JPG, and WebP supported.",
+      "dropDescription": "or click to browse - PNG, JPG, WebP, and AVIF supported.",
       "pasteHint": "You can also Ctrl+V / Cmd+V to paste",
       "outputBadge": "Output: 16:9 .webp",
       "original": "Original",

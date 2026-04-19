@@ -73,7 +73,9 @@ export function useImageCrop(t: ImageCropTranslations) {
   // ── Load image from file ──
   const loadImage = useCallback(
     (file: File) => {
-      if (!file.type.startsWith("image/")) {
+      const isImageMime = file.type.startsWith("image/");
+      const isAvifByExt = /\.avif$/i.test(file.name);
+      if (!isImageMime && !isAvifByExt) {
         notify(t.invalidImageFile);
         return;
       }
