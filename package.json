@@ -102,7 +102,7 @@
     "postcss": "^8.5.8",
     "tailwindcss": "^4.2.1",
     "tsx": "^4.19.2",
-    "typescript": "^6.0.2",
+    "typescript": "^6.0.3",
     "vite": "^7.3.2",
     "vitest": "^4.1.4"
   }
