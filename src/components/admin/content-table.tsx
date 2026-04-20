@@ -59,6 +59,13 @@ function typeIcon(type: InventoryItem["type"]) {
 const GSC_PROPERTY_ID = "sc-domain:snipgeek.com";
 const GSC_PROPERTY_BASE = "https://search.google.com/u/0/search-console";
 
+const ADMIN_FILTER_SELECT_TRIGGER_CLASSNAME =
+  "bg-background text-foreground hover:border-foreground/30 focus:border-accent";
+const ADMIN_SELECT_CONTENT_CLASSNAME =
+  "border-border bg-popover text-popover-foreground shadow-2xl";
+const ADMIN_SELECT_ITEM_CLASSNAME =
+  "text-popover-foreground data-[state=checked]:bg-accent/10 data-[state=checked]:text-foreground data-[highlighted]:bg-accent/18 data-[highlighted]:text-foreground dark:data-[state=checked]:bg-accent/16 dark:data-[highlighted]:bg-accent/24";
+
 function gscPropertyUrl(property = GSC_PROPERTY_ID) {
   const params = new URLSearchParams({ resource_id: property });
   return `${GSC_PROPERTY_BASE}?${params.toString()}`;
@@ -571,36 +578,51 @@ export function ContentTable() {
           <div className="flex items-center gap-2">
             <Filter className="h-4 w-4 text-muted-foreground" />
             <Select value={filterType} onValueChange={setFilterType}>
-              <SelectTrigger className="w-[140px] font-mono text-[10px] font-bold uppercase tracking-widest">
+              <SelectTrigger
+                className={cn(
+                  "w-[140px] font-mono text-[10px] font-bold uppercase tracking-widest",
+                  ADMIN_FILTER_SELECT_TRIGGER_CLASSNAME,
+                )}
+              >
                 <SelectValue placeholder="Type" />
               </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Semua tipe</SelectItem>
-                <SelectItem value="blog">Blog</SelectItem>
-                <SelectItem value="note">Notes</SelectItem>
-                <SelectItem value="tool">Tools</SelectItem>
+              <SelectContent className={ADMIN_SELECT_CONTENT_CLASSNAME}>
+                <SelectItem className={ADMIN_SELECT_ITEM_CLASSNAME} value="all">Semua tipe</SelectItem>
+                <SelectItem className={ADMIN_SELECT_ITEM_CLASSNAME} value="blog">Blog</SelectItem>
+                <SelectItem className={ADMIN_SELECT_ITEM_CLASSNAME} value="note">Notes</SelectItem>
+                <SelectItem className={ADMIN_SELECT_ITEM_CLASSNAME} value="tool">Tools</SelectItem>
               </SelectContent>
             </Select>
             <Select value={filterLocale} onValueChange={setFilterLocale}>
-              <SelectTrigger className="w-[110px] font-mono text-[10px] font-bold uppercase tracking-widest">
+              <SelectTrigger
+                className={cn(
+                  "w-[110px] font-mono text-[10px] font-bold uppercase tracking-widest",
+                  ADMIN_FILTER_SELECT_TRIGGER_CLASSNAME,
+                )}
+              >
                 <SelectValue placeholder="Locale" />
               </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Locales</SelectItem>
-                <SelectItem value="en">EN</SelectItem>
-                <SelectItem value="id">ID</SelectItem>
+              <SelectContent className={ADMIN_SELECT_CONTENT_CLASSNAME}>
+                <SelectItem className={ADMIN_SELECT_ITEM_CLASSNAME} value="all">All Locales</SelectItem>
+                <SelectItem className={ADMIN_SELECT_ITEM_CLASSNAME} value="en">EN</SelectItem>
+                <SelectItem className={ADMIN_SELECT_ITEM_CLASSNAME} value="id">ID</SelectItem>
               </SelectContent>
             </Select>
           </div>
           <div className="flex flex-wrap items-center gap-2">
             <Select value={batchSize} onValueChange={setBatchSize}>
-              <SelectTrigger className="w-[120px] font-mono text-[10px] font-bold uppercase tracking-widest">
+              <SelectTrigger
+                className={cn(
+                  "w-[120px] font-mono text-[10px] font-bold uppercase tracking-widest",
+                  ADMIN_FILTER_SELECT_TRIGGER_CLASSNAME,
+                )}
+              >
                 <SelectValue placeholder="Batch size" />
               </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="5">Batch 5</SelectItem>
-                <SelectItem value="10">Batch 10</SelectItem>
-                <SelectItem value="20">Batch 20</SelectItem>
+              <SelectContent className={ADMIN_SELECT_CONTENT_CLASSNAME}>
+                <SelectItem className={ADMIN_SELECT_ITEM_CLASSNAME} value="5">Batch 5</SelectItem>
+                <SelectItem className={ADMIN_SELECT_ITEM_CLASSNAME} value="10">Batch 10</SelectItem>
+                <SelectItem className={ADMIN_SELECT_ITEM_CLASSNAME} value="20">Batch 20</SelectItem>
               </SelectContent>
             </Select>
             <Button
@@ -798,9 +820,10 @@ export function ContentTable() {
                       <SelectValue />
                     </span>
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className={ADMIN_SELECT_CONTENT_CLASSNAME}>
                     {STATUS_OPTIONS.map((s) => (
                       <SelectItem
+                        className={ADMIN_SELECT_ITEM_CLASSNAME}
                         key={s.value}
                         value={s.value}
                         disabled={
