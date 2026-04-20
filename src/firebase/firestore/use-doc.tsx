@@ -1,6 +1,6 @@
 'use client';
     
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useLayoutEffect } from 'react';
 import {
   DocumentReference,
   onSnapshot,
@@ -44,13 +44,26 @@ export function useDoc<T = unknown>(
   type StateDataType = WithId<T> | null;
 
   const [data, setData] = useState<StateDataType>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(Boolean(memoizedDocRef));
   const [error, setError] = useState<FirestoreError | Error | null>(null);
+
+  useLayoutEffect(() => {
+    if (!memoizedDocRef) {
+      setIsLoading(false);
+      return;
+    }
+
+    setIsLoading(true);
+  }, [memoizedDocRef]);
 
   useEffect(() => {
     if (!memoizedDocRef) {
       return;
     }
+
+    setIsLoading(true);
+    setError(null);
+    setData(null);
 
     const unsubscribe = onSnapshot(
       memoizedDocRef,

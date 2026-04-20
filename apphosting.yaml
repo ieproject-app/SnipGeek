@@ -39,6 +39,16 @@ env:
     availability:
       - RUNTIME
 
+  - variable: GSC_SERVICE_ACCOUNT_JSON
+    secret: GSC_SERVICE_ACCOUNT_JSON
+    availability:
+      - RUNTIME
+
+  - variable: GSC_SITE_URL
+    value: "https://snipgeek.com/"
+    availability:
+      - RUNTIME
+
   - variable: NEXT_PUBLIC_GISCUS_REPO_ID
     value: "R_kgDORdCsvw"
     availability:

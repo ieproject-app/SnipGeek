@@ -80,7 +80,7 @@ export async function generateMetadata({
   const dictionary = await getDictionary(locale);
   const homepageTitle =
     dictionary.home.title ||
-    "SnipGeek - Windows dan Ubuntu: Tutorial, Troubleshooting, dan Update Penting";
+    "SnipGeek - Windows and Ubuntu Tutorials, Troubleshooting, and Important Updates";
   const homepageDescription =
     dictionary.home.description ||
     "Windows and Ubuntu tutorials, troubleshooting guides, and important updates for daily users.";

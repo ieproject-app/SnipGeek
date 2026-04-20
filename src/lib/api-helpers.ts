@@ -55,12 +55,22 @@ export async function verifyAdminFromRequest(
         const adminSnap = await adminDb.collection('roles_admin').doc(decoded.uid).get();
         const isAdmin = adminSnap.exists && adminSnap.data()?.role === 'admin';
 
+        if (!isAdmin) {
+            console.warn('[verifyAdmin] not admin', {
+                uid: decoded.uid,
+                email: decoded.email,
+                docExists: adminSnap.exists,
+                docRole: adminSnap.data()?.role,
+            });
+        }
+
         return {
             isAdmin,
             uid: decoded.uid,
             email: decoded.email || decoded.uid,
         };
-    } catch {
+    } catch (error) {
+        console.warn('[verifyAdmin] token verification failed:', error instanceof Error ? error.message : error);
         return { isAdmin: false };
     }
 }

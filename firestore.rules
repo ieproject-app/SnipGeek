@@ -78,6 +78,13 @@ service cloud.firestore {
       allow read: if isAdmin();
     }
 
+    // Index Monitor — admin-only dashboard tracking GSC indexing status.
+    // Document id = SHA-1 hash of the URL, payload includes { url, type,
+    // locale, status, notes, lastCheckedAt, lastGSCResult, updatedAt }.
+    match /indexStatus/{urlHash} {
+      allow read, write: if isAdmin();
+    }
+
     // Default deny
     match /{path=**} {
       allow read, write: if false;

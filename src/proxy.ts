@@ -5,10 +5,12 @@ export function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
   const preferredLocale = request.cookies.get("NEXT_LOCALE")?.value;
 
-  // Skip middleware for API routes, Next.js internal files, and static files
+  // Skip middleware for API routes, Next.js internal files, static files,
+  // and the internal /admin dashboard (which is intentionally not localized).
   if (
     pathname.startsWith("/api") ||
     pathname.startsWith("/_next") ||
+    pathname.startsWith("/admin") ||
     pathname.includes(".")
   ) {
     return NextResponse.next();

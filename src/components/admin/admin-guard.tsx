@@ -28,7 +28,20 @@ export function AdminGuard({ children }: AdminGuardProps) {
   }, [firestore, user?.uid]);
 
   // Subscribe to the admin document
-  const { data: adminDoc, isLoading: isAdminLoading } = useDoc(adminDocRef);
+  const { data: adminDoc, isLoading: isAdminLoading, error: adminError } = useDoc(adminDocRef);
+
+  // eslint-disable-next-line no-console
+  useEffect(() => {
+    console.log('[AdminGuard STATE]', {
+      uid: user?.uid,
+      email: user?.email,
+      isUserLoading,
+      isAdminLoading,
+      adminDocExists: !!adminDoc,
+      adminDocData: adminDoc,
+      adminError: adminError?.message,
+    });
+  }, [user, isUserLoading, isAdminLoading, adminDoc, adminError]);
 
   useEffect(() => {
     // If auth is finished and no user, redirect to login
@@ -54,6 +67,12 @@ export function AdminGuard({ children }: AdminGuardProps) {
 
   // 3. If admin doc doesn't exist, access is denied
   if (!adminDoc) {
+    // eslint-disable-next-line no-console
+    console.log('[AdminGuard DEBUG]', {
+      uid: user.uid,
+      email: user.email,
+      expectedFirestorePath: `roles_admin/${user.uid}`,
+    });
     return (
       <div className="flex h-screen w-full flex-col items-center justify-center p-6 text-center bg-background">
         <div className="mb-6 p-4 bg-destructive/10 rounded-full">

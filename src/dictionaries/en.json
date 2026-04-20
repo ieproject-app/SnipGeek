@@ -14,12 +14,12 @@
     "viewProfile": "View My Profile"
   },
   "home": {
-    "title": "SnipGeek - Windows dan Ubuntu: Tutorial, Troubleshooting, dan Update Penting",
+    "title": "SnipGeek - Windows and Ubuntu Tutorials, Troubleshooting, and Important Updates",
     "description": "Windows and Ubuntu tutorials, troubleshooting guides, and important updates for daily users.",
     "featuredPosts": "Featured Posts",
     "latestPosts": "Latest Posts",
     "viewAllPosts": "View All Posts",
-    "specialTagSectionTitle": "Postingan",
+    "specialTagSectionTitle": "Posts",
     "breadcrumbHome": "Home",
     "sliderAndShadow": {
       "title": "Looking for tutorials?",
@@ -284,7 +284,7 @@
     "resultsFound": "results found"
   },
   "localeSuggestion": {
-    "title": "Prefer reading in Bahasa Indonesia?",
+    "title": "Prefer reading in Indonesian?",
     "description": "We detected your browser prefers Indonesian. Switch to the Indonesian version for localized content and navigation.",
     "switch": "Switch to Indonesian",
     "stay": "Stay in English",
@@ -338,7 +338,7 @@
     "contentTypeSeries": "Series",
     "contentTypeNews": "News/Update",
     "contentTypeTips": "Tips & Tricks",
-    "contentTypeNotes": "Notes/Catatan",
+    "contentTypeNotes": "Notes",
     "seriesPhaseLabel": "Series Phase",
     "seriesArticleLabel": "Series Article",
     "seriesTargetLabel": "Target Reader",

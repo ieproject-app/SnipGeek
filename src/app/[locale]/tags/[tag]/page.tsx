@@ -8,35 +8,60 @@ import { shouldIndexTag, getAllTags } from "@/lib/tags";
 import { getLinkPrefix } from "@/lib/utils";
 import { notFound } from "next/navigation";
 
+async function getTagAlternates(tag: string) {
+  const normalizedTag = decodeURIComponent(tag).trim().toLowerCase();
+  const localizedEntries = await Promise.all(
+    i18n.locales.map(async (locale) => {
+      const tags = await getAllTags(locale);
+      const exists = tags.some((entry) => entry.name === normalizedTag);
+      if (!exists) {
+        return null;
+      }
+
+      const prefix = locale === i18n.defaultLocale ? "" : `/${locale}`;
+      return [locale, `${prefix}/tags/${encodeURIComponent(normalizedTag)}`] as const;
+    }),
+  );
+
+  const languages: Record<string, string> = {};
+
+  localizedEntries.forEach((entry) => {
+    if (!entry) {
+      return;
+    }
+
+    languages[entry[0]] = entry[1];
+  });
+
+  return languages;
+}
+
 export async function generateMetadata({
   params,
 }: {
   params: Promise<{ locale: string; tag: string }>;
 }): Promise<Metadata> {
   const { locale, tag } = await params;
-  const decodedTag = decodeURIComponent(tag).toUpperCase();
+  const normalizedTag = decodeURIComponent(tag).trim().toLowerCase();
+  const encodedTag = encodeURIComponent(normalizedTag);
+  const decodedTag = normalizedTag.toUpperCase();
   const dictionary = await getDictionary(locale as Locale);
   const canonicalPath =
-    locale === i18n.defaultLocale ? `/tags/${tag}` : `/${locale}/tags/${tag}`;
-
-  const languages: Record<string, string> = {};
-  i18n.locales.forEach((loc) => {
-    const prefix = loc === i18n.defaultLocale ? "" : `/${loc}`;
-    languages[loc] = `${prefix}/tags/${tag}`;
-  });
+    locale === i18n.defaultLocale ? `/tags/${encodedTag}` : `/${locale}/tags/${encodedTag}`;
+  const languages = await getTagAlternates(tag);
 
   const allPosts = await getSortedPostsData(locale);
   const postsCount = allPosts.filter((p) =>
-    p.frontmatter.tags?.some((t) => t.trim().toLowerCase() === decodedTag.toLowerCase()),
+    p.frontmatter.tags?.some((t) => t.trim().toLowerCase() === normalizedTag),
   ).length;
 
   const notes = await getRawNotes(locale);
   const notesCount = notes.filter((n) =>
-    n.frontmatter.tags?.some((t) => t.trim().toLowerCase() === decodedTag.toLowerCase()),
+    n.frontmatter.tags?.some((t) => t.trim().toLowerCase() === normalizedTag),
   ).length;
 
   const totalItems = postsCount + notesCount;
-  const shouldIndex = shouldIndexTag(decodedTag, totalItems);
+  const shouldIndex = shouldIndexTag(normalizedTag, totalItems);
 
   return {
     title: dictionary.tags.title.replace("{tag}", decodedTag),
@@ -56,10 +81,14 @@ export async function generateMetadata({
 }
 
 export async function generateStaticParams() {
-  const tags = await getAllTags(i18n.defaultLocale);
-  return i18n.locales.flatMap((locale) =>
-    tags.map((tag) => ({ locale, tag: tag.name })),
+  const localizedTags = await Promise.all(
+    i18n.locales.map(async (locale) => {
+      const tags = await getAllTags(locale);
+      return tags.map((tag) => ({ locale, tag: tag.name }));
+    }),
   );
+
+  return localizedTags.flat();
 }
 
 export default async function TagPage({
@@ -87,7 +116,7 @@ export default async function TagPage({
   }
 
   const linkPrefix = getLinkPrefix(locale);
-  const canonicalUrl = `https://snipgeek.com${linkPrefix}/tags/${tag}`;
+  const canonicalUrl = `https://snipgeek.com${linkPrefix}/tags/${encodeURIComponent(decodedTag)}`;
   const displayTag = decodedTag.toUpperCase();
 
   return (
