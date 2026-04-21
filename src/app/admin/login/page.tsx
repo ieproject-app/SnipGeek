@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth, useUser } from "@/firebase";
 import { initiateGoogleSignIn } from "@/firebase/non-blocking-login";
@@ -21,16 +21,60 @@ export default function AdminLoginPage() {
   const auth = useAuth();
   const router = useRouter();
 
+  // Detect if we just returned from a mobile redirect flow.
+  // When signInWithRedirect fires, we set 'sg_pending_google_redirect' in sessionStorage.
+  // On return, provider.tsx calls finalizeGoogleRedirectSignIn which clears it.
+  // We read it here to show a dedicated "completing login" spinner instead of
+  // flashing the login form, which caused a confusing re-login prompt on mobile.
+  const [isRedirectPending, setIsRedirectPending] = useState(false);
+
+  useEffect(() => {
+    try {
+      const pending = sessionStorage.getItem("sg_pending_google_redirect") === "1";
+      setIsRedirectPending(pending);
+    } catch {
+      // sessionStorage unavailable (e.g. private browsing on some browsers)
+    }
+  }, []);
+
   useEffect(() => {
     if (user) {
       router.push("/admin");
     }
   }, [user, router]);
 
+  // Phase 1: Firebase is initialising (checking persisted auth state)
   if (isUserLoading) {
     return (
       <div className="flex min-h-screen w-full items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-accent" />
+      </div>
+    );
+  }
+
+  // Phase 2: We came back from Google redirect — wait for onAuthStateChanged
+  // This prevents the "login button flash" / double-prompt on mobile.
+  if (isRedirectPending) {
+    return (
+      <div className="flex min-h-screen w-full flex-col items-center justify-center gap-4 px-4 bg-muted/30">
+        <Loader2 className="h-10 w-10 animate-spin text-accent" />
+        <p className="font-mono text-[11px] font-bold uppercase tracking-[0.3em] text-muted-foreground animate-pulse">
+          Menyelesaikan login&hellip;
+        </p>
+        <p className="text-xs text-muted-foreground/60 text-center max-w-xs">
+          Jika proses ini terlalu lama, muat ulang halaman atau coba lagi.
+        </p>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="mt-2 text-xs text-muted-foreground"
+          onClick={() => {
+            try { sessionStorage.removeItem("sg_pending_google_redirect"); } catch {}
+            setIsRedirectPending(false);
+          }}
+        >
+          Batal &amp; kembali ke login
+        </Button>
       </div>
     );
   }

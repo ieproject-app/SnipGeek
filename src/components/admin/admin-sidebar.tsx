@@ -19,8 +19,8 @@ export function AdminSidebar() {
   const auth = getAuth();
 
   const menuItems = [
-    { name: 'Overview', href: '/admin', exact: true, icon: LayoutDashboard },
-    { name: 'Index Monitor', href: '/admin/content', icon: ListChecks },
+    { name: 'Dashboard', href: '/admin', exact: true, icon: LayoutDashboard },
+    { name: 'Index Monitor', href: '/admin/index-monitor', icon: ListChecks },
   ];
 
   const handleLogout = async () => {

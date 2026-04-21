@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useCallback } from "react";
 import {
   Loader2,
   ExternalLink,
@@ -12,6 +12,9 @@ import {
   CheckCircle2,
   Save,
   Filter,
+  Copy,
+  Clock,
+  ShieldCheck,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -58,6 +61,31 @@ function typeIcon(type: InventoryItem["type"]) {
 
 const GSC_PROPERTY_ID = "sc-domain:snipgeek.com";
 const GSC_PROPERTY_BASE = "https://search.google.com/u/0/search-console";
+
+/** Minimum gap (ms) before allowing a re-refresh — 24 hours */
+const REFRESH_COOLDOWN_MS = 24 * 60 * 60 * 1000;
+
+/** Returns true if the last checked timestamp is within REFRESH_COOLDOWN_MS */
+function isFreshlyChecked(lastCheckedAt?: string): boolean {
+  if (!lastCheckedAt) return false;
+  const t = new Date(lastCheckedAt).getTime();
+  if (Number.isNaN(t)) return false;
+  return Date.now() - t < REFRESH_COOLDOWN_MS;
+}
+
+/** Returns a short human-relative label like "2 h ago" */
+function relativeTimeLabel(value?: string): string {
+  if (!value) return "Never";
+  const diff = Date.now() - new Date(value).getTime();
+  if (Number.isNaN(diff)) return "?";
+  const mins = Math.floor(diff / 60_000);
+  if (mins < 1) return "Just now";
+  if (mins < 60) return `${mins}m ago`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs}h ago`;
+  const days = Math.floor(hrs / 24);
+  return `${days}d ago`;
+}
 
 const ADMIN_FILTER_SELECT_TRIGGER_CLASSNAME =
   "bg-background text-foreground hover:border-foreground/30 focus:border-accent";
@@ -209,6 +237,7 @@ type BatchRefreshState = {
 
 type RefreshGscOptions = {
   silent?: boolean;
+  force?: boolean;
 };
 
 export function ContentTable() {
@@ -219,6 +248,8 @@ export function ContentTable() {
   const [filterType, setFilterType] = useState<string>("all");
   const [filterStatus, setFilterStatus] = useState<string>("all");
   const [filterLocale, setFilterLocale] = useState<string>("all");
+  // visibility: "all" = show everything, "public" = only indexable, "hidden" = only draft/gated/unpaired
+  const [filterVisibility, setFilterVisibility] = useState<"all" | "public" | "hidden">("all");
   const [search, setSearch] = useState("");
   const [rowState, setRowState] = useState<Record<string, RowState>>({});
   const [batchSize, setBatchSize] = useState<string>("10");
@@ -276,6 +307,11 @@ export function ContentTable() {
     const locale = sp.get("locale");
     if (locale && ["en", "id"].includes(locale)) setFilterLocale(locale);
 
+    const visibility = sp.get("visibility");
+    if (visibility && ["all", "public", "hidden"].includes(visibility)) {
+      setFilterVisibility(visibility as "all" | "public" | "hidden");
+    }
+
     const q = sp.get("q");
     if (q) setSearch(q);
   }, []);
@@ -284,6 +320,15 @@ export function ContentTable() {
     if (!inventory) return [];
     const q = search.trim().toLowerCase();
     return inventory.filter((item) => {
+      // visibility filter: mirrors dashboard's isNonIndexable logic exactly
+      const isHidden = Boolean(
+        item.draft ||
+        item.requiresAuth ||
+        (item.type === "blog" && item.hasLocalePair === false),
+      );
+      if (filterVisibility === "hidden" && !isHidden) return false;
+      if (filterVisibility === "public" && isHidden) return false;
+
       if (filterType !== "all" && item.type !== filterType) return false;
       if (filterLocale !== "all" && item.locale !== filterLocale) return false;
       const row = rowState[item.id];
@@ -296,7 +341,7 @@ export function ContentTable() {
       }
       return true;
     });
-  }, [inventory, filterType, filterLocale, filterStatus, gscQuickFilter, search, rowState]);
+  }, [inventory, filterType, filterLocale, filterStatus, filterVisibility, gscQuickFilter, search, rowState]);
 
   const statusCounts = useMemo(() => {
     if (!inventory) return null;
@@ -316,6 +361,8 @@ export function ContentTable() {
         const status = rowState[item.id]?.status ?? "unknown";
         return status === "unknown" || status === "not_submitted" || status === "submitted";
       })
+      // Priority batch skips items that were refreshed within 24 hours
+      .filter((item) => !isFreshlyChecked(rowState[item.id]?.lastCheckedAt))
       .sort((a, b) => {
         const score = (item: InventoryItem) => {
           const status = rowState[item.id]?.status ?? "unknown";
@@ -377,6 +424,31 @@ export function ContentTable() {
     }
   };
 
+  const copyUrl = useCallback(async (url: string) => {
+    try {
+      await navigator.clipboard.writeText(url);
+      toast({ title: "URL copied", description: url });
+    } catch {
+      toast({ title: "Copy gagal", description: "Tidak bisa akses clipboard.", variant: "destructive" });
+    }
+  }, [toast]);
+
+  const openGscAndCopy = useCallback(async (url: string) => {
+    // Open the GSC property page (Google's inspect deep-link is not stable / 404s).
+    // We copy the article URL so the user can immediately paste it into GSC's URL search box.
+    const propertyUrl = `${GSC_PROPERTY_BASE}?${new URLSearchParams({ resource_id: GSC_PROPERTY_ID }).toString()}`;
+    window.open(propertyUrl, "_blank", "noreferrer");
+    try {
+      await navigator.clipboard.writeText(url);
+      toast({
+        title: "GSC dibuka · URL disalin",
+        description: "Paste URL di kolom pencarian URL Inspection GSC.",
+      });
+    } catch {
+      toast({ title: "GSC dibuka", description: "Copy URL secara manual dari baris ini." });
+    }
+  }, [toast]);
+
   const refreshGsc = async (item: InventoryItem, options: RefreshGscOptions = {}) => {
     if (item.type === "blog" && item.hasLocalePair === false) {
       if (!options.silent) {
@@ -386,6 +458,17 @@ export function ContentTable() {
           variant: "destructive",
         });
       }
+      return false;
+    }
+
+    // Cooldown check: skip if refreshed within 24 hours (unless forced)
+    const existingRow = rowState[item.id];
+    if (!options.silent && !options.force && isFreshlyChecked(existingRow?.lastCheckedAt)) {
+      const when = relativeTimeLabel(existingRow?.lastCheckedAt);
+      toast({
+        title: "Refresh terlalu cepat",
+        description: `URL ini baru saja di-refresh ${when}. Tunggu 24 jam sebelum refresh ulang.`,
+      });
       return false;
     }
 
@@ -516,7 +599,7 @@ export function ContentTable() {
   return (
     <div className="min-h-screen">
       {/* Hero header */}
-      <header className="border-b-2 border-foreground/90 bg-background px-8 pt-10 pb-8 md:px-12">
+      <header className="border-b-2 border-foreground/90 bg-background px-4 pt-8 pb-6 md:px-8 md:pt-10 md:pb-8 lg:px-12">
         <p className="font-mono text-[10px] font-bold uppercase tracking-[0.3em] text-accent">
           — Index Monitor / Inventory
         </p>
@@ -564,7 +647,7 @@ export function ContentTable() {
       </header>
 
       {/* Controls */}
-      <div className="sticky top-0 z-10 border-b bg-background/95 backdrop-blur-sm px-8 py-4 md:px-12">
+      <div className="sticky top-0 z-10 border-b bg-background/95 backdrop-blur-sm px-4 py-3 md:px-8 md:py-4 lg:px-12">
         <div className="flex flex-wrap items-center gap-3">
           <div className="relative min-w-[260px] flex-1">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -625,34 +708,42 @@ export function ContentTable() {
                 <SelectItem className={ADMIN_SELECT_ITEM_CLASSNAME} value="20">Batch 20</SelectItem>
               </SelectContent>
             </Select>
-            <Button
-              size="sm"
-              variant="outline"
-              disabled={batchRefresh.running}
-              className="gap-2 font-mono text-[10px] font-bold uppercase tracking-widest"
-              onClick={() => runBatchRefresh(filtered, `Refresh visible ${Math.min(filtered.length, Number(batchSize))}`)}
-            >
-              {batchRefresh.running && batchRefresh.label.startsWith("Refresh visible") ? (
-                <Loader2 className="h-3.5 w-3.5 animate-spin" />
-              ) : (
-                <RefreshCw className="h-3.5 w-3.5" />
-              )}
-              Visible ({Math.min(filtered.length, Number(batchSize))})
-            </Button>
-            <Button
-              size="sm"
-              variant="outline"
-              disabled={batchRefresh.running}
-              className="gap-2 font-mono text-[10px] font-bold uppercase tracking-widest"
-              onClick={() => runBatchRefresh(priorityCandidates, `Refresh priority ${Math.min(priorityCandidates.length, Number(batchSize))}`)}
-            >
-              {batchRefresh.running && batchRefresh.label.startsWith("Refresh priority") ? (
-                <Loader2 className="h-3.5 w-3.5 animate-spin" />
-              ) : (
-                <RefreshCw className="h-3.5 w-3.5" />
-              )}
-              Priority ({Math.min(priorityCandidates.length, Number(batchSize))})
-            </Button>
+            <div className="flex flex-col items-start gap-0.5">
+              <Button
+                size="sm"
+                variant="outline"
+                disabled={batchRefresh.running}
+                className="gap-2 font-mono text-[10px] font-bold uppercase tracking-widest"
+                title="Refresh semua URL yang tampil di layar sekarang (termasuk yang sudah baru di-refresh)"
+                onClick={() => runBatchRefresh(filtered, `Refresh visible ${Math.min(filtered.length, Number(batchSize))}`)}
+              >
+                {batchRefresh.running && batchRefresh.label.startsWith("Refresh visible") ? (
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                ) : (
+                  <RefreshCw className="h-3.5 w-3.5" />
+                )}
+                Visible ({Math.min(filtered.length, Number(batchSize))})
+              </Button>
+              <span className="pl-1 font-mono text-[9px] text-muted-foreground/60">Refresh semua yg terlihat</span>
+            </div>
+            <div className="flex flex-col items-start gap-0.5">
+              <Button
+                size="sm"
+                variant="outline"
+                disabled={batchRefresh.running}
+                className="gap-2 font-mono text-[10px] font-bold uppercase tracking-widest border-accent/30 text-accent hover:border-accent hover:text-accent"
+                title="Refresh URL yang belum indexed/submitted dan belum pernah di-refresh dalam 24 jam"
+                onClick={() => runBatchRefresh(priorityCandidates, `Refresh priority ${Math.min(priorityCandidates.length, Number(batchSize))}`)}
+              >
+                {batchRefresh.running && batchRefresh.label.startsWith("Refresh priority") ? (
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                ) : (
+                  <ShieldCheck className="h-3.5 w-3.5" />
+                )}
+                Priority ({Math.min(priorityCandidates.length, Number(batchSize))})
+              </Button>
+              <span className="pl-1 font-mono text-[9px] text-muted-foreground/60">Hanya yg belum indexed &amp; &gt;24 jam</span>
+            </div>
           </div>
           <div className="ml-auto font-mono text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
             {batchRefresh.running
@@ -674,6 +765,7 @@ export function ContentTable() {
           </button>
           <button
             onClick={() => setGscQuickFilter("needs_review")}
+            title="URL yang butuh review manual di GSC (verdict: Fail atau status Excluded)"
             className={cn(
               "rounded-full border px-3 py-1.5 font-mono text-[10px] font-bold uppercase tracking-widest transition",
               gscQuickFilter === "needs_review"
@@ -682,6 +774,7 @@ export function ContentTable() {
             )}
           >
             Needs review
+            <span className="ml-1 opacity-60 font-normal normal-case tracking-normal">(verdict fail)</span>
           </button>
           <button
             onClick={() => setGscQuickFilter("unknown_google")}
@@ -709,8 +802,8 @@ export function ContentTable() {
       </div>
 
       {/* Row list — card-style, not a classic table */}
-      <div className="divide-y px-8 md:px-12">
-        {filtered.map((item) => {
+      <div className="divide-y px-4 md:px-8 lg:px-12">
+        {filtered.map((item, idx) => {
           const row = rowState[item.id] ?? { status: "unknown" as IndexStatusValue, notes: "", dirty: false };
           const opt = statusOpt(row.status);
           const gscSummary = summarizeForHumans(row.lastGSCResult);
@@ -718,11 +811,20 @@ export function ContentTable() {
           const missingPairsLabel = item.missingPairLocales?.join(", ") || "locale";
           const statusLocked =
             isUnpairedBlog && (row.status === "submitted" || row.status === "indexed");
+          const fresh = isFreshlyChecked(row.lastCheckedAt);
           return (
             <div
               key={item.id}
-              className="group grid grid-cols-1 items-start gap-4 py-4 md:grid-cols-[minmax(0,1fr)_200px_200px_auto]"
+              style={{ animationDelay: `${idx * 30}ms` }}
+              className="group grid animate-[fadeSlideIn_0.25s_ease_both] grid-cols-1 items-start gap-4 py-4 md:grid-cols-[minmax(0,1fr)_200px_200px_auto]"
             >
+              {fresh && (
+                <div className="col-span-full flex items-center justify-end -mb-2">
+                  <span className="flex items-center gap-1 rounded-full border border-emerald-500/20 bg-emerald-500/5 px-2 py-0.5 font-mono text-[9px] font-bold uppercase tracking-widest text-emerald-700/70 dark:text-emerald-400/70">
+                    <ShieldCheck className="h-2 w-2" /> Sudah di-refresh, skip saat Priority batch
+                  </span>
+                </div>
+              )}
               {/* URL + meta */}
               <div className="min-w-0">
                 <div className="flex items-center gap-2">
@@ -765,9 +867,19 @@ export function ContentTable() {
                   )}
                 </div>
                 <div className="mt-2 space-y-1">
-                  <p className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-muted-foreground">
-                    Last check · {formatLastCheckedAt(row.lastCheckedAt)}
-                  </p>
+                  <div className="flex items-center gap-1.5">
+                    {isFreshlyChecked(row.lastCheckedAt) ? (
+                      <span className="flex items-center gap-1 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 font-mono text-[9px] font-bold uppercase tracking-widest text-emerald-700 dark:text-emerald-400">
+                        <ShieldCheck className="h-2.5 w-2.5" />
+                        Fresh · {relativeTimeLabel(row.lastCheckedAt)}
+                      </span>
+                    ) : (
+                      <span className="flex items-center gap-1 font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-muted-foreground">
+                        <Clock className="h-2.5 w-2.5" />
+                        {row.lastCheckedAt ? relativeTimeLabel(row.lastCheckedAt) : "Never checked"}
+                      </span>
+                    )}
+                  </div>
                   {isUnpairedBlog ? (
                     <p className="text-xs text-destructive">
                       Push ke Google ditahan sampai file pasangan locale tersedia.
@@ -856,12 +968,19 @@ export function ContentTable() {
                   size="sm"
                   variant="ghost"
                   className="h-9 w-9 p-0 hover:bg-accent/10 hover:text-accent"
-                  asChild
-                  title="Buka property Google Search Console"
+                  title="Copy URL artikel"
+                  onClick={() => copyUrl(item.url)}
                 >
-                  <a href={gscPropertyUrl()} target="_blank" rel="noreferrer">
-                    <ExternalLink className="h-3.5 w-3.5" />
-                  </a>
+                  <Copy className="h-3.5 w-3.5" />
+                </Button>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="h-9 w-9 p-0 hover:bg-accent/10 hover:text-accent"
+                  title="Buka GSC Inspect URL + copy URL ke clipboard"
+                  onClick={() => openGscAndCopy(item.url)}
+                >
+                  <ExternalLink className="h-3.5 w-3.5" />
                 </Button>
                 <Button
                   size="sm"

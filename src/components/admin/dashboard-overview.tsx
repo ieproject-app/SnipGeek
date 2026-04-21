@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useCallback } from "react";
 import Link from "next/link";
 import {
   Loader2,
@@ -13,6 +13,7 @@ import {
   TrendingUp,
   TrendingDown,
   Minus,
+  Copy,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -166,6 +167,7 @@ function buildMonitorHref(params: {
   locale?: string;
   q?: string;
   gsc?: GscQuickFilter;
+  visibility?: "public" | "hidden";
 }) {
   const searchParams = new URLSearchParams();
 
@@ -174,12 +176,14 @@ function buildMonitorHref(params: {
   if (params.locale) searchParams.set("locale", params.locale);
   if (params.q) searchParams.set("q", params.q);
   if (params.gsc) searchParams.set("gsc", params.gsc);
+  if (params.visibility) searchParams.set("visibility", params.visibility);
 
   const query = searchParams.toString();
-  return query ? `/admin/content?${query}` : "/admin/content";
+  return query ? `/admin/index-monitor?${query}` : "/admin/index-monitor";
 }
 
-function gscInspectUrl(property = "sc-domain:snipgeek.com") {
+/** Opens the GSC property page (reliable, no deep-link 404) */
+function gscPropertyUrl(property = "sc-domain:snipgeek.com") {
   const params = new URLSearchParams({ resource_id: property });
   return `https://search.google.com/u/0/search-console?${params.toString()}`;
 }
@@ -417,6 +421,30 @@ export function DashboardOverview() {
     });
   };
 
+  const copyAndOpenGsc = useCallback(async (pageUrl: string) => {
+    // Open the GSC property page (Google's inspect deep-link is not stable / 404s).
+    // We copy the article URL so the user can immediately paste it into GSC's URL search box.
+    window.open(gscPropertyUrl(), "_blank", "noreferrer");
+    try {
+      await navigator.clipboard.writeText(pageUrl);
+      toast({
+        title: "GSC dibuka · URL disalin",
+        description: "Paste URL di kolom pencarian URL Inspection GSC.",
+      });
+    } catch {
+      toast({ title: "GSC dibuka", description: "Copy URL secara manual dari baris ini." });
+    }
+  }, [toast]);
+
+  const copyUrl = useCallback(async (url: string) => {
+    try {
+      await navigator.clipboard.writeText(url);
+      toast({ title: "URL copied", description: url });
+    } catch {
+      toast({ title: "Copy gagal", variant: "destructive" });
+    }
+  }, [toast]);
+
   if (loading) {
     return (
       <div className="flex min-h-[70vh] items-center justify-center">
@@ -516,8 +544,8 @@ export function DashboardOverview() {
               <Link href={buildMonitorHref({ status: "indexed" })}>
                 <StatBlock label="Indexed" value={actionableSummary.indexed} sub="Sudah aman" accent="emerald" />
               </Link>
-              <Link href={buildMonitorHref({ status: "excluded" })}>
-                <StatBlock label="Draft / gated" value={actionableSummary.gatedOrDraft} sub="Tidak dikejar" accent="primary" />
+              <Link href={buildMonitorHref({ visibility: "hidden" })}>
+                <StatBlock label="Draft / Gated" value={actionableSummary.gatedOrDraft} sub="Tidak dikejar" accent="primary" />
               </Link>
             </div>
 
@@ -616,14 +644,17 @@ export function DashboardOverview() {
                   <Link href={buildMonitorHref({ status: "indexed", gsc: "indexed_google" })}>
                     <StatBlock label="Ready" value={actionableSummary.indexed} sub="Indexed" accent="emerald" />
                   </Link>
-                  <Link href={buildMonitorHref({ status: "excluded" })}>
+                  <Link href={buildMonitorHref({ visibility: "hidden" })}>
                     <StatBlock label="Skipped" value={actionableSummary.gatedOrDraft} sub="Draft / gated" accent="primary" />
                   </Link>
                 </div>
 
                 <div className="mb-3 flex flex-wrap items-center gap-2 border-b border-dashed pb-3">
                   <Button asChild variant="ghost" size="sm" className="font-mono text-[10px] font-bold uppercase tracking-widest text-destructive hover:text-destructive">
-                    <Link href={buildMonitorHref({ gsc: "needs_review" })}>Needs review</Link>
+                    <Link href={buildMonitorHref({ gsc: "needs_review" })}>
+                      Needs review
+                      <span className="ml-1 opacity-60 font-normal normal-case tracking-normal">(verdict fail)</span>
+                    </Link>
                   </Button>
                   <Button asChild variant="ghost" size="sm" className="font-mono text-[10px] font-bold uppercase tracking-widest text-amber-700 hover:text-amber-700 dark:text-amber-400 dark:hover:text-amber-400">
                     <Link href={buildMonitorHref({ gsc: "unknown_google" })}>Unknown to Google</Link>
@@ -639,10 +670,11 @@ export function DashboardOverview() {
                       Tidak ada URL prioritas saat ini. Semua item publik sudah aman atau sudah indexed.
                     </div>
                   ) : (
-                    priorityItems.map((item) => (
+                    priorityItems.map((item, idx) => (
                       <div
                         key={item.id}
-                        className="flex flex-col gap-3 rounded-2xl border border-border/60 bg-background/30 px-4 py-3 md:grid md:grid-cols-[minmax(0,1fr)_auto] md:items-center"
+                        style={{ animationDelay: `${idx * 40}ms` }}
+                        className="flex animate-[fadeSlideIn_0.25s_ease_both] flex-col gap-3 rounded-2xl border border-border/60 bg-background/30 px-4 py-3 md:grid md:grid-cols-[minmax(0,1fr)_auto] md:items-center"
                       >
                         <div className="min-w-0 space-y-2">
                           <div className="flex flex-wrap items-center gap-2">
@@ -667,10 +699,23 @@ export function DashboardOverview() {
                         </div>
 
                         <div className="flex flex-wrap items-center gap-2 self-start md:justify-end">
-                          <Button asChild variant="ghost" size="sm" className="font-mono text-[10px] font-bold uppercase tracking-widest text-muted-foreground hover:text-foreground">
-                            <Link href={gscInspectUrl()} target="_blank">
-                              Open GSC
-                            </Link>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="font-mono text-[10px] font-bold uppercase tracking-widest text-muted-foreground hover:text-foreground"
+                            title="Copy URL + buka GSC Inspect URL"
+                            onClick={() => copyAndOpenGsc(item.url)}
+                          >
+                            Open GSC
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground"
+                            title="Copy URL ke clipboard"
+                            onClick={() => copyUrl(item.url)}
+                          >
+                            <Copy className="h-3.5 w-3.5" />
                           </Button>
                           <Button asChild variant="ghost" size="sm" className="font-mono text-[10px] font-bold uppercase tracking-widest text-muted-foreground hover:text-foreground">
                             <Link href={item.url} target="_blank">
