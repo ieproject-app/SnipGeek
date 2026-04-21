@@ -10,7 +10,6 @@ import type { TranslationsMap } from "@/lib/posts";
 import {
   UserRound,
   ShieldCheck,
-  ShieldAlert,
   Mail,
   FileText,
   Terminal,
@@ -26,8 +25,6 @@ import { ScrollReveal } from "@/components/ui/scroll-reveal";
 import { SnipTooltip } from "@/components/ui/snip-tooltip";
 import { getLinkPrefix } from "@/lib/utils";
 import { useAuth, useUser } from "@/firebase";
-import { initiateGoogleSignIn } from "@/firebase/non-blocking-login";
-import { isFirebaseConfigValid } from "@/firebase/config";
 import { signOut } from "firebase/auth";
 import { useNotification } from "@/hooks/use-notification";
 
@@ -67,28 +64,6 @@ export function LayoutFooter({
       href: `${linkPrefix}/contact`,
     },
   ];
-
-  const handleLogin = async () => {
-    if (!auth) {
-      const isDev = process.env.NODE_ENV === "development";
-      const configReady = isFirebaseConfigValid();
-      notify(
-        isDev && !configReady
-          ? "Mode dev: Firebase Auth belum dikonfigurasi lengkap (.env.local)."
-          : dictionary?.notifications?.authNotReady || "Sistem login belum siap. Silakan coba lagi.",
-        <ShieldAlert className="h-4 w-4" />
-      );
-      return;
-    }
-    try {
-      await initiateGoogleSignIn(auth);
-    } catch (error) {
-           notify(
-             dictionary?.notifications?.loginError || "Gagal masuk.",
-             <ShieldAlert className="h-4 w-4" />
-           );
-         }
-  };
 
   const handleLogout = async () => {
     if (auth) {
@@ -235,13 +210,13 @@ export function LayoutFooter({
                 </Link>
                 <div className="w-1 h-1 rounded-full bg-primary/20" />
                 {!user ? (
-                  <button
-                    onClick={handleLogin}
+                  <Link
+                    href="/admin/login"
                     className="group flex items-center gap-2 text-[11px] font-black uppercase tracking-widest text-primary/60 hover:text-accent transition-all duration-300"
                   >
                     <GoogleLogo className="h-3.5 w-3.5 transition-transform group-hover:scale-120" />
                     <span>Admin Portal</span>
-                  </button>
+                  </Link>
                 ) : (
                   <button
                     onClick={handleLogout}

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { getRedirectResult } from "firebase/auth";
 import { useAuth, useUser } from "@/firebase";
 import { initiateGoogleSignIn } from "@/firebase/non-blocking-login";
 import { Button } from "@/components/ui/button";
@@ -21,64 +22,101 @@ export default function AdminLoginPage() {
   const auth = useAuth();
   const router = useRouter();
 
-  // Detect if we just returned from a mobile redirect flow.
-  // When signInWithRedirect fires, we set 'sg_pending_google_redirect' in sessionStorage.
-  // On return, provider.tsx calls finalizeGoogleRedirectSignIn which clears it.
-  // We read it here to show a dedicated "completing login" spinner instead of
-  // flashing the login form, which caused a confusing re-login prompt on mobile.
-  const [isRedirectPending, setIsRedirectPending] = useState(false);
+  /**
+   * `redirectChecked` starts as false and flips to true once
+   * getRedirectResult() has fully resolved (success, null, or error).
+   *
+   * Why call getRedirectResult() here instead of relying on sessionStorage?
+   * - sessionStorage is cleared by provider.tsx BEFORE this component reads it
+   *   → race condition that left isRedirectPending stuck at false
+   * - OR sessionStorage persists across refreshes, leaving isRedirectPending
+   *   stuck at true forever when getRedirectResult() already returned null
+   *
+   * Calling getRedirectResult() directly is the only reliable source of truth.
+   * Firebase SDK returns null quickly when no redirect is pending, so there is
+   * no meaningful performance cost on normal page loads.
+   */
+  const [redirectChecked, setRedirectChecked] = useState(false);
+  const [redirectError, setRedirectError] = useState<string | null>(null);
 
   useEffect(() => {
-    try {
-      const pending = sessionStorage.getItem("sg_pending_google_redirect") === "1";
-      setIsRedirectPending(pending);
-    } catch {
-      // sessionStorage unavailable (e.g. private browsing on some browsers)
+    if (!auth) {
+      setRedirectChecked(true);
+      return;
     }
-  }, []);
 
+    getRedirectResult(auth)
+      .then(() => {
+        // Success: onAuthStateChanged in provider will fire with the user.
+        // Nothing to do here — the user redirect below handles navigation.
+      })
+      .catch((err: { code?: string; message?: string }) => {
+        if (err?.code === "auth/unauthorized-domain") {
+          setRedirectError(
+            "Domain ini belum didaftarkan di Firebase Console (Authorized Domains).",
+          );
+        } else if (err?.code && err.code !== "auth/no-auth-event") {
+          setRedirectError(`Login gagal: ${err.code}`);
+        }
+        // auth/no-auth-event = no redirect was pending, not a real error
+      })
+      .finally(() => {
+        // Always clean up the sessionStorage flag (belt-and-suspenders).
+        try { sessionStorage.removeItem("sg_pending_google_redirect"); } catch {}
+        setRedirectChecked(true);
+      });
+  }, [auth]);
+
+  // Redirect to dashboard once user is confirmed
   useEffect(() => {
-    if (user) {
-      router.push("/admin");
-    }
+    if (user) router.push("/admin");
   }, [user, router]);
 
-  // Phase 1: Firebase is initialising (checking persisted auth state)
-  if (isUserLoading) {
+  // ── Loading states ────────────────────────────────────────
+  // Show spinner while EITHER Firebase is resolving auth state
+  // OR we haven't finished checking getRedirectResult yet.
+  if (isUserLoading || !redirectChecked) {
     return (
-      <div className="flex min-h-screen w-full items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-accent" />
-      </div>
-    );
-  }
-
-  // Phase 2: We came back from Google redirect — wait for onAuthStateChanged
-  // This prevents the "login button flash" / double-prompt on mobile.
-  if (isRedirectPending) {
-    return (
-      <div className="flex min-h-screen w-full flex-col items-center justify-center gap-4 px-4 bg-muted/30">
-        <Loader2 className="h-10 w-10 animate-spin text-accent" />
+      <div className="flex min-h-screen w-full flex-col items-center justify-center gap-3 bg-muted/30">
+        <Loader2 className="h-9 w-9 animate-spin text-accent" />
         <p className="font-mono text-[11px] font-bold uppercase tracking-[0.3em] text-muted-foreground animate-pulse">
-          Menyelesaikan login&hellip;
+          Memeriksa sesi&hellip;
         </p>
-        <p className="text-xs text-muted-foreground/60 text-center max-w-xs">
-          Jika proses ini terlalu lama, muat ulang halaman atau coba lagi.
-        </p>
-        <Button
-          variant="ghost"
-          size="sm"
-          className="mt-2 text-xs text-muted-foreground"
-          onClick={() => {
-            try { sessionStorage.removeItem("sg_pending_google_redirect"); } catch {}
-            setIsRedirectPending(false);
-          }}
-        >
-          Batal &amp; kembali ke login
-        </Button>
       </div>
     );
   }
 
+  // Redirect will happen via useEffect; render nothing in the meantime
+  if (user) return null;
+
+  // ── Error state ───────────────────────────────────────────
+  if (redirectError) {
+    return (
+      <div className="flex min-h-screen w-full items-center justify-center px-4 py-12 bg-muted/30">
+        <Card className="w-full max-w-md border-destructive/20 bg-destructive/5">
+          <CardHeader className="text-center space-y-3">
+            <div className="mx-auto p-4 bg-destructive/10 rounded-full w-fit">
+              <AlertCircle className="h-10 w-10 text-destructive" />
+            </div>
+            <CardTitle className="font-display text-xl font-black uppercase text-destructive">
+              Login Gagal
+            </CardTitle>
+            <CardDescription>{redirectError}</CardDescription>
+          </CardHeader>
+          <CardContent className="pb-8 px-8">
+            <Button
+              className="w-full rounded-full"
+              onClick={() => setRedirectError(null)}
+            >
+              Coba Lagi
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  // ── Firebase not configured ───────────────────────────────
   if (!auth) {
     return (
       <div className="flex min-h-screen w-full items-center justify-center px-4 py-12">
@@ -99,6 +137,7 @@ export default function AdminLoginPage() {
     );
   }
 
+  // ── Login form ────────────────────────────────────────────
   return (
     <div className="flex min-h-screen w-full items-center justify-center px-4 py-12 bg-muted/30">
       <Card className="w-full max-w-md shadow-2xl border-primary/10 bg-card/60 backdrop-blur-sm overflow-hidden">
