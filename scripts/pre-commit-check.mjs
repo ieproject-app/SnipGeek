@@ -206,6 +206,11 @@ function extractTranslationKey(content) {
   return m ? m[1].trim() : null;
 }
 
+function isPublished(content) {
+  const m = content.match(/^published:\s*(true|false)\s*$/m);
+  return m ? m[1] === "true" : false;
+}
+
 const POSTS_DIR = join(ROOT, "_posts");
 const LOCALES = ["en", "id"];
 
@@ -214,9 +219,11 @@ const stagedPosts = [...staged].filter(
 );
 
 let bilingualErrors = 0;
+let unpublishedErrors = 0;
+let missingPairErrors = 0;
 
 if (stagedPosts.length > 0) {
-  console.log("🌐 Pre-commit: checking bilingual filename sync...\n");
+  console.log("🌐 Pre-commit: checking staged post publish + bilingual rules...\n");
 
   // Build a lookup: translationKey → { locale, slug, filePath } for all on-disk posts
   const diskIndex = new Map(); // translationKey → Map<locale, slug>
@@ -239,11 +246,28 @@ if (stagedPosts.length > 0) {
 
     const content = readFileSync(join(ROOT, stagedFile), "utf8");
     const translationKey = extractTranslationKey(content);
+    const published = isPublished(content);
+
+    if (!published) {
+      console.log(`  ❌ Unpublished post cannot be committed: ${stagedFile}`);
+      console.log("     Fix: set published: true only when the article is ready to ship.\n");
+      unpublishedErrors++;
+    }
+
     if (!translationKey) continue;
 
     const stagedSlug = basename(stagedFile, ".mdx");
     const byLocale = diskIndex.get(translationKey);
     if (!byLocale) continue;
+
+    const missingLocales = LOCALES.filter((targetLocale) => !byLocale.has(targetLocale));
+    if (missingLocales.length > 0) {
+      console.log(`  ❌ Missing locale pair detected in: ${stagedFile}`);
+      console.log(`     translationKey: "${translationKey}"`);
+      console.log(`     Missing locale(s): ${missingLocales.join(", ")}`);
+      console.log("     Fix: add the counterpart article with the same filename in the missing locale directory.\n");
+      missingPairErrors++;
+    }
 
     // Check every other locale that has a matching translationKey on disk
     for (const [otherLocale, otherSlug] of byLocale) {
@@ -259,13 +283,19 @@ if (stagedPosts.length > 0) {
     }
   }
 
-  if (bilingualErrors === 0) {
-    console.log("✅ Bilingual filenames are in sync.\n");
+  if (bilingualErrors === 0 && unpublishedErrors === 0 && missingPairErrors === 0) {
+    console.log("✅ All post publish & bilingual rules passed.\n");
   }
 }
 
-if (bilingualErrors > 0) {
-  console.log(`❌ ${bilingualErrors} bilingual filename mismatch(es) found.`);
+const totalErrors = bilingualErrors + unpublishedErrors + missingPairErrors;
+
+if (totalErrors > 0) {
+  if (bilingualErrors > 0) console.log(`❌ ${bilingualErrors} bilingual filename mismatch(es) found.`);
+  if (unpublishedErrors > 0) console.log(`❌ ${unpublishedErrors} unpublished post(s) found.`);
+  if (missingPairErrors > 0) console.log(`❌ ${missingPairErrors} missing locale pair(s) found.`);
+  
+  console.log(`   Please fix these issues before committing.`);
   console.log(`   Or skip this check with: git commit --no-verify\n`);
   process.exit(1);
 }
