@@ -34,6 +34,9 @@ import { cn } from "@/lib/utils";
 
 type GscQuickFilter = "needs_review" | "unknown_google" | "indexed_google";
 
+const GSC_TAB_NAME = "snipgeek-gsc-console";
+let gscWindowRef: Window | null = null;
+
 type PriorityRefreshState = {
   running: boolean;
   done: number;
@@ -78,9 +81,13 @@ function StatBlock({
   accent?: "emerald" | "amber" | "destructive" | "primary";
 }) {
   const trendIcon =
-    trend === "up" ? <TrendingUp className="h-3 w-3" /> :
-    trend === "down" ? <TrendingDown className="h-3 w-3" /> :
-    trend === "flat" ? <Minus className="h-3 w-3" /> : null;
+    trend === "up" ? (
+      <TrendingUp className="h-3 w-3" />
+    ) : trend === "down" ? (
+      <TrendingDown className="h-3 w-3" />
+    ) : trend === "flat" ? (
+      <Minus className="h-3 w-3" />
+    ) : null;
 
   const accentColor = {
     emerald: "text-emerald-600 dark:text-emerald-400",
@@ -95,14 +102,25 @@ function StatBlock({
         <p className="font-mono text-[10px] font-bold uppercase tracking-[0.25em] text-muted-foreground">
           {label}
         </p>
-        {trendIcon && <span className={cn("mt-0.5", accentColor)}>{trendIcon}</span>}
+        {trendIcon && (
+          <span className={cn("mt-0.5", accentColor)}>{trendIcon}</span>
+        )}
       </div>
       <div className="mt-2.5 flex items-baseline gap-2">
-        <span className={cn("font-display text-3xl font-black tracking-tighter", accentColor)}>
+        <span
+          className={cn(
+            "font-display text-3xl font-black tracking-tighter",
+            accentColor,
+          )}
+        >
           {value}
         </span>
       </div>
-      {sub && <p className="mt-1 text-[11px] leading-relaxed text-muted-foreground">{sub}</p>}
+      {sub && (
+        <p className="mt-1 text-[11px] leading-relaxed text-muted-foreground">
+          {sub}
+        </p>
+      )}
     </div>
   );
 }
@@ -213,7 +231,8 @@ export function DashboardOverview() {
         setInventory(inv.items);
         setStatuses(st.items);
       } catch (e) {
-        if (!cancelled) setError(e instanceof Error ? e.message : "Failed to load data.");
+        if (!cancelled)
+          setError(e instanceof Error ? e.message : "Failed to load data.");
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -232,8 +251,13 @@ export function DashboardOverview() {
   const kpis = useMemo(() => {
     if (!inventory) return null;
     const total = inventory.length;
-    let blog = 0, note = 0, tool = 0;
-    let indexed = 0, submitted = 0, notSubmitted = 0, excluded = 0;
+    let blog = 0,
+      note = 0,
+      tool = 0;
+    let indexed = 0,
+      submitted = 0,
+      notSubmitted = 0,
+      excluded = 0;
     for (const item of inventory) {
       if (item.type === "blog") blog++;
       else if (item.type === "note") note++;
@@ -245,7 +269,17 @@ export function DashboardOverview() {
       else notSubmitted++;
     }
     const indexedPct = total === 0 ? 0 : Math.round((indexed / total) * 100);
-    return { total, blog, note, tool, indexed, submitted, notSubmitted, excluded, indexedPct };
+    return {
+      total,
+      blog,
+      note,
+      tool,
+      indexed,
+      submitted,
+      notSubmitted,
+      excluded,
+      indexedPct,
+    };
   }, [inventory, statusMap]);
 
   const articleDates = useMemo(() => {
@@ -264,12 +298,14 @@ export function DashboardOverview() {
   }, [inventory]);
 
   const weekStats = useMemo(() => {
-    if (!articleDates.length) return { current: 0, previous: 0, urgency: "ok" as const };
+    if (!articleDates.length)
+      return { current: 0, previous: 0, urgency: "ok" as const };
     const currentKey = getIsoWeek(new Date()).key;
     const prevDate = new Date();
     prevDate.setDate(prevDate.getDate() - 7);
     const prevKey = getIsoWeek(prevDate).key;
-    let current = 0, previous = 0;
+    let current = 0,
+      previous = 0;
     for (const d of articleDates) {
       const k = getIsoWeek(new Date(d)).key;
       if (k === currentKey) current++;
@@ -279,11 +315,11 @@ export function DashboardOverview() {
   }, [articleDates]);
 
   const weekTrend: "up" | "down" | "flat" =
-    weekStats.current > weekStats.previous ? "up"
-    : weekStats.current < weekStats.previous ? "down"
-    : "flat";
-
-  const weeklyDelta = weekStats.current - weekStats.previous;
+    weekStats.current > weekStats.previous
+      ? "up"
+      : weekStats.current < weekStats.previous
+        ? "down"
+        : "flat";
 
   const actionableSummary = useMemo(() => {
     if (!inventory) {
@@ -305,8 +341,9 @@ export function DashboardOverview() {
     for (const item of inventory) {
       const isNonIndexable = Boolean(
         item.draft ||
-          item.requiresAuth ||
-          (item.type === "blog" && item.hasLocalePair === false),
+        item.requiresAuth ||
+        item.excludeFromIndexMonitoring ||
+        (item.type === "blog" && item.hasLocalePair === false),
       );
 
       if (isNonIndexable) {
@@ -336,12 +373,14 @@ export function DashboardOverview() {
     if (!inventory) return [];
 
     return inventory
-      .filter(
-        (item) =>
+      .filter((item) => {
+        return (
           !item.draft &&
           !item.requiresAuth &&
-          (item.type !== "blog" || item.hasLocalePair !== false),
-      )
+          !item.excludeFromIndexMonitoring &&
+          (item.type !== "blog" || item.hasLocalePair !== false)
+        );
+      })
       .map((item) => ({
         ...item,
         status: statusMap.get(item.id)?.status ?? "unknown",
@@ -375,7 +414,8 @@ export function DashboardOverview() {
     if (targets.length === 0) {
       toast({
         title: "Tidak ada URL prioritas",
-        description: "Semua URL prioritas saat ini sudah aman atau tidak perlu dicek.",
+        description:
+          "Semua URL prioritas saat ini sudah aman atau tidak perlu dicek.",
       });
       return;
     }
@@ -421,29 +461,112 @@ export function DashboardOverview() {
     });
   };
 
-  const copyAndOpenGsc = useCallback(async (pageUrl: string) => {
-    // Open the GSC property page (Google's inspect deep-link is not stable / 404s).
-    // We copy the article URL so the user can immediately paste it into GSC's URL search box.
-    window.open(gscPropertyUrl(), "_blank", "noreferrer");
-    try {
-      await navigator.clipboard.writeText(pageUrl);
-      toast({
-        title: "GSC dibuka · URL disalin",
-        description: "Paste URL di kolom pencarian URL Inspection GSC.",
-      });
-    } catch {
-      toast({ title: "GSC dibuka", description: "Copy URL secara manual dari baris ini." });
-    }
-  }, [toast]);
+  const copyAndOpenGsc = useCallback(
+    async (pageUrl: string) => {
+      const copyWithExecCommand = (value: string) => {
+        if (typeof document === "undefined") return false;
 
-  const copyUrl = useCallback(async (url: string) => {
-    try {
-      await navigator.clipboard.writeText(url);
-      toast({ title: "URL copied", description: url });
-    } catch {
-      toast({ title: "Copy gagal", variant: "destructive" });
-    }
-  }, [toast]);
+        const textarea = document.createElement("textarea");
+        textarea.value = value;
+        textarea.setAttribute("readonly", "");
+        textarea.style.position = "fixed";
+        textarea.style.top = "0";
+        textarea.style.left = "-9999px";
+        textarea.style.opacity = "0";
+        textarea.style.pointerEvents = "none";
+
+        document.body.appendChild(textarea);
+        textarea.focus();
+        textarea.select();
+        textarea.setSelectionRange(0, textarea.value.length);
+
+        let ok = false;
+        try {
+          ok = document.execCommand("copy");
+        } catch {
+          ok = false;
+        }
+
+        document.body.removeChild(textarea);
+        return ok;
+      };
+
+      const copyWithClipboardApi = async (value: string) => {
+        try {
+          await navigator.clipboard.writeText(value);
+          return true;
+        } catch {
+          return false;
+        }
+      };
+
+      const gscUrl = gscPropertyUrl();
+
+      let copied = copyWithExecCommand(pageUrl);
+
+      if (!copied) {
+        copied = await copyWithClipboardApi(pageUrl);
+      }
+
+      let gscWindow: Window | null = null;
+
+      try {
+        if (gscWindowRef && !gscWindowRef.closed) {
+          gscWindowRef.location.href = gscUrl;
+          gscWindow = gscWindowRef;
+        }
+      } catch {
+        gscWindowRef = null;
+      }
+
+      if (!gscWindow) {
+        gscWindow = window.open(gscUrl, GSC_TAB_NAME);
+        gscWindowRef = gscWindow;
+      }
+
+      gscWindow?.focus();
+
+      if (copied) {
+        toast({
+          title: "GSC dibuka · URL disalin",
+          description: "Paste URL di kolom pencarian URL Inspection GSC.",
+        });
+        return;
+      }
+
+      const manualValue = window.prompt(
+        "Browser memblokir clipboard otomatis. Copy URL ini lalu paste ke GSC:",
+        pageUrl,
+      );
+
+      if (manualValue !== null) {
+        toast({
+          title: "GSC dibuka · Copy manual",
+          description: "URL siap di-copy dari prompt browser.",
+        });
+        return;
+      }
+
+      toast({
+        title: "GSC dibuka",
+        description:
+          "Clipboard diblokir browser. Copy URL secara manual dari baris ini.",
+      });
+    },
+    [toast],
+  );
+
+  const copyUrl = useCallback(
+    async (url: string) => {
+      try {
+        await navigator.clipboard.writeText(url);
+        toast({ title: "URL copied", description: url });
+      } catch {
+        toast({ title: "Copy gagal", variant: "destructive" });
+      }
+    },
+    [toast],
+  );
 
   if (loading) {
     return (
@@ -482,14 +605,16 @@ export function DashboardOverview() {
         <div className="flex flex-col gap-2 xl:flex-row xl:items-end xl:justify-between">
           <div className="space-y-1">
             <p className="font-mono text-[10px] font-bold uppercase tracking-[0.3em] text-muted-foreground">
-              — SnipGeek Control · Issue #{new Date().getFullYear()}·W{String(getIsoWeek(new Date()).week).padStart(2, "0")}
+              — SnipGeek Control · Issue #{new Date().getFullYear()}·W
+              {String(getIsoWeek(new Date()).week).padStart(2, "0")}
             </p>
             <div>
               <h1 className="font-display text-[26px] font-black uppercase tracking-[-0.05em] md:text-[30px]">
                 Index <span className="text-accent">Monitor.</span>
               </h1>
               <p className="mt-0.5 text-xs text-muted-foreground md:text-sm">
-                Satu layar untuk kondisi index, antrean prioritas, dan jalur tindakan cepat.
+                Satu layar untuk kondisi index, antrean prioritas, dan jalur
+                tindakan cepat.
               </p>
             </div>
           </div>
@@ -500,7 +625,11 @@ export function DashboardOverview() {
               Live
             </div>
             <div className="rounded-full border border-border/70 bg-card/40 px-3 py-1 font-mono text-muted-foreground">
-              Snapshot · {new Date().toLocaleString("id-ID", { dateStyle: "medium", timeStyle: "short" })}
+              Snapshot ·{" "}
+              {new Date().toLocaleString("id-ID", {
+                dateStyle: "medium",
+                timeStyle: "short",
+              })}
             </div>
           </div>
         </div>
@@ -509,43 +638,102 @@ export function DashboardOverview() {
       <div className="flex-1 overflow-auto px-4 py-3 md:px-5 xl:min-h-0 xl:overflow-hidden">
         <div className="flex h-full min-h-0 flex-col gap-3">
           <section className="grid shrink-0 grid-cols-1 gap-3 lg:grid-cols-2 xl:grid-cols-12">
-            <div className="rounded-2xl border border-border/70 bg-card/40 p-4 xl:col-span-3">
+            <div className="rounded-2xl border border-border/70 bg-card/40 p-4 xl:col-span-4">
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <p className="font-mono text-[10px] font-bold uppercase tracking-[0.3em] text-accent">
-                    — Indexed ratio
+                    — Needs action today
                   </p>
                   <div className="mt-2">
-                    <HeroNumber value={kpis.indexedPct} suffix="%" />
+                    <HeroNumber value={actionableSummary.needsAction} />
                   </div>
                 </div>
                 <div className="rounded-full border border-border/70 px-2 py-1 font-mono text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
-                  {actionableSummary.indexableTotal} indexable
+                  {actionableSummary.indexableTotal} public URLs
                 </div>
               </div>
               <p className="mt-2 text-sm text-muted-foreground">
-                <span className="font-bold text-foreground">{kpis.indexed}</span> dari <span className="font-bold text-foreground">{kpis.total}</span> URL sudah indexed.
+                {actionableSummary.needsAction > 0 ? (
+                  <>
+                    <span className="font-bold text-foreground">
+                      {kpis.notSubmitted}
+                    </span>{" "}
+                    belum submit ·{" "}
+                    <span className="font-bold text-foreground">
+                      {actionableSummary.submitted}
+                    </span>{" "}
+                    menunggu verifikasi.
+                  </>
+                ) : (
+                  <>
+                    Semua URL publik aman.{" "}
+                    <span className="font-bold text-foreground">
+                      {actionableSummary.indexed}
+                    </span>{" "}
+                    sudah indexed.
+                  </>
+                )}
               </p>
-              <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-muted">
-                <div
-                  className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-emerald-400 transition-all"
-                  style={{ width: `${kpis.indexedPct}%` }}
-                />
+              <div className="mt-4 grid grid-cols-3 gap-2">
+                <div className="rounded-xl border border-border/60 bg-background/40 px-3 py-2">
+                  <p className="font-mono text-[9px] font-bold uppercase tracking-[0.22em] text-muted-foreground">
+                    Backlog
+                  </p>
+                  <p className="mt-1 font-display text-2xl font-black tracking-tighter text-destructive">
+                    {actionableSummary.needsAction}
+                  </p>
+                </div>
+                <div className="rounded-xl border border-border/60 bg-background/40 px-3 py-2">
+                  <p className="font-mono text-[9px] font-bold uppercase tracking-[0.22em] text-muted-foreground">
+                    Awaiting
+                  </p>
+                  <p className="mt-1 font-display text-2xl font-black tracking-tighter text-amber-600 dark:text-amber-400">
+                    {actionableSummary.submitted}
+                  </p>
+                </div>
+                <div className="rounded-xl border border-border/60 bg-background/40 px-3 py-2">
+                  <p className="font-mono text-[9px] font-bold uppercase tracking-[0.22em] text-muted-foreground">
+                    Indexed
+                  </p>
+                  <p className="mt-1 font-display text-2xl font-black tracking-tighter text-emerald-600 dark:text-emerald-400">
+                    {actionableSummary.indexed}
+                  </p>
+                </div>
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-3 xl:col-span-6 xl:grid-cols-4">
-              <Link href={buildMonitorHref({ status: "submitted" })}>
-                <StatBlock label="Submitted" value={kpis.submitted} sub="Menunggu verifikasi" accent="amber" />
-              </Link>
+            <div className="grid grid-cols-2 gap-3 xl:col-span-5 xl:grid-cols-4">
               <Link href={buildMonitorHref({ status: "not_submitted" })}>
-                <StatBlock label="Belum submit" value={kpis.notSubmitted} sub="Perlu tindakan" accent="destructive" />
+                <StatBlock
+                  label="Belum submit"
+                  value={kpis.notSubmitted}
+                  sub="Tindakan utama"
+                  accent="destructive"
+                />
+              </Link>
+              <Link href={buildMonitorHref({ status: "submitted" })}>
+                <StatBlock
+                  label="Submitted"
+                  value={kpis.submitted}
+                  sub="Menunggu verifikasi"
+                  accent="amber"
+                />
               </Link>
               <Link href={buildMonitorHref({ status: "indexed" })}>
-                <StatBlock label="Indexed" value={actionableSummary.indexed} sub="Sudah aman" accent="emerald" />
+                <StatBlock
+                  label="Indexed"
+                  value={actionableSummary.indexed}
+                  sub={`${kpis.indexedPct}% coverage`}
+                  accent="emerald"
+                />
               </Link>
               <Link href={buildMonitorHref({ visibility: "hidden" })}>
-                <StatBlock label="Draft / Gated" value={actionableSummary.gatedOrDraft} sub="Tidak dikejar" accent="primary" />
+                <StatBlock
+                  label="Hidden"
+                  value={actionableSummary.gatedOrDraft}
+                  sub="Draft / gated"
+                  accent="primary"
+                />
               </Link>
             </div>
 
@@ -557,41 +745,76 @@ export function DashboardOverview() {
                   </p>
                   <p className="mt-2 text-sm leading-relaxed text-foreground">
                     {actionableSummary.needsAction > 0
-                      ? `${actionableSummary.needsAction} URL publik masih perlu submit atau review.`
-                      : "Semua URL publik sudah aman. Lanjut cek cadence mingguan."}
+                      ? `${actionableSummary.needsAction} URL publik masih perlu submit atau review. Fokuskan refresh ke antrean prioritas dulu.`
+                      : "Semua URL publik sudah aman. Panel ini sekarang bisa dipakai untuk jaga ritme publish mingguan."}
                   </p>
                 </div>
-                <AlertTriangle className={cn("mt-0.5 h-4 w-4 shrink-0", actionableSummary.needsAction > 0 ? "text-destructive" : "text-emerald-500")} />
+                <AlertTriangle
+                  className={cn(
+                    "mt-0.5 h-4 w-4 shrink-0",
+                    actionableSummary.needsAction > 0
+                      ? "text-destructive"
+                      : "text-emerald-500",
+                  )}
+                />
               </div>
 
               <div className="mt-3 grid grid-cols-4 gap-2">
-                <Link href={buildMonitorHref({ type: "blog" })} className="rounded-xl border border-border/70 bg-background/30 px-2.5 py-2 transition-colors hover:border-accent/50">
+                <Link
+                  href={buildMonitorHref({ type: "blog" })}
+                  className="rounded-xl border border-border/70 bg-background/30 px-2.5 py-2 transition-colors hover:border-accent/50"
+                >
                   <div className="flex items-center justify-between text-muted-foreground">
-                    <span className="font-mono text-[9px] font-bold uppercase tracking-[0.25em]">Blog</span>
+                    <span className="font-mono text-[9px] font-bold uppercase tracking-[0.25em]">
+                      Blog
+                    </span>
                     <FileText className="h-3 w-3" />
                   </div>
-                  <p className="mt-1.5 font-display text-2xl font-black tracking-tighter text-foreground">{kpis.blog}</p>
+                  <p className="mt-1.5 font-display text-2xl font-black tracking-tighter text-foreground">
+                    {kpis.blog}
+                  </p>
                 </Link>
-                <Link href={buildMonitorHref({ type: "note" })} className="rounded-xl border border-border/70 bg-background/30 px-2.5 py-2 transition-colors hover:border-accent/50">
+                <Link
+                  href={buildMonitorHref({ type: "note" })}
+                  className="rounded-xl border border-border/70 bg-background/30 px-2.5 py-2 transition-colors hover:border-accent/50"
+                >
                   <div className="flex items-center justify-between text-muted-foreground">
-                    <span className="font-mono text-[9px] font-bold uppercase tracking-[0.25em]">Notes</span>
+                    <span className="font-mono text-[9px] font-bold uppercase tracking-[0.25em]">
+                      Notes
+                    </span>
                     <StickyNote className="h-3 w-3" />
                   </div>
-                  <p className="mt-1.5 font-display text-2xl font-black tracking-tighter text-foreground">{kpis.note}</p>
+                  <p className="mt-1.5 font-display text-2xl font-black tracking-tighter text-foreground">
+                    {kpis.note}
+                  </p>
                 </Link>
-                <Link href={buildMonitorHref({ type: "tool" })} className="rounded-xl border border-border/70 bg-background/30 px-2.5 py-2 transition-colors hover:border-accent/50">
+                <Link
+                  href={buildMonitorHref({ type: "tool" })}
+                  className="rounded-xl border border-border/70 bg-background/30 px-2.5 py-2 transition-colors hover:border-accent/50"
+                >
                   <div className="flex items-center justify-between text-muted-foreground">
-                    <span className="font-mono text-[9px] font-bold uppercase tracking-[0.25em]">Tools</span>
+                    <span className="font-mono text-[9px] font-bold uppercase tracking-[0.25em]">
+                      Tools
+                    </span>
                     <Wrench className="h-3 w-3" />
                   </div>
-                  <p className="mt-1.5 font-display text-2xl font-black tracking-tighter text-foreground">{kpis.tool}</p>
+                  <p className="mt-1.5 font-display text-2xl font-black tracking-tighter text-foreground">
+                    {kpis.tool}
+                  </p>
                 </Link>
-                <Link href={buildMonitorHref({ status: "not_submitted" })} className="rounded-xl border border-border/70 bg-background/30 px-2.5 py-2 transition-colors hover:border-accent/50">
+                <Link
+                  href={buildMonitorHref({ status: "not_submitted" })}
+                  className="rounded-xl border border-border/70 bg-background/30 px-2.5 py-2 transition-colors hover:border-accent/50"
+                >
                   <div className="flex items-center justify-between text-muted-foreground">
-                    <span className="font-mono text-[9px] font-bold uppercase tracking-[0.25em]">Week</span>
+                    <span className="font-mono text-[9px] font-bold uppercase tracking-[0.25em]">
+                      Week
+                    </span>
                     <ArrowUpRight className="h-3 w-3" />
                   </div>
-                  <p className="mt-1.5 font-display text-2xl font-black tracking-tighter text-foreground">{weekStats.current}/{WEEKLY_TARGET}</p>
+                  <p className="mt-1.5 font-display text-2xl font-black tracking-tighter text-foreground">
+                    {weekStats.current}/{WEEKLY_TARGET}
+                  </p>
                 </Link>
               </div>
             </div>
@@ -609,7 +832,9 @@ export function DashboardOverview() {
                       size="sm"
                       className="gap-2 font-mono text-[10px] font-bold uppercase tracking-widest"
                       onClick={refreshPriorityUrls}
-                      disabled={priorityRefresh.running || priorityItems.length === 0}
+                      disabled={
+                        priorityRefresh.running || priorityItems.length === 0
+                      }
                     >
                       {priorityRefresh.running ? (
                         <Loader2 className="h-3 w-3 animate-spin" />
@@ -620,14 +845,28 @@ export function DashboardOverview() {
                         ? `Refreshing ${priorityRefresh.done}/${priorityRefresh.total}`
                         : `Refresh Priority (${priorityItems.length})`}
                     </Button>
-                    <Button asChild variant="outline" size="sm" className="gap-2 font-mono text-[10px] font-bold uppercase tracking-widest">
-                      <Link href={buildMonitorHref({ status: "not_submitted" })}>
+                    <Button
+                      asChild
+                      variant="outline"
+                      size="sm"
+                      className="gap-2 font-mono text-[10px] font-bold uppercase tracking-widest"
+                    >
+                      <Link
+                        href={buildMonitorHref({ status: "not_submitted" })}
+                      >
                         Open Monitor
                         <ArrowUpRight className="h-3 w-3" />
                       </Link>
                     </Button>
-                    <Button asChild variant="ghost" size="sm" className="font-mono text-[10px] font-bold uppercase tracking-widest text-muted-foreground hover:text-foreground">
-                      <Link href={buildMonitorHref({ status: "submitted" })}>Awaiting</Link>
+                    <Button
+                      asChild
+                      variant="ghost"
+                      size="sm"
+                      className="font-mono text-[10px] font-bold uppercase tracking-widest text-muted-foreground hover:text-foreground"
+                    >
+                      <Link href={buildMonitorHref({ status: "submitted" })}>
+                        Awaiting
+                      </Link>
                     </Button>
                   </div>
                 }
@@ -635,47 +874,107 @@ export function DashboardOverview() {
 
               <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-border/70 bg-card/40 p-3">
                 <div className="mb-3 grid grid-cols-2 gap-2 lg:grid-cols-4">
-                  <Link href={buildMonitorHref({ status: "not_submitted", gsc: "needs_review" })}>
-                    <StatBlock label="Need action" value={actionableSummary.needsAction} sub="URL publik" accent={actionableSummary.needsAction > 0 ? "destructive" : "emerald"} />
+                  <Link
+                    href={buildMonitorHref({
+                      status: "not_submitted",
+                      gsc: "needs_review",
+                    })}
+                  >
+                    <StatBlock
+                      label="Need action"
+                      value={actionableSummary.needsAction}
+                      sub="Fokus utama hari ini"
+                      accent={
+                        actionableSummary.needsAction > 0
+                          ? "destructive"
+                          : "emerald"
+                      }
+                    />
                   </Link>
                   <Link href={buildMonitorHref({ status: "submitted" })}>
-                    <StatBlock label="Awaiting" value={actionableSummary.submitted} sub="Masih submitted" accent="amber" />
+                    <StatBlock
+                      label="Awaiting"
+                      value={actionableSummary.submitted}
+                      sub="Tunggu verifikasi Google"
+                      accent="amber"
+                    />
                   </Link>
-                  <Link href={buildMonitorHref({ status: "indexed", gsc: "indexed_google" })}>
-                    <StatBlock label="Ready" value={actionableSummary.indexed} sub="Indexed" accent="emerald" />
+                  <Link
+                    href={buildMonitorHref({
+                      status: "indexed",
+                      gsc: "indexed_google",
+                    })}
+                  >
+                    <StatBlock
+                      label="Ready"
+                      value={actionableSummary.indexed}
+                      sub="Sudah aman"
+                      accent="emerald"
+                    />
                   </Link>
                   <Link href={buildMonitorHref({ visibility: "hidden" })}>
-                    <StatBlock label="Skipped" value={actionableSummary.gatedOrDraft} sub="Draft / gated" accent="primary" />
+                    <StatBlock
+                      label="Skipped"
+                      value={actionableSummary.gatedOrDraft}
+                      sub="Tidak dikejar"
+                      accent="primary"
+                    />
                   </Link>
                 </div>
 
                 <div className="mb-3 flex flex-wrap items-center gap-2 border-b border-dashed pb-3">
-                  <Button asChild variant="ghost" size="sm" className="font-mono text-[10px] font-bold uppercase tracking-widest text-destructive hover:text-destructive">
+                  <Button
+                    asChild
+                    variant="ghost"
+                    size="sm"
+                    className="font-mono text-[10px] font-bold uppercase tracking-widest text-destructive hover:text-destructive"
+                  >
                     <Link href={buildMonitorHref({ gsc: "needs_review" })}>
                       Needs review
-                      <span className="ml-1 opacity-60 font-normal normal-case tracking-normal">(verdict fail)</span>
+                      <span className="ml-1 opacity-60 font-normal normal-case tracking-normal">
+                        (verdict fail)
+                      </span>
                     </Link>
                   </Button>
-                  <Button asChild variant="ghost" size="sm" className="font-mono text-[10px] font-bold uppercase tracking-widest text-amber-700 hover:text-amber-700 dark:text-amber-400 dark:hover:text-amber-400">
-                    <Link href={buildMonitorHref({ gsc: "unknown_google" })}>Unknown to Google</Link>
+                  <Button
+                    asChild
+                    variant="ghost"
+                    size="sm"
+                    className="font-mono text-[10px] font-bold uppercase tracking-widest text-amber-700 hover:text-amber-700 dark:text-amber-400 dark:hover:text-amber-400"
+                  >
+                    <Link href={buildMonitorHref({ gsc: "unknown_google" })}>
+                      Unknown to Google
+                    </Link>
                   </Button>
-                  <Button asChild variant="ghost" size="sm" className="font-mono text-[10px] font-bold uppercase tracking-widest text-emerald-700 hover:text-emerald-700 dark:text-emerald-400 dark:hover:text-emerald-400">
-                    <Link href={buildMonitorHref({ gsc: "indexed_google" })}>Indexed</Link>
+                  <Button
+                    asChild
+                    variant="ghost"
+                    size="sm"
+                    className="font-mono text-[10px] font-bold uppercase tracking-widest text-emerald-700 hover:text-emerald-700 dark:text-emerald-400 dark:hover:text-emerald-400"
+                  >
+                    <Link href={buildMonitorHref({ gsc: "indexed_google" })}>
+                      Indexed
+                    </Link>
                   </Button>
                 </div>
 
                 <div className="grid gap-2 xl:min-h-0 xl:flex-1 xl:overflow-y-auto xl:pr-1">
                   {priorityItems.length === 0 ? (
                     <div className="rounded-2xl border border-border/60 bg-background/30 px-4 py-5 text-sm text-muted-foreground">
-                      Tidak ada URL prioritas saat ini. Semua item publik sudah aman atau sudah indexed.
+                      Tidak ada URL prioritas saat ini. Semua item publik sudah
+                      aman atau sudah indexed.
                     </div>
                   ) : (
                     priorityItems.map((item, idx) => (
                       <div
                         key={item.id}
                         style={{ animationDelay: `${idx * 40}ms` }}
-                        className="flex animate-[fadeSlideIn_0.25s_ease_both] flex-col gap-3 rounded-2xl border border-border/60 bg-background/30 px-4 py-3 md:grid md:grid-cols-[minmax(0,1fr)_auto] md:items-center"
+                        className="flex animate-[fadeSlideIn_0.25s_ease_both] flex-col gap-3 rounded-2xl border border-border/60 bg-background/30 px-4 py-3 md:grid md:grid-cols-[auto_minmax(0,1fr)_auto] md:items-center"
                       >
+                        <div className="flex h-10 w-10 items-center justify-center rounded-2xl border border-border/60 bg-card/70 font-display text-lg font-black tracking-tighter text-foreground">
+                          {idx + 1}
+                        </div>
+
                         <div className="min-w-0 space-y-2">
                           <div className="flex flex-wrap items-center gap-2">
                             <span className="rounded-full border border-border/70 px-2 py-1 font-mono text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
@@ -684,7 +983,12 @@ export function DashboardOverview() {
                             <span className="rounded-full border border-border/70 px-2 py-1 font-mono text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
                               {item.locale.toUpperCase()}
                             </span>
-                            <span className={cn("rounded-full border px-2 py-1 font-mono text-[10px] font-bold uppercase tracking-widest", statusTone(item.status))}>
+                            <span
+                              className={cn(
+                                "rounded-full border px-2 py-1 font-mono text-[10px] font-bold uppercase tracking-widest",
+                                statusTone(item.status),
+                              )}
+                            >
                               {statusLabel(item.status)}
                             </span>
                           </div>
@@ -700,13 +1004,30 @@ export function DashboardOverview() {
 
                         <div className="flex flex-wrap items-center gap-2 self-start md:justify-end">
                           <Button
-                            variant="ghost"
                             size="sm"
-                            className="font-mono text-[10px] font-bold uppercase tracking-widest text-muted-foreground hover:text-foreground"
+                            className="gap-2 font-mono text-[10px] font-bold uppercase tracking-widest"
                             title="Copy URL + buka GSC Inspect URL"
                             onClick={() => copyAndOpenGsc(item.url)}
                           >
                             Open GSC
+                            <ArrowUpRight className="h-3 w-3" />
+                          </Button>
+                          <Button
+                            asChild
+                            variant="outline"
+                            size="sm"
+                            className="gap-2 font-mono text-[10px] font-bold uppercase tracking-widest"
+                          >
+                            <Link
+                              href={buildMonitorHref({
+                                type: item.type,
+                                status: item.status,
+                                locale: item.locale,
+                                q: item.slug,
+                              })}
+                            >
+                              Review
+                            </Link>
                           </Button>
                           <Button
                             variant="ghost"
@@ -717,22 +1038,14 @@ export function DashboardOverview() {
                           >
                             <Copy className="h-3.5 w-3.5" />
                           </Button>
-                          <Button asChild variant="ghost" size="sm" className="font-mono text-[10px] font-bold uppercase tracking-widest text-muted-foreground hover:text-foreground">
+                          <Button
+                            asChild
+                            variant="ghost"
+                            size="sm"
+                            className="font-mono text-[10px] font-bold uppercase tracking-widest text-muted-foreground hover:text-foreground"
+                          >
                             <Link href={item.url} target="_blank">
                               Open URL
-                            </Link>
-                          </Button>
-                          <Button asChild variant="outline" size="sm" className="gap-2 font-mono text-[10px] font-bold uppercase tracking-widest">
-                            <Link
-                              href={buildMonitorHref({
-                                type: item.type,
-                                status: item.status,
-                                locale: item.locale,
-                                q: item.slug,
-                              })}
-                            >
-                              Review
-                              <ArrowUpRight className="h-3 w-3" />
                             </Link>
                           </Button>
                         </div>
@@ -744,19 +1057,30 @@ export function DashboardOverview() {
             </div>
 
             <div className="grid min-h-0 gap-3 xl:col-span-5 xl:grid-rows-2 xl:overflow-hidden">
-              <div className="flex min-h-0 flex-col overflow-hidden rounded-2xl border border-border/70 bg-card/40 p-4">
+              <div className="flex min-h-0 flex-col overflow-hidden rounded-2xl border border-border/60 bg-card/30 p-4">
                 <SectionHeader
                   kicker="Cadence"
                   title="Weekly Target"
                   action={
                     <div className="flex items-center gap-2 font-mono text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
-                      <span>{weekStats.current}/{WEEKLY_TARGET}</span>
+                      <span>
+                        {weekStats.current}/{WEEKLY_TARGET}
+                      </span>
                       {trendIconPlaceholder(weekTrend, weekStats.urgency)}
                     </div>
                   }
                 />
 
-                <WeeklyTargetChart publishDates={articleDates} heightClassName="h-32" />
+                <p className="mb-3 text-sm text-muted-foreground">
+                  {weekStats.current >= WEEKLY_TARGET
+                    ? "Cadence aman minggu ini."
+                    : `${Math.max(WEEKLY_TARGET - weekStats.current, 0)} publish lagi untuk capai target.`}
+                </p>
+
+                <WeeklyTargetChart
+                  publishDates={articleDates}
+                  heightClassName="h-28"
+                />
 
                 <div className="mt-2 flex flex-wrap items-center gap-3 border-t border-dashed pt-2 font-mono text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
                   <span className="flex items-center gap-2">
@@ -770,7 +1094,7 @@ export function DashboardOverview() {
                 </div>
               </div>
 
-              <div className="flex min-h-0 flex-col overflow-hidden rounded-2xl border border-border/70 bg-card/40 p-4">
+              <div className="flex min-h-0 flex-col overflow-hidden rounded-2xl border border-border/60 bg-card/30 p-4">
                 <SectionHeader
                   kicker="Rhythm"
                   title="Posting Heatmap"
@@ -781,6 +1105,11 @@ export function DashboardOverview() {
                     </div>
                   }
                 />
+
+                <p className="mb-3 text-sm text-muted-foreground">
+                  Gunakan heatmap untuk cek ritme, bukan sebagai fokus utama
+                  tindakan.
+                </p>
 
                 <div className="overflow-x-auto">
                   <PostingHeatmap publishDates={articleDates} />
@@ -799,13 +1128,28 @@ export function DashboardOverview() {
                 </div>
 
                 <div className="mt-2 flex flex-wrap gap-2">
-                  <Button asChild variant="ghost" size="sm" className="font-mono text-[10px] font-bold uppercase tracking-widest text-muted-foreground hover:text-foreground">
+                  <Button
+                    asChild
+                    variant="ghost"
+                    size="sm"
+                    className="font-mono text-[10px] font-bold uppercase tracking-widest text-muted-foreground hover:text-foreground"
+                  >
                     <Link href={buildMonitorHref({ type: "blog" })}>Blog</Link>
                   </Button>
-                  <Button asChild variant="ghost" size="sm" className="font-mono text-[10px] font-bold uppercase tracking-widest text-muted-foreground hover:text-foreground">
+                  <Button
+                    asChild
+                    variant="ghost"
+                    size="sm"
+                    className="font-mono text-[10px] font-bold uppercase tracking-widest text-muted-foreground hover:text-foreground"
+                  >
                     <Link href={buildMonitorHref({ type: "note" })}>Notes</Link>
                   </Button>
-                  <Button asChild variant="ghost" size="sm" className="font-mono text-[10px] font-bold uppercase tracking-widest text-muted-foreground hover:text-foreground">
+                  <Button
+                    asChild
+                    variant="ghost"
+                    size="sm"
+                    className="font-mono text-[10px] font-bold uppercase tracking-widest text-muted-foreground hover:text-foreground"
+                  >
                     <Link href={buildMonitorHref({ type: "tool" })}>Tools</Link>
                   </Button>
                 </div>
@@ -827,7 +1171,14 @@ function trendIconPlaceholder(
   }
 
   if (trend === "down") {
-    return <TrendingDown className={cn("h-3 w-3", urgency === "late" ? "text-destructive" : "text-amber-500")} />;
+    return (
+      <TrendingDown
+        className={cn(
+          "h-3 w-3",
+          urgency === "late" ? "text-destructive" : "text-amber-500",
+        )}
+      />
+    );
   }
 
   return <Minus className="h-3 w-3 text-muted-foreground" />;

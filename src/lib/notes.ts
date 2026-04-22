@@ -15,7 +15,7 @@ export type NoteFrontmatter = {
   authorId?: string;
   heroImage?: string;
   category?: string;
-  [key: string]: string | number | boolean | string[] | null | undefined;
+  excludeFromIndexMonitoring?: boolean;
 };
 
 // Preserve existing type aliases for backward compatibility
@@ -54,4 +54,3 @@ export const getAllNoteSlugs = notesEngine.getAllSlugs;
 export const getNoteTranslation = notesEngine.getTranslation;
 export const getAllLocales = notesEngine.getAllLocales;
 export const getAllNotesTranslationsMap = notesEngine.getAllTranslationsMap;
-

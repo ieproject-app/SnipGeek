@@ -609,7 +609,7 @@ export function LayoutHeader({
               open={isMenuOpen}
               onOpenChange={(open) => setActiveView(open ? "menu" : "none")}
             >
-              <div className="relative z-110">
+              <div className="relative z-[110]">
                 <SnipTooltip
                   label={
                     dictionary?.promptGenerator?.tooltips?.moreMenu ?? "More Menu"
@@ -648,7 +648,7 @@ export function LayoutHeader({
                 align="end"
                 side="bottom"
                 sideOffset={18}
-                className="z-200 min-w-55 rounded-2xl border border-border bg-background p-0 shadow-2xl ring-1 ring-black/3 overflow-hidden"
+                className="z-[200] min-w-55 rounded-2xl border border-border bg-background p-0 shadow-2xl ring-1 ring-black/3 overflow-hidden"
               >
                 <div className="py-3">
                   <div className="px-4 py-2 mb-1">
@@ -1073,7 +1073,7 @@ export function LayoutHeader({
       {/* ── Notification Toast Pill (Floating Center, Outside Header bounds) ── */}
       <div
         className={cn(
-          "fixed top-3 left-1/2 z-100 -translate-x-1/2 pointer-events-none transition-all duration-500 [transition-timing-function:cubic-bezier(0.34,1.56,0.64,1)]",
+          "fixed top-3 left-1/2 z-[100] -translate-x-1/2 pointer-events-none transition-all duration-500 [transition-timing-function:cubic-bezier(0.34,1.56,0.64,1)]",
           mounted && message
             ? "opacity-100 translate-y-0 blur-0"
             : "opacity-0 -translate-y-6 blur-sm",

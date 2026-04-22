@@ -16,6 +16,8 @@ export type ToolRegistryEntry = {
   requiresAuth?: boolean;
   /** If true, the tool is not yet live in production. */
   devOnly?: boolean;
+  /** If true, keep this public tool out of index monitoring and priority queues. */
+  excludeFromIndexMonitoring?: boolean;
 };
 
 export const toolsRegistry: ToolRegistryEntry[] = [
@@ -25,7 +27,12 @@ export const toolsRegistry: ToolRegistryEntry[] = [
   { slug: "image-crop", label: "Image Crop" },
   { slug: "random-name-picker", label: "Random Name Picker" },
   { slug: "laptop-service-estimator", label: "Laptop Service Estimator" },
-  { slug: "prompt-generator", label: "Prompt Generator" },
+  {
+    slug: "prompt-generator",
+    label: "Prompt Generator",
+    devOnly: true,
+    excludeFromIndexMonitoring: true,
+  },
 
   // Internal tools — gated, do NOT count toward index monitoring by default
   { slug: "employee-history", label: "Employee History", requiresAuth: true },

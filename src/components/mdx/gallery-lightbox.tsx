@@ -141,7 +141,7 @@ export function GalleryLightbox({
       )}
 
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="z-100 flex max-h-screen max-w-[100vw] items-center justify-center border-none bg-transparent p-0 shadow-none outline-none [&>button]:hidden">
+        <DialogContent className="z-[100] flex max-h-screen max-w-[100vw] items-center justify-center border-none bg-transparent p-0 shadow-none outline-none [&>button]:hidden">
           <DialogTitle className="sr-only">Image gallery preview</DialogTitle>
           <DialogDescription className="sr-only">
             Use left and right controls to move between gallery images.

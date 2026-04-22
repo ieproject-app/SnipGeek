@@ -132,7 +132,7 @@ export function LocaleSuggestionBanner({
       // Uses z-45 so it floats above the secondary nav (z-20) but
       // below the header's own z-50 overlays.
       className={cn(
-        "fixed left-0 right-0 z-45 top-16",
+        "fixed left-0 right-0 z-[45] top-16",
         "transition-all duration-350 ease-out",
         visible
           ? "translate-y-0 opacity-100"

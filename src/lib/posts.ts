@@ -15,6 +15,7 @@ export type PostFrontmatter = {
   published?: boolean;
   featured?: boolean;
   tags?: string[];
+  excludeFromIndexMonitoring?: boolean;
   category?: string;
   authorId?: string;
   hideFromHome?: boolean;

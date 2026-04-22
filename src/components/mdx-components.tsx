@@ -22,7 +22,6 @@ import {
   Info,
   Lightbulb,
   TriangleAlert,
-  ShieldAlert,
 } from "lucide-react";
 import { GithubLogo } from "@/components/icons/github-logo";
 import { WindowsStoreLogo } from "@/components/icons/windows-store-logo";
@@ -200,9 +199,7 @@ export const DownloadButton = ({ id }: { id: string }) => {
             </span>
 
             <span className="mt-1 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
-              {linkData.fileSize && (
-                <span>{linkData.fileSize}</span>
-              )}
+              {linkData.fileSize && <span>{linkData.fileSize}</span>}
             </span>
           </span>
         </span>
@@ -222,7 +219,6 @@ export const DownloadButton = ({ id }: { id: string }) => {
     </span>
   );
 };
-
 
 export const ImageGrid = ({
   children,
@@ -286,7 +282,12 @@ export const Gallery = ({
       )}
       {...props}
     >
-      <div className={cn("grid grid-cols-1 gap-4 [&>p]:contents [&>span]:contents [&_span.block]:my-0! [&_span.block]:w-full [&_img]:my-0! [&_img]:rounded-xl [&_img]:w-full hover:[&_img]:shadow-md transition-shadow", gridCols)}>
+      <div
+        className={cn(
+          "grid grid-cols-1 gap-4 [&>p]:contents [&>span]:contents [&_span.block]:my-0! [&_span.block]:w-full [&_img]:my-0! [&_img]:rounded-xl [&_img]:w-full hover:[&_img]:shadow-md transition-shadow",
+          gridCols,
+        )}
+      >
         {children}
       </div>
       {caption && (
@@ -497,27 +498,6 @@ const MdxBlockquote = ({
   </blockquote>
 );
 
-const MdxPre = ({
-  children,
-  className,
-  class: _class,
-  style,
-  ...props
-}: MdxElementProps & { style?: React.CSSProperties }) => (
-  <pre
-    className={cn(
-      "rounded-lg p-6 my-6 overflow-x-auto border border-primary/5 text-[13px] leading-relaxed font-mono",
-      "[&>code]:bg-transparent [&>code]:p-0 [&>code]:text-inherit [&>code]:font-normal",
-      _class,
-      className,
-    )}
-    style={style}
-    {...props}
-  >
-    {children}
-  </pre>
-);
-
 const MdxHr = ({ class: _class, className, ...props }: MdxElementProps) => (
   <hr
     className={cn(
@@ -620,7 +600,7 @@ const calloutConfig: Record<
     label: "Warning",
   },
   danger: {
-    icon: ShieldAlert,
+    icon: TriangleAlert,
     className: "border-rose-500/30 bg-rose-500/8",
     iconClassName: "text-rose-500",
     label: "Important",
@@ -677,10 +657,13 @@ export const Steps = ({
         }
 
         return React.cloneElement(
-          child as React.ReactElement<{ stepNumber?: number; isLast?: boolean }>,
+          child as React.ReactElement<{
+            stepNumber?: number;
+            isLast?: boolean;
+          }>,
           {
-          stepNumber: index + 1,
-          isLast: index === items.length - 1,
+            stepNumber: index + 1,
+            isLast: index === items.length - 1,
           },
         );
       })}
@@ -765,7 +748,7 @@ export const mdxComponents = {
     <details
       className={cn(
         "my-6 rounded-xl border border-primary/10 bg-muted/20 p-4",
-        className
+        className,
       )}
       {...props}
     >
@@ -776,7 +759,7 @@ export const mdxComponents = {
     <summary
       className={cn(
         "font-display cursor-pointer font-bold transition-colors hover:text-accent",
-        className
+        className,
       )}
       {...props}
     >
@@ -793,9 +776,3 @@ export const mdxComponents = {
   Steps,
   Step,
 };
-
-
-
-
-
-

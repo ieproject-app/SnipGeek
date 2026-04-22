@@ -1,12 +1,12 @@
-'use client';
+"use client";
 
-import { useEffect, ReactNode } from 'react';
-import { useRouter } from 'next/navigation';
-import { useUser, useDoc, useFirestore, useMemoFirebase } from '@/firebase';
-import { doc } from 'firebase/firestore';
-import { Loader2, ShieldAlert } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import Link from 'next/link';
+import { useEffect, ReactNode } from "react";
+import { useRouter } from "next/navigation";
+import { useUser, useDoc, useFirestore, useMemoFirebase } from "@/firebase";
+import { doc } from "firebase/firestore";
+import { Loader2, TriangleAlert } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 interface AdminGuardProps {
   children: ReactNode;
@@ -24,15 +24,18 @@ export function AdminGuard({ children }: AdminGuardProps) {
   // Memoize the document reference to the user's role
   const adminDocRef = useMemoFirebase(() => {
     if (!firestore || !user?.uid) return null;
-    return doc(firestore, 'roles_admin', user.uid);
+    return doc(firestore, "roles_admin", user.uid);
   }, [firestore, user?.uid]);
 
   // Subscribe to the admin document
-  const { data: adminDoc, isLoading: isAdminLoading, error: adminError } = useDoc(adminDocRef);
+  const {
+    data: adminDoc,
+    isLoading: isAdminLoading,
+    error: adminError,
+  } = useDoc(adminDocRef);
 
-  // eslint-disable-next-line no-console
   useEffect(() => {
-    console.log('[AdminGuard STATE]', {
+    console.log("[AdminGuard STATE]", {
       uid: user?.uid,
       email: user?.email,
       isUserLoading,
@@ -46,7 +49,7 @@ export function AdminGuard({ children }: AdminGuardProps) {
   useEffect(() => {
     // If auth is finished and no user, redirect to login
     if (!isUserLoading && !user) {
-      router.push('/admin/login');
+      router.push("/admin/login");
     }
   }, [user, isUserLoading, router]);
 
@@ -67,8 +70,7 @@ export function AdminGuard({ children }: AdminGuardProps) {
 
   // 3. If admin doc doesn't exist, access is denied
   if (!adminDoc) {
-    // eslint-disable-next-line no-console
-    console.log('[AdminGuard DEBUG]', {
+    console.log("[AdminGuard DEBUG]", {
       uid: user.uid,
       email: user.email,
       expectedFirestorePath: `roles_admin/${user.uid}`,
@@ -76,20 +78,23 @@ export function AdminGuard({ children }: AdminGuardProps) {
     return (
       <div className="flex h-screen w-full flex-col items-center justify-center p-6 text-center bg-background">
         <div className="mb-6 p-4 bg-destructive/10 rounded-full">
-            <ShieldAlert className="h-12 w-12 text-destructive" />
+          <TriangleAlert className="h-12 w-12 text-destructive" />
         </div>
-        <h1 className="font-display text-3xl font-black tracking-tighter mb-2">Access Denied</h1>
+        <h1 className="font-display text-3xl font-black tracking-tighter mb-2">
+          Access Denied
+        </h1>
         <p className="text-muted-foreground max-w-md mb-8">
-          Your account (<strong>{user.email}</strong>) does not have administrative privileges. 
-          Please contact the system owner to grant access.
+          Your account (<strong>{user.email}</strong>) does not have
+          administrative privileges. Please contact the system owner to grant
+          access.
         </p>
         <div className="flex gap-4">
-            <Button asChild variant="outline">
-                <Link href="/">Back to Website</Link>
-            </Button>
-            <Button onClick={() => window.location.href = '/admin/login'}>
-                Try Different Account
-            </Button>
+          <Button asChild variant="outline">
+            <Link href="/">Back to Website</Link>
+          </Button>
+          <Button onClick={() => (window.location.href = "/admin/login")}>
+            Try Different Account
+          </Button>
         </div>
       </div>
     );

@@ -1,7 +1,10 @@
 import { createSign } from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { getAdminDb, requireAdmin } from "@/lib/api-helpers";
-import type { IndexStatusDoc, IndexStatusValue } from "@/app/api/admin/index-status/route";
+import type {
+  IndexStatusDoc,
+  IndexStatusValue,
+} from "@/app/api/admin/index-status/route";
 import { buildContentInventory } from "@/lib/content-inventory";
 
 /**
@@ -26,7 +29,8 @@ const CACHE_TTL_MS = 3 * 24 * 60 * 60 * 1000; // 3 days
 
 const GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token";
 const GSC_SCOPE = "https://www.googleapis.com/auth/webmasters.readonly";
-const GSC_INSPECTION_URL = "https://searchconsole.googleapis.com/v1/urlInspection/index:inspect";
+const GSC_INSPECTION_URL =
+  "https://searchconsole.googleapis.com/v1/urlInspection/index:inspect";
 
 type ServiceAccountCredentials = {
   client_email: string;
@@ -69,7 +73,9 @@ function parseServiceAccountEnv(raw: string): ServiceAccountCredentials {
   const parsed = JSON.parse(json) as Partial<ServiceAccountCredentials>;
 
   if (!parsed.client_email || !parsed.private_key) {
-    throw new Error("GSC_SERVICE_ACCOUNT_JSON is missing client_email or private_key.");
+    throw new Error(
+      "GSC_SERVICE_ACCOUNT_JSON is missing client_email or private_key.",
+    );
   }
 
   return {
@@ -106,7 +112,9 @@ function buildJwtAssertion(serviceAccount: ServiceAccountCredentials): string {
   return `${unsigned}.${signature}`;
 }
 
-async function getAccessToken(serviceAccount: ServiceAccountCredentials): Promise<string> {
+async function getAccessToken(
+  serviceAccount: ServiceAccountCredentials,
+): Promise<string> {
   const assertion = buildJwtAssertion(serviceAccount);
   const res = await fetch(serviceAccount.token_uri || GOOGLE_TOKEN_URL, {
     method: "POST",
@@ -124,7 +132,11 @@ async function getAccessToken(serviceAccount: ServiceAccountCredentials): Promis
   };
 
   if (!res.ok || !json.access_token) {
-    throw new Error(json.error_description || json.error || "Failed to obtain Google OAuth token.");
+    throw new Error(
+      json.error_description ||
+        json.error ||
+        "Failed to obtain Google OAuth token.",
+    );
   }
 
   return json.access_token;
@@ -150,17 +162,28 @@ async function inspectUrlWithGsc(params: {
   const json = (await res.json().catch(() => ({}))) as InspectionApiResponse;
 
   if (!res.ok) {
-    throw new Error(json.error?.message || `GSC inspection failed (${res.status}).`);
+    throw new Error(
+      json.error?.message || `GSC inspection failed (${res.status}).`,
+    );
   }
 
   return json;
 }
 
-function mapInspectionToStatus(result: InspectionApiResponse): IndexStatusValue {
-  const verdict = result.inspectionResult?.indexStatusResult?.verdict?.toUpperCase() || "";
-  const coverageState = result.inspectionResult?.indexStatusResult?.coverageState?.toLowerCase() || "";
-  const indexingState = result.inspectionResult?.indexStatusResult?.indexingState?.toLowerCase() || "";
-  const pageFetchState = result.inspectionResult?.indexStatusResult?.pageFetchState?.toLowerCase() || "";
+function mapInspectionToStatus(
+  result: InspectionApiResponse,
+): IndexStatusValue {
+  const verdict =
+    result.inspectionResult?.indexStatusResult?.verdict?.toUpperCase() || "";
+  const coverageState =
+    result.inspectionResult?.indexStatusResult?.coverageState?.toLowerCase() ||
+    "";
+  const indexingState =
+    result.inspectionResult?.indexStatusResult?.indexingState?.toLowerCase() ||
+    "";
+  const pageFetchState =
+    result.inspectionResult?.indexStatusResult?.pageFetchState?.toLowerCase() ||
+    "";
 
   if (verdict === "PASS") {
     return "indexed";
@@ -191,6 +214,21 @@ function mapInspectionToStatus(result: InspectionApiResponse): IndexStatusValue 
   return "not_submitted";
 }
 
+function mergeInspectedStatus(
+  existingStatus: IndexStatusValue | undefined,
+  inspectedStatus: IndexStatusValue,
+): IndexStatusValue {
+  if (inspectedStatus === "indexed") return "indexed";
+  if (inspectedStatus === "excluded") return "excluded";
+  if (inspectedStatus === "submitted") return "submitted";
+
+  if (existingStatus === "indexed" || existingStatus === "submitted") {
+    return existingStatus;
+  }
+
+  return inspectedStatus;
+}
+
 function summarizeInspection(result: InspectionApiResponse): string {
   const index = result.inspectionResult?.indexStatusResult;
   return [
@@ -213,7 +251,9 @@ async function resolveInventoryMetadata(params: {
   title?: string;
 }) {
   const inventory = await buildContentInventory({ includeDrafts: true });
-  const match = inventory.find((item) => item.id === params.id || item.url === params.url);
+  const match = inventory.find(
+    (item) => item.id === params.id || item.url === params.url,
+  );
 
   if (params.type && params.locale) {
     return {
@@ -256,13 +296,18 @@ export async function POST(req: NextRequest) {
     };
 
     if (!id || !url) {
-      return NextResponse.json({ error: "Required: id, url." }, { status: 400 });
+      return NextResponse.json(
+        { error: "Required: id, url." },
+        { status: 400 },
+      );
     }
 
     const db = getAdminDb();
     const docRef = db.collection("indexStatus").doc(id);
     const snap = await docRef.get();
-    const existing = snap.exists ? (snap.data() as Partial<IndexStatusDoc>) : null;
+    const existing = snap.exists
+      ? (snap.data() as Partial<IndexStatusDoc>)
+      : null;
 
     // Serve from cache if fresh and not forced.
     if (!force && existing && isCacheFresh(existing.lastCheckedAt)) {
@@ -304,7 +349,8 @@ export async function POST(req: NextRequest) {
     if (!resolvedType || !resolvedLocale) {
       return NextResponse.json(
         {
-          error: "Missing content metadata. Provide type and locale for first-time GSC inspection.",
+          error:
+            "Missing content metadata. Provide type and locale for first-time GSC inspection.",
         },
         { status: 400 },
       );
@@ -323,7 +369,9 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const serviceAccount = parseServiceAccountEnv(process.env.GSC_SERVICE_ACCOUNT_JSON!);
+    const serviceAccount = parseServiceAccountEnv(
+      process.env.GSC_SERVICE_ACCOUNT_JSON!,
+    );
     const accessToken = await getAccessToken(serviceAccount);
     const inspection = await inspectUrlWithGsc({
       accessToken,
@@ -331,7 +379,8 @@ export async function POST(req: NextRequest) {
       siteUrl,
     });
 
-    const status = mapInspectionToStatus(inspection);
+    const inspectedStatus = mapInspectionToStatus(inspection);
+    const status = mergeInspectedStatus(existing?.status, inspectedStatus);
     const lastCheckedAt = new Date().toISOString();
     const lastGSCResult = summarizeInspection(inspection);
 
@@ -361,7 +410,8 @@ export async function POST(req: NextRequest) {
     });
   } catch (error) {
     console.error("[gsc inspect]", error);
-    const message = error instanceof Error ? error.message : "Failed to inspect URL.";
+    const message =
+      error instanceof Error ? error.message : "Failed to inspect URL.";
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }

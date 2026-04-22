@@ -210,8 +210,8 @@ function WinnerCard({
   // In fullscreen: render as absolute overlay inside the wrapper.
   // Outside fullscreen: render as fixed overlay over the whole page.
   const positionClass = isFullscreen
-    ? "absolute inset-0 z-60"
-    : "fixed inset-0 z-300";
+    ? "absolute inset-0 z-[60]"
+      : "fixed inset-0 z-[300]";
 
   return (
     <div

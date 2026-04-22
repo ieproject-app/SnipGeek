@@ -3,16 +3,9 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
-  Bug,
-  X,
-  ExternalLink,
-  Globe,
-  Lock,
-  Eye,
-  EyeOff,
-} from "lucide-react";
+import { Bug, X, ExternalLink, Globe, Lock, Eye, EyeOff } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { toolsRegistry } from "@/lib/tools-registry";
 
 type ToolEntry = {
   id: string;
@@ -23,18 +16,28 @@ type ToolEntry = {
 };
 
 const ALL_TOOLS: ToolEntry[] = [
-  { id: "tools-listing", name: "Tools (listing)", path: "/tools", indexed: true, category: "page" },
-  { id: "bios-keys", name: "BIOS Keys & Boot Menu", path: "/tools/bios-keys-boot-menu", indexed: true, category: "public" },
-  { id: "spin-wheel", name: "Spin Wheel", path: "/tools/spin-wheel", indexed: true, category: "public" },
-  { id: "random-name", name: "Random Name Picker", path: "/tools/random-name-picker", indexed: true, category: "public" },
-  { id: "laptop-estimator", name: "Laptop Service Estimator", path: "/tools/laptop-service-estimator", indexed: true, category: "public" },
-  { id: "image-crop", name: "Image Crop", path: "/tools/image-crop", indexed: true, category: "public" },
-  { id: "employee-history", name: "Employee History", path: "/tools/employee-history", indexed: false, category: "internal" },
-  { id: "number-generator", name: "Number Generator", path: "/tools/number-generator", indexed: false, category: "internal" },
-  { id: "prompt-generator", name: "Prompt Generator", path: "/tools/prompt-generator", indexed: false, category: "internal" },
-  { id: "signatories-index", name: "Signatories Index", path: "/tools/signatories-index", indexed: false, category: "internal" },
-  { id: "compress-pdf", name: "Compress PDF", path: "/tools/compress-pdf", indexed: false, category: "internal" },
-  { id: "address-label", name: "Address Label Generator", path: "/tools/address-label-generator", indexed: false, category: "internal" },
+  {
+    id: "tools-listing",
+    name: "Tools (listing)",
+    path: "/tools",
+    indexed: true,
+    category: "page",
+  },
+  ...toolsRegistry.map<ToolEntry>((tool) => ({
+    id: tool.slug,
+    name: tool.label,
+    path: `/tools/${tool.slug}`,
+    indexed:
+      tool.requiresAuth !== true &&
+      tool.devOnly !== true &&
+      tool.excludeFromIndexMonitoring !== true,
+    category:
+      tool.requiresAuth === true ||
+      tool.devOnly === true ||
+      tool.excludeFromIndexMonitoring === true
+        ? "internal"
+        : "public",
+  })),
 ];
 
 const CATEGORY_CONFIG = {
@@ -79,7 +82,7 @@ export function DevIndexTracker() {
         className={cn(
           "fixed bottom-24 right-5 z-[9999] flex h-10 w-10 items-center justify-center rounded-full shadow-lg transition-all duration-200",
           "bg-neutral-900 text-neutral-100 ring-1 ring-white/10 hover:ring-white/30 hover:scale-105 active:scale-95",
-          isOpen && "rotate-90"
+          isOpen && "rotate-90",
         )}
       >
         {isOpen ? <X className="h-4 w-4" /> : <Bug className="h-4 w-4" />}
@@ -91,7 +94,7 @@ export function DevIndexTracker() {
           "fixed right-0 top-0 z-[9998] h-full w-72 overflow-y-auto",
           "bg-neutral-950 text-neutral-100 border-l border-white/10 shadow-2xl",
           "transition-transform duration-300 ease-in-out flex flex-col",
-          isOpen ? "translate-x-0" : "translate-x-full"
+          isOpen ? "translate-x-0" : "translate-x-full",
         )}
       >
         {/* Header */}
@@ -136,7 +139,12 @@ export function DevIndexTracker() {
               <div key={cat}>
                 <div className="flex items-center gap-2 bg-neutral-900/30 px-4 py-2">
                   <Icon className={cn("h-3 w-3", cfg.color)} />
-                  <span className={cn("font-mono text-[10px] font-bold uppercase tracking-widest", cfg.color)}>
+                  <span
+                    className={cn(
+                      "font-mono text-[10px] font-bold uppercase tracking-widest",
+                      cfg.color,
+                    )}
+                  >
                     {cfg.label}
                   </span>
                 </div>
@@ -144,7 +152,10 @@ export function DevIndexTracker() {
                   {tools.map((tool) => {
                     const href = `${localePrefix}${tool.path}`;
                     return (
-                      <li key={tool.id} className="group flex items-center gap-3 px-4 py-2.5 hover:bg-white/5 transition-colors">
+                      <li
+                        key={tool.id}
+                        className="group flex items-center gap-3 px-4 py-2.5 hover:bg-white/5 transition-colors"
+                      >
                         <div className="flex-1 min-w-0">
                           <p className="truncate font-mono text-[11px] font-medium text-neutral-200 leading-snug">
                             {tool.name}
@@ -159,7 +170,7 @@ export function DevIndexTracker() {
                               "font-mono text-[9px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded",
                               tool.indexed
                                 ? "bg-emerald-500/15 text-emerald-400"
-                                : "bg-rose-500/15 text-rose-400"
+                                : "bg-rose-500/15 text-rose-400",
                             )}
                           >
                             {tool.indexed ? "index" : "noindex"}

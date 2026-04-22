@@ -1,0 +1,97 @@
+---
+title: "GitHub Copilot Pro Ditutup Sementara — Ini yang Berubah"
+slug: "github-copilot-pro-plan-changes-2026"
+translationKey: "github-copilot-pro-plan-changes-2026"
+date: "2026-04-22"
+description: "GitHub menghentikan sementara pendaftaran baru Copilot Pro, Pro+, dan Student plan, memperketat batas token, dan menghapus model Opus dari Pro."
+heroImage: "/images/_posts/github/github-copilot-temporarily-closed/github-banner.webp"
+imageAlt: "Banner GitHub Copilot Pro yang menampilkan status temporarily unavailable"
+published: true
+featured: false
+tags: ["web", "ai", "github", "code-editor", "devops"]
+category: "AI"
+---
+
+Hari ini saya lumayan syok. Niatnya mau cek-cek harga langganan GitHub Copilot Pro untuk perbandingan, eh malah bingung sendiri karena tombol pendaftarannya hilang dan diganti tulisan *"Temporarily unavailable."* Saya pikir ini cuma *bug* tampilan. Sudah coba refresh berkali-kali, buka *incognito*, sampai cek dari HP, hasilnya sama saja.
+
+Ternyata pendaftarannya memang ditutup. Untung saya sudah balik pakai Antigravity — biarpun model Claude-nya lumayan cepat kena limit kalau dipakai nonstop, tapi model Gemini Flash-nya sudah lebih dari cukup buat kebutuhan *coding* saya sehari-hari.
+
+Tanggal 20 April 2026, GitHub mengumumkan secara resmi serangkaian perubahan pada semua paket Copilot individual. Dan ini bukan sekadar penyesuaian kecil.
+
+<Callout variant="info" title="Catatan Kesegaran Konten">
+  Artikel ini ditulis berdasarkan pengumuman resmi GitHub yang dipublikasikan 20 April 2026. Detail bisa berubah seiring pembaruan kebijakan GitHub.
+</Callout>
+
+## Tiga Perubahan Sekaligus
+
+GitHub melakukan tiga perubahan besar dalam satu pengumuman, semuanya dikaitkan dengan alasan yang sama: menjaga kualitas layanan bagi pengguna yang sudah berlangganan.
+
+**Pendaftaran baru dihentikan sementara — tanpa pengecualian**
+
+Sign-up baru untuk Copilot Pro, Pro+, dan Student plan semuanya di-*pause* tanpa ada tanggal buka yang pasti. Kalau kamu sudah langganan sebelumnya, tidak ada perubahan dari sisi kamu. Tapi kalau baru mau daftar — bahkan Student plan sekalipun — ya harus sabar dulu.
+
+![Halaman pricing GitHub Copilot menampilkan plan Pro dengan status temporarily unavailable](/images/_posts/github/github-copilot-temporarily-closed/image3-pro-plan-disable.webp)
+*Plan Copilot Pro ditandai sebagai temporarily unavailable di halaman billing GitHub.*
+
+**Batas penggunaan berbasis token diperketat**
+
+Ini bagian yang paling bikin saya terkejut — karena limit sebenarnya sudah ada sebelumnya, hanya sekarang lebih ketat. Copilot sekarang punya dua batas terpisah: *session limit* (jendela pendek yang cepat reset) dan *weekly limit* (7 hari berbasis konsumsi token). Keduanya berdiri sendiri dan tidak bergantung pada sisa *premium request* kamu.
+
+Yang bikin pusing: kamu bisa saja masih punya *premium request*, tapi tetap kena batas kalau kuota token mingguan sudah habis. GitHub menambahkan *weekly limit* ini khusus untuk meredam *agentic workflows* — sesi coding panjang di mana agen Copilot berjalan secara otonom dalam waktu lama. GitHub bahkan terang-terangan bilang bahwa sekarang sudah umum terjadi kasus di mana hanya beberapa *request* saja langsung menelan biaya melebihi harga paket bulanan.
+
+<Expandable title="Cara kerja dua jenis limit ini" icon="info">
+  - **Session limit**: Reset secara berkala. Dirancang untuk mencegah overload saat trafik tinggi. Sebagian besar pengguna tidak akan kena ini dalam pola penggunaan normal.
+  - **Weekly limit**: Cap token selama 7 hari. Dibuat khusus untuk mengontrol sesi *agentic* panjang dan paralel. Kalau kena limit ini sementara masih ada *premium request*, Copilot otomatis pakai *Auto model selection* sampai minggu berikutnya dimulai.
+  - Kedua limit sekarang ditampilkan di VS Code dan Copilot CLI saat kamu mendekati 75% penggunaan — fitur transparansi baru yang ditambahkan bersamaan dengan pengumuman ini.
+</Expandable>
+
+**Model Opus dihapus dari plan Pro**
+
+Kalau selama ini kamu akses Claude Opus lewat Copilot Pro, akses itu sekarang sudah hilang. Opus 4.7 kini eksklusif untuk Pro+ ($39/bulan). Dan selain itu, Opus 4.5 serta Opus 4.6 juga sedang dalam proses penghapusan dari Pro+.
+
+![Peringatan batas penggunaan Copilot yang ditampilkan di VS Code](/images/_posts/github/github-copilot-temporarily-closed/image1-vscode.webp)
+*VS Code sekarang menampilkan banner peringatan ketika kamu mendekati batas token mingguan.*
+
+## Kenapa GitHub Mengambil Langkah Ini
+
+GitHub cukup jujur dalam pengumuman ini — lebih jujur dari yang biasanya saya ekspektasikan dari sebuah kebijakan produk. Inti masalahnya sederhana: *penggunaan AI agentic meledak, dan infrastruktur mereka tidak dirancang untuk menanggung beban sebesar itu.*
+
+GitHub secara eksplisit menyebutkan bahwa sudah menjadi hal biasa kalau hanya beberapa *request* langsung menelan biaya melebihi harga paket bulanan pengguna. Di titik itu, ekonominya sudah tidak masuk akal. Menutup pendaftaran baru adalah cara mereka membeli waktu untuk menstabilkan layanan bagi pengguna lama, sambil membenahi model harga dan infrastruktur yang ada.
+
+Bukan *shutdown*. Tapi juga bukan tambal sulam kecil — ini GitHub sedang beli waktu dengan sengaja.
+
+## Dampaknya Kalau Kamu Sudah Pakai Copilot Pro
+
+Langgananmu tetap jalan. Tapi beberapa hal sudah berbeda:
+
+- **Model Opus sudah tidak bisa diakses** dari plan Pro. Kalau workflow kamu mengandalkan Claude Opus untuk reasoning berat, kamu perlu ganti model atau upgrade.
+- **Weekly token limit lebih ketat.** Penggunaan *agentic* yang berat akan lebih cepat mentok. Indikator penggunaan baru di VS Code dan Copilot CLI membantu kamu pantau ini sebelum terlanjur terpotong.
+- **Refund tersedia**, tapi hanya sampai 20 Mei 2026. Kalau perubahan ini terasa terlalu mengganggu, kamu bisa cancel dan ajukan pengembalian dana untuk sisa periode langganan melalui [GitHub Billing settings](https://github.com/settings/billing/licensing).
+
+![Copilot CLI menampilkan status penggunaan dan perintah yang tersedia di terminal](/images/_posts/github/github-copilot-temporarily-closed/image2-cli)
+
+<div className="-mt-3 mb-6 text-center text-sm italic text-muted-foreground">Copilot CLI sekarang menampilkan status penggunaan — berguna untuk cek sisa budget token sebelum memulai sesi agentic yang panjang.</div>
+
+## Perlu Upgrade ke Pro+ atau Tidak?
+
+Pro+ seharga $39/bulan memberikan lebih dari 5× limit penggunaan dibanding Pro, akses ke Opus 4.7, dan GitHub Spark. Worth it atau tidak, sepenuhnya tergantung seberapa sering kamu pakai fitur *agentic*.
+
+Untuk developer yang cuma butuh *code completion*, *inline suggestion*, dan sesekali chat — plan Pro atau bahkan Free kemungkinan masih lebih dari cukup. Plan Free masih memberikan 50 request *agent mode* per bulan, 2.000 *completions*, dan akses ke Haiku 4.5 serta GPT-5 mini. Cukup untuk penggunaan ringan.
+
+Tapi kalau kamu rutin menjalankan agen multi-langkah, sering buat kode dalam sesi paralel besar, atau butuh model sekelas Opus untuk reasoning kompleks — Pro+ mulai terasa masuk akal.
+
+<Callout variant="tip" title="Tips Hindari Mentok di Limit">
+  GitHub berbagi beberapa cara untuk mengurangi konsumsi token sebelum kena batas:
+  - Pakai model yang lebih ringan (multiplier kecil) untuk tugas rutin — simpan model berat untuk yang benar-benar butuh.
+  - Gunakan **plan mode** di VS Code atau Copilot CLI sebelum mengerjakan tugas kompleks. Ini meningkatkan efisiensi dan mengurangi token yang terbuang sia-sia.
+  - Batasi *parallel workflow*. Perintah seperti `/fleet` bisa meroketkan konsumsi token dengan cepat.
+</Callout>
+
+---
+
+Untuk saat ini, kalau kamu butuh Copilot Pro tapi belum sempat daftar, pilihan paling realistis adalah pantau terus *changelog* GitHub dan tunggu. Memang agak menyebalkan — tapi setidaknya GitHub jujur soal alasannya, dan itu sudah lebih baik dari diam-diam mengubah ToS.
+
+Kalau kamu sedang cari alternatif atau mau tahu lebih soal tools yang saya pakai sehari-hari dalam workflow dev, kamu bisa cek juga artikel tentang [setup Disqus di SnipGeek](/blog/disqus-comments-snipgeek).
+
+### Referensi
+1. [Changes to GitHub Copilot Individual plans — GitHub Blog](https://github.blog/news-insights/company-news/changes-to-github-copilot-individual-plans/)

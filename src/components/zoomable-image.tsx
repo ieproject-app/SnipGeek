@@ -107,7 +107,7 @@ export const ZoomableImage = ({
                 </div>
             </DialogTrigger>
 
-            <DialogContent className="max-w-[100vw] max-h-screen border-none bg-transparent p-0 shadow-none outline-none flex items-center justify-center z-100 [&>button]:hidden">
+            <DialogContent className="max-w-[100vw] max-h-screen border-none bg-transparent p-0 shadow-none outline-none flex items-center justify-center z-[100] [&>button]:hidden">
                 <DialogTitle className="sr-only">Pratinjau Gambar</DialogTitle>
                 <DialogDescription className="sr-only">
                     Tampilan gambar diperbesar untuk {alt || "gambar artikel"}

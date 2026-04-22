@@ -15,7 +15,9 @@ import {
   Copy,
   Clock,
   ShieldCheck,
+  SlidersHorizontal,
 } from "lucide-react";
+
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -42,11 +44,36 @@ const STATUS_OPTIONS: {
   pill: string;
   dot: string;
 }[] = [
-  { value: "unknown",       label: "Unknown",      pill: "border-muted-foreground/20 text-muted-foreground",         dot: "bg-muted-foreground/40" },
-  { value: "not_submitted", label: "Belum Submit", pill: "border-destructive/30 text-destructive bg-destructive/5",  dot: "bg-destructive" },
-  { value: "submitted",     label: "Submitted",    pill: "border-amber-500/40 text-amber-700 dark:text-amber-400 bg-amber-500/5", dot: "bg-amber-500" },
-  { value: "indexed",       label: "Indexed",      pill: "border-emerald-500/40 text-emerald-700 dark:text-emerald-400 bg-emerald-500/5", dot: "bg-emerald-500" },
-  { value: "excluded",      label: "Excluded",     pill: "border-zinc-500/30 text-zinc-600 bg-zinc-500/5",           dot: "bg-zinc-500" },
+  {
+    value: "unknown",
+    label: "Unknown",
+    pill: "border-muted-foreground/20 text-muted-foreground",
+    dot: "bg-muted-foreground/40",
+  },
+  {
+    value: "not_submitted",
+    label: "Belum Submit",
+    pill: "border-destructive/30 text-destructive bg-destructive/5",
+    dot: "bg-destructive",
+  },
+  {
+    value: "submitted",
+    label: "Submitted",
+    pill: "border-amber-500/40 text-amber-700 dark:text-amber-400 bg-amber-500/5",
+    dot: "bg-amber-500",
+  },
+  {
+    value: "indexed",
+    label: "Indexed",
+    pill: "border-emerald-500/40 text-emerald-700 dark:text-emerald-400 bg-emerald-500/5",
+    dot: "bg-emerald-500",
+  },
+  {
+    value: "excluded",
+    label: "Excluded",
+    pill: "border-zinc-500/30 text-zinc-600 bg-zinc-500/5",
+    dot: "bg-zinc-500",
+  },
 ];
 
 function statusOpt(v: IndexStatusValue) {
@@ -61,6 +88,9 @@ function typeIcon(type: InventoryItem["type"]) {
 
 const GSC_PROPERTY_ID = "sc-domain:snipgeek.com";
 const GSC_PROPERTY_BASE = "https://search.google.com/u/0/search-console";
+const GSC_WINDOW_NAME = "snipgeek-gsc-console";
+
+let gscWindowRef: Window | null = null;
 
 /** Minimum gap (ms) before allowing a re-refresh — 24 hours */
 const REFRESH_COOLDOWN_MS = 24 * 60 * 60 * 1000;
@@ -93,11 +123,6 @@ const ADMIN_SELECT_CONTENT_CLASSNAME =
   "border-border bg-popover text-popover-foreground shadow-2xl";
 const ADMIN_SELECT_ITEM_CLASSNAME =
   "text-popover-foreground data-[state=checked]:bg-accent/10 data-[state=checked]:text-foreground data-[highlighted]:bg-accent/18 data-[highlighted]:text-foreground dark:data-[state=checked]:bg-accent/16 dark:data-[highlighted]:bg-accent/24";
-
-function gscPropertyUrl(property = GSC_PROPERTY_ID) {
-  const params = new URLSearchParams({ resource_id: property });
-  return `${GSC_PROPERTY_BASE}?${params.toString()}`;
-}
 
 function formatLastCheckedAt(value?: string) {
   if (!value) return "Never checked";
@@ -164,10 +189,12 @@ function summarizeForHumans(raw?: string) {
   const coverageLower = coverage?.toLowerCase() ?? "";
   if (coverageLower.includes("indexed")) {
     headline = "Indexed in Google";
-    tone = "border-emerald-500/40 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400";
+    tone =
+      "border-emerald-500/40 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400";
   } else if (coverageLower.includes("unknown to google")) {
     headline = "Not known by Google yet";
-    tone = "border-amber-500/40 bg-amber-500/10 text-amber-700 dark:text-amber-400";
+    tone =
+      "border-amber-500/40 bg-amber-500/10 text-amber-700 dark:text-amber-400";
   } else if (coverageLower.includes("excluded")) {
     headline = "Excluded from Google index";
     tone = "border-zinc-500/40 bg-zinc-500/10 text-zinc-700 dark:text-zinc-300";
@@ -182,9 +209,15 @@ function summarizeForHumans(raw?: string) {
   const details = [
     coverage ? `Coverage: ${coverage}` : null,
     verdict ? `Verdict: ${verdict}` : null,
-    indexingState && indexingState !== "Not specified" ? `Indexing: ${indexingState}` : null,
-    fetchState && fetchState !== "Not specified" ? `Fetch: ${fetchState}` : null,
-    robotsState && robotsState !== "Not specified" ? `Robots: ${robotsState}` : null,
+    indexingState && indexingState !== "Not specified"
+      ? `Indexing: ${indexingState}`
+      : null,
+    fetchState && fetchState !== "Not specified"
+      ? `Fetch: ${fetchState}`
+      : null,
+    robotsState && robotsState !== "Not specified"
+      ? `Robots: ${robotsState}`
+      : null,
     data.crawl ? `Last crawl: ${formatLastCheckedAt(data.crawl)}` : null,
   ].filter(Boolean) as string[];
 
@@ -195,7 +228,11 @@ function summarizeForHumans(raw?: string) {
   };
 }
 
-type GscQuickFilter = "all" | "needs_review" | "unknown_google" | "indexed_google";
+type GscQuickFilter =
+  | "all"
+  | "needs_review"
+  | "unknown_google"
+  | "indexed_google";
 
 function matchesGscQuickFilter(filter: GscQuickFilter, row?: RowState) {
   if (filter === "all") return true;
@@ -228,6 +265,10 @@ type RowState = {
   lastGSCResult?: string;
 };
 
+function isMonitoringOptOut(item: InventoryItem) {
+  return item.excludeFromIndexMonitoring === true;
+}
+
 type BatchRefreshState = {
   running: boolean;
   label: string;
@@ -240,6 +281,14 @@ type RefreshGscOptions = {
   force?: boolean;
 };
 
+function WorkspaceSectionLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <span className="font-mono text-[9px] font-bold uppercase tracking-[0.24em] text-muted-foreground">
+      {children}
+    </span>
+  );
+}
+
 export function ContentTable() {
   const [inventory, setInventory] = useState<InventoryItem[] | null>(null);
   const [loading, setLoading] = useState(true);
@@ -249,9 +298,12 @@ export function ContentTable() {
   const [filterStatus, setFilterStatus] = useState<string>("all");
   const [filterLocale, setFilterLocale] = useState<string>("all");
   // visibility: "all" = show everything, "public" = only indexable, "hidden" = only draft/gated/unpaired
-  const [filterVisibility, setFilterVisibility] = useState<"all" | "public" | "hidden">("all");
+  const [filterVisibility, setFilterVisibility] = useState<
+    "all" | "public" | "hidden"
+  >("all");
   const [search, setSearch] = useState("");
   const [rowState, setRowState] = useState<Record<string, RowState>>({});
+  const [advancedFiltersOpen, setAdvancedFiltersOpen] = useState(false);
   const [batchSize, setBatchSize] = useState<string>("10");
   const [batchRefresh, setBatchRefresh] = useState<BatchRefreshState>({
     running: false,
@@ -265,7 +317,10 @@ export function ContentTable() {
     (async () => {
       try {
         setLoading(true);
-        const [inv, st] = await Promise.all([fetchContentInventory(), fetchIndexStatuses()]);
+        const [inv, st] = await Promise.all([
+          fetchContentInventory(),
+          fetchIndexStatuses(),
+        ]);
         setInventory(inv.items);
         const initial: Record<string, RowState> = {};
         const stMap = new Map(st.items.map((s) => [s.id, s]));
@@ -295,12 +350,20 @@ export function ContentTable() {
     if (t && ["blog", "note", "tool"].includes(t)) setFilterType(t);
 
     const s = sp.get("status");
-    if (s && ["unknown", "not_submitted", "submitted", "indexed", "excluded"].includes(s)) {
+    if (
+      s &&
+      ["unknown", "not_submitted", "submitted", "indexed", "excluded"].includes(
+        s,
+      )
+    ) {
       setFilterStatus(s);
     }
 
     const gsc = sp.get("gsc");
-    if (gsc && ["needs_review", "unknown_google", "indexed_google"].includes(gsc)) {
+    if (
+      gsc &&
+      ["needs_review", "unknown_google", "indexed_google"].includes(gsc)
+    ) {
       setGscQuickFilter(gsc as GscQuickFilter);
     }
 
@@ -320,6 +383,8 @@ export function ContentTable() {
     if (!inventory) return [];
     const q = search.trim().toLowerCase();
     return inventory.filter((item) => {
+      if (isMonitoringOptOut(item)) return false;
+
       // visibility filter: mirrors dashboard's isNonIndexable logic exactly
       const isHidden = Boolean(
         item.draft ||
@@ -341,7 +406,16 @@ export function ContentTable() {
       }
       return true;
     });
-  }, [inventory, filterType, filterLocale, filterStatus, filterVisibility, gscQuickFilter, search, rowState]);
+  }, [
+    inventory,
+    filterType,
+    filterLocale,
+    filterStatus,
+    filterVisibility,
+    gscQuickFilter,
+    search,
+    rowState,
+  ]);
 
   const statusCounts = useMemo(() => {
     if (!inventory) return null;
@@ -354,39 +428,112 @@ export function ContentTable() {
   }, [inventory, rowState]);
 
   const priorityCandidates = useMemo(() => {
-    return filtered
-      .filter((item) => !item.draft && !item.requiresAuth)
-      .filter((item) => item.type !== "blog" || item.hasLocalePair !== false)
-      .filter((item) => {
-        const status = rowState[item.id]?.status ?? "unknown";
-        return status === "unknown" || status === "not_submitted" || status === "submitted";
-      })
-      // Priority batch skips items that were refreshed within 24 hours
-      .filter((item) => !isFreshlyChecked(rowState[item.id]?.lastCheckedAt))
-      .sort((a, b) => {
-        const score = (item: InventoryItem) => {
+    return (
+      filtered
+        .filter((item) => !item.draft && !item.requiresAuth)
+        .filter((item) => item.type !== "blog" || item.hasLocalePair !== false)
+        .filter((item) => {
           const status = rowState[item.id]?.status ?? "unknown";
-          if (status === "unknown" || status === "not_submitted") return 0;
-          if (status === "submitted") return 1;
-          return 2;
-        };
+          return (
+            status === "unknown" ||
+            status === "not_submitted" ||
+            status === "submitted"
+          );
+        })
+        // Priority batch skips items that were refreshed within 24 hours
+        .filter((item) => !isFreshlyChecked(rowState[item.id]?.lastCheckedAt))
+        .sort((a, b) => {
+          const score = (item: InventoryItem) => {
+            const status = rowState[item.id]?.status ?? "unknown";
+            if (status === "unknown" || status === "not_submitted") return 0;
+            if (status === "submitted") return 1;
+            return 2;
+          };
 
-        const statusDiff = score(a) - score(b);
-        if (statusDiff !== 0) return statusDiff;
+          const statusDiff = score(a) - score(b);
+          if (statusDiff !== 0) return statusDiff;
 
-        const aDate = a.date ? new Date(a.date).getTime() : 0;
-        const bDate = b.date ? new Date(b.date).getTime() : 0;
-        return bDate - aDate;
-      });
+          const aDate = a.date ? new Date(a.date).getTime() : 0;
+          const bDate = b.date ? new Date(b.date).getTime() : 0;
+          return bDate - aDate;
+        })
+    );
   }, [filtered, rowState]);
 
+  const monitorInventory = useMemo(() => {
+    if (!inventory) return [];
+    return inventory.filter((item) => !isMonitoringOptOut(item));
+  }, [inventory]);
+
+  const publicCount = useMemo(() => {
+    return monitorInventory.filter(
+      (item) =>
+        !item.draft &&
+        !item.requiresAuth &&
+        (item.type !== "blog" || item.hasLocalePair !== false),
+    ).length;
+  }, [monitorInventory]);
+
+  const hiddenCount = useMemo(() => {
+    return monitorInventory.filter(
+      (item) =>
+        item.draft ||
+        item.requiresAuth ||
+        (item.type === "blog" && item.hasLocalePair === false),
+    ).length;
+  }, [monitorInventory]);
+
+  const actionableCount = useMemo(() => {
+    return monitorInventory.filter((item) => {
+      const hidden = Boolean(
+        item.draft ||
+        item.requiresAuth ||
+        (item.type === "blog" && item.hasLocalePair === false),
+      );
+      if (hidden) return false;
+      const status = rowState[item.id]?.status ?? "unknown";
+      return status === "unknown" || status === "not_submitted";
+    }).length;
+  }, [monitorInventory, rowState]);
+
+  const waitingCount = useMemo(() => {
+    return monitorInventory.filter((item) => {
+      const hidden = Boolean(
+        item.draft ||
+        item.requiresAuth ||
+        (item.type === "blog" && item.hasLocalePair === false),
+      );
+      if (hidden) return false;
+      return (rowState[item.id]?.status ?? "unknown") === "submitted";
+    }).length;
+  }, [monitorInventory, rowState]);
+
+  const freshCount = useMemo(() => {
+    return monitorInventory.filter((item) =>
+      isFreshlyChecked(rowState[item.id]?.lastCheckedAt),
+    ).length;
+  }, [monitorInventory, rowState]);
+
   const setRowField = (id: string, patch: Partial<RowState>) => {
-    setRowState((prev) => ({ ...prev, [id]: { ...prev[id], ...patch, dirty: true } }));
+    setRowState((prev) => ({
+      ...prev,
+      [id]: { ...prev[id], ...patch, dirty: true },
+    }));
   };
 
   const save = async (item: InventoryItem) => {
     const row = rowState[item.id];
     if (!row) return;
+
+    if (isMonitoringOptOut(item)) {
+      toast({
+        title: "Konten dikecualikan dari index monitoring",
+        description:
+          "Item ini tidak perlu diprioritaskan index dan tidak boleh disubmit dari monitor.",
+        variant: "destructive",
+      });
+      return;
+    }
 
     if (
       item.type === "blog" &&
@@ -412,10 +559,16 @@ export function ContentTable() {
         status: row.status,
         notes: row.notes,
       });
-      setRowState((prev) => ({ ...prev, [item.id]: { ...prev[item.id], dirty: false, saving: false } }));
+      setRowState((prev) => ({
+        ...prev,
+        [item.id]: { ...prev[item.id], dirty: false, saving: false },
+      }));
       toast({ title: "Saved", description: item.path });
     } catch (e) {
-      setRowState((prev) => ({ ...prev, [item.id]: { ...prev[item.id], saving: false } }));
+      setRowState((prev) => ({
+        ...prev,
+        [item.id]: { ...prev[item.id], saving: false },
+      }));
       toast({
         title: "Failed to save",
         description: e instanceof Error ? e.message : "Error",
@@ -424,32 +577,109 @@ export function ContentTable() {
     }
   };
 
-  const copyUrl = useCallback(async (url: string) => {
-    try {
-      await navigator.clipboard.writeText(url);
-      toast({ title: "URL copied", description: url });
-    } catch {
-      toast({ title: "Copy gagal", description: "Tidak bisa akses clipboard.", variant: "destructive" });
-    }
-  }, [toast]);
+  const copyUrl = useCallback(
+    async (url: string) => {
+      try {
+        await navigator.clipboard.writeText(url);
+        toast({ title: "URL copied", description: url });
+      } catch {
+        toast({
+          title: "Copy gagal",
+          description: "Tidak bisa akses clipboard.",
+          variant: "destructive",
+        });
+      }
+    },
+    [toast],
+  );
 
-  const openGscAndCopy = useCallback(async (url: string) => {
-    // Open the GSC property page (Google's inspect deep-link is not stable / 404s).
-    // We copy the article URL so the user can immediately paste it into GSC's URL search box.
-    const propertyUrl = `${GSC_PROPERTY_BASE}?${new URLSearchParams({ resource_id: GSC_PROPERTY_ID }).toString()}`;
-    window.open(propertyUrl, "_blank", "noreferrer");
-    try {
-      await navigator.clipboard.writeText(url);
+  const openGscAndCopy = useCallback(
+    async (url: string) => {
+      const propertyUrl = `${GSC_PROPERTY_BASE}?${new URLSearchParams({ resource_id: GSC_PROPERTY_ID }).toString()}`;
+
+      const copySynchronously = (value: string) => {
+        try {
+          const textarea = document.createElement("textarea");
+          textarea.value = value;
+          textarea.setAttribute("readonly", "");
+          textarea.style.position = "fixed";
+          textarea.style.top = "0";
+          textarea.style.left = "-9999px";
+          textarea.style.opacity = "0";
+          textarea.style.pointerEvents = "none";
+          document.body.appendChild(textarea);
+          textarea.focus();
+          textarea.select();
+          textarea.setSelectionRange(0, textarea.value.length);
+          const copied = document.execCommand("copy");
+          document.body.removeChild(textarea);
+          return copied;
+        } catch {
+          return false;
+        }
+      };
+
+      let copied = copySynchronously(url);
+
+      if (!copied) {
+        try {
+          await navigator.clipboard.writeText(url);
+          copied = true;
+        } catch {
+          copied = copySynchronously(url);
+        }
+      }
+
+      try {
+        if (gscWindowRef && !gscWindowRef.closed) {
+          gscWindowRef.location.href = propertyUrl;
+          gscWindowRef.focus();
+        } else {
+          gscWindowRef = window.open(propertyUrl, GSC_WINDOW_NAME);
+          gscWindowRef?.focus();
+        }
+      } catch {
+        gscWindowRef = window.open(propertyUrl, GSC_WINDOW_NAME);
+        gscWindowRef?.focus();
+      }
+
+      if (copied) {
+        toast({
+          title: "GSC dibuka · URL disalin",
+          description: "Paste URL di kolom pencarian URL Inspection GSC.",
+        });
+        return;
+      }
+
+      window.prompt(
+        "Clipboard diblokir browser. Copy URL ini secara manual:",
+        url,
+      );
       toast({
-        title: "GSC dibuka · URL disalin",
-        description: "Paste URL di kolom pencarian URL Inspection GSC.",
+        title: "GSC dibuka",
+        description:
+          "Clipboard diblokir browser. Gunakan prompt manual untuk copy URL target.",
       });
-    } catch {
-      toast({ title: "GSC dibuka", description: "Copy URL secara manual dari baris ini." });
-    }
-  }, [toast]);
+    },
+    [toast],
+  );
 
-  const refreshGsc = async (item: InventoryItem, options: RefreshGscOptions = {}) => {
+  const refreshGsc = async (
+    item: InventoryItem,
+    options: RefreshGscOptions = {},
+  ) => {
+    if (isMonitoringOptOut(item)) {
+      if (!options.silent) {
+        toast({
+          title: "Konten dikecualikan dari index monitoring",
+          description:
+            "Item ini tidak perlu diprioritaskan index atau direfresh ke GSC dari monitor.",
+          variant: "destructive",
+        });
+      }
+      return false;
+    }
+
     if (item.type === "blog" && item.hasLocalePair === false) {
       if (!options.silent) {
         toast({
@@ -463,7 +693,11 @@ export function ContentTable() {
 
     // Cooldown check: skip if refreshed within 24 hours (unless forced)
     const existingRow = rowState[item.id];
-    if (!options.silent && !options.force && isFreshlyChecked(existingRow?.lastCheckedAt)) {
+    if (
+      !options.silent &&
+      !options.force &&
+      isFreshlyChecked(existingRow?.lastCheckedAt)
+    ) {
       const when = relativeTimeLabel(existingRow?.lastCheckedAt);
       toast({
         title: "Refresh terlalu cepat",
@@ -521,7 +755,10 @@ export function ContentTable() {
       if (!options.silent) {
         toast({
           title: "GSC tidak aktif",
-          description: e instanceof Error ? e.message : "Setup GSC_SERVICE_ACCOUNT_JSON untuk aktifkan.",
+          description:
+            e instanceof Error
+              ? e.message
+              : "Setup GSC_SERVICE_ACCOUNT_JSON untuk aktifkan.",
           variant: "destructive",
         });
       }
@@ -597,424 +834,582 @@ export function ContentTable() {
   }
 
   return (
-    <div className="min-h-screen">
-      {/* Hero header */}
-      <header className="border-b-2 border-foreground/90 bg-background px-4 pt-8 pb-6 md:px-8 md:pt-10 md:pb-8 lg:px-12">
-        <p className="font-mono text-[10px] font-bold uppercase tracking-[0.3em] text-accent">
-          — Index Monitor / Inventory
-        </p>
-        <h1 className="mt-2 font-display text-5xl font-black uppercase leading-[0.9] tracking-[-0.04em] md:text-7xl">
-          Content <span className="text-accent">Table.</span>
-        </h1>
-        <p className="mt-4 max-w-2xl text-sm text-muted-foreground">
-          {inventory?.length ?? 0} URL terdeteksi. Update status manual per baris atau gunakan
-          Quick Submit untuk membuka halaman Inspection Google Search Console di tab baru.
-        </p>
-
-        {/* Status chips row */}
-        {statusCounts && (
-          <div className="mt-6 flex flex-wrap items-center gap-2">
-            <button
-              onClick={() => setFilterStatus("all")}
-              className={cn(
-                "flex items-center gap-2 rounded-full border px-3 py-1.5 font-mono text-[10px] font-bold uppercase tracking-widest transition",
-                filterStatus === "all"
-                  ? "border-foreground bg-foreground text-background"
-                  : "border-foreground/20 hover:border-foreground/50",
-              )}
-            >
-              All · {statusCounts.all}
-            </button>
-            {STATUS_OPTIONS.map((s) => {
-              const n = statusCounts[s.value] ?? 0;
-              const active = filterStatus === s.value;
-              return (
-                <button
-                  key={s.value}
-                  onClick={() => setFilterStatus(active ? "all" : s.value)}
-                  className={cn(
-                    "flex items-center gap-2 rounded-full border px-3 py-1.5 font-mono text-[10px] font-bold uppercase tracking-widest transition",
-                    active ? "border-foreground bg-foreground text-background" : s.pill,
-                  )}
-                >
-                  <span className={cn("h-1.5 w-1.5 rounded-full", s.dot)} />
-                  {s.label} · {n}
-                </button>
-              );
-            })}
+    <div className="min-h-screen bg-background">
+      <header className="border-b border-border/70 bg-background px-4 py-4 md:px-8 lg:px-12">
+        <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
+          <div>
+            <p className="font-mono text-[10px] font-bold uppercase tracking-[0.3em] text-accent">
+              — Index Monitor / Ops List
+            </p>
+            <div className="mt-1 flex flex-col gap-1 xl:flex-row xl:items-end xl:gap-3">
+              <h1 className="font-display text-2xl font-black tracking-[-0.04em] md:text-3xl">
+                Index monitor
+              </h1>
+              <p className="text-sm text-muted-foreground">
+                {inventory?.length ?? 0} URL · {actionableCount} actionable ·{" "}
+                {waitingCount} awaiting · {freshCount} fresh · {publicCount}{" "}
+                public · {hiddenCount} hidden
+              </p>
+            </div>
           </div>
-        )}
+        </div>
       </header>
 
-      {/* Controls */}
-      <div className="sticky top-0 z-10 border-b bg-background/95 backdrop-blur-sm px-4 py-3 md:px-8 md:py-4 lg:px-12">
-        <div className="flex flex-wrap items-center gap-3">
-          <div className="relative min-w-[260px] flex-1">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              placeholder="Cari judul, slug, atau path…"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="pl-9 font-mono text-xs"
-            />
-          </div>
-          <div className="flex items-center gap-2">
-            <Filter className="h-4 w-4 text-muted-foreground" />
-            <Select value={filterType} onValueChange={setFilterType}>
-              <SelectTrigger
-                className={cn(
-                  "w-[140px] font-mono text-[10px] font-bold uppercase tracking-widest",
-                  ADMIN_FILTER_SELECT_TRIGGER_CLASSNAME,
-                )}
-              >
-                <SelectValue placeholder="Type" />
-              </SelectTrigger>
-              <SelectContent className={ADMIN_SELECT_CONTENT_CLASSNAME}>
-                <SelectItem className={ADMIN_SELECT_ITEM_CLASSNAME} value="all">Semua tipe</SelectItem>
-                <SelectItem className={ADMIN_SELECT_ITEM_CLASSNAME} value="blog">Blog</SelectItem>
-                <SelectItem className={ADMIN_SELECT_ITEM_CLASSNAME} value="note">Notes</SelectItem>
-                <SelectItem className={ADMIN_SELECT_ITEM_CLASSNAME} value="tool">Tools</SelectItem>
-              </SelectContent>
-            </Select>
-            <Select value={filterLocale} onValueChange={setFilterLocale}>
-              <SelectTrigger
-                className={cn(
-                  "w-[110px] font-mono text-[10px] font-bold uppercase tracking-widest",
-                  ADMIN_FILTER_SELECT_TRIGGER_CLASSNAME,
-                )}
-              >
-                <SelectValue placeholder="Locale" />
-              </SelectTrigger>
-              <SelectContent className={ADMIN_SELECT_CONTENT_CLASSNAME}>
-                <SelectItem className={ADMIN_SELECT_ITEM_CLASSNAME} value="all">All Locales</SelectItem>
-                <SelectItem className={ADMIN_SELECT_ITEM_CLASSNAME} value="en">EN</SelectItem>
-                <SelectItem className={ADMIN_SELECT_ITEM_CLASSNAME} value="id">ID</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="flex flex-wrap items-center gap-2">
-            <Select value={batchSize} onValueChange={setBatchSize}>
-              <SelectTrigger
-                className={cn(
-                  "w-[120px] font-mono text-[10px] font-bold uppercase tracking-widest",
-                  ADMIN_FILTER_SELECT_TRIGGER_CLASSNAME,
-                )}
-              >
-                <SelectValue placeholder="Batch size" />
-              </SelectTrigger>
-              <SelectContent className={ADMIN_SELECT_CONTENT_CLASSNAME}>
-                <SelectItem className={ADMIN_SELECT_ITEM_CLASSNAME} value="5">Batch 5</SelectItem>
-                <SelectItem className={ADMIN_SELECT_ITEM_CLASSNAME} value="10">Batch 10</SelectItem>
-                <SelectItem className={ADMIN_SELECT_ITEM_CLASSNAME} value="20">Batch 20</SelectItem>
-              </SelectContent>
-            </Select>
-            <div className="flex flex-col items-start gap-0.5">
-              <Button
-                size="sm"
-                variant="outline"
-                disabled={batchRefresh.running}
-                className="gap-2 font-mono text-[10px] font-bold uppercase tracking-widest"
-                title="Refresh semua URL yang tampil di layar sekarang (termasuk yang sudah baru di-refresh)"
-                onClick={() => runBatchRefresh(filtered, `Refresh visible ${Math.min(filtered.length, Number(batchSize))}`)}
-              >
-                {batchRefresh.running && batchRefresh.label.startsWith("Refresh visible") ? (
-                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                ) : (
-                  <RefreshCw className="h-3.5 w-3.5" />
-                )}
-                Visible ({Math.min(filtered.length, Number(batchSize))})
-              </Button>
-              <span className="pl-1 font-mono text-[9px] text-muted-foreground/60">Refresh semua yg terlihat</span>
+      <div className="sticky top-0 z-10 border-b border-border/70 bg-background/95 px-4 py-3 backdrop-blur-sm md:px-8 lg:px-12">
+        <div className="grid gap-2.5">
+          <div className="flex flex-col gap-2 xl:flex-row xl:items-center">
+            <div className="relative min-w-65 flex-1">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                placeholder="Cari judul, slug, atau path…"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="h-9 pl-9 font-mono text-xs"
+              />
             </div>
-            <div className="flex flex-col items-start gap-0.5">
-              <Button
-                size="sm"
-                variant="outline"
-                disabled={batchRefresh.running}
-                className="gap-2 font-mono text-[10px] font-bold uppercase tracking-widest border-accent/30 text-accent hover:border-accent hover:text-accent"
-                title="Refresh URL yang belum indexed/submitted dan belum pernah di-refresh dalam 24 jam"
-                onClick={() => runBatchRefresh(priorityCandidates, `Refresh priority ${Math.min(priorityCandidates.length, Number(batchSize))}`)}
-              >
-                {batchRefresh.running && batchRefresh.label.startsWith("Refresh priority") ? (
-                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                ) : (
-                  <ShieldCheck className="h-3.5 w-3.5" />
-                )}
-                Priority ({Math.min(priorityCandidates.length, Number(batchSize))})
-              </Button>
-              <span className="pl-1 font-mono text-[9px] text-muted-foreground/60">Hanya yg belum indexed &amp; &gt;24 jam</span>
-            </div>
-          </div>
-          <div className="ml-auto font-mono text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
-            {batchRefresh.running
-              ? `${batchRefresh.label} · ${batchRefresh.done}/${batchRefresh.total}`
-              : `${filtered.length} result${filtered.length !== 1 ? "s" : ""}`}
-          </div>
-        </div>
-        <div className="mt-3 flex flex-wrap items-center gap-2">
-          <button
-            onClick={() => setGscQuickFilter("all")}
-            className={cn(
-              "rounded-full border px-3 py-1.5 font-mono text-[10px] font-bold uppercase tracking-widest transition",
-              gscQuickFilter === "all"
-                ? "border-foreground bg-foreground text-background"
-                : "border-foreground/20 text-muted-foreground hover:border-foreground/50 hover:text-foreground",
-            )}
-          >
-            All GSC
-          </button>
-          <button
-            onClick={() => setGscQuickFilter("needs_review")}
-            title="URL yang butuh review manual di GSC (verdict: Fail atau status Excluded)"
-            className={cn(
-              "rounded-full border px-3 py-1.5 font-mono text-[10px] font-bold uppercase tracking-widest transition",
-              gscQuickFilter === "needs_review"
-                ? "border-destructive bg-destructive text-destructive-foreground"
-                : "border-destructive/30 bg-destructive/5 text-destructive hover:border-destructive/60",
-            )}
-          >
-            Needs review
-            <span className="ml-1 opacity-60 font-normal normal-case tracking-normal">(verdict fail)</span>
-          </button>
-          <button
-            onClick={() => setGscQuickFilter("unknown_google")}
-            className={cn(
-              "rounded-full border px-3 py-1.5 font-mono text-[10px] font-bold uppercase tracking-widest transition",
-              gscQuickFilter === "unknown_google"
-                ? "border-amber-500 bg-amber-500 text-black"
-                : "border-amber-500/40 bg-amber-500/10 text-amber-700 hover:border-amber-500/70 dark:text-amber-400",
-            )}
-          >
-            Unknown to Google
-          </button>
-          <button
-            onClick={() => setGscQuickFilter("indexed_google")}
-            className={cn(
-              "rounded-full border px-3 py-1.5 font-mono text-[10px] font-bold uppercase tracking-widest transition",
-              gscQuickFilter === "indexed_google"
-                ? "border-emerald-500 bg-emerald-500 text-black"
-                : "border-emerald-500/40 bg-emerald-500/10 text-emerald-700 hover:border-emerald-500/70 dark:text-emerald-400",
-            )}
-          >
-            Indexed
-          </button>
-        </div>
-      </div>
 
-      {/* Row list — card-style, not a classic table */}
-      <div className="divide-y px-4 md:px-8 lg:px-12">
-        {filtered.map((item, idx) => {
-          const row = rowState[item.id] ?? { status: "unknown" as IndexStatusValue, notes: "", dirty: false };
-          const opt = statusOpt(row.status);
-          const gscSummary = summarizeForHumans(row.lastGSCResult);
-          const isUnpairedBlog = item.type === "blog" && item.hasLocalePair === false;
-          const missingPairsLabel = item.missingPairLocales?.join(", ") || "locale";
-          const statusLocked =
-            isUnpairedBlog && (row.status === "submitted" || row.status === "indexed");
-          const fresh = isFreshlyChecked(row.lastCheckedAt);
-          return (
-            <div
-              key={item.id}
-              style={{ animationDelay: `${idx * 30}ms` }}
-              className="group grid animate-[fadeSlideIn_0.25s_ease_both] grid-cols-1 items-start gap-4 py-4 md:grid-cols-[minmax(0,1fr)_200px_200px_auto]"
-            >
-              {fresh && (
-                <div className="col-span-full flex items-center justify-end -mb-2">
-                  <span className="flex items-center gap-1 rounded-full border border-emerald-500/20 bg-emerald-500/5 px-2 py-0.5 font-mono text-[9px] font-bold uppercase tracking-widest text-emerald-700/70 dark:text-emerald-400/70">
-                    <ShieldCheck className="h-2 w-2" /> Sudah di-refresh, skip saat Priority batch
-                  </span>
-                </div>
-              )}
-              {/* URL + meta */}
-              <div className="min-w-0">
-                <div className="flex items-center gap-2">
-                  <span className="text-muted-foreground">{typeIcon(item.type)}</span>
-                  <h3 className="truncate font-display text-base font-black tracking-tight">
-                    {item.title}
-                  </h3>
-                </div>
-                <div className="mt-1 flex items-center gap-2">
-                  <a
-                    href={item.url}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="truncate font-mono text-[11px] text-muted-foreground hover:text-accent"
-                  >
-                    {item.path}
-                  </a>
-                </div>
-                <div className="mt-2 flex flex-wrap items-center gap-1.5">
-                  <span className="rounded-sm border border-foreground/20 px-1.5 py-[1px] font-mono text-[9px] font-bold uppercase tracking-widest">
-                    {item.locale}
-                  </span>
-                  <span className="rounded-sm border border-foreground/20 px-1.5 py-[1px] font-mono text-[9px] font-bold uppercase tracking-widest">
-                    {item.type}
-                  </span>
-                  {item.draft && (
-                    <span className="rounded-sm border border-amber-500/40 bg-amber-500/10 px-1.5 py-[1px] font-mono text-[9px] font-bold uppercase tracking-widest text-amber-700 dark:text-amber-400">
-                      Draft
-                    </span>
+            <div className="flex flex-wrap items-center gap-2 xl:flex-nowrap">
+              <Select value={filterStatus} onValueChange={setFilterStatus}>
+                <SelectTrigger
+                  className={cn(
+                    "h-9 w-36 font-mono text-[10px] font-bold uppercase tracking-widest",
+                    ADMIN_FILTER_SELECT_TRIGGER_CLASSNAME,
                   )}
-                  {item.requiresAuth && (
-                    <span className="rounded-sm border border-zinc-500/40 bg-zinc-500/10 px-1.5 py-[1px] font-mono text-[9px] font-bold uppercase tracking-widest text-zinc-600">
-                      Gated
-                    </span>
-                  )}
-                  {isUnpairedBlog && (
-                    <span className="rounded-sm border border-destructive/40 bg-destructive/10 px-1.5 py-[1px] font-mono text-[9px] font-bold uppercase tracking-widest text-destructive">
-                      Unpaired · Missing {missingPairsLabel}
-                    </span>
-                  )}
-                </div>
-                <div className="mt-2 space-y-1">
-                  <div className="flex items-center gap-1.5">
-                    {isFreshlyChecked(row.lastCheckedAt) ? (
-                      <span className="flex items-center gap-1 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 font-mono text-[9px] font-bold uppercase tracking-widest text-emerald-700 dark:text-emerald-400">
-                        <ShieldCheck className="h-2.5 w-2.5" />
-                        Fresh · {relativeTimeLabel(row.lastCheckedAt)}
-                      </span>
-                    ) : (
-                      <span className="flex items-center gap-1 font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-muted-foreground">
-                        <Clock className="h-2.5 w-2.5" />
-                        {row.lastCheckedAt ? relativeTimeLabel(row.lastCheckedAt) : "Never checked"}
-                      </span>
-                    )}
-                  </div>
-                  {isUnpairedBlog ? (
-                    <p className="text-xs text-destructive">
-                      Push ke Google ditahan sampai file pasangan locale tersedia.
-                    </p>
-                  ) : null}
-                  {gscSummary ? (
-                    <div className="space-y-2">
-                      <span className={cn("inline-flex rounded-full border px-2 py-1 font-mono text-[10px] font-bold uppercase tracking-widest", gscSummary.tone)}>
-                        {gscSummary.headline}
-                      </span>
-                      <div className="space-y-1 text-xs text-muted-foreground">
-                        {gscSummary.details.slice(0, 3).map((detail) => (
-                          <p key={detail}>{detail}</p>
-                        ))}
-                      </div>
-                    </div>
-                  ) : null}
-                </div>
-              </div>
-
-              {/* Status + pill */}
-              <div className="flex flex-col gap-1.5">
-                <Select
-                  value={row.status}
-                  onValueChange={(v) => {
-                    const nextStatus = v as IndexStatusValue;
-                    if (
-                      item.type === "blog" &&
-                      item.hasLocalePair === false &&
-                      (nextStatus === "submitted" || nextStatus === "indexed")
-                    ) {
-                      toast({
-                        title: "Pasangan locale belum lengkap",
-                        description: `Artikel ini belum punya pasangan ${missingPairsLabel}, jadi status push tidak bisa dipilih.`,
-                        variant: "destructive",
-                      });
-                      return;
-                    }
-                    setRowField(item.id, { status: nextStatus });
-                  }}
                 >
-                  <SelectTrigger
-                    className={cn(
-                      "h-9 border font-mono text-[10px] font-bold uppercase tracking-widest",
-                      opt.pill,
-                    )}
+                  <SelectValue placeholder="Status" />
+                </SelectTrigger>
+                <SelectContent className={ADMIN_SELECT_CONTENT_CLASSNAME}>
+                  <SelectItem
+                    className={ADMIN_SELECT_ITEM_CLASSNAME}
+                    value="all"
                   >
-                    <span className="flex items-center gap-2">
-                      <span className={cn("h-1.5 w-1.5 rounded-full", opt.dot)} />
-                      <SelectValue />
-                    </span>
-                  </SelectTrigger>
-                  <SelectContent className={ADMIN_SELECT_CONTENT_CLASSNAME}>
-                    {STATUS_OPTIONS.map((s) => (
+                    Semua status
+                  </SelectItem>
+                  {STATUS_OPTIONS.map((s) => {
+                    const n = statusCounts?.[s.value] ?? 0;
+                    return (
                       <SelectItem
                         className={ADMIN_SELECT_ITEM_CLASSNAME}
                         key={s.value}
                         value={s.value}
-                        disabled={
-                          item.type === "blog" &&
-                          item.hasLocalePair === false &&
-                          (s.value === "submitted" || s.value === "indexed")
-                        }
                       >
-                        <span className="flex items-center gap-2">
-                          <span className={cn("h-1.5 w-1.5 rounded-full", s.dot)} />
-                          {s.label}
-                        </span>
+                        {s.label} · {n}
                       </SelectItem>
-                    ))}
+                    );
+                  })}
+                </SelectContent>
+              </Select>
+
+              <Select
+                value={gscQuickFilter}
+                onValueChange={(v) => setGscQuickFilter(v as GscQuickFilter)}
+              >
+                <SelectTrigger
+                  className={cn(
+                    "h-9 w-32 font-mono text-[10px] font-bold uppercase tracking-widest",
+                    ADMIN_FILTER_SELECT_TRIGGER_CLASSNAME,
+                  )}
+                >
+                  <SelectValue placeholder="Google" />
+                </SelectTrigger>
+                <SelectContent className={ADMIN_SELECT_CONTENT_CLASSNAME}>
+                  <SelectItem
+                    className={ADMIN_SELECT_ITEM_CLASSNAME}
+                    value="all"
+                  >
+                    All Google
+                  </SelectItem>
+                  <SelectItem
+                    className={ADMIN_SELECT_ITEM_CLASSNAME}
+                    value="needs_review"
+                  >
+                    Review
+                  </SelectItem>
+                  <SelectItem
+                    className={ADMIN_SELECT_ITEM_CLASSNAME}
+                    value="unknown_google"
+                  >
+                    Unknown
+                  </SelectItem>
+                  <SelectItem
+                    className={ADMIN_SELECT_ITEM_CLASSNAME}
+                    value="indexed_google"
+                  >
+                    Indexed
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+
+              <Button
+                size="sm"
+                variant={advancedFiltersOpen ? "default" : "outline"}
+                className="h-9 gap-2 font-mono text-[10px] font-bold uppercase tracking-widest"
+                onClick={() => setAdvancedFiltersOpen((prev) => !prev)}
+              >
+                <SlidersHorizontal className="h-3.5 w-3.5" />
+                More filters
+              </Button>
+
+              <Select value={batchSize} onValueChange={setBatchSize}>
+                <SelectTrigger
+                  className={cn(
+                    "h-9 w-30 font-mono text-[10px] font-bold uppercase tracking-widest",
+                    ADMIN_FILTER_SELECT_TRIGGER_CLASSNAME,
+                  )}
+                >
+                  <SelectValue placeholder="Batch size" />
+                </SelectTrigger>
+                <SelectContent className={ADMIN_SELECT_CONTENT_CLASSNAME}>
+                  <SelectItem className={ADMIN_SELECT_ITEM_CLASSNAME} value="5">
+                    Batch 5
+                  </SelectItem>
+                  <SelectItem
+                    className={ADMIN_SELECT_ITEM_CLASSNAME}
+                    value="10"
+                  >
+                    Batch 10
+                  </SelectItem>
+                  <SelectItem
+                    className={ADMIN_SELECT_ITEM_CLASSNAME}
+                    value="20"
+                  >
+                    Batch 20
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+
+              <Button
+                size="sm"
+                variant="outline"
+                disabled={batchRefresh.running}
+                className="h-9 gap-2 font-mono text-[10px] font-bold uppercase tracking-widest"
+                title="Refresh semua URL yang tampil di layar sekarang"
+                onClick={() =>
+                  runBatchRefresh(
+                    filtered,
+                    `Refresh visible ${Math.min(filtered.length, Number(batchSize))}`,
+                  )
+                }
+              >
+                {batchRefresh.running &&
+                batchRefresh.label.startsWith("Refresh visible") ? (
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                ) : (
+                  <RefreshCw className="h-3.5 w-3.5" />
+                )}
+                Visible
+              </Button>
+
+              <Button
+                size="sm"
+                variant="outline"
+                disabled={batchRefresh.running}
+                className="h-9 gap-2 border-accent/30 font-mono text-[10px] font-bold uppercase tracking-widest text-accent hover:border-accent hover:text-accent"
+                title="Refresh URL prioritas yang belum indexed dan belum fresh"
+                onClick={() =>
+                  runBatchRefresh(
+                    priorityCandidates,
+                    `Refresh priority ${Math.min(priorityCandidates.length, Number(batchSize))}`,
+                  )
+                }
+              >
+                {batchRefresh.running &&
+                batchRefresh.label.startsWith("Refresh priority") ? (
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                ) : (
+                  <ShieldCheck className="h-3.5 w-3.5" />
+                )}
+                Priority
+              </Button>
+
+              <div className="shrink-0 font-mono text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+                {batchRefresh.running
+                  ? `${batchRefresh.done}/${batchRefresh.total}`
+                  : `${filtered.length} results`}
+              </div>
+            </div>
+          </div>
+
+          {advancedFiltersOpen ? (
+            <div className="rounded-2xl border border-border/70 bg-card/30 p-3">
+              <div className="mb-2 flex items-center gap-2">
+                <Filter className="h-4 w-4 text-muted-foreground" />
+                <WorkspaceSectionLabel>Advanced filters</WorkspaceSectionLabel>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-2">
+                <Select value={filterType} onValueChange={setFilterType}>
+                  <SelectTrigger
+                    className={cn(
+                      "h-9 w-35 font-mono text-[10px] font-bold uppercase tracking-widest",
+                      ADMIN_FILTER_SELECT_TRIGGER_CLASSNAME,
+                    )}
+                  >
+                    <SelectValue placeholder="Type" />
+                  </SelectTrigger>
+                  <SelectContent className={ADMIN_SELECT_CONTENT_CLASSNAME}>
+                    <SelectItem
+                      className={ADMIN_SELECT_ITEM_CLASSNAME}
+                      value="all"
+                    >
+                      Semua tipe
+                    </SelectItem>
+                    <SelectItem
+                      className={ADMIN_SELECT_ITEM_CLASSNAME}
+                      value="blog"
+                    >
+                      Blog
+                    </SelectItem>
+                    <SelectItem
+                      className={ADMIN_SELECT_ITEM_CLASSNAME}
+                      value="note"
+                    >
+                      Notes
+                    </SelectItem>
+                    <SelectItem
+                      className={ADMIN_SELECT_ITEM_CLASSNAME}
+                      value="tool"
+                    >
+                      Tools
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+
+                <Select value={filterLocale} onValueChange={setFilterLocale}>
+                  <SelectTrigger
+                    className={cn(
+                      "h-9 w-27.5 font-mono text-[10px] font-bold uppercase tracking-widest",
+                      ADMIN_FILTER_SELECT_TRIGGER_CLASSNAME,
+                    )}
+                  >
+                    <SelectValue placeholder="Locale" />
+                  </SelectTrigger>
+                  <SelectContent className={ADMIN_SELECT_CONTENT_CLASSNAME}>
+                    <SelectItem
+                      className={ADMIN_SELECT_ITEM_CLASSNAME}
+                      value="all"
+                    >
+                      All Locales
+                    </SelectItem>
+                    <SelectItem
+                      className={ADMIN_SELECT_ITEM_CLASSNAME}
+                      value="en"
+                    >
+                      EN
+                    </SelectItem>
+                    <SelectItem
+                      className={ADMIN_SELECT_ITEM_CLASSNAME}
+                      value="id"
+                    >
+                      ID
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+
+                <Select
+                  value={filterVisibility}
+                  onValueChange={(v) =>
+                    setFilterVisibility(v as "all" | "public" | "hidden")
+                  }
+                >
+                  <SelectTrigger
+                    className={cn(
+                      "h-9 w-32.5 font-mono text-[10px] font-bold uppercase tracking-widest",
+                      ADMIN_FILTER_SELECT_TRIGGER_CLASSNAME,
+                    )}
+                  >
+                    <SelectValue placeholder="Visibility" />
+                  </SelectTrigger>
+                  <SelectContent className={ADMIN_SELECT_CONTENT_CLASSNAME}>
+                    <SelectItem
+                      className={ADMIN_SELECT_ITEM_CLASSNAME}
+                      value="all"
+                    >
+                      Semua
+                    </SelectItem>
+                    <SelectItem
+                      className={ADMIN_SELECT_ITEM_CLASSNAME}
+                      value="public"
+                    >
+                      Public
+                    </SelectItem>
+                    <SelectItem
+                      className={ADMIN_SELECT_ITEM_CLASSNAME}
+                      value="hidden"
+                    >
+                      Hidden
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
+            </div>
+          ) : null}
+        </div>
+      </div>
 
-              {/* Notes */}
-              <Input
-                placeholder="Notes…"
-                value={row.notes}
-                onChange={(e) => setRowField(item.id, { notes: e.target.value })}
-                className="h-9 font-mono text-xs"
-              />
+      <div className="space-y-2 px-4 py-4 md:px-8 lg:px-12">
+        {filtered.map((item, idx) => {
+          const row = rowState[item.id] ?? {
+            status: "unknown" as IndexStatusValue,
+            notes: "",
+            dirty: false,
+          };
+          const opt = statusOpt(row.status);
+          const gscSummary = summarizeForHumans(row.lastGSCResult);
+          const isUnpairedBlog =
+            item.type === "blog" && item.hasLocalePair === false;
+          const isOptOut = isMonitoringOptOut(item);
+          const missingPairsLabel =
+            item.missingPairLocales?.join(", ") || "locale";
+          const statusLocked =
+            isOptOut ||
+            (isUnpairedBlog &&
+              (row.status === "submitted" || row.status === "indexed"));
+          const fresh = isFreshlyChecked(row.lastCheckedAt);
 
-              {/* Actions */}
-              <div className="flex items-center justify-end gap-1">
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  className="h-9 w-9 p-0 hover:bg-accent/10 hover:text-accent"
-                  title="Copy URL artikel"
-                  onClick={() => copyUrl(item.url)}
-                >
-                  <Copy className="h-3.5 w-3.5" />
-                </Button>
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  className="h-9 w-9 p-0 hover:bg-accent/10 hover:text-accent"
-                  title="Buka GSC Inspect URL + copy URL ke clipboard"
-                  onClick={() => openGscAndCopy(item.url)}
-                >
-                  <ExternalLink className="h-3.5 w-3.5" />
-                </Button>
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  className="h-9 w-9 p-0 hover:bg-accent/10 hover:text-accent"
-                  onClick={() => refreshGsc(item)}
-                  disabled={Boolean(row.refreshing) || batchRefresh.running || isUnpairedBlog}
-                  title="Refresh from GSC API"
-                >
-                  {row.refreshing ? (
-                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                  ) : (
-                    <RefreshCw className="h-3.5 w-3.5" />
-                  )}
-                </Button>
-                <Button
-                  size="sm"
-                  variant={row.dirty ? "default" : "ghost"}
-                  disabled={!row.dirty || row.saving || row.refreshing || statusLocked}
-                  className={cn(
-                    "h-9 gap-1 font-mono text-[10px] font-bold uppercase tracking-widest",
-                    !row.dirty && "w-9 p-0",
-                  )}
-                  onClick={() => save(item)}
-                  title={row.dirty ? "Save" : "Saved"}
-                >
-                  {row.saving ? (
-                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                  ) : row.dirty ? (
-                    <><Save className="h-3.5 w-3.5" /> Save</>
-                  ) : (
-                    <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />
-                  )}
-                </Button>
+          return (
+            <div
+              key={item.id}
+              style={{ animationDelay: `${idx * 30}ms` }}
+              className="group animate-[fadeSlideIn_0.25s_ease_both] rounded-2xl border border-border/70 bg-card/25 px-3.5 py-3 shadow-sm transition-colors hover:border-border"
+            >
+              <div className="grid grid-cols-1 gap-3 xl:grid-cols-[minmax(0,1fr)_190px_auto] xl:items-center">
+                <div className="min-w-0">
+                  <div className="flex items-start gap-3">
+                    <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-xl border border-border/60 bg-background/50 text-muted-foreground">
+                      {typeIcon(item.type)}
+                    </div>
+
+                    <div className="min-w-0 flex-1">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <h3 className="truncate text-sm font-semibold tracking-tight text-foreground">
+                          {item.title}
+                        </h3>
+                        {fresh ? (
+                          <span className="inline-flex items-center gap-1 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 font-mono text-[9px] font-bold uppercase tracking-widest text-emerald-700 dark:text-emerald-400">
+                            <ShieldCheck className="h-2.5 w-2.5" />
+                            Fresh
+                          </span>
+                        ) : null}
+                        {gscSummary ? (
+                          <span
+                            className={cn(
+                              "inline-flex rounded-full border px-2 py-0.5 font-mono text-[9px] font-bold uppercase tracking-widest",
+                              gscSummary.tone,
+                            )}
+                          >
+                            {gscSummary.headline}
+                          </span>
+                        ) : (
+                          <span className="inline-flex rounded-full border border-border/60 px-2 py-0.5 font-mono text-[9px] font-bold uppercase tracking-widest text-muted-foreground">
+                            No GSC
+                          </span>
+                        )}
+                      </div>
+
+                      <a
+                        href={item.url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="mt-1 block truncate font-mono text-[11px] text-muted-foreground hover:text-accent"
+                      >
+                        {item.path}
+                      </a>
+
+                      <div className="mt-2 flex flex-wrap items-center gap-1.5">
+                        <span className="rounded-full border border-foreground/15 px-2 py-0.5 font-mono text-[9px] font-bold uppercase tracking-widest">
+                          {item.locale}
+                        </span>
+                        <span className="rounded-full border border-foreground/15 px-2 py-0.5 font-mono text-[9px] font-bold uppercase tracking-widest">
+                          {item.type}
+                        </span>
+                        {item.draft && (
+                          <span className="rounded-full border border-amber-500/40 bg-amber-500/10 px-2 py-0.5 font-mono text-[9px] font-bold uppercase tracking-widest text-amber-700 dark:text-amber-400">
+                            Draft
+                          </span>
+                        )}
+                        {item.requiresAuth && (
+                          <span className="rounded-full border border-zinc-500/40 bg-zinc-500/10 px-2 py-0.5 font-mono text-[9px] font-bold uppercase tracking-widest text-zinc-600">
+                            Gated
+                          </span>
+                        )}
+                        {isUnpairedBlog && (
+                          <span className="rounded-full border border-destructive/40 bg-destructive/10 px-2 py-0.5 font-mono text-[9px] font-bold uppercase tracking-widest text-destructive">
+                            Missing {missingPairsLabel}
+                          </span>
+                        )}
+                        {isOptOut && (
+                          <span className="rounded-full border border-zinc-500/40 bg-zinc-500/10 px-2 py-0.5 font-mono text-[9px] font-bold uppercase tracking-widest text-zinc-500 dark:text-zinc-300">
+                            Hidden from monitor
+                          </span>
+                        )}
+                        <span className="inline-flex items-center gap-1 font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-muted-foreground">
+                          <Clock className="h-2.5 w-2.5" />
+                          {row.lastCheckedAt
+                            ? relativeTimeLabel(row.lastCheckedAt)
+                            : "Never checked"}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Select
+                    value={row.status}
+                    onValueChange={(v) => {
+                      const nextStatus = v as IndexStatusValue;
+                      if (
+                        isOptOut &&
+                        (nextStatus === "submitted" || nextStatus === "indexed")
+                      ) {
+                        toast({
+                          title: "Konten dikecualikan dari index monitoring",
+                          description:
+                            "Item ini tidak boleh dipindah ke status submitted atau indexed dari monitor.",
+                          variant: "destructive",
+                        });
+                        return;
+                      }
+                      if (
+                        item.type === "blog" &&
+                        item.hasLocalePair === false &&
+                        (nextStatus === "submitted" || nextStatus === "indexed")
+                      ) {
+                        toast({
+                          title: "Pasangan locale belum lengkap",
+                          description: `Artikel ini belum punya pasangan ${missingPairsLabel}, jadi status push tidak bisa dipilih.`,
+                          variant: "destructive",
+                        });
+                        return;
+                      }
+                      setRowField(item.id, { status: nextStatus });
+                    }}
+                  >
+                    <SelectTrigger
+                      className={cn(
+                        "h-8 border font-mono text-[10px] font-bold uppercase tracking-widest",
+                        opt.pill,
+                      )}
+                    >
+                      <span className="flex items-center gap-2">
+                        <span
+                          className={cn("h-1.5 w-1.5 rounded-full", opt.dot)}
+                        />
+                        <SelectValue />
+                      </span>
+                    </SelectTrigger>
+                    <SelectContent className={ADMIN_SELECT_CONTENT_CLASSNAME}>
+                      {STATUS_OPTIONS.map((s) => (
+                        <SelectItem
+                          className={ADMIN_SELECT_ITEM_CLASSNAME}
+                          key={s.value}
+                          value={s.value}
+                          disabled={
+                            ((item.type === "blog" &&
+                              item.hasLocalePair === false) ||
+                              isOptOut) &&
+                            (s.value === "submitted" || s.value === "indexed")
+                          }
+                        >
+                          <span className="flex items-center gap-2">
+                            <span
+                              className={cn("h-1.5 w-1.5 rounded-full", s.dot)}
+                            />
+                            {s.label}
+                          </span>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {row.notes ? (
+                    <p className="truncate text-[11px] text-muted-foreground">
+                      {row.notes}
+                    </p>
+                  ) : null}
+                </div>
+
+                <div className="flex flex-wrap items-center gap-1.5 xl:justify-end">
+                  <Button
+                    size="sm"
+                    className="h-8 gap-2 font-mono text-[10px] font-bold uppercase tracking-widest"
+                    title="Buka GSC Inspect URL + copy URL ke clipboard"
+                    onClick={() => openGscAndCopy(item.url)}
+                  >
+                    <ExternalLink className="h-3.5 w-3.5" />
+                    GSC
+                  </Button>
+
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="h-8 w-8 p-0"
+                    onClick={() => refreshGsc(item)}
+                    disabled={
+                      Boolean(row.refreshing) ||
+                      batchRefresh.running ||
+                      isUnpairedBlog ||
+                      isOptOut
+                    }
+                    title="Refresh from GSC API"
+                  >
+                    {row.refreshing ? (
+                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                    ) : (
+                      <RefreshCw className="h-3.5 w-3.5" />
+                    )}
+                  </Button>
+
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="h-8 w-8 p-0 hover:bg-accent/10 hover:text-accent"
+                    title="Copy URL artikel"
+                    onClick={() => copyUrl(item.url)}
+                  >
+                    <Copy className="h-3.5 w-3.5" />
+                  </Button>
+
+                  <Button
+                    asChild
+                    size="sm"
+                    variant="ghost"
+                    className="h-8 w-8 p-0 hover:bg-accent/10 hover:text-accent"
+                  >
+                    <a
+                      href={item.url}
+                      target="_blank"
+                      rel="noreferrer"
+                      title="Buka URL publik"
+                    >
+                      <ExternalLink className="h-3.5 w-3.5" />
+                    </a>
+                  </Button>
+
+                  <Button
+                    size="sm"
+                    variant={row.dirty ? "default" : "ghost"}
+                    disabled={
+                      !row.dirty || row.saving || row.refreshing || statusLocked
+                    }
+                    className={cn(
+                      "h-8 gap-1 font-mono text-[10px] font-bold uppercase tracking-widest",
+                      !row.dirty && "px-2 text-muted-foreground",
+                    )}
+                    onClick={() => save(item)}
+                    title={row.dirty ? "Save" : "Saved"}
+                  >
+                    {row.saving ? (
+                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                    ) : row.dirty ? (
+                      <>
+                        <Save className="h-3.5 w-3.5" /> Save
+                      </>
+                    ) : (
+                      <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />
+                    )}
+                  </Button>
+                </div>
               </div>
             </div>
           );

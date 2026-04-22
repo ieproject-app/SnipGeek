@@ -27,6 +27,8 @@ export type InventoryItem = {
   date?: string;
   /** True for draft blog/note, or devOnly tools. */
   draft?: boolean;
+  /** Explicit opt-out for index monitoring, even when the URL is public. */
+  excludeFromIndexMonitoring?: boolean;
   /** Tools gated behind login are not indexable — used to mark noIndex. */
   requiresAuth?: boolean;
   /** True when a blog article has matching sibling files in the other locales. */
@@ -48,10 +50,15 @@ function makePath(locale: string, segment: string, slug?: string): string {
  * Build the full content inventory from disk + registry.
  * Server-only — must be called from API routes, not client components.
  */
-export async function buildContentInventory(options: { includeDrafts?: boolean } = {}): Promise<InventoryItem[]> {
+export async function buildContentInventory(
+  options: { includeDrafts?: boolean } = {},
+): Promise<InventoryItem[]> {
   const { includeDrafts = false } = options;
   const items: InventoryItem[] = [];
-  const postsByLocale = new Map<string, Awaited<ReturnType<typeof getSortedPostsData>>>();
+  const postsByLocale = new Map<
+    string,
+    Awaited<ReturnType<typeof getSortedPostsData>>
+  >();
   const blogSlugSetByLocale = new Map<string, Set<string>>();
 
   for (const locale of i18n.locales) {
@@ -81,6 +88,8 @@ export async function buildContentInventory(options: { includeDrafts?: boolean }
         title: p.frontmatter.title,
         date: p.frontmatter.date,
         draft: p.frontmatter.published !== true,
+        excludeFromIndexMonitoring:
+          p.frontmatter.excludeFromIndexMonitoring === true,
         hasLocalePair: missingPairLocales.length === 0,
         missingPairLocales,
       });
@@ -101,6 +110,8 @@ export async function buildContentInventory(options: { includeDrafts?: boolean }
         title: n.frontmatter.title,
         date: n.frontmatter.date,
         draft: n.frontmatter.published !== true,
+        excludeFromIndexMonitoring:
+          n.frontmatter.excludeFromIndexMonitoring === true,
       });
     }
 
@@ -118,6 +129,7 @@ export async function buildContentInventory(options: { includeDrafts?: boolean }
         title: tool.label,
         requiresAuth: tool.requiresAuth,
         draft: tool.devOnly,
+        excludeFromIndexMonitoring: tool.excludeFromIndexMonitoring,
       });
     }
   }

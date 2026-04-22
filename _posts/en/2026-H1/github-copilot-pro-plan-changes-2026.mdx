@@ -1,0 +1,97 @@
+---
+title: "GitHub Copilot Pro Sign-Ups Are Paused — Here's What Changed"
+slug: "github-copilot-pro-plan-changes-2026"
+translationKey: "github-copilot-pro-plan-changes-2026"
+date: "2026-04-22"
+description: "GitHub paused new sign-ups for Copilot Pro, Pro+, and Student plans, tightened token-based usage limits, and removed Opus models from Pro."
+heroImage: "/images/_posts/github/github-copilot-temporarily-closed/github-banner.webp"
+imageAlt: "GitHub Copilot Pro plan temporarily unavailable banner"
+published: true
+featured: false
+tags: ["web", "ai", "github", "code-editor", "devops"]
+category: "AI"
+---
+
+I was genuinely shocked today. I went to check the GitHub Copilot Pro pricing page just to compare options, and ended up confused when the sign-up button was gone, replaced by a *"Temporarily unavailable"* badge. My first instinct was that it was a UI bug. I refreshed multiple times, tried incognito mode, even checked on my phone. Same result.
+
+It turns out sign-ups are actually paused. Honestly, I'm glad I recently switched back to using Antigravity. Even though its Claude model hits rate limits pretty fast during heavy use, the Gemini Flash model has been more than enough for my daily coding needs.
+
+On April 20, 2026, GitHub officially announced a set of changes to all individual Copilot plans. And they're not small tweaks.
+
+<Callout variant="info" title="Freshness Note">
+  This article reflects GitHub's official announcement published April 20, 2026. Details may change as GitHub updates its plans and pricing structure.
+</Callout>
+
+## Three Changes at Once
+
+GitHub made three significant moves simultaneously, all framed as necessary to protect service quality for existing customers.
+
+**Sign-ups are paused — for everyone**
+
+New registrations for Copilot Pro, Pro+, and the Student plan are all on hold with no official reopening date given. If you're already subscribed, nothing changes on your side. But if you were planning to sign up — even the Student plan — you'll have to wait.
+
+![GitHub Copilot Pro plan showing Temporarily Unavailable status in VS Code extension panel](/images/_posts/github/github-copilot-temporarily-closed/image3-pro-plan-disable.webp)
+*Copilot Pro plan marked as temporarily unavailable, as seen in the GitHub billing interface.*
+
+**Token-based usage limits got tighter**
+
+This is the part that caught me off guard, because the limits already existed — they just got stricter. Copilot now enforces two separate ceilings: a *session limit* (a short window that resets frequently) and a *weekly limit* (a 7-day rolling cap based on token consumption). These are completely separate from your premium request count.
+
+The tricky part: you can still have premium requests remaining and hit a wall anyway, because the token cap is independent. GitHub introduced the weekly limit specifically to rein in *agentic workflows* — those long, parallelized coding sessions where Copilot agents run autonomously for extended stretches. GitHub themselves admitted it's now common for a handful of such requests to cost more than the entire monthly plan price.
+
+<Expandable title="How the two usage limits actually work" icon="info">
+  - **Session limit**: Resets periodically. Designed to prevent service overload during peak usage. Most users won't hit this under normal usage patterns.
+  - **Weekly limit**: A 7-day token cap. Introduced specifically to control long-trajectory, parallelized agentic workflows. If you hit this while still having premium requests, Copilot automatically switches to Auto model selection until the weekly window resets.
+  - Both limits are shown in VS Code and Copilot CLI when you approach 75% usage — a new transparency feature GitHub added with this announcement.
+</Expandable>
+
+**Opus models removed from Pro**
+
+If you were using Claude Opus through Copilot Pro, that access is gone. Opus 4.7 is now exclusive to Pro+ ($39/month). On top of that, Opus 4.5 and Opus 4.6 are also being phased out from Pro+ entirely.
+
+![GitHub Copilot usage limit warning displayed in VS Code editor interface](/images/_posts/github/github-copilot-temporarily-closed/image1-vscode.webp)
+*VS Code now shows a usage warning banner when you're approaching your weekly token limit.*
+
+## Why GitHub Did This
+
+GitHub was unusually transparent in this announcement. The core problem: *agentic AI usage has exploded, and the infrastructure wasn't priced for it.*
+
+Their exact framing was that some users run sessions where just a few requests exceed the entire plan cost. At that level of consumption, the economics simply don't hold. Pausing new sign-ups buys them time to stabilize service for existing customers while they rework the pricing and infrastructure model underneath.
+
+It's not a shutdown. But it's not a minor patch either — it's GitHub buying time.
+
+## What It Means If You're Already on Copilot Pro
+
+Your subscription still works. But a few things are genuinely different now:
+
+- **Opus models are gone** from the Pro tier. If your workflow relied on Claude Opus for heavier reasoning tasks, you'll need to switch models or upgrade.
+- **Weekly token limits are stricter.** Heavy agentic usage will hit the ceiling sooner. The new usage indicators in VS Code and Copilot CLI help you track this before you're cut off.
+- **Refunds are available**, but only until May 20, 2026. If the changes feel like too much of a downgrade, you can cancel and request a refund for the remaining subscription period through your [GitHub Billing settings](https://github.com/settings/billing/licensing).
+
+![GitHub Copilot CLI showing usage status and available commands in terminal](/images/_posts/github/github-copilot-temporarily-closed/image2-cli)
+
+<div className="-mt-3 mb-6 text-center text-sm italic text-muted-foreground">Copilot CLI now displays your current usage status — useful for checking limits before starting a long agentic session.</div>
+
+## Should You Upgrade to Pro+?
+
+Pro+ at $39/month gets you more than 5× the usage limits of Pro, access to Opus 4.7, and GitHub Spark. Whether that's worth it depends entirely on how heavily you rely on agentic features.
+
+For most developers doing everyday code completion, inline suggestions, and occasional chat — Pro (or even Free) is still probably enough. The Free tier still gives you 50 agent/chat requests per month, 2,000 completions, and access to Haiku 4.5 and GPT-5 mini. Not bad for light usage.
+
+But if you regularly run multi-step autonomous agents, generate large amounts of code in parallelized sessions, or depend on Opus-level reasoning for complex tasks — Pro+ starts to justify itself.
+
+<Callout variant="tip" title="Tips to Avoid Hitting Limits">
+  GitHub shared a few ways to reduce token burn before it becomes a problem:
+  - Use lighter models (smaller multiplier) for routine tasks — save the heavy models for when they're actually needed.
+  - Use **plan mode** in VS Code or Copilot CLI before diving into complex tasks. It improves efficiency and reduces unnecessary token consumption.
+  - Limit parallel workflows. Tools like `/fleet` spike token usage fast.
+</Callout>
+
+---
+
+For now, if you need Copilot Pro and can't sign up, the only real option is to watch GitHub's changelog and wait. It's a rough patch — but at least they were honest about why it's happening.
+
+If you're exploring alternatives in the meantime, I've found the [Disqus comments setup for SnipGeek](/blog/disqus-comments-snipgeek) walkthrough useful for keeping track of what tools I'm actively using in my workflow.
+
+### References
+1. [Changes to GitHub Copilot Individual plans — GitHub Blog](https://github.blog/news-insights/company-news/changes-to-github-copilot-individual-plans/)
