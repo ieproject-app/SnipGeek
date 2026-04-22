@@ -16,6 +16,8 @@ import {
   Clock,
   ShieldCheck,
   SlidersHorizontal,
+  MoreHorizontal,
+  ChevronDown,
 } from "lucide-react";
 
 import { Input } from "@/components/ui/input";
@@ -27,6 +29,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { useToast } from "@/hooks/use-toast";
 import {
   fetchContentInventory,
@@ -36,54 +46,83 @@ import {
   type InventoryItem,
   type IndexStatusValue,
 } from "@/components/admin/admin-api-client";
+import {
+  STATUS_META,
+  STATUS_ORDER,
+  getStatusMeta,
+} from "@/components/admin/shared/status-tones";
+import { StageFunnel, type StageCount } from "@/components/admin/shared/stage-funnel";
 import { cn } from "@/lib/utils";
 
-const STATUS_OPTIONS: {
-  value: IndexStatusValue;
-  label: string;
-  pill: string;
-  dot: string;
-}[] = [
-  {
-    value: "unknown",
-    label: "Unknown",
-    pill: "border-muted-foreground/20 text-muted-foreground",
-    dot: "bg-muted-foreground/40",
-  },
-  {
-    value: "not_submitted",
-    label: "Belum Submit",
-    pill: "border-destructive/30 text-destructive bg-destructive/5",
-    dot: "bg-destructive",
-  },
-  {
-    value: "submitted",
-    label: "Submitted",
-    pill: "border-amber-500/40 text-amber-700 dark:text-amber-400 bg-amber-500/5",
-    dot: "bg-amber-500",
-  },
-  {
-    value: "indexed",
-    label: "Indexed",
-    pill: "border-emerald-500/40 text-emerald-700 dark:text-emerald-400 bg-emerald-500/5",
-    dot: "bg-emerald-500",
-  },
-  {
-    value: "excluded",
-    label: "Excluded",
-    pill: "border-zinc-500/30 text-zinc-600 bg-zinc-500/5",
-    dot: "bg-zinc-500",
-  },
-];
+/**
+ * Status options derived from the shared tone registry. The select trigger
+ * classes differ slightly from the row pill (no left border accent), so we
+ * build a thin adapter on top of STATUS_META instead of duplicating the table.
+ */
+const STATUS_OPTIONS = STATUS_ORDER.map((value) => ({
+  value,
+  label: STATUS_META[value].label,
+  pill: STATUS_META[value].pill,
+  dot: STATUS_META[value].dot,
+}));
 
 function statusOpt(v: IndexStatusValue) {
-  return STATUS_OPTIONS.find((s) => s.value === v) ?? STATUS_OPTIONS[0];
+  const meta = getStatusMeta(v);
+  return { value: meta.value, label: meta.label, pill: meta.pill, dot: meta.dot };
 }
 
 function typeIcon(type: InventoryItem["type"]) {
   if (type === "blog") return <FileText className="h-3.5 w-3.5" />;
   if (type === "note") return <StickyNote className="h-3.5 w-3.5" />;
   return <Wrench className="h-3.5 w-3.5" />;
+}
+
+/* ------------------------------------------------------------------
+ * Stage tabs — the primary filter UI, maps to existing status filter.
+ * ------------------------------------------------------------------ */
+
+type StageTab = "all" | "needs" | "submit" | "index" | "excluded";
+
+const STAGE_TAB_ORDER: StageTab[] = [
+  "all",
+  "needs",
+  "submit",
+  "index",
+  "excluded",
+];
+
+const STAGE_TAB_LABEL: Record<StageTab, { full: string; short: string }> = {
+  all: { full: "All", short: "All" },
+  needs: { full: "Needs action", short: "Needs" },
+  submit: { full: "Submitted", short: "Submit" },
+  index: { full: "Indexed", short: "Indexed" },
+  excluded: { full: "Excluded", short: "Excl." },
+};
+
+function matchesStageTab(tab: StageTab, status: IndexStatusValue): boolean {
+  switch (tab) {
+    case "all":
+      return true;
+    case "needs":
+      return status === "not_submitted" || status === "unknown";
+    case "submit":
+      return status === "submitted";
+    case "index":
+      return status === "indexed";
+    case "excluded":
+      return status === "excluded";
+  }
+}
+
+/** Maps a legacy `?status=...` URL param → new stage tab. */
+function stageTabFromStatusParam(value: string | null): StageTab | null {
+  if (!value) return null;
+  if (value === "not_submitted" || value === "unknown") return "needs";
+  if (value === "submitted") return "submit";
+  if (value === "indexed") return "index";
+  if (value === "excluded") return "excluded";
+  if (STAGE_TAB_ORDER.includes(value as StageTab)) return value as StageTab;
+  return null;
 }
 
 const GSC_PROPERTY_ID = "sc-domain:snipgeek.com";
@@ -295,7 +334,7 @@ export function ContentTable() {
   const [error, setError] = useState<string | null>(null);
   const [gscQuickFilter, setGscQuickFilter] = useState<GscQuickFilter>("all");
   const [filterType, setFilterType] = useState<string>("all");
-  const [filterStatus, setFilterStatus] = useState<string>("all");
+  const [stageTab, setStageTab] = useState<StageTab>("all");
   const [filterLocale, setFilterLocale] = useState<string>("all");
   // visibility: "all" = show everything, "public" = only indexable, "hidden" = only draft/gated/unpaired
   const [filterVisibility, setFilterVisibility] = useState<
@@ -349,15 +388,8 @@ export function ContentTable() {
     const t = sp.get("type");
     if (t && ["blog", "note", "tool"].includes(t)) setFilterType(t);
 
-    const s = sp.get("status");
-    if (
-      s &&
-      ["unknown", "not_submitted", "submitted", "indexed", "excluded"].includes(
-        s,
-      )
-    ) {
-      setFilterStatus(s);
-    }
+    const mappedTab = stageTabFromStatusParam(sp.get("status"));
+    if (mappedTab) setStageTab(mappedTab);
 
     const gsc = sp.get("gsc");
     if (
@@ -398,7 +430,7 @@ export function ContentTable() {
       if (filterLocale !== "all" && item.locale !== filterLocale) return false;
       const row = rowState[item.id];
       const s = row?.status ?? "unknown";
-      if (filterStatus !== "all" && s !== filterStatus) return false;
+      if (!matchesStageTab(stageTab, s)) return false;
       if (!matchesGscQuickFilter(gscQuickFilter, row)) return false;
       if (q) {
         const hay = `${item.title} ${item.path} ${item.slug}`.toLowerCase();
@@ -410,22 +442,63 @@ export function ContentTable() {
     inventory,
     filterType,
     filterLocale,
-    filterStatus,
+    stageTab,
     filterVisibility,
     gscQuickFilter,
     search,
     rowState,
   ]);
 
-  const statusCounts = useMemo(() => {
-    if (!inventory) return null;
-    const c: Record<string, number> = { all: inventory.length };
+  /**
+   * Count per stage tab, ignoring `stageTab` itself so each badge reflects
+   * the full-inventory count for that stage (otherwise switching tabs would
+   * change the badges). We still honour the other filters so the count
+   * reflects what the user would actually see if they selected that tab.
+   */
+  const tabCounts = useMemo(() => {
+    const empty: Record<StageTab, number> = {
+      all: 0,
+      needs: 0,
+      submit: 0,
+      index: 0,
+      excluded: 0,
+    };
+    if (!inventory) return empty;
+    const q = search.trim().toLowerCase();
     for (const item of inventory) {
-      const s = rowState[item.id]?.status ?? "unknown";
-      c[s] = (c[s] ?? 0) + 1;
+      if (isMonitoringOptOut(item)) continue;
+      const isHidden = Boolean(
+        item.draft ||
+        item.requiresAuth ||
+        (item.type === "blog" && item.hasLocalePair === false),
+      );
+      if (filterVisibility === "hidden" && !isHidden) continue;
+      if (filterVisibility === "public" && isHidden) continue;
+      if (filterType !== "all" && item.type !== filterType) continue;
+      if (filterLocale !== "all" && item.locale !== filterLocale) continue;
+      const row = rowState[item.id];
+      if (!matchesGscQuickFilter(gscQuickFilter, row)) continue;
+      if (q) {
+        const hay = `${item.title} ${item.path} ${item.slug}`.toLowerCase();
+        if (!hay.includes(q)) continue;
+      }
+      const status = (row?.status ?? "unknown") as IndexStatusValue;
+      empty.all++;
+      if (status === "not_submitted" || status === "unknown") empty.needs++;
+      else if (status === "submitted") empty.submit++;
+      else if (status === "indexed") empty.index++;
+      else if (status === "excluded") empty.excluded++;
     }
-    return c;
-  }, [inventory, rowState]);
+    return empty;
+  }, [
+    inventory,
+    filterType,
+    filterLocale,
+    filterVisibility,
+    gscQuickFilter,
+    search,
+    rowState,
+  ]);
 
   const priorityCandidates = useMemo(() => {
     return (
@@ -833,32 +906,108 @@ export function ContentTable() {
     );
   }
 
+  /* -----------------------------------------------------------------
+   * Compact funnel — mirrors the dashboard pipeline so the user knows
+   * where in the workflow they are standing while working the monitor.
+   * ----------------------------------------------------------------- */
+  const indexedCount = monitorInventory.filter((item) => {
+    const hidden = Boolean(
+      item.draft ||
+      item.requiresAuth ||
+      (item.type === "blog" && item.hasLocalePair === false),
+    );
+    if (hidden) return false;
+    return (rowState[item.id]?.status ?? "unknown") === "indexed";
+  }).length;
+
+  const compactStages: StageCount[] = [
+    { key: "total", count: monitorInventory.length },
+    { key: "public", count: publicCount },
+    { key: "submit", count: waitingCount },
+    { key: "index", count: indexedCount },
+    { key: "needs", count: actionableCount },
+  ];
+
+  const activeFunnelKey =
+    stageTab === "needs"
+      ? "needs"
+      : stageTab === "submit"
+        ? "submit"
+        : stageTab === "index"
+          ? "index"
+          : null;
+
+  const batchLimit = Math.min(filtered.length, Number(batchSize));
+  const priorityLimit = Math.min(priorityCandidates.length, Number(batchSize));
+
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b border-border/70 bg-background px-4 py-4 md:px-8 lg:px-12">
-        <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
+      {/* ── Header: eyebrow + title + compact funnel ─── */}
+      <header className="border-b border-border/70 bg-background px-4 py-5 md:px-6 lg:px-8">
+        <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
           <div>
-            <p className="font-mono text-[10px] font-bold uppercase tracking-[0.3em] text-accent">
-              — Index Monitor / Ops List
+            <p className="font-mono text-[10px] font-bold uppercase tracking-[0.28em] text-muted-foreground">
+              — Workspace
             </p>
-            <div className="mt-1 flex flex-col gap-1 xl:flex-row xl:items-end xl:gap-3">
-              <h1 className="font-display text-2xl font-black tracking-[-0.04em] md:text-3xl">
-                Index monitor
-              </h1>
-              <p className="text-sm text-muted-foreground">
-                {inventory?.length ?? 0} URL · {actionableCount} actionable ·{" "}
-                {waitingCount} awaiting · {freshCount} fresh · {publicCount}{" "}
-                public · {hiddenCount} hidden
-              </p>
-            </div>
+            <h1 className="mt-1 font-display text-3xl font-black tracking-[-0.03em]">
+              Index Monitor
+            </h1>
+            <p className="mt-1 text-xs text-muted-foreground">
+              {monitorInventory.length} URL dalam monitor · {publicCount} public · {hiddenCount} hidden · {freshCount} fresh
+            </p>
+          </div>
+          <div className="hidden sm:block">
+            <StageFunnel
+              stages={compactStages}
+              variant="compact"
+              activeKey={activeFunnelKey}
+            />
           </div>
         </div>
       </header>
 
-      <div className="sticky top-0 z-10 border-b border-border/70 bg-background/95 px-4 py-3 backdrop-blur-sm md:px-8 lg:px-12">
-        <div className="grid gap-2.5">
-          <div className="flex flex-col gap-2 xl:flex-row xl:items-center">
-            <div className="relative min-w-65 flex-1">
+      {/* ── Stage tabs (sticky) ─── */}
+      <div className="sticky top-0 z-10 border-b border-border/70 bg-background/95 px-4 py-2 backdrop-blur-sm md:px-6 lg:px-8">
+        <div className="flex flex-wrap items-center gap-1">
+                {STAGE_TAB_ORDER.map((tab) => {
+                  const active = stageTab === tab;
+                  const count = tabCounts[tab];
+                  return (
+                    <button
+                      key={tab}
+                      type="button"
+                      onClick={() => setStageTab(tab)}
+                      className={cn(
+                        "inline-flex items-center gap-2 rounded-xl border px-3 py-1.5 font-mono text-[10px] font-bold uppercase tracking-widest transition-colors",
+                        active
+                          ? "border-accent/50 bg-accent/10 text-foreground"
+                          : "border-transparent text-muted-foreground hover:border-border/70 hover:bg-card/50 hover:text-foreground",
+                      )}
+                    >
+                      <span className="sm:hidden">{STAGE_TAB_LABEL[tab].short}</span>
+                      <span className="hidden sm:inline">{STAGE_TAB_LABEL[tab].full}</span>
+                      <span
+                        className={cn(
+                          "inline-flex min-w-[1.25rem] items-center justify-center rounded-full border px-1 text-[9px] tabular-nums",
+                          active
+                            ? "border-accent/30 bg-background/60 text-foreground"
+                            : "border-border/60 bg-card/40 text-muted-foreground",
+                        )}
+                      >
+                        {count}
+                      </span>
+                    </button>
+                  );
+                })}
+        </div>
+      </div>
+
+      {/* ── Filter row ─── */}
+      <div className="border-b border-border/70 bg-background px-4 py-3 md:px-6 lg:px-8">
+        <div className="flex flex-col gap-2 xl:flex-row xl:items-center">
+          <div className="flex flex-wrap items-center gap-2">
+            {/* search takes full width on mobile, inline on xl */}
+            <div className="relative w-full xl:min-w-64 xl:flex-1">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
                 placeholder="Cari judul, slug, atau path…"
@@ -868,286 +1017,220 @@ export function ContentTable() {
               />
             </div>
 
-            <div className="flex flex-wrap items-center gap-2 xl:flex-nowrap">
-              <Select value={filterStatus} onValueChange={setFilterStatus}>
+            {/* filter controls: 2-col on mobile, inline on xl */}
+            <div className="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto sm:flex-wrap xl:flex-nowrap">
+            <Select value={filterType} onValueChange={setFilterType}>
+              <SelectTrigger
+                className={cn(
+                  "h-9 w-32 font-mono text-[10px] font-bold uppercase tracking-widest",
+                  ADMIN_FILTER_SELECT_TRIGGER_CLASSNAME,
+                )}
+              >
+                <SelectValue placeholder="Type" />
+              </SelectTrigger>
+              <SelectContent className={ADMIN_SELECT_CONTENT_CLASSNAME}>
+                <SelectItem className={ADMIN_SELECT_ITEM_CLASSNAME} value="all">
+                  All types
+                </SelectItem>
+                <SelectItem className={ADMIN_SELECT_ITEM_CLASSNAME} value="blog">
+                  Blog
+                </SelectItem>
+                <SelectItem className={ADMIN_SELECT_ITEM_CLASSNAME} value="note">
+                  Notes
+                </SelectItem>
+                <SelectItem className={ADMIN_SELECT_ITEM_CLASSNAME} value="tool">
+                  Tools
+                </SelectItem>
+              </SelectContent>
+            </Select>
+
+            <Select value={filterLocale} onValueChange={setFilterLocale}>
+              <SelectTrigger
+                className={cn(
+                  "h-9 w-24 font-mono text-[10px] font-bold uppercase tracking-widest",
+                  ADMIN_FILTER_SELECT_TRIGGER_CLASSNAME,
+                )}
+              >
+                <SelectValue placeholder="Locale" />
+              </SelectTrigger>
+              <SelectContent className={ADMIN_SELECT_CONTENT_CLASSNAME}>
+                <SelectItem className={ADMIN_SELECT_ITEM_CLASSNAME} value="all">
+                  All locales
+                </SelectItem>
+                <SelectItem className={ADMIN_SELECT_ITEM_CLASSNAME} value="en">
+                  EN
+                </SelectItem>
+                <SelectItem className={ADMIN_SELECT_ITEM_CLASSNAME} value="id">
+                  ID
+                </SelectItem>
+              </SelectContent>
+            </Select>
+
+            <Select
+              value={gscQuickFilter}
+              onValueChange={(v) => setGscQuickFilter(v as GscQuickFilter)}
+            >
+              <SelectTrigger
+                className={cn(
+                  "h-9 w-28 font-mono text-[10px] font-bold uppercase tracking-widest",
+                  ADMIN_FILTER_SELECT_TRIGGER_CLASSNAME,
+                )}
+              >
+                <SelectValue placeholder="Google" />
+              </SelectTrigger>
+              <SelectContent className={ADMIN_SELECT_CONTENT_CLASSNAME}>
+                <SelectItem className={ADMIN_SELECT_ITEM_CLASSNAME} value="all">
+                  All Google
+                </SelectItem>
+                <SelectItem className={ADMIN_SELECT_ITEM_CLASSNAME} value="needs_review">
+                  Review
+                </SelectItem>
+                <SelectItem className={ADMIN_SELECT_ITEM_CLASSNAME} value="unknown_google">
+                  Unknown
+                </SelectItem>
+                <SelectItem className={ADMIN_SELECT_ITEM_CLASSNAME} value="indexed_google">
+                  Indexed
+                </SelectItem>
+              </SelectContent>
+            </Select>
+
+            <Button
+              size="sm"
+              variant={advancedFiltersOpen ? "default" : "outline"}
+              className="h-9 gap-2 font-mono text-[10px] font-bold uppercase tracking-widest"
+              onClick={() => setAdvancedFiltersOpen((prev) => !prev)}
+            >
+              <SlidersHorizontal className="h-3.5 w-3.5" />
+              More
+            </Button>
+
+            {/* ── Batch actions dropdown (consolidated) ─── */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  disabled={batchRefresh.running}
+                  className="h-9 gap-2 font-mono text-[10px] font-bold uppercase tracking-widest"
+                >
+                  {batchRefresh.running ? (
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  ) : (
+                    <RefreshCw className="h-3.5 w-3.5" />
+                  )}
+                  {batchRefresh.running
+                    ? `${batchRefresh.done}/${batchRefresh.total}`
+                    : "Batch"}
+                  <ChevronDown className="h-3 w-3 opacity-60" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuLabel className="font-mono text-[9px] font-bold uppercase tracking-widest text-muted-foreground">
+                  Batch size
+                </DropdownMenuLabel>
+                <div className="flex gap-1 px-2 pb-2">
+                  {["5", "10", "20"].map((n) => (
+                    <button
+                      key={n}
+                      type="button"
+                      onClick={() => setBatchSize(n)}
+                      className={cn(
+                        "flex-1 rounded-md border px-2 py-1 font-mono text-[10px] font-bold tabular-nums transition-colors",
+                        batchSize === n
+                          ? "border-accent/50 bg-accent/10 text-foreground"
+                          : "border-border/60 bg-background text-muted-foreground hover:text-foreground",
+                      )}
+                    >
+                      {n}
+                    </button>
+                  ))}
+                </div>
+                <DropdownMenuSeparator />
+                <DropdownMenuLabel className="font-mono text-[9px] font-bold uppercase tracking-widest text-muted-foreground">
+                  Refresh
+                </DropdownMenuLabel>
+                <DropdownMenuItem
+                  disabled={batchRefresh.running || filtered.length === 0}
+                  onSelect={() =>
+                    runBatchRefresh(
+                      filtered,
+                      `Refresh visible ${batchLimit}`,
+                    )
+                  }
+                  className="flex items-center gap-2"
+                >
+                  <RefreshCw className="h-3.5 w-3.5" />
+                  Refresh visible ({batchLimit})
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  disabled={
+                    batchRefresh.running || priorityCandidates.length === 0
+                  }
+                  onSelect={() =>
+                    runBatchRefresh(
+                      priorityCandidates,
+                      `Refresh priority ${priorityLimit}`,
+                    )
+                  }
+                  className="flex items-center gap-2"
+                >
+                  <ShieldCheck className="h-3.5 w-3.5" />
+                  Refresh priority ({priorityLimit})
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            <div className="shrink-0 font-mono text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+              {filtered.length} shown
+            </div>
+            </div>
+          </div>
+        </div>
+
+        {advancedFiltersOpen ? (
+          <div className="mt-2 rounded-xl border border-border/70 bg-card/30 p-3">
+            <div className="mb-2 flex items-center gap-2">
+              <Filter className="h-4 w-4 text-muted-foreground" />
+              <WorkspaceSectionLabel>Advanced filters</WorkspaceSectionLabel>
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              <Select
+                value={filterVisibility}
+                onValueChange={(v) =>
+                  setFilterVisibility(v as "all" | "public" | "hidden")
+                }
+              >
                 <SelectTrigger
                   className={cn(
                     "h-9 w-36 font-mono text-[10px] font-bold uppercase tracking-widest",
                     ADMIN_FILTER_SELECT_TRIGGER_CLASSNAME,
                   )}
                 >
-                  <SelectValue placeholder="Status" />
+                  <SelectValue placeholder="Visibility" />
                 </SelectTrigger>
                 <SelectContent className={ADMIN_SELECT_CONTENT_CLASSNAME}>
-                  <SelectItem
-                    className={ADMIN_SELECT_ITEM_CLASSNAME}
-                    value="all"
-                  >
-                    Semua status
+                  <SelectItem className={ADMIN_SELECT_ITEM_CLASSNAME} value="all">
+                    All visibility
                   </SelectItem>
-                  {STATUS_OPTIONS.map((s) => {
-                    const n = statusCounts?.[s.value] ?? 0;
-                    return (
-                      <SelectItem
-                        className={ADMIN_SELECT_ITEM_CLASSNAME}
-                        key={s.value}
-                        value={s.value}
-                      >
-                        {s.label} · {n}
-                      </SelectItem>
-                    );
-                  })}
-                </SelectContent>
-              </Select>
-
-              <Select
-                value={gscQuickFilter}
-                onValueChange={(v) => setGscQuickFilter(v as GscQuickFilter)}
-              >
-                <SelectTrigger
-                  className={cn(
-                    "h-9 w-32 font-mono text-[10px] font-bold uppercase tracking-widest",
-                    ADMIN_FILTER_SELECT_TRIGGER_CLASSNAME,
-                  )}
-                >
-                  <SelectValue placeholder="Google" />
-                </SelectTrigger>
-                <SelectContent className={ADMIN_SELECT_CONTENT_CLASSNAME}>
-                  <SelectItem
-                    className={ADMIN_SELECT_ITEM_CLASSNAME}
-                    value="all"
-                  >
-                    All Google
+                  <SelectItem className={ADMIN_SELECT_ITEM_CLASSNAME} value="public">
+                    Public
                   </SelectItem>
-                  <SelectItem
-                    className={ADMIN_SELECT_ITEM_CLASSNAME}
-                    value="needs_review"
-                  >
-                    Review
-                  </SelectItem>
-                  <SelectItem
-                    className={ADMIN_SELECT_ITEM_CLASSNAME}
-                    value="unknown_google"
-                  >
-                    Unknown
-                  </SelectItem>
-                  <SelectItem
-                    className={ADMIN_SELECT_ITEM_CLASSNAME}
-                    value="indexed_google"
-                  >
-                    Indexed
+                  <SelectItem className={ADMIN_SELECT_ITEM_CLASSNAME} value="hidden">
+                    Hidden
                   </SelectItem>
                 </SelectContent>
               </Select>
-
-              <Button
-                size="sm"
-                variant={advancedFiltersOpen ? "default" : "outline"}
-                className="h-9 gap-2 font-mono text-[10px] font-bold uppercase tracking-widest"
-                onClick={() => setAdvancedFiltersOpen((prev) => !prev)}
-              >
-                <SlidersHorizontal className="h-3.5 w-3.5" />
-                More filters
-              </Button>
-
-              <Select value={batchSize} onValueChange={setBatchSize}>
-                <SelectTrigger
-                  className={cn(
-                    "h-9 w-30 font-mono text-[10px] font-bold uppercase tracking-widest",
-                    ADMIN_FILTER_SELECT_TRIGGER_CLASSNAME,
-                  )}
-                >
-                  <SelectValue placeholder="Batch size" />
-                </SelectTrigger>
-                <SelectContent className={ADMIN_SELECT_CONTENT_CLASSNAME}>
-                  <SelectItem className={ADMIN_SELECT_ITEM_CLASSNAME} value="5">
-                    Batch 5
-                  </SelectItem>
-                  <SelectItem
-                    className={ADMIN_SELECT_ITEM_CLASSNAME}
-                    value="10"
-                  >
-                    Batch 10
-                  </SelectItem>
-                  <SelectItem
-                    className={ADMIN_SELECT_ITEM_CLASSNAME}
-                    value="20"
-                  >
-                    Batch 20
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-
-              <Button
-                size="sm"
-                variant="outline"
-                disabled={batchRefresh.running}
-                className="h-9 gap-2 font-mono text-[10px] font-bold uppercase tracking-widest"
-                title="Refresh semua URL yang tampil di layar sekarang"
-                onClick={() =>
-                  runBatchRefresh(
-                    filtered,
-                    `Refresh visible ${Math.min(filtered.length, Number(batchSize))}`,
-                  )
-                }
-              >
-                {batchRefresh.running &&
-                batchRefresh.label.startsWith("Refresh visible") ? (
-                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                ) : (
-                  <RefreshCw className="h-3.5 w-3.5" />
-                )}
-                Visible
-              </Button>
-
-              <Button
-                size="sm"
-                variant="outline"
-                disabled={batchRefresh.running}
-                className="h-9 gap-2 border-accent/30 font-mono text-[10px] font-bold uppercase tracking-widest text-accent hover:border-accent hover:text-accent"
-                title="Refresh URL prioritas yang belum indexed dan belum fresh"
-                onClick={() =>
-                  runBatchRefresh(
-                    priorityCandidates,
-                    `Refresh priority ${Math.min(priorityCandidates.length, Number(batchSize))}`,
-                  )
-                }
-              >
-                {batchRefresh.running &&
-                batchRefresh.label.startsWith("Refresh priority") ? (
-                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                ) : (
-                  <ShieldCheck className="h-3.5 w-3.5" />
-                )}
-                Priority
-              </Button>
-
-              <div className="shrink-0 font-mono text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
-                {batchRefresh.running
-                  ? `${batchRefresh.done}/${batchRefresh.total}`
-                  : `${filtered.length} results`}
-              </div>
+              <p className="text-xs text-muted-foreground">
+                Default menampilkan semua. Filter ke &ldquo;Public&rdquo; untuk fokus ke
+                URL yang bisa masuk Google.
+              </p>
             </div>
           </div>
-
-          {advancedFiltersOpen ? (
-            <div className="rounded-2xl border border-border/70 bg-card/30 p-3">
-              <div className="mb-2 flex items-center gap-2">
-                <Filter className="h-4 w-4 text-muted-foreground" />
-                <WorkspaceSectionLabel>Advanced filters</WorkspaceSectionLabel>
-              </div>
-
-              <div className="flex flex-wrap items-center gap-2">
-                <Select value={filterType} onValueChange={setFilterType}>
-                  <SelectTrigger
-                    className={cn(
-                      "h-9 w-35 font-mono text-[10px] font-bold uppercase tracking-widest",
-                      ADMIN_FILTER_SELECT_TRIGGER_CLASSNAME,
-                    )}
-                  >
-                    <SelectValue placeholder="Type" />
-                  </SelectTrigger>
-                  <SelectContent className={ADMIN_SELECT_CONTENT_CLASSNAME}>
-                    <SelectItem
-                      className={ADMIN_SELECT_ITEM_CLASSNAME}
-                      value="all"
-                    >
-                      Semua tipe
-                    </SelectItem>
-                    <SelectItem
-                      className={ADMIN_SELECT_ITEM_CLASSNAME}
-                      value="blog"
-                    >
-                      Blog
-                    </SelectItem>
-                    <SelectItem
-                      className={ADMIN_SELECT_ITEM_CLASSNAME}
-                      value="note"
-                    >
-                      Notes
-                    </SelectItem>
-                    <SelectItem
-                      className={ADMIN_SELECT_ITEM_CLASSNAME}
-                      value="tool"
-                    >
-                      Tools
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-
-                <Select value={filterLocale} onValueChange={setFilterLocale}>
-                  <SelectTrigger
-                    className={cn(
-                      "h-9 w-27.5 font-mono text-[10px] font-bold uppercase tracking-widest",
-                      ADMIN_FILTER_SELECT_TRIGGER_CLASSNAME,
-                    )}
-                  >
-                    <SelectValue placeholder="Locale" />
-                  </SelectTrigger>
-                  <SelectContent className={ADMIN_SELECT_CONTENT_CLASSNAME}>
-                    <SelectItem
-                      className={ADMIN_SELECT_ITEM_CLASSNAME}
-                      value="all"
-                    >
-                      All Locales
-                    </SelectItem>
-                    <SelectItem
-                      className={ADMIN_SELECT_ITEM_CLASSNAME}
-                      value="en"
-                    >
-                      EN
-                    </SelectItem>
-                    <SelectItem
-                      className={ADMIN_SELECT_ITEM_CLASSNAME}
-                      value="id"
-                    >
-                      ID
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-
-                <Select
-                  value={filterVisibility}
-                  onValueChange={(v) =>
-                    setFilterVisibility(v as "all" | "public" | "hidden")
-                  }
-                >
-                  <SelectTrigger
-                    className={cn(
-                      "h-9 w-32.5 font-mono text-[10px] font-bold uppercase tracking-widest",
-                      ADMIN_FILTER_SELECT_TRIGGER_CLASSNAME,
-                    )}
-                  >
-                    <SelectValue placeholder="Visibility" />
-                  </SelectTrigger>
-                  <SelectContent className={ADMIN_SELECT_CONTENT_CLASSNAME}>
-                    <SelectItem
-                      className={ADMIN_SELECT_ITEM_CLASSNAME}
-                      value="all"
-                    >
-                      Semua
-                    </SelectItem>
-                    <SelectItem
-                      className={ADMIN_SELECT_ITEM_CLASSNAME}
-                      value="public"
-                    >
-                      Public
-                    </SelectItem>
-                    <SelectItem
-                      className={ADMIN_SELECT_ITEM_CLASSNAME}
-                      value="hidden"
-                    >
-                      Hidden
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-          ) : null}
-        </div>
+        ) : null}
       </div>
 
-      <div className="space-y-2 px-4 py-4 md:px-8 lg:px-12">
+      {/* ── Row list ─── */}
+      <div className="space-y-2 px-4 py-4 md:px-6 lg:px-8">
         {filtered.map((item, idx) => {
           const row = rowState[item.id] ?? {
             status: "unknown" as IndexStatusValue,
@@ -1166,6 +1249,11 @@ export function ContentTable() {
             (isUnpairedBlog &&
               (row.status === "submitted" || row.status === "indexed"));
           const fresh = isFreshlyChecked(row.lastCheckedAt);
+          const refreshDisabled =
+            Boolean(row.refreshing) ||
+            batchRefresh.running ||
+            isUnpairedBlog ||
+            isOptOut;
 
           return (
             <div
@@ -1173,7 +1261,8 @@ export function ContentTable() {
               style={{ animationDelay: `${idx * 30}ms` }}
               className="group animate-[fadeSlideIn_0.25s_ease_both] rounded-2xl border border-border/70 bg-card/25 px-3.5 py-3 shadow-sm transition-colors hover:border-border"
             >
-              <div className="grid grid-cols-1 gap-3 xl:grid-cols-[minmax(0,1fr)_190px_auto] xl:items-center">
+              <div className="grid grid-cols-1 gap-3 md:grid-cols-[minmax(0,1fr)_auto] xl:grid-cols-[minmax(0,1fr)_170px_auto] xl:items-center">
+                {/* ── Content column ─── */}
                 <div className="min-w-0">
                   <div className="flex items-start gap-3">
                     <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-xl border border-border/60 bg-background/50 text-muted-foreground">
@@ -1181,16 +1270,11 @@ export function ContentTable() {
                     </div>
 
                     <div className="min-w-0 flex-1">
+                      {/* Title + GSC headline (primary info) */}
                       <div className="flex flex-wrap items-center gap-2">
                         <h3 className="truncate text-sm font-semibold tracking-tight text-foreground">
                           {item.title}
                         </h3>
-                        {fresh ? (
-                          <span className="inline-flex items-center gap-1 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 font-mono text-[9px] font-bold uppercase tracking-widest text-emerald-700 dark:text-emerald-400">
-                            <ShieldCheck className="h-2.5 w-2.5" />
-                            Fresh
-                          </span>
-                        ) : null}
                         {gscSummary ? (
                           <span
                             className={cn(
@@ -1200,13 +1284,10 @@ export function ContentTable() {
                           >
                             {gscSummary.headline}
                           </span>
-                        ) : (
-                          <span className="inline-flex rounded-full border border-border/60 px-2 py-0.5 font-mono text-[9px] font-bold uppercase tracking-widest text-muted-foreground">
-                            No GSC
-                          </span>
-                        )}
+                        ) : null}
                       </div>
 
+                      {/* Path */}
                       <a
                         href={item.url}
                         target="_blank"
@@ -1216,45 +1297,53 @@ export function ContentTable() {
                         {item.path}
                       </a>
 
-                      <div className="mt-2 flex flex-wrap items-center gap-1.5">
-                        <span className="rounded-full border border-foreground/15 px-2 py-0.5 font-mono text-[9px] font-bold uppercase tracking-widest">
-                          {item.locale}
+                      {/* Meta chips line — secondary info */}
+                      <div className="mt-2 flex flex-wrap items-center gap-1.5 text-muted-foreground">
+                        <span className="font-mono text-[10px] font-bold uppercase tracking-widest">
+                          {item.locale} · {item.type}
                         </span>
-                        <span className="rounded-full border border-foreground/15 px-2 py-0.5 font-mono text-[9px] font-bold uppercase tracking-widest">
-                          {item.type}
-                        </span>
-                        {item.draft && (
-                          <span className="rounded-full border border-amber-500/40 bg-amber-500/10 px-2 py-0.5 font-mono text-[9px] font-bold uppercase tracking-widest text-amber-700 dark:text-amber-400">
-                            Draft
-                          </span>
-                        )}
-                        {item.requiresAuth && (
-                          <span className="rounded-full border border-zinc-500/40 bg-zinc-500/10 px-2 py-0.5 font-mono text-[9px] font-bold uppercase tracking-widest text-zinc-600">
-                            Gated
-                          </span>
-                        )}
-                        {isUnpairedBlog && (
-                          <span className="rounded-full border border-destructive/40 bg-destructive/10 px-2 py-0.5 font-mono text-[9px] font-bold uppercase tracking-widest text-destructive">
-                            Missing {missingPairsLabel}
-                          </span>
-                        )}
-                        {isOptOut && (
-                          <span className="rounded-full border border-zinc-500/40 bg-zinc-500/10 px-2 py-0.5 font-mono text-[9px] font-bold uppercase tracking-widest text-zinc-500 dark:text-zinc-300">
-                            Hidden from monitor
-                          </span>
-                        )}
-                        <span className="inline-flex items-center gap-1 font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-muted-foreground">
+                        <span className="text-border">·</span>
+                        <span className="inline-flex items-center gap-1 font-mono text-[10px] font-bold uppercase tracking-[0.18em]">
                           <Clock className="h-2.5 w-2.5" />
                           {row.lastCheckedAt
                             ? relativeTimeLabel(row.lastCheckedAt)
                             : "Never checked"}
                         </span>
+                        {fresh ? (
+                          <span className="inline-flex items-center gap-1 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-1.5 py-0.5 font-mono text-[9px] font-bold uppercase tracking-widest text-emerald-700 dark:text-emerald-400">
+                            <ShieldCheck className="h-2.5 w-2.5" />
+                            Fresh
+                          </span>
+                        ) : null}
+                        {item.draft ? (
+                          <span className="rounded-full border border-amber-500/40 bg-amber-500/10 px-1.5 py-0.5 font-mono text-[9px] font-bold uppercase tracking-widest text-amber-700 dark:text-amber-400">
+                            Draft
+                          </span>
+                        ) : null}
+                        {item.requiresAuth ? (
+                          <span className="rounded-full border border-zinc-500/40 bg-zinc-500/10 px-1.5 py-0.5 font-mono text-[9px] font-bold uppercase tracking-widest text-zinc-600 dark:text-zinc-300">
+                            Gated
+                          </span>
+                        ) : null}
+                        {isUnpairedBlog ? (
+                          <span className="rounded-full border border-destructive/40 bg-destructive/10 px-1.5 py-0.5 font-mono text-[9px] font-bold uppercase tracking-widest text-destructive">
+                            Missing {missingPairsLabel}
+                          </span>
+                        ) : null}
+                        {isOptOut ? (
+                          <span className="rounded-full border border-zinc-500/40 bg-zinc-500/10 px-1.5 py-0.5 font-mono text-[9px] font-bold uppercase tracking-widest text-zinc-500 dark:text-zinc-300">
+                            Hidden
+                          </span>
+                        ) : null}
                       </div>
                     </div>
                   </div>
                 </div>
 
-                <div className="space-y-2">
+                {/* ── Status + Actions row (inline on mobile) ─── */}
+                <div className="flex items-start gap-2 md:contents">
+                  {/* Status select column */}
+                  <div className="flex-1 space-y-1.5 xl:space-y-1.5">
                   <Select
                     value={row.status}
                     onValueChange={(v) => {
@@ -1327,9 +1416,10 @@ export function ContentTable() {
                       {row.notes}
                     </p>
                   ) : null}
-                </div>
+                  </div>
 
-                <div className="flex flex-wrap items-center gap-1.5 xl:justify-end">
+                  {/* ── Actions column ─── */}
+                  <div className="flex shrink-0 items-center gap-1.5 xl:justify-end">
                   <Button
                     size="sm"
                     className="h-8 gap-2 font-mono text-[10px] font-bold uppercase tracking-widest"
@@ -1340,75 +1430,80 @@ export function ContentTable() {
                     GSC
                   </Button>
 
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="h-8 w-8 p-0"
-                    onClick={() => refreshGsc(item)}
-                    disabled={
-                      Boolean(row.refreshing) ||
-                      batchRefresh.running ||
-                      isUnpairedBlog ||
-                      isOptOut
-                    }
-                    title="Refresh from GSC API"
-                  >
-                    {row.refreshing ? (
-                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                    ) : (
-                      <RefreshCw className="h-3.5 w-3.5" />
-                    )}
-                  </Button>
-
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    className="h-8 w-8 p-0 hover:bg-accent/10 hover:text-accent"
-                    title="Copy URL artikel"
-                    onClick={() => copyUrl(item.url)}
-                  >
-                    <Copy className="h-3.5 w-3.5" />
-                  </Button>
-
-                  <Button
-                    asChild
-                    size="sm"
-                    variant="ghost"
-                    className="h-8 w-8 p-0 hover:bg-accent/10 hover:text-accent"
-                  >
-                    <a
-                      href={item.url}
-                      target="_blank"
-                      rel="noreferrer"
-                      title="Buka URL publik"
+                  {row.dirty ? (
+                    <Button
+                      size="sm"
+                      variant="default"
+                      disabled={row.saving || row.refreshing || statusLocked}
+                      className="h-8 gap-1 font-mono text-[10px] font-bold uppercase tracking-widest"
+                      onClick={() => save(item)}
+                      title="Save"
                     >
-                      <ExternalLink className="h-3.5 w-3.5" />
-                    </a>
-                  </Button>
+                      {row.saving ? (
+                        <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                      ) : (
+                        <>
+                          <Save className="h-3.5 w-3.5" />
+                          Save
+                        </>
+                      )}
+                    </Button>
+                  ) : null}
 
-                  <Button
-                    size="sm"
-                    variant={row.dirty ? "default" : "ghost"}
-                    disabled={
-                      !row.dirty || row.saving || row.refreshing || statusLocked
-                    }
-                    className={cn(
-                      "h-8 gap-1 font-mono text-[10px] font-bold uppercase tracking-widest",
-                      !row.dirty && "px-2 text-muted-foreground",
-                    )}
-                    onClick={() => save(item)}
-                    title={row.dirty ? "Save" : "Saved"}
-                  >
-                    {row.saving ? (
-                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                    ) : row.dirty ? (
-                      <>
-                        <Save className="h-3.5 w-3.5" /> Save
-                      </>
-                    ) : (
-                      <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />
-                    )}
-                  </Button>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground"
+                        aria-label="More actions"
+                      >
+                        <MoreHorizontal className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-48">
+                      <DropdownMenuItem
+                        onSelect={() => refreshGsc(item)}
+                        disabled={refreshDisabled}
+                        className="flex items-center gap-2"
+                      >
+                        {row.refreshing ? (
+                          <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                        ) : (
+                          <RefreshCw className="h-3.5 w-3.5" />
+                        )}
+                        Refresh from GSC
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onSelect={() => copyUrl(item.url)}
+                        className="flex items-center gap-2"
+                      >
+                        <Copy className="h-3.5 w-3.5" />
+                        Copy URL
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <a
+                          href={item.url}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="flex items-center gap-2"
+                        >
+                          <ExternalLink className="h-3.5 w-3.5" />
+                          Open public URL
+                        </a>
+                      </DropdownMenuItem>
+                      {!row.dirty ? (
+                        <DropdownMenuItem
+                          disabled
+                          className="flex items-center gap-2"
+                        >
+                          <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />
+                          Saved
+                        </DropdownMenuItem>
+                      ) : null}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                  </div>
                 </div>
               </div>
             </div>
@@ -1420,7 +1515,7 @@ export function ContentTable() {
               No results
             </p>
             <p className="mt-2 font-mono text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70">
-              Try removing filters
+              Coba kurangi filter atau ganti stage tab di atas.
             </p>
           </div>
         )}

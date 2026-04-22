@@ -56,11 +56,35 @@ export function WeeklyTargetChart({
             label={{ value: `Target ${WEEKLY_TARGET}`, position: "right", fontSize: 10 }}
           />
           <Tooltip
-            formatter={(value: number) => [`${value} artikel`, "Jumlah"]}
-            labelFormatter={(_, payload) => {
-              const first = Array.isArray(payload) ? payload[0] : undefined;
-              const p = first?.payload as { fullLabel?: string } | undefined;
-              return p?.fullLabel ?? "";
+            cursor={{ fill: "hsl(var(--muted))", opacity: 0.5, radius: 4 }}
+            content={({ active, payload, label }) => {
+              if (!active || !payload?.length) return null;
+              const entry = payload[0]?.payload as {
+                count: number;
+                fullLabel: string;
+                onTarget: boolean;
+              };
+              return (
+                <div className="rounded-xl border border-border/60 bg-card px-3 py-2.5 shadow-lg">
+                  <p className="font-mono text-[9px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
+                    {label} · {entry.fullLabel}
+                  </p>
+                  <p
+                    className={`mt-1 font-display text-base font-black tabular-nums ${
+                      entry.onTarget ? "text-emerald-500" : entry.count === 0 ? "text-muted-foreground" : "text-destructive"
+                    }`}
+                  >
+                    {entry.count} artikel
+                  </p>
+                  <p className="mt-0.5 text-[10px] text-muted-foreground">
+                    {entry.onTarget
+                      ? "✓ On target"
+                      : entry.count === 0
+                        ? "Belum ada publish"
+                        : `${WEEKLY_TARGET - entry.count} lagi ke target`}
+                  </p>
+                </div>
+              );
             }}
           />
           <Bar dataKey="count" radius={[6, 6, 0, 0]}>

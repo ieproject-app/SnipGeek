@@ -40,9 +40,14 @@ export default function AdminLoginPage() {
   const [redirectError, setRedirectError] = useState<string | null>(null);
 
   useEffect(() => {
+    let isMounted = true;
     if (!auth) {
-      setRedirectChecked(true);
-      return;
+      Promise.resolve().then(() => {
+        if (isMounted) setRedirectChecked(true);
+      });
+      return () => {
+        isMounted = false;
+      };
     }
 
     getRedirectResult(auth)
@@ -146,7 +151,7 @@ export default function AdminLoginPage() {
           <div className="flex justify-center">
             <SnipGeekLogo className="h-14 w-14" />
           </div>
-          <CardTitle className="font-display text-3xl font-black tracking-tighter uppercase">
+          <CardTitle className="font-display text-3xl font-black tracking-[-0.03em]">
             Admin Console
           </CardTitle>
           <CardDescription className="text-sm px-6">

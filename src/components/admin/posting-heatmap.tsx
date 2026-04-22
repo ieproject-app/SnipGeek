@@ -2,6 +2,12 @@
 
 import { useMemo } from "react";
 import { cn } from "@/lib/utils";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 type Props = {
   /** ISO date strings. */
@@ -14,6 +20,16 @@ const DAY_MS = 86400000;
 
 function formatDate(d: Date): string {
   return d.toISOString().slice(0, 10);
+}
+
+function formatDisplayDate(d: Date): string {
+  return d.toLocaleDateString("id-ID", {
+    weekday: "short",
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    timeZone: "UTC",
+  });
 }
 
 /** GitHub-style contribution heatmap: 53 columns × 7 rows (Mon–Sun). */
@@ -63,35 +79,62 @@ export function PostingHeatmap({ publishDates, year }: Props) {
   const dayLabels = ["Mon", "", "Wed", "", "Fri", "", "Sun"];
 
   return (
-    <div className="flex gap-2 overflow-x-auto pb-2">
-      <div className="flex flex-col gap-[3px] pt-[18px] text-[9px] text-muted-foreground">
-        {dayLabels.map((l, i) => (
-          <div key={i} className="h-[11px] leading-[11px]">
-            {l}
-          </div>
-        ))}
+    <TooltipProvider delayDuration={100}>
+      <div className="flex gap-2 overflow-x-auto pb-2">
+        {/* Day-of-week labels */}
+        <div className="flex flex-col gap-[4px] pt-[20px] text-[9px] text-muted-foreground">
+          {dayLabels.map((l, i) => (
+            <div key={i} className="h-[14px] leading-[14px]">
+              {l}
+            </div>
+          ))}
+        </div>
+
+        {/* Week columns */}
+        <div className="flex gap-[4px]">
+          {weeks.map((week, wIdx) => (
+            <div key={wIdx} className="flex flex-col gap-[4px]">
+              {week.map((day, dIdx) => {
+                const key = formatDate(day);
+                const count = countsByDate[key] ?? 0;
+                const inYear = day.getUTCFullYear() === currentYear;
+
+                return (
+                  <Tooltip key={dIdx}>
+                    <TooltipTrigger asChild>
+                      <div
+                        className={cn(
+                          "h-[14px] w-[14px] cursor-default rounded-[3px] transition-colors hover:ring-2 hover:ring-foreground/20 hover:ring-offset-1",
+                          inYear ? levelClass(count) : "bg-transparent",
+                        )}
+                      />
+                    </TooltipTrigger>
+                    {inYear && (
+                      <TooltipContent
+                        side="top"
+                        className="flex flex-col gap-0.5 border-border/60 bg-card px-3 py-2 shadow-lg"
+                      >
+                        <span className="font-mono text-[9px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
+                          {formatDisplayDate(day)}
+                        </span>
+                        {count > 0 ? (
+                          <span className="font-display text-sm font-black text-emerald-500">
+                            {count} artikel dipublish
+                          </span>
+                        ) : (
+                          <span className="text-xs text-muted-foreground">
+                            Tidak ada publish
+                          </span>
+                        )}
+                      </TooltipContent>
+                    )}
+                  </Tooltip>
+                );
+              })}
+            </div>
+          ))}
+        </div>
       </div>
-      <div className="flex gap-[3px]">
-        {weeks.map((week, wIdx) => (
-          <div key={wIdx} className="flex flex-col gap-[3px]">
-            {week.map((day, dIdx) => {
-              const key = formatDate(day);
-              const count = countsByDate[key] ?? 0;
-              const inYear = day.getUTCFullYear() === currentYear;
-              return (
-                <div
-                  key={dIdx}
-                  title={`${key}${count ? ` · ${count} publish` : ""}`}
-                  className={cn(
-                    "h-[11px] w-[11px] rounded-[2px] transition-colors",
-                    inYear ? levelClass(count) : "bg-transparent",
-                  )}
-                />
-              );
-            })}
-          </div>
-        ))}
-      </div>
-    </div>
+    </TooltipProvider>
   );
 }

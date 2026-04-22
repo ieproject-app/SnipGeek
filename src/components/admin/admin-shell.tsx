@@ -10,6 +10,17 @@ import { cn } from "@/lib/utils";
 
 const emptySubscribe = () => () => {};
 
+/** Map pathname → human-readable page title for the mobile top bar. */
+function resolvePageTitle(pathname: string): { eyebrow: string; title: string } {
+  if (pathname.startsWith("/admin/index-monitor")) {
+    return { eyebrow: "Workspace", title: "Index Monitor" };
+  }
+  if (pathname.startsWith("/admin/login")) {
+    return { eyebrow: "Auth", title: "Sign in" };
+  }
+  return { eyebrow: "Overview", title: "Dashboard" };
+}
+
 /**
  * Wraps any authenticated admin page with the sidebar + access guard.
  * - Desktop: fixed sidebar on the left
@@ -61,12 +72,12 @@ export function AdminShell({ children }: { children: ReactNode }) {
         >
           <Menu className="h-5 w-5" />
         </button>
-        <div className="ml-3 leading-none">
+        <div className="ml-3 min-w-0 leading-none">
           <p className="font-mono text-[9px] font-bold uppercase tracking-[0.26em] text-muted-foreground">
-            SnipGeek
+            — {resolvePageTitle(pathname).eyebrow}
           </p>
-          <span className="mt-1 block font-display text-sm font-black tracking-tight">
-            Control <span className="text-accent">workspace.</span>
+          <span className="mt-1 block truncate font-display text-sm font-black tracking-tight">
+            {resolvePageTitle(pathname).title}
           </span>
         </div>
       </div>
