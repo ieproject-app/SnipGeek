@@ -2,13 +2,15 @@
 /**
  * Git pre-commit hook for SnipGeek.
  *
- * Checks if staged MDX files reference images that are NOT staged.
- * This prevents accidentally committing a post without its images.
+ * Checks if staged MDX files reference images that are NOT staged AND NOT
+ * already tracked by git. This prevents accidentally committing a post without
+ * its images, while avoiding false positives for images that already exist in
+ * the repository (e.g. when only updating tags/frontmatter on existing posts).
  *
  * What it does:
  *  1. Find all staged .mdx files
  *  2. Extract image paths from frontmatter (heroImage) and body (![alt](/images/...), src="/images/...")
- *  3. Check if those image files exist on disk but are NOT staged
+ *  3. Check if those image files exist on disk but are NEITHER staged NOR already tracked in git
  *  4. Also check if the image directory has any untracked files
  *  5. Warn (or block) if images are missing from the commit
  *
@@ -40,6 +42,15 @@ function getUntrackedFiles() {
 function getUnstagedModified() {
   const out = git("git diff --name-only");
   return out ? out.split("\n").map((f) => f.trim()).filter(Boolean) : [];
+}
+
+/**
+ * Returns all files already tracked by git (committed at any point in history).
+ * These files don't need to be re-staged — they're already in the repo.
+ */
+function getTrackedFiles() {
+  const out = git("git ls-files");
+  return out ? new Set(out.split("\n").map((f) => f.trim()).filter(Boolean)) : new Set();
 }
 
 function walkDir(dir) {
@@ -105,6 +116,7 @@ function guessImageDirs(imagePaths) {
 const staged = new Set(getStagedFiles());
 const untracked = new Set(getUntrackedFiles());
 const unstaged = new Set(getUnstagedModified());
+const tracked = getTrackedFiles(); // files already committed in git history
 
 const stagedMdx = [...staged].filter((f) =>
   f.endsWith(".mdx") && (f.startsWith("_posts/") || f.startsWith("_notes/") || f.startsWith("_pages/"))
@@ -124,13 +136,17 @@ for (const mdxFile of stagedMdx) {
 
   if (imagePaths.size === 0) continue;
 
-  // Check each referenced image
+  // Check each referenced image.
+  // An image is only a problem if it exists on disk but is NEITHER:
+  //   a) staged in this commit, NOR
+  //   b) already tracked in git (committed in a previous commit)
   const missingFromStage = [];
   for (const imgPath of imagePaths) {
     const onDisk = existsSync(join(ROOT, imgPath));
     const isStaged = staged.has(imgPath);
+    const isTracked = tracked.has(imgPath);
 
-    if (onDisk && !isStaged) {
+    if (onDisk && !isStaged && !isTracked) {
       missingFromStage.push(imgPath);
     }
   }
