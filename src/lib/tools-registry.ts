@@ -27,12 +27,6 @@ export const toolsRegistry: ToolRegistryEntry[] = [
   { slug: "image-crop", label: "Image Crop" },
   { slug: "random-name-picker", label: "Random Name Picker" },
   { slug: "laptop-service-estimator", label: "Laptop Service Estimator" },
-  {
-    slug: "prompt-generator",
-    label: "Prompt Generator",
-    devOnly: true,
-    excludeFromIndexMonitoring: true,
-  },
 
   // Internal tools — gated, do NOT count toward index monitoring by default
   { slug: "employee-history", label: "Employee History", requiresAuth: true },

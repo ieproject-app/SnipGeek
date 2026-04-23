@@ -43,7 +43,7 @@ export function StageFunnel({
   /* ── compact variant ─────────────────────────────────────────── */
   if (variant === "compact") {
     return (
-      <div className={cn("flex flex-wrap items-center gap-1.5", className)}>
+      <div className={cn("pointer-events-auto flex flex-wrap items-center gap-1.5", className)}>
         {STAGE_ORDER.map((key) => {
           const entry = byKey.get(key);
           if (!entry) return null;
@@ -65,7 +65,7 @@ export function StageFunnel({
           );
 
           const baseClass = cn(
-            "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 transition-colors",
+            "inline-flex cursor-pointer items-center gap-1.5 rounded-full border px-2.5 py-1 transition-all duration-200 ease-out will-change-transform hover:-translate-y-0.5 hover:shadow-sm active:translate-y-0 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40",
             palette.surface,
             isActive ? "border-accent/60 bg-accent/10" : palette.surfaceActive,
           );
@@ -77,6 +77,8 @@ export function StageFunnel({
                 href={entry.href}
                 onClick={() => onStageSelect?.(key)}
                 className={baseClass}
+                aria-current={isActive ? "page" : undefined}
+                data-active={isActive ? "true" : undefined}
               >
                 {content}
               </Link>
@@ -89,6 +91,8 @@ export function StageFunnel({
               type="button"
               onClick={() => onStageSelect?.(key)}
               className={baseClass}
+              aria-pressed={isActive}
+              data-active={isActive ? "true" : undefined}
             >
               {content}
             </button>
@@ -226,7 +230,7 @@ export function StageFunnel({
 
     const baseClass = cn(
       // base
-      "relative border p-4 transition-colors",
+      "relative border p-4 transition-all duration-200 ease-out will-change-transform hover:-translate-y-0.5 hover:shadow-md",
       // mobile: 2-per-row (gap-2 = 8px, so each takes half minus half the gap)
       "basis-[calc(50%-4px)] xl:basis-auto xl:flex-1 xl:min-w-0",
       palette.surface,

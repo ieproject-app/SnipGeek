@@ -19,6 +19,7 @@ import {
   MoreHorizontal,
   ChevronDown,
 } from "lucide-react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -124,6 +125,14 @@ function stageTabFromStatusParam(value: string | null): StageTab | null {
   if (STAGE_TAB_ORDER.includes(value as StageTab)) return value as StageTab;
   return null;
 }
+
+ function stageTabToStatusParam(value: StageTab): string | null {
+  if (value === "needs") return "not_submitted";
+  if (value === "submit") return "submitted";
+  if (value === "index") return "indexed";
+  if (value === "excluded") return "excluded";
+  return null;
+ }
 
 const GSC_PROPERTY_ID = "sc-domain:snipgeek.com";
 const GSC_PROPERTY_BASE = "https://search.google.com/u/0/search-console";
@@ -351,8 +360,13 @@ export function ContentTable() {
     total: 0,
   });
   const { toast } = useToast();
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
 
   useEffect(() => {
+    let cancelled = false;
+
     (async () => {
       try {
         setLoading(true);
@@ -360,6 +374,7 @@ export function ContentTable() {
           fetchContentInventory(),
           fetchIndexStatuses(),
         ]);
+        if (cancelled) return;
         setInventory(inv.items);
         const initial: Record<string, RowState> = {};
         const stMap = new Map(st.items.map((s) => [s.id, s]));
@@ -375,41 +390,149 @@ export function ContentTable() {
         }
         setRowState(initial);
       } catch (e) {
-        setError(e instanceof Error ? e.message : "Failed to load.");
+        if (!cancelled) {
+          setError(e instanceof Error ? e.message : "Failed to load.");
+        }
       } finally {
-        setLoading(false);
+        if (!cancelled) {
+          setLoading(false);
+        }
       }
     })();
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    const sp = new URLSearchParams(window.location.search);
+    const sp = new URLSearchParams(searchParams.toString());
     const t = sp.get("type");
-    if (t && ["blog", "note", "tool"].includes(t)) setFilterType(t);
+    setFilterType(t && ["blog", "note", "tool"].includes(t) ? t : "all");
 
     const mappedTab = stageTabFromStatusParam(sp.get("status"));
-    if (mappedTab) setStageTab(mappedTab);
+    setStageTab(mappedTab ?? "all");
 
     const gsc = sp.get("gsc");
-    if (
-      gsc &&
-      ["needs_review", "unknown_google", "indexed_google"].includes(gsc)
-    ) {
-      setGscQuickFilter(gsc as GscQuickFilter);
-    }
+    setGscQuickFilter(
+      gsc && ["needs_review", "unknown_google", "indexed_google"].includes(gsc)
+        ? (gsc as GscQuickFilter)
+        : "all",
+    );
 
     const locale = sp.get("locale");
-    if (locale && ["en", "id"].includes(locale)) setFilterLocale(locale);
+    setFilterLocale(locale && ["en", "id"].includes(locale) ? locale : "all");
 
     const visibility = sp.get("visibility");
-    if (visibility && ["all", "public", "hidden"].includes(visibility)) {
-      setFilterVisibility(visibility as "all" | "public" | "hidden");
-    }
+    setFilterVisibility(
+      visibility && ["all", "public", "hidden"].includes(visibility)
+        ? (visibility as "all" | "public" | "hidden")
+        : "all",
+    );
 
     const q = sp.get("q");
-    if (q) setSearch(q);
-  }, []);
+    setSearch(q ?? "");
+  }, [searchParams]);
+
+  const buildMonitorSearchParams = useCallback(
+    (next: { status?: string | null; visibility?: "all" | "public" | "hidden" | null }) => {
+      const sp = new URLSearchParams(searchParams.toString());
+
+      if (filterType === "all") sp.delete("type");
+      else sp.set("type", filterType);
+
+      if (filterLocale === "all") sp.delete("locale");
+      else sp.set("locale", filterLocale);
+
+      if (gscQuickFilter === "all") sp.delete("gsc");
+      else sp.set("gsc", gscQuickFilter);
+
+      if (search.trim()) sp.set("q", search.trim());
+      else sp.delete("q");
+
+      if (next.status === null || next.status === undefined) sp.delete("status");
+      else sp.set("status", next.status);
+
+      if (
+        next.visibility === null ||
+        next.visibility === undefined ||
+        next.visibility === "all"
+      ) {
+        sp.delete("visibility");
+      } else {
+        sp.set("visibility", next.visibility);
+      }
+
+      return sp;
+    },
+    [filterLocale, filterType, gscQuickFilter, search, searchParams],
+  );
+
+  const buildMonitorHref = useCallback(
+    (next: { status?: string | null; visibility?: "all" | "public" | "hidden" | null }) => {
+      const query = buildMonitorSearchParams(next).toString();
+      return query ? `${pathname}?${query}` : pathname;
+    },
+    [buildMonitorSearchParams, pathname],
+  );
+
+  const syncMonitorUrl = useCallback(
+    (next: { status?: string | null; visibility?: "all" | "public" | "hidden" | null }) => {
+      const query = buildMonitorSearchParams(next).toString();
+
+      router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false });
+    },
+    [buildMonitorSearchParams, pathname, router],
+  );
+
+  const handleStageTabChange = useCallback(
+    (nextTab: StageTab) => {
+      setStageTab(nextTab);
+      syncMonitorUrl({
+        status: stageTabToStatusParam(nextTab),
+        visibility: filterVisibility,
+      });
+    },
+    [filterVisibility, syncMonitorUrl],
+  );
+
+  const handleVisibilityChange = useCallback(
+    (nextVisibility: "all" | "public" | "hidden") => {
+      setFilterVisibility(nextVisibility);
+      syncMonitorUrl({
+        status: stageTabToStatusParam(stageTab),
+        visibility: nextVisibility,
+      });
+    },
+    [stageTab, syncMonitorUrl],
+  );
+
+  const handleFunnelStageSelect = useCallback(
+    (key: StageCount["key"]) => {
+      if (key === "total") {
+        setStageTab("all");
+        setFilterVisibility("all");
+        syncMonitorUrl({ status: null, visibility: "all" });
+        return;
+      }
+
+      if (key === "public") {
+        setStageTab("all");
+        setFilterVisibility("public");
+        syncMonitorUrl({ status: null, visibility: "public" });
+        return;
+      }
+
+      const nextTab = key === "submit" ? "submit" : key === "index" ? "index" : "needs";
+      setStageTab(nextTab);
+      setFilterVisibility("public");
+      syncMonitorUrl({
+        status: stageTabToStatusParam(nextTab),
+        visibility: "public",
+      });
+    },
+    [syncMonitorUrl],
+  );
 
   const filtered = useMemo(() => {
     if (!inventory) return [];
@@ -921,15 +1044,39 @@ export function ContentTable() {
   }).length;
 
   const compactStages: StageCount[] = [
-    { key: "total", count: monitorInventory.length },
-    { key: "public", count: publicCount },
-    { key: "submit", count: waitingCount },
-    { key: "index", count: indexedCount },
-    { key: "needs", count: actionableCount },
+    {
+      key: "total",
+      count: monitorInventory.length,
+      href: buildMonitorHref({ status: null, visibility: "all" }),
+    },
+    {
+      key: "public",
+      count: publicCount,
+      href: buildMonitorHref({ status: null, visibility: "public" }),
+    },
+    {
+      key: "submit",
+      count: waitingCount,
+      href: buildMonitorHref({ status: "submitted", visibility: "public" }),
+    },
+    {
+      key: "index",
+      count: indexedCount,
+      href: buildMonitorHref({ status: "indexed", visibility: "public" }),
+    },
+    {
+      key: "needs",
+      count: actionableCount,
+      href: buildMonitorHref({ status: "not_submitted", visibility: "public" }),
+    },
   ];
-
+  
   const activeFunnelKey =
-    stageTab === "needs"
+    filterVisibility === "public" && stageTab === "all"
+      ? "public"
+      : filterVisibility === "all" && stageTab === "all"
+        ? "total"
+        : stageTab === "needs"
       ? "needs"
       : stageTab === "submit"
         ? "submit"
@@ -956,11 +1103,12 @@ export function ContentTable() {
               {monitorInventory.length} URL dalam monitor · {publicCount} public · {hiddenCount} hidden · {freshCount} fresh
             </p>
           </div>
-          <div className="hidden sm:block">
+          <div className="relative z-20 hidden shrink-0 sm:block">
             <StageFunnel
               stages={compactStages}
               variant="compact"
               activeKey={activeFunnelKey}
+              onStageSelect={handleFunnelStageSelect}
             />
           </div>
         </div>
@@ -976,7 +1124,7 @@ export function ContentTable() {
                     <button
                       key={tab}
                       type="button"
-                      onClick={() => setStageTab(tab)}
+                      onClick={() => handleStageTabChange(tab)}
                       className={cn(
                         "inline-flex items-center gap-2 rounded-xl border px-3 py-1.5 font-mono text-[10px] font-bold uppercase tracking-widest transition-colors",
                         active
@@ -1197,7 +1345,7 @@ export function ContentTable() {
               <Select
                 value={filterVisibility}
                 onValueChange={(v) =>
-                  setFilterVisibility(v as "all" | "public" | "hidden")
+                  handleVisibilityChange(v as "all" | "public" | "hidden")
                 }
               >
                 <SelectTrigger

@@ -115,10 +115,20 @@ export function IslandToolbar() {
               <FileText className="h-4 w-4" />
             </button>
           </SnipTooltip>
+          <SnipTooltip label={dictionary.contentTypeApps} side="bottom">
+            <button
+              type="button"
+              aria-label={dictionary.contentTypeApps}
+              onClick={() => setContentType("apps")}
+              className={cn("relative z-10 flex h-9 w-10 items-center justify-center rounded-md transition-colors duration-200", contentType === "apps" ? "text-primary" : "text-muted-foreground hover:text-primary/70")}
+            >
+              <Download className="h-4 w-4" />
+            </button>
+          </SnipTooltip>
           <motion.div
-            className="absolute inset-y-0 z-0 w-1/4 rounded-md border border-primary/5 bg-background shadow-sm"
+            className="absolute inset-y-0 z-0 w-1/5 rounded-md border border-primary/5 bg-background shadow-sm"
             animate={{
-              x: contentType === "series" ? "0%" : contentType === "news" ? "100%" : contentType === "tips" ? "200%" : "300%",
+              x: contentType === "series" ? "0%" : contentType === "news" ? "100%" : contentType === "tips" ? "200%" : contentType === "notes" ? "300%" : "400%",
             }}
             transition={{ type: "spring", stiffness: 520, damping: 38 }}
           />

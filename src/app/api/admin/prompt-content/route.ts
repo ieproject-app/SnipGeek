@@ -1,14 +1,14 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import { requireAdmin } from "@/lib/api-helpers";
 import { getPostData } from "@/lib/posts";
 import { getNoteData } from "@/lib/notes";
 import { i18n, type Locale } from "@/i18n-config";
 
-export async function GET(request: Request) {
-  if (process.env.NODE_ENV !== "development") {
-    return NextResponse.json({ error: "Not found" }, { status: 404 });
-  }
+export async function GET(req: NextRequest) {
+  const guard = await requireAdmin(req);
+  if (guard) return guard;
 
-  const { searchParams } = new URL(request.url);
+  const { searchParams } = new URL(req.url);
   const type = searchParams.get("type");
   const slug = searchParams.get("slug");
   const localeParam = searchParams.get("locale");

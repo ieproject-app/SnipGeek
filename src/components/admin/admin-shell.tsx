@@ -15,6 +15,9 @@ function resolvePageTitle(pathname: string): { eyebrow: string; title: string } 
   if (pathname.startsWith("/admin/index-monitor")) {
     return { eyebrow: "Workspace", title: "Index Monitor" };
   }
+  if (pathname.startsWith("/admin/prompt-generator")) {
+    return { eyebrow: "Editorial", title: "Prompt Generator" };
+  }
   if (pathname.startsWith("/admin/login")) {
     return { eyebrow: "Auth", title: "Sign in" };
   }

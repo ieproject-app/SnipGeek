@@ -302,26 +302,26 @@ export function HomeClient({
     .slice(0, 8);
   topicPosts.forEach((p) => seenSlugs.add(p.slug));
 
-  const updateTag = "Ubuntu";
+  // Software & App Updates: posts with "apps" tag + "update" or "news" tag
+  const appTags = new Set(["apps", "software"]);
+  const updateNewsTags = new Set(["update", "news"]);
+  
   const primaryUpdatePosts = allPosts
     .filter(
       (post) =>
         post.frontmatter.published &&
         !seenSlugs.has(post.slug) &&
-        post.frontmatter.tags?.some((tag: string) => windowsUbuntuTags.has(tag.toLowerCase())) &&
-        ((post.frontmatter.category || "").toLowerCase().includes("update") ||
-          post.frontmatter.tags?.some((tag: string) => {
-            const normalized = tag.toLowerCase();
-            return normalized === "update" || normalized === "news";
-          })),
+        post.frontmatter.tags?.some((tag: string) => appTags.has(tag.toLowerCase())) &&
+        post.frontmatter.tags?.some((tag: string) => updateNewsTags.has(tag.toLowerCase())),
     )
     .slice(0, 6);
 
+  // Fallback: any post with apps tag
   const updateFallback = allPosts.filter(
     (post) =>
       post.frontmatter.published &&
       !seenSlugs.has(post.slug) &&
-      post.frontmatter.tags?.some((tag: string) => windowsUbuntuTags.has(tag.toLowerCase())),
+      post.frontmatter.tags?.some((tag: string) => appTags.has(tag.toLowerCase())),
   );
 
   const updatePosts = [
@@ -332,7 +332,7 @@ export function HomeClient({
   ].slice(0, 6);
 
   const focusTopicsTitle = locale === "id" ? "Sorotan Windows & Ubuntu" : "Windows & Ubuntu Highlights";
-  const updatesTitle = locale === "id" ? "Update Penting Sistem" : "Important System Updates";
+  const updatesTitle = locale === "id" ? "Software & App Updates" : "Software & App Updates";
   const updatesViewMore = locale === "id" ? "lihat update" : "view updates";
   const notesTitle = locale === "id" ? "Catatan Teknis Terbaru" : "Latest Technical Notes";
   const notesViewMore = locale === "id" ? "Selengkapnya" : "View Notes";
@@ -474,7 +474,7 @@ export function HomeClient({
             viewMoreText={updatesViewMore}
             dictionary={dictionary}
             locale={locale}
-            tag={updateTag}
+            tag="apps"
             viewMoreHref={`${linkPrefix}/blog`}
           />
         </LazySection>

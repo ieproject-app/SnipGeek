@@ -49,9 +49,9 @@ import {
 } from "lucide-react";
 import { downloadLinks } from "@/lib/data-downloads";
 import { useNotification } from "@/hooks/use-notification";
+import { fetchAdminPromptContent } from "@/components/admin/admin-api-client";
 import { cn } from "@/lib/utils";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { ToolWrapper } from "@/components/tools/tool-wrapper";
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
 import type { Dictionary } from "@/lib/get-dictionary";
 
@@ -98,6 +98,7 @@ type ToolPromptsDictionary = {
   contentTypeNews: string;
   contentTypeTips: string;
   contentTypeNotes: string;
+  contentTypeApps: string;
   seriesPhaseLabel: string;
   seriesArticleLabel: string;
   seriesTargetLabel: string;
@@ -264,7 +265,7 @@ export interface ToolPromptsProps {
   availableTags: AvailableTag[];
 }
 
-type WorkflowContentType = "series" | "news" | "tips" | "notes";
+type WorkflowContentType = "series" | "news" | "tips" | "notes" | "apps";
 type SeriesPhase = "phase-1" | "phase-2" | "phase-3" | "phase-4" | "phase-5";
 type NoteIntent = "finding" | "reference" | "mini-fix" | "observation";
 
@@ -823,21 +824,12 @@ export function usePromptLogic({
     const loadOriginalContent = async () => {
       try {
         setIsOriginalLoading(true);
-        const params = new URLSearchParams({
+        const data = await fetchAdminPromptContent({
           type: selectedArticle.type,
           slug: selectedArticle.slug,
           locale,
-        });
-
-        const res = await fetch(`/api/dev/prompt-content?${params.toString()}`, {
           signal: controller.signal,
         });
-
-        if (!res.ok) {
-          throw new Error("Failed to load original content");
-        }
-
-        const data = (await res.json()) as { content?: string };
         setOriginalContent(data.content || "");
       } catch (error) {
         if ((error as Error).name === "AbortError") return;
@@ -1019,22 +1011,22 @@ export function usePromptLogic({
       }
     }
 
-    if (mode === "create" && contentType === "news") {
+    if (mode === "create" && (contentType === "news" || contentType === "apps")) {
       const validUrls = debouncedNewsSourceUrls.filter((url) => url.trim() !== "");
       if (validUrls.length === 0) {
         issues.push({
-          id: "news-source-missing",
+          id: contentType === "apps" ? "apps-source-missing" : "news-source-missing",
           severity: "error",
-          title: "News mode requires at least one source URL",
+          title: contentType === "apps" ? "App updates mode requires at least one source URL" : "News mode requires at least one source URL",
           description: "Add at least one source URL before generating or copying the brief.",
         });
       }
 
       if (debouncedNewsAngle.trim() === "") {
         issues.push({
-          id: "news-angle-empty",
+          id: contentType === "apps" ? "apps-angle-empty" : "news-angle-empty",
           severity: "warning",
-          title: "News angle is empty",
+          title: contentType === "apps" ? "App updates angle is empty" : "News angle is empty",
           description: "AI can still generate the brief, but without a clear SnipGeek angle the output may feel generic.",
         });
       }
@@ -1102,7 +1094,7 @@ export function usePromptLogic({
       try {
         const d = JSON.parse(savedDraft);
         if (d.mode === "create" || d.mode === "modify") setMode(d.mode);
-        if (["series", "news", "tips", "notes"].includes(d.contentType)) setContentType(d.contentType);
+        if (["series", "news", "tips", "notes", "apps"].includes(d.contentType)) setContentType(d.contentType);
         if (typeof d.draft === "string") setDraft(d.draft);
         if (typeof d.publishDate === "string" && d.publishDate.trim() !== "") setPublishDate(d.publishDate);
         if (typeof d.heroImage === "string") setHeroImage(d.heroImage);
@@ -1237,7 +1229,9 @@ export function usePromptLogic({
           ? "NEWS / UPDATE"
           : contentType === "tips"
             ? "TIPS & TRICKS"
-            : "NOTES / CATATAN";
+            : contentType === "apps"
+              ? "SOFTWARE & APP UPDATES"
+              : "NOTES / CATATAN";
     const outputFormat = contentType === "notes" ? "TECHNICAL NOTE" : "BLOG POST";
     const captionAlignmentClass =
       captionAlignment === "left"
@@ -1312,6 +1306,15 @@ export function usePromptLogic({
           prompt += `- Source URLs: [MISSING]\n`;
         }
         prompt += `- Angle: ${debouncedNewsAngle.trim() || "[NOT PROVIDED]"}\n\n`;
+      }
+
+      if (contentType === "apps") {
+        prompt += `**SOFTWARE & APP UPDATES BLOCK**\n`;
+        prompt += `- Type: Application/Software news or update\n`;
+        prompt += `- REQUIRED Frontmatter Tags: MUST include "apps" + either "news" or "update"\n`;
+        prompt += `- Example: tags: ["apps", "news", "{app-name}"] or tags: ["apps", "update", "{app-name}"]\n`;
+        prompt += `- Goal: Cover software/app releases, updates, redesigns, pricing changes, or shutdown announcements.\n`;
+        prompt += `- Tone: Informative with personal perspective (SnipGeek's take).\n\n`;
       }
 
       if (contentType === "tips") {
@@ -1497,6 +1500,8 @@ export function usePromptLogic({
         prompt += `**SERIES KEY POINTS (INPUT):**\n${debouncedDraft || "[MISSING]"}\n`;
       } else if (contentType === "news") {
         prompt += `**NEWS ANALYSIS NOTES (INPUT):**\n${debouncedDraft || "[OPTIONAL]"}\n`;
+      } else if (contentType === "apps") {
+        prompt += `**APP UPDATE KEY POINTS (INPUT):**\n${debouncedDraft || "[MISSING]"}\n`;
       } else if (contentType === "notes") {
         prompt += `**NOTES INPUT (KEY POINTS / RAW FINDINGS):**\n${debouncedDraft || "[MISSING]"}\n`;
       } else {
@@ -1512,6 +1517,9 @@ export function usePromptLogic({
     }
     if (!isModify && contentType === "news") {
       prompt += `Fetch all listed source URLs, extract only relevant facts, then rewrite in original SnipGeek voice with a clear "SnipGeek's take" section based on the provided angle. `;
+    }
+    if (!isModify && contentType === "apps") {
+      prompt += `Fetch all listed source URLs, extract only relevant facts, then cover the app/software update comprehensively: what's new, what changed, and why it matters. Include a clear "SnipGeek's take" section with personal perspective. Frontmatter MUST include tags: ["apps", "news", "{app-name}"] or ["apps", "update", "{app-name}"]. `;
     }
     if (!isModify && (contentType === "series" || contentType === "tips")) {
       prompt += `Expand the provided key points into complete, practical sections with implementation details, warnings, and checks. `;

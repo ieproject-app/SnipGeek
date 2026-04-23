@@ -7,6 +7,7 @@ import {
 import { cn } from "@/lib/utils";
 import { FirebaseProviderWrapper } from "@/components/layout/firebase-provider-wrapper";
 import { ThemeProvider } from "@/components/theme-provider";
+import { NotificationProvider } from "@/hooks/use-notification";
 import "../globals.css";
 
 const fontDisplay = Bricolage_Grotesque({
@@ -55,7 +56,9 @@ export default function AdminRootLayout({
       <body className="font-sans antialiased">
         <FirebaseProviderWrapper>
           <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
-            {children}
+            <NotificationProvider>
+              {children}
+            </NotificationProvider>
           </ThemeProvider>
         </FirebaseProviderWrapper>
       </body>

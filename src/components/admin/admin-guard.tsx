@@ -35,6 +35,8 @@ export function AdminGuard({ children }: AdminGuardProps) {
   } = useDoc(adminDocRef);
 
   useEffect(() => {
+    if (process.env.NODE_ENV !== "development") return;
+
     console.log("[AdminGuard STATE]", {
       uid: user?.uid,
       email: user?.email,
@@ -49,7 +51,7 @@ export function AdminGuard({ children }: AdminGuardProps) {
   useEffect(() => {
     // If auth is finished and no user, redirect to login
     if (!isUserLoading && !user) {
-      router.push("/admin/login");
+      router.replace("/admin/login");
     }
   }, [user, isUserLoading, router]);
 
@@ -70,11 +72,14 @@ export function AdminGuard({ children }: AdminGuardProps) {
 
   // 3. If admin doc doesn't exist, access is denied
   if (!adminDoc) {
-    console.log("[AdminGuard DEBUG]", {
-      uid: user.uid,
-      email: user.email,
-      expectedFirestorePath: `roles_admin/${user.uid}`,
-    });
+    if (process.env.NODE_ENV === "development") {
+      console.log("[AdminGuard DEBUG]", {
+        uid: user.uid,
+        email: user.email,
+        expectedFirestorePath: `roles_admin/${user.uid}`,
+      });
+    }
+
     return (
       <div className="flex h-screen w-full flex-col items-center justify-center p-6 text-center bg-background">
         <div className="mb-6 p-4 bg-destructive/10 rounded-full">
@@ -92,7 +97,7 @@ export function AdminGuard({ children }: AdminGuardProps) {
           <Button asChild variant="outline">
             <Link href="/">Back to Website</Link>
           </Button>
-          <Button onClick={() => (window.location.href = "/admin/login")}>
+          <Button onClick={() => router.replace("/admin/login")}>
             Try Different Account
           </Button>
         </div>

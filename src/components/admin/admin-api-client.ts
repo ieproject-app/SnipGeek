@@ -40,6 +40,16 @@ export type GscInspectResponse = {
   data: IndexStatusRecord & { inspectionResultLink?: string };
 };
 
+export type PromptContentResponse = {
+  slug: string;
+  type: "blog" | "note";
+  locale: string;
+  title: string;
+  published: boolean;
+  date: string;
+  content: string;
+};
+
 export async function fetchContentInventory(): Promise<{
   items: InventoryItem[];
   generatedAt: string;
@@ -71,5 +81,24 @@ export async function refreshFromGsc(payload: {
   return adminFetch("/api/admin/gsc/inspect", {
     method: "POST",
     body: JSON.stringify(payload),
+  });
+}
+
+export async function fetchAdminPromptContent(
+  params: {
+    type: "blog" | "note";
+    slug: string;
+    locale: string;
+    signal?: AbortSignal;
+  },
+): Promise<PromptContentResponse> {
+  const query = new URLSearchParams({
+    type: params.type,
+    slug: params.slug,
+    locale: params.locale,
+  });
+
+  return adminFetch(`/api/admin/prompt-content?${query.toString()}`, {
+    signal: params.signal,
   });
 }

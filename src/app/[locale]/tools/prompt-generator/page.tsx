@@ -1,22 +1,9 @@
-
-import { getDictionary } from '@/lib/get-dictionary';
-import { i18n, type Locale } from '@/i18n-config';
+import { i18n } from '@/i18n-config';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { ToolPromptBuilder } from '@/components/tools/tool-prompt-builder';
-import { getSortedPostsData } from '@/lib/posts';
-import { getSortedNotesData } from '@/lib/notes';
-import { getAllTags } from '@/lib/tags';
 
-export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
-  const { locale } = await params;
-  const dictionary = await getDictionary(locale as Locale);
-  const title = dictionary.promptGenerator.title;
-  const description = dictionary.promptGenerator.description;
-
+export async function generateMetadata(): Promise<Metadata> {
   return {
-    title,
-    description,
     robots: {
       index: false,
       follow: false,
@@ -28,58 +15,6 @@ export async function generateStaticParams() {
   return i18n.locales.map((locale) => ({ locale }));
 }
 
-export default async function PromptGeneratorPage({ params }: { params: Promise<{ locale: string }> }) {
-  if (process.env.NODE_ENV !== 'development') {
-    notFound();
-  }
-
-  const { locale: lang } = await params;
-  const dictionary = await getDictionary(lang as Locale);
-  const pageContent = dictionary.promptGenerator;
-
-  const [posts, notes, allTags] = await Promise.all([
-    getSortedPostsData(lang, { includeDrafts: true }),
-    getSortedNotesData(lang, { includeDrafts: true }),
-    getAllTags('en'),
-  ]);
-
-  const existingArticles = [
-    ...posts.map((p) => ({
-      slug: p.slug,
-      title: p.frontmatter.title,
-      type: 'blog' as const,
-      published: p.frontmatter.published === true,
-      date: p.frontmatter.date,
-    })),
-    ...notes.map((n) => ({
-      slug: n.slug,
-      title: n.frontmatter.title,
-      type: 'note' as const,
-      published: n.frontmatter.published === true,
-      date: n.frontmatter.date,
-    })),
-  ].sort((a, b) => {
-    if (a.published !== b.published) {
-      return a.published ? 1 : -1;
-    }
-
-    return a.title.localeCompare(b.title);
-  });
-
-  // Pass a serializable subset — only name and count are needed by the prompt builder
-  const availableTags = allTags.map(({ name, count }) => ({ name, count }));
-
-  return (
-    <div className="w-full">
-      <main className="mx-auto max-w-7xl px-4 pt-6 pb-12 sm:px-6 sm:pt-8 sm:pb-16">
-        <ToolPromptBuilder
-          dictionary={pageContent}
-          fullDictionary={dictionary}
-          existingArticles={existingArticles}
-          availableTags={availableTags}
-          locale={lang as Locale}
-        />
-      </main>
-    </div>
-  );
+export default function PromptGeneratorPage() {
+  notFound();
 }

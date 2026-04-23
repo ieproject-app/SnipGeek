@@ -115,25 +115,28 @@ export default async function Home({
     .slice(0, 8);
   topicPosts.forEach((post) => seenSlugs.add(post.slug));
 
+  // Software & App Updates: posts with "apps" tag + "update" or "news" tag
+  const appTags = new Set(["apps", "software"]);
+  const updateNewsTags = new Set(["update", "news"]);
+  
   const primaryUpdatePosts = allPosts
     .filter(
       (post) =>
         post.frontmatter.published &&
         !seenSlugs.has(post.slug) &&
-        post.frontmatter.tags?.some((tag: string) => windowsUbuntuTags.has(tag.toLowerCase())) &&
-        (((post.frontmatter.category || "").toLowerCase().includes("update")) ||
-          post.frontmatter.tags?.some((tag: string) => {
-            const normalized = tag.toLowerCase();
-            return normalized === "update" || normalized === "news";
-          })),
+        post.frontmatter.tags?.some((tag: string) => appTags.has(tag.toLowerCase())) &&
+        post.frontmatter.tags?.some((tag: string) => updateNewsTags.has(tag.toLowerCase())),
     )
     .slice(0, 6);
+  
+  // Fallback: any post with apps tag (without requiring update/news)
   const updateFallback = allPosts.filter(
     (post) =>
       post.frontmatter.published &&
       !seenSlugs.has(post.slug) &&
-      post.frontmatter.tags?.some((tag: string) => windowsUbuntuTags.has(tag.toLowerCase())),
+      post.frontmatter.tags?.some((tag: string) => appTags.has(tag.toLowerCase())),
   );
+  
   const updatePosts = [
     ...primaryUpdatePosts,
     ...updateFallback.filter(
@@ -292,7 +295,7 @@ export default async function Home({
           __html: JSON.stringify(
             toBlogItems(
               updatePosts,
-              locale === "id" ? "Update Penting Sistem" : "Important System Updates",
+              locale === "id" ? "Software & App Updates" : "Software & App Updates",
               "update-posts",
             ),
           ),

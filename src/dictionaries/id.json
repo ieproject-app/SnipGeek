@@ -71,6 +71,10 @@
         "title": "AI Article Prompt Generator",
         "description": "Buat prompt terstruktur untuk meminta artikel baru dengan detail yang lengkap."
       },
+      "prompt_generator": {
+        "title": "Prompt Generator",
+        "description": "Susun dan revisi prompt editorial terstruktur langsung dari workspace admin."
+      },
       "number_to_words": {
         "title": "Generator Terbilang",
         "description": "Mengubah angka menjadi bentuk tulisan dalam Bahasa Indonesia."
@@ -339,6 +343,7 @@
     "contentTypeNews": "Berita/Update",
     "contentTypeTips": "Tips & Tricks",
     "contentTypeNotes": "Catatan/Notes",
+    "contentTypeApps": "Update Aplikasi",
     "seriesPhaseLabel": "Fase Series",
     "seriesArticleLabel": "Artikel Series",
     "seriesTargetLabel": "Target Pembaca",

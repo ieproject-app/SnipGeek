@@ -71,6 +71,10 @@
         "title": "AI Article Prompt Generator",
         "description": "Create a structured prompt to request a new article with complete details."
       },
+      "prompt_generator": {
+        "title": "Prompt Generator",
+        "description": "Build and revise structured editorial prompts from the admin workspace."
+      },
       "number_to_words": {
         "title": "Number to Words Generator",
         "description": "Convert numbers into their written-out form in Indonesian."
@@ -339,6 +343,7 @@
     "contentTypeNews": "News/Update",
     "contentTypeTips": "Tips & Tricks",
     "contentTypeNotes": "Notes",
+    "contentTypeApps": "App Updates",
     "seriesPhaseLabel": "Series Phase",
     "seriesArticleLabel": "Series Article",
     "seriesTargetLabel": "Target Reader",

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useSyncExternalStore } from "react";
 import { useUser, useAuth, isFirebaseInitialized } from "@/firebase";
 import { initiateGoogleSignIn } from "@/firebase/non-blocking-login";
 import { signOut } from "firebase/auth";
@@ -35,6 +35,7 @@ interface ToolWrapperProps {
   dictionary: Dictionary;
   isPublic?: boolean;
   requiresCloud?: boolean;
+  hideAuthenticatedUserBar?: boolean;
 }
 
 const INTERNAL_TOOL_ALLOWLIST_RAW =
@@ -70,15 +71,16 @@ export function ToolWrapper({
   dictionary,
   isPublic = false,
   requiresCloud = true,
+  hideAuthenticatedUserBar = false,
 }: ToolWrapperProps) {
   const { user, isUserLoading } = useUser();
   const auth = useAuth();
   const { notify } = useNotification();
-  const [isHydrated, setIsHydrated] = useState(false);
-
-  useEffect(() => {
-    setIsHydrated(true);
-  }, []);
+  const isHydrated = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false,
+  );
 
   const t = dictionary?.tools?.systemNotReady || {
     title: "SISTEM BELUM SIAP",
@@ -133,7 +135,7 @@ export function ToolWrapper({
         )}
 
         {/* Compact auth bar — only visible when logged in */}
-        {user && (
+        {user && !hideAuthenticatedUserBar && (
           <div className="flex items-center justify-between h-10 px-3 bg-muted/20 rounded-xl border border-border/40 overflow-hidden">
             <div className="flex items-center gap-2 min-w-0">
               <Avatar className="h-6 w-6 shrink-0 border border-border/60 shadow-sm">
@@ -331,38 +333,40 @@ export function ToolWrapper({
 
   return (
     <div className="space-y-8 animate-in fade-in duration-700">
-      <div className="flex items-center justify-between h-12 px-4 bg-muted/20 rounded-xl border border-border/40 overflow-hidden">
-        <div className="flex items-center gap-2.5 min-w-0">
-          <Avatar className="h-7 w-7 shrink-0 border border-border/60 shadow-sm">
-            <AvatarImage
-              src={user.photoURL || ""}
-              alt={user.displayName || "User"}
-            />
-            <AvatarFallback className="bg-primary text-primary-foreground font-black text-[10px]">
-              {user.displayName?.charAt(0) || "U"}
-            </AvatarFallback>
-          </Avatar>
-          <div className="flex items-center gap-2 min-w-0">
-            <p className="text-xs font-black uppercase tracking-tight text-primary truncate max-w-[160px]">
-              {user.displayName}
-            </p>
-            <Badge
-              variant="secondary"
-              className="h-4 px-1.5 text-[8px] font-black uppercase bg-emerald-500/10 text-emerald-600 border-none shrink-0"
-            >
-              <CheckCircle2 className="h-2 w-2 mr-1" /> Verified
-            </Badge>
+      {!hideAuthenticatedUserBar && (
+        <div className="flex items-center justify-between h-12 px-4 bg-muted/20 rounded-xl border border-border/40 overflow-hidden">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <Avatar className="h-7 w-7 shrink-0 border border-border/60 shadow-sm">
+              <AvatarImage
+                src={user.photoURL || ""}
+                alt={user.displayName || "User"}
+              />
+              <AvatarFallback className="bg-primary text-primary-foreground font-black text-[10px]">
+                {user.displayName?.charAt(0) || "U"}
+              </AvatarFallback>
+            </Avatar>
+            <div className="flex items-center gap-2 min-w-0">
+              <p className="text-xs font-black uppercase tracking-tight text-primary truncate max-w-[160px]">
+                {user.displayName}
+              </p>
+              <Badge
+                variant="secondary"
+                className="h-4 px-1.5 text-[8px] font-black uppercase bg-emerald-500/10 text-emerald-600 border-none shrink-0"
+              >
+                <CheckCircle2 className="h-2 w-2 mr-1" /> Verified
+              </Badge>
+            </div>
           </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleLogout}
+            className="h-7 px-2.5 rounded-lg text-[10px] font-black uppercase tracking-wider text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-all shrink-0"
+          >
+            <LogOut className="h-3 w-3 mr-1.5" /> Keluar
+          </Button>
         </div>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={handleLogout}
-          className="h-7 px-2.5 rounded-lg text-[10px] font-black uppercase tracking-wider text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-all shrink-0"
-        >
-          <LogOut className="h-3 w-3 mr-1.5" /> Keluar
-        </Button>
-      </div>
+      )}
 
       <header className="text-center space-y-3">
         <h1 className="font-display text-4xl font-extrabold tracking-tighter text-primary uppercase">

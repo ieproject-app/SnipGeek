@@ -1,13 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import {
   LogOut,
   ExternalLink,
   LayoutDashboard,
   ListChecks,
+  Sparkles,
   Search as SearchIcon,
 } from "lucide-react";
 import { SnipGeekLogo } from "@/components/icons/snipgeek-logo";
@@ -28,6 +29,12 @@ const NAV_ITEMS = [
     icon: ListChecks,
     description: "Workspace eksekusi · review status · aksi GSC",
   },
+  {
+    name: "Prompt Generator",
+    href: "/admin/prompt-generator",
+    icon: Sparkles,
+    description: "Editorial brief builder · create atau revise prompt kerja",
+  },
 ];
 
 const GSC_PROPERTY_URL =
@@ -46,11 +53,12 @@ export function AdminSidebar({
 }) {
   const pathnameFromHook = usePathname();
   const pathname = currentPath ?? pathnameFromHook;
+  const router = useRouter();
   const auth = getAuth();
 
   const handleLogout = async () => {
     await signOut(auth);
-    window.location.href = "/";
+    router.replace("/");
   };
 
   return (

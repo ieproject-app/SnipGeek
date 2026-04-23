@@ -281,6 +281,50 @@ function WorkflowContextCard() {
             </div>
           )}
 
+          {contentType === "apps" && (
+            <div className="space-y-3">
+              <div className="space-y-1.5">
+                <p className="text-[9px] font-black uppercase tracking-wider text-muted-foreground">{dictionary.newsSourceUrlsLabel}</p>
+                <div className="space-y-2">
+                  {newsSourceUrls.map((url: string, index: number) => (
+                    <div key={index} className="flex items-center gap-2">
+                      <Input
+                        value={url}
+                        onChange={(e) => updateNewsSourceUrl(index, e.target.value)}
+                        placeholder={`https://example.com/source-${index + 1}`}
+                        className="h-9 border-primary/10 bg-background/50 text-xs"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => removeNewsSourceUrl(index)}
+                        className="h-9 w-9 rounded-md border border-primary/10 text-muted-foreground transition-colors hover:border-destructive/40 hover:text-destructive"
+                      >
+                        <Trash2 className="mx-auto h-3.5 w-3.5" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+                <button
+                  type="button"
+                  onClick={addNewsSourceUrl}
+                  disabled={newsSourceUrls.length >= 3}
+                  className="inline-flex h-8 items-center gap-1.5 rounded-full border border-primary/15 px-3 text-[9px] font-black uppercase tracking-wider text-muted-foreground transition-colors hover:border-primary/30 hover:text-primary disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  <Plus className="h-3 w-3" /> Add URL (max 3)
+                </button>
+              </div>
+              <div className="space-y-1.5">
+                <p className="text-[9px] font-black uppercase tracking-wider text-muted-foreground">{dictionary.newsAngleLabel}</p>
+                <Input
+                  value={newsAngle}
+                  onChange={(e) => setNewsAngle(e.target.value)}
+                  placeholder={isIndonesianLocale ? "Contoh: fokus ke fitur baru yang paling berguna" : "Example: focus on the most useful new features"}
+                  className="h-9 border-primary/10 bg-background/50 text-xs"
+                />
+              </div>
+            </div>
+          )}
+
           {contentType === "tips" && (
             <div className="flex items-center justify-between rounded-lg border border-primary/10 bg-background/40 px-3 py-2">
               <p className="text-[10px] font-black uppercase tracking-wider text-muted-foreground">{dictionary.tipsStandaloneLabel}</p>
