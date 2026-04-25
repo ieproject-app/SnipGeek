@@ -46,13 +46,14 @@ export function PromptBuilder(props: PromptBuilderProps) {
           existingArticles={props.existingArticles}
         />
 
+        <div className="mb-2 w-full">
+          <PromptBuilderControlStrip />
+        </div>
+
         <div className="sticky top-18 z-40 mb-4 w-full">
           <div className="rounded-3xl border border-border/70 bg-background/90 p-2.5 shadow-sm backdrop-blur-xl">
-            <div className="flex flex-col gap-2.5">
-              <PromptBuilderControlStrip />
-              <div className="overflow-x-auto rounded-2xl border border-border/60 bg-card/50 px-2.5 py-2.5">
-                <IslandToolbar />
-              </div>
+            <div className="rounded-2xl border border-border/60 bg-card/50 px-2.5 py-2.5">
+              <IslandToolbar />
             </div>
           </div>
         </div>

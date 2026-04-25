@@ -50,3 +50,6 @@ src/github/downloaded-logs-*.json
 # IDE settings
 .idea/
 *.code-workspace
+
+# Experimental Playground
+/playground/

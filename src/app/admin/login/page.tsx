@@ -66,8 +66,8 @@ export default function AdminLoginPage() {
         // auth/no-auth-event = no redirect was pending, not a real error
       })
       .finally(() => {
-        // Always clean up the sessionStorage flag (belt-and-suspenders).
-        try { sessionStorage.removeItem("sg_pending_google_redirect"); } catch {}
+        // Always clean up the localStorage flag (belt-and-suspenders).
+        try { localStorage.removeItem("sg_pending_google_redirect"); } catch {}
         setRedirectChecked(true);
       });
   }, [auth]);

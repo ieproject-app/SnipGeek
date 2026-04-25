@@ -102,3 +102,10 @@ export async function fetchAdminPromptContent(
     signal: params.signal,
   });
 }
+
+export async function submitToIndexNow(payload: { urlList: string[] }): Promise<{ ok: true; submitted: number }> {
+  return adminFetch("/api/admin/indexnow", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}

@@ -1,0 +1,127 @@
+---
+title: "Ubuntu 26.04 LTS Resmi Rilis — Kesan Pertama dari Live USB"
+slug: "ubuntu-26-04-lts-released-kernel-7-gnome-50"
+translationKey: "ubuntu-26-04-lts-released-kernel-7-gnome-50"
+date: "2026-04-25"
+description: "Ubuntu 26.04 LTS 'Resolute Raccoon' resmi rilis dengan Linux 7.0 dan GNOME 50. Ini kesan pertama saya langsung dari live USB sebelum upgrade dari Ubuntu 25.10."
+category: "Linux"
+tags: ["ubuntu", "ubuntu-26-04", "linux", "gnome-50", "news"]
+published: true
+featured: true
+heroImage: "/images/_posts/ubuntu/ubuntu-26-04-rilis/banner-v2.webp"
+imageAlt: "Ubuntu 26.04 LTS Resolute Raccoon — tampilan desktop resmi dengan GNOME 50"
+---
+
+Sudah beberapa minggu terakhir saya mengikuti perkembangan Ubuntu 26.04 — dari fase beta, snapshot ISO, sampai akhirnya hari ini Canonical mengumumkan rilis finalnya. Jujur, saya cukup deg-degan. Bukan karena khawatir, tapi karena ini pertama kalinya saya sengaja menyiapkan diri untuk langsung mencoba versi baru begitu rilis, mulai dari live USB dulu sebelum memutuskan upgrade mesin utama.
+
+Dan hasilnya? Lebih baik dari yang saya bayangkan.
+
+**Ubuntu 26.04 LTS 'Resolute Raccoon'** resmi dirilis pada 25 April 2026. Versi ini membawa Linux Kernel 7.0, GNOME 50 penuh tanpa Xorg, dan sejumlah perubahan besar yang sudah lama dinanti. Dukungan LTS-nya mencakup 5 tahun standar dan tambahan 5 tahun dengan Ubuntu Pro.
+
+<Callout variant="info" title="Catatan Artikel">
+  Ini adalah kesan pertama saya dari sesi live USB — bukan review mendalam setelah instalasi penuh. Pengalaman upgrade langsung dari Ubuntu 25.10 ke 26.04 akan saya bagikan di artikel berikutnya.
+</Callout>
+
+---
+
+## Pengalaman Live USB: Lebih Polished dari Sebelumnya
+
+Saya biasa skeptis soal live USB Ubuntu — biasanya terasa lambat, animasi patah-patah, dan sering ada hal kecil yang tidak berfungsi. Tapi kali ini rasanya berbeda.
+
+Dari pertama booting, GNOME 50 langsung terasa lebih responsif. Dock yang sekarang tidak lagi transparan justru memberikan kesan lebih tegas dan fokus. Ikon folder baru yang berwarna-warni mungkin terlihat terlalu cerah untuk sebagian orang, tapi saya pribadi suka perubahan segar ini.
+
+<Gallery caption="Screenshot: Tampilan desktop Ubuntu 26.04 dari sesi live USB saya">
+  ![Desktop Ubuntu 26.04 LTS dengan GNOME 50 — tampilan awal live session](/images/_posts/ubuntu/ubuntu-26-04-rilis/screenshot/ubuntu_1604_001.webp)
+  ![Nautilus file manager di Ubuntu 26.04 dengan folder icons berwarna baru](/images/_posts/ubuntu/ubuntu-26-04-rilis/screenshot/ubuntu_1604_002.webp)
+  ![Ubuntu Dock di 26.04 sudah tidak transparan lagi, tampil lebih solid](/images/_posts/ubuntu/ubuntu-26-04-rilis/screenshot/ubuntu_1604_003.webp)
+</Gallery>
+
+Yang paling langsung terasa adalah performa scroll dan animasi GNOME Shell. Saya tidak bisa membuktikan ini dengan angka dari live session, tapi secara subjektif, semuanya terasa lebih *tight*. VRR (*Variable Refresh Rate*) juga sudah aktif secara default untuk monitor yang mendukung, dan layar saya memang langsung merasakannya.
+
+---
+
+## Apa yang Benar-Benar Baru di 26.04
+
+Kalau kamu sudah membaca artikel sebelumnya tentang [fitur baru dan perubahan utama Ubuntu 26.04](/id/blog/ubuntu-26-04-lts-resolute-raccoon-new-features-major-changes), kamu sudah tahu gambaran besarnya — GNOME 50 full Wayland, Kernel 7.0, toolchain baru, hingga ROCm dan CUDA yang kini bisa langsung `apt install`. Saya tidak akan mengulang semua itu di sini.
+
+Yang ingin saya highlight justru hal-hal yang baru terasa nyata setelah saya lihat langsung:
+
+<Gallery caption="Screenshot: Fitur dan perubahan baru yang terasa di sesi live">
+  ![Resources system monitor baru menggantikan GNOME System Monitor di Ubuntu 26.04](/images/_posts/ubuntu/ubuntu-26-04-rilis/screenshot/ubuntu_1604_004.webp)
+  ![Showtime video player baru di Ubuntu 26.04 menggantikan Totem](/images/_posts/ubuntu/ubuntu-26-04-rilis/screenshot/ubuntu_1604_005.webp)
+  ![Security Center baru di Ubuntu 26.04 dengan kontrol enkripsi dan Ubuntu Pro](/images/_posts/ubuntu/ubuntu-26-04-rilis/screenshot/ubuntu_1604_006.webp)
+</Gallery>
+
+**Resources** sebagai pengganti GNOME System Monitor terasa jauh lebih modern. Tampilannya rapi, data CPU/GPU/Memory tersaji lebih jelas. **Showtime** sebagai pengganti Totem juga langsung bisa dipakai — desainnya sederhana tapi fungsional. Dan **Security Center** yang baru adalah tambahan yang benar-benar terasa berguna, terutama untuk yang mau kelola enkripsi disk atau status Ubuntu Pro.
+
+Satu hal yang saya perhatikan dan agak mengagetkan: **Software & Updates sudah hilang**. Tidak ada lagi GUI khusus untuk kelola PPA, repo, atau driver. Sebagian fiturnya sudah dipindah ke App Center dan Security Center. Kalau kamu butuh, masih bisa install ulang dengan `apt install software-properties-gtk`.
+
+---
+
+## Desktop dan UI: Perubahan Kecil yang Terasa Besar
+
+Jujur, bagian ini yang paling saya nikmati dari sesi live USB kemarin.
+
+<Gallery caption="Screenshot: Perubahan visual dan UX di GNOME 50 Ubuntu 26.04">
+  ![GNOME Overview search di Ubuntu 26.04 dengan hasil dari App Center dan web search](/images/_posts/ubuntu/ubuntu-26-04-rilis/screenshot/ubuntu_1604_007.webp)
+  ![Tampilan notifikasi Ubuntu 26.04 dengan teks bold yang lebih kontras](/images/_posts/ubuntu/ubuntu-26-04-rilis/screenshot/ubuntu_1604_008.webp)
+  ![Power mode icon baru di top bar Ubuntu 26.04 ketika mode Performance aktif](/images/_posts/ubuntu/ubuntu-26-04-rilis/screenshot/ubuntu_1604_009.webp)
+</Gallery>
+
+GNOME Shell Search sekarang lebih berguna. Ketik di overview, dan kamu langsung dapat hasil dari App Center plus opsi *web search* langsung lewat Firefox. Dua search provider ini sudah terpasang by default, dan terasa natural saat dipakai.
+
+Notifikasi sekarang menggunakan teks bold untuk judul, dan radius modal/popover lebih konsisten. Kecil memang, tapi hasilnya adalah tampilan yang terasa lebih dipoles. Dan kalau kamu pakai mode **Performance** atau **Power Saving**, sekarang ada ikon langsung di top bar. Mode Balance tidak menampilkan ikon — logic yang masuk akal.
+
+Satu hal yang mungkin tidak semua orang sadari: **sudo sekarang menampilkan asterisk** saat kamu mengetik password di terminal. Bisa tekan Tab untuk menyembunyikannya. Perubahan kecil, tapi cukup ramah untuk pengguna baru.
+
+---
+
+## Kebutuhan Sistem: Ada Kenaikan RAM
+
+![Kustomisasi tampilan Ubuntu 26.04 dan monitor Resources yang berjalan di desktop GNOME 50](/images/_posts/ubuntu/ubuntu-26-04-rilis/screenshot/ubuntu_1604_010.webp)
+*Tampilan kustomisasi Appearance dan Resources monitor di Ubuntu 26.04 — dua hal yang langsung saya coba di sesi live.*
+
+Canonical secara resmi menaikkan rekomendasi RAM untuk Ubuntu 26.04:
+
+<Expandable title="Spesifikasi Minimum yang Direkomendasikan" icon="info">
+  - Prosesor dual-core 2 GHz atau lebih baik
+  - **6 GB RAM** (rekomendasi, bukan batas keras — 4 GB masih bisa berjalan)
+  - 25 GB ruang disk kosong
+</Expandable>
+
+Ini bukan karena Ubuntu atau GNOME jadi lebih berat, tapi lebih karena *jujur* tentang kebutuhan nyata workload modern. Mesin saya dengan RAM 8 GB berjalan sangat mulus di live USB — tidak ada keluhan sama sekali.
+
+---
+
+## Upgrade: Jangan Buru-Buru Kalau dari 24.04
+
+Kalau kamu sekarang di Ubuntu 25.10 seperti saya, prompt upgrade seharusnya muncul dalam beberapa hari ke depan. Saya sendiri sudah berencana untuk upgrade dan akan berbagi pengalaman langsung prosesnya — termasuk kalau ada yang tidak mulus.
+
+Yang penting untuk diketahui:
+
+- **Dari Ubuntu 24.04 LTS:** Jalur upgrade langsung ke 26.04 belum dibuka sampai Juli 2026, saat Ubuntu 26.04.1 LTS dirilis. Kalau tidak mau tunggu, bisa clean install atau upgrade manual dengan risiko sendiri.
+- **Dari Ubuntu 25.10:** Prompt upgrade akan muncul otomatis. Tidak wajib langsung upgrade — semuanya terserah kamu.
+- **Software & Updates sudah hilang:** Kalau sebelumnya kamu pakai GUI ini untuk kelola upgrade non-LTS (misalnya ke 26.10 nanti), kamu perlu alternatif lain — tapi ini kemungkinan akan diperbarui lewat update mendatang.
+
+---
+
+## SnipGeek's Take
+
+Ubuntu 26.04 LTS terasa seperti versi Ubuntu yang paling matang dalam beberapa siklus terakhir. Penghapusan Xorg adalah langkah berani — tapi setelah melihat sendiri betapa lancarnya GNOME 50 di Wayland, saya tidak lagi merasa itu terlalu terburu-buru.
+
+Live USB-nya sendiri sudah sangat baik. Saya jarang menyebut pengalaman live session sebagai sesuatu yang memuaskan, tapi kali ini memang begitu. Cukup untuk meyakinkan saya bahwa upgrade dari 25.10 layak untuk segera dilakukan.
+
+Saya sudah siapkan flash drive-nya. Mungkin minggu ini juga.
+
+Kalau kamu penasaran ingin coba dulu sebelum commit, kamu bisa download ISO-nya langsung dari server resmi Canonical:
+
+[⬇ Download Ubuntu 26.04 LTS Desktop ISO (AMD64)](https://releases.ubuntu.com/26.04/ubuntu-26.04-desktop-amd64.iso)
+
+Kalau kamu sudah mencoba juga — entah live USB atau langsung install — cerita di kolom komentar ya. Saya penasaran pengalaman orang lain, terutama yang upgrade dari 24.04.
+
+---
+
+### Referensi
+1. [Ubuntu 26.04 LTS is Now Available to Download — OMG Ubuntu](https://www.omgubuntu.co.uk/2026/04/ubuntu-26-04-lts-released)
+2. [Ubuntu 26.04 LTS Released with Kernel 7.0, GNOME 50 & More — UbuntuHandbook](https://ubuntuhandbook.org/index.php/2026/04/ubuntu-26-04-lts-released-with-kernel-7-0-gnome-50-more)
+3. [Ubuntu 26.04 LTS Official Release — releases.ubuntu.com](https://releases.ubuntu.com/26.04/)

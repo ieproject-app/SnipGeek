@@ -29,7 +29,7 @@ export async function initiateGoogleSignIn(authInstance: Auth): Promise<void> {
   // Use Redirect on mobile as it's more reliable.
   if (isMobileOrTablet()) {
     try {
-      try { sessionStorage.setItem('sg_pending_google_redirect', '1'); } catch {}
+      try { localStorage.setItem('sg_pending_google_redirect', String(Date.now())); } catch {}
       await signInWithRedirect(authInstance, provider);
     } catch (error: unknown) {
       const authError = error as AuthError;
@@ -60,7 +60,7 @@ export async function initiateGoogleSignIn(authInstance: Auth): Promise<void> {
       authError.code === 'auth/popup-blocked' ||
       authError.code === 'auth/operation-not-supported-in-this-environment'
     ) {
-      try { sessionStorage.setItem('sg_pending_google_redirect', '1'); } catch {}
+      try { localStorage.setItem('sg_pending_google_redirect', String(Date.now())); } catch {}
       await signInWithRedirect(authInstance, provider);
       return;
     }
@@ -83,16 +83,25 @@ export async function finalizeGoogleRedirectSignIn(authInstance: Auth) {
   if (typeof window === 'undefined') return null;
   let pending = false;
   try {
-    pending = sessionStorage.getItem('sg_pending_google_redirect') === '1';
+    const timeStr = localStorage.getItem('sg_pending_google_redirect');
+    if (timeStr) {
+      const time = parseInt(timeStr, 10);
+      // Valid if less than 15 minutes old (900000 ms)
+      if (Date.now() - time < 900000) {
+        pending = true;
+      } else {
+        localStorage.removeItem('sg_pending_google_redirect');
+      }
+    }
   } catch {}
   if (!pending) return null;
 
   try {
     const result = await getRedirectResult(authInstance);
-    try { sessionStorage.removeItem('sg_pending_google_redirect'); } catch {}
+    try { localStorage.removeItem('sg_pending_google_redirect'); } catch {}
     return result;
   } catch (error: unknown) {
-    try { sessionStorage.removeItem('sg_pending_google_redirect'); } catch {}
+    try { localStorage.removeItem('sg_pending_google_redirect'); } catch {}
     const authError = error as AuthError;
     if (authError?.code === 'auth/unauthorized-domain') {
       alert('Domain ini belum didaftarkan di Firebase Console (Authorized Domains).');

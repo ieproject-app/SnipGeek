@@ -18,6 +18,7 @@ import {
   SlidersHorizontal,
   MoreHorizontal,
   ChevronDown,
+  Send,
 } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
@@ -44,6 +45,7 @@ import {
   fetchIndexStatuses,
   updateIndexStatus,
   refreshFromGsc,
+  submitToIndexNow,
   type InventoryItem,
   type IndexStatusValue,
 } from "@/components/admin/admin-api-client";
@@ -309,6 +311,7 @@ type RowState = {
   dirty: boolean;
   saving?: boolean;
   refreshing?: boolean;
+  pushing?: boolean;
   lastCheckedAt?: string;
   lastGSCResult?: string;
 };
@@ -963,6 +966,72 @@ export function ContentTable() {
     }
   };
 
+  const pushToIndexNow = async (item: InventoryItem) => {
+    if (isMonitoringOptOut(item)) {
+      toast({
+        title: "Konten dikecualikan",
+        description: "Item ini tidak perlu disubmit ke IndexNow.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (item.type === "blog" && item.hasLocalePair === false) {
+      toast({
+        title: "Pasangan locale belum lengkap",
+        description: "Artikel belum punya pasangan locale, tidak bisa disubmit ke IndexNow.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setRowState((prev) => ({
+      ...prev,
+      [item.id]: {
+        ...(prev[item.id] ?? { status: "unknown", notes: "", dirty: false }),
+        pushing: true,
+      },
+    }));
+
+    try {
+      // Create urls: main url and paired locale url if any
+      const urlList = [item.url];
+      
+      // If blog and has locale pair, we could submit both. 
+      // But the table rows already have both rows if they exist.
+      // So submitting just this item's url is fine. The user can submit the other manually or batch.
+      
+      await submitToIndexNow({ urlList });
+      
+      setRowState((prev) => ({
+        ...prev,
+        [item.id]: {
+          ...prev[item.id],
+          pushing: false,
+        },
+      }));
+
+      toast({
+        title: "Terkirim ke IndexNow",
+        description: `Berhasil mengirim ${item.path} ke Bing.`,
+      });
+    } catch (e) {
+      setRowState((prev) => ({
+        ...prev,
+        [item.id]: {
+          ...prev[item.id],
+          pushing: false,
+        },
+      }));
+      
+      toast({
+        title: "Gagal mengirim ke IndexNow",
+        description: e instanceof Error ? e.message : "Terjadi kesalahan",
+        variant: "destructive",
+      });
+    }
+  };
+
   const runBatchRefresh = async (items: InventoryItem[], label: string) => {
     const limit = Number(batchSize);
     const targets = items.slice(0, limit);
@@ -1399,6 +1468,7 @@ export function ContentTable() {
           const fresh = isFreshlyChecked(row.lastCheckedAt);
           const refreshDisabled =
             Boolean(row.refreshing) ||
+            Boolean(row.pushing) ||
             batchRefresh.running ||
             isUnpairedBlog ||
             isOptOut;
@@ -1621,6 +1691,18 @@ export function ContentTable() {
                           <RefreshCw className="h-3.5 w-3.5" />
                         )}
                         Refresh from GSC
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onSelect={() => pushToIndexNow(item)}
+                        disabled={refreshDisabled}
+                        className="flex items-center gap-2"
+                      >
+                        {row.pushing ? (
+                          <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                        ) : (
+                          <Send className="h-3.5 w-3.5" />
+                        )}
+                        Push to IndexNow
                       </DropdownMenuItem>
                       <DropdownMenuItem
                         onSelect={() => copyUrl(item.url)}
