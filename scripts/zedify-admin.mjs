@@ -52,9 +52,9 @@ const TRANSFORMS = [
   { pattern: /\bshadow-primary\/\d+\b/g, replace: "" },
   { pattern: /\bshadow-accent\/\d+\b/g, replace: "" },
 
-  // Lighten heading weight from font-black to font-bold for a less display-loud feel.
-  // Avoid touching arbitrary text in JSX strings: only run in className contexts is impossible
-  // with a regex alone, so skip this and keep manual control.
+  // Lighten font-black to font-bold for less display-loud feel.
+  // Note: font-black is purely a Tailwind class token; matching as a whole word is safe.
+  { pattern: /\bfont-black\b/g, replace: "font-bold" },
 ];
 
 /**

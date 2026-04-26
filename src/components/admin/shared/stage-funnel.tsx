@@ -58,16 +58,16 @@ export function StageFunnel({
               <span className="font-mono text-[9px] font-bold uppercase tracking-widest">
                 {meta.label}
               </span>
-              <span className={cn("font-display text-sm font-black tabular-nums", palette.number)}>
+              <span className={cn("font-display text-sm font-bold tabular-nums", palette.number)}>
                 {entry.count}
               </span>
             </>
           );
 
           const baseClass = cn(
-            "inline-flex cursor-pointer items-center gap-1.5 rounded-full border px-2.5 py-1 transition-all duration-200 ease-out will-change-transform hover:-translate-y-0.5 hover: active:translate-y-0 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40",
+            "inline-flex cursor-pointer items-center gap-1.5 border px-2 py-0.5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40",
             palette.surface,
-            isActive ? "border-accent/60 bg-accent/10" : palette.surfaceActive,
+            isActive ? "border-accent bg-accent/10" : palette.surfaceActive,
           );
 
           if (entry.href) {
@@ -134,7 +134,7 @@ export function StageFunnel({
               </span>
               <span
                 className={cn(
-                  "font-display text-base font-black tabular-nums",
+                  "font-display text-base font-bold tabular-nums",
                   palette.number,
                 )}
               >
@@ -211,7 +211,7 @@ export function StageFunnel({
             </p>
             <p
               className={cn(
-                "mt-0.5 font-display text-3xl font-black tracking-tighter tabular-nums leading-none",
+                "mt-0.5 font-display text-3xl font-bold tracking-tighter tabular-nums leading-none",
                 palette.number,
               )}
             >

@@ -475,7 +475,7 @@ export function DashboardOverview() {
           <p className="font-mono text-[10px] font-bold uppercase tracking-[0.3em] text-destructive">
             — Error
           </p>
-          <h2 className="mt-2 font-display text-3xl font-black uppercase tracking-tighter text-destructive">
+          <h2 className="mt-2 font-display text-3xl font-bold uppercase tracking-tighter text-destructive">
             Gagal memuat data
           </h2>
           <p className="mt-3 text-sm text-muted-foreground">{error}</p>
@@ -532,14 +532,14 @@ export function DashboardOverview() {
               — SnipGeek Control · W
               {String(getIsoWeek(new Date()).week).padStart(2, "0")}
             </p>
-            <h1 className="mt-1 font-display text-3xl font-black tracking-[-0.03em]">
+            <h1 className="mt-1 font-display text-3xl font-bold tracking-[-0.03em]">
               Dashboard
             </h1>
             <p className="mt-1 text-xs text-muted-foreground">
               Pipeline status, cadence, dan priority queue untuk minggu ini.
             </p>
           </div>
-          <div className="flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-1">
+          <div className="flex items-center gap-1.5 border border-emerald-500/40 bg-emerald-500/10 px-2 py-1">
             <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />
             <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-emerald-700 dark:text-emerald-400">
               Live
@@ -620,7 +620,7 @@ export function DashboardOverview() {
                     style={{ animationDelay: `${idx * 35}ms` }}
                     className="flex animate-[fadeSlideIn_0.25s_ease_both] items-start gap-3 border border-border bg-card px-3.5 py-3 transition-colors hover:border-border"
                   >
-                    <div className="flex h-7 w-7 shrink-0 items-center justify-center border border-border bg-background font-display text-sm font-black text-muted-foreground">
+                    <div className="flex h-7 w-7 shrink-0 items-center justify-center border border-border bg-background font-display text-sm font-bold text-muted-foreground">
                       {idx + 1}
                     </div>
 

@@ -81,7 +81,7 @@ export function NoteEditor({ initialData, id }: NoteEditorProps) {
           </Button>
           <div className="flex items-center gap-2">
             <StickyNote className="h-6 w-6 text-amber-500" />
-            <h1 className="font-display text-3xl font-black tracking-tighter uppercase">
+            <h1 className="font-display text-3xl font-bold tracking-tighter uppercase">
               Quick Note
             </h1>
           </div>
@@ -104,7 +104,7 @@ export function NoteEditor({ initialData, id }: NoteEditorProps) {
         <Card className="border-border">
           <CardContent className="p-6 space-y-6">
             <div className="space-y-2">
-              <Label className="text-[10px] font-black uppercase text-muted-foreground">
+              <Label className="text-[10px] font-bold uppercase text-muted-foreground">
                 Title
               </Label>
               <Input
@@ -117,7 +117,7 @@ export function NoteEditor({ initialData, id }: NoteEditorProps) {
               />
             </div>
             <div className="space-y-2">
-              <Label className="text-[10px] font-black uppercase text-muted-foreground">
+              <Label className="text-[10px] font-bold uppercase text-muted-foreground">
                 Description
               </Label>
               <Input
@@ -132,7 +132,7 @@ export function NoteEditor({ initialData, id }: NoteEditorProps) {
               />
             </div>
             <div className="space-y-2">
-              <Label className="text-[10px] font-black uppercase text-muted-foreground">
+              <Label className="text-[10px] font-bold uppercase text-muted-foreground">
                 Snippet Content (Markdown)
               </Label>
               <Textarea
@@ -149,7 +149,7 @@ export function NoteEditor({ initialData, id }: NoteEditorProps) {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
-                <Label className="text-[10px] font-black uppercase text-muted-foreground">
+                <Label className="text-[10px] font-bold uppercase text-muted-foreground">
                   Tags
                 </Label>
                 <Input
@@ -161,7 +161,7 @@ export function NoteEditor({ initialData, id }: NoteEditorProps) {
                 />
               </div>
               <div className="space-y-2">
-                <Label className="text-[10px] font-black uppercase text-muted-foreground">
+                <Label className="text-[10px] font-bold uppercase text-muted-foreground">
                   Translation Key (Optional)
                 </Label>
                 <Input

@@ -118,7 +118,7 @@ export function PostingHeatmap({ publishDates, year }: Props) {
                           {formatDisplayDate(day)}
                         </span>
                         {count > 0 ? (
-                          <span className="font-display text-sm font-black text-emerald-500">
+                          <span className="font-display text-sm font-bold text-emerald-500">
                             {count} artikel dipublish
                           </span>
                         ) : (

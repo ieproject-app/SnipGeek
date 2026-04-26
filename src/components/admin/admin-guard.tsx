@@ -85,7 +85,7 @@ export function AdminGuard({ children }: AdminGuardProps) {
         <div className="mb-6 p-4 bg-destructive/10 rounded-full">
           <TriangleAlert className="h-12 w-12 text-destructive" />
         </div>
-        <h1 className="font-display text-3xl font-black tracking-tighter mb-2">
+        <h1 className="font-display text-3xl font-bold tracking-tighter mb-2">
           Access Denied
         </h1>
         <p className="text-muted-foreground max-w-md mb-8">

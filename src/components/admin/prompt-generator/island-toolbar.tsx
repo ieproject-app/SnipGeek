@@ -162,7 +162,7 @@ export function IslandToolbar() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: 7 }}
                   transition={{ duration: 0.14, ease: "easeOut" }}
-                  className={cn("text-[9px] font-black uppercase tracking-tighter", isPublished ? "text-emerald-500" : "text-muted-foreground")}
+                  className={cn("text-[9px] font-bold uppercase tracking-tighter", isPublished ? "text-emerald-500" : "text-muted-foreground")}
                 >
                   {isPublished ? "LIVE" : "DRAFT"}
                 </motion.span>
@@ -246,7 +246,7 @@ export function StickyBottomBar() {
       <button
         onClick={handleCopy}
         className={cn(
-          "flex h-10 items-center justify-center gap-2 px-6 text-[10px] font-black uppercase tracking-widest transition-all duration-300 ",
+          "flex h-10 items-center justify-center gap-2 px-6 text-[10px] font-bold uppercase tracking-widest transition-all duration-300 ",
           hasBlockingIssues
             ? "bg-destructive/15 text-destructive border border-destructive/30 hover:bg-destructive/20"
             : isCopied
@@ -280,7 +280,7 @@ export function StickyBottomBar() {
                 <AlertTriangle className="h-4 w-4 text-destructive" />
               </div>
               <div>
-                <h4 className="text-[11px] font-black uppercase tracking-wider text-foreground">
+                <h4 className="text-[11px] font-bold uppercase tracking-wider text-foreground">
                   Reset Session?
                 </h4>
                 <p className="mt-1.5 text-[10px] leading-relaxed text-muted-foreground">
@@ -297,7 +297,7 @@ export function StickyBottomBar() {
               </button>
               <button
                 onClick={handleReset}
-                className=" bg-destructive px-3 py-1.5 text-[9px] font-black uppercase tracking-wider text-destructive-foreground transition-colors hover:bg-destructive/90"
+                className=" bg-destructive px-3 py-1.5 text-[9px] font-bold uppercase tracking-wider text-destructive-foreground transition-colors hover:bg-destructive/90"
               >
                 Yes, Reset
               </button>

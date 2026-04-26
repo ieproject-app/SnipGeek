@@ -505,7 +505,7 @@ export function DownloadIdPicker({
                         )}
                       />
                       <span className="min-w-0">
-                        <span className="block truncate text-[10px] font-black uppercase tracking-wide text-primary">
+                        <span className="block truncate text-[10px] font-bold uppercase tracking-wide text-primary">
                           {id}
                         </span>
                         <span className="block truncate text-[11px] text-foreground/90">

@@ -1089,7 +1089,7 @@ export function ContentTable() {
           <p className="font-mono text-[10px] font-bold uppercase tracking-[0.3em] text-destructive">
             — Error
           </p>
-          <h2 className="mt-2 font-display text-3xl font-black uppercase tracking-tighter text-destructive">
+          <h2 className="mt-2 font-display text-3xl font-bold uppercase tracking-tighter text-destructive">
             Gagal memuat
           </h2>
           <p className="mt-3 text-sm">{error}</p>
@@ -1165,7 +1165,7 @@ export function ContentTable() {
             <p className="font-mono text-[10px] font-bold uppercase tracking-[0.28em] text-muted-foreground">
               — Workspace
             </p>
-            <h1 className="mt-1 font-display text-3xl font-black tracking-[-0.03em]">
+            <h1 className="mt-1 font-display text-3xl font-bold tracking-[-0.03em]">
               Index Monitor
             </h1>
             <p className="mt-1 text-xs text-muted-foreground">
@@ -1741,7 +1741,7 @@ export function ContentTable() {
         })}
         {filtered.length === 0 && (
           <div className="py-20 text-center">
-            <p className="font-display text-2xl font-black uppercase tracking-tight text-muted-foreground">
+            <p className="font-display text-2xl font-bold uppercase tracking-tight text-muted-foreground">
               No results
             </p>
             <p className="mt-2 font-mono text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70">

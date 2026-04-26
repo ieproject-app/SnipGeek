@@ -33,7 +33,7 @@ function DraftContentCard() {
         <CardHeader className="flex flex-row items-center justify-between border-b bg-muted/30 px-5 py-3">
           <div className="flex items-center gap-2">
             {mode === "modify" ? <Layers className="h-3.5 w-3.5 shrink-0 text-sky-500" /> : <PenLine className="h-3.5 w-3.5 shrink-0 text-primary" />}
-            <CardTitle className="text-[10px] font-black uppercase tracking-widest">
+            <CardTitle className="text-[10px] font-bold uppercase tracking-widest">
               {mode === "modify" ? dictionary.originalContentTitle : contentType === "series" ? "Series Key Points" : contentType === "news" ? "News Notes / Extra Points" : contentType === "tips" ? "Tips Key Points" : "Notes Key Points / Findings"}
             </CardTitle>
           </div>
@@ -67,11 +67,11 @@ function DraftContentCard() {
         {mode === "modify" && (
           <div ref={blockComposerRef} className="border-t border-border bg-sky-500/[0.06] px-5 py-4">
              <div className="flex items-center justify-between gap-2">
-               <p className="text-[9px] font-black uppercase tracking-[0.12em] text-sky-600 dark:text-sky-400">
+               <p className="text-[9px] font-bold uppercase tracking-[0.12em] text-sky-600 dark:text-sky-400">
                  Block Comment Composer
                </p>
                {selectedBlockLine !== null && (
-                 <span className="rounded-full border border-sky-500/30 bg-background px-2.5 py-1 text-[8px] font-black uppercase tracking-wider text-sky-700 dark:text-sky-300">
+                 <span className="rounded-full border border-sky-500/30 bg-background px-2.5 py-1 text-[8px] font-bold uppercase tracking-wider text-sky-700 dark:text-sky-300">
                    Line {selectedBlockLine}
                  </span>
                )}
@@ -98,7 +98,7 @@ function DraftContentCard() {
                     type="button"
                     onClick={addSelectedBlockToInstructions}
                     disabled={!selectedBlock.trim()}
-                    className=" border border-sky-500/35 bg-sky-500/10 px-4 py-2 text-[9px] font-black uppercase tracking-wider text-sky-700 transition-colors hover:bg-sky-500/20 disabled:cursor-not-allowed disabled:opacity-50 dark:text-sky-300"
+                    className=" border border-sky-500/35 bg-sky-500/10 px-4 py-2 text-[9px] font-bold uppercase tracking-wider text-sky-700 transition-colors hover:bg-sky-500/20 disabled:cursor-not-allowed disabled:opacity-50 dark:text-sky-300"
                   >
                     Insert To Instructions
                   </button>
@@ -124,7 +124,7 @@ function ModInstructionsCard() {
       <Card className=" border-l-4 border-l-accent border-border bg-card ">
         <CardHeader className="flex flex-row items-center gap-2 border-b bg-muted/30 px-5 py-3">
           <Zap className="h-3.5 w-3.5 shrink-0 text-accent" />
-          <CardTitle className="text-[10px] font-black uppercase tracking-widest">
+          <CardTitle className="text-[10px] font-bold uppercase tracking-widest">
             {dictionary.modInstructionsTitle || "Modification Instructions"}
           </CardTitle>
         </CardHeader>
@@ -135,7 +135,7 @@ function ModInstructionsCard() {
                   key={action}
                   onClick={() => applyQuickAction(action)}
                   className={cn(
-                    "flex h-7 items-center gap-1.5 rounded-full px-3 text-[9px] font-black uppercase tracking-wide transition-all",
+                    "flex h-7 items-center gap-1.5 rounded-full px-3 text-[9px] font-bold uppercase tracking-wide transition-all",
                     action === "readability" ? "border border-sky-500/20 bg-sky-500/10 text-sky-500 hover:bg-sky-500/20" :
                     action === "polish" ? "border border-fuchsia-500/20 bg-fuchsia-500/10 text-fuchsia-500 hover:bg-fuchsia-500/20" :
                     action === "images" ? "border border-violet-500/20 bg-violet-500/10 text-violet-500 hover:bg-violet-500/20" :

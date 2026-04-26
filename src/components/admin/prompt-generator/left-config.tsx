@@ -39,30 +39,30 @@ function ArticleSelectorCard() {
       <Card className="overflow-hidden border-l-4 border-l-amber-400 border-border bg-card ">
         <CardHeader className="flex flex-row items-center gap-2 border-b bg-muted/30 px-5 py-3">
           <Search className="h-3.5 w-3.5 shrink-0 text-amber-500" />
-          <CardTitle className="text-[10px] font-black uppercase tracking-widest">
+          <CardTitle className="text-[10px] font-bold uppercase tracking-widest">
             {dictionary.selectArticleLabel}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3 p-5">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="rounded-full border border-border bg-background/40 px-3 py-1 text-[9px] font-black uppercase tracking-wider text-muted-foreground">
+            <span className="rounded-full border border-border bg-background/40 px-3 py-1 text-[9px] font-bold uppercase tracking-wider text-muted-foreground">
               {contentType} · {articleStats.total}
             </span>
             <button
               onClick={() => setStatusFilter("all")}
-              className={cn("rounded-full px-3 py-1 text-[9px] font-black uppercase tracking-wider transition-colors", statusFilter === "all" ? "bg-primary text-primary-foreground" : "bg-primary/5 text-muted-foreground hover:bg-primary/10 hover:text-primary")}
+              className={cn("rounded-full px-3 py-1 text-[9px] font-bold uppercase tracking-wider transition-colors", statusFilter === "all" ? "bg-primary text-primary-foreground" : "bg-primary/5 text-muted-foreground hover:bg-primary/10 hover:text-primary")}
             >
               All {articleStats.total}
             </button>
             <button
               onClick={() => setStatusFilter("published")}
-              className={cn("rounded-full px-3 py-1 text-[9px] font-black uppercase tracking-wider transition-colors", statusFilter === "published" ? "bg-emerald-500 text-white" : "bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/20 dark:text-emerald-400")}
+              className={cn("rounded-full px-3 py-1 text-[9px] font-bold uppercase tracking-wider transition-colors", statusFilter === "published" ? "bg-emerald-500 text-white" : "bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/20 dark:text-emerald-400")}
             >
               Live {articleStats.published}
             </button>
             <button
               onClick={() => setStatusFilter("draft")}
-              className={cn("rounded-full px-3 py-1 text-[9px] font-black uppercase tracking-wider transition-colors", statusFilter === "draft" ? "bg-amber-500 text-white" : "bg-amber-500/10 text-amber-600 hover:bg-amber-500/20 dark:text-amber-400")}
+              className={cn("rounded-full px-3 py-1 text-[9px] font-bold uppercase tracking-wider transition-colors", statusFilter === "draft" ? "bg-amber-500 text-white" : "bg-amber-500/10 text-amber-600 hover:bg-amber-500/20 dark:text-amber-400")}
             >
               Draft {articleStats.draft}
             </button>
@@ -70,13 +70,13 @@ function ArticleSelectorCard() {
           
           <div className=" border border-amber-500/20 bg-amber-500/5 px-3 py-2">
             <div className="flex items-center justify-between gap-2">
-              <p className="text-[9px] font-black uppercase tracking-[0.12em] text-amber-600 dark:text-amber-400">
+              <p className="text-[9px] font-bold uppercase tracking-[0.12em] text-amber-600 dark:text-amber-400">
                 Draft Queue ({contentType})
               </p>
               <button
                 type="button"
                 onClick={() => setStatusFilter("draft")}
-                className="rounded-full border border-amber-500/30 bg-amber-500/10 px-2.5 py-1 text-[8px] font-black uppercase tracking-wider text-amber-700 transition-colors hover:bg-amber-500/20 dark:text-amber-300"
+                className="rounded-full border border-amber-500/30 bg-amber-500/10 px-2.5 py-1 text-[8px] font-bold uppercase tracking-wider text-amber-700 transition-colors hover:bg-amber-500/20 dark:text-amber-300"
               >
                 Show Draft Only
               </button>
@@ -97,7 +97,7 @@ function ArticleSelectorCard() {
                         key={article.slug}
                         type="button"
                         onClick={() => setSelectedSlug(article.slug)}
-                        className={cn("inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-[8px] font-black uppercase tracking-wide transition-colors", isStale ? "border-destructive/40 bg-destructive/10 text-destructive" : "border-amber-500/25 bg-amber-500/8 text-amber-700 dark:text-amber-300")}
+                        className={cn("inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-[8px] font-bold uppercase tracking-wide transition-colors", isStale ? "border-destructive/40 bg-destructive/10 text-destructive" : "border-amber-500/25 bg-amber-500/8 text-amber-700 dark:text-amber-300")}
                       >
                         <span className="max-w-30 truncate">{article.slug}</span>
                         <span className="opacity-75">{parseNaturalDate(article.date)}</span>
@@ -140,7 +140,7 @@ function ArticleSelectorCard() {
                     <span className="truncate text-[11px] font-bold leading-tight">
                       {article.title}
                     </span>
-                    <span className={cn("ml-auto rounded-full px-1.5 py-0.5 text-[8px] font-black uppercase tracking-wider", article.published ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400" : "bg-amber-500/15 text-amber-600 dark:text-amber-400")}>
+                    <span className={cn("ml-auto rounded-full px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wider", article.published ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400" : "bg-amber-500/15 text-amber-600 dark:text-amber-400")}>
                       {article.published ? "Live" : "Draft"}
                     </span>
                   </div>
@@ -157,13 +157,13 @@ function ArticleSelectorCard() {
                 <span className="block truncate font-mono text-[9px] text-amber-600 dark:text-amber-400">
                   ✓ {selectedSlug}
                 </span>
-                <span className="text-[8px] font-black uppercase tracking-wider text-muted-foreground">
+                <span className="text-[8px] font-bold uppercase tracking-wider text-muted-foreground">
                   {selectedArticle.published ? "Published article" : "Draft article"}
                 </span>
               </div>
               <button
                 onClick={() => setSelectedSlug("")}
-                className="ml-2 shrink-0 text-[10px] font-black uppercase text-muted-foreground hover:text-destructive"
+                className="ml-2 shrink-0 text-[10px] font-bold uppercase text-muted-foreground hover:text-destructive"
               >
                 Clear
               </button>
@@ -193,7 +193,7 @@ function WorkflowContextCard() {
       <Card className="overflow-hidden border-l-4 border-l-emerald-400 border-border bg-card ">
         <CardHeader className="flex flex-row items-center gap-2 border-b bg-muted/30 px-5 py-3">
           <Sparkles className="h-3.5 w-3.5 shrink-0 text-emerald-500" />
-          <CardTitle className="text-[10px] font-black uppercase tracking-widest">
+          <CardTitle className="text-[10px] font-bold uppercase tracking-widest">
             Workflow Context
           </CardTitle>
         </CardHeader>
@@ -201,7 +201,7 @@ function WorkflowContextCard() {
           {contentType === "series" && (
             <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
               <div className="space-y-1.5">
-                <p className="text-[9px] font-black uppercase tracking-wider text-muted-foreground">{dictionary.seriesPhaseLabel}</p>
+                <p className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground">{dictionary.seriesPhaseLabel}</p>
                 <Select value={seriesPhase} onValueChange={(v: string) => setSeriesPhase(v as typeof seriesPhase)}>
                   <SelectTrigger className="h-9 border-border bg-background/50 text-xs">
                     <SelectValue />
@@ -214,7 +214,7 @@ function WorkflowContextCard() {
                 </Select>
               </div>
               <div className="space-y-1.5">
-                <p className="text-[9px] font-black uppercase tracking-wider text-muted-foreground">{dictionary.seriesArticleLabel}</p>
+                <p className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground">{dictionary.seriesArticleLabel}</p>
                 <Select value={seriesArticleNumber} onValueChange={setSeriesArticleNumber}>
                   <SelectTrigger className="h-9 border-border bg-background/50 text-xs">
                     <SelectValue />
@@ -227,11 +227,11 @@ function WorkflowContextCard() {
                 </Select>
               </div>
               <div className="space-y-1.5 md:col-span-2">
-                <p className="text-[9px] font-black uppercase tracking-wider text-muted-foreground">{dictionary.seriesTargetLabel}</p>
+                <p className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground">{dictionary.seriesTargetLabel}</p>
                 <Input readOnly value={seriesTarget} className="h-9 border-border bg-background/50 text-xs" />
               </div>
               <div className="space-y-1.5 md:col-span-2">
-                <p className="text-[9px] font-black uppercase tracking-wider text-muted-foreground">{dictionary.seriesToneLabel}</p>
+                <p className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground">{dictionary.seriesToneLabel}</p>
                 <Input readOnly value={seriesTone} className="h-9 border-border bg-background/50 text-xs" />
               </div>
             </div>
@@ -240,7 +240,7 @@ function WorkflowContextCard() {
           {contentType === "news" && (
             <div className="space-y-3">
               <div className="space-y-1.5">
-                <p className="text-[9px] font-black uppercase tracking-wider text-muted-foreground">{dictionary.newsSourceUrlsLabel}</p>
+                <p className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground">{dictionary.newsSourceUrlsLabel}</p>
                 <div className="space-y-2">
                   {newsSourceUrls.map((url: string, index: number) => (
                     <div key={index} className="flex items-center gap-2">
@@ -264,13 +264,13 @@ function WorkflowContextCard() {
                   type="button"
                   onClick={addNewsSourceUrl}
                   disabled={newsSourceUrls.length >= 3}
-                  className="inline-flex h-8 items-center gap-1.5 rounded-full border border-border px-3 text-[9px] font-black uppercase tracking-wider text-muted-foreground transition-colors hover:border-primary/30 hover:text-primary disabled:cursor-not-allowed disabled:opacity-50"
+                  className="inline-flex h-8 items-center gap-1.5 rounded-full border border-border px-3 text-[9px] font-bold uppercase tracking-wider text-muted-foreground transition-colors hover:border-primary/30 hover:text-primary disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   <Plus className="h-3 w-3" /> Add URL (max 3)
                 </button>
               </div>
               <div className="space-y-1.5">
-                <p className="text-[9px] font-black uppercase tracking-wider text-muted-foreground">{dictionary.newsAngleLabel}</p>
+                <p className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground">{dictionary.newsAngleLabel}</p>
                 <Input
                   value={newsAngle}
                   onChange={(e) => setNewsAngle(e.target.value)}
@@ -284,7 +284,7 @@ function WorkflowContextCard() {
           {contentType === "apps" && (
             <div className="space-y-3">
               <div className="space-y-1.5">
-                <p className="text-[9px] font-black uppercase tracking-wider text-muted-foreground">{dictionary.newsSourceUrlsLabel}</p>
+                <p className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground">{dictionary.newsSourceUrlsLabel}</p>
                 <div className="space-y-2">
                   {newsSourceUrls.map((url: string, index: number) => (
                     <div key={index} className="flex items-center gap-2">
@@ -308,13 +308,13 @@ function WorkflowContextCard() {
                   type="button"
                   onClick={addNewsSourceUrl}
                   disabled={newsSourceUrls.length >= 3}
-                  className="inline-flex h-8 items-center gap-1.5 rounded-full border border-border px-3 text-[9px] font-black uppercase tracking-wider text-muted-foreground transition-colors hover:border-primary/30 hover:text-primary disabled:cursor-not-allowed disabled:opacity-50"
+                  className="inline-flex h-8 items-center gap-1.5 rounded-full border border-border px-3 text-[9px] font-bold uppercase tracking-wider text-muted-foreground transition-colors hover:border-primary/30 hover:text-primary disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   <Plus className="h-3 w-3" /> Add URL (max 3)
                 </button>
               </div>
               <div className="space-y-1.5">
-                <p className="text-[9px] font-black uppercase tracking-wider text-muted-foreground">{dictionary.newsAngleLabel}</p>
+                <p className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground">{dictionary.newsAngleLabel}</p>
                 <Input
                   value={newsAngle}
                   onChange={(e) => setNewsAngle(e.target.value)}
@@ -327,7 +327,7 @@ function WorkflowContextCard() {
 
           {contentType === "tips" && (
             <div className="flex items-center justify-between border border-border bg-background/40 px-3 py-2">
-              <p className="text-[10px] font-black uppercase tracking-wider text-muted-foreground">{dictionary.tipsStandaloneLabel}</p>
+              <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">{dictionary.tipsStandaloneLabel}</p>
               <Switch checked={tipsStandalone} onCheckedChange={setTipsStandalone} />
             </div>
           )}
@@ -335,7 +335,7 @@ function WorkflowContextCard() {
           {contentType === "notes" && (
             <div className="space-y-3">
               <div className="space-y-1.5">
-                <p className="text-[9px] font-black uppercase tracking-wider text-muted-foreground">{dictionary.notesIntentLabel}</p>
+                <p className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground">{dictionary.notesIntentLabel}</p>
                 <Select value={noteIntent} onValueChange={(v: string) => setNoteIntent(v as typeof noteIntent)}>
                   <SelectTrigger className="h-9 border-border bg-background/50 text-xs">
                     <SelectValue />
@@ -398,27 +398,27 @@ function TechnicalTabsCard() {
           <div className="border-b border-border bg-muted/30 flex items-center justify-between">
             <TabsList className="h-12 bg-transparent justify-start overflow-x-auto gap-1 px-2 no-scrollbar">
                {showImages && (
-                 <TabsTrigger value="images" className="data-[state=active]:bg-emerald-500/10 data-[state=active]:text-emerald-500 text-[10px] font-black uppercase tracking-wider h-8 px-3">
+                 <TabsTrigger value="images" className="data-[state=active]:bg-emerald-500/10 data-[state=active]:text-emerald-500 text-[10px] font-bold uppercase tracking-wider h-8 px-3">
                    <ImageIcon className="h-3 w-3 mr-1.5" /> Images
                  </TabsTrigger>
                )}
                {showDownloads && (
-                 <TabsTrigger value="downloads" className="data-[state=active]:bg-blue-500/10 data-[state=active]:text-blue-500 text-[10px] font-black uppercase tracking-wider h-8 px-3">
+                 <TabsTrigger value="downloads" className="data-[state=active]:bg-blue-500/10 data-[state=active]:text-blue-500 text-[10px] font-bold uppercase tracking-wider h-8 px-3">
                    <Download className="h-3 w-3 mr-1.5" /> DLs
                  </TabsTrigger>
                )}
                {showGrids && (
-                 <TabsTrigger value="grids" className="data-[state=active]:bg-violet-500/10 data-[state=active]:text-violet-500 text-[10px] font-black uppercase tracking-wider h-8 px-3">
+                 <TabsTrigger value="grids" className="data-[state=active]:bg-violet-500/10 data-[state=active]:text-violet-500 text-[10px] font-bold uppercase tracking-wider h-8 px-3">
                    <Grid3X3 className="h-3 w-3 mr-1.5" /> Grids
                  </TabsTrigger>
                )}
                {showGallery && (
-                 <TabsTrigger value="gallery" className="data-[state=active]:bg-fuchsia-500/10 data-[state=active]:text-fuchsia-500 text-[10px] font-black uppercase tracking-wider h-8 px-3">
+                 <TabsTrigger value="gallery" className="data-[state=active]:bg-fuchsia-500/10 data-[state=active]:text-fuchsia-500 text-[10px] font-bold uppercase tracking-wider h-8 px-3">
                    <GalleryHorizontal className="h-3 w-3 mr-1.5" /> Gallery
                  </TabsTrigger>
                )}
                {showSpecs && (
-                 <TabsTrigger value="specs" className="data-[state=active]:bg-orange-500/10 data-[state=active]:text-orange-500 text-[10px] font-black uppercase tracking-wider h-8 px-3">
+                 <TabsTrigger value="specs" className="data-[state=active]:bg-orange-500/10 data-[state=active]:text-orange-500 text-[10px] font-bold uppercase tracking-wider h-8 px-3">
                    <Settings2 className="h-3 w-3 mr-1.5" /> Specs
                  </TabsTrigger>
                )}
@@ -430,8 +430,8 @@ function TechnicalTabsCard() {
               <TabsContent value="images" className="space-y-4 m-0 border-none outline-none">
                 <div className="space-y-1.5">
                   <div className="flex items-center gap-2">
-                    <p className="text-[9px] font-black uppercase tracking-wider text-emerald-600 dark:text-emerald-400">Hero / Banner</p>
-                    <span className="rounded-full border border-emerald-500/30 bg-emerald-500/15 px-2 py-0.5 text-[8px] font-black uppercase tracking-wide text-emerald-600 dark:text-emerald-400">HERO</span>
+                    <p className="text-[9px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">Hero / Banner</p>
+                    <span className="rounded-full border border-emerald-500/30 bg-emerald-500/15 px-2 py-0.5 text-[8px] font-bold uppercase tracking-wide text-emerald-600 dark:text-emerald-400">HERO</span>
                   </div>
                   <Input
                     placeholder="path/to/hero.webp | Alt text (optional)"
@@ -441,7 +441,7 @@ function TechnicalTabsCard() {
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <p className="text-[9px] font-black uppercase tracking-wider text-muted-foreground">Body Images <span className="font-mono text-xs normal-case tracking-normal opacity-40">path | alt | caption hint</span></p>
+                  <p className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground">Body Images <span className="font-mono text-xs normal-case tracking-normal opacity-40">path | alt | caption hint</span></p>
                   <Textarea
                     placeholder={dictionary.imagesPlaceholder}
                     value={images}
@@ -452,11 +452,11 @@ function TechnicalTabsCard() {
 
                 <div className=" border border-border bg-background/35 p-3">
                    <div className="flex items-center justify-between gap-2">
-                     <p className="text-[9px] font-black uppercase tracking-[0.12em] text-muted-foreground">Auto Caption Policy</p>
+                     <p className="text-[9px] font-bold uppercase tracking-[0.12em] text-muted-foreground">Auto Caption Policy</p>
                    </div>
                    <div className="mt-3 grid grid-cols-2 gap-2">
                       <div className="space-y-1">
-                        <p className="text-[9px] font-black uppercase tracking-wider text-muted-foreground">Mode</p>
+                        <p className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground">Mode</p>
                         <Select value={captionMode} onValueChange={(v: string) => setCaptionMode(v as typeof captionMode)}>
                           <SelectTrigger className="h-8 border-border bg-background text-[10px]">
                             <SelectValue />
@@ -469,7 +469,7 @@ function TechnicalTabsCard() {
                         </Select>
                       </div>
                       <div className="space-y-1">
-                        <p className="text-[9px] font-black uppercase tracking-wider text-muted-foreground">Alignment</p>
+                        <p className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground">Alignment</p>
                         <Select value={captionAlignment} onValueChange={(v: string) => setCaptionAlignment(v as typeof captionAlignment)}>
                           <SelectTrigger className="h-8 border-border bg-background text-[10px]">
                             <SelectValue />
@@ -482,7 +482,7 @@ function TechnicalTabsCard() {
                         </Select>
                       </div>
                       <div className="space-y-1">
-                        <p className="text-[9px] font-black uppercase tracking-wider text-muted-foreground">Coverage</p>
+                        <p className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground">Coverage</p>
                         <Select value={captionCoverage} onValueChange={(v: string) => setCaptionCoverage(v as typeof captionCoverage)}>
                           <SelectTrigger className="h-8 border-border bg-background text-[10px]">
                             <SelectValue />
@@ -494,7 +494,7 @@ function TechnicalTabsCard() {
                         </Select>
                       </div>
                       <div className="space-y-1">
-                        <p className="text-[9px] font-black uppercase tracking-wider text-muted-foreground">Max</p>
+                        <p className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground">Max</p>
                         <Input
                           value={captionMaxCount}
                           onChange={(e) => setCaptionMaxCount(e.target.value.replace(/[^0-9]/g, ""))}
@@ -532,7 +532,7 @@ function TechnicalTabsCard() {
                      </button>
                    </div>
                  ))}
-                 <button type="button" onClick={addDownloadItem} className="flex h-9 w-full items-center justify-center gap-1.5 border border-dashed border-border text-[10px] font-black uppercase tracking-wide text-muted-foreground transition-all hover:border-primary/40 hover:text-primary">
+                 <button type="button" onClick={addDownloadItem} className="flex h-9 w-full items-center justify-center gap-1.5 border border-dashed border-border text-[10px] font-bold uppercase tracking-wide text-muted-foreground transition-all hover:border-primary/40 hover:text-primary">
                     <Plus className="h-3 w-3" /> Add Link
                  </button>
               </TabsContent>
@@ -633,7 +633,7 @@ function GalleryTab({
           type="button"
           onClick={() => setShowImport(!showImport)}
           className={cn(
-            "inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-[9px] font-black uppercase tracking-wider transition-colors",
+            "inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-[9px] font-bold uppercase tracking-wider transition-colors",
             showImport
               ? "border-fuchsia-500/40 bg-fuchsia-500/15 text-fuchsia-500"
               : "border-border text-muted-foreground hover:border-fuchsia-500/30 hover:text-fuchsia-500"
@@ -651,7 +651,7 @@ function GalleryTab({
       {/* Quick Import area */}
       {showImport && (
         <div className=" border border-fuchsia-500/20 bg-fuchsia-500/5 p-3 space-y-2.5">
-          <p className="text-[9px] font-black uppercase tracking-wider text-fuchsia-600 dark:text-fuchsia-400">
+          <p className="text-[9px] font-bold uppercase tracking-wider text-fuchsia-600 dark:text-fuchsia-400">
             Paste paths (1 per line) — auto-grouped per 3
           </p>
           <Textarea
@@ -679,7 +679,7 @@ function GalleryTab({
             type="button"
             onClick={handleGenerate}
             disabled={pathLines.length === 0}
-            className="inline-flex h-8 items-center gap-1.5 rounded-full border border-fuchsia-500/30 bg-fuchsia-500/15 px-4 text-[9px] font-black uppercase tracking-wider text-fuchsia-600 transition-colors hover:bg-fuchsia-500/25 disabled:cursor-not-allowed disabled:opacity-40 dark:text-fuchsia-400"
+            className="inline-flex h-8 items-center gap-1.5 rounded-full border border-fuchsia-500/30 bg-fuchsia-500/15 px-4 text-[9px] font-bold uppercase tracking-wider text-fuchsia-600 transition-colors hover:bg-fuchsia-500/25 disabled:cursor-not-allowed disabled:opacity-40 dark:text-fuchsia-400"
           >
             <GalleryHorizontal className="h-3 w-3" /> Generate {previewCount > 0 ? previewCount : ""} Gallery{previewCount !== 1 ? "s" : ""}
           </button>

@@ -301,7 +301,7 @@ export function PostEditor({ initialData, id }: PostEditorProps) {
             </Link>
           </Button>
           <div>
-            <h1 className="font-display text-3xl font-black tracking-tighter uppercase">
+            <h1 className="font-display text-3xl font-bold tracking-tighter uppercase">
               {id ? "Edit Article" : "New Article"}
             </h1>
             <p className="text-xs text-muted-foreground font-mono">
@@ -467,7 +467,7 @@ export function PostEditor({ initialData, id }: PostEditorProps) {
                       </div>
 
                       {formData.heroImageUrl === img.url && (
-                        <Badge className="absolute top-1 left-1 bg-accent text-accent-foreground text-[8px] font-black h-4 px-1.5 uppercase">
+                        <Badge className="absolute top-1 left-1 bg-accent text-accent-foreground text-[8px] font-bold h-4 px-1.5 uppercase">
                           Hero
                         </Badge>
                       )}
@@ -499,7 +499,7 @@ export function PostEditor({ initialData, id }: PostEditorProps) {
         <div className="lg:col-span-4 space-y-8">
           <Card className="border-border overflow-hidden ">
             <CardHeader className="bg-muted/30 py-3 border-b">
-              <CardTitle className="text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
+              <CardTitle className="text-[10px] font-bold uppercase tracking-widest flex items-center gap-2">
                 <Star className="h-3 w-3 text-accent" /> Featured Image (Hero)
               </CardTitle>
             </CardHeader>
@@ -522,7 +522,7 @@ export function PostEditor({ initialData, id }: PostEditorProps) {
                 )}
               </div>
               <div className="space-y-2">
-                <Label className="text-[10px] font-black uppercase text-muted-foreground">
+                <Label className="text-[10px] font-bold uppercase text-muted-foreground">
                   Alt Text (SEO)
                 </Label>
                 <Input
@@ -542,20 +542,20 @@ export function PostEditor({ initialData, id }: PostEditorProps) {
 
           <Card className="border-border ">
             <CardHeader className="bg-muted/30 py-3 border-b">
-              <CardTitle className="text-[10px] font-black uppercase tracking-widest">
+              <CardTitle className="text-[10px] font-bold uppercase tracking-widest">
                 Metadata
               </CardTitle>
             </CardHeader>
             <CardContent className="p-6 space-y-6">
               <div className="space-y-2">
-                <Label className="text-[10px] font-black uppercase text-muted-foreground">
+                <Label className="text-[10px] font-bold uppercase text-muted-foreground">
                   Language
                 </Label>
                 <div className="flex gap-2">
                   <Button
                     type="button"
                     variant={formData.locale === "en" ? "default" : "outline"}
-                    className="flex-1 h-8 text-[10px] font-black uppercase"
+                    className="flex-1 h-8 text-[10px] font-bold uppercase"
                     onClick={() =>
                       setFormData((prev) => ({ ...prev, locale: "en" }))
                     }
@@ -565,7 +565,7 @@ export function PostEditor({ initialData, id }: PostEditorProps) {
                   <Button
                     type="button"
                     variant={formData.locale === "id" ? "default" : "outline"}
-                    className="flex-1 h-8 text-[10px] font-black uppercase"
+                    className="flex-1 h-8 text-[10px] font-bold uppercase"
                     onClick={() =>
                       setFormData((prev) => ({ ...prev, locale: "id" }))
                     }
@@ -575,7 +575,7 @@ export function PostEditor({ initialData, id }: PostEditorProps) {
                 </div>
               </div>
               <div className="space-y-2">
-                <Label className="text-[10px] font-black uppercase text-muted-foreground">
+                <Label className="text-[10px] font-bold uppercase text-muted-foreground">
                   Title
                 </Label>
                 <Input
@@ -586,7 +586,7 @@ export function PostEditor({ initialData, id }: PostEditorProps) {
                 />
               </div>
               <div className="space-y-2">
-                <Label className="text-[10px] font-black uppercase text-muted-foreground">
+                <Label className="text-[10px] font-bold uppercase text-muted-foreground">
                   Slug (URL)
                 </Label>
                 <Input
@@ -599,7 +599,7 @@ export function PostEditor({ initialData, id }: PostEditorProps) {
                 />
               </div>
               <div className="space-y-2">
-                <Label className="text-[10px] font-black uppercase text-muted-foreground">
+                <Label className="text-[10px] font-bold uppercase text-muted-foreground">
                   Category
                 </Label>
                 <Input
@@ -615,7 +615,7 @@ export function PostEditor({ initialData, id }: PostEditorProps) {
                 />
               </div>
               <div className="space-y-2">
-                <Label className="text-[10px] font-black uppercase text-muted-foreground">
+                <Label className="text-[10px] font-bold uppercase text-muted-foreground">
                   Excerpt
                 </Label>
                 <Textarea
@@ -631,7 +631,7 @@ export function PostEditor({ initialData, id }: PostEditorProps) {
                 />
               </div>
               <div className="space-y-2">
-                <Label className="text-[10px] font-black uppercase text-muted-foreground">
+                <Label className="text-[10px] font-bold uppercase text-muted-foreground">
                   Tags (Koma pisah)
                 </Label>
                 <Input
@@ -648,7 +648,7 @@ export function PostEditor({ initialData, id }: PostEditorProps) {
 
           <Card className="border-border bg-emerald-500/2 ">
             <CardHeader className="py-3 border-b">
-              <CardTitle className="text-[10px] font-black uppercase tracking-widest">
+              <CardTitle className="text-[10px] font-bold uppercase tracking-widest">
                 Publish Settings
               </CardTitle>
             </CardHeader>

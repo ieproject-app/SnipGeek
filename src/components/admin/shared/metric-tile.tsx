@@ -66,7 +66,7 @@ export function MetricTile({
           ) : null}
           <p
             className={cn(
-              "mt-0.5 font-display text-2xl font-black tracking-tighter tabular-nums",
+              "mt-0.5 font-display text-2xl font-bold tracking-tighter tabular-nums",
               palette.number,
             )}
           >

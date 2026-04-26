@@ -70,7 +70,7 @@ export function WeeklyTargetChart({
                     {label} · {entry.fullLabel}
                   </p>
                   <p
-                    className={`mt-1 font-display text-base font-black tabular-nums ${
+                    className={`mt-1 font-display text-base font-bold tabular-nums ${
                       entry.onTarget ? "text-emerald-500" : entry.count === 0 ? "text-muted-foreground" : "text-destructive"
                     }`}
                   >
