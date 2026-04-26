@@ -1211,10 +1211,8 @@ export function ContentTable() {
                 <span className="hidden sm:inline">{STAGE_TAB_LABEL[tab].full}</span>
                 <span
                   className={cn(
-                    "inline-flex min-w-[1.5rem] items-center justify-center px-1 font-mono text-[9px] tabular-nums",
-                    active
-                      ? "bg-accent/15 text-foreground"
-                      : "bg-muted text-muted-foreground",
+                    "font-mono text-[10px] tabular-nums",
+                    active ? "text-accent" : "text-muted-foreground/70",
                   )}
                 >
                   {count}
@@ -1403,10 +1401,15 @@ export function ContentTable() {
               </DropdownMenuContent>
             </DropdownMenu>
 
-            <div className="shrink-0 font-mono text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
-              {filtered.length} shown
             </div>
-            </div>
+          </div>
+          <div className="flex items-center gap-2 border-t border-border pt-2 xl:border-l xl:border-t-0 xl:pl-3 xl:pt-0">
+            <span className="font-display text-sm font-bold tabular-nums text-foreground">
+              {filtered.length}
+            </span>
+            <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+              shown
+            </span>
           </div>
         </div>
 
