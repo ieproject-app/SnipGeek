@@ -9,9 +9,9 @@ import {
   getStaticPageCanonicalPath,
 } from "@/lib/static-pages";
 import {
-  LayoutStaticPageTemplate,
-  resolveStaticPageIcon,
-} from "@/components/layout/static-page-template";
+  LayoutLegalPageTemplate,
+  resolveLegalPageIcon,
+} from "@/components/layout/legal-page-template";
 
 export async function generateMetadata({
   params,
@@ -45,7 +45,7 @@ export default async function DisclaimerPage({
   const lastUpdated = getStaticPageLastUpdated(frontmatter);
 
   return (
-    <LayoutStaticPageTemplate
+    <LayoutLegalPageTemplate
       title={title}
       description={description}
       lastUpdated={lastUpdated}
@@ -54,9 +54,8 @@ export default async function DisclaimerPage({
         frontmatter.badgeLabel ||
         (locale === "id" ? "Dokumen Resmi" : "Official Document")
       }
-      icon={resolveStaticPageIcon(frontmatter.icon)}
+      icon={resolveLegalPageIcon(frontmatter.icon)}
       canonicalUrl={`https://snipgeek.com${canonicalPath}`}
-      maxWidthClassName="max-w-3xl"
       footerNote={
         locale === "id"
           ? "Dengan menggunakan SnipGeek, Anda mengakui bahwa Anda telah membaca dan memahami Disclaimer ini."

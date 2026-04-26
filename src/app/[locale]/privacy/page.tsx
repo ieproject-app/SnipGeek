@@ -9,9 +9,9 @@ import {
   getStaticPageCanonicalPath,
 } from "@/lib/static-pages";
 import {
-  LayoutStaticPageTemplate,
-  resolveStaticPageIcon,
-} from "@/components/layout/static-page-template";
+  LayoutLegalPageTemplate,
+  resolveLegalPageIcon,
+} from "@/components/layout/legal-page-template";
 
 export async function generateMetadata({
   params,
@@ -49,7 +49,7 @@ export default async function PrivacyPage({
   const lastUpdated = getStaticPageLastUpdated(frontmatter);
 
   return (
-    <LayoutStaticPageTemplate
+    <LayoutLegalPageTemplate
       title={title}
       description={description}
       lastUpdated={lastUpdated}
@@ -58,8 +58,7 @@ export default async function PrivacyPage({
         frontmatter.badgeLabel ||
         (locale === "id" ? "Dokumen Resmi" : "Official Document")
       }
-      icon={resolveStaticPageIcon(frontmatter.icon)}
-      maxWidthClassName="max-w-3xl"
+      icon={resolveLegalPageIcon(frontmatter.icon)}
       canonicalUrl={`https://snipgeek.com${canonicalPath}`}
       footerNote={
         locale === "id"
