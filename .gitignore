@@ -51,5 +51,8 @@ src/github/downloaded-logs-*.json
 .idea/
 *.code-workspace
 
+# ESLint result dump
+eslint-result.json
+
 # Experimental Playground
 /playground/

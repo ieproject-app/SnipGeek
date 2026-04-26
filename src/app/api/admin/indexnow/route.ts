@@ -3,7 +3,7 @@ import { requireAdmin } from "@/lib/api-helpers";
 
 const INDEXNOW_KEY = "a8f4c92b7d1e635f80b2a1c4e7d9f36b";
 const HOST = "snipgeek.com";
-const KEY_LOCATION = `https://${HOST}/${INDEXNOW_KEY}.txt`;
+const KEY_LOCATION = `https://${HOST}/verification/${INDEXNOW_KEY}.txt`;
 
 export async function POST(req: NextRequest) {
   const guard = await requireAdmin(req);
