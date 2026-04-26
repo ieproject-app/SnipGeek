@@ -1,18 +1,38 @@
+"use client";
 
-import React, { useId } from 'react';
+import React, { useEffect, useId, useState } from 'react';
+import { useTheme } from 'next-themes';
 
 type SnipGeekLogoProps = React.SVGProps<SVGSVGElement>;
 
 /**
- * SnipGeekLogo - Adaptive branding with two versions:
- * 1. Colorful gradients for Light Mode.
- * 2. Monochrome white with opacities for Dark Mode.
+ * SnipGeekLogo - Aperture-style mark with 3 triangular blades,
+ * a solid outer ring, and a center focal dot.
+ *
+ * Renders the Light or Dark variant based on the resolved theme from
+ * next-themes (class-based). Falls back to the Light variant during SSR
+ * and before hydration to avoid flash/invisible logo.
  */
 export const SnipGeekLogo = ({
   className,
   ...props
 }: SnipGeekLogoProps) => {
   const id = useId().replace(/:/g, "");
+  const gradId = `sg-grad-${id}`;
+
+  const { resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  const isDark = mounted && resolvedTheme === "dark";
+
+  // Blade polygon: apex at outer ring (50, 14), narrow base near center.
+  // Rotated 0°, 120°, 240° for a 3-blade aperture.
+  const bladePoints = "50,14 42,40 58,40";
+
+  const strokeColor = isDark ? "white" : `url(#${gradId})`;
+  const fillColor = isDark ? "white" : `url(#${gradId})`;
+  const dotColor = isDark ? "white" : "#bae6fd";
+  const dotOpacity = isDark ? 0.9 : 1;
 
   return (
     <svg
@@ -21,46 +41,39 @@ export const SnipGeekLogo = ({
       className={className}
       {...props}
     >
-      <defs>
-        <linearGradient id={`blue-bright-${id}`} x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#bae6fd" />
-          <stop offset="100%" stopColor="#0ea5e9" />
-        </linearGradient>
-        <linearGradient id={`blue-deep-${id}`} x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#1d4ed8" />
-          <stop offset="100%" stopColor="#0c2461" />
-        </linearGradient>
-      </defs>
+      {!isDark && (
+        <defs>
+          <linearGradient id={gradId} x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#0ea5e9" />
+            <stop offset="100%" stopColor="#1d4ed8" />
+          </linearGradient>
+        </defs>
+      )}
 
-      {/* Light Mode Version (Default) */}
-      <g className="dark:hidden transition-opacity duration-500">
-        <polygon
-          points="5,5 46,5 46,37 37,46 5,46"
-          fill={`url(#blue-bright-${id})`}
-        />
-        <polygon
-          points="63,54 95,54 95,95 54,95 54,63"
-          fill={`url(#blue-bright-${id})`}
-        />
-        <rect
-          x="54" y="5" width="41" height="41" rx="4"
-          fill={`url(#blue-deep-${id})`}
-        />
-        <rect
-          x="5" y="54" width="41" height="41" rx="4"
-          fill={`url(#blue-deep-${id})`}
-        />
-        <circle cx="50" cy="50" r="2" fill="#bae6fd" opacity="0.9" />
+      {/* Outer ring */}
+      <circle
+        cx="50"
+        cy="50"
+        r="42"
+        fill="none"
+        stroke={strokeColor}
+        strokeWidth="5"
+      />
+
+      {/* 3 triangular blades */}
+      <g
+        fill={fillColor}
+        stroke={strokeColor}
+        strokeWidth="3"
+        strokeLinejoin="round"
+      >
+        <polygon points={bladePoints} />
+        <polygon points={bladePoints} transform="rotate(120 50 50)" />
+        <polygon points={bladePoints} transform="rotate(240 50 50)" />
       </g>
 
-      {/* Dark Mode Version (Monochrome White) */}
-      <g className="hidden dark:block transition-opacity duration-500">
-        <polygon points="5,5 46,5 46,37 37,46 5,46" fill="white" />
-        <polygon points="63,54 95,54 95,95 54,95 54,63" fill="white" />
-        <rect x="54" y="5" width="41" height="41" rx="4" fill="white" opacity="0.3" />
-        <rect x="5" y="54" width="41" height="41" rx="4" fill="white" opacity="0.3" />
-        <circle cx="50" cy="50" r="2" fill="white" opacity="0.6" />
-      </g>
+      {/* Center focal dot */}
+      <circle cx="50" cy="50" r="5" fill={dotColor} fillOpacity={dotOpacity} />
     </svg>
   );
 };

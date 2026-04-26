@@ -509,7 +509,7 @@ export function LayoutHeader({
                     <ChevronRight className="h-4 w-4 rotate-180 text-accent" />
                   </div>
                   <div className="relative h-9 w-9 flex items-center justify-center shrink-0">
-                    <div className="absolute inset-0 bg-accent/10 rounded-xl transition-all duration-500 group-hover:bg-accent/20 group-hover:shadow-sm group-hover:rotate-6 group-hover:scale-110" />
+                    <div className="absolute inset-0 bg-accent/10 rounded-full transition-all duration-500 group-hover:bg-accent/20 group-hover:shadow-sm group-hover:scale-110" />
                     <SnipGeekLogo className="h-6 w-6 relative z-10 transition-all duration-500 group-hover:scale-110 group-hover:rotate-3" />
                   </div>
                 </div>

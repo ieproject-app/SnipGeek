@@ -66,7 +66,7 @@ export function AdminSidebar({
       {/* ── Brand ───────────────────────────────────── */}
       <div className="border-b border-border/70 px-4 py-5">
         <Link href="/admin" className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-2xl border border-border/60 bg-card/50">
+          <div className="flex h-10 w-10 items-center justify-center rounded-full border border-border/60 bg-card/50">
             <SnipGeekLogo className="h-7 w-7" />
           </div>
           <div className="leading-none">
