@@ -1203,7 +1203,7 @@ export function ContentTable() {
               >
                 {active && (
                   <span
-                    className="absolute inset-x-0 bottom-0 h-[2px] bg-accent"
+                    className="absolute inset-x-0 -bottom-px h-0.5 bg-accent"
                     aria-hidden
                   />
                 )}
