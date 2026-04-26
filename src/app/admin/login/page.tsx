@@ -82,7 +82,7 @@ export default function AdminLoginPage() {
   // OR we haven't finished checking getRedirectResult yet.
   if (isUserLoading || !redirectChecked) {
     return (
-      <div className="flex min-h-screen w-full flex-col items-center justify-center gap-3 bg-muted/30">
+      <div className="flex min-h-screen w-full flex-col items-center justify-center gap-3 bg-background">
         <Loader2 className="h-9 w-9 animate-spin text-accent" />
         <p className="font-mono text-[11px] font-bold uppercase tracking-[0.3em] text-muted-foreground animate-pulse">
           Memeriksa sesi&hellip;
@@ -97,20 +97,20 @@ export default function AdminLoginPage() {
   // ── Error state ───────────────────────────────────────────
   if (redirectError) {
     return (
-      <div className="flex min-h-screen w-full items-center justify-center px-4 py-12 bg-muted/30">
-        <Card className="w-full max-w-md border-destructive/20 bg-destructive/5">
+      <div className="flex min-h-screen w-full items-center justify-center px-4 py-12 bg-background">
+        <Card className="w-full max-w-md rounded-none border-destructive bg-card shadow-none">
           <CardHeader className="text-center space-y-3">
-            <div className="mx-auto p-4 bg-destructive/10 rounded-full w-fit">
-              <AlertCircle className="h-10 w-10 text-destructive" />
+            <div className="mx-auto flex h-14 w-14 items-center justify-center border border-destructive bg-destructive/10">
+              <AlertCircle className="h-7 w-7 text-destructive" />
             </div>
-            <CardTitle className="font-display text-xl font-black uppercase text-destructive">
+            <CardTitle className="font-display text-xl font-bold uppercase tracking-tight text-destructive">
               Login Gagal
             </CardTitle>
             <CardDescription>{redirectError}</CardDescription>
           </CardHeader>
           <CardContent className="pb-8 px-8">
             <Button
-              className="w-full rounded-full"
+              className="w-full rounded-none"
               onClick={() => setRedirectError(null)}
             >
               Coba Lagi
@@ -124,13 +124,13 @@ export default function AdminLoginPage() {
   // ── Firebase not configured ───────────────────────────────
   if (!auth) {
     return (
-      <div className="flex min-h-screen w-full items-center justify-center px-4 py-12">
-        <Card className="w-full max-w-md border-destructive/20 bg-destructive/5">
+      <div className="flex min-h-screen w-full items-center justify-center px-4 py-12 bg-background">
+        <Card className="w-full max-w-md rounded-none border-destructive bg-card shadow-none">
           <CardHeader className="text-center space-y-3">
-            <div className="mx-auto p-4 bg-destructive/10 rounded-full w-fit">
-              <AlertCircle className="h-10 w-10 text-destructive" />
+            <div className="mx-auto flex h-14 w-14 items-center justify-center border border-destructive bg-destructive/10">
+              <AlertCircle className="h-7 w-7 text-destructive" />
             </div>
-            <CardTitle className="font-display text-2xl font-black uppercase text-destructive">
+            <CardTitle className="font-display text-xl font-bold uppercase tracking-tight text-destructive">
               Firebase belum siap
             </CardTitle>
             <CardDescription>
@@ -144,14 +144,17 @@ export default function AdminLoginPage() {
 
   // ── Login form ────────────────────────────────────────────
   return (
-    <div className="flex min-h-screen w-full items-center justify-center px-4 py-12 bg-muted/30">
-      <Card className="w-full max-w-md shadow-2xl border-primary/10 bg-card/60 backdrop-blur-sm overflow-hidden">
-        <div className="h-1.5 w-full bg-accent" />
+    <div className="flex min-h-screen w-full items-center justify-center px-4 py-12 bg-background">
+      <Card className="w-full max-w-md rounded-none border-border bg-card shadow-none overflow-hidden">
+        <div className="h-1 w-full bg-accent" />
         <CardHeader className="space-y-4 text-center pt-10 pb-6">
           <div className="flex justify-center">
             <SnipGeekLogo className="h-14 w-14" />
           </div>
-          <CardTitle className="font-display text-3xl font-black tracking-[-0.03em]">
+          <p className="font-mono text-[10px] font-bold uppercase tracking-[0.35em] text-muted-foreground">
+            SnipGeek · Admin
+          </p>
+          <CardTitle className="font-display text-2xl font-bold tracking-tight">
             Admin Console
           </CardTitle>
           <CardDescription className="text-sm px-6">
@@ -161,7 +164,7 @@ export default function AdminLoginPage() {
         <CardContent className="pb-10 px-10 space-y-4">
           <Button
             type="button"
-            className="w-full h-12 font-black uppercase tracking-widest gap-3 rounded-full"
+            className="w-full h-11 font-bold uppercase tracking-wider gap-3 rounded-none"
             onClick={() => auth && initiateGoogleSignIn(auth)}
           >
             <GoogleLogo className="h-5 w-5" />

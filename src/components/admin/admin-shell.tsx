@@ -66,29 +66,29 @@ export function AdminShell({ children }: { children: ReactNode }) {
 
   return (
     <AdminGuard>
-      {/* ── Mobile top bar ─────────────────────────────── */}
-      <div className="sticky top-0 z-40 flex h-14 items-center border-b border-border/70 bg-background/95 px-4 backdrop-blur md:hidden">
+      {/* ── Mobile top bar ─────────────────────────────────── */}
+      <div className="sticky top-0 z-40 flex h-12 items-center border-b border-border bg-background px-3 md:hidden">
         <button
           onClick={() => setDrawerOpen(true)}
-          className="flex h-9 w-9 items-center justify-center rounded-xl border border-border/60 bg-card/40 text-muted-foreground transition-colors hover:border-border hover:bg-muted/60 hover:text-foreground"
+          className="flex h-8 w-8 items-center justify-center border border-border bg-card text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
           aria-label="Open navigation"
         >
-          <Menu className="h-5 w-5" />
+          <Menu className="h-4 w-4" />
         </button>
         <div className="ml-3 min-w-0 leading-none">
           <p className="font-mono text-[9px] font-bold uppercase tracking-[0.26em] text-muted-foreground">
-            — {resolvePageTitle(pathname).eyebrow}
+            {resolvePageTitle(pathname).eyebrow}
           </p>
-          <span className="mt-1 block truncate font-display text-sm font-black tracking-tight">
+          <span className="mt-1 block truncate font-display text-sm font-bold tracking-tight">
             {resolvePageTitle(pathname).title}
           </span>
         </div>
       </div>
 
-      {/* ── Mobile drawer backdrop ──────────────────────── */}
+      {/* ── Mobile drawer backdrop ──────────────────── */}
       {drawerOpen && (
         <div
-          className="fixed inset-0 z-40 bg-background/60 backdrop-blur-sm md:hidden"
+          className="fixed inset-0 z-40 bg-background/80 md:hidden"
           onClick={() => setDrawerOpen(false)}
           aria-hidden
         />
@@ -105,7 +105,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
         <div className="absolute right-0 top-0 translate-y-0 translate-x-full p-2">
           <button
             onClick={handleCloseDrawer}
-            className="flex h-9 w-9 items-center justify-center rounded-xl border border-border/60 bg-background/85 text-muted-foreground shadow-md backdrop-blur transition-colors hover:border-border hover:text-foreground"
+            className="flex h-8 w-8 items-center justify-center border border-border bg-background text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
             aria-label="Close navigation"
           >
             <X className="h-4 w-4" />

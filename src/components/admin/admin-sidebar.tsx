@@ -62,102 +62,99 @@ export function AdminSidebar({
   };
 
   return (
-    <aside className="sticky top-0 flex h-screen w-64 shrink-0 flex-col border-r border-border/70 bg-background/95 backdrop-blur">
-      {/* ── Brand ───────────────────────────────────── */}
-      <div className="border-b border-border/70 px-4 py-5">
+    <aside className="sticky top-0 flex h-screen w-64 shrink-0 flex-col border-r border-border bg-background">
+      {/* ── Brand ────────────────────────────── */}
+      <div className="border-b border-border px-4 py-4">
         <Link href="/admin" className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full border border-border/60 bg-card/50">
-            <SnipGeekLogo className="h-7 w-7" />
+          <div className="flex h-9 w-9 items-center justify-center border border-border bg-card">
+            <SnipGeekLogo className="h-6 w-6" />
           </div>
           <div className="leading-none">
             <p className="font-mono text-[9px] font-bold uppercase tracking-[0.3em] text-muted-foreground">
               SnipGeek
             </p>
-            <p className="mt-1 font-display text-lg font-black tracking-tight text-foreground">
-              Admin <span className="text-accent">Control.</span>
+            <p className="mt-1 font-display text-base font-bold tracking-tight text-foreground">
+              Admin <span className="text-accent">Control</span>
             </p>
           </div>
         </Link>
       </div>
 
-      {/* ── Primary nav ─────────────────────────────── */}
-      <nav className="flex-1 space-y-1 p-3">
-        <p className="mb-2 px-2 font-mono text-[9px] font-bold uppercase tracking-[0.3em] text-muted-foreground">
-          — Navigation
+      {/* ── Primary nav ──────────────────────── */}
+      <nav className="flex-1 p-2">
+        <p className="mb-2 mt-1 px-2 font-mono text-[9px] font-bold uppercase tracking-[0.3em] text-muted-foreground">
+          Navigation
         </p>
-        {NAV_ITEMS.map((item) => {
-          const isActive = item.exact
-            ? pathname === item.href
-            : pathname.startsWith(item.href);
+        <div className="space-y-px">
+          {NAV_ITEMS.map((item) => {
+            const isActive = item.exact
+              ? pathname === item.href
+              : pathname.startsWith(item.href);
 
-          const Icon = item.icon;
+            const Icon = item.icon;
 
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              title={item.description}
-              onClick={(event) => {
-                if (mobile && onNavigateAction) {
-                  event.preventDefault();
-                  onNavigateAction(item.href);
-                  return;
-                }
-                onCloseAction?.();
-              }}
-              className={cn(
-                "flex items-center gap-3 rounded-xl border px-3 py-2.5 transition-all",
-                isActive
-                  ? "border-accent/40 bg-accent/10 text-foreground"
-                  : "border-transparent text-muted-foreground hover:border-border/70 hover:bg-card/50 hover:text-foreground",
-              )}
-            >
-              <span
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                title={item.description}
+                onClick={(event) => {
+                  if (mobile && onNavigateAction) {
+                    event.preventDefault();
+                    onNavigateAction(item.href);
+                    return;
+                  }
+                  onCloseAction?.();
+                }}
                 className={cn(
-                  "flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border transition-colors",
+                  "relative flex items-center gap-3 px-3 py-2 transition-colors",
                   isActive
-                    ? "border-accent/40 bg-accent/15 text-accent"
-                    : "border-border/60 bg-background/60 text-muted-foreground",
+                    ? "bg-accent/10 text-foreground"
+                    : "text-muted-foreground hover:bg-muted hover:text-foreground",
                 )}
               >
-                <Icon className="h-4 w-4" />
-              </span>
-              <span className="min-w-0 flex-1 text-sm font-semibold tracking-tight">
-                {item.name}
-              </span>
-            </Link>
-          );
-        })}
-
-        {/* ── Quick actions ──────────────────────────── */}
-        <div className="mt-6">
-          <p className="mb-2 px-2 font-mono text-[9px] font-bold uppercase tracking-[0.3em] text-muted-foreground">
-            — Quick actions
-          </p>
-          <a
-            href={GSC_PROPERTY_URL}
-            target="_blank"
-            rel="noreferrer"
-            className="flex items-center gap-3 rounded-xl border border-transparent px-3 py-2 text-muted-foreground transition-all hover:border-border/70 hover:bg-card/50 hover:text-foreground"
-          >
-            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-border/60 bg-background/60">
-              <SearchIcon className="h-4 w-4" />
-            </span>
-            <span className="min-w-0 flex-1 text-sm font-semibold tracking-tight">
-              Open GSC
-            </span>
-            <ExternalLink className="h-3.5 w-3.5 text-muted-foreground/60" />
-          </a>
+                {isActive && (
+                  <span className="absolute inset-y-0 left-0 w-[2px] bg-accent" aria-hidden />
+                )}
+                <Icon
+                  className={cn(
+                    "h-4 w-4 shrink-0",
+                    isActive ? "text-accent" : "text-muted-foreground",
+                  )}
+                />
+                <span className="min-w-0 flex-1 text-sm font-semibold tracking-tight">
+                  {item.name}
+                </span>
+              </Link>
+            );
+          })}
         </div>
+
+        {/* ── Quick actions ────────────────────── */}
+        <p className="mb-2 mt-6 px-2 font-mono text-[9px] font-bold uppercase tracking-[0.3em] text-muted-foreground">
+          Quick actions
+        </p>
+        <a
+          href={GSC_PROPERTY_URL}
+          target="_blank"
+          rel="noreferrer"
+          className="flex items-center gap-3 px-3 py-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+        >
+          <SearchIcon className="h-4 w-4 shrink-0" />
+          <span className="min-w-0 flex-1 text-sm font-semibold tracking-tight">
+            Open GSC
+          </span>
+          <ExternalLink className="h-3.5 w-3.5 text-muted-foreground/60" />
+        </a>
       </nav>
 
-      {/* ── Footer actions ──────────────────────────── */}
-      <div className="space-y-1 border-t border-border/70 p-3">
+      {/* ── Footer actions ────────────────────── */}
+      <div className="space-y-px border-t border-border p-2">
         <Button
           asChild
           variant="ghost"
           size="sm"
-          className="h-9 w-full justify-start gap-2 rounded-xl px-3 font-mono text-[10px] font-bold uppercase tracking-widest text-muted-foreground hover:bg-card/50 hover:text-foreground"
+          className="h-8 w-full justify-start gap-2 rounded-none px-3 font-mono text-[10px] font-bold uppercase tracking-widest text-muted-foreground hover:bg-muted hover:text-foreground"
         >
           <Link href="/" target="_blank">
             <ExternalLink className="h-3.5 w-3.5" />
@@ -168,7 +165,7 @@ export function AdminSidebar({
           variant="ghost"
           size="sm"
           onClick={handleLogout}
-          className="h-9 w-full justify-start gap-2 rounded-xl px-3 font-mono text-[10px] font-bold uppercase tracking-widest text-destructive hover:bg-destructive/10 hover:text-destructive"
+          className="h-8 w-full justify-start gap-2 rounded-none px-3 font-mono text-[10px] font-bold uppercase tracking-widest text-destructive hover:bg-destructive/10 hover:text-destructive"
         >
           <LogOut className="h-3.5 w-3.5" />
           Sign Out
