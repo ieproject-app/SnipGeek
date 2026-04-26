@@ -25,6 +25,8 @@ const scriptSrcDirectives = [
   `https://apis.google.com`, // Firebase Auth popup
   `https://*.firebaseapp.com`, // Firebase Auth handler
   `https://giscus.app`, // Giscus comments
+  `https://www.youtube.com`, // YouTubeEmbed player script
+  `https://www.youtube-nocookie.com`, // YouTubeEmbed privacy-enhanced player
 ].join(" ");
 
 const cspDirectives = [
@@ -62,7 +64,7 @@ const cspDirectives = [
     `https://giscus.app`,                               // Giscus comments
   ].join(" "),
 
-  // Connections: Firebase, Analytics, Monetag
+  // Connections: Firebase, Analytics, Monetag, YouTube
   [
     `connect-src`,
     `'self'`,
@@ -76,10 +78,12 @@ const cspDirectives = [
     `wss://*.firebaseio.com`,                          // Firebase realtime (websocket)
     `https://static.monetag.com`,                      // Monetag
     `https://giscus.app`,                               // Giscus comments
+    `https://*.googlevideo.com`,                       // YouTube video segment CDN
+    `https://*.ytimg.com`,                             // YouTube thumbnails & static assets
   ].join(" "),
 
-  // Media (audio/video): self + blob
-  `media-src 'self' blob:`,
+  // Media (audio/video): self + blob + YouTube CDN (needed for Firefox)
+  `media-src 'self' blob: https://*.googlevideo.com https://*.ytimg.com`,
 
   // Workers (Next.js service worker, if any)
   `worker-src 'self' blob:`,

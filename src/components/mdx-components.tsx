@@ -31,6 +31,7 @@ import { SpecList, SpecItem } from "./mdx/spec-sheet";
 import { Expandable } from "./mdx/expandable";
 import { GalleryLightbox, type GalleryImageItem } from "./mdx/gallery-lightbox";
 import { CopyablePre } from "./mdx/copyable-pre";
+import { YouTubeEmbed } from "./mdx/youtube-embed";
 
 type MdxElementProps = {
   children?: React.ReactNode;
@@ -775,4 +776,5 @@ export const mdxComponents = {
   Callout,
   Steps,
   Step,
+  YouTubeEmbed,
 };

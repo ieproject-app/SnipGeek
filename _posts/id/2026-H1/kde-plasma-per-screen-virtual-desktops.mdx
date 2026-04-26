@@ -1,0 +1,84 @@
+---
+title: "KDE Plasma Akhirnya Punya Per-Screen Virtual Desktops"
+slug: "kde-plasma-per-screen-virtual-desktops"
+translationKey: "kde-plasma-per-screen-virtual-desktops"
+date: "2026-04-26"
+description: "KDE Plasma kini bisa ganti virtual desktop per monitor secara mandiri — fitur yang 21 tahun ditunggu pengguna Linux, dan Ubuntu sudah punya versinya sendiri."
+heroImage: "/images/_posts/kde-plasma/virtual-desktop-update/banner-kde-plasma.webp"
+imageAlt: "Fitur per-screen virtual desktop KDE Plasma pada setup multi-monitor"
+published: true
+featured: false
+tags: ["linux", "wayland", "kde-plasma", "news", "ui-design"]
+category: "Linux"
+---
+
+Sejak beberapa bulan terakhir saya pakai dua monitor dengan desktop KDE Plasma, ada satu hal kecil yang cukup mengganggu: setiap kali ganti virtual desktop, kedua layar ikut berpindah bersamaan. Kalau saya sedang fokus di satu monitor untuk suatu pekerjaan dan ingin ganti desktop di monitor satunya saja, tidak ada cara yang bersih untuk melakukannya. Semua workspace berpindah sekaligus. Bagi environment desktop yang penuh kontrol detail seperti KDE, itu terasa janggal.
+
+Ternyata bukan saya saja yang merasa seperti itu. Permintaan fitur ini sudah ada di bug tracker KDE sejak **tahun 2005** — artinya sudah **21 tahun** pengguna menunggu.
+
+## Fitur yang Dinantikan 21 Tahun
+
+Kabar utama dari posting "This Week in Plasma" tanggal 18 April 2026 cukup singkat tapi maknanya besar:
+
+> **Setiap layar kini bisa ganti ke virtual desktop mana pun secara mandiri.**
+
+Dikontribusikan oleh Hynek Schlindenbuch ([KDE Bugzilla #107302](https://bugs.kde.org/show_bug.cgi?id=107302)), ini persis jenis peningkatan kualitas hidup yang kelihatannya kecil di atas kertas, tapi langsung terasa saat dipakai di setup multi-monitor sehari-hari. Tidak perlu lagi berpindah seluruh sesi hanya karena mau workspace bersih di satu sisi.
+
+Video demo-nya cukup jelas — masing-masing monitor punya switcher desktop sendiri. Kamu bisa taruh kode di Desktop 1 di layar kiri, sementara browser di layar kanan secara independen menampilkan Desktop 3. Keduanya bergerak sendiri-sendiri, bukan ikut-ikutan.
+
+<YouTubeEmbed videoid="tltpUvdkPbY" />
+
+<Callout variant="info" title="Catatan Versi">
+  Fitur ini masuk dalam siklus pengembangan KDE Plasma per April 2026. Cek versi KDE Plasma di distribusimu untuk tahu kapan update ini masuk ke channel pembaruan sistem.
+</Callout>
+
+## Ubuntu Sudah Punya Versinya Sendiri
+
+Sebelum terlalu antusias, saya ingat bahwa **GNOME di Ubuntu sebenarnya sudah punya konsep serupa sejak lama** — hanya cara kerjanya yang berbeda.
+
+Di **Settings → Multitasking** Ubuntu, ada opsi di bagian "Multi-Monitor" yang memungkinkan kamu memilih antara:
+
+- **Workspaces on primary display only** — monitor lain menampilkan tampilan statis dari workspace aktif
+- **Workspaces on all displays** — ganti workspace mempengaruhi semua monitor secara bersamaan
+
+![Pengaturan Multitasking Ubuntu 26.04 yang menampilkan opsi workspace multi-monitor.](/images/_posts/kde-plasma/virtual-desktop-update/multi-monitor-ubuntu.webp)
+
+<div className="-mt-3 mb-6 text-center text-sm italic text-muted-foreground">Pengaturan Multitasking di Ubuntu 26.04 — opsi "Workspaces on primary display only" memberi kontrol workspace mandiri untuk layar utama.</div>
+
+Tapi perlu dipahami, implementasi Ubuntu/GNOME dan fitur baru KDE ini tidak persis sama. Model GNOME membiarkan monitor sekunder "tetap diam" sementara hanya layar utama yang berpindah workspace — ini lebih ke toggle visibilitas workspace, bukan pengendalian mandiri sejati. Pendekatan KDE lebih granular: tiap layar punya switcher sendiri dan bisa loncat ke desktop mana pun secara bebas.
+
+Untuk pengguna dengan dua monitor atau lebih yang mengerjakan hal berbeda secara bersamaan, model KDE jelas lebih fleksibel. Untuk kebanyakan orang dengan setup dua monitor biasa, toggle di Ubuntu sudah cukup berguna dan tidak perlu konfigurasi tambahan.
+
+## Perubahan Lain yang Patut Diperhatikan
+
+Fitur per-screen virtual desktop memang yang paling disorot, tapi update TWiP ini juga membawa beberapa perbaikan lain yang layak dicatat:
+
+- **Pemilih aplikasi kalender default** — Bisa pilih aplikasi kalender favorit langsung dari System Settings → Default Applications.
+- **Alt+Tab selalu di layar utama** — Konfigurasi window switcher agar selalu muncul di monitor utama, apapun posisi kursor atau fokus keyboard.
+- **Favorit aksi aplikasi** — Tandai aksi spesifik dari hasil pencarian sebagai favorit untuk akses lebih cepat.
+- **Kicker sorot aplikasi baru** — Menu Aplikasi Kicker sekarang menyorot aplikasi yang baru dipasang, serupa dengan Kickoff.
+- **Drag-and-drop ke Favorites** — Kamu sekarang bisa seret aplikasi langsung ke bagian Favorites di Kickoff, Kicker, dan widget Dashboard.
+- **Discover bisa tutup otomatis setelah update** — Opsi agar Discover langsung menutup diri setelah selesai memasang pembaruan.
+- **Wayland session restore** — KWin kini mendukung protokol manajemen sesi Wayland — fondasi penting agar aplikasi bisa mengingat ukuran dan posisi jendela setelah reboot. Toolkit dan aplikasi masih perlu mengimplementasikan sisi mereka, tapi infrastrukturnya sudah ada di KWin.
+- **Penamaan GPU di System Monitor** — System Monitor sekarang membedakan beberapa GPU berdasarkan nama aslinya, bukan angka acak.
+- **Peningkatan matematika di KRunner** — Ekspresi seperti `2 + sqrt(2)` sekarang bisa dievaluasi dengan benar di kedua urutan penulisan.
+
+<Callout variant="tip" title="Wayland Session Restore">
+  Dukungan protokol manajemen sesi Wayland di KWin adalah fondasi penting — ini infrastruktur yang dibutuhkan agar aplikasi bisa memulihkan posisi dan ukuran jendela setelah logout atau reboot, hal yang sudah lama bisa dilakukan di X11. Langkah berikutnya adalah aplikasi dan toolkit mengimplementasikan bagian mereka.
+</Callout>
+
+## Pandangan SnipGeek
+
+Saya lebih banyak menghabiskan waktu di Ubuntu dengan GNOME, jadi fitur-fitur spesifik KDE ini lebih ke bahan pantauan teknis daripada perubahan langsung untuk saya. Tapi saya genuinely merasa pendekatan per-screen virtual desktop yang KDE landingkan ini adalah implementasi yang lebih rapi dari dua pilihan yang ada. Pengaturan workspace multi-monitor GNOME memang berguna, tapi lebih seperti toggle global — tidak memberikan kontrol per-layar yang segranular yang kini ditawarkan KDE.
+
+Kalau kamu pengguna KDE Plasma yang selama ini bekerja di sekitar keterbatasan ini — atau penasaran apakah setup multi-monitor Wayland di Linux sudah cukup matang untuk menggantikan workflow Windows — rilis ini adalah tonggak yang berarti.
+
+Untuk pengguna Ubuntu, pengaturan workspace multi-monitor di Settings → Multitasking patut dicoba lagi kalau belum pernah disentuh. Tidak sepowerful model baru KDE, tapi sudah ada di sana dan sering terlewatkan.
+
+Kalau kamu ingin tahu lebih jauh soal kondisi Ubuntu di 2026, tulisan saya tentang [GNOME 50 dan Ubuntu 26.04](/blog/gnome-50-makes-ubuntu-26-04-feel-like-a-big-upgrade) membahas lebih banyak peningkatan display dan workspace yang ikut hadir di LTS terbaru. Dan kalau kamu sedang mempertimbangkan pilihan Linux secara lebih luas, [artikel tentang relevansi dual-boot](/blog/why-dual-boot-still-relevant) bisa membantu memetakan keputusan.
+
+Sudah pernah coba per-screen desktop switching di KDE, atau kamu pakai pengaturan multitasking Ubuntu untuk hal serupa? Tinggalkan komentar — saya penasaran setup seperti apa yang kalian pakai.
+
+### Referensi
+1. [This Week in Plasma: Per-Screen Virtual Desktops and Wayland Session Restore](https://blogs.kde.org/2026/04/18/this-week-in-plasma-per-screen-virtual-desktops-and-wayland-session-restore/)
+2. [After 21 Years, KDE Plasma is Finally Adding This Long-Requested Feature](https://www.neowin.net/news/after-21-years-of-waiting-kde-plasma-is-finally-adding-this-long-requested-feature/)
