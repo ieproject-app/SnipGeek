@@ -36,15 +36,15 @@ export function SectionHeader({
       <div className="min-w-0">
         {eyebrow ? (
           <p className="font-mono text-[10px] font-bold uppercase tracking-[0.28em] text-muted-foreground">
-            — {eyebrow}
+            {eyebrow}
           </p>
         ) : null}
         <h2
           className={cn(
             "mt-1 font-display font-bold tracking-tight text-foreground",
             size === "lg"
-              ? "text-2xl font-black tracking-[-0.02em]"
-              : "text-lg",
+              ? "text-2xl font-bold tracking-[-0.02em]"
+              : "text-base",
           )}
         >
           {title}

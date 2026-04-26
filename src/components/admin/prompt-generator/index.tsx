@@ -51,8 +51,8 @@ export function PromptBuilder(props: PromptBuilderProps) {
         </div>
 
         <div className="sticky top-18 z-40 mb-4 w-full">
-          <div className="rounded-3xl border border-border/70 bg-background/90 p-2.5 shadow-sm backdrop-blur-xl">
-            <div className="rounded-2xl border border-border/60 bg-card/50 px-2.5 py-2.5">
+          <div className="border border-border bg-background p-2">
+            <div className="border border-border bg-card px-2.5 py-2.5">
               <IslandToolbar />
             </div>
           </div>
@@ -90,13 +90,13 @@ function PromptBuilderAdminHeader({
   description: string;
 }) {
   return (
-    <section className="rounded-3xl border border-border/70 bg-card/35 p-4 shadow-sm backdrop-blur-sm md:p-4">
+    <section className="border border-border bg-card p-4 md:p-4">
       <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
         <div className="max-w-3xl">
           <p className="font-mono text-[10px] font-bold uppercase tracking-[0.28em] text-muted-foreground">
-            — Admin workspace
+            Admin workspace
           </p>
-          <h1 className="mt-1.5 font-display text-2xl font-black tracking-[-0.03em] text-foreground md:text-3xl">
+          <h1 className="mt-1.5 font-display text-2xl font-bold tracking-tight text-foreground md:text-3xl">
             {title}
           </h1>
           <p className="mt-1.5 max-w-2xl text-sm leading-relaxed text-muted-foreground">
@@ -105,10 +105,10 @@ function PromptBuilderAdminHeader({
         </div>
 
         <div className="flex flex-wrap gap-2 lg:justify-end">
-          <span className="inline-flex items-center rounded-full border border-border/70 bg-background/75 px-3 py-1.5 font-mono text-[10px] font-black uppercase tracking-[0.18em] text-foreground">
+          <span className="inline-flex items-center border border-border bg-background px-2 py-1 font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-foreground">
             Admin only
           </span>
-          <span className="inline-flex items-center rounded-full border border-border/70 bg-background/75 px-3 py-1.5 font-mono text-[10px] font-black uppercase tracking-[0.18em] text-foreground">
+          <span className="inline-flex items-center border border-border bg-background px-2 py-1 font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-foreground">
             Create + modify
           </span>
         </div>
@@ -161,26 +161,26 @@ function PromptBuilderAdminBar({
   };
 
   return (
-    <div className="rounded-3xl border border-border/70 bg-card/40 p-3.5 shadow-sm backdrop-blur-sm md:p-4">
+    <div className="border border-border bg-card p-3.5 md:p-4">
       <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
         <div className="space-y-2 xl:max-w-4xl">
           <p className="font-mono text-[10px] font-bold uppercase tracking-[0.28em] text-muted-foreground">
-            — Editorial operations
+            Editorial operations
           </p>
           <div className="flex flex-wrap gap-2 text-[11px] text-muted-foreground">
-            <span className="rounded-full border border-border/70 bg-background/80 px-3 py-1.5 font-mono font-bold uppercase tracking-[0.18em] text-foreground">
+            <span className="border border-border bg-background px-2 py-1 font-mono font-bold uppercase tracking-[0.18em] text-foreground">
               {locale.toUpperCase()} active
             </span>
-            <span className="rounded-full border border-border/70 bg-background/60 px-3 py-1.5 font-mono font-bold uppercase tracking-[0.18em]">
+            <span className="border border-border bg-background px-2 py-1 font-mono font-bold uppercase tracking-[0.18em]">
               {stats.total} entries loaded
             </span>
-            <span className="rounded-full border border-amber-500/25 bg-amber-500/10 px-3 py-1.5 font-mono font-bold uppercase tracking-[0.18em] text-amber-700 dark:text-amber-300">
+            <span className="border border-amber-500/40 bg-amber-500/10 px-2 py-1 font-mono font-bold uppercase tracking-[0.18em] text-amber-700 dark:text-amber-300">
               {stats.drafts} drafts queued
             </span>
-            <span className="rounded-full border border-border/70 bg-background/60 px-3 py-1.5 font-mono font-bold uppercase tracking-[0.18em]">
+            <span className="border border-border bg-background px-2 py-1 font-mono font-bold uppercase tracking-[0.18em]">
               {stats.published} published ready
             </span>
-            <span className="rounded-full border border-border/70 bg-background/60 px-3 py-1.5 font-mono font-bold uppercase tracking-[0.18em]">
+            <span className="border border-border bg-background px-2 py-1 font-mono font-bold uppercase tracking-[0.18em]">
               {stats.blogs} blogs · {stats.notes} notes
             </span>
           </div>
@@ -191,7 +191,7 @@ function PromptBuilderAdminBar({
 
         <div className="space-y-1.5 xl:min-w-[250px] xl:max-w-[280px]">
           <p className="font-mono text-[9px] font-bold uppercase tracking-[0.24em] text-muted-foreground xl:text-right">
-            — Content locale
+            Content locale
           </p>
           <div className="flex flex-wrap gap-2 xl:justify-end">
             {localeOptions.map((localeOption) => (
@@ -201,10 +201,10 @@ function PromptBuilderAdminBar({
                 disabled={isPending}
                 onClick={() => handleLocaleChange(localeOption)}
                 className={cn(
-                  "inline-flex min-w-[76px] items-center justify-center rounded-2xl border px-3 py-2 font-mono text-[10px] font-black uppercase tracking-[0.22em] transition-all",
+                  "inline-flex min-w-[72px] items-center justify-center border px-3 py-1.5 font-mono text-[10px] font-bold uppercase tracking-[0.22em] transition-colors",
                   localeOption === locale
-                    ? "border-accent/45 bg-accent/10 text-foreground shadow-sm"
-                    : "border-border/70 bg-background/75 text-muted-foreground hover:border-border hover:bg-background hover:text-foreground",
+                    ? "border-accent bg-accent/10 text-foreground"
+                    : "border-border bg-background text-muted-foreground hover:bg-muted hover:text-foreground",
                   isPending && "cursor-wait opacity-70",
                 )}
               >
@@ -237,14 +237,14 @@ function PromptBuilderControlStrip() {
 
   return (
     <div className="grid gap-2 lg:grid-cols-4">
-      <div className="rounded-2xl border border-border/70 bg-card/55 px-3.5 py-2.5 shadow-sm">
+      <div className="border border-border bg-card px-3.5 py-2.5">
         <div className="flex items-center gap-2 text-muted-foreground">
           {mode === "modify" ? <Layers className="h-3.5 w-3.5 text-sky-500" /> : <PenLine className="h-3.5 w-3.5 text-primary" />}
           <p className="font-mono text-[9px] font-bold uppercase tracking-[0.24em]">
             Active mode
           </p>
         </div>
-        <p className="mt-1.5 text-sm font-black uppercase tracking-[0.14em] text-foreground">
+        <p className="mt-1.5 text-sm font-bold uppercase tracking-[0.14em] text-foreground">
           {mode}
         </p>
         <p className="mt-0.5 text-[10px] text-muted-foreground">
@@ -252,14 +252,14 @@ function PromptBuilderControlStrip() {
         </p>
       </div>
 
-      <div className="rounded-2xl border border-border/70 bg-card/55 px-3.5 py-2.5 shadow-sm">
+      <div className="border border-border bg-card px-3.5 py-2.5">
         <div className="flex items-center gap-2 text-muted-foreground">
           <Sparkles className="h-3.5 w-3.5 text-accent" />
           <p className="font-mono text-[9px] font-bold uppercase tracking-[0.24em]">
             Content track
           </p>
         </div>
-        <p className="mt-1.5 text-sm font-black uppercase tracking-[0.14em] text-foreground">
+        <p className="mt-1.5 text-sm font-bold uppercase tracking-[0.14em] text-foreground">
           {contentType}
         </p>
         <p className="mt-0.5 truncate text-[10px] text-muted-foreground">
@@ -267,14 +267,14 @@ function PromptBuilderControlStrip() {
         </p>
       </div>
 
-      <div className="rounded-2xl border border-border/70 bg-card/55 px-3.5 py-2.5 shadow-sm">
+      <div className="border border-border bg-card px-3.5 py-2.5">
         <div className="flex items-center gap-2 text-muted-foreground">
           <FileText className="h-3.5 w-3.5 text-primary" />
           <p className="font-mono text-[9px] font-bold uppercase tracking-[0.24em]">
             Prompt output
           </p>
         </div>
-        <p className="mt-1.5 text-sm font-black uppercase tracking-[0.14em] text-foreground">
+        <p className="mt-1.5 text-sm font-bold uppercase tracking-[0.14em] text-foreground">
           {promptStats.words} words · {promptStats.chars} chars
         </p>
         <p className="mt-0.5 text-[10px] text-muted-foreground">
@@ -283,8 +283,8 @@ function PromptBuilderControlStrip() {
       </div>
 
       <div className={cn(
-        "rounded-2xl border px-3.5 py-2.5 shadow-sm",
-        hasBlockingIssues ? "border-destructive/30 bg-destructive/5" : "border-emerald-500/20 bg-emerald-500/5",
+        "border px-3.5 py-2.5",
+        hasBlockingIssues ? "border-destructive bg-destructive/5" : "border-emerald-500/40 bg-emerald-500/5",
       )}>
         <div className="flex items-center gap-2 text-muted-foreground">
           {hasBlockingIssues ? <AlertTriangle className="h-3.5 w-3.5 text-destructive" /> : <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />}
@@ -292,7 +292,7 @@ function PromptBuilderControlStrip() {
             Validation state
           </p>
         </div>
-        <p className="mt-1.5 text-sm font-black uppercase tracking-[0.14em] text-foreground">
+        <p className="mt-1.5 text-sm font-bold uppercase tracking-[0.14em] text-foreground">
           {hasBlockingIssues ? `${validationCount} issue${validationCount === 1 ? "" : "s"} to review` : "Ready to copy"}
         </p>
         <p className="mt-0.5 text-[10px] text-muted-foreground">
@@ -319,12 +319,12 @@ function PromptBuilderRail({
   children: React.ReactNode;
 }) {
   return (
-    <section className="rounded-3xl border border-border/70 bg-card/25 p-4 shadow-sm backdrop-blur-sm md:p-5">
-      <div className="border-b border-border/60 pb-4">
+    <section className="border border-border bg-card p-4 md:p-5">
+      <div className="border-b border-border pb-4">
         <p className="font-mono text-[9px] font-bold uppercase tracking-[0.26em] text-muted-foreground">
-          — {eyebrow}
+          {eyebrow}
         </p>
-        <h2 className="mt-2 font-display text-xl font-black tracking-tight text-foreground">
+        <h2 className="mt-2 font-display text-xl font-bold tracking-tight text-foreground">
           {title}
         </h2>
         <p className="mt-1 max-w-2xl text-sm leading-relaxed text-muted-foreground">

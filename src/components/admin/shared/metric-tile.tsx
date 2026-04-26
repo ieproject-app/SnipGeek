@@ -51,7 +51,7 @@ export function MetricTile({
         {Icon ? (
           <div
             className={cn(
-              "flex h-9 w-9 shrink-0 items-center justify-center rounded-xl",
+              "flex h-9 w-9 shrink-0 items-center justify-center",
               palette.iconWrap,
             )}
           >
@@ -94,7 +94,7 @@ export function MetricTile({
   );
 
   const baseClass = cn(
-    "relative block rounded-2xl border p-3.5 transition-colors",
+    "relative block border p-3.5 transition-colors",
     palette.surface,
     href ? palette.surfaceActive : "",
     className,
