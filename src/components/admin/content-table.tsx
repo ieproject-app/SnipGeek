@@ -1184,38 +1184,44 @@ export function ContentTable() {
       </header>
 
       {/* ── Stage tabs (sticky) ─── */}
-      <div className="sticky top-0 z-10 border-b border-border bg-background px-4 py-2 md:px-6 lg:px-8">
-        <div className="flex flex-wrap items-center gap-1">
-                {STAGE_TAB_ORDER.map((tab) => {
-                  const active = stageTab === tab;
-                  const count = tabCounts[tab];
-                  return (
-                    <button
-                      key={tab}
-                      type="button"
-                      onClick={() => handleStageTabChange(tab)}
-                      className={cn(
-                        "inline-flex items-center gap-2 border px-3 py-1.5 font-mono text-[10px] font-bold uppercase tracking-widest transition-colors",
-                        active
-                          ? "border-accent/50 bg-accent/10 text-foreground"
-                          : "border-transparent text-muted-foreground hover:border-border hover:bg-card hover:text-foreground",
-                      )}
-                    >
-                      <span className="sm:hidden">{STAGE_TAB_LABEL[tab].short}</span>
-                      <span className="hidden sm:inline">{STAGE_TAB_LABEL[tab].full}</span>
-                      <span
-                        className={cn(
-                          "inline-flex min-w-[1.25rem] items-center justify-center rounded-full border px-1 text-[9px] tabular-nums",
-                          active
-                            ? "border-accent/30 bg-background text-foreground"
-                            : "border-border bg-card text-muted-foreground",
-                        )}
-                      >
-                        {count}
-                      </span>
-                    </button>
-                  );
-                })}
+      <div className="sticky top-0 z-10 border-b border-border bg-background px-4 md:px-6 lg:px-8">
+        <div className="flex flex-wrap items-center gap-0">
+          {STAGE_TAB_ORDER.map((tab) => {
+            const active = stageTab === tab;
+            const count = tabCounts[tab];
+            return (
+              <button
+                key={tab}
+                type="button"
+                onClick={() => handleStageTabChange(tab)}
+                className={cn(
+                  "relative inline-flex items-center gap-1.5 px-3 py-2.5 font-mono text-[10px] font-bold uppercase tracking-widest transition-colors",
+                  active
+                    ? "text-foreground"
+                    : "text-muted-foreground hover:text-foreground",
+                )}
+              >
+                {active && (
+                  <span
+                    className="absolute inset-x-0 bottom-0 h-[2px] bg-accent"
+                    aria-hidden
+                  />
+                )}
+                <span className="sm:hidden">{STAGE_TAB_LABEL[tab].short}</span>
+                <span className="hidden sm:inline">{STAGE_TAB_LABEL[tab].full}</span>
+                <span
+                  className={cn(
+                    "inline-flex min-w-[1.5rem] items-center justify-center px-1 font-mono text-[9px] tabular-nums",
+                    active
+                      ? "bg-accent/15 text-foreground"
+                      : "bg-muted text-muted-foreground",
+                  )}
+                >
+                  {count}
+                </span>
+              </button>
+            );
+          })}
         </div>
       </div>
 
