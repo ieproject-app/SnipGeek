@@ -234,9 +234,9 @@ const normalizeImagePath = (path: string): string => {
   if (!path) return "";
   return path
     .trim()
-    .replace(/\\/g, "/")                // Flip \ to /
-    .replace(/^public\//, "/")          // Remove 'public/' prefix
-    .replace(/^\/+/, "/");              // Ensure single leading /
+    .replace(/\\/g, "/") // Flip \ to /
+    .replace(/^public\//, "/") // Remove 'public/' prefix
+    .replace(/^\/+/, "/"); // Ensure single leading /
 };
 
 // Safe UUID v4 generator — works in HTTP, HTTPS, and all browsers
@@ -395,10 +395,10 @@ export function FeaturePill({
         whileTap={{ scale: 0.91 }}
         transition={{ type: "spring", stiffness: 450, damping: 25 }}
         className={cn(
-          "flex items-center justify-center w-10 h-10 rounded-xl border transition-colors duration-300",
+          "flex items-center justify-center w-10 h-10 border transition-colors duration-300",
           active
             ? activeClass
-            : "bg-background/50 text-foreground/70 border-primary/10 hover:border-primary/30 hover:bg-accent/10 hover:text-foreground",
+            : "bg-background/50 text-foreground/70 border-border hover:border-primary/30 hover:bg-accent/10 hover:text-foreground",
         )}
       >
         <motion.span
@@ -454,7 +454,7 @@ export function DownloadIdPicker({
         <button
           type="button"
           className={cn(
-            "flex-1 h-7 rounded-md border border-primary/10 bg-background px-2 text-left text-[10px] transition-colors",
+            "flex-1 h-7 border border-border bg-background px-2 text-left text-[10px] transition-colors",
             "hover:border-primary/35 hover:bg-accent/10 hover:text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary/30",
           )}
         >
@@ -474,7 +474,7 @@ export function DownloadIdPicker({
             placeholder="Search by ID, filename, or platform..."
             className="h-8 text-[11px]"
           />
-          <div className="max-h-56 overflow-auto rounded-md border border-primary/10">
+          <div className="max-h-56 overflow-auto border border-border">
             {filtered.length === 0 ? (
               <div className="px-3 py-4 text-[11px] text-muted-foreground">
                 No matching download ID.
@@ -492,7 +492,7 @@ export function DownloadIdPicker({
                       setOpen(false);
                     }}
                     className={cn(
-                      "w-full text-left px-3 py-2 border-b border-primary/5 last:border-b-0 transition-colors",
+                      "w-full text-left px-3 py-2 border-b border-border last:border-b-0 transition-colors",
                       "hover:bg-muted/40",
                       isSelected && "bg-primary/10",
                     )}
@@ -770,7 +770,7 @@ export function usePromptLogic({
     const snippet = compact.length > 220 ? `${compact.slice(0, 220)}...` : compact;
     const lineLabel = selectedBlockLine ?? "?";
     const note = selectedBlockComment.trim() || "[describe exact change]";
-    const blockInstruction = `- Target block (line ${lineLabel}): "${snippet}"\n  Change request: ${note}`;
+    const blockInstruction = `- Target block (line ${lineLabel}): "${snippet}"\n Change request: ${note}`;
 
     setModInstructions((prev) => (prev ? `${prev}\n${blockInstruction}` : blockInstruction));
     setSelectedBlockComment("");

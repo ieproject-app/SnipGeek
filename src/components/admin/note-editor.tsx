@@ -89,7 +89,7 @@ export function NoteEditor({ initialData, id }: NoteEditorProps) {
         <Button
           onClick={handleSubmit}
           disabled={isSubmitting}
-          className="rounded-lg shadow-lg shadow-amber-500/20 bg-amber-500 hover:bg-amber-600 h-11 px-8 font-bold"
+          className=" shadow-amber-500/20 bg-amber-500 hover:bg-amber-600 h-11 px-8 font-bold"
         >
           {isSubmitting ? (
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -101,7 +101,7 @@ export function NoteEditor({ initialData, id }: NoteEditorProps) {
       </header>
 
       <div className="space-y-6">
-        <Card className="border-primary/10">
+        <Card className="border-border">
           <CardContent className="p-6 space-y-6">
             <div className="space-y-2">
               <Label className="text-[10px] font-black uppercase text-muted-foreground">

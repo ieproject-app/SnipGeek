@@ -178,8 +178,8 @@ export const STAGE_TONE_CLASS: Record<
   }
 > = {
   neutral: {
-    surface: "border-border/70 bg-card/40",
-    surfaceActive: "hover:border-foreground/30 hover:bg-card/70",
+    surface: "border-border bg-card",
+    surfaceActive: "hover:border-foreground/30 hover:bg-card",
     iconWrap: "bg-muted/60 text-muted-foreground",
     dot: "bg-muted-foreground/60",
     number: "text-foreground",

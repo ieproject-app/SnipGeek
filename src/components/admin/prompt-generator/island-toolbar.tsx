@@ -37,7 +37,7 @@ export function IslandToolbar() {
         initial={{ opacity: 0, y: -8, scale: 0.96 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ duration: 0.35, delay: 0.04, ease: [0.21, 0.47, 0.32, 0.98] }}
-        className="flex items-center gap-1.5 rounded-xl border border-primary/10 bg-card/50 p-1.5 shadow-sm backdrop-blur-lg"
+        className="flex items-center gap-1.5 border border-border bg-card p-1.5 "
       >
         <div className="relative flex items-center">
           <SnipTooltip label={dictionary.modes.create} side="bottom">
@@ -46,7 +46,7 @@ export function IslandToolbar() {
               aria-label={dictionary.modes.create}
               aria-pressed={mode === "create"}
               onClick={() => setMode("create")}
-              className={cn("relative z-10 flex h-9 w-10 items-center justify-center rounded-md transition-colors duration-200", mode === "create" ? "text-primary" : "text-muted-foreground hover:text-primary/70")}
+              className={cn("relative z-10 flex h-9 w-10 items-center justify-center transition-colors duration-200", mode === "create" ? "text-primary" : "text-muted-foreground hover:text-primary/70")}
             >
               <PenLine className="h-4 w-4" />
             </button>
@@ -58,13 +58,13 @@ export function IslandToolbar() {
               aria-label={dictionary.modes.modify}
               aria-pressed={mode === "modify"}
               onClick={() => setMode("modify")}
-              className={cn("relative z-10 flex h-9 w-10 items-center justify-center rounded-md transition-colors duration-200", mode === "modify" ? "text-primary" : "text-muted-foreground hover:text-primary/70")}
+              className={cn("relative z-10 flex h-9 w-10 items-center justify-center transition-colors duration-200", mode === "modify" ? "text-primary" : "text-muted-foreground hover:text-primary/70")}
             >
               <Layers className="h-4 w-4" />
             </button>
           </SnipTooltip>
           <motion.div
-            className="absolute inset-y-0 z-0 w-1/2 rounded-md border border-primary/5 bg-background shadow-sm"
+            className="absolute inset-y-0 z-0 w-1/2 border border-border bg-background "
             animate={{ x: mode === "modify" ? "100%" : "0%" }}
             transition={{ type: "spring", stiffness: 520, damping: 38 }}
           />
@@ -78,7 +78,7 @@ export function IslandToolbar() {
               type="button"
               aria-label={dictionary.contentTypeSeries}
               onClick={() => setContentType("series")}
-              className={cn("relative z-10 flex h-9 w-10 items-center justify-center rounded-md transition-colors duration-200", contentType === "series" ? "text-primary" : "text-muted-foreground hover:text-primary/70")}
+              className={cn("relative z-10 flex h-9 w-10 items-center justify-center transition-colors duration-200", contentType === "series" ? "text-primary" : "text-muted-foreground hover:text-primary/70")}
             >
               <BookOpen className="h-4 w-4" />
             </button>
@@ -89,7 +89,7 @@ export function IslandToolbar() {
               type="button"
               aria-label={dictionary.contentTypeNews}
               onClick={() => setContentType("news")}
-              className={cn("relative z-10 flex h-9 w-10 items-center justify-center rounded-md transition-colors duration-200", contentType === "news" ? "text-primary" : "text-muted-foreground hover:text-primary/70")}
+              className={cn("relative z-10 flex h-9 w-10 items-center justify-center transition-colors duration-200", contentType === "news" ? "text-primary" : "text-muted-foreground hover:text-primary/70")}
             >
               <Search className="h-4 w-4" />
             </button>
@@ -100,7 +100,7 @@ export function IslandToolbar() {
               type="button"
               aria-label={dictionary.contentTypeTips}
               onClick={() => setContentType("tips")}
-              className={cn("relative z-10 flex h-9 w-10 items-center justify-center rounded-md transition-colors duration-200", contentType === "tips" ? "text-primary" : "text-muted-foreground hover:text-primary/70")}
+              className={cn("relative z-10 flex h-9 w-10 items-center justify-center transition-colors duration-200", contentType === "tips" ? "text-primary" : "text-muted-foreground hover:text-primary/70")}
             >
               <Sparkles className="h-4 w-4" />
             </button>
@@ -110,7 +110,7 @@ export function IslandToolbar() {
               type="button"
               aria-label={dictionary.contentTypeNotes}
               onClick={() => setContentType("notes")}
-              className={cn("relative z-10 flex h-9 w-10 items-center justify-center rounded-md transition-colors duration-200", contentType === "notes" ? "text-primary" : "text-muted-foreground hover:text-primary/70")}
+              className={cn("relative z-10 flex h-9 w-10 items-center justify-center transition-colors duration-200", contentType === "notes" ? "text-primary" : "text-muted-foreground hover:text-primary/70")}
             >
               <FileText className="h-4 w-4" />
             </button>
@@ -120,13 +120,13 @@ export function IslandToolbar() {
               type="button"
               aria-label={dictionary.contentTypeApps}
               onClick={() => setContentType("apps")}
-              className={cn("relative z-10 flex h-9 w-10 items-center justify-center rounded-md transition-colors duration-200", contentType === "apps" ? "text-primary" : "text-muted-foreground hover:text-primary/70")}
+              className={cn("relative z-10 flex h-9 w-10 items-center justify-center transition-colors duration-200", contentType === "apps" ? "text-primary" : "text-muted-foreground hover:text-primary/70")}
             >
               <Download className="h-4 w-4" />
             </button>
           </SnipTooltip>
           <motion.div
-            className="absolute inset-y-0 z-0 w-1/5 rounded-md border border-primary/5 bg-background shadow-sm"
+            className="absolute inset-y-0 z-0 w-1/5 border border-border bg-background "
             animate={{
               x: contentType === "series" ? "0%" : contentType === "news" ? "100%" : contentType === "tips" ? "200%" : contentType === "notes" ? "300%" : "400%",
             }}
@@ -140,10 +140,10 @@ export function IslandToolbar() {
         initial={{ opacity: 0, y: -8, scale: 0.96 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ duration: 0.35, delay: 0.1, ease: [0.21, 0.47, 0.32, 0.98] }}
-        className="flex items-center gap-3 rounded-xl border border-primary/10 bg-card/50 p-1.5 shadow-sm backdrop-blur-lg"
+        className="flex items-center gap-3 border border-border bg-card p-1.5 "
       >
-        <div className="flex h-10 items-center gap-2.5 rounded-lg border border-primary/10 bg-primary/5 px-3.5">
-          <div className="flex items-center gap-2 border-r border-primary/10 pr-3.5">
+        <div className="flex h-10 items-center gap-2.5 border border-border bg-primary/5 px-3.5">
+          <div className="flex items-center gap-2 border-r border-border pr-3.5">
             <Calendar className="h-3.5 w-3.5 shrink-0 text-primary" />
             <Input
               value={publishDate}
@@ -188,7 +188,7 @@ export function IslandToolbar() {
               )}
             </AnimatePresence>
 
-            <div className="flex items-center gap-2 overflow-hidden border-l border-primary/10 pl-2">
+            <div className="flex items-center gap-2 overflow-hidden border-l border-border pl-2">
               <SnipTooltip label="Hide From Home" side="bottom">
                 <motion.span animate={isHideFromHome ? { scale: [1, 1.2, 1] } : { scale: 1 }} transition={{ duration: 0.4, ease: "backOut" }} className="flex">
                   <EyeOff className={cn("h-3.5 w-3.5 transition-colors duration-300", isHideFromHome ? "text-rose-500" : "text-muted-foreground")} />
@@ -197,7 +197,7 @@ export function IslandToolbar() {
               <Switch checked={isHideFromHome} onCheckedChange={setIsHideFromHome} className="scale-75 data-[state=checked]:bg-rose-500" />
             </div>
 
-            <div className="hidden items-center gap-2 border-l border-primary/10 pl-2 xl:flex">
+            <div className="hidden items-center gap-2 border-l border-border pl-2 xl:flex">
               <Hash className="h-3.5 w-3.5 shrink-0 text-muted-foreground/70" />
               <Input
                 value={categoryHint}
@@ -215,7 +215,7 @@ export function IslandToolbar() {
         initial={{ opacity: 0, y: -8, scale: 0.96 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ duration: 0.35, delay: 0.16, ease: [0.21, 0.47, 0.32, 0.98] }}
-        className="flex items-center gap-1.5 rounded-xl border border-primary/10 bg-card/50 p-1.5 shadow-sm backdrop-blur-lg"
+        className="flex items-center gap-1.5 border border-border bg-card p-1.5 "
       >
         <FeaturePill active={showImages} onClick={() => setShowImages(!showImages)} icon={ImageIcon} label="Images" activeClass="bg-emerald-500 text-white border-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.3)]" />
         <FeaturePill active={showDownloads} onClick={() => setShowDownloads(!showDownloads)} icon={Download} label="Downloads" activeClass="bg-blue-500 text-white border-blue-400 shadow-[0_0_15px_rgba(59,130,246,0.3)]" />
@@ -236,8 +236,8 @@ export function StickyBottomBar() {
   } = usePrompt();
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 flex items-center gap-2 rounded-2xl border border-primary/10 bg-card/90 p-2 shadow-2xl backdrop-blur-xl">
-      <div className="flex items-center px-3 pr-4 border-r border-primary/10">
+    <div className="fixed bottom-6 right-6 z-50 flex items-center gap-2 border border-border bg-card p-2 ">
+      <div className="flex items-center px-3 pr-4 border-r border-border">
          <span className="text-[10px] font-mono text-muted-foreground/50 tracking-wide">
            {promptStats.words}w
          </span>
@@ -246,12 +246,12 @@ export function StickyBottomBar() {
       <button
         onClick={handleCopy}
         className={cn(
-          "flex h-10 items-center justify-center gap-2 rounded-xl px-6 text-[10px] font-black uppercase tracking-widest transition-all duration-300 shadow-sm",
+          "flex h-10 items-center justify-center gap-2 px-6 text-[10px] font-black uppercase tracking-widest transition-all duration-300 ",
           hasBlockingIssues
             ? "bg-destructive/15 text-destructive border border-destructive/30 hover:bg-destructive/20"
             : isCopied
             ? "bg-emerald-500 text-white shadow-[0_0_20px_rgba(16,185,129,0.3)]"
-            : "bg-primary text-primary-foreground hover:bg-primary/90 hover:shadow-lg hover:-translate-y-0.5",
+            : "bg-primary text-primary-foreground hover:bg-primary/90 hover: hover:-translate-y-0.5",
         )}
       >
         {hasBlockingIssues ? (
@@ -268,12 +268,12 @@ export function StickyBottomBar() {
         <PopoverTrigger asChild>
           <button
             type="button"
-            className="flex h-10 w-10 items-center justify-center rounded-xl text-muted-foreground hover:bg-destructive/15 hover:text-destructive transition-colors duration-200"
+            className="flex h-10 w-10 items-center justify-center text-muted-foreground hover:bg-destructive/15 hover:text-destructive transition-colors duration-200"
           >
             <Trash2 className="h-4 w-4" />
           </button>
         </PopoverTrigger>
-        <PopoverContent align="end" side="top" sideOffset={16} className="w-[300px] rounded-xl border border-primary/10 bg-card/95 p-4 shadow-2xl backdrop-blur-xl">
+        <PopoverContent align="end" side="top" sideOffset={16} className="w-[300px] border border-border bg-card p-4 ">
           <div className="space-y-4">
             <div className="flex gap-3">
               <div className="mt-0.5 flex-shrink-0 rounded-full bg-destructive/10 p-2 h-fit">
@@ -288,16 +288,16 @@ export function StickyBottomBar() {
                 </p>
               </div>
             </div>
-            <div className="flex items-center justify-end gap-2 border-t border-primary/5 pt-3">
+            <div className="flex items-center justify-end gap-2 border-t border-border pt-3">
               <button
                 onClick={() => setResetPopoverOpen(false)}
-                className="rounded-md px-3 py-1.5 text-[9px] font-bold uppercase tracking-wider text-muted-foreground transition-colors hover:bg-muted/40"
+                className=" px-3 py-1.5 text-[9px] font-bold uppercase tracking-wider text-muted-foreground transition-colors hover:bg-muted/40"
               >
                 Cancel
               </button>
               <button
                 onClick={handleReset}
-                className="rounded-md bg-destructive px-3 py-1.5 text-[9px] font-black uppercase tracking-wider text-destructive-foreground shadow-sm transition-colors hover:bg-destructive/90"
+                className=" bg-destructive px-3 py-1.5 text-[9px] font-black uppercase tracking-wider text-destructive-foreground transition-colors hover:bg-destructive/90"
               >
                 Yes, Reset
               </button>

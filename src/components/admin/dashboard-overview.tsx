@@ -525,7 +525,7 @@ export function DashboardOverview() {
   return (
     <div className="min-h-screen bg-background">
       {/* ── Header: editorial title + live dot ─── */}
-      <header className="border-b border-border/70 bg-background/95 px-4 py-5 backdrop-blur md:px-6">
+      <header className="border-b border-border bg-background px-4 py-5 md:px-6">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <p className="font-mono text-[10px] font-bold uppercase tracking-[0.28em] text-muted-foreground">
@@ -549,7 +549,7 @@ export function DashboardOverview() {
       </header>
 
       {/* ── Funnel: the workflow spine ─── */}
-      <section className="border-b border-border/70 bg-background px-4 py-4 md:px-6">
+      <section className="border-b border-border bg-background px-4 py-4 md:px-6">
         <p className="mb-3 font-mono text-[10px] font-bold uppercase tracking-[0.28em] text-muted-foreground">
           — Pipeline
         </p>
@@ -601,8 +601,8 @@ export function DashboardOverview() {
 
           <div className="mt-4">
             {priorityItems.length === 0 ? (
-              <div className="flex flex-col items-center justify-center rounded-2xl border border-emerald-500/20 bg-emerald-500/5 py-16 text-center">
-                <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-2xl border border-emerald-500/30 bg-emerald-500/10">
+              <div className="flex flex-col items-center justify-center border border-emerald-500/20 bg-emerald-500/5 py-16 text-center">
+                <div className="mb-3 flex h-12 w-12 items-center justify-center border border-emerald-500/30 bg-emerald-500/10">
                   <ArrowUpRight className="h-5 w-5 text-emerald-500" />
                 </div>
                 <p className="text-sm font-semibold text-foreground">
@@ -618,9 +618,9 @@ export function DashboardOverview() {
                   <div
                     key={item.id}
                     style={{ animationDelay: `${idx * 35}ms` }}
-                    className="flex animate-[fadeSlideIn_0.25s_ease_both] items-start gap-3 rounded-2xl border border-border/70 bg-card/30 px-3.5 py-3 transition-colors hover:border-border"
+                    className="flex animate-[fadeSlideIn_0.25s_ease_both] items-start gap-3 border border-border bg-card px-3.5 py-3 transition-colors hover:border-border"
                   >
-                    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-xl border border-border/60 bg-background/60 font-display text-sm font-black text-muted-foreground">
+                    <div className="flex h-7 w-7 shrink-0 items-center justify-center border border-border bg-background font-display text-sm font-black text-muted-foreground">
                       {idx + 1}
                     </div>
 
@@ -708,7 +708,7 @@ export function DashboardOverview() {
         {/* ── Cadence panels ─── */}
         <aside className="flex flex-col gap-4 xl:w-96 xl:shrink-0">
           {/* Weekly target */}
-          <div className="overflow-hidden rounded-2xl border border-border/60 bg-card/30 p-4">
+          <div className="overflow-hidden border border-border bg-card p-4">
             <SectionHeader
               eyebrow="Cadence"
               title="Weekly target"
@@ -733,7 +733,7 @@ export function DashboardOverview() {
           </div>
 
           {/* Posting heatmap */}
-          <div className="flex flex-col overflow-hidden rounded-2xl border border-border/60 bg-card/30 p-4">
+          <div className="flex flex-col overflow-hidden border border-border bg-card p-4">
             <SectionHeader
               eyebrow="Rhythm"
               title="Posting heatmap"

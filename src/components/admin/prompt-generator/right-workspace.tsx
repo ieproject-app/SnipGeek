@@ -29,8 +29,8 @@ function DraftContentCard() {
 
   return (
     <ScrollReveal direction="up" delay={mode === "modify" ? 0.2 : 0.1} className="flex-1 flex flex-col">
-      <Card className={cn("flex flex-1 flex-col overflow-hidden rounded-xl border-l-4 border-primary/10 bg-card/50 shadow-lg transition-all duration-300", mode === "modify" ? "border-l-sky-400" : "border-l-primary")}>
-        <CardHeader className="flex flex-row items-center justify-between border-b bg-muted/5 px-5 py-3">
+      <Card className={cn("flex flex-1 flex-col overflow-hidden border-l-4 border-border bg-card transition-all duration-300", mode === "modify" ? "border-l-sky-400" : "border-l-primary")}>
+        <CardHeader className="flex flex-row items-center justify-between border-b bg-muted/30 px-5 py-3">
           <div className="flex items-center gap-2">
             {mode === "modify" ? <Layers className="h-3.5 w-3.5 shrink-0 text-sky-500" /> : <PenLine className="h-3.5 w-3.5 shrink-0 text-primary" />}
             <CardTitle className="text-[10px] font-black uppercase tracking-widest">
@@ -53,7 +53,7 @@ function DraftContentCard() {
           className="min-h-120 w-full resize-y rounded-none border-none bg-transparent p-6 font-mono text-xs leading-relaxed focus-visible:ring-0"
         />
 
-        <div className="flex items-center gap-2 border-t bg-muted/5 px-5 py-2">
+        <div className="flex items-center gap-2 border-t bg-muted/30 px-5 py-2">
           <span className="font-mono text-[9px] text-muted-foreground/40">
             {mode === "modify" ? "Paste the existing MDX content above" : "Write your draft in MDX or plain text above"}
           </span>
@@ -65,13 +65,13 @@ function DraftContentCard() {
         </div>
 
         {mode === "modify" && (
-          <div ref={blockComposerRef} className="border-t border-primary/10 bg-sky-500/[0.06] px-5 py-4">
+          <div ref={blockComposerRef} className="border-t border-border bg-sky-500/[0.06] px-5 py-4">
              <div className="flex items-center justify-between gap-2">
                <p className="text-[9px] font-black uppercase tracking-[0.12em] text-sky-600 dark:text-sky-400">
                  Block Comment Composer
                </p>
                {selectedBlockLine !== null && (
-                 <span className="rounded-full border border-sky-500/30 bg-background/80 px-2.5 py-1 text-[8px] font-black uppercase tracking-wider text-sky-700 dark:text-sky-300">
+                 <span className="rounded-full border border-sky-500/30 bg-background px-2.5 py-1 text-[8px] font-black uppercase tracking-wider text-sky-700 dark:text-sky-300">
                    Line {selectedBlockLine}
                  </span>
                )}
@@ -85,20 +85,20 @@ function DraftContentCard() {
                   value={selectedBlock}
                   onChange={(e) => setSelectedBlock(e.target.value)}
                   placeholder="Selected block preview will appear here"
-                  className="bg-background/60 font-mono text-[11px]"
+                  className="bg-background font-mono text-[11px]"
                 />
                 <Textarea
                   value={selectedBlockComment}
                   onChange={(e) => setSelectedBlockComment(e.target.value)}
                   placeholder="Comment the exact change you want for this selected block"
-                  className="min-h-16 bg-background/60 text-[11px]"
+                  className="min-h-16 bg-background text-[11px]"
                 />
                 <div className="flex justify-end">
                   <button
                     type="button"
                     onClick={addSelectedBlockToInstructions}
                     disabled={!selectedBlock.trim()}
-                    className="rounded-md border border-sky-500/35 bg-sky-500/10 px-4 py-2 text-[9px] font-black uppercase tracking-wider text-sky-700 transition-colors hover:bg-sky-500/20 disabled:cursor-not-allowed disabled:opacity-50 dark:text-sky-300"
+                    className=" border border-sky-500/35 bg-sky-500/10 px-4 py-2 text-[9px] font-black uppercase tracking-wider text-sky-700 transition-colors hover:bg-sky-500/20 disabled:cursor-not-allowed disabled:opacity-50 dark:text-sky-300"
                   >
                     Insert To Instructions
                   </button>
@@ -121,8 +121,8 @@ function ModInstructionsCard() {
 
   return (
     <ScrollReveal direction="left" delay={0.3}>
-      <Card className="rounded-xl border-l-4 border-l-accent border-primary/10 bg-card/50 shadow-md">
-        <CardHeader className="flex flex-row items-center gap-2 border-b bg-muted/5 px-5 py-3">
+      <Card className=" border-l-4 border-l-accent border-border bg-card ">
+        <CardHeader className="flex flex-row items-center gap-2 border-b bg-muted/30 px-5 py-3">
           <Zap className="h-3.5 w-3.5 shrink-0 text-accent" />
           <CardTitle className="text-[10px] font-black uppercase tracking-widest">
             {dictionary.modInstructionsTitle || "Modification Instructions"}
@@ -151,7 +151,7 @@ function ModInstructionsCard() {
              placeholder={dictionary.modInstructionsPlaceholder || "Write specific changes to implement..."}
              value={modInstructions}
              onChange={(e) => setModInstructions(e.target.value)}
-             className={cn("min-h-32 rounded-lg bg-background/30 p-4 font-mono text-xs", focusRing)}
+             className={cn("min-h-32 bg-background/30 p-4 font-mono text-xs", focusRing)}
            />
         </CardContent>
       </Card>

@@ -28,9 +28,9 @@ export default function AdminLoginPage() {
    *
    * Why call getRedirectResult() here instead of relying on sessionStorage?
    * - sessionStorage is cleared by provider.tsx BEFORE this component reads it
-   *   → race condition that left isRedirectPending stuck at false
+   * → race condition that left isRedirectPending stuck at false
    * - OR sessionStorage persists across refreshes, leaving isRedirectPending
-   *   stuck at true forever when getRedirectResult() already returned null
+   * stuck at true forever when getRedirectResult() already returned null
    *
    * Calling getRedirectResult() directly is the only reliable source of truth.
    * Firebase SDK returns null quickly when no redirect is pending, so there is

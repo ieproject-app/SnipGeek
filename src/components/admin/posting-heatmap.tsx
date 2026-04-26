@@ -112,7 +112,7 @@ export function PostingHeatmap({ publishDates, year }: Props) {
                     {inYear && (
                       <TooltipContent
                         side="top"
-                        className="flex flex-col gap-0.5 border-border/60 bg-card px-3 py-2 shadow-lg"
+                        className="flex flex-col gap-0.5 border-border bg-card px-3 py-2 "
                       >
                         <span className="font-mono text-[9px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
                           {formatDisplayDate(day)}

@@ -312,7 +312,7 @@ export function PostEditor({ initialData, id }: PostEditorProps) {
         <Button
           onClick={handleSubmit}
           disabled={isSubmitting}
-          className="rounded-lg shadow-lg shadow-primary/20 h-11 px-8 font-bold"
+          className=" h-11 px-8 font-bold"
         >
           {isSubmitting ? (
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -325,9 +325,9 @@ export function PostEditor({ initialData, id }: PostEditorProps) {
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         <div className="lg:col-span-8 space-y-8">
-          <Card className="border-primary/10 overflow-hidden shadow-sm">
+          <Card className="border-border overflow-hidden ">
             <Tabs defaultValue="write" className="w-full">
-              <CardHeader className="border-b bg-muted/5 p-0">
+              <CardHeader className="border-b bg-muted/30 p-0">
                 <div className="flex items-center justify-between px-6 py-2">
                   <TabsList className="bg-transparent border-none">
                     <TabsTrigger
@@ -408,7 +408,7 @@ export function PostEditor({ initialData, id }: PostEditorProps) {
                     <div
                       key={idx}
                       className={cn(
-                        "group relative aspect-square rounded-lg border overflow-hidden bg-muted transition-all",
+                        "group relative aspect-square border overflow-hidden bg-muted transition-all",
                         formData.heroImageUrl === img.url
                           ? "ring-2 ring-accent border-accent"
                           : "hover:border-primary/30",
@@ -474,7 +474,7 @@ export function PostEditor({ initialData, id }: PostEditorProps) {
                     </div>
                   ))}
                   {formData.images.length === 0 && !isUploading && (
-                    <div className="col-span-full py-20 text-center border-2 border-dashed rounded-lg bg-muted/20">
+                    <div className="col-span-full py-20 text-center border-2 border-dashed bg-muted/30">
                       <ImageIcon className="h-10 w-10 mx-auto text-muted-foreground opacity-20 mb-2" />
                       <p className="text-xs font-bold text-muted-foreground/40 uppercase">
                         No images uploaded yet
@@ -497,14 +497,14 @@ export function PostEditor({ initialData, id }: PostEditorProps) {
         </div>
 
         <div className="lg:col-span-4 space-y-8">
-          <Card className="border-primary/10 overflow-hidden shadow-sm">
-            <CardHeader className="bg-muted/5 py-3 border-b">
+          <Card className="border-border overflow-hidden ">
+            <CardHeader className="bg-muted/30 py-3 border-b">
               <CardTitle className="text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
                 <Star className="h-3 w-3 text-accent" /> Featured Image (Hero)
               </CardTitle>
             </CardHeader>
             <CardContent className="p-6 space-y-4">
-              <div className="relative aspect-video rounded-lg bg-muted flex items-center justify-center overflow-hidden border-2 border-dashed border-primary/10 shadow-inner">
+              <div className="relative aspect-video bg-muted flex items-center justify-center overflow-hidden border-2 border-dashed border-border shadow-inner">
                 {formData.heroImageUrl ? (
                   <Image
                     src={formData.heroImageUrl}
@@ -540,8 +540,8 @@ export function PostEditor({ initialData, id }: PostEditorProps) {
             </CardContent>
           </Card>
 
-          <Card className="border-primary/10 shadow-sm">
-            <CardHeader className="bg-muted/5 py-3 border-b">
+          <Card className="border-border ">
+            <CardHeader className="bg-muted/30 py-3 border-b">
               <CardTitle className="text-[10px] font-black uppercase tracking-widest">
                 Metadata
               </CardTitle>
@@ -646,7 +646,7 @@ export function PostEditor({ initialData, id }: PostEditorProps) {
             </CardContent>
           </Card>
 
-          <Card className="border-primary/10 bg-emerald-500/2 shadow-sm">
+          <Card className="border-border bg-emerald-500/2 ">
             <CardHeader className="py-3 border-b">
               <CardTitle className="text-[10px] font-black uppercase tracking-widest">
                 Publish Settings

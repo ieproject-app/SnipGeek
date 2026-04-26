@@ -23,7 +23,7 @@ type MetricTileProps = {
 
 /**
  * Uniform metric tile used across the dashboard + monitor header.
- * Replaces the ad-hoc `rounded-xl border ...` spans.
+ * Replaces the ad-hoc ` border ...` spans.
  */
 export function MetricTile({
   eyebrow,

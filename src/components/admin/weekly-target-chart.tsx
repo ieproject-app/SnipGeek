@@ -65,7 +65,7 @@ export function WeeklyTargetChart({
                 onTarget: boolean;
               };
               return (
-                <div className="rounded-xl border border-border/60 bg-card px-3 py-2.5 shadow-lg">
+                <div className=" border border-border bg-card px-3 py-2.5 ">
                   <p className="font-mono text-[9px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
                     {label} · {entry.fullLabel}
                   </p>

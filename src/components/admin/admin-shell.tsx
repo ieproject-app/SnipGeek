@@ -88,7 +88,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
       {/* ── Mobile drawer backdrop ──────────────────── */}
       {drawerOpen && (
         <div
-          className="fixed inset-0 z-40 bg-background/80 md:hidden"
+          className="fixed inset-0 z-40 bg-background md:hidden"
           onClick={() => setDrawerOpen(false)}
           aria-hidden
         />

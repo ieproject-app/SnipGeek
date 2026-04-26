@@ -36,8 +36,8 @@ function ArticleSelectorCard() {
 
   return (
     <ScrollReveal direction="up" delay={0.1}>
-      <Card className="overflow-hidden rounded-xl border-l-4 border-l-amber-400 border-primary/10 bg-card/50 shadow-sm">
-        <CardHeader className="flex flex-row items-center gap-2 border-b bg-muted/5 px-5 py-3">
+      <Card className="overflow-hidden border-l-4 border-l-amber-400 border-border bg-card ">
+        <CardHeader className="flex flex-row items-center gap-2 border-b bg-muted/30 px-5 py-3">
           <Search className="h-3.5 w-3.5 shrink-0 text-amber-500" />
           <CardTitle className="text-[10px] font-black uppercase tracking-widest">
             {dictionary.selectArticleLabel}
@@ -45,7 +45,7 @@ function ArticleSelectorCard() {
         </CardHeader>
         <CardContent className="space-y-3 p-5">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="rounded-full border border-primary/10 bg-background/40 px-3 py-1 text-[9px] font-black uppercase tracking-wider text-muted-foreground">
+            <span className="rounded-full border border-border bg-background/40 px-3 py-1 text-[9px] font-black uppercase tracking-wider text-muted-foreground">
               {contentType} · {articleStats.total}
             </span>
             <button
@@ -68,7 +68,7 @@ function ArticleSelectorCard() {
             </button>
           </div>
           
-          <div className="rounded-lg border border-amber-500/20 bg-amber-500/5 px-3 py-2">
+          <div className=" border border-amber-500/20 bg-amber-500/5 px-3 py-2">
             <div className="flex items-center justify-between gap-2">
               <p className="text-[9px] font-black uppercase tracking-[0.12em] text-amber-600 dark:text-amber-400">
                 Draft Queue ({contentType})
@@ -119,10 +119,10 @@ function ArticleSelectorCard() {
               placeholder={dictionary.searchArticlePlaceholder}
               value={articleSearch}
               onChange={(e) => setArticleSearch(e.target.value)}
-              className={cn("h-10 rounded-lg bg-background/50 pl-9 text-xs", focusRing)}
+              className={cn("h-10 bg-background/50 pl-9 text-xs", focusRing)}
             />
           </div>
-          <ScrollArea className="h-50 rounded-lg border border-primary/5 bg-background/20 p-2">
+          <ScrollArea className="h-50 border border-border bg-background/20 p-2">
             <div className="grid grid-cols-1 gap-1.5">
               {filteredArticles.length === 0 && (
                 <p className="col-span-1 py-8 text-center text-[10px] text-muted-foreground">
@@ -133,7 +133,7 @@ function ArticleSelectorCard() {
                 <button
                   key={article.slug}
                   onClick={() => setSelectedSlug(article.slug)}
-                  className={cn("flex flex-col gap-1 rounded-lg border p-3 text-left transition-all", selectedSlug === article.slug ? "border-amber-400 bg-amber-500 text-white shadow-sm" : "border-transparent hover:border-primary/10 hover:bg-background")}
+                  className={cn("flex flex-col gap-1 border p-3 text-left transition-all", selectedSlug === article.slug ? "border-amber-400 bg-amber-500 text-white " : "border-transparent hover:border-border hover:bg-background")}
                 >
                   <div className="flex items-center gap-1.5">
                     <FileText className="h-2.5 w-2.5 shrink-0 opacity-60" />
@@ -152,7 +152,7 @@ function ArticleSelectorCard() {
             </div>
           </ScrollArea>
           {selectedSlug && selectedArticle && (
-            <div className="flex items-center justify-between rounded-lg border border-amber-500/20 bg-amber-500/10 px-3 py-2">
+            <div className="flex items-center justify-between border border-amber-500/20 bg-amber-500/10 px-3 py-2">
               <div className="min-w-0">
                 <span className="block truncate font-mono text-[9px] text-amber-600 dark:text-amber-400">
                   ✓ {selectedSlug}
@@ -190,8 +190,8 @@ function WorkflowContextCard() {
 
   return (
     <ScrollReveal direction="up" delay={0.14}>
-      <Card className="overflow-hidden rounded-xl border-l-4 border-l-emerald-400 border-primary/10 bg-card/50 shadow-sm">
-        <CardHeader className="flex flex-row items-center gap-2 border-b bg-muted/5 px-5 py-3">
+      <Card className="overflow-hidden border-l-4 border-l-emerald-400 border-border bg-card ">
+        <CardHeader className="flex flex-row items-center gap-2 border-b bg-muted/30 px-5 py-3">
           <Sparkles className="h-3.5 w-3.5 shrink-0 text-emerald-500" />
           <CardTitle className="text-[10px] font-black uppercase tracking-widest">
             Workflow Context
@@ -203,7 +203,7 @@ function WorkflowContextCard() {
               <div className="space-y-1.5">
                 <p className="text-[9px] font-black uppercase tracking-wider text-muted-foreground">{dictionary.seriesPhaseLabel}</p>
                 <Select value={seriesPhase} onValueChange={(v: string) => setSeriesPhase(v as typeof seriesPhase)}>
-                  <SelectTrigger className="h-9 border-primary/10 bg-background/50 text-xs">
+                  <SelectTrigger className="h-9 border-border bg-background/50 text-xs">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -216,7 +216,7 @@ function WorkflowContextCard() {
               <div className="space-y-1.5">
                 <p className="text-[9px] font-black uppercase tracking-wider text-muted-foreground">{dictionary.seriesArticleLabel}</p>
                 <Select value={seriesArticleNumber} onValueChange={setSeriesArticleNumber}>
-                  <SelectTrigger className="h-9 border-primary/10 bg-background/50 text-xs">
+                  <SelectTrigger className="h-9 border-border bg-background/50 text-xs">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -228,11 +228,11 @@ function WorkflowContextCard() {
               </div>
               <div className="space-y-1.5 md:col-span-2">
                 <p className="text-[9px] font-black uppercase tracking-wider text-muted-foreground">{dictionary.seriesTargetLabel}</p>
-                <Input readOnly value={seriesTarget} className="h-9 border-primary/10 bg-background/50 text-xs" />
+                <Input readOnly value={seriesTarget} className="h-9 border-border bg-background/50 text-xs" />
               </div>
               <div className="space-y-1.5 md:col-span-2">
                 <p className="text-[9px] font-black uppercase tracking-wider text-muted-foreground">{dictionary.seriesToneLabel}</p>
-                <Input readOnly value={seriesTone} className="h-9 border-primary/10 bg-background/50 text-xs" />
+                <Input readOnly value={seriesTone} className="h-9 border-border bg-background/50 text-xs" />
               </div>
             </div>
           )}
@@ -248,12 +248,12 @@ function WorkflowContextCard() {
                         value={url}
                         onChange={(e) => updateNewsSourceUrl(index, e.target.value)}
                         placeholder={`https://example.com/source-${index + 1}`}
-                        className="h-9 border-primary/10 bg-background/50 text-xs"
+                        className="h-9 border-border bg-background/50 text-xs"
                       />
                       <button
                         type="button"
                         onClick={() => removeNewsSourceUrl(index)}
-                        className="h-9 w-9 rounded-md border border-primary/10 text-muted-foreground transition-colors hover:border-destructive/40 hover:text-destructive"
+                        className="h-9 w-9 border border-border text-muted-foreground transition-colors hover:border-destructive/40 hover:text-destructive"
                       >
                         <Trash2 className="mx-auto h-3.5 w-3.5" />
                       </button>
@@ -264,7 +264,7 @@ function WorkflowContextCard() {
                   type="button"
                   onClick={addNewsSourceUrl}
                   disabled={newsSourceUrls.length >= 3}
-                  className="inline-flex h-8 items-center gap-1.5 rounded-full border border-primary/15 px-3 text-[9px] font-black uppercase tracking-wider text-muted-foreground transition-colors hover:border-primary/30 hover:text-primary disabled:cursor-not-allowed disabled:opacity-50"
+                  className="inline-flex h-8 items-center gap-1.5 rounded-full border border-border px-3 text-[9px] font-black uppercase tracking-wider text-muted-foreground transition-colors hover:border-primary/30 hover:text-primary disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   <Plus className="h-3 w-3" /> Add URL (max 3)
                 </button>
@@ -275,7 +275,7 @@ function WorkflowContextCard() {
                   value={newsAngle}
                   onChange={(e) => setNewsAngle(e.target.value)}
                   placeholder={isIndonesianLocale ? "Contoh: fokus ke dampak untuk daily Ubuntu user" : "Example: focus on impact for daily Ubuntu users"}
-                  className="h-9 border-primary/10 bg-background/50 text-xs"
+                  className="h-9 border-border bg-background/50 text-xs"
                 />
               </div>
             </div>
@@ -292,12 +292,12 @@ function WorkflowContextCard() {
                         value={url}
                         onChange={(e) => updateNewsSourceUrl(index, e.target.value)}
                         placeholder={`https://example.com/source-${index + 1}`}
-                        className="h-9 border-primary/10 bg-background/50 text-xs"
+                        className="h-9 border-border bg-background/50 text-xs"
                       />
                       <button
                         type="button"
                         onClick={() => removeNewsSourceUrl(index)}
-                        className="h-9 w-9 rounded-md border border-primary/10 text-muted-foreground transition-colors hover:border-destructive/40 hover:text-destructive"
+                        className="h-9 w-9 border border-border text-muted-foreground transition-colors hover:border-destructive/40 hover:text-destructive"
                       >
                         <Trash2 className="mx-auto h-3.5 w-3.5" />
                       </button>
@@ -308,7 +308,7 @@ function WorkflowContextCard() {
                   type="button"
                   onClick={addNewsSourceUrl}
                   disabled={newsSourceUrls.length >= 3}
-                  className="inline-flex h-8 items-center gap-1.5 rounded-full border border-primary/15 px-3 text-[9px] font-black uppercase tracking-wider text-muted-foreground transition-colors hover:border-primary/30 hover:text-primary disabled:cursor-not-allowed disabled:opacity-50"
+                  className="inline-flex h-8 items-center gap-1.5 rounded-full border border-border px-3 text-[9px] font-black uppercase tracking-wider text-muted-foreground transition-colors hover:border-primary/30 hover:text-primary disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   <Plus className="h-3 w-3" /> Add URL (max 3)
                 </button>
@@ -319,14 +319,14 @@ function WorkflowContextCard() {
                   value={newsAngle}
                   onChange={(e) => setNewsAngle(e.target.value)}
                   placeholder={isIndonesianLocale ? "Contoh: fokus ke fitur baru yang paling berguna" : "Example: focus on the most useful new features"}
-                  className="h-9 border-primary/10 bg-background/50 text-xs"
+                  className="h-9 border-border bg-background/50 text-xs"
                 />
               </div>
             </div>
           )}
 
           {contentType === "tips" && (
-            <div className="flex items-center justify-between rounded-lg border border-primary/10 bg-background/40 px-3 py-2">
+            <div className="flex items-center justify-between border border-border bg-background/40 px-3 py-2">
               <p className="text-[10px] font-black uppercase tracking-wider text-muted-foreground">{dictionary.tipsStandaloneLabel}</p>
               <Switch checked={tipsStandalone} onCheckedChange={setTipsStandalone} />
             </div>
@@ -337,7 +337,7 @@ function WorkflowContextCard() {
               <div className="space-y-1.5">
                 <p className="text-[9px] font-black uppercase tracking-wider text-muted-foreground">{dictionary.notesIntentLabel}</p>
                 <Select value={noteIntent} onValueChange={(v: string) => setNoteIntent(v as typeof noteIntent)}>
-                  <SelectTrigger className="h-9 border-primary/10 bg-background/50 text-xs">
+                  <SelectTrigger className="h-9 border-border bg-background/50 text-xs">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -378,7 +378,7 @@ function TechnicalTabsCard() {
   if (!hasFeatures) {
     return (
       <ScrollReveal direction="up" delay={0.2}>
-        <div className="flex flex-col items-center gap-3 rounded-xl border border-dashed border-primary/10 bg-muted/2 py-8 text-center">
+        <div className="flex flex-col items-center gap-3 border border-dashed border-border bg-muted/2 py-8 text-center">
           <Settings2 className="h-6 w-6 text-muted-foreground/20" />
           <p className="text-[10px] font-medium text-muted-foreground/40">
             Enable features above to show technical configurations here.
@@ -393,32 +393,32 @@ function TechnicalTabsCard() {
 
   return (
     <ScrollReveal direction="up" delay={0.2}>
-      <Card className="overflow-hidden rounded-xl border-primary/10 bg-card/50 shadow-sm border-l-4 border-l-muted-foreground/30">
+      <Card className="overflow-hidden border-border bg-card border-l-4 border-l-muted-foreground/30">
         <Tabs defaultValue={defaultTab} className="w-full">
-          <div className="border-b border-primary/5 bg-muted/5 flex items-center justify-between">
+          <div className="border-b border-border bg-muted/30 flex items-center justify-between">
             <TabsList className="h-12 bg-transparent justify-start overflow-x-auto gap-1 px-2 no-scrollbar">
                {showImages && (
-                 <TabsTrigger value="images" className="data-[state=active]:bg-emerald-500/10 data-[state=active]:text-emerald-500 text-[10px] font-black uppercase tracking-wider rounded-md h-8 px-3">
+                 <TabsTrigger value="images" className="data-[state=active]:bg-emerald-500/10 data-[state=active]:text-emerald-500 text-[10px] font-black uppercase tracking-wider h-8 px-3">
                    <ImageIcon className="h-3 w-3 mr-1.5" /> Images
                  </TabsTrigger>
                )}
                {showDownloads && (
-                 <TabsTrigger value="downloads" className="data-[state=active]:bg-blue-500/10 data-[state=active]:text-blue-500 text-[10px] font-black uppercase tracking-wider rounded-md h-8 px-3">
+                 <TabsTrigger value="downloads" className="data-[state=active]:bg-blue-500/10 data-[state=active]:text-blue-500 text-[10px] font-black uppercase tracking-wider h-8 px-3">
                    <Download className="h-3 w-3 mr-1.5" /> DLs
                  </TabsTrigger>
                )}
                {showGrids && (
-                 <TabsTrigger value="grids" className="data-[state=active]:bg-violet-500/10 data-[state=active]:text-violet-500 text-[10px] font-black uppercase tracking-wider rounded-md h-8 px-3">
+                 <TabsTrigger value="grids" className="data-[state=active]:bg-violet-500/10 data-[state=active]:text-violet-500 text-[10px] font-black uppercase tracking-wider h-8 px-3">
                    <Grid3X3 className="h-3 w-3 mr-1.5" /> Grids
                  </TabsTrigger>
                )}
                {showGallery && (
-                 <TabsTrigger value="gallery" className="data-[state=active]:bg-fuchsia-500/10 data-[state=active]:text-fuchsia-500 text-[10px] font-black uppercase tracking-wider rounded-md h-8 px-3">
+                 <TabsTrigger value="gallery" className="data-[state=active]:bg-fuchsia-500/10 data-[state=active]:text-fuchsia-500 text-[10px] font-black uppercase tracking-wider h-8 px-3">
                    <GalleryHorizontal className="h-3 w-3 mr-1.5" /> Gallery
                  </TabsTrigger>
                )}
                {showSpecs && (
-                 <TabsTrigger value="specs" className="data-[state=active]:bg-orange-500/10 data-[state=active]:text-orange-500 text-[10px] font-black uppercase tracking-wider rounded-md h-8 px-3">
+                 <TabsTrigger value="specs" className="data-[state=active]:bg-orange-500/10 data-[state=active]:text-orange-500 text-[10px] font-black uppercase tracking-wider h-8 px-3">
                    <Settings2 className="h-3 w-3 mr-1.5" /> Specs
                  </TabsTrigger>
                )}
@@ -446,11 +446,11 @@ function TechnicalTabsCard() {
                     placeholder={dictionary.imagesPlaceholder}
                     value={images}
                     onChange={(e) => setImages(e.target.value)}
-                    className={cn("min-h-32 rounded-lg bg-background/50 p-3 font-mono text-[11px]", focusRing)}
+                    className={cn("min-h-32 bg-background/50 p-3 font-mono text-[11px]", focusRing)}
                   />
                 </div>
 
-                <div className="rounded-lg border border-primary/10 bg-background/35 p-3">
+                <div className=" border border-border bg-background/35 p-3">
                    <div className="flex items-center justify-between gap-2">
                      <p className="text-[9px] font-black uppercase tracking-[0.12em] text-muted-foreground">Auto Caption Policy</p>
                    </div>
@@ -458,7 +458,7 @@ function TechnicalTabsCard() {
                       <div className="space-y-1">
                         <p className="text-[9px] font-black uppercase tracking-wider text-muted-foreground">Mode</p>
                         <Select value={captionMode} onValueChange={(v: string) => setCaptionMode(v as typeof captionMode)}>
-                          <SelectTrigger className="h-8 border-primary/10 bg-background/60 text-[10px]">
+                          <SelectTrigger className="h-8 border-border bg-background text-[10px]">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
@@ -471,7 +471,7 @@ function TechnicalTabsCard() {
                       <div className="space-y-1">
                         <p className="text-[9px] font-black uppercase tracking-wider text-muted-foreground">Alignment</p>
                         <Select value={captionAlignment} onValueChange={(v: string) => setCaptionAlignment(v as typeof captionAlignment)}>
-                          <SelectTrigger className="h-8 border-primary/10 bg-background/60 text-[10px]">
+                          <SelectTrigger className="h-8 border-border bg-background text-[10px]">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
@@ -484,7 +484,7 @@ function TechnicalTabsCard() {
                       <div className="space-y-1">
                         <p className="text-[9px] font-black uppercase tracking-wider text-muted-foreground">Coverage</p>
                         <Select value={captionCoverage} onValueChange={(v: string) => setCaptionCoverage(v as typeof captionCoverage)}>
-                          <SelectTrigger className="h-8 border-primary/10 bg-background/60 text-[10px]">
+                          <SelectTrigger className="h-8 border-border bg-background text-[10px]">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
@@ -498,7 +498,7 @@ function TechnicalTabsCard() {
                         <Input
                           value={captionMaxCount}
                           onChange={(e) => setCaptionMaxCount(e.target.value.replace(/[^0-9]/g, ""))}
-                          className="h-8 border-primary/10 bg-background/60 text-[10px]"
+                          className="h-8 border-border bg-background text-[10px]"
                         />
                       </div>
                    </div>
@@ -509,9 +509,9 @@ function TechnicalTabsCard() {
             {showDownloads && (
               <TabsContent value="downloads" className="space-y-3 m-0 border-none outline-none">
                  {downloadItems.map((item, index) => (
-                   <div key={item.id} className="flex items-center gap-2 rounded-lg border border-primary/5 bg-background/30 p-2">
+                   <div key={item.id} className="flex items-center gap-2 border border-border bg-background/30 p-2">
                      <Select value={item.type} onValueChange={(val: string) => updateDownloadItem(item.id, { type: val as "id" | "url", value: "" })}>
-                       <SelectTrigger className="h-7 w-15 border-primary/10 text-[9px]">
+                       <SelectTrigger className="h-7 w-15 border-border text-[9px]">
                          <SelectValue />
                        </SelectTrigger>
                        <SelectContent>
@@ -522,17 +522,17 @@ function TechnicalTabsCard() {
                      {item.type === "id" ? (
                        <DownloadIdPicker value={item.value} onSelect={(next: string) => updateDownloadItem(item.id, { value: next })} downloadIds={downloadIds as string[]} />
                      ) : (
-                       <Input value={item.value} onChange={(e) => updateDownloadItem(item.id, { value: e.target.value })} placeholder="https://..." className="h-7 flex-1 border-primary/10 text-[10px]" />
+                       <Input value={item.value} onChange={(e) => updateDownloadItem(item.id, { value: e.target.value })} placeholder="https://..." className="h-7 flex-1 border-border text-[10px]" />
                      )}
-                     <button type="button" onClick={() => removeDownloadItem(item.id)} className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive">
+                     <button type="button" onClick={() => removeDownloadItem(item.id)} className="flex h-7 w-7 shrink-0 items-center justify-center text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive">
                        <Trash2 className="h-3 w-3" />
                      </button>
-                     <button type="button" onClick={() => copyLinkCaller(index)} className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-blue-500/10 hover:text-blue-500">
+                     <button type="button" onClick={() => copyLinkCaller(index)} className="flex h-7 w-7 shrink-0 items-center justify-center text-muted-foreground transition-colors hover:bg-blue-500/10 hover:text-blue-500">
                        <Copy className="h-3 w-3" />
                      </button>
                    </div>
                  ))}
-                 <button type="button" onClick={addDownloadItem} className="flex h-9 w-full items-center justify-center gap-1.5 rounded-lg border border-dashed border-primary/20 text-[10px] font-black uppercase tracking-wide text-muted-foreground transition-all hover:border-primary/40 hover:text-primary">
+                 <button type="button" onClick={addDownloadItem} className="flex h-9 w-full items-center justify-center gap-1.5 border border-dashed border-border text-[10px] font-black uppercase tracking-wide text-muted-foreground transition-all hover:border-primary/40 hover:text-primary">
                     <Plus className="h-3 w-3" /> Add Link
                  </button>
               </TabsContent>
@@ -544,7 +544,7 @@ function TechnicalTabsCard() {
                  {imageGridMappings.trim() && (
                     <div className="flex flex-wrap gap-1 mt-2">
                       {imageGridMappings.split("\n").filter((l: string) => l.trim()).map((_, i: number) => (
-                        <button key={i} onClick={() => copyGridCaller(i)} className="flex items-center gap-1 rounded-md border border-violet-500/20 bg-violet-500/10 px-2 py-1 font-mono text-[9px] text-violet-500 transition-colors hover:bg-violet-500/20">
+                        <button key={i} onClick={() => copyGridCaller(i)} className="flex items-center gap-1 border border-violet-500/20 bg-violet-500/10 px-2 py-1 font-mono text-[9px] text-violet-500 transition-colors hover:bg-violet-500/20">
                           <Copy className="h-2.5 w-2.5" /> {`{{Grid ${i + 1}}}`}
                         </button>
                       ))}
@@ -568,7 +568,7 @@ function TechnicalTabsCard() {
                 {specsMappings.trim() && (
                    <div className="flex flex-wrap gap-1 mt-2">
                       {specsGroups.map((_, i) => (
-                        <button key={i} onClick={() => copySpecCaller(i)} className="flex items-center gap-1 rounded-md border border-orange-500/20 bg-orange-500/10 px-2 py-1 font-mono text-[9px] text-orange-500 transition-colors hover:bg-orange-500/20">
+                        <button key={i} onClick={() => copySpecCaller(i)} className="flex items-center gap-1 border border-orange-500/20 bg-orange-500/10 px-2 py-1 font-mono text-[9px] text-orange-500 transition-colors hover:bg-orange-500/20">
                           <Copy className="h-2.5 w-2.5" /> {`{{Specs ${i + 1}}}`}
                         </button>
                       ))}
@@ -636,7 +636,7 @@ function GalleryTab({
             "inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-[9px] font-black uppercase tracking-wider transition-colors",
             showImport
               ? "border-fuchsia-500/40 bg-fuchsia-500/15 text-fuchsia-500"
-              : "border-primary/15 text-muted-foreground hover:border-fuchsia-500/30 hover:text-fuchsia-500"
+              : "border-border text-muted-foreground hover:border-fuchsia-500/30 hover:text-fuchsia-500"
           )}
         >
           <Import className="h-3 w-3" /> Quick Import
@@ -650,7 +650,7 @@ function GalleryTab({
 
       {/* Quick Import area */}
       {showImport && (
-        <div className="rounded-lg border border-fuchsia-500/20 bg-fuchsia-500/5 p-3 space-y-2.5">
+        <div className=" border border-fuchsia-500/20 bg-fuchsia-500/5 p-3 space-y-2.5">
           <p className="text-[9px] font-black uppercase tracking-wider text-fuchsia-600 dark:text-fuchsia-400">
             Paste paths (1 per line) — auto-grouped per 3
           </p>
@@ -661,7 +661,7 @@ function GalleryTab({
             value={importPaths}
             onChange={(e) => setImportPaths(e.target.value)}
             className={cn(
-              "min-h-28 bg-background/60 p-3 font-mono text-[11px] border-fuchsia-500/15",
+              "min-h-28 bg-background p-3 font-mono text-[11px] border-fuchsia-500/15",
               focusRing
             )}
           />
@@ -704,7 +704,7 @@ function GalleryTab({
               <button
                 key={i}
                 onClick={() => copyGalleryCaller(i)}
-                className="flex items-center gap-1 rounded-md border border-fuchsia-500/20 bg-fuchsia-500/10 px-2 py-1 font-mono text-[9px] text-fuchsia-500 transition-colors hover:bg-fuchsia-500/20"
+                className="flex items-center gap-1 border border-fuchsia-500/20 bg-fuchsia-500/10 px-2 py-1 font-mono text-[9px] text-fuchsia-500 transition-colors hover:bg-fuchsia-500/20"
               >
                 <Copy className="h-2.5 w-2.5" /> {`{{Gallery ${i + 1}}}`}
               </button>

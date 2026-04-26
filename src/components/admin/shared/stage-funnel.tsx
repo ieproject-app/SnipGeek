@@ -65,7 +65,7 @@ export function StageFunnel({
           );
 
           const baseClass = cn(
-            "inline-flex cursor-pointer items-center gap-1.5 rounded-full border px-2.5 py-1 transition-all duration-200 ease-out will-change-transform hover:-translate-y-0.5 hover:shadow-sm active:translate-y-0 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40",
+            "inline-flex cursor-pointer items-center gap-1.5 rounded-full border px-2.5 py-1 transition-all duration-200 ease-out will-change-transform hover:-translate-y-0.5 hover: active:translate-y-0 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40",
             palette.surface,
             isActive ? "border-accent/60 bg-accent/10" : palette.surfaceActive,
           );
@@ -118,7 +118,7 @@ export function StageFunnel({
             <>
               <span
                 className={cn(
-                  "flex h-7 w-7 shrink-0 items-center justify-center rounded-lg",
+                  "flex h-7 w-7 shrink-0 items-center justify-center ",
                   palette.iconWrap,
                 )}
               >
@@ -144,7 +144,7 @@ export function StageFunnel({
           );
 
           const baseClass = cn(
-            "flex items-center gap-2.5 rounded-xl border px-2.5 py-1.5 transition-colors",
+            "flex items-center gap-2.5 border px-2.5 py-1.5 transition-colors",
             palette.surface,
             palette.surfaceActive,
           );
@@ -171,9 +171,9 @@ export function StageFunnel({
    * Layout strategy:
    * - Mobile / tablet: flex-wrap so cards wrap naturally into 2 columns.
    * - XL+: flex-nowrap, all 5 cards in one row, borders join into a
-   *   single pill-row (each card removes its left border except the first).
+   * single pill-row (each card removes its left border except the first).
    * - No chevron overlays — the shared border IS the visual separator.
-   *   This avoids all z-index / grid-cell clipping issues.
+   * This avoids all z-index / grid-cell clipping issues.
    * ─────────────────────────────────────────────────────────────── */
   const stageNodes: React.ReactNode[] = [];
 
@@ -199,7 +199,7 @@ export function StageFunnel({
         <div className="flex items-start gap-3">
           <div
             className={cn(
-              "flex h-9 w-9 shrink-0 items-center justify-center rounded-xl",
+              "flex h-9 w-9 shrink-0 items-center justify-center ",
               palette.iconWrap,
             )}
           >
@@ -230,13 +230,13 @@ export function StageFunnel({
 
     const baseClass = cn(
       // base
-      "relative border p-4 transition-all duration-200 ease-out will-change-transform hover:-translate-y-0.5 hover:shadow-md",
+      "relative border p-4 transition-all duration-200 ease-out will-change-transform hover:-translate-y-0.5 hover:",
       // mobile: 2-per-row (gap-2 = 8px, so each takes half minus half the gap)
       "basis-[calc(50%-4px)] xl:basis-auto xl:flex-1 xl:min-w-0",
       palette.surface,
       entry.href ? palette.surfaceActive : "",
       // mobile: each card is its own pill; XL: they join into one strip
-      "rounded-2xl xl:rounded-none",
+      " xl:rounded-none",
       isFirst && "xl:rounded-l-2xl",
       isLast && "xl:rounded-r-2xl",
       // on XL: remove left border so cards share edges (joined strip effect)

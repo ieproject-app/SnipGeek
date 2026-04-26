@@ -170,7 +170,7 @@ function relativeTimeLabel(value?: string): string {
 const ADMIN_FILTER_SELECT_TRIGGER_CLASSNAME =
   "bg-background text-foreground hover:border-foreground/30 focus:border-accent";
 const ADMIN_SELECT_CONTENT_CLASSNAME =
-  "border-border bg-popover text-popover-foreground shadow-2xl";
+  "border-border bg-popover text-popover-foreground ";
 const ADMIN_SELECT_ITEM_CLASSNAME =
   "text-popover-foreground data-[state=checked]:bg-accent/10 data-[state=checked]:text-foreground data-[highlighted]:bg-accent/18 data-[highlighted]:text-foreground dark:data-[state=checked]:bg-accent/16 dark:data-[highlighted]:bg-accent/24";
 
@@ -1159,7 +1159,7 @@ export function ContentTable() {
   return (
     <div className="min-h-screen bg-background">
       {/* ── Header: eyebrow + title + compact funnel ─── */}
-      <header className="border-b border-border/70 bg-background px-4 py-5 md:px-6 lg:px-8">
+      <header className="border-b border-border bg-background px-4 py-5 md:px-6 lg:px-8">
         <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
           <div>
             <p className="font-mono text-[10px] font-bold uppercase tracking-[0.28em] text-muted-foreground">
@@ -1184,7 +1184,7 @@ export function ContentTable() {
       </header>
 
       {/* ── Stage tabs (sticky) ─── */}
-      <div className="sticky top-0 z-10 border-b border-border/70 bg-background/95 px-4 py-2 backdrop-blur-sm md:px-6 lg:px-8">
+      <div className="sticky top-0 z-10 border-b border-border bg-background px-4 py-2 md:px-6 lg:px-8">
         <div className="flex flex-wrap items-center gap-1">
                 {STAGE_TAB_ORDER.map((tab) => {
                   const active = stageTab === tab;
@@ -1195,10 +1195,10 @@ export function ContentTable() {
                       type="button"
                       onClick={() => handleStageTabChange(tab)}
                       className={cn(
-                        "inline-flex items-center gap-2 rounded-xl border px-3 py-1.5 font-mono text-[10px] font-bold uppercase tracking-widest transition-colors",
+                        "inline-flex items-center gap-2 border px-3 py-1.5 font-mono text-[10px] font-bold uppercase tracking-widest transition-colors",
                         active
                           ? "border-accent/50 bg-accent/10 text-foreground"
-                          : "border-transparent text-muted-foreground hover:border-border/70 hover:bg-card/50 hover:text-foreground",
+                          : "border-transparent text-muted-foreground hover:border-border hover:bg-card hover:text-foreground",
                       )}
                     >
                       <span className="sm:hidden">{STAGE_TAB_LABEL[tab].short}</span>
@@ -1207,8 +1207,8 @@ export function ContentTable() {
                         className={cn(
                           "inline-flex min-w-[1.25rem] items-center justify-center rounded-full border px-1 text-[9px] tabular-nums",
                           active
-                            ? "border-accent/30 bg-background/60 text-foreground"
-                            : "border-border/60 bg-card/40 text-muted-foreground",
+                            ? "border-accent/30 bg-background text-foreground"
+                            : "border-border bg-card text-muted-foreground",
                         )}
                       >
                         {count}
@@ -1220,7 +1220,7 @@ export function ContentTable() {
       </div>
 
       {/* ── Filter row ─── */}
-      <div className="border-b border-border/70 bg-background px-4 py-3 md:px-6 lg:px-8">
+      <div className="border-b border-border bg-background px-4 py-3 md:px-6 lg:px-8">
         <div className="flex flex-col gap-2 xl:flex-row xl:items-center">
           <div className="flex flex-wrap items-center gap-2">
             {/* search takes full width on mobile, inline on xl */}
@@ -1352,10 +1352,10 @@ export function ContentTable() {
                       type="button"
                       onClick={() => setBatchSize(n)}
                       className={cn(
-                        "flex-1 rounded-md border px-2 py-1 font-mono text-[10px] font-bold tabular-nums transition-colors",
+                        "flex-1 border px-2 py-1 font-mono text-[10px] font-bold tabular-nums transition-colors",
                         batchSize === n
                           ? "border-accent/50 bg-accent/10 text-foreground"
-                          : "border-border/60 bg-background text-muted-foreground hover:text-foreground",
+                          : "border-border bg-background text-muted-foreground hover:text-foreground",
                       )}
                     >
                       {n}
@@ -1405,7 +1405,7 @@ export function ContentTable() {
         </div>
 
         {advancedFiltersOpen ? (
-          <div className="mt-2 rounded-xl border border-border/70 bg-card/30 p-3">
+          <div className="mt-2 border border-border bg-card p-3">
             <div className="mb-2 flex items-center gap-2">
               <Filter className="h-4 w-4 text-muted-foreground" />
               <WorkspaceSectionLabel>Advanced filters</WorkspaceSectionLabel>
@@ -1477,13 +1477,13 @@ export function ContentTable() {
             <div
               key={item.id}
               style={{ animationDelay: `${idx * 30}ms` }}
-              className="group animate-[fadeSlideIn_0.25s_ease_both] rounded-2xl border border-border/70 bg-card/25 px-3.5 py-3 shadow-sm transition-colors hover:border-border"
+              className="group animate-[fadeSlideIn_0.25s_ease_both] border border-border bg-card px-3.5 py-3 transition-colors hover:border-border"
             >
               <div className="grid grid-cols-1 gap-3 md:grid-cols-[minmax(0,1fr)_auto] xl:grid-cols-[minmax(0,1fr)_170px_auto] xl:items-center">
                 {/* ── Content column ─── */}
                 <div className="min-w-0">
                   <div className="flex items-start gap-3">
-                    <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-xl border border-border/60 bg-background/50 text-muted-foreground">
+                    <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center border border-border bg-background/50 text-muted-foreground">
                       {typeIcon(item.type)}
                     </div>
 
