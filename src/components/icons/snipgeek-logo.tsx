@@ -56,14 +56,33 @@ export const SnipGeekLogo = ({
       aria-hidden
       {...props}
     >
-      {!isDark && (
-        <defs>
+      <defs>
+        {!isDark && (
           <linearGradient id={gradId} x1="0%" y1="0%" x2="100%" y2="100%">
             <stop offset="0%" stopColor="#0ea5e9" />
             <stop offset="100%" stopColor="#1d4ed8" />
           </linearGradient>
-        </defs>
-      )}
+        )}
+        {!noAnimate && (
+          <style>{`
+            @keyframes sg-${id} {
+              from { stroke-dashoffset: 100; }
+              to { stroke-dashoffset: 0; }
+            }
+            .sg-draw-${id} {
+              stroke-dasharray: 100;
+              stroke-dashoffset: 100;
+              animation: sg-${id} 1.4s cubic-bezier(0.4, 0, 0.2, 1) 0.1s forwards;
+            }
+            @media (prefers-reduced-motion: reduce) {
+              .sg-draw-${id} {
+                animation: none;
+                stroke-dashoffset: 0;
+              }
+            }
+          `}</style>
+        )}
+      </defs>
 
       <path
         d={APERTURE_PATH}
@@ -73,7 +92,7 @@ export const SnipGeekLogo = ({
         strokeWidth={6}
         strokeLinejoin="round"
         strokeLinecap="round"
-        className={noAnimate ? undefined : "snipgeek-logo-draw"}
+        className={noAnimate ? undefined : `sg-draw-${id}`}
       />
     </svg>
   );
