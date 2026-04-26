@@ -574,3 +574,34 @@
         transform: translateY(0);
     }
 }
+
+/* ── SnipGeek logo draw-on animation (one-shot, on mount/refresh) ───
+ *
+ * Path uses pathLength="100" so dasharray/offset can be expressed as
+ * percentages without measuring the actual path length at runtime.
+ * Animation plays once per mount; the layout-level <SnipGeekLogo /> in
+ * the public site header and admin sidebar mounts only on full refresh
+ * (Next.js App Router persists layouts across navigations), which is
+ * exactly the trigger we want.
+ * ──────────────────────────────────────────────────────────────────── */
+@keyframes snipgeek-logo-draw {
+    from {
+        stroke-dashoffset: 100;
+    }
+    to {
+        stroke-dashoffset: 0;
+    }
+}
+
+.snipgeek-logo-draw {
+    stroke-dasharray: 100;
+    stroke-dashoffset: 100;
+    animation: snipgeek-logo-draw 1.4s cubic-bezier(0.4, 0, 0.2, 1) 0.1s forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .snipgeek-logo-draw {
+        animation: none;
+        stroke-dashoffset: 0;
+    }
+}

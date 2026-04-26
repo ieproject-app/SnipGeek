@@ -1,20 +1,41 @@
 "use client";
 
-import React, { useEffect, useId, useState } from 'react';
-import { useTheme } from 'next-themes';
+import React, { useEffect, useId, useState } from "react";
+import { useTheme } from "next-themes";
 
-type SnipGeekLogoProps = React.SVGProps<SVGSVGElement>;
+type SnipGeekLogoProps = React.SVGProps<SVGSVGElement> & {
+  /** Disable the draw-on animation (e.g. inside dropdowns where it loops awkwardly). */
+  noAnimate?: boolean;
+};
 
 /**
- * SnipGeekLogo - Aperture-style mark with 3 triangular blades,
- * a solid outer ring, and a center focal dot.
+ * SnipGeekLogo — single-path aperture mark.
  *
- * Renders the Light or Dark variant based on the resolved theme from
- * next-themes (class-based). Falls back to the Light variant during SSR
- * and before hydration to avoid flash/invisible logo.
+ * Geometry: an outer ring with 3 inward triangular blade indents at the 12,
+ * 4, and 8 o'clock positions, drawn as one continuous closed path. The shape
+ * preserves the original 3-fold rotational symmetry but is now traceable in
+ * a single stroke — which lets us animate the draw on mount the same way
+ * threads.com does with its `@` logo.
+ *
+ * Coordinates assume a 100×100 viewBox centered at (50, 50) with ring
+ * radius 42 and blade tips reaching to a small inner radius (4) toward the
+ * center, leaving a tiny iris hole.
  */
+const APERTURE_PATH =
+  "M 60.87 9.43 " +
+  "A 42 42 0 0 1 90.57 60.87 " +
+  "L 53.46 52 " +
+  "L 79.7 79.7 " +
+  "A 42 42 0 0 1 20.3 79.7 " +
+  "L 46.54 52 " +
+  "L 9.43 60.87 " +
+  "A 42 42 0 0 1 39.13 9.43 " +
+  "L 50 46 " +
+  "Z";
+
 export const SnipGeekLogo = ({
   className,
+  noAnimate,
   ...props
 }: SnipGeekLogoProps) => {
   const id = useId().replace(/:/g, "");
@@ -25,20 +46,14 @@ export const SnipGeekLogo = ({
   useEffect(() => setMounted(true), []);
   const isDark = mounted && resolvedTheme === "dark";
 
-  // Blade polygon: apex at outer ring (50, 14), narrow base near center.
-  // Rotated 0°, 120°, 240° for a 3-blade aperture.
-  const bladePoints = "50,14 42,40 58,40";
-
-  const strokeColor = isDark ? "white" : `url(#${gradId})`;
-  const fillColor = isDark ? "white" : `url(#${gradId})`;
-  const dotColor = isDark ? "white" : "#bae6fd";
-  const dotOpacity = isDark ? 0.9 : 1;
+  const strokeColor = isDark ? "#ffffff" : `url(#${gradId})`;
 
   return (
     <svg
       viewBox="0 0 100 100"
       xmlns="http://www.w3.org/2000/svg"
       className={className}
+      aria-hidden
       {...props}
     >
       {!isDark && (
@@ -50,30 +65,16 @@ export const SnipGeekLogo = ({
         </defs>
       )}
 
-      {/* Outer ring */}
-      <circle
-        cx="50"
-        cy="50"
-        r="42"
+      <path
+        d={APERTURE_PATH}
+        pathLength={100}
         fill="none"
         stroke={strokeColor}
-        strokeWidth="5"
-      />
-
-      {/* 3 triangular blades */}
-      <g
-        fill={fillColor}
-        stroke={strokeColor}
-        strokeWidth="3"
+        strokeWidth={6}
         strokeLinejoin="round"
-      >
-        <polygon points={bladePoints} />
-        <polygon points={bladePoints} transform="rotate(120 50 50)" />
-        <polygon points={bladePoints} transform="rotate(240 50 50)" />
-      </g>
-
-      {/* Center focal dot */}
-      <circle cx="50" cy="50" r="5" fill={dotColor} fillOpacity={dotOpacity} />
+        strokeLinecap="round"
+        className={noAnimate ? undefined : "snipgeek-logo-draw"}
+      />
     </svg>
   );
 };
