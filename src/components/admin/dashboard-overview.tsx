@@ -473,7 +473,7 @@ export function DashboardOverview() {
       <div className="p-12">
         <div className="border-2 border-destructive/40 bg-destructive/5 p-8">
           <p className="font-mono text-[10px] font-bold uppercase tracking-[0.3em] text-destructive">
-            — Error
+            Error
           </p>
           <h2 className="mt-2 font-display text-3xl font-bold uppercase tracking-tighter text-destructive">
             Gagal memuat data
@@ -525,11 +525,11 @@ export function DashboardOverview() {
   return (
     <div className="min-h-screen bg-background">
       {/* ── Header: editorial title + live dot ─── */}
-      <header className="border-b border-border bg-background px-4 py-5 md:px-6">
+      <header className="border-b border-border bg-background px-4 py-5 md:px-6 lg:px-8">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <p className="font-mono text-[10px] font-bold uppercase tracking-[0.28em] text-muted-foreground">
-              — SnipGeek Control · W
+              SnipGeek Control · W
               {String(getIsoWeek(new Date()).week).padStart(2, "0")}
             </p>
             <h1 className="mt-1 font-display text-3xl font-bold tracking-[-0.03em]">
@@ -549,15 +549,15 @@ export function DashboardOverview() {
       </header>
 
       {/* ── Funnel: the workflow spine ─── */}
-      <section className="border-b border-border bg-background px-4 py-4 md:px-6">
+      <section className="border-b border-border bg-background px-4 py-4 md:px-6 lg:px-8">
         <p className="mb-3 font-mono text-[10px] font-bold uppercase tracking-[0.28em] text-muted-foreground">
-          — Pipeline
+          Pipeline
         </p>
         <StageFunnel stages={funnelStages} variant="full" />
       </section>
 
       {/* ── Body: queue (left) + cadence (right) ─── */}
-      <div className="flex flex-col gap-5 px-4 py-5 md:px-6 xl:flex-row">
+      <div className="flex flex-col gap-5 px-4 py-5 md:px-6 lg:px-8 xl:flex-row">
         {/* ── Priority queue ─── */}
         <section className="min-w-0 flex-1">
           <SectionHeader

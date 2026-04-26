@@ -33,47 +33,42 @@ export function PromptBuilder(props: PromptBuilderProps) {
 
   return (
     <PromptContext.Provider value={store}>
-      <div className="mx-auto w-full max-w-[1540px] space-y-4 pb-32">
+      <div className="min-h-screen bg-background">
         <PromptBuilderAdminHeader
           title={toolMeta.title}
           description={toolMeta.description}
-        />
-
-        <PromptBuilderAdminBar
           locale={props.locale}
           locales={props.locales}
           adminRouteBase={props.adminRouteBase}
           existingArticles={props.existingArticles}
         />
 
-        <div className="mb-2 w-full">
+        <div className="mx-auto w-full max-w-[1540px] space-y-4 px-4 py-5 pb-32 md:px-6 lg:px-8">
           <PromptBuilderControlStrip />
-        </div>
 
-        <div className="sticky top-18 z-40 mb-4 w-full">
-          <div className="border border-border bg-background p-2">
-            <div className="border border-border bg-card px-2.5 py-2.5">
+          <div className="sticky top-18 z-40">
+            <div className="border border-border bg-card p-2">
               <IslandToolbar />
             </div>
           </div>
-        </div>
 
-        <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(360px,420px)_minmax(0,1fr)] xl:gap-8">
-          <PromptBuilderRail
-            eyebrow="Source rail"
-            title="Source & configuration"
-            description="Pick workflow context, switch article source, and tune metadata plus mappings before generating the final prompt."
-          >
-            <LeftConfig />
-          </PromptBuilderRail>
+          <div className="grid grid-cols-1 gap-5 xl:grid-cols-[minmax(360px,420px)_minmax(0,1fr)] xl:gap-6">
+            <PromptBuilderRail
+              eyebrow="Source rail"
+              title="Source & configuration"
+              description="Pick workflow context, switch article source, and tune metadata plus mappings before generating the final prompt."
+            >
+              <LeftConfig />
+            </PromptBuilderRail>
 
-          <PromptBuilderRail
-            eyebrow="Draft rail"
-            title="Drafting & revision workspace"
-            description="Write the source brief, inspect original content, and shape final modification instructions in one focused workspace."
-          >
-            <RightWorkspace />
-          </PromptBuilderRail>
+            <PromptBuilderRail
+              eyebrow="Draft rail"
+              title="Drafting & revision workspace"
+              description="Write the source brief, inspect original content, and shape final modification instructions in one focused workspace."
+            >
+              <RightWorkspace />
+            </PromptBuilderRail>
+          </div>
         </div>
 
         <StickyBottomBar />
@@ -85,44 +80,13 @@ export function PromptBuilder(props: PromptBuilderProps) {
 function PromptBuilderAdminHeader({
   title,
   description,
-}: {
-  title: string;
-  description: string;
-}) {
-  return (
-    <section className="border border-border bg-card p-4 md:p-4">
-      <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-        <div className="max-w-3xl">
-          <p className="font-mono text-[10px] font-bold uppercase tracking-[0.28em] text-muted-foreground">
-            Admin workspace
-          </p>
-          <h1 className="mt-1.5 font-display text-2xl font-bold tracking-tight text-foreground md:text-3xl">
-            {title}
-          </h1>
-          <p className="mt-1.5 max-w-2xl text-sm leading-relaxed text-muted-foreground">
-            {description}
-          </p>
-        </div>
-
-        <div className="flex flex-wrap gap-2 lg:justify-end">
-          <span className="inline-flex items-center border border-border bg-background px-2 py-1 font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-foreground">
-            Admin only
-          </span>
-          <span className="inline-flex items-center border border-border bg-background px-2 py-1 font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-foreground">
-            Create + modify
-          </span>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function PromptBuilderAdminBar({
   locale,
   locales,
   adminRouteBase,
   existingArticles,
 }: {
+  title: string;
+  description: string;
   locale: string;
   locales?: readonly string[];
   adminRouteBase?: string;
@@ -133,91 +97,58 @@ function PromptBuilderAdminBar({
   const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
   const localeOptions = locales && locales.length > 0 ? [...locales] : ["en", "id"];
+
   const stats = useMemo(() => {
     const drafts = existingArticles.filter((article) => !article.published).length;
     const published = existingArticles.length - drafts;
-    const blogs = existingArticles.filter((article) => article.type === "blog").length;
-    const notes = existingArticles.filter((article) => article.type === "note").length;
-
-    return {
-      total: existingArticles.length,
-      drafts,
-      published,
-      blogs,
-      notes,
-    };
+    return { total: existingArticles.length, drafts, published };
   }, [existingArticles]);
 
   const handleLocaleChange = (nextLocale: string) => {
     if (nextLocale === locale) return;
-
     const params = new URLSearchParams(searchParams.toString());
     params.set("locale", nextLocale);
     const basePath = adminRouteBase || pathname || "/admin/prompt-generator";
-
     startTransition(() => {
       router.push(`${basePath}?${params.toString()}`);
     });
   };
 
   return (
-    <div className="border border-border bg-card p-3.5 md:p-4">
-      <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
-        <div className="space-y-2 xl:max-w-4xl">
+    <header className="border-b border-border bg-background px-4 py-5 md:px-6 lg:px-8">
+      <div className="mx-auto flex w-full max-w-[1540px] flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <div className="min-w-0">
           <p className="font-mono text-[10px] font-bold uppercase tracking-[0.28em] text-muted-foreground">
-            Editorial operations
+            Editorial · Prompt Generator
           </p>
-          <div className="flex flex-wrap gap-2 text-[11px] text-muted-foreground">
-            <span className="border border-border bg-background px-2 py-1 font-mono font-bold uppercase tracking-[0.18em] text-foreground">
-              {locale.toUpperCase()} active
-            </span>
-            <span className="border border-border bg-background px-2 py-1 font-mono font-bold uppercase tracking-[0.18em]">
-              {stats.total} entries loaded
-            </span>
-            <span className="border border-amber-500/40 bg-amber-500/10 px-2 py-1 font-mono font-bold uppercase tracking-[0.18em] text-amber-700 dark:text-amber-300">
-              {stats.drafts} drafts queued
-            </span>
-            <span className="border border-border bg-background px-2 py-1 font-mono font-bold uppercase tracking-[0.18em]">
-              {stats.published} published ready
-            </span>
-            <span className="border border-border bg-background px-2 py-1 font-mono font-bold uppercase tracking-[0.18em]">
-              {stats.blogs} blogs · {stats.notes} notes
-            </span>
-          </div>
-          <p className="text-xs leading-relaxed text-muted-foreground">
-            Use this admin workspace to prepare new briefs, inspect existing articles, and push revision-ready prompts without leaving the editorial shell.
+          <h1 className="mt-1 font-display text-3xl font-bold tracking-[-0.03em]">
+            {title}
+          </h1>
+          <p className="mt-1 text-xs text-muted-foreground">
+            {stats.total} entries · {stats.published} published · {stats.drafts} drafts · {description}
           </p>
         </div>
-
-        <div className="space-y-1.5 xl:min-w-[250px] xl:max-w-[280px]">
-          <p className="font-mono text-[9px] font-bold uppercase tracking-[0.24em] text-muted-foreground xl:text-right">
-            Content locale
-          </p>
-          <div className="flex flex-wrap gap-2 xl:justify-end">
-            {localeOptions.map((localeOption) => (
-              <button
-                key={localeOption}
-                type="button"
-                disabled={isPending}
-                onClick={() => handleLocaleChange(localeOption)}
-                className={cn(
-                  "inline-flex min-w-[72px] items-center justify-center border px-3 py-1.5 font-mono text-[10px] font-bold uppercase tracking-[0.22em] transition-colors",
-                  localeOption === locale
-                    ? "border-accent bg-accent/10 text-foreground"
-                    : "border-border bg-background text-muted-foreground hover:bg-muted hover:text-foreground",
-                  isPending && "cursor-wait opacity-70",
-                )}
-              >
-                {localeOption}
-              </button>
-            ))}
-          </div>
-          <p className="text-[10px] text-muted-foreground xl:text-right">
-            Switching locale refreshes dictionary copy, draft inventory, and original-content lookup for this workspace.
-          </p>
+        <div className="flex flex-wrap items-center gap-1">
+          {localeOptions.map((localeOption) => (
+            <button
+              key={localeOption}
+              type="button"
+              disabled={isPending}
+              onClick={() => handleLocaleChange(localeOption)}
+              className={cn(
+                "inline-flex h-8 min-w-[3rem] items-center justify-center border px-3 font-mono text-[10px] font-bold uppercase tracking-widest transition-colors",
+                localeOption === locale
+                  ? "border-accent bg-accent/10 text-foreground"
+                  : "border-border bg-background text-muted-foreground hover:bg-muted hover:text-foreground",
+                isPending && "cursor-wait opacity-70",
+              )}
+            >
+              {localeOption}
+            </button>
+          ))}
         </div>
       </div>
-    </div>
+    </header>
   );
 }
 
@@ -319,19 +250,19 @@ function PromptBuilderRail({
   children: React.ReactNode;
 }) {
   return (
-    <section className="border border-border bg-card p-4 md:p-5">
-      <div className="border-b border-border pb-4">
+    <section className="border border-border bg-card">
+      <div className="border-b border-border bg-muted/30 px-4 py-3">
         <p className="font-mono text-[9px] font-bold uppercase tracking-[0.26em] text-muted-foreground">
           {eyebrow}
         </p>
-        <h2 className="mt-2 font-display text-xl font-bold tracking-tight text-foreground">
+        <h2 className="mt-1 font-display text-base font-bold tracking-tight text-foreground">
           {title}
         </h2>
-        <p className="mt-1 max-w-2xl text-sm leading-relaxed text-muted-foreground">
+        <p className="mt-1 max-w-2xl text-xs leading-relaxed text-muted-foreground">
           {description}
         </p>
       </div>
-      <div className="mt-5">
+      <div className="p-4 md:p-5">
         {children}
       </div>
     </section>

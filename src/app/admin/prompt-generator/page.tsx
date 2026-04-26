@@ -65,17 +65,15 @@ export default async function AdminPromptGeneratorPage({
 
   return (
     <AdminShell>
-      <div className="min-h-screen bg-background px-4 py-5 md:px-6">
-        <PromptBuilder
-          dictionary={pageContent}
-          fullDictionary={dictionary}
-          existingArticles={existingArticles}
-          availableTags={availableTags}
-          locale={locale}
-          adminRouteBase="/admin/prompt-generator"
-          locales={i18n.locales}
-        />
-      </div>
+      <PromptBuilder
+        dictionary={pageContent}
+        fullDictionary={dictionary}
+        existingArticles={existingArticles}
+        availableTags={availableTags}
+        locale={locale}
+        adminRouteBase="/admin/prompt-generator"
+        locales={i18n.locales}
+      />
     </AdminShell>
   );
 }

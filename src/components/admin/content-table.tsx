@@ -1163,7 +1163,7 @@ export function ContentTable() {
         <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
           <div>
             <p className="font-mono text-[10px] font-bold uppercase tracking-[0.28em] text-muted-foreground">
-              — Workspace
+              Workspace · Index Monitor
             </p>
             <h1 className="mt-1 font-display text-3xl font-bold tracking-[-0.03em]">
               Index Monitor
