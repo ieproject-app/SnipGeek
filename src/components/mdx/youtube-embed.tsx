@@ -38,21 +38,24 @@ export function YouTubeEmbed({ videoid, title }: YouTubeEmbedProps) {
   const thumbnailUrl = `https://i.ytimg.com/vi/${videoid}/hqdefault.jpg`;
   const resolvedTitle = title ?? "YouTube video player";
 
-  return (
-    <span ref={containerRef} className="block my-8 w-full">
-      <span
-        className="block relative w-full rounded-xl overflow-hidden bg-black"
-        style={{ paddingBottom: "56.25%" }}
-      >
-        {shouldLoad ? (
-          <iframe
-            src={`https://www.youtube-nocookie.com/embed/${videoid}`}
-            title={resolvedTitle}
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowFullScreen
-            className="absolute inset-0 w-full h-full border-0"
-          />
-        ) : (
+    const origin = typeof window !== "undefined" ? window.location.origin : "";
+    const src = `https://www.youtube.com/embed/${videoid}?origin=${origin}&rel=0`;
+
+    return (
+      <span ref={containerRef} className="block my-8 w-full">
+        <span
+          className="block relative w-full rounded-xl overflow-hidden bg-black"
+          style={{ paddingBottom: "56.25%" }}
+        >
+          {shouldLoad ? (
+            <iframe
+              src={src}
+              title={resolvedTitle}
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+              className="absolute inset-0 w-full h-full border-0"
+            />
+          ) : (
           /* Thumbnail placeholder — zero iframe cost */
           <span className="absolute inset-0 flex items-center justify-center">
             {/* eslint-disable-next-line @next/next/no-img-element */}

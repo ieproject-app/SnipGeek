@@ -1354,8 +1354,13 @@ export function usePromptLogic({
       }
     }
 
+    prompt += `\n**3A. YOUTUBE EMBED POLICY**\n`;
+    prompt += `- To embed a YouTube video, ALWAYS use the \`<YouTubeEmbed videoid="XXX" />\` component.\n`;
+    prompt += `- NEVER use raw <iframe> tags or markdown links for YouTube videos.\n`;
+    prompt += `- Example: \`<YouTubeEmbed videoid="ogfYd705cRs" />\`\n`;
+
     if (!isModify && hasBodyImages && captionMode !== "off") {
-      prompt += `\n**3A. IMAGE CAPTION POLICY**\n`;
+      prompt += `\n**3B. IMAGE CAPTION POLICY**\n`;
       prompt += `- Caption Mode: ${captionMode.toUpperCase()}\n`;
       prompt += `- Alignment: ${captionAlignment.toUpperCase()} (${captionAlignmentClass})\n`;
       prompt += `- Coverage: ${captionCoverage.toUpperCase()}\n`;

@@ -1,0 +1,61 @@
+---
+title: "Fixing Infinite Loading on YouTube Embeds in Firefox"
+slug: "fix-youtube-embed-infinite-loading-firefox"
+translationKey: "fix-youtube-embed-infinite-loading-firefox"
+date: "2026-04-26"
+description: "How to fix YouTube embeds getting stuck on an infinite loading spinner in Firefox by adjusting CSP directives and embed parameters."
+category: "Web"
+tags: ["web", "debugging", "nextjs", "error-fix"]
+published: true
+---
+
+I recently ran into a frustrating issue where YouTube embeds in my Next.js project worked perfectly in Chrome, but got stuck on an infinite loading spinner in Firefox. The player UI loaded, but the video stream never started.
+
+After digging into Firefox's strict security policies, I found that the issue stems from a combination of strict Content Security Policy (CSP) enforcement and Enhanced Tracking Protection. Here is how I finally resolved it.
+
+## The Core Issues
+
+Firefox is highly disciplined about `worker-src` and `media-src`. YouTube relies heavily on service workers to manage video streaming segments (from `googlevideo.com`). If these aren't explicitly whitelisted, Firefox silently blocks the stream. Additionally, Firefox's tracking protection sometimes aggressively blocks `youtube-nocookie.com` embeds, treating them as third-party tracking workarounds.
+
+## The Solution
+
+<Steps>
+  <Step>
+  ### 1. Broaden CSP Directives
+  You must explicitly allow YouTube and Google domains across multiple CSP directives, particularly `worker-src` and `media-src`. Update your `next.config.ts` to include these:
+
+  ```typescript
+  // Connect and Media sources need the actual video CDNs
+  const mediaAndConnectSrc = "https://*.googlevideo.com https://*.ytimg.com https://*.youtube.com https://*.youtube-nocookie.com https://*.google.com";
+
+  // Workers are critical for Firefox
+  `worker-src 'self' blob: https://*.youtube.com https://*.youtube-nocookie.com`,
+  ```
+  </Step>
+
+  <Step>
+  ### 2. Adjust Referrer-Policy
+  YouTube often needs to verify where the embed request originates. If your `Referrer-Policy` is too strict (like `strict-origin-when-cross-origin`), it might strip necessary context. Downgrading it slightly helps:
+
+  ```typescript
+  {
+    key: "Referrer-Policy",
+    value: "no-referrer-when-downgrade",
+  }
+  ```
+  </Step>
+
+  <Step>
+  ### 3. Avoid Nocookie Domain and Append Origin
+  If the video still spins, Firefox's Enhanced Tracking Protection might be blocking the nocookie domain. Switch back to the standard `youtube.com` domain and explicitly pass your site's origin.
+
+  ```tsx
+  const origin = typeof window !== "undefined" ? window.location.origin : "";
+  const src = `https://www.youtube.com/embed/${videoid}?origin=${origin}&rel=0`;
+
+  <iframe src={src} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen />
+  ```
+  </Step>
+</Steps>
+
+By combining a more permissive CSP for YouTube's specific CDNs and passing an explicit origin, the embed now streams reliably across all browsers.

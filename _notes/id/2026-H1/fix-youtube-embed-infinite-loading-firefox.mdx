@@ -1,0 +1,61 @@
+---
+title: "Mengatasi YouTube Embed Muter-Muter Terus di Firefox"
+slug: "fix-youtube-embed-infinite-loading-firefox"
+translationKey: "fix-youtube-embed-infinite-loading-firefox"
+date: "2026-04-26"
+description: "Cara memperbaiki video embed YouTube yang nyangkut di loading spinner pada Firefox dengan menyesuaikan aturan CSP dan parameter embed."
+category: "Web"
+tags: ["web", "debugging", "nextjs", "error-fix"]
+published: true
+---
+
+Baru-baru ini saya menghadapi masalah yang cukup menjengkelkan: embed video YouTube di proyek Next.js saya berjalan lancar di Chrome, tapi terus-menerus *loading* (muter-muter) saat dibuka di Firefox. UI dari player berhasil dimuat, tapi *stream* videonya tidak pernah mulai.
+
+Setelah menelusuri kebijakan keamanan Firefox yang ketat, saya menemukan bahwa akar masalahnya ada pada kombinasi aturan *Content Security Policy* (CSP) dan *Enhanced Tracking Protection*. Berikut cara saya mengatasinya.
+
+## Penyebab Utama
+
+Firefox sangat disiplin dalam menerapkan aturan `worker-src` dan `media-src`. YouTube sangat bergantung pada *service workers* untuk mengambil segmen video (dari `googlevideo.com`). Jika domain ini tidak diizinkan secara eksplisit, Firefox akan memblokir *stream* tersebut secara diam-diam. Selain itu, fitur perlindungan pelacakan Firefox terkadang memblokir embed dari `youtube-nocookie.com` karena dicurigai sebagai trik pelacakan pihak ketiga.
+
+## Solusi
+
+<Steps>
+  <Step>
+  ### 1. Perluas Aturan CSP
+  Kamu harus mengizinkan domain YouTube dan Google secara eksplisit di beberapa arahan CSP, terutama `worker-src` dan `media-src`. Perbarui `next.config.ts` kamu dengan menambahkan ini:
+
+  ```typescript
+  // Connect dan Media butuh akses ke CDN video asli
+  const mediaAndConnectSrc = "https://*.googlevideo.com https://*.ytimg.com https://*.youtube.com https://*.youtube-nocookie.com https://*.google.com";
+
+  // Workers sangat krusial untuk Firefox
+  `worker-src 'self' blob: https://*.youtube.com https://*.youtube-nocookie.com`,
+  ```
+  </Step>
+
+  <Step>
+  ### 2. Sesuaikan Referrer-Policy
+  YouTube sering kali perlu memverifikasi dari mana permintaan *embed* itu berasal. Jika `Referrer-Policy` kamu terlalu ketat (misalnya `strict-origin-when-cross-origin`), informasi penting bisa terpotong. Menurunkannya sedikit akan sangat membantu:
+
+  ```typescript
+  {
+    key: "Referrer-Policy",
+    value: "no-referrer-when-downgrade",
+  }
+  ```
+  </Step>
+
+  <Step>
+  ### 3. Hindari Domain Nocookie dan Tambahkan Origin
+  Jika video masih saja *loading*, kemungkinan besar *Enhanced Tracking Protection* memblokir domain nocookie tersebut. Kembalilah menggunakan domain standar `youtube.com` dan berikan parameter *origin* situs kamu secara eksplisit.
+
+  ```tsx
+  const origin = typeof window !== "undefined" ? window.location.origin : "";
+  const src = `https://www.youtube.com/embed/${videoid}?origin=${origin}&rel=0`;
+
+  <iframe src={src} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen />
+  ```
+  </Step>
+</Steps>
+
+Dengan menggabungkan CSP yang lebih ramah untuk CDN spesifik YouTube dan menyertakan parameter *origin*, embed video sekarang bisa diputar dengan lancar di semua browser.

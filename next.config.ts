@@ -26,7 +26,12 @@ const scriptSrcDirectives = [
   `https://*.firebaseapp.com`, // Firebase Auth handler
   `https://giscus.app`, // Giscus comments
   `https://www.youtube.com`, // YouTubeEmbed player script
+  `https://*.youtube.com`,
   `https://www.youtube-nocookie.com`, // YouTubeEmbed privacy-enhanced player
+  `https://*.youtube-nocookie.com`,
+  `https://s.ytimg.com`, // YouTube static assets
+  `https://*.google.com`, // Google scripts
+  `https://*.gstatic.com`, // Google static assets
 ].join(" ");
 
 const cspDirectives = [
@@ -38,10 +43,10 @@ const cspDirectives = [
   [`script-src`, scriptSrcDirectives].join(" "),
 
   // Styles: self + inline (Tailwind/CSS-in-JS needs unsafe-inline)
-  `style-src 'self' 'unsafe-inline' https://fonts.googleapis.com`,
+  `style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://*.youtube.com https://*.youtube-nocookie.com`,
 
   // Fonts
-  `font-src 'self' https://fonts.gstatic.com`,
+  `font-src 'self' data: https://fonts.gstatic.com https://*.gstatic.com https://*.youtube.com https://*.youtube-nocookie.com`,
 
   // Images: self + data URIs + all HTTPS
   [
@@ -80,13 +85,16 @@ const cspDirectives = [
     `https://giscus.app`,                               // Giscus comments
     `https://*.googlevideo.com`,                       // YouTube video segment CDN
     `https://*.ytimg.com`,                             // YouTube thumbnails & static assets
+    `https://*.youtube.com`,
+    `https://*.youtube-nocookie.com`,
+    `https://*.google.com`,
   ].join(" "),
 
   // Media (audio/video): self + blob + YouTube CDN (needed for Firefox)
-  `media-src 'self' blob: https://*.googlevideo.com https://*.ytimg.com`,
+  `media-src 'self' blob: https://*.googlevideo.com https://*.ytimg.com https://*.youtube.com https://*.youtube-nocookie.com`,
 
-  // Workers (Next.js service worker, if any)
-  `worker-src 'self' blob:`,
+  // Workers (Next.js service worker, if any) + YouTube workers for Firefox
+  `worker-src 'self' blob: https://*.youtube.com https://*.youtube-nocookie.com`,
 
   // Object embeds: none
   `object-src 'none'`,
@@ -109,9 +117,9 @@ const securityHeaders = [
     value: "SAMEORIGIN",
   },
   {
-    // Send full referrer for same-origin, origin-only for cross-origin
+    // Send full referrer for same-origin, but still provide enough info for cross-origin
     key: "Referrer-Policy",
-    value: "strict-origin-when-cross-origin",
+    value: "no-referrer-when-downgrade",
   },
   {
     // Restrict access to sensitive browser features
