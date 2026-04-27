@@ -7,11 +7,13 @@ import {
   getStaticPageLastUpdated,
   getStaticPageTitle,
   getStaticPageCanonicalPath,
+  getStaticPageAltLocale,
 } from "@/lib/static-pages";
 import {
   LayoutLegalPageTemplate,
   resolveLegalPageIcon,
 } from "@/components/layout/legal-page-template";
+import { getReadingTime } from "@/lib/reading-time";
 
 export async function generateMetadata({
   params,
@@ -38,6 +40,8 @@ export default async function TermsPage({
   const { locale } = await params;
   const { frontmatter, content } = await getStaticPageData("terms", locale);
   const canonicalPath = getStaticPageCanonicalPath("terms", locale);
+  const altLocale = getStaticPageAltLocale("terms", locale);
+  const { minutes: readingMinutes } = getReadingTime(content);
 
   const title =
     getStaticPageTitle(
@@ -60,11 +64,28 @@ export default async function TermsPage({
       }
       icon={resolveLegalPageIcon(frontmatter.icon)}
       canonicalUrl={`https://snipgeek.com${canonicalPath}`}
+      locale={locale}
+      readingMinutes={readingMinutes}
+      altLocaleHref={altLocale?.href}
+      altLocaleLabel={altLocale?.label}
       footerNote={
         locale === "id"
           ? "Dengan terus menggunakan SnipGeek, Anda dianggap menyetujui ketentuan yang berlaku."
           : "By continuing to use SnipGeek, you are considered to have accepted the applicable terms."
       }
+      footerCtas={[
+        {
+          label: locale === "id" ? "Hubungi kami" : "Contact us",
+          href: locale === "id" ? "/id/contact" : "/contact",
+        },
+        {
+          label:
+            locale === "id"
+              ? "Lihat Kebijakan Privasi"
+              : "View Privacy Policy",
+          href: locale === "id" ? "/id/privacy" : "/privacy",
+        },
+      ]}
     />
   );
 }

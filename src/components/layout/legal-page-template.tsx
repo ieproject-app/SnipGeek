@@ -7,6 +7,12 @@ import { mdxComponents } from "@/components/mdx-components";
 import { cn } from "@/lib/utils";
 import { extractHeadings, type Heading } from "@/lib/mdx-utils";
 import { TocSidebar, TocMobile } from "@/components/layout/toc-sidebar";
+import { StaticPageHeader } from "@/components/layout/static-page-header";
+import {
+  StaticPageFooterCard,
+  type StaticPageFooterCta,
+} from "@/components/layout/static-page-footer";
+import { ReadingProgress } from "@/components/layout/reading-progress";
 import type { ComponentType, SVGProps } from "react";
 import {
   Shield,
@@ -27,6 +33,7 @@ import {
   HandCoins,
   RefreshCw,
   MessageSquare,
+  Hash,
 } from "lucide-react";
 
 type IconComponent = ComponentType<SVGProps<SVGSVGElement>>;
@@ -39,7 +46,12 @@ type LegalPageTemplateProps = {
   badgeLabel?: string;
   icon?: IconComponent;
   footerNote?: string;
+  footerCtas?: StaticPageFooterCta[];
   canonicalUrl?: string;
+  locale?: string;
+  readingMinutes?: number;
+  altLocaleHref?: string;
+  altLocaleLabel?: string;
 };
 
 const sectionIconMap: Record<string, IconComponent> = {
@@ -119,13 +131,20 @@ const iconMap: Record<string, IconComponent> = {
   badgeinfo: BadgeInfo,
 };
 
-export function resolveLegalPageIcon(icon?: string | IconComponent): IconComponent {
+export function resolveLegalPageIcon(
+  icon?: string | IconComponent,
+): IconComponent {
   if (!icon) return FileText;
   if (typeof icon !== "string") return icon;
 
   const normalized = icon.replace(/[\s_-]/g, "").toLowerCase();
   return iconMap[normalized] || FileText;
 }
+
+const tocLabels: Record<string, string> = {
+  en: "Contents",
+  id: "Daftar isi",
+};
 
 export function LayoutLegalPageTemplate({
   title,
@@ -135,12 +154,19 @@ export function LayoutLegalPageTemplate({
   badgeLabel = "Official Document",
   icon: Icon = FileText,
   footerNote,
+  footerCtas,
   canonicalUrl = "https://snipgeek.com",
+  locale = "en",
+  readingMinutes,
+  altLocaleHref,
+  altLocaleLabel,
 }: LegalPageTemplateProps) {
   const headings: Heading[] = extractHeadings(content);
+  const tocLabel = tocLabels[locale] ?? tocLabels.en;
 
   return (
     <div className="w-full">
+      <ReadingProgress />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -150,42 +176,23 @@ export function LayoutLegalPageTemplate({
             name: title,
             description: description,
             url: canonicalUrl,
-            inLanguage: "en",
+            inLanguage: locale,
           }),
         }}
       />
       <main className="mx-auto max-w-7xl px-4 pt-12 pb-24 sm:px-6 lg:px-8">
-        <ScrollReveal direction="down" delay={0.05}>
-          <header className="mb-10 space-y-4 text-center">
-            <div className="inline-flex items-center gap-2 rounded-full border border-accent/20 bg-accent/10 px-3 py-1.5 text-[11px] font-black uppercase tracking-widest text-accent">
-              <Icon className="h-3.5 w-3.5" />
-              {badgeLabel}
-            </div>
-
-            <h1
-              className="font-display font-black tracking-tighter text-primary"
-              style={{
-                fontSize: "clamp(2rem, 1.75rem + 1.25vw, 3rem)",
-                lineHeight: "1.1",
-                letterSpacing: "-0.03em",
-              }}
-            >
-              {title}
-            </h1>
-
-            {description ? (
-              <p className="mx-auto max-w-2xl text-lg leading-relaxed text-muted-foreground">
-                {description}
-              </p>
-            ) : null}
-
-            {lastUpdated ? (
-              <p className="text-sm font-mono text-muted-foreground/60">
-                Last updated: <time dateTime={lastUpdated}>{lastUpdated}</time>
-              </p>
-            ) : null}
-          </header>
-        </ScrollReveal>
+        <StaticPageHeader
+          title={title}
+          description={description}
+          badgeLabel={badgeLabel}
+          icon={Icon}
+          lastUpdated={lastUpdated}
+          readingMinutes={readingMinutes}
+          locale={locale}
+          altLocaleHref={altLocaleHref}
+          altLocaleLabel={altLocaleLabel}
+          className="mb-10"
+        />
 
         {/* Mobile TOC — horizontal scroll pills */}
         {headings.length > 0 && (
@@ -203,7 +210,7 @@ export function LayoutLegalPageTemplate({
               <div className="sticky top-24">
                 <div className="w-[200px] rounded-2xl border border-primary/10 bg-card/30 p-4 backdrop-blur-sm">
                   <p className="mb-3 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">
-                    Contents
+                    {tocLabel}
                   </p>
                   <TocSidebar headings={headings} />
                 </div>
@@ -222,13 +229,7 @@ export function LayoutLegalPageTemplate({
           <div className="hidden lg:block" />
         </div>
 
-        {footerNote ? (
-          <ScrollReveal direction="up" delay={0.15}>
-            <div className="mt-10 rounded-xl border border-accent/20 bg-accent/5 p-5 text-center">
-              <p className="text-sm text-muted-foreground">{footerNote}</p>
-            </div>
-          </ScrollReveal>
-        ) : null}
+        <StaticPageFooterCard note={footerNote} ctas={footerCtas} />
       </main>
     </div>
   );
@@ -236,7 +237,10 @@ export function LayoutLegalPageTemplate({
 
 /**
  * Renders MDX content with each H2 section wrapped in its own card.
- * Uses a custom h2 component that injects the section icon and card styling.
+ * Uses a custom h2 component that injects:
+ *  - section index pill (01 / N)
+ *  - section icon
+ *  - hover anchor `#` affordance
  */
 function LegalSectionCards({
   content,
@@ -246,6 +250,8 @@ function LegalSectionCards({
   headings: Heading[];
 }) {
   const h2Headings = headings.filter((h) => h.level === 2);
+  const totalSections = h2Headings.length;
+  const totalLabel = String(totalSections).padStart(2, "0");
 
   const legalMdxComponents = {
     ...mdxComponents,
@@ -259,50 +265,55 @@ function LegalSectionCards({
       class?: string;
       className?: string;
     } & React.HTMLAttributes<HTMLElement>) => {
-      const id = children
-        ? String(
-            React.Children.toArray(children)
-              .map((c) => (typeof c === "string" ? c : ""))
-              .join(""),
-          )
-            .trim()
-        : "";
+      const text = String(
+        React.Children.toArray(children ?? [])
+          .map((c) => (typeof c === "string" ? c : ""))
+          .join(""),
+      ).trim();
 
-      // Find matching heading to get the icon
-      const heading = h2Headings.find((h) => {
-        const text = String(
-          React.Children.toArray(children ?? [])
-            .map((c) => (typeof c === "string" ? c : ""))
-            .join(""),
-        ).trim();
-        return h.text === text;
-      });
+      const headingIndex = h2Headings.findIndex((h) => h.text === text);
+      const heading = headingIndex >= 0 ? h2Headings[headingIndex] : undefined;
+      const SectionIcon = heading ? getSectionIcon(heading.id) : FileText;
+      const id = heading?.id ?? extractIdFromChildren(children);
 
-      const SectionIcon = heading
-        ? getSectionIcon(heading.id)
-        : FileText;
+      const indexLabel =
+        headingIndex >= 0 ? String(headingIndex + 1).padStart(2, "0") : "";
 
       return (
-        <div className="mt-10 mb-4 first:mt-0">
-          <div className="flex items-center gap-3 mb-3">
+        <div className="group/section mt-12 mb-4 first:mt-0">
+          <div className="mb-3 flex items-start gap-3">
             <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-primary/15 bg-primary/10">
               <SectionIcon className="h-4 w-4 text-primary" />
             </div>
-            <h2
-              id={
-                children
-                  ? extractIdFromChildren(children)
-                  : undefined
-              }
-              className={cn(
-                "font-display text-lg font-black tracking-tighter leading-snug text-primary scroll-mt-24",
-                _class,
-                className,
-              )}
-              {...props}
-            >
-              {children}
-            </h2>
+            <div className="min-w-0 flex-1">
+              <p className="mb-1 text-[10px] font-mono font-semibold uppercase tracking-[0.2em] text-muted-foreground/60">
+                {indexLabel}
+                <span className="mx-1 text-muted-foreground/40">/</span>
+                {totalLabel}
+              </p>
+              <div className="flex items-center gap-2">
+                <h2
+                  id={id}
+                  className={cn(
+                    "font-display text-lg font-black tracking-tighter leading-snug text-primary scroll-mt-24",
+                    _class,
+                    className,
+                  )}
+                  {...props}
+                >
+                  {children}
+                </h2>
+                {id ? (
+                  <a
+                    href={`#${id}`}
+                    aria-label={`Anchor link to ${text}`}
+                    className="opacity-0 transition-opacity group-hover/section:opacity-100 focus:opacity-100"
+                  >
+                    <Hash className="h-3.5 w-3.5 text-muted-foreground/60 hover:text-primary" />
+                  </a>
+                ) : null}
+              </div>
+            </div>
           </div>
           <div className="h-0.5 w-full bg-linear-to-r from-accent/50 via-accent/25 to-transparent" />
         </div>

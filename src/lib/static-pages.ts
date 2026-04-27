@@ -59,6 +59,26 @@ export function getStaticPageLanguageAlternates(
   return languages;
 }
 
+const altLocaleLabels: Record<string, string> = {
+  en: "English",
+  id: "Bahasa Indonesia",
+};
+
+export function getStaticPageAltLocale(
+  slug: StaticPageSlug,
+  locale: string,
+): { href: string; label: string } | undefined {
+  const current = resolveLocale(locale);
+  const alt = i18n.locales.find((l) => l !== current);
+  if (!alt) return undefined;
+
+  const href =
+    alt === i18n.defaultLocale ? `/${slug}` : `/${alt}/${slug}`;
+  const label = altLocaleLabels[alt] ?? alt.toUpperCase();
+
+  return { href, label };
+}
+
 export async function getStaticPageData(
   slug: StaticPageSlug,
   locale?: string,

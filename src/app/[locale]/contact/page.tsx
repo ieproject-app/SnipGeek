@@ -7,8 +7,12 @@ import {
   getStaticPageLastUpdated,
   getStaticPageTitle,
   getStaticPageCanonicalPath,
+  getStaticPageAltLocale,
 } from "@/lib/static-pages";
 import { resolveLegalPageIcon } from "@/components/layout/legal-page-template";
+import { StaticPageHeader } from "@/components/layout/static-page-header";
+import { StaticPageFooterCard } from "@/components/layout/static-page-footer";
+import { ReadingProgress } from "@/components/layout/reading-progress";
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -127,12 +131,17 @@ export default async function ContactPage({
   const { locale } = await params;
   const { frontmatter } = await getStaticPageData("contact", locale);
   const canonicalPath = getStaticPageCanonicalPath("contact", locale);
+  const altLocale = getStaticPageAltLocale("contact", locale);
 
   const title = getStaticPageTitle(frontmatter, locale === "id" ? "Kontak" : "Contact") || (locale === "id" ? "Kontak" : "Contact");
   const description = getStaticPageDescription(frontmatter);
   const lastUpdated = getStaticPageLastUpdated(frontmatter);
-  const badgeLabel = frontmatter.badgeLabel || (locale === "id" ? "Kontak Resmi" : "Official Contact");
-  const Icon = resolveLegalPageIcon(frontmatter.icon);
+  const badgeLabel = typeof frontmatter.badgeLabel === "string" && frontmatter.badgeLabel
+    ? frontmatter.badgeLabel
+    : (locale === "id" ? "Kontak Resmi" : "Official Contact");
+  const Icon = resolveLegalPageIcon(
+    typeof frontmatter.icon === "string" ? frontmatter.icon : undefined,
+  );
 
   const categories = contactCategories[locale as keyof typeof contactCategories] || contactCategories.en;
   const responses = responseItems[locale as keyof typeof responseItems] || responseItems.en;
@@ -141,6 +150,7 @@ export default async function ContactPage({
 
   return (
     <div className="w-full">
+      <ReadingProgress />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -150,6 +160,7 @@ export default async function ContactPage({
             name: title,
             description: description,
             url: `https://snipgeek.com${canonicalPath}`,
+            inLanguage: locale,
             mainEntity: {
               "@type": "EmailMessage",
               email: "iwan.efndi@gmail.com",
@@ -158,38 +169,17 @@ export default async function ContactPage({
         }}
       />
       <main className="mx-auto max-w-4xl px-4 pt-12 pb-24 sm:px-6 lg:px-8">
-        {/* Hero */}
-        <ScrollReveal direction="down" delay={0.05}>
-          <header className="mb-12 space-y-4 text-center">
-            <div className="inline-flex items-center gap-2 rounded-full border border-accent/20 bg-accent/10 px-3 py-1.5 text-[11px] font-black uppercase tracking-widest text-accent">
-              <Icon className="h-3.5 w-3.5" />
-              {badgeLabel}
-            </div>
-
-            <h1
-              className="font-display font-black tracking-tighter text-primary"
-              style={{
-                fontSize: "clamp(2rem, 1.75rem + 1.25vw, 3rem)",
-                lineHeight: "1.1",
-                letterSpacing: "-0.03em",
-              }}
-            >
-              {title}
-            </h1>
-
-            {description ? (
-              <p className="mx-auto max-w-2xl text-lg leading-relaxed text-muted-foreground">
-                {description}
-              </p>
-            ) : null}
-
-            {lastUpdated ? (
-              <p className="text-sm font-mono text-muted-foreground/60">
-                Last updated: <time dateTime={lastUpdated}>{lastUpdated}</time>
-              </p>
-            ) : null}
-          </header>
-        </ScrollReveal>
+        <StaticPageHeader
+          title={title}
+          description={description}
+          badgeLabel={badgeLabel}
+          icon={Icon}
+          lastUpdated={lastUpdated}
+          locale={locale}
+          altLocaleHref={altLocale?.href}
+          altLocaleLabel={altLocale?.label}
+          className="mb-12"
+        />
 
         {/* Email CTA — prominent */}
         <ScrollReveal direction="up" delay={0.08}>
@@ -309,6 +299,19 @@ export default async function ContactPage({
             </div>
           </div>
         </ScrollReveal>
+
+        <StaticPageFooterCard
+          ctas={[
+            {
+              label: isId ? "Lihat Kebijakan Privasi" : "View Privacy Policy",
+              href: isId ? "/id/privacy" : "/privacy",
+            },
+            {
+              label: isId ? "Lihat Disclaimer" : "View Disclaimer",
+              href: isId ? "/id/disclaimer" : "/disclaimer",
+            },
+          ]}
+        />
       </main>
     </div>
   );

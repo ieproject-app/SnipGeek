@@ -27,6 +27,7 @@ import { DownloadButton } from "@/components/mdx-components";
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { MotionDiv, MotionSpan } from "@/components/ui/client-motion";
+import { ReadingProgress } from "@/components/layout/reading-progress";
 
 export async function generateMetadata({
   params,
@@ -85,6 +86,7 @@ export default async function AboutPage({
 
   return (
     <div className="w-full">
+      <ReadingProgress />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
