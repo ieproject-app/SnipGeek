@@ -1,0 +1,168 @@
+---
+title: "Sembunyikan GRUB dan Perbaiki Layar Hitam Plymouth di Ubuntu Dual Boot"
+slug: "hide-grub-fix-plymouth-blank-screen-ubuntu"
+translationKey: "hide-grub-fix-plymouth-blank-screen-ubuntu"
+date: "2026-04-28"
+description: "Sembunyikan menu GRUB dan perbaiki layar hitam Plymouth di Ubuntu dual boot dengan menonaktifkan os-prober dan mengatur GRUB_GFXPAYLOAD_LINUX=keep."
+heroImage: "/images/_posts/ubuntu/hide-grub-fix-plymouth/image-grub-changed.webp"
+imageAlt: "File konfigurasi GRUB yang menampilkan pengaturan untuk menyembunyikan menu dan memperbaiki animasi Plymouth."
+published: true
+featured: false
+tags: ["ubuntu", "dual-boot", "troubleshooting", "ubuntu-25-10", "setup"]
+category: "Linux"
+---
+
+Saya pakai Ubuntu dan Windows 11 di satu laptop yang sama. Setup dual boot, tapi cara beralih antar OS-nya tidak saya andalkan ke GRUB — saya lebih suka tekan `F11` saat laptop baru nyala, masuk ke boot menu BIOS, lalu pilih OS dari sana. Lebih langsung, lebih bersih.
+
+Masalahnya, GRUB tetap muncul setiap kali Ubuntu di-boot. Ada menu dengan entri Ubuntu, lalu di bawahnya ada **Windows Boot Manager** — yang bagi siapapun yang pegang laptop saya, bisa langsung boot ke Windows tanpa perlu tahu password apapun. Itu yang bikin saya kurang nyaman.
+
+Sekalian saya pikir: kalau toh saya tidak pernah pakai menu GRUB, kenapa tidak disembunyikan sekalian? Biar dari BIOS langsung loncat ke animasi boot Ubuntu, tanpa jeda menu di tengah.
+
+<Callout variant="info" title="Catatan Versi">
+  Artikel ini ditulis menggunakan Ubuntu 25.10 (Plucky Puffin). Langkah-langkahnya relevan untuk Ubuntu 24.04 ke atas dengan GRUB 2.
+</Callout>
+
+## Masalah 1: Windows Muncul di Menu GRUB
+
+Ini terjadi karena Ubuntu secara default menjalankan `os-prober` setiap kali `update-grub` dipanggil. Program ini scan semua partisi di disk dan otomatis menambahkan entri untuk OS lain yang ditemukan — termasuk Windows.
+
+Solusinya: nonaktifkan `os-prober` lewat konfigurasi GRUB.
+
+Buka file konfigurasi GRUB:
+
+```bash
+sudo nano /etc/default/grub
+```
+
+Tambahkan atau pastikan baris ini ada:
+
+```ini
+GRUB_DISABLE_OS_PROBER=true
+```
+
+## Masalah 2: Menu GRUB yang Tidak Perlu
+
+Kalau kamu juga tidak butuh melihat menu GRUB setiap boot, dua baris ini yang dicari:
+
+```ini
+GRUB_TIMEOUT=0
+GRUB_TIMEOUT_STYLE=hidden
+```
+
+`GRUB_TIMEOUT=0` bikin GRUB tidak menunggu sama sekali. `GRUB_TIMEOUT_STYLE=hidden` menyembunyikan tampilan menu-nya sepenuhnya. GRUB tetap aktif sebagai bootloader — tapi dia langsung kerja tanpa nampil.
+
+<Callout variant="tip" title="Kalau Ubuntu Gagal Boot?">
+  Kamu masih bisa akses menu GRUB darurat dengan tahan `Shift` atau tekan `Esc` berulang saat laptop baru POST. GRUB akan muncul seperti biasa.
+</Callout>
+
+## Konfigurasi Lengkap
+
+Setelah semua penyesuaian, bagian atas `/etc/default/grub` saya jadi seperti ini:
+
+```ini
+GRUB_DEFAULT=0
+GRUB_TIMEOUT_STYLE=hidden
+GRUB_TIMEOUT=0
+GRUB_DISTRIBUTOR=`( . /etc/os-release && echo ${NAME} )` 
+GRUB_CMDLINE_LINUX_DEFAULT="quiet splash"
+GRUB_CMDLINE_LINUX=""
+GRUB_DISABLE_OS_PROBER=true
+```
+
+Simpan file, lalu terapkan perubahan:
+
+```bash
+sudo update-grub
+```
+
+Reboot — dan menu GRUB tidak akan muncul lagi, Windows pun hilang dari daftar.
+
+## Masalah 3: Animasi Boot Plymouth Jadi Blank
+
+Nah, ini bonus masalah yang muncul setelah GRUB disembunyikan. Setelah reboot, alih-alih melihat animasi boot Ubuntu yang biasanya, layar hanya menampilkan layar hitam kosong sampai GDM muncul.
+
+Penyebabnya: ketika GRUB di-skip terlalu cepat tanpa sempat mengatur mode grafis, Plymouth tidak mendapat "jembatan" yang dibutuhkan untuk inisialisasi tampilannya. Animasinya gagal render, dan yang terlihat hanya blank.
+
+Solusinya adalah memberi tahu GRUB untuk mengunci mode grafis dan menjaganya tetap aktif sampai kernel mengambil alih.
+
+Tambahkan dua baris ini di `/etc/default/grub`:
+
+```ini
+GRUB_GFXMODE=1920x1080
+GRUB_GFXPAYLOAD_LINUX=keep
+```
+
+<Steps>
+  <Step>
+
+  ### Cek resolusi layar kamu
+
+  Sesuaikan nilai `GRUB_GFXMODE` dengan resolusi native layar laptop atau monitor kamu. Untuk tahu resolusinya:
+
+  ```bash
+  xrandr | grep '*'
+  ```
+
+  Atau bisa juga cek di **Settings → Displays**.
+
+  </Step>
+  <Step>
+
+  ### Edit konfigurasi GRUB
+
+  ```bash
+  sudo nano /etc/default/grub
+  ```
+
+  Tambahkan kedua baris di bagian manapun dalam file:
+
+  ```ini
+  GRUB_GFXMODE=1920x1080
+  GRUB_GFXPAYLOAD_LINUX=keep
+  ```
+
+  </Step>
+  <Step>
+
+  ### Terapkan perubahan
+
+  ```bash
+  sudo update-grub
+  ```
+
+  Reboot dan animasi Plymouth seharusnya muncul normal.
+
+  </Step>
+</Steps>
+
+`GRUB_GFXPAYLOAD_LINUX=keep` adalah kuncinya — opsi ini meminta GRUB untuk *mempertahankan* mode grafis yang sudah diset, alih-alih melepasnya sebelum kernel Linux mulai berjalan. Plymouth butuh kondisi grafis yang sudah siap, dan baris ini yang memastikan itu.
+
+## Konfigurasi Final
+
+![File konfigurasi GRUB dengan semua pengaturan yang diterapkan.](/images/_posts/ubuntu/hide-grub-fix-plymouth/image-grub-changed.webp)
+
+<div className="-mt-3 mb-6 text-center text-sm italic text-muted-foreground">Konfigurasi GRUB final dengan semua pengaturan yang diterapkan.</div>
+
+Ini tampilan `/etc/default/grub` saya yang sudah lengkap dengan semua penyesuaian:
+
+```ini
+GRUB_DEFAULT=0
+GRUB_TIMEOUT_STYLE=hidden
+GRUB_TIMEOUT=0
+GRUB_DISTRIBUTOR=`( . /etc/os-release && echo ${NAME} )` 
+GRUB_CMDLINE_LINUX_DEFAULT="quiet splash"
+GRUB_CMDLINE_LINUX=""
+GRUB_DISABLE_OS_PROBER=true
+GRUB_GFXMODE=1920x1080
+GRUB_GFXPAYLOAD_LINUX=keep
+```
+
+Setelah `sudo update-grub` dan reboot: tidak ada menu GRUB, tidak ada entri Windows, dan animasi boot Ubuntu muncul mulus seperti seharusnya.
+
+Kalau kamu punya setup dual boot serupa dan sudah terbiasa pilih OS langsung dari BIOS, kombinasi konfigurasi ini rasanya jauh lebih rapi. Boot terasa lebih cepat juga karena tidak ada jeda menu di tengah.
+
+Ada yang berbeda hasilnya di setup kamu? Tulis di kolom komentar — mungkin ada variasi hardware atau versi Ubuntu yang perlu penyesuaian berbeda.
+
+### Referensi
+1. [Dokumentasi Konfigurasi GRUB — GNU](https://www.gnu.org/software/grub/manual/grub/html_node/Simple-configuration.html)
+2. [Konfigurasi Plymouth — Ubuntu Wiki](https://wiki.ubuntu.com/Plymouth)

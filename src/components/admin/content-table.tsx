@@ -1044,17 +1044,34 @@ export function ContentTable() {
       return;
     }
 
-    setBatchRefresh({ running: true, label, done: 0, total: targets.length });
+    // Safety cap: prevent excessive GSC API calls in production
+    const MAX_BATCH_SIZE = 10;
+    const safeTargets = targets.slice(0, MAX_BATCH_SIZE);
+
+    if (targets.length > MAX_BATCH_SIZE) {
+      toast({
+        title: "Batch size dibatasi",
+        description: `Maksimal ${MAX_BATCH_SIZE} URL per batch untuk menghindari rate limit GSC API.`,
+        variant: "destructive",
+      });
+    }
+
+    setBatchRefresh({ running: true, label, done: 0, total: safeTargets.length });
 
     let success = 0;
     let failed = 0;
+    const errors: string[] = [];
 
-    for (let index = 0; index < targets.length; index += 1) {
-      const item = targets[index];
+    for (let index = 0; index < safeTargets.length; index += 1) {
+      const item = safeTargets[index];
       try {
         const ok = await refreshGsc(item, { silent: true });
         if (ok) success += 1;
         else failed += 1;
+      } catch (e) {
+        failed += 1;
+        const errorMsg = e instanceof Error ? e.message : "Unknown error";
+        errors.push(`${item.path}: ${errorMsg}`);
       } finally {
         setBatchRefresh((prev) => ({ ...prev, done: index + 1 }));
       }
@@ -1064,9 +1081,13 @@ export function ContentTable() {
 
     toast({
       title: `${label} selesai`,
-      description: `${success} berhasil${failed ? ` · ${failed} gagal` : ""}`,
+      description: `${success} berhasil${failed ? ` · ${failed} gagal` : ""}${errors.length > 0 ? ` (cek console untuk detail)` : ""}`,
       variant: failed ? "destructive" : undefined,
     });
+
+    if (errors.length > 0) {
+      console.error("[Batch refresh errors]:", errors);
+    }
   };
 
   if (loading) {
@@ -1350,7 +1371,7 @@ export function ContentTable() {
                   Batch size
                 </DropdownMenuLabel>
                 <div className="flex gap-1 px-2 pb-2">
-                  {["5", "10", "20"].map((n) => (
+                  {["5", "10"].map((n) => (
                     <button
                       key={n}
                       type="button"

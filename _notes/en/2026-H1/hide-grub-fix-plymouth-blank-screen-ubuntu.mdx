@@ -1,0 +1,168 @@
+---
+title: "Hide GRUB and Fix Plymouth Blank Screen on Ubuntu Dual Boot"
+slug: "hide-grub-fix-plymouth-blank-screen-ubuntu"
+translationKey: "hide-grub-fix-plymouth-blank-screen-ubuntu"
+date: "2026-04-28"
+description: "Hide GRUB menu and fix Plymouth blank screen on Ubuntu dual boot by disabling os-prober and setting GRUB_GFXPAYLOAD_LINUX=keep."
+heroImage: "/images/_posts/ubuntu/hide-grub-fix-plymouth/image-grub-changed.webp"
+imageAlt: "GRUB configuration file showing the settings to hide menu and fix Plymouth animation."
+published: true
+featured: false
+tags: ["ubuntu", "dual-boot", "troubleshooting", "ubuntu-25-10", "setup"]
+category: "Linux"
+---
+
+I run Ubuntu and Windows 11 on the same laptop with dual boot setup, but I don't rely on GRUB to switch between them. I prefer pressing `F11` during boot to enter the BIOS boot menu and pick the OS from there. It feels more direct and cleaner.
+
+The problem is GRUB still shows up every time Ubuntu boots. There's a menu with Ubuntu entries, and below it sits **Windows Boot Manager** — anyone using my laptop could boot straight into Windows without needing any password. That made me uncomfortable.
+
+I figured if I never use the GRUB menu anyway, why not hide it completely? Let the boot jump straight from BIOS to Ubuntu's boot animation without that menu pause in the middle.
+
+<Callout variant="info" title="Version Note">
+  This article was written using Ubuntu 25.10 (Plucky Puffin). The steps apply to Ubuntu 24.04 and above with GRUB 2.
+</Callout>
+
+## Problem 1: Windows Appears in GRUB Menu
+
+This happens because Ubuntu runs `os-prober` every time `update-grub` is called. The program scans all disk partitions and automatically adds entries for any other OS it finds — including Windows.
+
+The solution is to disable `os-prober` through GRUB configuration.
+
+Open the GRUB configuration file:
+
+```bash
+sudo nano /etc/default/grub
+```
+
+Add or ensure this line exists:
+
+```ini
+GRUB_DISABLE_OS_PROBER=true
+```
+
+## Problem 2: Unnecessary GRUB Menu
+
+If you also don't need to see the GRUB menu on every boot, these two lines are what you want:
+
+```ini
+GRUB_TIMEOUT=0
+GRUB_TIMEOUT_STYLE=hidden
+```
+
+`GRUB_TIMEOUT=0` makes GRUB wait zero seconds. `GRUB_TIMEOUT_STYLE=hidden` hides the menu entirely. GRUB still works as your bootloader — it just does its job without displaying anything.
+
+<Callout variant="tip" title="If Ubuntu Fails to Boot?">
+  You can still access the emergency GRUB menu by holding `Shift` or pressing `Esc` repeatedly during POST. GRUB will appear normally.
+</Callout>
+
+## Complete Configuration
+
+After all adjustments, the top of my `/etc/default/grub` looks like this:
+
+```ini
+GRUB_DEFAULT=0
+GRUB_TIMEOUT_STYLE=hidden
+GRUB_TIMEOUT=0
+GRUB_DISTRIBUTOR=`( . /etc/os-release && echo ${NAME} )` 
+GRUB_CMDLINE_LINUX_DEFAULT="quiet splash"
+GRUB_CMDLINE_LINUX=""
+GRUB_DISABLE_OS_PROBER=true
+```
+
+Save the file, then apply the changes:
+
+```bash
+sudo update-grub
+```
+
+Reboot — the GRUB menu won't appear anymore, and Windows is gone from the list.
+
+## Problem 3: Plymouth Boot Animation Goes Blank
+
+Here's the bonus issue that surfaced after hiding GRUB. After rebooting, instead of seeing Ubuntu's usual boot animation, the screen just stayed black until GDM appeared.
+
+The cause: when GRUB is skipped too quickly without setting up graphics mode, Plymouth doesn't get the "bridge" it needs to initialize its display. The animation fails to render, leaving only a blank screen.
+
+The fix is to tell GRUB to lock the graphics mode and keep it active until the kernel takes over.
+
+Add these two lines to `/etc/default/grub`:
+
+```ini
+GRUB_GFXMODE=1920x1080
+GRUB_GFXPAYLOAD_LINUX=keep
+```
+
+<Steps>
+  <Step>
+
+  ### Check your screen resolution
+
+  Adjust the `GRUB_GFXMODE` value to match your laptop or monitor's native resolution. To find it:
+
+  ```bash
+  xrandr | grep '*'
+  ```
+
+  Or check in **Settings → Displays**.
+
+  </Step>
+  <Step>
+
+  ### Edit GRUB configuration
+
+  ```bash
+  sudo nano /etc/default/grub
+  ```
+
+  Add both lines anywhere in the file:
+
+  ```ini
+  GRUB_GFXMODE=1920x1080
+  GRUB_GFXPAYLOAD_LINUX=keep
+  ```
+
+  </Step>
+  <Step>
+
+  ### Apply changes
+
+  ```bash
+  sudo update-grub
+  ```
+
+  Reboot and the Plymouth animation should appear normally.
+
+  </Step>
+</Steps>
+
+`GRUB_GFXPAYLOAD_LINUX=keep` is the key — this option asks GRUB to *maintain* the graphics mode already set, instead of dropping it before the Linux kernel starts. Plymouth needs a ready graphics state, and this line ensures that.
+
+## Final Configuration
+
+![GRUB configuration file showing all the settings applied.](/images/_posts/ubuntu/hide-grub-fix-plymouth/image-grub-changed.webp)
+
+<div className="-mt-3 mb-6 text-center text-sm italic text-muted-foreground">The final GRUB configuration with all settings applied.</div>
+
+Here's my complete `/etc/default/grub` with all adjustments:
+
+```ini
+GRUB_DEFAULT=0
+GRUB_TIMEOUT_STYLE=hidden
+GRUB_TIMEOUT=0
+GRUB_DISTRIBUTOR=`( . /etc/os-release && echo ${NAME} )` 
+GRUB_CMDLINE_LINUX_DEFAULT="quiet splash"
+GRUB_CMDLINE_LINUX=""
+GRUB_DISABLE_OS_PROBER=true
+GRUB_GFXMODE=1920x1080
+GRUB_GFXPAYLOAD_LINUX=keep
+```
+
+After `sudo update-grub` and a reboot: no GRUB menu, no Windows entry, and Ubuntu's boot animation appears smoothly as it should.
+
+If you have a similar dual-boot setup and are used to selecting OS directly from BIOS, this configuration feels much cleaner. Boot feels faster too since there's no menu pause in the middle.
+
+Did you get different results with your setup? Let me know in the comments — there might be hardware variations or Ubuntu versions that need different adjustments.
+
+### References
+1. [GRUB Configuration Documentation — GNU](https://www.gnu.org/software/grub/manual/grub/html_node/Simple-configuration.html)
+2. [Plymouth Configuration — Ubuntu Wiki](https://wiki.ubuntu.com/Plymouth)
