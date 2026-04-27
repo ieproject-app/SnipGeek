@@ -117,9 +117,21 @@ export function TocMobile({ headings, className }: TocMobileProps) {
   }, [headings]);
 
   useEffect(() => {
-    if (activeId && buttonRefs.current.has(activeId) && scrollRef.current) {
-      const btn = buttonRefs.current.get(activeId)!;
-      btn.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
+    if (!activeId) return;
+    const container = scrollRef.current;
+    const btn = buttonRefs.current.get(activeId);
+    if (!container || !btn) return;
+
+    // Scroll the pill bar HORIZONTALLY only — never call scrollIntoView here,
+    // because on mobile that hijacks vertical page scroll while the user is
+    // actively scrolling (IntersectionObserver fires repeatedly).
+    const containerRect = container.getBoundingClientRect();
+    const btnRect = btn.getBoundingClientRect();
+    const delta =
+      btnRect.left + btnRect.width / 2 - (containerRect.left + containerRect.width / 2);
+
+    if (Math.abs(delta) > 1) {
+      container.scrollBy({ left: delta, behavior: "smooth" });
     }
   }, [activeId]);
 
