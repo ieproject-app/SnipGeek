@@ -116,29 +116,30 @@ export function TocMobile({ headings, className }: TocMobileProps) {
     return () => observerRef.current?.disconnect();
   }, [headings]);
 
-  useEffect(() => {
-    if (!activeId) return;
-    const container = scrollRef.current;
-    const btn = buttonRefs.current.get(activeId);
-    if (!container || !btn) return;
-
-    // Scroll the pill bar HORIZONTALLY only — never call scrollIntoView here,
-    // because on mobile that hijacks vertical page scroll while the user is
-    // actively scrolling (IntersectionObserver fires repeatedly).
-    const containerRect = container.getBoundingClientRect();
-    const btnRect = btn.getBoundingClientRect();
-    const delta =
-      btnRect.left + btnRect.width / 2 - (containerRect.left + containerRect.width / 2);
-
-    if (Math.abs(delta) > 1) {
-      container.scrollBy({ left: delta, behavior: "smooth" });
-    }
-  }, [activeId]);
+  // Note: we intentionally do NOT auto-center the active pill horizontally
+  // while the user scrolls. On mobile browsers, programmatic scroll on an
+  // overflow container can interfere with momentum scrolling of the page
+  // (symptom: page jumps back toward the top). The pill only auto-centers
+  // when the user taps a pill.
 
   const handleClick = (id: string) => {
     const el = document.getElementById(id);
-    if (el) {
-      el.scrollIntoView({ behavior: "smooth", block: "start" });
+    if (!el) return;
+    el.scrollIntoView({ behavior: "smooth", block: "start" });
+
+    // Center the tapped pill horizontally in its own container only.
+    const container = scrollRef.current;
+    const btn = buttonRefs.current.get(id);
+    if (container && btn) {
+      const containerRect = container.getBoundingClientRect();
+      const btnRect = btn.getBoundingClientRect();
+      const delta =
+        btnRect.left +
+        btnRect.width / 2 -
+        (containerRect.left + containerRect.width / 2);
+      if (Math.abs(delta) > 1) {
+        container.scrollBy({ left: delta, behavior: "smooth" });
+      }
     }
   };
 
@@ -146,7 +147,7 @@ export function TocMobile({ headings, className }: TocMobileProps) {
     <div
       ref={scrollRef}
       className={cn(
-        "flex gap-2 overflow-x-auto pb-2 scrollbar-none",
+        "flex gap-2 overflow-x-auto overflow-y-hidden pb-2 scrollbar-none overscroll-x-contain",
         className,
       )}
     >
