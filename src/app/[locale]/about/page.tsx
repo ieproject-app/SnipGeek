@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { i18n } from "@/i18n-config";
 import type { Locale } from "@/i18n-config";
 import type { Metadata } from "next";
@@ -22,12 +23,17 @@ import {
   Laptop,
   PenLine,
   ArrowRight,
+  Clock,
+  Globe,
 } from "lucide-react";
 import { DownloadButton } from "@/components/mdx-components";
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { MotionDiv, MotionSpan } from "@/components/ui/client-motion";
 import { ReadingProgress } from "@/components/layout/reading-progress";
+import { TocMobile } from "@/components/layout/toc-sidebar";
+import { getReadingTime } from "@/lib/reading-time";
+import { extractHeadings } from "@/lib/mdx-utils";
 
 export async function generateMetadata({
   params,
@@ -83,6 +89,22 @@ export default async function AboutPage({
       : "Always learning, refining workflows, and building useful things.";
 
   const currentPrefix = locale === i18n.defaultLocale ? "" : `/${locale}`;
+
+  const { minutes: readingMinutes } = getReadingTime(content);
+  const storyHeadings = extractHeadings(content).filter((h) => h.level === 2);
+
+  const altLocale = i18n.locales.find((l) => l !== locale);
+  const altLocalePrefix =
+    altLocale && altLocale !== i18n.defaultLocale ? `/${altLocale}` : "";
+  const altLocaleHref = altLocale ? `${altLocalePrefix}/about` : undefined;
+  const altLocaleLabel =
+    altLocale === "id"
+      ? "Bahasa Indonesia"
+      : altLocale === "en"
+        ? "English"
+        : undefined;
+  const readInLabel = locale === "id" ? "Baca dalam" : "Read in";
+  const minReadLabel = locale === "id" ? "menit baca" : "min read";
 
   return (
     <div className="w-full">
@@ -152,6 +174,16 @@ export default async function AboutPage({
                     <MapPin className="h-3.5 w-3.5 text-primary" />
                     {data.profile.locationLabel}
                   </Badge>
+                  {altLocaleHref && altLocaleLabel ? (
+                    <Link
+                      href={altLocaleHref}
+                      hrefLang={altLocale}
+                      className="inline-flex items-center gap-2 rounded-full border border-primary/15 bg-background/70 px-4 py-1.5 text-sm font-medium text-foreground backdrop-blur transition-colors hover:border-primary/35 hover:text-primary"
+                    >
+                      <Globe className="h-3.5 w-3.5 text-primary" />
+                      {readInLabel} {altLocaleLabel}
+                    </Link>
+                  ) : null}
                 </div>
 
                 <div className="mt-5 flex items-center gap-3 rounded-2xl border border-primary/10 bg-card/50 px-4 py-3 lg:hidden">
@@ -308,7 +340,22 @@ export default async function AboutPage({
 
         <ScrollReveal direction="up" delay={0.1}>
           <section className="mb-20">
-            <SectionHeading title={dictionary.about.story} />
+            <SectionHeading
+              title={dictionary.about.story}
+              meta={
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/10 bg-card/40 px-3 py-1 text-[11px] font-mono text-muted-foreground">
+                  <Clock className="h-3 w-3" />
+                  {readingMinutes} {minReadLabel}
+                </span>
+              }
+            />
+
+            {storyHeadings.length > 0 ? (
+              <div className="mt-5 lg:hidden">
+                <TocMobile headings={storyHeadings} />
+              </div>
+            ) : null}
+
             <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_300px] lg:items-start">
               <div className="min-w-0">
                 <div className="rounded-3xl border border-primary/10 bg-card/20 p-6 shadow-sm backdrop-blur-sm sm:p-8">
@@ -612,13 +659,20 @@ export default async function AboutPage({
   );
 }
 
-function SectionHeading({ title }: { title: string }) {
+function SectionHeading({
+  title,
+  meta,
+}: {
+  title: string;
+  meta?: React.ReactNode;
+}) {
   return (
     <div className="flex items-center gap-4">
       <h2 className="font-display shrink-0 text-xl font-bold uppercase tracking-tight text-primary">
         {title}
       </h2>
       <div className="h-px flex-1 bg-linear-to-r from-primary/40 to-transparent" />
+      {meta ? <div className="shrink-0">{meta}</div> : null}
     </div>
   );
 }
