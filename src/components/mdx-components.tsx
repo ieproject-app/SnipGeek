@@ -32,6 +32,14 @@ import { Expandable } from "./mdx/expandable";
 import { GalleryLightbox, type GalleryImageItem } from "./mdx/gallery-lightbox";
 import { CopyablePre } from "./mdx/copyable-pre";
 import { YouTubeEmbed } from "./mdx/youtube-embed";
+import {
+  ContactEmailCta,
+  ContactCategoryGrid,
+  ContactCategory,
+  ResponseList,
+  ResponseItem,
+  ImportantNote,
+} from "./mdx/contact-blocks";
 
 type MdxElementProps = {
   children?: React.ReactNode;
@@ -777,4 +785,10 @@ export const mdxComponents = {
   Steps,
   Step,
   YouTubeEmbed,
+  ContactEmailCta,
+  ContactCategoryGrid,
+  ContactCategory,
+  ResponseList,
+  ResponseItem,
+  ImportantNote,
 };
