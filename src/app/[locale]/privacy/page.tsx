@@ -68,6 +68,7 @@ export default async function PrivacyPage({
       readingMinutes={readingMinutes}
       altLocaleHref={altLocale?.href}
       altLocaleLabel={altLocale?.label}
+      sectionIcons={frontmatter.sectionIcons}
       footerNote={
         locale === "id"
           ? "Kebijakan ini berlaku untuk SnipGeek dan seluruh halamannya."

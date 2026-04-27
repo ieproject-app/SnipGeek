@@ -64,6 +64,7 @@ export default async function DisclaimerPage({
       readingMinutes={readingMinutes}
       altLocaleHref={altLocale?.href}
       altLocaleLabel={altLocale?.label}
+      sectionIcons={frontmatter.sectionIcons}
       footerNote={
         locale === "id"
           ? "Dengan menggunakan SnipGeek, Anda mengakui bahwa Anda telah membaca dan memahami Disclaimer ini."

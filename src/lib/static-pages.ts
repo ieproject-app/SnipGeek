@@ -16,7 +16,8 @@ export type StaticPageFrontmatter = {
   seoTitle?: string;
   badgeLabel?: string;
   icon?: string;
-  [key: string]: string | number | boolean | string[] | null | undefined;
+  sectionIcons?: Record<string, string>;
+  [key: string]: unknown;
 };
 
 export type StaticPageData = {

@@ -52,75 +52,48 @@ type LegalPageTemplateProps = {
   readingMinutes?: number;
   altLocaleHref?: string;
   altLocaleLabel?: string;
+  /**
+   * Map of heading id (slug) → lucide icon name. Sourced from MDX
+   * frontmatter so authors can colocate section icons with content.
+   */
+  sectionIcons?: Record<string, string>;
 };
 
-const sectionIconMap: Record<string, IconComponent> = {
-  // Disclaimer EN
-  "1-general-disclaimer": Shield,
-  "2-tutorials-and-guides": FileText,
-  "3-downloads-and-third-party-files": Download,
-  "4-tools-and-utilities": AlertTriangle,
-  "5-external-links": ExternalLink,
-  "6-not-professional-advice": Scale,
-  "7-limitation-of-liability": Gavel,
-  "8-changes-to-this-disclaimer": RefreshCw,
-  "9-contact": Mail,
-  // Disclaimer ID
-  "1-disclaimer-umum": Shield,
-  "2-tutorial-dan-panduan": FileText,
-  "3-unduhan-dan-file-pihak-ketiga": Download,
-  "4-tools-dan-utilitas": AlertTriangle,
-  "5-tautan-eksternal": ExternalLink,
-  "6-bukan-nasihat-profesional": Scale,
-  "7-batasan-tanggung-jawab": Gavel,
-  "8-perubahan-pada-disclaimer-ini": RefreshCw,
-  "9-kontak": Mail,
-  // Privacy EN
-  "1-general-information": Eye,
-  "2-cookies": Cookie,
-  "3-data-we-collect": Database,
-  "4-third-party-services": ExternalLink,
-  "5-childrens-privacy": Baby,
-  "6-your-rights-gdpr-data-privacy": HandCoins,
-  "7-changes-to-this-policy": RefreshCw,
-  "8-contact-us": MessageSquare,
-  // Privacy ID
-  "1-informasi-umum": Eye,
-  "2-cookie": Cookie,
-  "3-data-yang-kami-kumpulkan": Database,
-  "4-layanan-pihak-ketiga": ExternalLink,
-  "5-privasi-anak": Baby,
-  "6-hak-anda-gdpr-privasi-data": HandCoins,
-  "7-perubahan-kebijakan-ini": RefreshCw,
-  "8-hubungi-kami": MessageSquare,
-  // Terms EN
-  "1-introduction": FileText,
-  "2-acceptance-of-terms": UserCheck,
-  "3-user-accounts": UserCheck,
-  "4-use-of-services": AlertTriangle,
-  "5-content-ownership": Shield,
-  "6-tools-and-generated-output": AlertTriangle,
-  "7-disclaimer-of-warranties": Scale,
-  "8-limitation-of-liability": Gavel,
-  "9-external-services-and-links": ExternalLink,
-  "10-changes-to-these-terms": RefreshCw,
-  "11-contact": Mail,
-  // Terms ID
-  "1-pendahuluan": FileText,
-  "2-penerimaan-ketentuan": UserCheck,
-  "3-akun-pengguna": UserCheck,
-  "4-penggunaan-layanan": AlertTriangle,
-  "5-kepemilikan-konten": Shield,
-  "6-tools-dan-hasil-yang-dihasilkan": AlertTriangle,
-  "7-penafian-jaminan": Scale,
-  "8-batasan-tanggung-jawab": Gavel,
-  "9-layanan-dan-tautan-eksternal": ExternalLink,
-  "10-perubahan-pada-ketentuan-ini": RefreshCw,
-  "11-kontak": Mail,
+/**
+ * Lucide icon name → component map. Authors reference icons by string
+ * in MDX frontmatter (e.g. `sectionIcons: { "1-general-disclaimer": "Shield" }`)
+ * and this resolver maps it back to a React component at render time.
+ */
+const lucideByName: Record<string, IconComponent> = {
+  Shield,
+  FileText,
+  Mail,
+  ScrollText,
+  BadgeInfo,
+  Scale,
+  AlertTriangle,
+  Download,
+  ExternalLink,
+  UserCheck,
+  Gavel,
+  Eye,
+  Cookie,
+  Database,
+  Baby,
+  HandCoins,
+  RefreshCw,
+  MessageSquare,
 };
 
-function getSectionIcon(headingId: string): IconComponent {
-  return sectionIconMap[headingId] || FileText;
+function getSectionIcon(
+  headingId: string,
+  overrides?: Record<string, string>,
+): IconComponent {
+  const overrideName = overrides?.[headingId];
+  if (overrideName) {
+    return lucideByName[overrideName] ?? FileText;
+  }
+  return FileText;
 }
 
 const iconMap: Record<string, IconComponent> = {
@@ -160,6 +133,7 @@ export function LayoutLegalPageTemplate({
   readingMinutes,
   altLocaleHref,
   altLocaleLabel,
+  sectionIcons,
 }: LegalPageTemplateProps) {
   const headings: Heading[] = extractHeadings(content);
   const tocLabel = tocLabels[locale] ?? tocLabels.en;
@@ -221,7 +195,11 @@ export function LayoutLegalPageTemplate({
           {/* Main content with section cards — centered */}
           <ScrollReveal direction="up" delay={0.1}>
             <div className="mx-auto w-full max-w-3xl">
-              <LegalSectionCards content={content} headings={headings} />
+              <LegalSectionCards
+                content={content}
+                headings={headings}
+                sectionIcons={sectionIcons}
+              />
             </div>
           </ScrollReveal>
 
@@ -245,9 +223,11 @@ export function LayoutLegalPageTemplate({
 function LegalSectionCards({
   content,
   headings,
+  sectionIcons,
 }: {
   content: string;
   headings: Heading[];
+  sectionIcons?: Record<string, string>;
 }) {
   const h2Headings = headings.filter((h) => h.level === 2);
   const totalSections = h2Headings.length;
@@ -273,7 +253,9 @@ function LegalSectionCards({
 
       const headingIndex = h2Headings.findIndex((h) => h.text === text);
       const heading = headingIndex >= 0 ? h2Headings[headingIndex] : undefined;
-      const SectionIcon = heading ? getSectionIcon(heading.id) : FileText;
+      const SectionIcon = heading
+        ? getSectionIcon(heading.id, sectionIcons)
+        : FileText;
       const id = heading?.id ?? extractIdFromChildren(children);
 
       const indexLabel =

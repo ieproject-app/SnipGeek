@@ -68,6 +68,7 @@ export default async function TermsPage({
       readingMinutes={readingMinutes}
       altLocaleHref={altLocale?.href}
       altLocaleLabel={altLocale?.label}
+      sectionIcons={frontmatter.sectionIcons}
       footerNote={
         locale === "id"
           ? "Dengan terus menggunakan SnipGeek, Anda dianggap menyetujui ketentuan yang berlaku."
