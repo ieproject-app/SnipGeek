@@ -3,6 +3,7 @@ title: "Hide GRUB and Fix Plymouth Blank Screen on Ubuntu Dual Boot"
 slug: "hide-grub-fix-plymouth-blank-screen-ubuntu"
 translationKey: "hide-grub-fix-plymouth-blank-screen-ubuntu"
 date: "2026-04-28"
+updated: "2026-04-28"
 description: "Hide GRUB menu and fix Plymouth blank screen on Ubuntu dual boot by disabling os-prober and setting GRUB_GFXPAYLOAD_LINUX=keep."
 heroImage: "/images/_posts/ubuntu/hide-grub-fix-plymouth/image-grub-changed.webp"
 imageAlt: "GRUB configuration file showing the settings to hide menu and fix Plymouth animation."
@@ -158,6 +159,26 @@ GRUB_GFXPAYLOAD_LINUX=keep
 ```
 
 After `sudo update-grub` and a reboot: no GRUB menu, no Windows entry, and Ubuntu's boot animation appears smoothly as it should.
+
+## Problem 4: GRUB Still Appears After Configuration
+
+After applying all the GRUB configuration and running `update-grub`, the menu still appeared on boot. I was surprised — the configuration looked correct, but something was overriding my settings.
+
+Investigating with `grep -i timeout /boot/grub/grub.cfg` revealed the issue: `set timeout=30` appeared at the very top of the file, overriding the `hidden` setting below it. The cause was GRUB's failsafe mechanism — it detected a previous boot failure (*recordfail*) and forced the menu to appear regardless of configuration.
+
+The fix is to clear the recordfail flag from GRUB's environment:
+
+```bash
+sudo grub-editenv /boot/grub/grubenv list
+```
+
+If you see `recordfail=1`, reset it with:
+
+```bash
+sudo grub-editenv /boot/grub/grubenv unset recordfail
+```
+
+After a reboot, GRUB finally skipped the menu as intended.
 
 If you have a similar dual-boot setup and are used to selecting OS directly from BIOS, this configuration feels much cleaner. Boot feels faster too since there's no menu pause in the middle.
 

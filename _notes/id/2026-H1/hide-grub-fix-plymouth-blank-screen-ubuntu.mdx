@@ -3,6 +3,7 @@ title: "Sembunyikan GRUB dan Perbaiki Layar Hitam Plymouth di Ubuntu Dual Boot"
 slug: "hide-grub-fix-plymouth-blank-screen-ubuntu"
 translationKey: "hide-grub-fix-plymouth-blank-screen-ubuntu"
 date: "2026-04-28"
+updated: "2026-04-28"
 description: "Sembunyikan menu GRUB dan perbaiki layar hitam Plymouth di Ubuntu dual boot dengan menonaktifkan os-prober dan mengatur GRUB_GFXPAYLOAD_LINUX=keep."
 heroImage: "/images/_posts/ubuntu/hide-grub-fix-plymouth/image-grub-changed.webp"
 imageAlt: "File konfigurasi GRUB yang menampilkan pengaturan untuk menyembunyikan menu dan memperbaiki animasi Plymouth."
@@ -158,6 +159,26 @@ GRUB_GFXPAYLOAD_LINUX=keep
 ```
 
 Setelah `sudo update-grub` dan reboot: tidak ada menu GRUB, tidak ada entri Windows, dan animasi boot Ubuntu muncul mulus seperti seharusnya.
+
+## Masalah 4: GRUB Masih Muncul Setelah Konfigurasi
+
+Setelah menerapkan semua konfigurasi GRUB dan menjalankan `update-grub`, menu tetap muncul saat boot. Saya kaget — konfigurasinya sudah benar, tapi ada sesuatu yang menimpa setting saya.
+
+Investigasi dengan `grep -i timeout /boot/grub/grub.cfg` mengungkap masalahnya: `set timeout=30` muncul di paling atas file, menimpa setting `hidden` di bawahnya. Penyebabnya adalah mekanisme failsafe GRUB — dia mendeteksi boot sebelumnya gagal (*recordfail*) dan memaksa menu tampil apa pun konfigurasinya.
+
+Solusinya adalah menghapus flag recordfail dari environment GRUB:
+
+```bash
+sudo grub-editenv /boot/grub/grubenv list
+```
+
+Kalau kamu melihat `recordfail=1`, reset dengan:
+
+```bash
+sudo grub-editenv /boot/grub/grubenv unset recordfail
+```
+
+Setelah reboot, GRUB akhirnya skip menu seperti yang diinginkan.
 
 Kalau kamu punya setup dual boot serupa dan sudah terbiasa pilih OS langsung dari BIOS, kombinasi konfigurasi ini rasanya jauh lebih rapi. Boot terasa lebih cepat juga karena tidak ada jeda menu di tengah.
 
