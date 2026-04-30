@@ -15,13 +15,13 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
     CalendarIcon, Loader2, Database, CheckCircle, PlusCircle, Trash2, Copy, Check,
-    RotateCcw, AlertTriangle, Plus, Minus, Zap, Hash,
+    RotateCcw, AlertTriangle, Plus, Minus, Zap, Hash, ChevronLeft, ChevronRight,
 } from 'lucide-react';
 import {
     Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger,
 } from "@/components/ui/dialog";
 import { cn } from '@/lib/utils';
-import { format, addMonths } from 'date-fns';
+import { format, addMonths, addWeeks, addYears, startOfMonth, endOfMonth, isSameMonth } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { motion, AnimatePresence } from 'framer-motion';
 import { DAILY_LIMIT, type ValueCategory, type StockMatrix, type StockCategoryDetail } from './types';
@@ -271,7 +271,24 @@ export function NumberGeneratorTab({ hook }: NumberGeneratorTabProps) {
                                                     {req.docDate ? format(req.docDate, 'd MMM yyyy', { locale: id }) : <span>Pilih tanggal dokumen</span>}
                                                 </Button>
                                             </PopoverTrigger>
-                                            <PopoverContent className="w-auto p-1.5 border-primary/15 shadow-2xl rounded-xl overflow-hidden backdrop-blur-sm">
+                                            <PopoverContent className="w-auto p-0 border-primary/15 shadow-2xl rounded-xl overflow-hidden backdrop-blur-sm">
+                                                <div className="flex items-center justify-between px-3 py-2 bg-muted/30 border-b border-primary/5">
+                                                    <button
+                                                        onClick={() => handleRequestChange(req.id, 'docDate', addMonths(req.docDate || new Date(), -1))}
+                                                        className="p-1.5 rounded-md hover:bg-accent/10 text-muted-foreground hover:text-accent transition-colors"
+                                                    >
+                                                        <ChevronLeft className="h-4 w-4" />
+                                                    </button>
+                                                    <span className="text-xs font-semibold text-foreground">
+                                                        {format(req.docDate || new Date(), 'MMMM yyyy', { locale: id })}
+                                                    </span>
+                                                    <button
+                                                        onClick={() => handleRequestChange(req.id, 'docDate', addMonths(req.docDate || new Date(), 1))}
+                                                        className="p-1.5 rounded-md hover:bg-accent/10 text-muted-foreground hover:text-accent transition-colors"
+                                                    >
+                                                        <ChevronRight className="h-4 w-4" />
+                                                    </button>
+                                                </div>
                                                 <Calendar
                                                     mode="single"
                                                     selected={req.docDate}
@@ -280,35 +297,54 @@ export function NumberGeneratorTab({ hook }: NumberGeneratorTabProps) {
                                                         handleRequestChange(req.id, 'docDate', d);
                                                         setOpenDatePickerId(null);
                                                     }}
-                                                    className="p-1"
+                                                    className="p-2"
                                                     classNames={{
-                                                        month_caption: 'flex justify-center pt-1 pb-1 relative items-center',
-                                                        caption_label: 'text-xs font-semibold',
-                                                        weekday: 'text-muted-foreground rounded-md w-8 font-medium text-[11px] text-center',
-                                                        day: 'h-8 w-8 text-center text-xs p-0 relative [&:has([aria-selected].day-range-end)]:rounded-r-md [&:has([aria-selected].day-outside)]:bg-accent/50 [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20',
-                                                        day_button: 'h-8 w-8 p-0 font-normal aria-selected:opacity-100',
+                                                        month_caption: 'hidden',
+                                                        weekday: 'text-muted-foreground rounded-md w-9 font-medium text-[11px] text-center',
+                                                        day: 'h-9 w-9 text-center text-xs p-0 relative [&:has([aria-selected].day-range-end)]:rounded-r-md [&:has([aria-selected].day-outside)]:bg-accent/50 [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20',
+                                                        day_button: 'h-9 w-9 p-0 font-normal aria-selected:opacity-100',
                                                     }}
-                                                    initialFocus
+                                                    components={{
+                                                        Nav: () => <></>,
+                                                    }}
                                                     fixedWeeks={false}
                                                 />
-                                                <div className="border-t border-primary/5 px-2 pt-2 pb-1 flex gap-1.5">
+                                                <div className="border-t border-primary/5 px-2 pt-2 pb-2 grid grid-cols-4 gap-1">
                                                     <button
                                                         onClick={() => {
                                                             handleRequestChange(req.id, 'docDate', new Date());
                                                             setOpenDatePickerId(null);
                                                         }}
-                                                        className="flex-1 text-[9px] font-black uppercase tracking-widest text-muted-foreground hover:text-accent hover:bg-accent/5 rounded-md py-1.5 transition-colors"
+                                                        className="text-[9px] font-black uppercase tracking-widest text-muted-foreground hover:text-accent hover:bg-accent/5 rounded-md py-1.5 transition-colors text-center"
                                                     >
                                                         Hari Ini
+                                                    </button>
+                                                    <button
+                                                        onClick={() => {
+                                                            handleRequestChange(req.id, 'docDate', addWeeks(new Date(), 1));
+                                                            setOpenDatePickerId(null);
+                                                        }}
+                                                        className="text-[9px] font-black uppercase tracking-widest text-muted-foreground hover:text-accent hover:bg-accent/5 rounded-md py-1.5 transition-colors text-center"
+                                                    >
+                                                        +1 Mgg
                                                     </button>
                                                     <button
                                                         onClick={() => {
                                                             handleRequestChange(req.id, 'docDate', addMonths(new Date(), 1));
                                                             setOpenDatePickerId(null);
                                                         }}
-                                                        className="flex-1 text-[9px] font-black uppercase tracking-widest text-muted-foreground hover:text-accent hover:bg-accent/5 rounded-md py-1.5 transition-colors"
+                                                        className="text-[9px] font-black uppercase tracking-widest text-muted-foreground hover:text-accent hover:bg-accent/5 rounded-md py-1.5 transition-colors text-center"
                                                     >
-                                                        +1 Bulan
+                                                        +1 Bln
+                                                    </button>
+                                                    <button
+                                                        onClick={() => {
+                                                            handleRequestChange(req.id, 'docDate', addYears(new Date(), 1));
+                                                            setOpenDatePickerId(null);
+                                                        }}
+                                                        className="text-[9px] font-black uppercase tracking-widest text-muted-foreground hover:text-accent hover:bg-accent/5 rounded-md py-1.5 transition-colors text-center"
+                                                    >
+                                                        +1 Thn
                                                     </button>
                                                 </div>
                                             </PopoverContent>
@@ -525,8 +561,16 @@ export function NumberGeneratorTab({ hook }: NumberGeneratorTabProps) {
                                                             result.isError ? "border-destructive/20 bg-destructive/5 text-destructive" : "border-accent/20 bg-accent/5 text-accent"
                                                         )}>{result.isError ? 'Perlu perhatian' : 'Siap disalin'}</Badge>
                                                         <span className="h-1 w-1 rounded-full bg-muted-foreground/30" />
-                                                        <span className="text-[10px] font-bold text-muted-foreground/60 uppercase">
+                                                        <span className="text-[10px] font-bold text-muted-foreground/60 uppercase flex items-center gap-1">
                                                             {format(result.date, 'd MMMM yyyy', { locale: id })}
+                                                            <button
+                                                                onClick={() => {
+                                                                    navigator.clipboard.writeText(format(result.date, 'd MMMM yyyy', { locale: id }));
+                                                                }}
+                                                                className="opacity-0 group-hover:opacity-100 hover:text-accent transition-all p-0.5"
+                                                            >
+                                                                <Copy className="h-3 w-3" />
+                                                            </button>
                                                         </span>
                                                     </div>
                                                     <span className={cn(

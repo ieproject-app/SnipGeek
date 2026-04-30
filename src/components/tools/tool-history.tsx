@@ -6,9 +6,12 @@ import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Button } from '@/components/ui/button'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { Calendar } from '@/components/ui/calendar'
+import { useState, useEffect } from 'react'
 import { type Dictionary } from '@/lib/get-dictionary'
 import { cn } from '@/lib/utils'
-import { Search, FileText, UserCheck, Plus, Trash2, Loader2, Copy, CheckCircle2, Database, AlertTriangle } from 'lucide-react'
+import { Search, FileText, UserCheck, Plus, Trash2, Loader2, Copy, CheckCircle2, Database, AlertTriangle, Calendar as CalendarIcon } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { ToolWrapper } from '@/components/tools/tool-wrapper'
 import { ScrollReveal } from '@/components/ui/scroll-reveal'
@@ -16,6 +19,8 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import { docRules, formatDate } from './employee-history/types'
+import { format } from 'date-fns'
+import { id } from 'date-fns/locale'
 import { useEmployeeHistory } from './employee-history/use-employee-history'
 
 export function ToolHistory({
@@ -42,6 +47,16 @@ export function ToolHistory({
     handleGenerateSigners, handleCopy, handleCopyAllGenerated,
     handleInjectEmployeeHistory,
   } = hook;
+
+  const [openDatePickerId, setOpenDatePickerId] = useState<number | null>(null);
+  const docTypeKeys = Object.keys(docRules);
+  const singleDocType = docTypeKeys.length === 1 ? docTypeKeys[0] : null;
+
+  useEffect(() => {
+    if (singleDocType && docQueries.length === 1 && !docQueries[0].docType) {
+      handleQueryChange(docQueries[0].id, 'docType', singleDocType);
+    }
+  }, [singleDocType]);
 
   return (
     <TooltipProvider delayDuration={300}>
@@ -220,9 +235,41 @@ export function ToolHistory({
                                 </span>
                               </TableCell>
                               <TableCell className="font-code text-xs tracking-wider px-4 opacity-70">{p.nik}</TableCell>
-                              <TableCell className="font-code text-xs whitespace-nowrap px-4 opacity-70">{formatDate(p.tglMulai, locale)}</TableCell>
-                              <TableCell className={cn("font-code text-xs whitespace-nowrap px-4", isActive ? "text-primary font-bold" : "opacity-70")}>
-                                {isActive ? t.present : formatDate(p.tglSelesai, locale)}
+                              <TableCell className="px-4">
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <button
+                                      onClick={() => handleCopy(formatDate(p.tglMulai, locale), `${p.nik}-mulai`, 'tglMulai', 'Tanggal mulai')}
+                                      className="text-left w-full hover:text-foreground transition-colors flex items-center gap-2 group/copy focus:outline-none font-code text-xs whitespace-nowrap opacity-70"
+                                    >
+                                      <span>{formatDate(p.tglMulai, locale)}</span>
+                                      {copiedState?.id === `${p.nik}-mulai` && copiedState?.type === 'tglMulai' ? (
+                                        <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500 shrink-0" />
+                                      ) : (
+                                        <Copy className="h-3.5 w-3.5 opacity-0 group-hover/copy:opacity-50 transition-opacity shrink-0" />
+                                      )}
+                                    </button>
+                                  </TooltipTrigger>
+                                  <TooltipContent side="top" sideOffset={8} className="text-xs animate-in fade-in duration-200">Klik untuk menyalin</TooltipContent>
+                                </Tooltip>
+                              </TableCell>
+                              <TableCell className="px-4">
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <button
+                                      onClick={() => handleCopy(isActive ? t.present : formatDate(p.tglSelesai, locale), `${p.nik}-selesai`, 'tglSelesai', 'Tanggal selesai')}
+                                      className={cn("text-left w-full hover:text-foreground transition-colors flex items-center gap-2 group/copy focus:outline-none font-code text-xs whitespace-nowrap", isActive ? "text-primary font-bold" : "opacity-70")}
+                                    >
+                                      <span>{isActive ? t.present : formatDate(p.tglSelesai, locale)}</span>
+                                      {copiedState?.id === `${p.nik}-selesai` && copiedState?.type === 'tglSelesai' ? (
+                                        <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500 shrink-0" />
+                                      ) : (
+                                        <Copy className="h-3.5 w-3.5 opacity-0 group-hover/copy:opacity-50 transition-opacity shrink-0" />
+                                      )}
+                                    </button>
+                                  </TooltipTrigger>
+                                  <TooltipContent side="top" sideOffset={8} className="text-xs animate-in fade-in duration-200">Klik untuk menyalin</TooltipContent>
+                                </Tooltip>
                               </TableCell>
                             </tr>
                           );
@@ -275,16 +322,83 @@ export function ToolHistory({
                     <div key={query.id} className="flex flex-col md:flex-row items-end gap-4 p-5 border rounded-lg bg-background/30 relative group transition-all hover:border-primary/30 hover:bg-accent/5">
                       <div className="w-full md:flex-1 space-y-2">
                         <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">{t.docTypePlaceholder}</label>
-                        <Select value={query.docType} onValueChange={value => handleQueryChange(query.id, 'docType', value)}>
-                          <SelectTrigger className="h-11 rounded-lg bg-background/50 focus:ring-primary/20"><SelectValue /></SelectTrigger>
-                          <SelectContent className="rounded-lg">
-                            {Object.keys(docRules).map(doc => <SelectItem key={doc} value={doc}>{doc}</SelectItem>)}
-                          </SelectContent>
-                        </Select>
+                        {singleDocType ? (
+                          <div className="h-11 px-4 rounded-lg bg-muted/30 border flex items-center text-sm font-medium">
+                            {singleDocType}
+                          </div>
+                        ) : (
+                          <Select value={query.docType} onValueChange={value => handleQueryChange(query.id, 'docType', value)}>
+                            <SelectTrigger className="h-11 rounded-lg bg-background/50 focus:ring-primary/20"><SelectValue /></SelectTrigger>
+                            <SelectContent className="rounded-lg">
+                              {Object.keys(docRules).map(doc => <SelectItem key={doc} value={doc}>{doc}</SelectItem>)}
+                            </SelectContent>
+                          </Select>
+                        )}
                       </div>
                       <div className="w-full md:flex-1 space-y-2">
                         <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">{t.startDateHeader}</label>
-                        <Input type="date" value={query.docDate} onChange={e => handleQueryChange(query.id, 'docDate', e.target.value)} className="h-11 rounded-lg bg-background/50 focus-visible:ring-primary/20" />
+                        <Popover open={openDatePickerId === query.id} onOpenChange={(isOpen) => setOpenDatePickerId(isOpen ? query.id : null)}>
+                          <PopoverTrigger asChild>
+                            <Button variant={'outline'} className={cn('w-full h-11 justify-start text-left font-normal rounded-lg border-primary/10 hover:border-primary/30 focus-visible:ring-accent', !query.docDate && 'text-muted-foreground')}>
+                              <CalendarIcon className="mr-2 h-4 w-4 text-accent" />
+                              {query.docDate ? format(new Date(query.docDate), 'd MMM yyyy', { locale: id }) : <span>Pilih tanggal dokumen</span>}
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-auto p-1.5 border-primary/15 shadow-2xl rounded-xl overflow-hidden backdrop-blur-sm">
+                            <Calendar
+                              mode="single"
+                              selected={query.docDate ? new Date(query.docDate) : undefined}
+                              onSelect={(d) => {
+                                if (!d) return;
+                                handleQueryChange(query.id, 'docDate', d.toISOString().split('T')[0]);
+                                setOpenDatePickerId(null);
+                              }}
+                              className="p-1"
+                              classNames={{
+                                month_caption: 'flex justify-center pt-1 pb-1 relative items-center',
+                                caption_label: 'text-xs font-semibold',
+                                weekday: 'text-muted-foreground rounded-md w-8 font-medium text-[11px] text-center',
+                                day: 'h-8 w-8 text-center text-xs p-0 relative [&:has([aria-selected].day-range-end)]:rounded-r-md [&:has([aria-selected].day-outside)]:bg-accent/50 [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20',
+                                day_button: 'h-8 w-8 p-0 font-normal aria-selected:opacity-100',
+                              }}
+                              initialFocus
+                              fixedWeeks={false}
+                            />
+                            <div className="border-t border-primary/5 px-2 pt-2 pb-1 flex gap-1.5">
+                              <button
+                                onClick={() => {
+                                  handleQueryChange(query.id, 'docDate', new Date().toISOString().split('T')[0]);
+                                  setOpenDatePickerId(null);
+                                }}
+                                className="flex-1 text-xs font-medium py-1.5 rounded-md bg-primary/5 hover:bg-primary/10 text-primary transition-colors"
+                              >
+                                Hari Ini
+                              </button>
+                              <button
+                                onClick={() => {
+                                  const nextWeek = new Date();
+                                  nextWeek.setDate(nextWeek.getDate() + 7);
+                                  handleQueryChange(query.id, 'docDate', nextWeek.toISOString().split('T')[0]);
+                                  setOpenDatePickerId(null);
+                                }}
+                                className="flex-1 text-xs font-medium py-1.5 rounded-md bg-muted hover:bg-muted/80 transition-colors"
+                              >
+                                +7 Hari
+                              </button>
+                              <button
+                                onClick={() => {
+                                  const nextMonth = new Date();
+                                  nextMonth.setMonth(nextMonth.getMonth() + 1);
+                                  handleQueryChange(query.id, 'docDate', nextMonth.toISOString().split('T')[0]);
+                                  setOpenDatePickerId(null);
+                                }}
+                                className="flex-1 text-xs font-medium py-1.5 rounded-md bg-muted hover:bg-muted/80 transition-colors"
+                              >
+                                +30 Hari
+                              </button>
+                            </div>
+                          </PopoverContent>
+                        </Popover>
                       </div>
                       {(query.docType === 'AMD PENUTUP' || query.docType === 'BAST') && (
                         <div className="w-full md:flex-1 space-y-2">

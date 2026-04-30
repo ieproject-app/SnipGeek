@@ -300,7 +300,11 @@ export function useToolNumbers() {
         setRequests(prev => prev.map(req => {
             if (req.id !== id) return req;
             const availableTypes = mergedCategories[category]?.types ?? [];
-            const nextDocType = availableTypes.includes(req.docType) ? req.docType : '';
+            const currentDocTypeValid = availableTypes.includes(req.docType);
+            let nextDocType = currentDocTypeValid ? req.docType : '';
+            if (!nextDocType && availableTypes.length === 1) {
+                nextDocType = availableTypes[0];
+            }
             return { ...req, category, docType: nextDocType };
         }));
     };
