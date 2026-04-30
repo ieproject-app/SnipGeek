@@ -56,3 +56,6 @@ eslint-result.json
 
 # Experimental Playground
 /playground/
+
+# Cloudinary draft images (local drafts before upload)
+claudinary/

@@ -434,7 +434,7 @@ function TechnicalTabsCard() {
                     <span className="rounded-full border border-emerald-500/30 bg-emerald-500/15 px-2 py-0.5 text-[8px] font-bold uppercase tracking-wide text-emerald-600 dark:text-emerald-400">HERO</span>
                   </div>
                   <Input
-                    placeholder="path/to/hero.webp | Alt text (optional)"
+                    placeholder="https://res.cloudinary.com/... | Alt text"
                     value={heroImage}
                     onChange={(e) => setHeroImage(e.target.value)}
                     className={cn("bg-background/50 font-mono text-[11px] focus-visible:border-emerald-500/50", focusRing)}
@@ -540,7 +540,7 @@ function TechnicalTabsCard() {
 
             {showGrids && (
               <TabsContent value="grids" className="space-y-3 m-0 border-none outline-none">
-                 <Textarea placeholder={"2 | path1.webp, path2.webp\n3 | img1, img2, img3"} value={imageGridMappings} onChange={(e) => setImageGridMappings(e.target.value)} className={cn("min-h-24 bg-background/50 p-3 font-mono text-[11px]", focusRing)} />
+                 <Textarea placeholder={"2 | https://res.cloudinary.com/..., https://res.cloudinary.com/..."} value={imageGridMappings} onChange={(e) => setImageGridMappings(e.target.value)} className={cn("min-h-24 bg-background/50 p-3 font-mono text-[11px]", focusRing)} />
                  {imageGridMappings.trim() && (
                     <div className="flex flex-wrap gap-1 mt-2">
                       {imageGridMappings.split("\n").filter((l: string) => l.trim()).map((_, i: number) => (
@@ -656,7 +656,7 @@ function GalleryTab({
           </p>
           <Textarea
             placeholder={
-              "public/images/_posts/apps/example/img-1.webp\npublic/images/_posts/apps/example/img-2.webp\npublic/images/_posts/apps/example/img-3.webp"
+              "https://res.cloudinary.com/snipgeek/image/upload/...\nhttps://res.cloudinary.com/snipgeek/image/upload/..."
             }
             value={importPaths}
             onChange={(e) => setImportPaths(e.target.value)}
@@ -688,7 +688,7 @@ function GalleryTab({
 
       {/* Main gallery mappings textarea */}
       <Textarea
-        placeholder={"Optional caption | path1.webp, path2.webp, path3.webp"}
+        placeholder={"Optional caption | https://res.cloudinary.com/..., https://res.cloudinary.com/..."}
         value={galleryMappings}
         onChange={(e) => setGalleryMappings(e.target.value)}
         className={cn("min-h-24 bg-background/50 p-3 font-mono text-[11px]", focusRing)}
