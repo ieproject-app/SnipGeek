@@ -19,6 +19,7 @@ import { ArticleRelated } from "@/components/blog/article-related";
 import { ArticleTOC } from "@/components/blog/article-toc";
 import { ArticleTags } from "@/components/blog/article-tags";
 import { ArticleLead } from "@/components/blog/article-lead";
+import { ArticleTranslationLink } from "@/components/blog/article-translation-link";
 import { RevealImage } from "@/components/ui/reveal-image";
 import { extractHeadings, stripMdxSyntax } from "@/lib/mdx-utils";
 import { LayoutBreadcrumbs } from "@/components/layout/layout-breadcrumbs";
@@ -192,6 +193,15 @@ export default async function Page({
     { label: initialPost.frontmatter.title },
   ];
 
+  // Resolve translation link for the other locale (server-side, zero client cost)
+  const otherLocale = i18n.locales.find((l) => l !== locale);
+  const translationEntry = otherLocale
+    ? await getPostTranslation(initialPost.frontmatter.translationKey, otherLocale)
+    : null;
+  const translationHref = translationEntry
+    ? `${getLinkPrefix(otherLocale!)}/blog/${translationEntry.slug}`
+    : null;
+
   const allPosts = await getSortedPostsData(locale);
   const currentTags = initialPost.frontmatter.tags ?? [];
   const currentCategory = initialPost.frontmatter.category;
@@ -276,6 +286,13 @@ export default async function Page({
           </div>
 
           <ArticleLead description={initialPost.frontmatter.description} />
+
+          {!initialPost.isFallback && (
+            <ArticleTranslationLink
+              translationHref={translationHref}
+              currentLocale={locale}
+            />
+          )}
 
           <div className="max-w-3xl mx-auto">
             <ArticleTOC

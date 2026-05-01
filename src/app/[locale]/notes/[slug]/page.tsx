@@ -18,6 +18,7 @@ import { ArticleRelated } from "@/components/blog/article-related";
 import { ArticleTOC } from "@/components/blog/article-toc";
 import { ArticleTags } from "@/components/blog/article-tags";
 import { ArticleLead } from "@/components/blog/article-lead";
+import { ArticleTranslationLink } from "@/components/blog/article-translation-link";
 import { extractHeadings, stripMdxSyntax } from "@/lib/mdx-utils";
 import { LayoutBreadcrumbs } from "@/components/layout/layout-breadcrumbs";
 import { ArticleComments } from "@/components/blog/article-comments";
@@ -187,6 +188,15 @@ export default async function Page({
       return false;
     });
 
+  // Resolve translation link for the other locale (server-side, zero client cost)
+  const otherLocale = i18n.locales.find((l) => l !== locale);
+  const translationEntry = otherLocale
+    ? await getNoteTranslation(initialNote.frontmatter.translationKey, otherLocale)
+    : null;
+  const translationHref = translationEntry
+    ? `${getLinkPrefix(otherLocale!)}/notes/${translationEntry.slug}`
+    : null;
+
   const heroSourceOg = resolveHeroImage(
     initialNote.frontmatter.heroImage,
     undefined,
@@ -225,6 +235,11 @@ export default async function Page({
               isCentered={true}
             />
             <ArticleLead description={initialNote.frontmatter.description} />
+
+            <ArticleTranslationLink
+              translationHref={translationHref}
+              currentLocale={locale}
+            />
           </header>
 
           <div className="max-w-3xl mx-auto">
