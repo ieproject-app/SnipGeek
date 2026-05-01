@@ -1,6 +1,7 @@
 
 'use client';
 
+import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
@@ -21,7 +22,7 @@ import {
     Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger,
 } from "@/components/ui/dialog";
 import { cn } from '@/lib/utils';
-import { format, addMonths, addWeeks, addYears, startOfMonth, endOfMonth, isSameMonth } from 'date-fns';
+import { format, addMonths, addWeeks, addYears } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { motion, AnimatePresence } from 'framer-motion';
 import { DAILY_LIMIT, type ValueCategory, type StockMatrix, type StockCategoryDetail } from './types';
@@ -141,6 +142,18 @@ export function NumberGeneratorTab({ hook }: NumberGeneratorTabProps) {
         handleGenerate, handleReset,
         copyFullResults, copyNumbersOnly, copyItem,
     } = hook;
+
+    // Separate display month state per request to avoid calendar desync
+    // This tracks which month is *shown* in the calendar, independent of the selected date
+    const [displayMonths, setDisplayMonths] = useState<Record<string, Date>>({});
+
+    const getDisplayMonth = (reqId: string, docDate: Date | undefined): Date => {
+        return displayMonths[reqId] ?? docDate ?? new Date();
+    };
+
+    const setDisplayMonth = (reqId: string, month: Date) => {
+        setDisplayMonths(prev => ({ ...prev, [reqId]: month }));
+    };
 
     return (
         <div className="space-y-10">
@@ -263,7 +276,13 @@ export function NumberGeneratorTab({ hook }: NumberGeneratorTabProps) {
                                         <Label className="text-[10px] font-black uppercase text-muted-foreground ml-1">Tanggal Dokumen</Label>
                                         <Popover
                                             open={openDatePickerId === req.id}
-                                            onOpenChange={(isOpen) => setOpenDatePickerId(isOpen ? req.id : null)}
+                                            onOpenChange={(isOpen) => {
+                                                if (isOpen) {
+                                                    // Sync display month to selected date when opening
+                                                    setDisplayMonth(req.id, req.docDate ?? new Date());
+                                                }
+                                                setOpenDatePickerId(isOpen ? req.id : null);
+                                            }}
                                         >
                                             <PopoverTrigger asChild>
                                                 <Button variant={'outline'} className={cn('w-full h-11 justify-start text-left font-normal rounded-lg border-primary/10 hover:border-primary/30 focus-visible:ring-accent', !req.docDate && 'text-muted-foreground')}>
@@ -274,16 +293,16 @@ export function NumberGeneratorTab({ hook }: NumberGeneratorTabProps) {
                                             <PopoverContent className="w-auto p-0 border-primary/15 shadow-2xl rounded-xl overflow-hidden backdrop-blur-sm">
                                                 <div className="flex items-center justify-between px-3 py-2 bg-muted/30 border-b border-primary/5">
                                                     <button
-                                                        onClick={() => handleRequestChange(req.id, 'docDate', addMonths(req.docDate || new Date(), -1))}
+                                                        onClick={() => setDisplayMonth(req.id, addMonths(getDisplayMonth(req.id, req.docDate), -1))}
                                                         className="p-1.5 rounded-md hover:bg-accent/10 text-muted-foreground hover:text-accent transition-colors"
                                                     >
                                                         <ChevronLeft className="h-4 w-4" />
                                                     </button>
                                                     <span className="text-xs font-semibold text-foreground">
-                                                        {format(req.docDate || new Date(), 'MMMM yyyy', { locale: id })}
+                                                        {format(getDisplayMonth(req.id, req.docDate), 'MMMM yyyy', { locale: id })}
                                                     </span>
                                                     <button
-                                                        onClick={() => handleRequestChange(req.id, 'docDate', addMonths(req.docDate || new Date(), 1))}
+                                                        onClick={() => setDisplayMonth(req.id, addMonths(getDisplayMonth(req.id, req.docDate), 1))}
                                                         className="p-1.5 rounded-md hover:bg-accent/10 text-muted-foreground hover:text-accent transition-colors"
                                                     >
                                                         <ChevronRight className="h-4 w-4" />
@@ -292,6 +311,8 @@ export function NumberGeneratorTab({ hook }: NumberGeneratorTabProps) {
                                                 <Calendar
                                                     mode="single"
                                                     selected={req.docDate}
+                                                    month={getDisplayMonth(req.id, req.docDate)}
+                                                    onMonthChange={(month) => setDisplayMonth(req.id, month)}
                                                     onSelect={(d) => {
                                                         if (!d) return;
                                                         handleRequestChange(req.id, 'docDate', d);
@@ -312,7 +333,9 @@ export function NumberGeneratorTab({ hook }: NumberGeneratorTabProps) {
                                                 <div className="border-t border-primary/5 px-2 pt-2 pb-2 grid grid-cols-4 gap-1">
                                                     <button
                                                         onClick={() => {
-                                                            handleRequestChange(req.id, 'docDate', new Date());
+                                                            const today = new Date();
+                                                            handleRequestChange(req.id, 'docDate', today);
+                                                            setDisplayMonth(req.id, today);
                                                             setOpenDatePickerId(null);
                                                         }}
                                                         className="text-[9px] font-black uppercase tracking-widest text-muted-foreground hover:text-accent hover:bg-accent/5 rounded-md py-1.5 transition-colors text-center"
@@ -321,7 +344,9 @@ export function NumberGeneratorTab({ hook }: NumberGeneratorTabProps) {
                                                     </button>
                                                     <button
                                                         onClick={() => {
-                                                            handleRequestChange(req.id, 'docDate', addWeeks(new Date(), 1));
+                                                            const d = addWeeks(new Date(), 1);
+                                                            handleRequestChange(req.id, 'docDate', d);
+                                                            setDisplayMonth(req.id, d);
                                                             setOpenDatePickerId(null);
                                                         }}
                                                         className="text-[9px] font-black uppercase tracking-widest text-muted-foreground hover:text-accent hover:bg-accent/5 rounded-md py-1.5 transition-colors text-center"
@@ -330,7 +355,9 @@ export function NumberGeneratorTab({ hook }: NumberGeneratorTabProps) {
                                                     </button>
                                                     <button
                                                         onClick={() => {
-                                                            handleRequestChange(req.id, 'docDate', addMonths(new Date(), 1));
+                                                            const d = addMonths(new Date(), 1);
+                                                            handleRequestChange(req.id, 'docDate', d);
+                                                            setDisplayMonth(req.id, d);
                                                             setOpenDatePickerId(null);
                                                         }}
                                                         className="text-[9px] font-black uppercase tracking-widest text-muted-foreground hover:text-accent hover:bg-accent/5 rounded-md py-1.5 transition-colors text-center"
@@ -339,7 +366,9 @@ export function NumberGeneratorTab({ hook }: NumberGeneratorTabProps) {
                                                     </button>
                                                     <button
                                                         onClick={() => {
-                                                            handleRequestChange(req.id, 'docDate', addYears(new Date(), 1));
+                                                            const d = addYears(new Date(), 1);
+                                                            handleRequestChange(req.id, 'docDate', d);
+                                                            setDisplayMonth(req.id, d);
                                                             setOpenDatePickerId(null);
                                                         }}
                                                         className="text-[9px] font-black uppercase tracking-widest text-muted-foreground hover:text-accent hover:bg-accent/5 rounded-md py-1.5 transition-colors text-center"
