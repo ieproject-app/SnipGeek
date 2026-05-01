@@ -29,5 +29,6 @@
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts",
   ],
-  "exclude": ["node_modules", "functions"],
+  "exclude": ["node_modules", "functions", "playground"],
 }
+
