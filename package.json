@@ -92,7 +92,7 @@
     "@types/fast-levenshtein": "^0.0.4",
     "@types/file-saver": "^2.0.7",
     "@types/negotiator": "^0.6.3",
-    "@types/node": "^20",
+    "@types/node": "^25",
     "@types/pdfjs-dist": "^2.10.378",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.1",
