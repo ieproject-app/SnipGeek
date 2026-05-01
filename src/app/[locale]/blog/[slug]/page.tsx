@@ -247,17 +247,16 @@ export default async function Page({
             />
           </header>
 
-          {/* Hero image - full-width on mobile, rounded on desktop */}
+          {/* Hero image - 4:3 aspect ratio, full-width on mobile, rounded on desktop */}
           <div className="relative -mx-4 sm:-mx-6 lg:mx-0 mb-12">
             {heroSource ? (
-              <div className="relative w-full lg:max-w-4xl lg:mx-auto lg:rounded-xl lg:overflow-hidden lg:shadow-xl">
+              <div className="relative w-full aspect-[16/10] overflow-hidden lg:max-w-4xl lg:mx-auto lg:rounded-xl lg:shadow-xl">
                 <RevealImage
                   src={heroSource.url}
                   alt={imageAlt || initialPost.frontmatter.title}
-                  width={1200}
-                  height={675}
-                  className="w-full h-auto max-h-[65vh] object-contain"
-                  wrapperClassName="w-full flex items-center justify-center focus:outline-none"
+                  fill
+                  className="object-cover"
+                  wrapperClassName="absolute inset-0"
                   placeholderClassName="hidden"
                   showSkeleton
                   holdUntilLoaded
@@ -265,11 +264,10 @@ export default async function Page({
                   sizes="(max-width: 1200px) 100vw, 1200px"
                   priority
                   data-ai-hint={heroSource.hint}
-                  style={{ width: "100%", height: "auto", objectFit: "contain", aspectRatio: "auto" }}
                 />
               </div>
             ) : (
-              <div className="w-full aspect-video lg:max-w-4xl lg:mx-auto lg:rounded-xl lg:overflow-hidden lg:shadow-xl flex items-center justify-center bg-primary/5 relative z-10">
+              <div className="w-full aspect-[16/10] lg:max-w-4xl lg:mx-auto lg:rounded-xl lg:overflow-hidden lg:shadow-xl flex items-center justify-center bg-primary/5 relative z-10">
                 <span className="text-primary/20 font-display text-6xl font-black">
                   SnipGeek
                 </span>
