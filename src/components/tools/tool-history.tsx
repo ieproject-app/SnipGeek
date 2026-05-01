@@ -56,7 +56,8 @@ export function ToolHistory({
     if (singleDocType && docQueries.length === 1 && !docQueries[0].docType) {
       handleQueryChange(docQueries[0].id, 'docType', singleDocType);
     }
-  }, [singleDocType]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [singleDocType, handleQueryChange]);
 
   return (
     <TooltipProvider delayDuration={300}>
@@ -350,7 +351,12 @@ export function ToolHistory({
                               selected={query.docDate ? new Date(query.docDate) : undefined}
                               onSelect={(d) => {
                                 if (!d) return;
-                                handleQueryChange(query.id, 'docDate', d.toISOString().split('T')[0]);
+                                // Use local date parts to avoid UTC timezone shift
+                                // e.g. toISOString() on +07:00 timezone would shift date back by 1 day
+                                const yyyy = d.getFullYear();
+                                const mm = String(d.getMonth() + 1).padStart(2, '0');
+                                const dd = String(d.getDate()).padStart(2, '0');
+                                handleQueryChange(query.id, 'docDate', `${yyyy}-${mm}-${dd}`);
                                 setOpenDatePickerId(null);
                               }}
                               className="p-1"
@@ -367,7 +373,11 @@ export function ToolHistory({
                             <div className="border-t border-primary/5 px-2 pt-2 pb-1 flex gap-1.5">
                               <button
                                 onClick={() => {
-                                  handleQueryChange(query.id, 'docDate', new Date().toISOString().split('T')[0]);
+                                  const d = new Date();
+                                  const yyyy = d.getFullYear();
+                                  const mm = String(d.getMonth() + 1).padStart(2, '0');
+                                  const dd = String(d.getDate()).padStart(2, '0');
+                                  handleQueryChange(query.id, 'docDate', `${yyyy}-${mm}-${dd}`);
                                   setOpenDatePickerId(null);
                                 }}
                                 className="flex-1 text-xs font-medium py-1.5 rounded-md bg-primary/5 hover:bg-primary/10 text-primary transition-colors"
@@ -376,9 +386,12 @@ export function ToolHistory({
                               </button>
                               <button
                                 onClick={() => {
-                                  const nextWeek = new Date();
-                                  nextWeek.setDate(nextWeek.getDate() + 7);
-                                  handleQueryChange(query.id, 'docDate', nextWeek.toISOString().split('T')[0]);
+                                  const d = new Date();
+                                  d.setDate(d.getDate() + 7);
+                                  const yyyy = d.getFullYear();
+                                  const mm = String(d.getMonth() + 1).padStart(2, '0');
+                                  const dd = String(d.getDate()).padStart(2, '0');
+                                  handleQueryChange(query.id, 'docDate', `${yyyy}-${mm}-${dd}`);
                                   setOpenDatePickerId(null);
                                 }}
                                 className="flex-1 text-xs font-medium py-1.5 rounded-md bg-muted hover:bg-muted/80 transition-colors"
@@ -387,9 +400,12 @@ export function ToolHistory({
                               </button>
                               <button
                                 onClick={() => {
-                                  const nextMonth = new Date();
-                                  nextMonth.setMonth(nextMonth.getMonth() + 1);
-                                  handleQueryChange(query.id, 'docDate', nextMonth.toISOString().split('T')[0]);
+                                  const d = new Date();
+                                  d.setMonth(d.getMonth() + 1);
+                                  const yyyy = d.getFullYear();
+                                  const mm = String(d.getMonth() + 1).padStart(2, '0');
+                                  const dd = String(d.getDate()).padStart(2, '0');
+                                  handleQueryChange(query.id, 'docDate', `${yyyy}-${mm}-${dd}`);
                                   setOpenDatePickerId(null);
                                 }}
                                 className="flex-1 text-xs font-medium py-1.5 rounded-md bg-muted hover:bg-muted/80 transition-colors"

@@ -178,7 +178,10 @@ export function useEmployeeHistory(employeeData: string, locale: string) {
     docQueries.forEach(query => {
       if (!query.docType || !query.docDate) return;
 
-      const targetDate = new Date(query.docDate);
+      // Parse date string as local time to avoid UTC midnight timezone shift
+      // new Date('2026-05-02') would be parsed as UTC → wrong date in +07:00
+      const [yyyy, mm, dd] = query.docDate.split('-').map(Number);
+      const targetDate = new Date(yyyy, mm - 1, dd);
       if (isNaN(targetDate.getTime())) return;
 
       let requiredGrups = docRules[query.docType] || [];

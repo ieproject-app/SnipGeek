@@ -41,9 +41,11 @@ export const docRules: DocRule = {
 
 // --- HELPER FUNCTIONS ---
 export const parseDate = (dateStr: string): Date => {
-  if (!dateStr) return new Date();
+  // Return invalid Date (NaN) instead of today for empty/bad input
+  // so callers can detect missing data via isNaN(date.getTime())
+  if (!dateStr) return new Date(NaN);
   const [day, month, year] = dateStr.split('/').map(Number);
-  if (isNaN(year)) return new Date();
+  if (isNaN(year)) return new Date(NaN);
   if (year === 9999) return new Date(9999, 11, 31);
   return new Date(year, month - 1, day);
 };
