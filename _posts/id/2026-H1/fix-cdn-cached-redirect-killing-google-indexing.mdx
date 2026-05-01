@@ -1,0 +1,192 @@
+---
+title: "Redirect 307 Ter-cache CDN Bikin Indexing Google Ambruk Total"
+slug: "fix-cdn-cached-redirect-killing-google-indexing"
+translationKey: "fix-cdn-cached-redirect-killing-google-indexing"
+date: "2026-05-03"
+description: "Redirect locale berbasis cookie ter-cache di Firebase CDN tanpa Vary: Cookie, bikin Googlebot kena 307 terus. Begini cara diagnosis dan perbaikannya."
+heroImage: "https://res.cloudinary.com/snipgeek/image/upload/q_auto/f_auto/v1777599316/error-index-google_devogj.webp"
+imageAlt: "Google Search Console menampilkan error indexing akibat redirect yang ter-cache"
+published: true
+featured: false
+tags: ["web", "nextjs", "seo", "firebase", "debugging"]
+category: "Development"
+---
+
+Minggu lalu saya buka Google Search Console dan langsung kaget — impressions SnipGeek turun dari sekitar 180 per hari jadi hampir nol dalam tiga hari. Tidak ada deployment error, tidak ada alert downtime, tidak ada perubahan konten. Tiba-tiba saja Google berhenti menampilkan halaman saya.
+
+Awalnya saya curiga ada tag `noindex` yang tidak sengaja masuk, atau `robots.txt` yang rusak. Ternyata bukan. Penyebabnya jauh lebih halus — dan jujur, saya tidak menyangka sebuah cookie bahasa bisa bikin separah ini.
+
+## Gejalanya: Homepage Redirect ke `/id/`
+
+Saya jalankan `curl` ke homepage live untuk cek response header:
+
+```bash
+curl -sI https://snipgeek.com/ | grep -iE 'HTTP|location|cache|cdn'
+```
+
+Hasilnya bikin saya diam sejenak:
+
+```
+HTTP/2 307
+location: /id/
+cache-control: public, s-maxage=3600, stale-while-revalidate=86400
+cdn-cache-status: hit
+age: 2326
+```
+
+Homepage mengembalikan **307 temporary redirect ke `/id/`** — versi Bahasa Indonesia — untuk *semua pengunjung*, termasuk Googlebot. Dan CDN sudah meng-cache-nya selama lebih dari 38 menit.
+
+Saya cek halaman lain seperti `/blog` dan `/about` — semuanya normal, return 200. Tapi homepage, halaman paling penting untuk crawling, justru yang rusak.
+
+## Akar Masalahnya: Cookie + CDN = Racun
+
+SnipGeek adalah situs bilingual (English/Indonesian) yang dibangun dengan [Next.js](/blog/firebase-studio-sunset-migration-guide) dan di-deploy di Firebase App Hosting. Routing i18n-nya ada di `proxy.ts` (pengganti middleware di Next.js 16).
+
+Ini kode yang menyebabkan masalah:
+
+```typescript
+// proxy.ts (SEBELUM — versi yang bermasalah)
+const preferredLocale = request.cookies.get("NEXT_LOCALE")?.value;
+
+if (pathnameIsMissingLocale) {
+  if (preferredLocale && preferredLocale !== i18n.defaultLocale) {
+    // Redirect ini di-cache CDN!
+    return NextResponse.redirect(
+      new URL(`/${preferredLocale}${pathname}`, request.url),
+    );
+  }
+  return NextResponse.rewrite(
+    new URL(`/${i18n.defaultLocale}${pathname}`, request.url),
+  );
+}
+```
+
+Logikanya kelihatan wajar: kalau pengunjung punya cookie `NEXT_LOCALE=id`, redirect ke versi Indonesia. Kalau tidak, rewrite ke locale default (English).
+
+Masalahnya ada di apa yang terjadi *setelah* response redirect itu keluar dari server.
+
+## Kenapa CDN Bikin Masalah Ini Jadi Fatal
+
+Firebase App Hosting punya CDN di depan server. Di `next.config.ts` saya menerapkan cache header ini untuk semua route halaman:
+
+```typescript
+{
+  key: "Cache-Control",
+  value: "public, s-maxage=3600, stale-while-revalidate=86400",
+}
+```
+
+Artinya CDN diminta "cache response ini selama 1 jam, dan boleh serve yang stale sampai 24 jam." Yang hilang? **Tidak ada header `Vary: Cookie`.**
+
+Jadi ketika *saya* (atau pengunjung manapun yang prefer bahasa Indonesia) mengakses homepage dengan cookie `NEXT_LOCALE=id`, CDN langsung meng-cache redirect 307 itu. Setiap pengunjung berikutnya — termasuk Googlebot — mendapat redirect yang ter-cache, bukan halaman HTML yang sebenarnya.
+
+Googlebot tidak mengirim cookie. Dia mengharapkan konten HTML di `snipgeek.com/`. Yang didapat malah dipantulkan ke `/id/` terus-menerus, tergantung timing cache CDN. Hasilnya: Google berhenti mempercayai homepage sebagai entry point yang stabil, dan impressions ambruk.
+
+<Callout variant="danger" title="Pola Berbahaya">
+  Redirect berbasis cookie + CDN caching publik tanpa `Vary: Cookie` = **cache poisoning**. Cookie pengunjung pertama menentukan apa yang dilihat semua orang sampai cache expired.
+</Callout>
+
+## Proses Diagnosis
+
+Audit yang saya lakukan cukup sistematis. Saya cek tiap layer yang bisa mempengaruhi indexing:
+
+<Steps>
+  <Step>
+
+  ### Cek robots.txt dan sitemap.xml
+
+  Keduanya bersih. `robots.txt` mengizinkan `/` untuk semua user agent, dan `sitemap.xml` berisi semua 216 URL yang published termasuk setiap blog post.
+
+  ```bash
+  curl -sS https://snipgeek.com/robots.txt | head -20
+  curl -sS https://snipgeek.com/sitemap.xml | grep -c '<url>'
+  ```
+
+  </Step>
+  <Step>
+
+  ### Cek meta robots di blog post
+
+  Saya fetch contoh blog post dan periksa HTML untuk directive `noindex`:
+
+  ```bash
+  curl -sS https://snipgeek.com/blog/disable-windows-defender-windows-11 \
+    | grep -i 'robots'
+  ```
+
+  Hasilnya: `<meta name="robots" content="index, follow"/>` — benar. Tidak ada `X-Robots-Tag` header juga.
+
+  </Step>
+  <Step>
+
+  ### Test dengan user-agent Googlebot
+
+  Saya ingin memastikan Googlebot melihat hal yang sama:
+
+  ```bash
+  curl -sI -A "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)" \
+    https://snipgeek.com/blog/disable-windows-defender-windows-11
+  ```
+
+  Blog post mengembalikan 200 dengan HTML lengkap. Tapi ketika saya test homepage — di situ 307-nya muncul.
+
+  </Step>
+  <Step>
+
+  ### Lacak asal redirect
+
+  Header `age: 2326` dan `cdn-cache-status: hit` mengonfirmasi ini bukan response segar dari server. CDN yang menyajikan redirect basi. Saya telusuri kembali ke `proxy.ts` dan menemukan branch redirect berbasis cookie.
+
+  </Step>
+</Steps>
+
+## Perbaikannya: Tiga Baris Dihapus
+
+Fix-nya minimal. Saya hapus seluruh branch redirect berbasis cookie dari `proxy.ts`:
+
+```typescript
+// proxy.ts (SESUDAH — versi yang sudah diperbaiki)
+if (pathnameIsMissingLocale) {
+  return NextResponse.rewrite(
+    new URL(
+      `/${i18n.defaultLocale}${pathname.startsWith("/") ? "" : "/"}${pathname}`,
+      request.url,
+    ),
+  );
+}
+```
+
+Sekarang URL tanpa locale **selalu** di-rewrite ke locale default (English). Tidak ada redirect, tidak ada risiko cache poisoning.
+
+Preferensi bahasa berbasis cookie tetap berfungsi — tapi sepenuhnya di sisi client. Komponen `LanguageSwitcher` dan `LocaleSuggestionBanner` menggunakan `router.push()` untuk navigasi ke URL `/id/` saat pengguna mengganti bahasa. Cookie tetap di-set untuk logika "jangan tampilkan lagi" di banner, tapi proxy tidak pernah membacanya lagi.
+
+<Callout variant="info" title="Prinsipnya">
+  Redirect server-side yang bergantung pada cookie tidak boleh di-cache secara publik. Tambahkan `Vary: Cookie` (yang efektifnya mematikan CDN caching) atau pindahkan logikanya ke client-side.
+</Callout>
+
+## Perbaikan Tambahan
+
+Sambil sudah bongkar-bongkar, saya sekalian menambah beberapa perkuatan defensif:
+
+- **Hapus redirect `/en` duplikat** dari `next.config.ts` — proxy sudah meng-handle kanonisasi `/en/*` → `/*` dengan redirect 308. Punya keduanya itu redundan.
+- **Tambah meta `robots` eksplisit** ke `generateMetadata` blog dan notes — sebelumnya mengandalkan inheritance dari layout, yang rapuh kalau metadata layout berubah.
+- **Tambah schema JSON-LD HowTo** untuk artikel bertag tutorial — ini mengaktifkan [rich results di Google Search](/blog/to-do-after-install-windows11) untuk konten step-by-step.
+
+## Pelajaran yang Saya Ambil
+
+Bagian paling menakutkan dari bug ini adalah betapa tidak terlihatnya. Situs tetap bisa diakses normal di browser saya (saya punya cookie-nya, jadi saya melihat redirect dan mendarat di `/id/` — persis seperti yang didesain). Tidak ada error log, tidak ada 500, tidak ada build failure.
+
+Satu-satunya sinyal adalah grafik Search Console yang turun ke nol. Kalau saya tidak cek GSC minggu itu, bug ini bisa tidak terdeteksi jauh lebih lama.
+
+Tiga poin yang saya pin untuk ke depan:
+
+- **Jangan pernah return redirect berbasis cookie dengan cache header `public`.** Kalau response bervariasi berdasarkan cookie, tandai `private` atau gunakan `Vary: Cookie`.
+- **Test homepage kamu dengan `curl`, bukan browser.** Browser membawa cookie dan cache state yang menyembunyikan masalah level CDN.
+- **Cek Search Console tiap minggu.** Itu satu-satunya early warning system untuk masalah crawl yang tidak muncul di application monitoring.
+
+Kalau kamu menjalankan situs Next.js multilingual di hosting yang punya CDN di depannya (Firebase, Vercel, Cloudflare), saya sangat sarankan untuk jalankan `curl -sI homepage-kamu.com` sekarang juga. Bisa saja hasilnya mengejutkan.
+
+### References
+1. [Google tentang 307 redirect dan indexing](https://developers.google.com/search/docs/crawling-indexing/301-redirects)
+2. [Dokumentasi proxy.ts Next.js](https://nextjs.org/docs/app/api-reference/file-conventions/proxy)
+3. [HTTP Vary header — MDN](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Vary)

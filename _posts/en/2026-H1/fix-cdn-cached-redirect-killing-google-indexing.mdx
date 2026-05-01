@@ -1,0 +1,192 @@
+---
+title: "How a Cached 307 Redirect Quietly Killed My Google Indexing"
+slug: "fix-cdn-cached-redirect-killing-google-indexing"
+translationKey: "fix-cdn-cached-redirect-killing-google-indexing"
+date: "2026-05-03"
+description: "A cookie-based locale redirect got cached by Firebase CDN without Vary: Cookie, poisoning Googlebot with 307 redirects. Here's how I diagnosed and fixed it."
+heroImage: "https://res.cloudinary.com/snipgeek/image/upload/q_auto/f_auto/v1777599316/error-index-google_devogj.webp"
+imageAlt: "Google Search Console showing indexing errors caused by a cached redirect"
+published: true
+featured: false
+tags: ["web", "nextjs", "seo", "firebase", "debugging"]
+category: "Development"
+---
+
+I noticed something alarming in Google Search Console last week — impressions for SnipGeek dropped from around 180 per day to nearly zero in the span of three days. No deployment errors, no downtime alerts, no content changes. Just silence from Google.
+
+My first instinct was to check for accidental `noindex` tags or a broken `robots.txt`. Both turned out fine. The real problem was far more subtle — and honestly, I didn't expect a locale cookie to be the culprit.
+
+## The Symptom: Homepage Redirecting to `/id/`
+
+I ran a quick `curl` against the live homepage to check response headers:
+
+```bash
+curl -sI https://snipgeek.com/ | grep -iE 'HTTP|location|cache|cdn'
+```
+
+The result stopped me cold:
+
+```
+HTTP/2 307
+location: /id/
+cache-control: public, s-maxage=3600, stale-while-revalidate=86400
+cdn-cache-status: hit
+age: 2326
+```
+
+The homepage was returning a **307 temporary redirect to `/id/`** — the Indonesian locale — for *every single visitor*, including Googlebot. And the CDN had cached it for over 38 minutes already.
+
+I checked other pages like `/blog` and `/about` — those returned 200 normally. But the homepage, the most important page for crawling, was broken.
+
+## The Root Cause: Cookie + CDN = Poison
+
+SnipGeek is a bilingual site (English/Indonesian) built with [Next.js](/blog/firebase-studio-sunset-migration-guide) and deployed on Firebase App Hosting. The i18n routing lives in `proxy.ts` (Next.js 16's replacement for middleware).
+
+Here's the code that caused the issue:
+
+```typescript
+// proxy.ts (BEFORE — the broken version)
+const preferredLocale = request.cookies.get("NEXT_LOCALE")?.value;
+
+if (pathnameIsMissingLocale) {
+  if (preferredLocale && preferredLocale !== i18n.defaultLocale) {
+    // This redirect gets cached by the CDN!
+    return NextResponse.redirect(
+      new URL(`/${preferredLocale}${pathname}`, request.url),
+    );
+  }
+  return NextResponse.rewrite(
+    new URL(`/${i18n.defaultLocale}${pathname}`, request.url),
+  );
+}
+```
+
+The logic itself seems reasonable: if a visitor has a `NEXT_LOCALE=id` cookie, redirect them to the Indonesian version. Otherwise, rewrite to the default English locale.
+
+The problem is what happens *after* the redirect response leaves the server.
+
+## Why the CDN Made It Catastrophic
+
+Firebase App Hosting sits behind a CDN. My `next.config.ts` applied this cache header to all page routes:
+
+```typescript
+{
+  key: "Cache-Control",
+  value: "public, s-maxage=3600, stale-while-revalidate=86400",
+}
+```
+
+This told the CDN: "cache this response for 1 hour, and serve stale for up to 24 hours." The critical missing piece? **No `Vary: Cookie` header.**
+
+So when *I* (or any Indonesian-preferring visitor) hit the homepage with a `NEXT_LOCALE=id` cookie, the CDN cached the 307 redirect. Every subsequent visitor — including Googlebot — got that cached redirect instead of the actual English homepage.
+
+Googlebot doesn't send cookies. It expected to see HTML content at `snipgeek.com/`. Instead, it got bounced to `/id/` over and over, depending on CDN cache timing. The result: Google stopped trusting the homepage as a stable entry point, and impressions collapsed.
+
+<Callout variant="danger" title="The Dangerous Pattern">
+  A cookie-based redirect + public CDN caching without `Vary: Cookie` = **cache poisoning**. The first visitor's cookie determines what everyone else sees until the cache expires.
+</Callout>
+
+## How I Diagnosed It
+
+The audit was systematic. I checked each layer that could affect indexing:
+
+<Steps>
+  <Step>
+
+  ### Check robots.txt and sitemap.xml
+
+  Both were clean. `robots.txt` allowed `/` for all user agents, and `sitemap.xml` contained all 216 published URLs including every blog post.
+
+  ```bash
+  curl -sS https://snipgeek.com/robots.txt | head -20
+  curl -sS https://snipgeek.com/sitemap.xml | grep -c '<url>'
+  ```
+
+  </Step>
+  <Step>
+
+  ### Check meta robots tags on blog posts
+
+  I fetched a sample blog post and checked the HTML for `noindex` directives:
+
+  ```bash
+  curl -sS https://snipgeek.com/blog/disable-windows-defender-windows-11 \
+    | grep -i 'robots'
+  ```
+
+  Result: `<meta name="robots" content="index, follow"/>` — correct. No `X-Robots-Tag` header either.
+
+  </Step>
+  <Step>
+
+  ### Test with Googlebot user-agent
+
+  I wanted to make sure Googlebot saw the same thing:
+
+  ```bash
+  curl -sI -A "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)" \
+    https://snipgeek.com/blog/disable-windows-defender-windows-11
+  ```
+
+  Blog posts returned 200 with full HTML. But when I tested the homepage — that's where the 307 appeared.
+
+  </Step>
+  <Step>
+
+  ### Trace the redirect origin
+
+  The `age: 2326` and `cdn-cache-status: hit` headers confirmed it wasn't a fresh response from the server. The CDN was serving a stale redirect. I traced it back to `proxy.ts` and found the cookie-based redirect branch.
+
+  </Step>
+</Steps>
+
+## The Fix: Three Lines Removed
+
+The fix was minimal. I removed the cookie-based redirect branch entirely from `proxy.ts`:
+
+```typescript
+// proxy.ts (AFTER — the fixed version)
+if (pathnameIsMissingLocale) {
+  return NextResponse.rewrite(
+    new URL(
+      `/${i18n.defaultLocale}${pathname.startsWith("/") ? "" : "/"}${pathname}`,
+      request.url,
+    ),
+  );
+}
+```
+
+Now locale-less URLs **always** rewrite to the default English locale. No redirect, no cache poisoning risk.
+
+The cookie-based language preference still works — but entirely client-side. The `LanguageSwitcher` component and the `LocaleSuggestionBanner` both use `router.push()` to navigate to the `/id/` URL when the user switches languages. The cookie is still set for the banner's "don't show again" logic, but the proxy never reads it.
+
+<Callout variant="info" title="The Principle">
+  Server-side redirects that depend on cookies should never be publicly cached. Either add `Vary: Cookie` (which effectively disables CDN caching) or move the logic client-side.
+</Callout>
+
+## What Else I Hardened
+
+While I had the hood open, I made a few more defensive changes:
+
+- **Removed duplicate `/en` redirect** from `next.config.ts` — the proxy already canonicalizes `/en/*` → `/*` with a 308 redirect. Having both was redundant.
+- **Added explicit `robots` meta** to blog and note `generateMetadata` — previously relied on layout inheritance, which is fragile if the layout metadata changes.
+- **Added HowTo JSON-LD schema** for tutorial-tagged articles — this enables [rich results in Google Search](/blog/to-do-after-install-windows11) for step-by-step content.
+
+## Lessons Learned
+
+The scariest part of this bug was how invisible it was. The site loaded fine in my browser (I had the cookie, so I saw the redirect and landed on `/id/` — exactly as designed). No error logs, no 500s, no build failures.
+
+The only signal was the Search Console graph dropping to zero. If I hadn't checked GSC that week, it could have gone unnoticed for much longer.
+
+Three takeaways I'm keeping pinned:
+
+- **Never return a cookie-dependent redirect with `public` cache headers.** If the response varies by cookie, either mark it `private` or use `Vary: Cookie`.
+- **Test your homepage with `curl`, not a browser.** Browsers carry cookies and cache state that hide CDN-level issues.
+- **Check Search Console weekly.** It's the only early warning system for crawl-level problems that don't show up in application monitoring.
+
+If you're running a multilingual Next.js site on any CDN-fronted hosting (Firebase, Vercel, Cloudflare), I'd strongly recommend running `curl -sI your-homepage.com` right now. You might be surprised by what comes back.
+
+### References
+1. [Google on 307 redirects and indexing](https://developers.google.com/search/docs/crawling-indexing/301-redirects)
+2. [Next.js proxy.ts documentation](https://nextjs.org/docs/app/api-reference/file-conventions/proxy)
+3. [HTTP Vary header — MDN](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Vary)
