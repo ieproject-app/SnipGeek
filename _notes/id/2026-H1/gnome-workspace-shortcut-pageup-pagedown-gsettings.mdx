@@ -1,0 +1,86 @@
+---
+title: "Set Shortcut Workspace GNOME dengan Tombol PageUp/PageDown Tanpa Modifier"
+slug: "gnome-workspace-shortcut-pageup-pagedown-gsettings"
+date: "2026-05-01"
+description: "GNOME Settings menolak PageUp/PageDown polos sebagai shortcut workspace. Lewati batasan GUI ini dengan gsettings langsung dari terminal."
+translationKey: "gnome-workspace-shortcut-pageup-pagedown-gsettings"
+published: true
+category: "Linux"
+tags: ["linux", "gnome-50", "tutorial", "troubleshooting"]
+---
+
+Saya sedang mengatur ulang workflow GNOME dan kepikiran: kenapa tidak pakai <kbd>PageUp</kbd> dan <kbd>PageDown</kbd> sebagai shortcut pindah workspace? Tombolnya ada di posisi yang pas, jarang kepakai saat ngetik biasa, dan tinggal sentuh aja tanpa perlu kombinasi ribet.
+
+Tapi GNOME Settings punya pendapat lain. Setiap kali saya coba set di **Settings → Keyboard → Navigation**, dialognya diam saja. Tidak mau menyimpan. Tidak ada pesan error. Cuma... bengong.
+
+Ternyata GNOME punya filter di editor shortcut GUI-nya: untuk navigasi workspace, harus ada minimal satu modifier key (<kbd>Super</kbd>, <kbd>Ctrl</kbd>, atau <kbd>Alt</kbd>). Tombol polos seperti <kbd>PageUp</kbd> sendirian langsung ditolak. Solusinya sederhana — set langsung lewat `gsettings` dari terminal.
+
+![Tampilan pengaturan shortcut keyboard GNOME untuk navigasi workspace](https://res.cloudinary.com/snipgeek/image/upload/q_auto/f_auto/v1777635382/Screenshot_inqbkp.webp)
+
+## Setting Shortcut via gsettings
+
+Pertama, perlu tahu bahwa workspace di GNOME modern tersusun secara horizontal. Makanya nama key-nya pakai **left/right**, bukan up/down.
+
+<Steps>
+  <Step>
+
+### Buka Terminal
+
+Terminal apa pun bisa dipakai.
+
+  </Step>
+  <Step>
+
+### Set PageUp dan PageDown
+
+Jalankan dua perintah ini:
+
+```bash
+gsettings set org.gnome.desktop.wm.keybindings switch-to-workspace-left "['Page_Up']"
+gsettings set org.gnome.desktop.wm.keybindings switch-to-workspace-right "['Page_Down']"
+```
+
+  </Step>
+  <Step>
+
+### Verifikasi
+
+Pastikan shortcut sudah tersimpan dengan benar:
+
+```bash
+gsettings get org.gnome.desktop.wm.keybindings switch-to-workspace-left
+gsettings get org.gnome.desktop.wm.keybindings switch-to-workspace-right
+```
+
+Output yang diharapkan:
+
+```
+['Page_Up']
+['Page_Down']
+```
+
+  </Step>
+</Steps>
+
+Selesai. <kbd>PageUp</kbd> dan <kbd>PageDown</kbd> langsung bisa dipakai buat pindah workspace — tanpa perlu modifier key tambahan.
+
+<Callout variant="info" title="Mau Pakai Kombinasi Modifier?">
+  Kalau lebih suka pakai <kbd>Super</kbd>+<kbd>PageUp</kbd> atau kombinasi lain, tinggal sesuaikan perintahnya:
+
+  ```bash
+  gsettings set org.gnome.desktop.wm.keybindings switch-to-workspace-left "['<Super>Page_Up']"
+  gsettings set org.gnome.desktop.wm.keybindings switch-to-workspace-right "['<Super>Page_Down']"
+  ```
+</Callout>
+
+## Kenapa Harus Lewat Terminal?
+
+Jujur, saya habis lima menit mondar-mandir di Settings, klik sana-sini, mikir ada yang salah dengan cara saya. Ternyata GNOME sengaja mendesain GUI shortcut editornya untuk menolak bare key pada navigasi workspace — mungkin biar tidak kecipratan ganti workspace saat lagi ngetik biasa.
+
+Tapi `gsettings` tidak punya filter itu. Binding yang ditolak di GUI ternyata sah-sah saja di level dconf. Begitu saya tahu itu, perbaikannya cuma butuh sepuluh detik.
+
+Kalau kamu sedang [setup Ubuntu baru](/blog/ubuntu-26-04-lts-resolute-raccoon-new-features-major-changes), saya sarankan tambahkan perintah ini ke post-install script bareng [tweak GNOME lainnya](/blog/remap-keyboard-key-keyd-wayland-linux). Efeknya kecil, tapi bikin navigasi workspace terasa jauh lebih cepat tanpa harus merogoh kombinasi tombol setiap kali.
+
+### References
+1. [gsettings — GNOME Developer Documentation](https://developer.gnome.org/gio/stable/gsettings.html)
+2. [org.gnome.desktop.wm.keybindings — GNOME Schemas](https://gitlab.gnome.org/GNOME/gnome-control-center/-/blob/main/schemas/org.gnome.desktop.wm.keybindings.gschema.xml)

@@ -1,0 +1,86 @@
+---
+title: "Set GNOME Workspace Shortcuts with Bare PageUp/PageDown Keys"
+slug: "gnome-workspace-shortcut-pageup-pagedown-gsettings"
+date: "2026-05-03"
+description: "GNOME Settings rejects bare PageUp/PageDown for workspace shortcuts. Bypass this GUI limitation using gsettings to enable faster navigation."
+translationKey: "gnome-workspace-shortcut-pageup-pagedown-gsettings"
+published: true
+category: "Linux"
+tags: ["linux", "gnome-50", "tutorial", "troubleshooting"]
+---
+
+I was setting up my GNOME workflow and wanted a clean, single-key shortcut to switch workspaces. <kbd>PageUp</kbd> and <kbd>PageDown</kbd> felt like the natural choice — they're right there, unused during normal typing, and perfectly positioned for thumb access.
+
+But GNOME Settings had other plans. Every time I tried to assign them under **Settings → Keyboard → Navigation**, the dialog simply refused to save. No error message. Just silence.
+
+The problem: GNOME's GUI keyboard shortcut editor requires at least one modifier key (<kbd>Super</kbd>, <kbd>Ctrl</kbd>, <kbd>Alt</kbd>) for workspace navigation shortcuts. Bare keys are silently rejected. The fix is straightforward — set them via `gsettings` on the command line.
+
+![GNOME keyboard shortcut navigation settings showing workspace switch options](https://res.cloudinary.com/snipgeek/image/upload/q_auto/f_auto/v1777635382/Screenshot_inqbkp.webp)
+
+## Setting the Shortcuts via gsettings
+
+One thing to note: GNOME modern workspace layouts are horizontal, so the key names use **left/right** instead of up/down.
+
+<Steps>
+  <Step>
+
+### Open a Terminal
+
+Any terminal emulator works.
+
+  </Step>
+  <Step>
+
+### Assign PageUp and PageDown
+
+Run these two commands:
+
+```bash
+gsettings set org.gnome.desktop.wm.keybindings switch-to-workspace-left "['Page_Up']"
+gsettings set org.gnome.desktop.wm.keybindings switch-to-workspace-right "['Page_Down']"
+```
+
+  </Step>
+  <Step>
+
+### Verify the Assignment
+
+Confirm the shortcuts were stored correctly:
+
+```bash
+gsettings get org.gnome.desktop.wm.keybindings switch-to-workspace-left
+gsettings get org.gnome.desktop.wm.keybindings switch-to-workspace-right
+```
+
+Expected output:
+
+```
+['Page_Up']
+['Page_Down']
+```
+
+  </Step>
+</Steps>
+
+That's it. <kbd>PageUp</kbd> and <kbd>PageDown</kbd> now switch workspaces immediately — no modifier key required.
+
+<Callout variant="info" title="Prefer a Modifier Combination?">
+  If you'd rather use <kbd>Super</kbd>+<kbd>PageUp</kbd> or similar, adjust the command:
+
+  ```bash
+  gsettings set org.gnome.desktop.wm.keybindings switch-to-workspace-left "['<Super>Page_Up']"
+  gsettings set org.gnome.desktop.wm.keybindings switch-to-workspace-right "['<Super>Page_Down']"
+  ```
+</Callout>
+
+## Why the Terminal Is Necessary
+
+I spent a good five minutes clicking around the Settings app thinking I was doing something wrong. Turns out, the GUI keyboard shortcut editor has a hard filter: it won't register any shortcut for workspace navigation unless at least one modifier key is present. This is a deliberate design choice, not a bug — presumably to prevent accidental workspace switches during normal typing.
+
+But `gsettings` doesn't enforce that filter. The same bare-key binding that the GUI rejects is perfectly valid at the dconf level. Once I learned that, the fix took about ten seconds.
+
+If you're setting up a [fresh Ubuntu install](/blog/ubuntu-26-04-lts-resolute-raccoon-new-features-major-changes), I'd recommend adding these commands to your post-install script alongside other [GNOME customization tweaks](/blog/remap-keyboard-key-keyd-wayland-linux). It's a small quality-of-life improvement that makes workspace navigation feel noticeably faster.
+
+### References
+1. [gsettings — GNOME Developer Documentation](https://developer.gnome.org/gio/stable/gsettings.html)
+2. [org.gnome.desktop.wm.keybindings — GNOME Schemas](https://gitlab.gnome.org/GNOME/gnome-control-center/-/blob/main/schemas/org.gnome.desktop.wm.keybindings.gschema.xml)
