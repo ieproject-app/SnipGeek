@@ -27,16 +27,14 @@ describe('employee-history/types', () => {
       expect(d.getFullYear()).toBe(9999);
     });
 
-    it('returns current date for empty string', () => {
-      const before = Date.now();
+    it('returns NaN for empty string', () => {
       const d = parseDate('');
-      expect(d.getTime()).toBeGreaterThanOrEqual(before - 1000);
+      expect(isNaN(d.getTime())).toBe(true);
     });
 
-    it('returns current date for invalid input', () => {
+    it('returns NaN for invalid input', () => {
       const d = parseDate('invalid');
-      expect(d).toBeInstanceOf(Date);
-      expect(isNaN(d.getTime())).toBe(false);
+      expect(isNaN(d.getTime())).toBe(true);
     });
   });
 
