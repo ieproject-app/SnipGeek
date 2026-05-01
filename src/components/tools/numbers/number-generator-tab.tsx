@@ -132,11 +132,13 @@ export function NumberGeneratorTab({ hook }: NumberGeneratorTabProps) {
         isCopied, copiedIndex, isStockDialogOpen, setIsStockDialogOpen,
         stockMatrix, stockRawMatrix, stockPeriodsByYear, stockYears,
         stockCategories, isStockLoading, openDatePickerId, setOpenDatePickerId,
+        calendarViewMonths,
         userLimit, isLimitLoading, isAdminUser,
         remainingLimit, hasResults, successCount, failedCount, totalQuantity,
         mergedCategories, categoryOptions, stockCategoryDetailMap,
         fetchStockSummary,
         handleCategoryChange, handleDocTypeChange, handleRequestChange,
+        handleCalendarMonthChange,
         addRequest, removeRequest,
         handleGenerate, handleReset,
         copyFullResults, copyNumbersOnly, copyItem,
@@ -274,16 +276,22 @@ export function NumberGeneratorTab({ hook }: NumberGeneratorTabProps) {
                                             <PopoverContent className="w-auto p-0 border-primary/15 shadow-2xl rounded-xl overflow-hidden backdrop-blur-sm">
                                                 <div className="flex items-center justify-between px-3 py-2 bg-muted/30 border-b border-primary/5">
                                                     <button
-                                                        onClick={() => handleRequestChange(req.id, 'docDate', addMonths(req.docDate || new Date(), -1))}
+                                                        onClick={() => {
+                                                            const base = calendarViewMonths[req.id] || req.docDate || new Date();
+                                                            handleCalendarMonthChange(req.id, addMonths(base, -1));
+                                                        }}
                                                         className="p-1.5 rounded-md hover:bg-accent/10 text-muted-foreground hover:text-accent transition-colors"
                                                     >
                                                         <ChevronLeft className="h-4 w-4" />
                                                     </button>
                                                     <span className="text-xs font-semibold text-foreground">
-                                                        {format(req.docDate || new Date(), 'MMMM yyyy', { locale: id })}
+                                                        {format(calendarViewMonths[req.id] || req.docDate || new Date(), 'MMMM yyyy', { locale: id })}
                                                     </span>
                                                     <button
-                                                        onClick={() => handleRequestChange(req.id, 'docDate', addMonths(req.docDate || new Date(), 1))}
+                                                        onClick={() => {
+                                                            const base = calendarViewMonths[req.id] || req.docDate || new Date();
+                                                            handleCalendarMonthChange(req.id, addMonths(base, 1));
+                                                        }}
                                                         className="p-1.5 rounded-md hover:bg-accent/10 text-muted-foreground hover:text-accent transition-colors"
                                                     >
                                                         <ChevronRight className="h-4 w-4" />
@@ -292,6 +300,8 @@ export function NumberGeneratorTab({ hook }: NumberGeneratorTabProps) {
                                                 <Calendar
                                                     mode="single"
                                                     selected={req.docDate}
+                                                    month={calendarViewMonths[req.id] || req.docDate || new Date()}
+                                                    onMonthChange={(month) => handleCalendarMonthChange(req.id, month)}
                                                     onSelect={(d) => {
                                                         if (!d) return;
                                                         handleRequestChange(req.id, 'docDate', d);

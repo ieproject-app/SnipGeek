@@ -43,6 +43,7 @@ export function useToolNumbers() {
     const [stockCategoryDetails, setStockCategoryDetails] = useState<StockCategoryDetail[]>([]);
     const [isStockLoading, setIsStockLoading] = useState(false);
     const [openDatePickerId, setOpenDatePickerId] = useState<string | null>(null);
+    const [calendarViewMonths, setCalendarViewMonths] = useState<Record<string, Date>>({});
 
     // Admin Injector states
     const [injectText, setInjectText] = useState('');
@@ -550,6 +551,10 @@ export function useToolNumbers() {
         setTimeout(() => setCopiedIndex(null), 2000);
     };
 
+    const handleCalendarMonthChange = (id: string, month: Date) => {
+        setCalendarViewMonths(prev => ({ ...prev, [id]: month }));
+    };
+
     return {
         // State
         requests, valueCategory, setValueCategory, isGenerating, generatedNumbers,
@@ -557,6 +562,7 @@ export function useToolNumbers() {
         isStockDialogOpen, setIsStockDialogOpen, stockMatrix, stockRawMatrix,
         stockPeriodsByYear, stockYears, stockCategories, stockCategoryDetails,
         isStockLoading, openDatePickerId, setOpenDatePickerId,
+        calendarViewMonths,
         injectText, setInjectText, injectValueCategory, setInjectValueCategory,
         isInjecting, injectProgress,
         userLimit, isLimitLoading, isAdminUser,
@@ -571,6 +577,7 @@ export function useToolNumbers() {
         fetchDynamicCategories, handleSaveDynamicCategory, handleDeleteDynamicCategory,
         fetchStockSummary, fetchMyHistory,
         handleCategoryChange, handleDocTypeChange, handleRequestChange,
+        handleCalendarMonthChange,
         addRequest, removeRequest,
         handleGenerate, handleBulkInject, handleReset,
         copyFullResults, copyNumbersOnly, copyItem,
