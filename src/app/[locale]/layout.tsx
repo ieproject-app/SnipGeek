@@ -169,10 +169,8 @@ export default async function LocaleLayout({
   const posts = await getSortedPostsData(locale);
   const notes = await getSortedNotesData(locale);
   const linkPrefix = locale === i18n.defaultLocale ? "" : `/${locale}`;
-  const SEARCHABLE_POST_LIMIT = 24;
-  const SEARCHABLE_NOTE_LIMIT = 8;
 
-  const searchablePosts = posts.slice(0, SEARCHABLE_POST_LIMIT).map((post) => ({
+  const searchablePosts = posts.map((post) => ({
     slug: post.slug,
     title: post.frontmatter.title,
     description: post.frontmatter.description,
@@ -181,7 +179,7 @@ export default async function LocaleLayout({
     tags: post.frontmatter.tags,
   }));
 
-  const searchableNotes = notes.slice(0, SEARCHABLE_NOTE_LIMIT).map((note) => ({
+  const searchableNotes = notes.map((note) => ({
     slug: note.slug,
     title: note.frontmatter.title,
     description: note.frontmatter.description,

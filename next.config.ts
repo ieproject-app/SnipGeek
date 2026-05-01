@@ -192,16 +192,8 @@ const nextConfig: NextConfig = {
   },
   async redirects() {
     return [
-      {
-        source: "/en",
-        destination: "/",
-        permanent: true,
-      },
-      {
-        source: "/en/:path*",
-        destination: "/:path*",
-        permanent: true,
-      },
+      // /en canonicalization is handled by proxy.ts (308 redirect).
+      // Only content-specific redirects below.
       {
         source: "/blog/hapus-folder-onedrive-duplikat-explorer",
         destination: "/blog/remove-duplicate-onedrive-windows-11",

@@ -3,7 +3,6 @@ import { i18n } from "./i18n-config";
 
 export function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
-  const preferredLocale = request.cookies.get("NEXT_LOCALE")?.value;
 
   // Skip middleware for API routes, Next.js internal files, static files,
   // and the internal /admin dashboard (which is intentionally not localized).
@@ -31,16 +30,11 @@ export function proxy(request: NextRequest) {
       !pathname.startsWith(`/${locale}/`) && pathname !== `/${locale}`,
   );
 
+  // Locale-less paths always rewrite to the default locale.
+  // Cookie-based locale preference is handled client-side only
+  // (language-switcher / locale-suggestion-banner) to avoid CDN
+  // caching a redirect that poisons every subsequent visitor.
   if (pathnameIsMissingLocale) {
-    if (preferredLocale && preferredLocale !== i18n.defaultLocale) {
-      return NextResponse.redirect(
-        new URL(
-          `/${preferredLocale}${pathname.startsWith("/") ? "" : "/"}${pathname}`,
-          request.url,
-        ),
-      );
-    }
-
     return NextResponse.rewrite(
       new URL(
         `/${i18n.defaultLocale}${pathname.startsWith("/") ? "" : "/"}${pathname}`,

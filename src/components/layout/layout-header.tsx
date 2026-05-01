@@ -185,7 +185,10 @@ export function LayoutHeader({
       const filteredData = (searchableData || []).filter(
         (item) =>
           (item.title || "").toLowerCase().includes(lowerCaseQuery) ||
-          (item.description || "").toLowerCase().includes(lowerCaseQuery),
+          (item.description || "").toLowerCase().includes(lowerCaseQuery) ||
+          (item.tags || []).some((tag: string) =>
+            tag.toLowerCase().includes(lowerCaseQuery),
+          ),
       );
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setResults(filteredData);

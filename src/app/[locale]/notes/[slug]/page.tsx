@@ -107,6 +107,17 @@ export async function generateMetadata({
       authors: ["Iwan Efendi"],
       tags: note.frontmatter.tags?.length ? note.frontmatter.tags : undefined,
     },
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        "max-video-preview": -1,
+        "max-image-preview": "large",
+        "max-snippet": -1,
+      },
+    },
     twitter: {
       card: "summary_large_image",
       title: note.frontmatter.title,

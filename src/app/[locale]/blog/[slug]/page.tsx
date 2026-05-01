@@ -108,6 +108,17 @@ export async function generateMetadata({
       authors: ["Iwan Efendi"],
       tags: post.frontmatter.tags?.length ? post.frontmatter.tags : undefined,
     },
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        "max-video-preview": -1,
+        "max-image-preview": "large",
+        "max-snippet": -1,
+      },
+    },
     twitter: {
       card: "summary_large_image",
       title: post.frontmatter.title,
@@ -376,6 +387,32 @@ export default async function Page({
           }),
         }}
       />
+      {/* HowTo schema for tutorial articles — enables rich results in Google */}
+      {(currentTags.some((t) => t.toLowerCase() === "tutorial") ||
+        currentCategory?.toLowerCase() === "tutorial") &&
+        headings.filter((h) => h.level === 2).length >= 2 && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "HowTo",
+              "name": initialPost.frontmatter.title,
+              "description": initialPost.frontmatter.description,
+              "image": ogImageUrl,
+              "totalTime": `PT${readingTime}M`,
+              "step": headings
+                .filter((h) => h.level === 2)
+                .map((h, i) => ({
+                  "@type": "HowToStep",
+                  "position": i + 1,
+                  "name": h.text,
+                  "url": `https://snipgeek.com${canonicalPath}#${h.id}`,
+                })),
+            }),
+          }}
+        />
+      )}
       <ArticleRelated
         type="blog"
         locale={locale}

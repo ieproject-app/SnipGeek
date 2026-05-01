@@ -63,16 +63,20 @@ SnipGeek is a bilingual (EN/ID) content platform for publishing technical articl
 #### Internal (Google login required)
 | Tool | Route | Status |
 |---|---|---|
-| Employee History (Riwayat Karyawan) | `/tools/employee-history` | ✅ Live |
 | Number Generator | `/tools/number-generator` | ✅ Live |
-| Signatories Index | `/tools/signatories-index` | 🚧 Unreleased |
-| Compress PDF | `/tools/compress-pdf` | 🚧 Unreleased |
-| Address Label Generator | `/tools/address-label-generator` | 🚧 Unreleased |
+| Employee History (Riwayat Karyawan) | `/tools/employee-history` | ✅ Live |
 
-#### Dev-Only (development mode only)
+#### Admin-Only
 | Tool | Route | Status |
 |---|---|---|
-| Prompt Generator | `/tools/prompt-generator` | � Dev Only |
+| Prompt Generator | `/admin/prompt-generator` | ✅ Live |
+
+#### Unreleased (dev mode only)
+| Tool | Route | Status |
+|---|---|---|
+| Signatories Index | `/tools/signatories-index` | 🔧 Dev Only |
+| Compress PDF | `/tools/compress-pdf` | 🔧 Dev Only |
+| Address Label Generator | `/tools/address-label-generator` | 🔧 Dev Only |
 
 #### Coming Soon
 | Tool | Status |
@@ -83,6 +87,16 @@ SnipGeek is a bilingual (EN/ID) content platform for publishing technical articl
 - Custom status-bar notification system (`useNotification`) shown in the header
 - Used for reading list actions, copy confirmations, etc.
 - **Do not** replace with Shadcn's `useToast` for these short feedback messages
+
+### 🛡️ Admin Dashboard
+- Secure admin area at `/admin` with Google authentication
+- Protected by Firebase Auth — only users with `admin` role in Firestore `roles_admin/{uid}` can access
+- **Prompt Generator**: AI-powered content generation tool with Cloudinary image integration
+  - Supports Cloudinary URLs for hero images, galleries, and grid layouts
+  - Users enter Cloudinary URLs directly (e.g., `https://res.cloudinary.com/snipgeek/image/upload/...`)
+  - No additional Cloudinary SDK configuration required — purely URL-based
+- Dashboard overview with system status and quick actions
+- Separate admin login at `/admin/login`
 
 ---
 
@@ -175,6 +189,10 @@ src/
 │   │   ├── terms/              # Terms of service
 │   │   └── layout.tsx          # Locale layout — fonts, ThemeProvider, Header, Footer
 │   ├── api/                    # API routes (numbers, posts, notes, tools, img, dev)
+│   ├── admin/                  # Admin dashboard (protected)
+│   │   ├── login/              # Admin login page
+│   │   ├── prompt-generator/   # Prompt Generator tool
+│   │   └── index-monitor/      # Index monitoring tool
 │   ├── llms.txt/               # Dynamic /llms.txt route for AI crawler accessibility
 │   ├── globals.css             # Tailwind 4 CSS (CSS variables for light/dark)
 │   ├── not-found.tsx           # 404 page (ThemeProvider-aware, correct fonts)
@@ -420,7 +438,7 @@ The following HTTP headers are applied to all routes via `next.config.ts`:
 | Date Utilities | date-fns |
 | PDF | pdf-lib (generation) + pdfjs-dist (parsing) |
 | OCR | Tesseract.js (client) + `@google-cloud/vision` (server) |
-| Image Processing | Sharp (server) + browser-image-compression (client) |
+| Image Processing | Sharp (server) + browser-image-compression (client) + Cloudinary (URL-based image hosting) |
 | Spreadsheets | ExcelJS |
 | Carousel | Embla Carousel React |
 | Confetti | react-confetti |
