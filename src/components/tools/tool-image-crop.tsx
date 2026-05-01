@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -16,8 +17,9 @@ import {
   CheckCircle2,
   X,
   Loader2,
+  RectangleHorizontal,
 } from "lucide-react";
-import { EXPORT_WIDTH, EXPORT_HEIGHT, MAX_TARGET_SIZE_KB, type ImageCropTranslations } from "./image-crop/types";
+import { MAX_TARGET_SIZE_KB, ASPECT_RATIO_STORAGE_KEY, type AspectRatioMode, type ImageCropTranslations } from "./image-crop/types";
 import { CropPreview, InfoPill } from "./image-crop/crop-preview";
 import { useImageCrop } from "./image-crop/use-image-crop";
 
@@ -29,6 +31,21 @@ interface ToolImageCropProps {
 }
 
 export function ToolImageCrop({ dictionary }: ToolImageCropProps) {
+  const [aspectRatio, setAspectRatio] = useState<AspectRatioMode>("4:3");
+
+  // Load saved preference from localStorage
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(ASPECT_RATIO_STORAGE_KEY);
+      if (saved === "16:9" || saved === "4:3") setAspectRatio(saved);
+    } catch {}
+  }, []);
+
+  const handleRatioChange = (mode: AspectRatioMode) => {
+    setAspectRatio(mode);
+    try { localStorage.setItem(ASPECT_RATIO_STORAGE_KEY, mode); } catch {}
+  };
+
   const toolMeta = dictionary?.tools?.tool_list?.image_crop || {
     title: "Image Crop",
     description: "Crop to 16:9 and export as WebP.",
@@ -77,13 +94,14 @@ export function ToolImageCrop({ dictionary }: ToolImageCropProps) {
     ],
   };
 
-  const hook = useImageCrop(t);
+  const hook = useImageCrop(t, aspectRatio);
   const {
     imageSrc, imgW, imgH, fileName, isDragging, isProcessing, estimatedSize,
     offsetX, setOffsetX, offsetY, setOffsetY, cropScale,
     fileInputRef,
     maxCropW, maxCropH, cropW, cropH, maxOffsetX, maxOffsetY,
-    cropX, cropY, canSlideX, canSlideY, canDrag, isAlready169,
+    cropX, cropY, canSlideX, canSlideY, canDrag, isAlreadyTarget,
+    exportW, exportH,
     compressLoading, compressProgress, compressError,
     handleFileInput, handleDrop, handleDragOver, handleDragLeave,
     handleReposition, handleBrowseFiles, handleDownload,
@@ -114,6 +132,25 @@ export function ToolImageCrop({ dictionary }: ToolImageCropProps) {
             </div>
           </div>
           <div className="flex flex-wrap items-center gap-2 sm:justify-end">
+            {/* Aspect ratio toggle */}
+            <div className="flex items-center rounded-full border border-primary/15 bg-background/70 p-0.5">
+              {(["4:3", "16:9"] as AspectRatioMode[]).map((mode) => (
+                <button
+                  key={mode}
+                  type="button"
+                  onClick={() => handleRatioChange(mode)}
+                  className={cn(
+                    "flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-black uppercase tracking-widest transition-all",
+                    aspectRatio === mode
+                      ? "bg-primary text-primary-foreground shadow-sm"
+                      : "text-muted-foreground hover:text-primary"
+                  )}
+                >
+                  <RectangleHorizontal className={cn("h-3 w-3", mode === "4:3" && "rotate-90")} />
+                  {mode}
+                </button>
+              ))}
+            </div>
             <Button
               type="button"
               onClick={handleBrowseFiles}
@@ -217,7 +254,7 @@ export function ToolImageCrop({ dictionary }: ToolImageCropProps) {
                   <div className="flex items-center gap-2 rounded-full border border-accent/20 bg-accent/10 px-3 py-1.5 backdrop-blur-sm">
                     <Crop className="h-3 w-3 text-accent" />
                     <span className="text-[10px] font-bold text-accent uppercase tracking-widest">
-                      {t.outputBadge} · {EXPORT_WIDTH}x{EXPORT_HEIGHT}
+                      Output: {aspectRatio} .webp · {exportW}x{exportH}
                     </span>
                   </div>
                 </div>
@@ -236,11 +273,11 @@ export function ToolImageCrop({ dictionary }: ToolImageCropProps) {
               <div className="flex flex-wrap justify-center gap-2">
                 <InfoPill label={t.original} value={`${imgW} × ${imgH}`} />
                 <InfoPill label={t.ratio} value={(imgW / imgH).toFixed(3)} />
-                <InfoPill label={t.target} value={`${EXPORT_WIDTH} × ${EXPORT_HEIGHT}`} />
-                {isAlready169 && (
+                <InfoPill label={t.target} value={`${exportW} × ${exportH}`} />
+                {isAlreadyTarget && (
                   <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 text-xs font-black uppercase tracking-wider">
                     <CheckCircle2 className="h-3.5 w-3.5" />
-                    {t.already169}
+                    Already {aspectRatio}
                   </div>
                 )}
               </div>
@@ -333,13 +370,13 @@ export function ToolImageCrop({ dictionary }: ToolImageCropProps) {
                       </div>
                       <div className="text-[11px] leading-relaxed text-muted-foreground">
                         <div className="flex flex-wrap items-center gap-2">
-                          <span className="font-mono font-bold text-primary">{fileName}-1920x1080.webp</span>
+                          <span className="font-mono font-bold text-primary">{fileName}-{exportW}x{exportH}.webp</span>
                           <span className="rounded-full bg-accent/10 px-2 py-0.5 font-mono text-[10px] font-bold uppercase tracking-widest text-accent">
                             auto quality
                           </span>
                         </div>
                         <p className="mt-1 font-mono text-primary">
-                          {EXPORT_WIDTH} × {EXPORT_HEIGHT} px · ≤{MAX_TARGET_SIZE_KB}KB
+                          {exportW} × {exportH} px · ≤{MAX_TARGET_SIZE_KB}KB
                           {estimatedSize && <span className="text-accent"> · Est. {estimatedSize}</span>}
                         </p>
                         <p className="mt-1 text-[10px] text-muted-foreground/70">{t.clientSideInfo}</p>

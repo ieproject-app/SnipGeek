@@ -4,16 +4,15 @@ import { useState, useRef, useCallback, useEffect, type ChangeEvent, type DragEv
 import { useNotification } from "@/hooks/use-notification";
 import { useImageCompress } from "@/hooks/use-image-compress";
 import {
-  TARGET_RATIO,
-  EXPORT_WIDTH,
-  EXPORT_HEIGHT,
   MAX_TARGET_SIZE_KB,
   formatBytes,
   getCropBox,
+  RATIO_CONFIG,
+  type AspectRatioMode,
   type ImageCropTranslations,
 } from "./types";
 
-export function useImageCrop(t: ImageCropTranslations) {
+export function useImageCrop(t: ImageCropTranslations, aspectRatio: AspectRatioMode = "16:9") {
   const { notify } = useNotification();
   const { loading: compressLoading, progress: compressProgress, error: compressError, encodeWithAutoQuality } = useImageCompress();
 
@@ -58,7 +57,11 @@ export function useImageCrop(t: ImageCropTranslations) {
   }, []);
 
   // ── Derived values ──
-  const { cropW: maxCropW, cropH: maxCropH } = imgW > 0 ? getCropBox(imgW, imgH) : { cropW: 0, cropH: 0 };
+  const ratioConfig = RATIO_CONFIG[aspectRatio];
+  const activeRatio = ratioConfig.ratio;
+  const exportW = ratioConfig.width;
+  const exportH = ratioConfig.height;
+  const { cropW: maxCropW, cropH: maxCropH } = imgW > 0 ? getCropBox(imgW, imgH, activeRatio) : { cropW: 0, cropH: 0 };
   const cropW = Math.round(maxCropW * cropScale);
   const cropH = Math.round(maxCropH * cropScale);
   const maxOffsetX = Math.max(0, imgW - cropW);
@@ -68,7 +71,7 @@ export function useImageCrop(t: ImageCropTranslations) {
   const canSlideX = maxOffsetX > 0;
   const canSlideY = maxOffsetY > 0;
   const canDrag = canSlideX || canSlideY;
-  const isAlready169 = imgW > 0 && Math.abs(imgW / imgH - TARGET_RATIO) < 0.01;
+  const isAlreadyTarget = imgW > 0 && Math.abs(imgW / imgH - activeRatio) < 0.01;
 
   // ── Load image from file ──
   const loadImage = useCallback(
@@ -185,13 +188,13 @@ export function useImageCrop(t: ImageCropTranslations) {
     try {
       // Create canvas at export size
       const canvas = document.createElement("canvas");
-      canvas.width = EXPORT_WIDTH;
-      canvas.height = EXPORT_HEIGHT;
+      canvas.width = exportW;
+      canvas.height = exportH;
       const ctx = canvas.getContext("2d", { alpha: false });
       if (!ctx) throw new Error("Canvas context failed");
 
       // Draw cropped image scaled to export size
-      ctx.drawImage(img, cropX, cropY, cropW, cropH, 0, 0, EXPORT_WIDTH, EXPORT_HEIGHT);
+      ctx.drawImage(img, cropX, cropY, cropW, cropH, 0, 0, exportW, exportH);
 
       // Encode with automatic quality search to stay under target size
       const { blob: compressedBlob, finalQuality } = await encodeWithAutoQuality(
@@ -282,11 +285,11 @@ export function useImageCrop(t: ImageCropTranslations) {
       objectUrlRef.current = url;
       const a = document.createElement("a");
       a.href = url;
-      a.download = `${fileName}-1920x1080.${outputExt}`;
+      a.download = `${fileName}-${exportW}x${exportH}.${outputExt}`;
       a.click();
 
       // Notify with size info
-      const downloadedName = `${fileName}-1920x1080.${outputExt}`;
+      const downloadedName = `${fileName}-${exportW}x${exportH}.${outputExt}`;
       const sizeStr = formatBytes(outputBlob.size);
       const message = t.downloaded
         .replace("{filename}", downloadedName)
@@ -298,7 +301,7 @@ export function useImageCrop(t: ImageCropTranslations) {
     } finally {
       setIsProcessing(false);
     }
-  }, [cropH, cropW, cropX, cropY, fileName, imgW, notify, t.downloaded, t.downloadError, encodeWithAutoQuality]);
+  }, [cropH, cropW, cropX, cropY, exportW, exportH, fileName, imgW, notify, t.downloaded, t.downloadError, encodeWithAutoQuality]);
 
   // ── Reset ──
   const handleReset = useCallback(() => {
@@ -336,8 +339,8 @@ export function useImageCrop(t: ImageCropTranslations) {
 
       // Use 1/4-resolution canvas for fast estimation
       const SCALE = 4;
-      const estW = Math.round(EXPORT_WIDTH / SCALE);
-      const estH = Math.round(EXPORT_HEIGHT / SCALE);
+      const estW = Math.round(exportW / SCALE);
+      const estH = Math.round(exportH / SCALE);
       const canvas = document.createElement("canvas");
       canvas.width = estW;
       canvas.height = estH;
@@ -358,7 +361,7 @@ export function useImageCrop(t: ImageCropTranslations) {
     }, 500);
 
     return () => { if (estimateTimerRef.current) clearTimeout(estimateTimerRef.current); };
-  }, [cropX, cropY, cropW, cropH, imgW]);
+  }, [cropX, cropY, cropW, cropH, imgW, exportW, exportH]);
 
   // ── Keyboard shortcuts ──
   useEffect(() => {
@@ -399,7 +402,8 @@ export function useImageCrop(t: ImageCropTranslations) {
 
     // Derived
     maxCropW, maxCropH, cropW, cropH, maxOffsetX, maxOffsetY,
-    cropX, cropY, canSlideX, canSlideY, canDrag, isAlready169,
+    cropX, cropY, canSlideX, canSlideY, canDrag, isAlreadyTarget,
+    exportW, exportH, activeRatio,
 
     // Compress state
     compressLoading, compressProgress, compressError,
