@@ -63,6 +63,12 @@ export function LocaleSuggestionBanner({
     if (locale !== "en") return;
     if (typeof window === "undefined") return;
 
+    // On article detail pages the inline ArticleTranslationLink already
+    // handles language discovery — suppress the global banner there.
+    const isArticlePage =
+      /^\/(id\/)?(blog|notes)\/.+/.test(pathname);
+    if (isArticlePage) return;
+
     const dismissed = window.localStorage.getItem(DISMISS_KEY) === "true";
     const preferredLocaleCookie = document.cookie
       .split("; ")
@@ -73,7 +79,7 @@ export function LocaleSuggestionBanner({
     if (!hasIndonesianPreference()) return;
 
     setVisible(true);
-  }, [locale]);
+  }, [locale, pathname]);
 
   const handleDismiss = () => {
     if (typeof window !== "undefined") {
