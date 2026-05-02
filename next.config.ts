@@ -195,6 +195,16 @@ const nextConfig: NextConfig = {
       // /en canonicalization is handled by proxy.ts (308 redirect).
       // Only content-specific redirects below.
       {
+        source: "/tags/web%20development",
+        destination: "/tags/web-development",
+        permanent: true,
+      },
+      {
+        source: "/id/tags/web%20development",
+        destination: "/id/tags/web-development",
+        permanent: true,
+      },
+      {
         source: "/blog/hapus-folder-onedrive-duplikat-explorer",
         destination: "/blog/remove-duplicate-onedrive-windows-11",
         permanent: true,
