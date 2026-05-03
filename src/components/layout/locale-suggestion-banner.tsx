@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { useParams, usePathname, useRouter } from "next/navigation";
-import { X, Globe } from "lucide-react";
+import { Flag, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { Dictionary } from "@/lib/get-dictionary";
 
@@ -50,6 +50,9 @@ export function LocaleSuggestionBanner({
   const pathname = usePathname();
   const router = useRouter();
   const [visible, setVisible] = useState(false);
+  const primaryButtonRef = useRef<HTMLButtonElement>(null);
+  const headingId = useId();
+  const descriptionId = useId();
   const localeSuggestion = dictionary.localeSuggestion ?? {
     title: "Prefer reading in Bahasa Indonesia?",
     description:
@@ -81,7 +84,21 @@ export function LocaleSuggestionBanner({
     setVisible(true);
   }, [locale, pathname]);
 
+  useEffect(() => {
+    if (visible) {
+      primaryButtonRef.current?.focus({ preventScroll: true });
+    }
+  }, [visible]);
+
   const handleDismiss = () => {
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem(DISMISS_KEY, "true");
+    }
+    setVisible(false);
+  };
+
+  const handleStay = () => {
+    document.cookie = `NEXT_LOCALE=en; path=/; max-age=${ONE_YEAR_SECONDS}; SameSite=Lax`;
     if (typeof window !== "undefined") {
       window.localStorage.setItem(DISMISS_KEY, "true");
     }
@@ -134,74 +151,84 @@ export function LocaleSuggestionBanner({
 
   return (
     <div
-      // Sits right below the fixed primary nav (h-16 = top-16).
-      // Uses z-45 so it floats above the secondary nav (z-20) but
-      // below the header's own z-50 overlays.
       className={cn(
-        "fixed left-0 right-0 z-[45] top-16",
-        "transition-all duration-350 ease-out",
+        "fixed bottom-6 right-4 z-[60] w-[min(90vw,360px)] md:bottom-8 md:right-8",
+        "transition-all duration-300 ease-out",
         visible
-          ? "translate-y-0 opacity-100"
-          : "-translate-y-full opacity-0 pointer-events-none",
+          ? "translate-y-0 opacity-100 pointer-events-auto"
+          : "translate-y-3 opacity-0 pointer-events-none",
       )}
       aria-hidden={!visible}
       aria-live="polite"
+      role="dialog"
+      aria-modal="false"
+      aria-labelledby={headingId}
+      aria-describedby={descriptionId}
       {...(!visible ? { inert: true } : {})}
     >
-      {/* Gradient strip — same visual language as the secondary nav bar */}
       <div
         className={cn(
-          "w-full border-b border-nav-primary/50",
-          "bg-linear-[140deg] from-[hsl(var(--nav-primary)/0.92)] to-[hsl(var(--accent)/0.60)]",
+          "relative overflow-hidden rounded-2xl border border-border/40",
+          "bg-card/95 shadow-[0_16px_40px_-8px_rgba(15,23,42,0.35)]",
+          "backdrop-blur supports-[backdrop-filter]:bg-card/85",
+          "dark:shadow-[0_16px_40px_-8px_rgba(8,47,73,0.45)]",
         )}
       >
-        <div className="mx-auto max-w-4xl px-4 md:px-6">
-          <div className="flex h-9 items-center justify-between gap-3">
+        <button
+          type="button"
+          onClick={handleDismiss}
+          className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground transition-all hover:bg-muted/30 hover:text-foreground focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+        >
+          <X className="h-4 w-4" aria-hidden />
+          <span className="sr-only">{localeSuggestion.dismiss}</span>
+        </button>
 
-            {/* Left: Globe + label */}
-            <div className="flex items-center gap-2 min-w-0">
-              <Globe
-                className="h-3.5 w-3.5 text-nav-primary-foreground/70 shrink-0"
-                aria-hidden
-              />
-              <p className="font-sans text-[10px] font-black uppercase tracking-[0.13em] text-nav-primary-foreground/80 truncate">
+        <div className="flex items-start gap-4 p-6">
+          <span className="mt-1 flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-accent/10 text-accent">
+            <Flag className="h-5 w-5" aria-hidden />
+          </span>
+
+          <div className="flex-1 space-y-5">
+            <div className="space-y-2">
+              <p
+                id={headingId}
+                className="font-display text-base font-semibold uppercase tracking-[0.14em] text-primary"
+              >
                 {localeSuggestion.title}
+              </p>
+              <p
+                id={descriptionId}
+                className="text-sm leading-relaxed text-muted-foreground"
+              >
+                {localeSuggestion.description}
               </p>
             </div>
 
-            {/* Right: CTA pill + dismiss */}
-            <div className="flex items-center gap-2 shrink-0">
-              {/* Switch button — matches the "active" pill style in secondary nav */}
+            <div className="space-y-3">
               <button
+                ref={primaryButtonRef}
                 type="button"
                 onClick={handleSwitch}
-                className={cn(
-                  "inline-flex items-center justify-center",
-                  "h-6 px-3 rounded-full shrink-0",
-                  "border border-white/90 bg-white text-slate-900",
-                  "font-sans text-[10px] font-black uppercase tracking-[0.12em]",
-                  "transition-all hover:bg-white/90 active:scale-[0.97]",
-                )}
+                className="w-full rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-[0_18px_32px_-16px_rgba(244,63,94,0.8)] transition-all hover:shadow-[0_18px_32px_-12px_rgba(244,63,94,0.65)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
               >
                 {localeSuggestion.switch}
               </button>
-
-              {/* Dismiss — subtle ghost on gradient */}
               <button
                 type="button"
-                onClick={handleDismiss}
-                className={cn(
-                  "flex h-6 w-6 shrink-0 items-center justify-center rounded-full",
-                  "text-nav-primary-foreground/50",
-                  "hover:text-nav-primary-foreground/90 hover:bg-white/10",
-                  "transition-all active:scale-90",
-                )}
-                aria-label={localeSuggestion.dismiss}
+                onClick={handleStay}
+                className="w-full rounded-xl border border-primary/40 px-5 py-2.5 text-sm font-semibold text-primary transition-all hover:bg-primary/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
               >
-                <X className="h-3.5 w-3.5" />
+                {localeSuggestion.stay}
               </button>
             </div>
 
+            <button
+              type="button"
+              onClick={handleDismiss}
+              className="rounded-md text-xs font-medium text-muted-foreground underline decoration-dotted underline-offset-4 transition-colors hover:text-foreground focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+            >
+              {localeSuggestion.dismiss}
+            </button>
           </div>
         </div>
       </div>
