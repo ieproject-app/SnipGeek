@@ -205,6 +205,36 @@ const nextConfig: NextConfig = {
         permanent: true,
       },
       {
+        source: "/tags/windows%2011",
+        destination: "/tags/windows-11",
+        permanent: true,
+      },
+      {
+        source: "/id/tags/windows%2011",
+        destination: "/id/tags/windows-11",
+        permanent: true,
+      },
+      {
+        source: "/kontak",
+        destination: "/contact",
+        permanent: true,
+      },
+      {
+        source: "/id/kontak",
+        destination: "/id/contact",
+        permanent: true,
+      },
+      {
+        source: "/jurnal",
+        destination: "/notes",
+        permanent: true,
+      },
+      {
+        source: "/id/jurnal",
+        destination: "/id/notes",
+        permanent: true,
+      },
+      {
         source: "/blog/hapus-folder-onedrive-duplikat-explorer",
         destination: "/blog/remove-duplicate-onedrive-windows-11",
         permanent: true,

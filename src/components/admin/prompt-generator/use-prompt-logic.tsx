@@ -1,49 +1,19 @@
 "use client";
 
 import { useState, useEffect, useMemo, useRef, useCallback, type SyntheticEvent } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { motion } from "framer-motion";
 import { Input } from "@/components/ui/input";
-import { Switch } from "@/components/ui/switch";
-import { Textarea } from "@/components/ui/textarea";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { SnipTooltip } from "@/components/ui/snip-tooltip";
 import {
-  Copy,
   Check,
   X,
   AlertTriangle,
-  Plus,
   Trash2,
-  ChevronDown,
-  Download,
-  Grid3X3,
-  GalleryHorizontal,
-  ImageIcon,
-  Calendar,
-  Zap,
-  Search,
-  Type,
-  Star,
-  Hash,
-  AlignLeft,
-  Sparkles,
-  Layers,
-  PenLine,
-  Settings2,
-  FileText,
-  BookOpen,
   ChevronsUpDown,
   CheckCircle2,
 } from "lucide-react";
@@ -51,8 +21,6 @@ import { downloadLinks } from "@/lib/data-downloads";
 import { useNotification } from "@/hooks/use-notification";
 import { fetchAdminPromptContent } from "@/components/admin/admin-api-client";
 import { cn } from "@/lib/utils";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { ScrollReveal } from "@/components/ui/scroll-reveal";
 import type { Dictionary } from "@/lib/get-dictionary";
 
 // Simple debounce hook
@@ -641,12 +609,20 @@ export function usePromptLogic({
     ? seriesProfile.context.id
     : seriesProfile.context.en;
   const selectedArticleType = contentType === "notes" ? "note" : "blog";
-  const noteIntentLabelMap: Record<NoteIntent, string> = {
-    finding: dictionary.notesIntentFinding,
-    reference: dictionary.notesIntentReference,
-    "mini-fix": dictionary.notesIntentMiniFix,
-    observation: dictionary.notesIntentObservation,
-  };
+  const noteIntentLabelMap = useMemo<Record<NoteIntent, string>>(
+    () => ({
+      finding: dictionary.notesIntentFinding,
+      reference: dictionary.notesIntentReference,
+      "mini-fix": dictionary.notesIntentMiniFix,
+      observation: dictionary.notesIntentObservation,
+    }),
+    [
+      dictionary.notesIntentFinding,
+      dictionary.notesIntentReference,
+      dictionary.notesIntentMiniFix,
+      dictionary.notesIntentObservation,
+    ],
+  );
 
   // ── Filtered article list ──
   const articlesForType = useMemo(
@@ -1036,14 +1012,12 @@ export function usePromptLogic({
   }, [
     contentType,
     downloadItems,
-    debouncedDraft,
     debouncedGalleryMappings,
     debouncedHeroImage,
     debouncedImageGridMappings,
     mode,
     debouncedNewsAngle,
     debouncedNewsSourceUrls,
-    debouncedOriginalContent,
     showDownloads,
     showGallery,
     showGrids,
@@ -1563,7 +1537,6 @@ export function usePromptLogic({
     isHideFromHome,
     isIdOnly,
     debouncedHeroImage,
-    debouncedImages,
     contentType,
     downloadItems,
     debouncedImageGridMappings,
@@ -1774,10 +1747,6 @@ export function usePromptLogic({
   const copySpecCaller = useCallback(async (index: number) => {
     await writeClipboard(`{{Specs ${index + 1}}}`, `Specs ${index + 1} caller copied`);
   }, [writeClipboard]);
-
-  const focusRing =
-    "focus-visible:ring-primary/20 focus-visible:ring-offset-0 focus-visible:border-primary/30 transition-all duration-300";
-
 
   return {
     mode, setMode, contentType, setContentType,

@@ -28,11 +28,12 @@ export const ZoomableImage = ({
     src,
     alt,
     className,
-    priority: _priority,
+    priority,
     ...props
 }: ZoomableImageProps) => {
     const [isLoaded, setIsLoaded] = useState(false);
     const [prevSrc, setPrevSrc] = useState(src);
+    void priority;
     const { onLoad: onImageLoad, ...imageProps } = props;
 
     if (src !== prevSrc) {
@@ -78,6 +79,7 @@ export const ZoomableImage = ({
                         />
                     )}
 
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                         src={src}
                         alt={alt || "SnipGeek Image"}
@@ -130,6 +132,7 @@ export const ZoomableImage = ({
                                 }}
                                 className="relative max-w-7xl max-h-full"
                             >
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
                                 <img
                                     src={src}
                                     alt={alt || "SnipGeek Image"}

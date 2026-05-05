@@ -23,6 +23,10 @@ export async function generateMetadata({
   return {
     title: dictionary.notes.title,
     description: dictionary.notes.description,
+    robots: {
+      index: false,
+      follow: false,
+    },
     alternates: {
       canonical: canonicalPath,
       languages: {

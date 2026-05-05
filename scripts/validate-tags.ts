@@ -95,7 +95,7 @@ function main() {
     tagCaseMap.get(lower)!.push(tag);
   });
 
-  tagCaseMap.forEach((variants, lowerTag) => {
+  tagCaseMap.forEach((variants) => {
     const uniqueVariants = [...new Set(variants)];
     if (uniqueVariants.length > 1) {
       issues.push(`⚠️  Tag casing inconsistency: "${uniqueVariants.join('" vs "')}"`);
@@ -104,7 +104,7 @@ function main() {
 
   // 2. Tags with very low count (might be typos)
   const lowCountTags = Array.from(allTags.entries())
-    .filter(([_, data]) => data.count === 1)
+    .filter(([, data]) => data.count === 1)
     .map(([tag, data]) => ({ tag, files: data.files }));
 
   if (lowCountTags.length > 0) {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { useParams, usePathname, useRouter } from "next/navigation";
 import { Flag, X } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -49,7 +49,26 @@ export function LocaleSuggestionBanner({
   const params = useParams();
   const pathname = usePathname();
   const router = useRouter();
-  const [visible, setVisible] = useState(false);
+  const [dismissed, setDismissed] = useState(false);
+  const shouldSuggest = useMemo(() => {
+    if (locale !== "en") return false;
+    if (typeof window === "undefined") return false;
+
+    const isArticlePage = /^\/(id\/)?(blog|notes)\/.+/.test(pathname);
+    if (isArticlePage) return false;
+
+    const dismissed = window.localStorage.getItem(DISMISS_KEY) === "true";
+    const preferredLocaleCookie = document.cookie
+      .split("; ")
+      .find((item) => item.startsWith("NEXT_LOCALE="))
+      ?.split("=")[1];
+
+    if (dismissed || preferredLocaleCookie === "en") return false;
+    if (!hasIndonesianPreference()) return false;
+
+    return true;
+  }, [locale, pathname]);
+  const visible = shouldSuggest && !dismissed;
   const primaryButtonRef = useRef<HTMLButtonElement>(null);
   const headingId = useId();
   const descriptionId = useId();
@@ -63,28 +82,6 @@ export function LocaleSuggestionBanner({
   };
 
   useEffect(() => {
-    if (locale !== "en") return;
-    if (typeof window === "undefined") return;
-
-    // On article detail pages the inline ArticleTranslationLink already
-    // handles language discovery — suppress the global banner there.
-    const isArticlePage =
-      /^\/(id\/)?(blog|notes)\/.+/.test(pathname);
-    if (isArticlePage) return;
-
-    const dismissed = window.localStorage.getItem(DISMISS_KEY) === "true";
-    const preferredLocaleCookie = document.cookie
-      .split("; ")
-      .find((item) => item.startsWith("NEXT_LOCALE="))
-      ?.split("=")[1];
-
-    if (dismissed || preferredLocaleCookie === "en") return;
-    if (!hasIndonesianPreference()) return;
-
-    setVisible(true);
-  }, [locale, pathname]);
-
-  useEffect(() => {
     if (visible) {
       primaryButtonRef.current?.focus({ preventScroll: true });
     }
@@ -94,7 +91,7 @@ export function LocaleSuggestionBanner({
     if (typeof window !== "undefined") {
       window.localStorage.setItem(DISMISS_KEY, "true");
     }
-    setVisible(false);
+    setDismissed(true);
   };
 
   const handleStay = () => {
@@ -102,7 +99,7 @@ export function LocaleSuggestionBanner({
     if (typeof window !== "undefined") {
       window.localStorage.setItem(DISMISS_KEY, "true");
     }
-    setVisible(false);
+    setDismissed(true);
   };
 
   const handleSwitch = () => {
@@ -145,14 +142,14 @@ export function LocaleSuggestionBanner({
     if (typeof window !== "undefined") {
       window.localStorage.removeItem(DISMISS_KEY);
     }
-    setVisible(false);
+    setDismissed(true);
     router.push(targetPath, { scroll: false });
   };
 
   return (
     <div
       className={cn(
-        "fixed bottom-6 right-4 z-[60] w-[min(90vw,360px)] md:bottom-8 md:right-8",
+        "fixed bottom-4 right-3 z-[60] w-[min(90vw,340px)] md:bottom-5 md:right-5",
         "transition-all duration-300 ease-out",
         visible
           ? "translate-y-0 opacity-100 pointer-events-auto"
@@ -168,66 +165,59 @@ export function LocaleSuggestionBanner({
     >
       <div
         className={cn(
-          "relative overflow-hidden rounded-2xl border border-border/40",
-          "bg-card/95 shadow-[0_16px_40px_-8px_rgba(15,23,42,0.35)]",
-          "backdrop-blur supports-[backdrop-filter]:bg-card/85",
-          "dark:shadow-[0_16px_40px_-8px_rgba(8,47,73,0.45)]",
+          "relative overflow-hidden rounded-xl border border-border/60",
+          "bg-card shadow-[0_8px_24px_-8px_rgba(15,23,42,0.12)]",
+          "dark:shadow-[0_8px_24px_-8px_rgba(0,0,0,0.4)]",
         )}
       >
         <button
           type="button"
           onClick={handleDismiss}
-          className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground transition-all hover:bg-muted/30 hover:text-foreground focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+          aria-label={localeSuggestion.dismiss}
+          className="absolute right-2.5 top-2.5 inline-flex h-6 w-6 items-center justify-center rounded-md text-muted-foreground/60 transition-colors hover:bg-muted/50 hover:text-foreground focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
         >
-          <X className="h-4 w-4" aria-hidden />
-          <span className="sr-only">{localeSuggestion.dismiss}</span>
+          <X className="h-3.5 w-3.5" aria-hidden />
         </button>
 
-        <div className="flex items-start gap-4 p-6">
-          <span className="mt-1 flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-accent/10 text-accent">
-            <Flag className="h-5 w-5" aria-hidden />
-          </span>
+        <div className="flex flex-col gap-3 px-4 py-3.5">
+          <div className="flex items-center gap-1.5 text-muted-foreground">
+            <Flag className="h-3 w-3" aria-hidden />
+            <span className="font-sans text-[10px] font-semibold uppercase tracking-[0.14em]">
+              Language
+            </span>
+          </div>
 
-          <div className="flex-1 space-y-5">
-            <div className="space-y-2">
-              <p
-                id={headingId}
-                className="font-display text-base font-semibold uppercase tracking-[0.14em] text-primary"
-              >
-                {localeSuggestion.title}
-              </p>
-              <p
-                id={descriptionId}
-                className="text-sm leading-relaxed text-muted-foreground"
-              >
-                {localeSuggestion.description}
-              </p>
-            </div>
+          <div className="space-y-1 pr-6">
+            <p
+              id={headingId}
+              className="font-sans text-sm font-semibold leading-snug text-foreground"
+            >
+              {localeSuggestion.title}
+            </p>
+            <p
+              id={descriptionId}
+              className="text-xs leading-relaxed text-muted-foreground"
+            >
+              {localeSuggestion.description}
+            </p>
+          </div>
 
-            <div className="space-y-3">
-              <button
-                ref={primaryButtonRef}
-                type="button"
-                onClick={handleSwitch}
-                className="w-full rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-[0_18px_32px_-16px_rgba(244,63,94,0.8)] transition-all hover:shadow-[0_18px_32px_-12px_rgba(244,63,94,0.65)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
-              >
-                {localeSuggestion.switch}
-              </button>
-              <button
-                type="button"
-                onClick={handleStay}
-                className="w-full rounded-xl border border-primary/40 px-5 py-2.5 text-sm font-semibold text-primary transition-all hover:bg-primary/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
-              >
-                {localeSuggestion.stay}
-              </button>
-            </div>
-
+          <div className="flex items-center gap-4 pt-0.5">
+            <button
+              ref={primaryButtonRef}
+              type="button"
+              onClick={handleSwitch}
+              className="text-xs font-semibold text-accent transition-colors hover:text-accent/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+            >
+              {localeSuggestion.switch}
+              <span aria-hidden> →</span>
+            </button>
             <button
               type="button"
-              onClick={handleDismiss}
-              className="rounded-md text-xs font-medium text-muted-foreground underline decoration-dotted underline-offset-4 transition-colors hover:text-foreground focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+              onClick={handleStay}
+              className="text-xs font-medium text-muted-foreground transition-colors hover:text-foreground focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
             >
-              {localeSuggestion.dismiss}
+              {localeSuggestion.stay}
             </button>
           </div>
         </div>

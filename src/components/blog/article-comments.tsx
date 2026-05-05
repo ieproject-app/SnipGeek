@@ -1,7 +1,7 @@
 "use client";
 
 import Giscus from "@giscus/react";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useSyncExternalStore } from "react";
 import { MessageSquare, ShieldCheck, ExternalLink } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useThemeMode } from "@/hooks/use-theme-mode";
@@ -24,27 +24,26 @@ interface ArticleCommentsProps {
 
 export function ArticleComments({ article, type, locale }: ArticleCommentsProps) {
   const [giscusVisible, setGiscusVisible] = useState(false);
-  const [mounted, setMounted] = useState(false);
-  const [isProductionDomain, setIsProductionDomain] = useState(false);
   const commentsRef = useRef<HTMLDivElement>(null);
   const { resolvedTheme } = useThemeMode();
+  const mounted = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false,
+  );
+
+  const isProductionDomain =
+    process.env.NODE_ENV === "production" &&
+    typeof window !== "undefined" &&
+    (window.location.hostname === productionHostname ||
+      window.location.hostname.endsWith("." + productionHostname) ||
+      window.location.hostname.includes("firebaseapp.com") ||
+      window.location.hostname.includes("web.app") ||
+      window.location.hostname.includes("hosted.app"));
 
   const giscusTheme = resolvedTheme === "dark" ? "dark_dimmed" : "light";
 
   useEffect(() => {
-    setMounted(true);
-
-    const isProduction = process.env.NODE_ENV === "production";
-    const isCorrectDomain =
-      typeof window !== "undefined" &&
-      (window.location.hostname === productionHostname ||
-        window.location.hostname.endsWith("." + productionHostname) ||
-        window.location.hostname.includes("firebaseapp.com") ||
-        window.location.hostname.includes("web.app") ||
-        window.location.hostname.includes("hosted.app"));
-
-    setIsProductionDomain(isProduction && isCorrectDomain);
-
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {

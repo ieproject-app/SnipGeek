@@ -170,7 +170,11 @@ export default function ToolAddressLabel({ locale }: { locale: "id" | "en" }) {
   };
   
   const handleSelectAddress = useCallback((entry: AddressEntry, type: 'sender' | 'receiver') => {
-    const { id, title, ...addressData } = entry;
+    const addressData = {
+      name: entry.name,
+      phone: entry.phone,
+      address: entry.address,
+    };
     if (type === 'sender') {
       setSender(addressData);
     } else {

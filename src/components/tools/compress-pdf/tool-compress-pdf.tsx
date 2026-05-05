@@ -9,8 +9,8 @@ import { Download, Loader2, Minimize, FileCheck2, UploadCloud, FileText, XCircle
 import { useToast } from '@/hooks/use-toast';
 import { Toaster } from '@/components/ui/toaster';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { ref, uploadBytesResumable, getDownloadURL, type UploadTaskSnapshot } from 'firebase/storage';
-import { httpsCallable, type HttpsCallableResult } from 'firebase/functions';
+import { ref, uploadBytesResumable, type UploadTaskSnapshot } from 'firebase/storage';
+import { httpsCallable } from 'firebase/functions';
 import { storage, functions } from '@/lib/firebase-config';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';

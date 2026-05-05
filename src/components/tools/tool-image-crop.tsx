@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -31,15 +31,15 @@ interface ToolImageCropProps {
 }
 
 export function ToolImageCrop({ dictionary }: ToolImageCropProps) {
-  const [aspectRatio, setAspectRatio] = useState<AspectRatioMode>("4:3");
-
-  // Load saved preference from localStorage
-  useEffect(() => {
+  const [aspectRatio, setAspectRatio] = useState<AspectRatioMode>(() => {
+    if (typeof window === "undefined") return "4:3";
     try {
-      const saved = localStorage.getItem(ASPECT_RATIO_STORAGE_KEY);
-      if (saved === "16:9" || saved === "4:3") setAspectRatio(saved);
-    } catch {}
-  }, []);
+      const saved = window.localStorage.getItem(ASPECT_RATIO_STORAGE_KEY);
+      return saved === "16:9" || saved === "4:3" ? saved : "4:3";
+    } catch {
+      return "4:3";
+    }
+  });
 
   const handleRatioChange = (mode: AspectRatioMode) => {
     setAspectRatio(mode);

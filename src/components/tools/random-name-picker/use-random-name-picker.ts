@@ -91,6 +91,7 @@ export function useRandomNamePicker(t: (key: string) => string) {
   const shuffleDurationRef = useRef<number>(shuffleDuration);
   const handleSelectWinnersRef = useRef<typeof handleSelectWinners>(handleSelectWinners);
   const playShuffleTickRef = useRef<typeof playShuffleTick>(playShuffleTick);
+  const tRef = useRef(t);
 
   // Keep animation refs in sync with latest values
   useEffect(() => { availableNamesRef.current = availableNames; }, [availableNames]);
@@ -98,6 +99,7 @@ export function useRandomNamePicker(t: (key: string) => string) {
   useEffect(() => { shuffleDurationRef.current = shuffleDuration; }, [shuffleDuration]);
   useEffect(() => { handleSelectWinnersRef.current = handleSelectWinners; }, [handleSelectWinners]);
   useEffect(() => { playShuffleTickRef.current = playShuffleTick; }, [playShuffleTick]);
+  useEffect(() => { tRef.current = t; }, [t]);
 
   // Load saved data from localStorage
   useEffect(() => {
@@ -127,7 +129,7 @@ export function useRandomNamePicker(t: (key: string) => string) {
       window.addEventListener('resize', updateViewportSize);
     } catch (error) {
       console.error("Failed to load data from localStorage", error);
-      toast({ variant: "destructive", title: "Error", description: t('errorLoadSavedData') });
+      toast({ variant: "destructive", title: "Error", description: tRef.current('errorLoadSavedData') });
     }
 
     return () => window.removeEventListener('resize', updateViewportSize);

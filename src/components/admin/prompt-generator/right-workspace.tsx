@@ -2,7 +2,7 @@ import { usePrompt } from "./index";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
-import { Copy, Map, Layers, PenLine, AlignLeft, BookOpen, Type, FileText, Zap, Sparkles } from "lucide-react";
+import { Layers, PenLine, AlignLeft, BookOpen, Type, Zap, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export function RightWorkspace() {
@@ -24,8 +24,6 @@ function DraftContentCard() {
     blockComposerRef, selectedBlockLine, selectedBlock, setSelectedBlock,
     selectedBlockRows, selectedBlockComment, setSelectedBlockComment, addSelectedBlockToInstructions
   } = usePrompt();
-
-  const focusRing = "focus-visible:ring-primary/20 focus-visible:ring-offset-0 focus-visible:border-primary/30 transition-all duration-300";
 
   return (
     <ScrollReveal direction="up" delay={mode === "modify" ? 0.2 : 0.1} className="flex-1 flex flex-col">

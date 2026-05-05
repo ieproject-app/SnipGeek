@@ -9,9 +9,6 @@ import { LanguageSwitcher } from "./language-switcher";
 import type { TranslationsMap } from "@/lib/posts";
 import {
   UserRound,
-  ShieldCheck,
-  Mail,
-  FileText,
   Terminal,
   LogOut,
 } from "lucide-react";

@@ -4,7 +4,7 @@ import { i18n, type Locale } from "@/i18n-config";
 import { getDictionary } from "@/lib/get-dictionary";
 import { TagListClient } from "./tag-list-client";
 import type { Metadata } from "next";
-import { shouldIndexTag, getAllTags } from "@/lib/tags";
+import { getAllTags } from "@/lib/tags";
 import { getLinkPrefix } from "@/lib/utils";
 import { notFound } from "next/navigation";
 
@@ -50,24 +50,11 @@ export async function generateMetadata({
     locale === i18n.defaultLocale ? `/tags/${encodedTag}` : `/${locale}/tags/${encodedTag}`;
   const languages = await getTagAlternates(tag);
 
-  const allPosts = await getSortedPostsData(locale);
-  const postsCount = allPosts.filter((p) =>
-    p.frontmatter.tags?.some((t) => t.trim().toLowerCase() === normalizedTag),
-  ).length;
-
-  const notes = await getRawNotes(locale);
-  const notesCount = notes.filter((n) =>
-    n.frontmatter.tags?.some((t) => t.trim().toLowerCase() === normalizedTag),
-  ).length;
-
-  const totalItems = postsCount + notesCount;
-  const shouldIndex = shouldIndexTag(normalizedTag, totalItems);
-
   return {
     title: dictionary.tags.title.replace("{tag}", decodedTag),
     description: dictionary.tags.description.replace("{tag}", decodedTag),
     robots: {
-      index: shouldIndex,
+      index: false,
       follow: true,
     },
     alternates: {

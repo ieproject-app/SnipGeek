@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getAdminServices, verifyAdminFromRequest, normalizeCategory, normalizeDocType, getCategorySearchOrder } from '@/lib/api-helpers';
+import { getAdminServices, verifyAdminFromRequest, normalizeDocType, getCategorySearchOrder } from '@/lib/api-helpers';
 import { format } from 'date-fns';
 import crypto from 'crypto';
 

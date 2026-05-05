@@ -23,12 +23,8 @@ export function IslandToolbar() {
     showGallery, setShowGallery,
     showSpecs, setShowSpecs,
     isIdOnly, setIsIdOnly,
-    hasBlockingIssues, isCopied, handleCopy,
-    resetPopoverOpen, setResetPopoverOpen, handleReset,
-    promptStats, dictionary
+    dictionary
   } = usePrompt();
-
-  const focusRing = "focus-visible:ring-primary/20 focus-visible:ring-offset-0 focus-visible:border-primary/30 transition-all duration-300";
 
   return (
     <div className="flex flex-wrap items-center justify-center gap-3">

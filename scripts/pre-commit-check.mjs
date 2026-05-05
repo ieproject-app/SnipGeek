@@ -17,7 +17,7 @@
  * Exit code 0 = OK, exit code 1 = blocked.
  */
 
-import { readFileSync, existsSync, readdirSync, statSync } from "node:fs";
+import { readFileSync, existsSync, readdirSync } from "node:fs";
 import { join, relative, dirname, basename } from "node:path";
 import { execSync } from "node:child_process";
 
@@ -36,11 +36,6 @@ function getStagedFiles() {
 
 function getUntrackedFiles() {
   const out = git("git ls-files --others --exclude-standard");
-  return out ? out.split("\n").map((f) => f.trim()).filter(Boolean) : [];
-}
-
-function getUnstagedModified() {
-  const out = git("git diff --name-only");
   return out ? out.split("\n").map((f) => f.trim()).filter(Boolean) : [];
 }
 
@@ -115,7 +110,6 @@ function guessImageDirs(imagePaths) {
 
 const staged = new Set(getStagedFiles());
 const untracked = new Set(getUntrackedFiles());
-const unstaged = new Set(getUnstagedModified());
 const tracked = getTrackedFiles(); // files already committed in git history
 
 const stagedMdx = [...staged].filter((f) =>

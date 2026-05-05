@@ -21,7 +21,7 @@ import {
     Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger,
 } from "@/components/ui/dialog";
 import { cn } from '@/lib/utils';
-import { format, addMonths, addWeeks, addYears, startOfMonth, endOfMonth, isSameMonth } from 'date-fns';
+import { format, addMonths, addWeeks, addYears } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { motion, AnimatePresence } from 'framer-motion';
 import { DAILY_LIMIT, type ValueCategory, type StockMatrix, type StockCategoryDetail } from './types';

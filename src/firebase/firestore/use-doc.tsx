@@ -1,6 +1,6 @@
 'use client';
     
-import { useState, useEffect, useLayoutEffect } from 'react';
+import { useState, useEffect } from 'react';
 import {
   DocumentReference,
   onSnapshot,
@@ -44,30 +44,18 @@ export function useDoc<T = unknown>(
   type StateDataType = WithId<T> | null;
 
   const [data, setData] = useState<StateDataType>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(Boolean(memoizedDocRef));
   const [error, setError] = useState<FirestoreError | Error | null>(null);
-
-  useLayoutEffect(() => {
-    if (!memoizedDocRef) {
-      setIsLoading(false);
-      return;
-    }
-
-    setIsLoading(true);
-  }, [memoizedDocRef]);
+  const [resolvedPath, setResolvedPath] = useState<string | null>(null);
 
   useEffect(() => {
     if (!memoizedDocRef) {
       return;
     }
 
-    setIsLoading(true);
-    setError(null);
-    setData(null);
-
     const unsubscribe = onSnapshot(
       memoizedDocRef,
       (snapshot: DocumentSnapshot<DocumentData>) => {
+        setResolvedPath(memoizedDocRef.path);
         if (snapshot.exists()) {
           setData({ ...(snapshot.data() as T), id: snapshot.id });
         } else {
@@ -75,7 +63,6 @@ export function useDoc<T = unknown>(
           setData(null);
         }
         setError(null); // Clear any previous error on successful snapshot (even if doc doesn't exist)
-        setIsLoading(false);
       },
       () => {
         const contextualError = new FirestorePermissionError({
@@ -83,9 +70,9 @@ export function useDoc<T = unknown>(
           path: memoizedDocRef.path,
         })
 
+        setResolvedPath(memoizedDocRef.path)
         setError(contextualError)
         setData(null)
-        setIsLoading(false)
 
         // trigger global error propagation
         errorEmitter.emit('permission-error', contextualError);
@@ -99,5 +86,9 @@ export function useDoc<T = unknown>(
     return { data: null, isLoading: false, error: null };
   }
 
-  return { data, isLoading, error };
+  const isLoading = resolvedPath !== memoizedDocRef.path;
+  const scopedData = resolvedPath === memoizedDocRef.path ? data : null;
+  const scopedError = resolvedPath === memoizedDocRef.path ? error : null;
+
+  return { data: scopedData, isLoading, error: scopedError };
 }

@@ -33,6 +33,7 @@ export async function generateMetadata({
       locale === "id"
         ? "Hubungi SnipGeek untuk pertanyaan, masukan, kolaborasi, atau hal lain terkait konten."
         : "Get in touch with SnipGeek for questions, feedback, collaboration, or content-related inquiries.",
+    robots: { index: false, follow: false },
   });
 }
 

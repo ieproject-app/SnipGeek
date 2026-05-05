@@ -18,13 +18,37 @@ import * as os from "os";
 // Initialize Firebase Admin SDK if not already initialized
 try {
     initializeApp();
-} catch (e) {
+} catch {
     logger.info("Firebase Admin SDK already initialized.");
 }
 
 const storage = getStorage();
 const COMPRESSED_FOLDER = "compressed";
 const GS_SETTINGS = '-dPDFSETTINGS=/ebook'; // Use a balanced setting for good results
+
+function getErrorMessage(error: unknown): string {
+    if (typeof error === 'object' && error !== null && 'message' in error) {
+        const message = (error as { message: unknown }).message;
+        if (typeof message === 'string') return message;
+    }
+    return 'Unknown error';
+}
+
+function getErrorStack(error: unknown): string | undefined {
+    if (typeof error === 'object' && error !== null && 'stack' in error) {
+        const stack = (error as { stack: unknown }).stack;
+        if (typeof stack === 'string') return stack;
+    }
+    return undefined;
+}
+
+function getErrorCode(error: unknown): string | undefined {
+    if (typeof error === 'object' && error !== null && 'code' in error) {
+        const code = (error as { code: unknown }).code;
+        if (typeof code === 'string') return code;
+    }
+    return undefined;
+}
 
 // Resource options MUST be set here for Cloud Functions.
 export const processPdfOnCall = onCall({
@@ -112,31 +136,31 @@ export const processPdfOnCall = onCall({
         logger.log(`Successfully processed file. New size: ${newSize}, URL: ${url}`);
         return { downloadUrl: url, newSize };
 
-    } catch (error: any) {
+    } catch (error: unknown) {
         logger.error("Error during compression pipeline:", {
-            message: error.message,
-            stack: error.stack,
-            code: error.code
+            message: getErrorMessage(error),
+            stack: getErrorStack(error),
+            code: getErrorCode(error)
         });
         if (error instanceof HttpsError) {
             throw error;
         }
         // Fallback for any other unexpected errors
-        throw new HttpsError('internal', 'An unexpected error occurred during the compression pipeline.', { details: error.message });
+        throw new HttpsError('internal', 'An unexpected error occurred during the compression pipeline.', { details: getErrorMessage(error) });
     } finally {
         // 6. Cleanup temporary files, ensuring it doesn't crash if files don't exist
         logger.log("Cleaning up temporary files...");
         try {
             await fs.unlink(tempInputPath);
-        } catch (cleanupError: any) {
-            if (cleanupError.code !== 'ENOENT') {
+        } catch (cleanupError: unknown) {
+            if (getErrorCode(cleanupError) !== 'ENOENT') {
                 logger.warn("Failed to cleanup temporary input file:", cleanupError);
             }
         }
         try {
             await fs.unlink(tempOutputPath);
-        } catch (cleanupError: any) {
-            if (cleanupError.code !== 'ENOENT') {
+        } catch (cleanupError: unknown) {
+            if (getErrorCode(cleanupError) !== 'ENOENT') {
                 logger.warn("Failed to cleanup temporary output file:", cleanupError);
             }
         }

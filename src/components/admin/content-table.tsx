@@ -11,7 +11,6 @@ import {
   RefreshCw,
   CheckCircle2,
   Save,
-  Filter,
   Copy,
   Clock,
   ShieldCheck,
@@ -168,9 +167,9 @@ function relativeTimeLabel(value?: string): string {
 }
 
 const ADMIN_FILTER_SELECT_TRIGGER_CLASSNAME =
-  "bg-background text-foreground hover:border-foreground/30 focus:border-accent";
+  "text-foreground hover:border-foreground/30 focus:border-accent focus-visible:ring-0";
 const ADMIN_SELECT_CONTENT_CLASSNAME =
-  "border-border bg-popover text-popover-foreground ";
+  "border-border bg-popover/95 text-popover-foreground backdrop-blur supports-[backdrop-filter]:backdrop-blur";
 const ADMIN_SELECT_ITEM_CLASSNAME =
   "text-popover-foreground data-[state=checked]:bg-accent/10 data-[state=checked]:text-foreground data-[highlighted]:bg-accent/18 data-[highlighted]:text-foreground dark:data-[state=checked]:bg-accent/16 dark:data-[highlighted]:bg-accent/24";
 
@@ -332,14 +331,6 @@ type RefreshGscOptions = {
   force?: boolean;
 };
 
-function WorkspaceSectionLabel({ children }: { children: React.ReactNode }) {
-  return (
-    <span className="font-mono text-[9px] font-bold uppercase tracking-[0.24em] text-muted-foreground">
-      {children}
-    </span>
-  );
-}
-
 export function ContentTable() {
   const [inventory, setInventory] = useState<InventoryItem[] | null>(null);
   const [loading, setLoading] = useState(true);
@@ -497,17 +488,6 @@ export function ContentTable() {
       });
     },
     [filterVisibility, syncMonitorUrl],
-  );
-
-  const handleVisibilityChange = useCallback(
-    (nextVisibility: "all" | "public" | "hidden") => {
-      setFilterVisibility(nextVisibility);
-      syncMonitorUrl({
-        status: stageTabToStatusParam(stageTab),
-        visibility: nextVisibility,
-      });
-    },
-    [stageTab, syncMonitorUrl],
   );
 
   const handleFunnelStageSelect = useCallback(
@@ -1178,9 +1158,9 @@ export function ContentTable() {
   const priorityLimit = Math.min(priorityCandidates.length, Number(batchSize));
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-transparent">
       {/* ── Header: eyebrow + title + compact funnel ─── */}
-      <header className="border-b border-border bg-background px-4 py-5 md:px-6 lg:px-8">
+      <header className="border-b border-border/50 bg-background/80 px-4 py-6 shadow-sm backdrop-blur supports-[backdrop-filter]:backdrop-blur md:px-6 lg:px-8">
         <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
           <div>
             <p className="font-mono text-[10px] font-bold uppercase tracking-[0.28em] text-muted-foreground">
@@ -1205,8 +1185,8 @@ export function ContentTable() {
       </header>
 
       {/* ── Stage tabs (sticky) ─── */}
-      <div className="sticky top-0 z-10 border-b border-border bg-background px-4 md:px-6 lg:px-8">
-        <div className="flex flex-wrap items-center gap-0">
+      <div className="sticky top-0 z-30 border-b border-border/40 bg-background/85 px-4 py-3 shadow-sm backdrop-blur supports-[backdrop-filter]:backdrop-blur md:px-6 lg:px-8">
+        <div className="flex flex-wrap items-center gap-1 rounded-full border border-border/50 bg-card/70 p-1">
           {STAGE_TAB_ORDER.map((tab) => {
             const active = stageTab === tab;
             const count = tabCounts[tab];
@@ -1216,23 +1196,18 @@ export function ContentTable() {
                 type="button"
                 onClick={() => handleStageTabChange(tab)}
                 className={cn(
-                  "relative inline-flex items-center gap-1.5 px-3 py-2.5 font-mono text-[10px] font-bold uppercase tracking-widest transition-colors",
+                  "inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 font-mono text-[10px] font-bold uppercase tracking-widest transition-all",
                   active
-                    ? "text-foreground"
+                    ? "bg-accent/20 text-foreground shadow-sm"
                     : "text-muted-foreground hover:text-foreground",
                 )}
+                aria-pressed={active}
               >
-                {active && (
-                  <span
-                    className="absolute inset-x-0 bottom-0 h-0.5 bg-accent"
-                    aria-hidden
-                  />
-                )}
                 <span className="sm:hidden">{STAGE_TAB_LABEL[tab].short}</span>
                 <span className="hidden sm:inline">{STAGE_TAB_LABEL[tab].full}</span>
                 <span
                   className={cn(
-                    "font-mono text-[10px] tabular-nums",
+                    "rounded-full bg-background/70 px-2 font-mono text-[10px] tabular-nums",
                     active ? "text-accent" : "text-muted-foreground/70",
                   )}
                 >
@@ -1245,8 +1220,8 @@ export function ContentTable() {
       </div>
 
       {/* ── Filter row ─── */}
-      <div className="border-b border-border bg-background px-4 py-3 md:px-6 lg:px-8">
-        <div className="flex flex-col gap-2 xl:flex-row xl:items-center">
+      <div className="border-b border-border/40 bg-background/75 px-4 py-4 shadow-sm backdrop-blur supports-[backdrop-filter]:backdrop-blur md:px-6 lg:px-8">
+        <div className="flex flex-col gap-3 xl:flex-row xl:items-center">
           <div className="flex flex-wrap items-center gap-2">
             {/* search takes full width on mobile, inline on xl */}
             <div className="relative w-full xl:min-w-64 xl:flex-1">
@@ -1255,91 +1230,92 @@ export function ContentTable() {
                 placeholder="Cari judul, slug, atau path…"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="h-9 pl-9 font-mono text-xs"
+                className="h-10 rounded-full border border-border/40 bg-card/70 pl-9 font-mono text-xs shadow-sm"
               />
             </div>
 
             {/* filter controls: 2-col on mobile, inline on xl */}
             <div className="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto sm:flex-wrap xl:flex-nowrap">
-            <Select value={filterType} onValueChange={setFilterType}>
-              <SelectTrigger
-                className={cn(
-                  "h-9 w-32 font-mono text-[10px] font-bold uppercase tracking-widest",
-                  ADMIN_FILTER_SELECT_TRIGGER_CLASSNAME,
-                )}
-              >
-                <SelectValue placeholder="Type" />
-              </SelectTrigger>
-              <SelectContent className={ADMIN_SELECT_CONTENT_CLASSNAME}>
-                <SelectItem className={ADMIN_SELECT_ITEM_CLASSNAME} value="all">
-                  All types
-                </SelectItem>
-                <SelectItem className={ADMIN_SELECT_ITEM_CLASSNAME} value="blog">
-                  Blog
-                </SelectItem>
-                <SelectItem className={ADMIN_SELECT_ITEM_CLASSNAME} value="note">
-                  Notes
-                </SelectItem>
-                <SelectItem className={ADMIN_SELECT_ITEM_CLASSNAME} value="tool">
-                  Tools
-                </SelectItem>
-              </SelectContent>
-            </Select>
+              <Select value={filterType} onValueChange={setFilterType}>
+                <SelectTrigger
+                  className={cn(
+                    "h-10 w-32 rounded-full border border-border/40 bg-card/70 font-mono text-[10px] font-bold uppercase tracking-widest",
+                    ADMIN_FILTER_SELECT_TRIGGER_CLASSNAME,
+                  )}
+                >
+                  <SelectValue placeholder="Type" />
+                </SelectTrigger>
+                <SelectContent className={ADMIN_SELECT_CONTENT_CLASSNAME}>
+                  <SelectItem className={ADMIN_SELECT_ITEM_CLASSNAME} value="all">
+                    All types
+                  </SelectItem>
+                  <SelectItem className={ADMIN_SELECT_ITEM_CLASSNAME} value="blog">
+                    Blog
+                  </SelectItem>
+                  <SelectItem className={ADMIN_SELECT_ITEM_CLASSNAME} value="note">
+                    Notes
+                  </SelectItem>
+                  <SelectItem className={ADMIN_SELECT_ITEM_CLASSNAME} value="tool">
+                    Tools
+                  </SelectItem>
+                </SelectContent>
+              </Select>
 
-            <Select value={filterLocale} onValueChange={setFilterLocale}>
-              <SelectTrigger
-                className={cn(
-                  "h-9 w-24 font-mono text-[10px] font-bold uppercase tracking-widest",
-                  ADMIN_FILTER_SELECT_TRIGGER_CLASSNAME,
-                )}
-              >
-                <SelectValue placeholder="Locale" />
-              </SelectTrigger>
-              <SelectContent className={ADMIN_SELECT_CONTENT_CLASSNAME}>
-                <SelectItem className={ADMIN_SELECT_ITEM_CLASSNAME} value="all">
-                  All locales
-                </SelectItem>
-                <SelectItem className={ADMIN_SELECT_ITEM_CLASSNAME} value="en">
-                  EN
-                </SelectItem>
-                <SelectItem className={ADMIN_SELECT_ITEM_CLASSNAME} value="id">
-                  ID
-                </SelectItem>
-              </SelectContent>
-            </Select>
+              <Select value={filterLocale} onValueChange={setFilterLocale}>
+                <SelectTrigger
+                  className={cn(
+                    "h-10 w-24 rounded-full border border-border/40 bg-card/70 font-mono text-[10px] font-bold uppercase tracking-widest",
+                    ADMIN_FILTER_SELECT_TRIGGER_CLASSNAME,
+                  )}
+                >
+                  <SelectValue placeholder="Locale" />
+                </SelectTrigger>
+                <SelectContent className={ADMIN_SELECT_CONTENT_CLASSNAME}>
+                  <SelectItem className={ADMIN_SELECT_ITEM_CLASSNAME} value="all">
+                    All locales
+                  </SelectItem>
+                  <SelectItem className={ADMIN_SELECT_ITEM_CLASSNAME} value="en">
+                    EN
+                  </SelectItem>
+                  <SelectItem className={ADMIN_SELECT_ITEM_CLASSNAME} value="id">
+                    ID
+                  </SelectItem>
+                </SelectContent>
+              </Select>
 
-            <Select
-              value={gscQuickFilter}
-              onValueChange={(v) => setGscQuickFilter(v as GscQuickFilter)}
-            >
-              <SelectTrigger
-                className={cn(
-                  "h-9 w-28 font-mono text-[10px] font-bold uppercase tracking-widest",
-                  ADMIN_FILTER_SELECT_TRIGGER_CLASSNAME,
-                )}
+              <Select
+                value={gscQuickFilter}
+                onValueChange={(v) => setGscQuickFilter(v as GscQuickFilter)}
               >
-                <SelectValue placeholder="Google" />
-              </SelectTrigger>
-              <SelectContent className={ADMIN_SELECT_CONTENT_CLASSNAME}>
-                <SelectItem className={ADMIN_SELECT_ITEM_CLASSNAME} value="all">
-                  All Google
-                </SelectItem>
-                <SelectItem className={ADMIN_SELECT_ITEM_CLASSNAME} value="needs_review">
-                  Review
-                </SelectItem>
-                <SelectItem className={ADMIN_SELECT_ITEM_CLASSNAME} value="unknown_google">
-                  Unknown
-                </SelectItem>
-                <SelectItem className={ADMIN_SELECT_ITEM_CLASSNAME} value="indexed_google">
-                  Indexed
-                </SelectItem>
-              </SelectContent>
-            </Select>
+                <SelectTrigger
+                  className={cn(
+                    "h-10 w-28 rounded-full border border-border/40 bg-card/70 font-mono text-[10px] font-bold uppercase tracking-widest",
+                    ADMIN_FILTER_SELECT_TRIGGER_CLASSNAME,
+                  )}
+                >
+                  <SelectValue placeholder="Google" />
+                </SelectTrigger>
+                <SelectContent className={ADMIN_SELECT_CONTENT_CLASSNAME}>
+                  <SelectItem className={ADMIN_SELECT_ITEM_CLASSNAME} value="all">
+                    All Google
+                  </SelectItem>
+                  <SelectItem className={ADMIN_SELECT_ITEM_CLASSNAME} value="needs_review">
+                    Review
+                  </SelectItem>
+                  <SelectItem className={ADMIN_SELECT_ITEM_CLASSNAME} value="unknown_google">
+                    Unknown
+                  </SelectItem>
+                  <SelectItem className={ADMIN_SELECT_ITEM_CLASSNAME} value="indexed_google">
+                    Indexed
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
 
             <Button
               size="sm"
               variant={advancedFiltersOpen ? "default" : "outline"}
-              className="h-9 gap-2 font-mono text-[10px] font-bold uppercase tracking-widest"
+              className="h-9 gap-2 rounded-full font-mono text-[10px] font-bold uppercase tracking-widest"
               onClick={() => setAdvancedFiltersOpen((prev) => !prev)}
             >
               <SlidersHorizontal className="h-3.5 w-3.5" />
@@ -1353,7 +1329,7 @@ export function ContentTable() {
                   size="sm"
                   variant="outline"
                   disabled={batchRefresh.running}
-                  className="h-9 gap-2 font-mono text-[10px] font-bold uppercase tracking-widest"
+                  className="h-9 gap-2 rounded-full font-mono text-[10px] font-bold uppercase tracking-widest"
                 >
                   {batchRefresh.running ? (
                     <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -1366,7 +1342,10 @@ export function ContentTable() {
                   <ChevronDown className="h-3 w-3 opacity-60" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56">
+              <DropdownMenuContent
+                align="end"
+                className="w-56 rounded-2xl border border-border/50 bg-popover/95 p-2 shadow-xl backdrop-blur supports-[backdrop-filter]:backdrop-blur"
+              >
                 <DropdownMenuLabel className="font-mono text-[9px] font-bold uppercase tracking-widest text-muted-foreground">
                   Batch size
                 </DropdownMenuLabel>
@@ -1399,7 +1378,7 @@ export function ContentTable() {
                       `Refresh visible ${batchLimit}`,
                     )
                   }
-                  className="flex items-center gap-2"
+                  className="flex items-center gap-2 rounded-lg"
                 >
                   <RefreshCw className="h-3.5 w-3.5" />
                   Refresh visible ({batchLimit})
@@ -1414,66 +1393,23 @@ export function ContentTable() {
                       `Refresh priority ${priorityLimit}`,
                     )
                   }
-                  className="flex items-center gap-2"
+                  className="flex items-center gap-2 rounded-lg"
                 >
                   <ShieldCheck className="h-3.5 w-3.5" />
                   Refresh priority ({priorityLimit})
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-
-            </div>
-          </div>
-          <div className="flex items-center gap-2 border-t border-border pt-2 xl:border-l xl:border-t-0 xl:pl-3 xl:pt-0">
-            <span className="font-display text-sm font-bold tabular-nums text-foreground">
-              {filtered.length}
-            </span>
-            <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
-              shown
-            </span>
           </div>
         </div>
-
-        {advancedFiltersOpen ? (
-          <div className="mt-2 border border-border bg-card p-3">
-            <div className="mb-2 flex items-center gap-2">
-              <Filter className="h-4 w-4 text-muted-foreground" />
-              <WorkspaceSectionLabel>Advanced filters</WorkspaceSectionLabel>
-            </div>
-            <div className="flex flex-wrap items-center gap-2">
-              <Select
-                value={filterVisibility}
-                onValueChange={(v) =>
-                  handleVisibilityChange(v as "all" | "public" | "hidden")
-                }
-              >
-                <SelectTrigger
-                  className={cn(
-                    "h-9 w-36 font-mono text-[10px] font-bold uppercase tracking-widest",
-                    ADMIN_FILTER_SELECT_TRIGGER_CLASSNAME,
-                  )}
-                >
-                  <SelectValue placeholder="Visibility" />
-                </SelectTrigger>
-                <SelectContent className={ADMIN_SELECT_CONTENT_CLASSNAME}>
-                  <SelectItem className={ADMIN_SELECT_ITEM_CLASSNAME} value="all">
-                    All visibility
-                  </SelectItem>
-                  <SelectItem className={ADMIN_SELECT_ITEM_CLASSNAME} value="public">
-                    Public
-                  </SelectItem>
-                  <SelectItem className={ADMIN_SELECT_ITEM_CLASSNAME} value="hidden">
-                    Hidden
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-              <p className="text-xs text-muted-foreground">
-                Default menampilkan semua. Filter ke &ldquo;Public&rdquo; untuk fokus ke
-                URL yang bisa masuk Google.
-              </p>
-            </div>
-          </div>
-        ) : null}
+        <div className="flex items-center gap-2 border-t border-border/40 pt-2 xl:border-l xl:border-t-0 xl:border-border/40 xl:pl-3 xl:pt-0">
+          <span className="font-display text-sm font-bold tabular-nums text-foreground">
+            {filtered.length}
+          </span>
+          <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+            shown
+          </span>
+        </div>
       </div>
 
       {/* ── Row list ─── */}
@@ -1491,10 +1427,6 @@ export function ContentTable() {
           const isOptOut = isMonitoringOptOut(item);
           const missingPairsLabel =
             item.missingPairLocales?.join(", ") || "locale";
-          const statusLocked =
-            isOptOut ||
-            (isUnpairedBlog &&
-              (row.status === "submitted" || row.status === "indexed"));
           const fresh = isFreshlyChecked(row.lastCheckedAt);
           const refreshDisabled =
             Boolean(row.refreshing) ||
@@ -1507,13 +1439,13 @@ export function ContentTable() {
             <div
               key={item.id}
               style={{ animationDelay: `${idx * 30}ms` }}
-              className="group animate-[fadeSlideIn_0.25s_ease_both] border border-border bg-card px-3.5 py-3 transition-colors hover:border-border"
+              className="group animate-[fadeSlideIn_0.25s_ease_both] rounded-2xl border border-border/40 bg-card/80 px-4 py-3.5 shadow-sm transition-colors hover:border-accent/30 hover:shadow-md"
             >
               <div className="grid grid-cols-1 gap-3 md:grid-cols-[minmax(0,1fr)_auto] xl:grid-cols-[minmax(0,1fr)_170px_auto] xl:items-center">
                 {/* ── Content column ─── */}
                 <div className="min-w-0">
                   <div className="flex items-start gap-3">
-                    <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center border border-border bg-background/50 text-muted-foreground">
+                    <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-border/40 bg-background/70 text-muted-foreground">
                       {typeIcon(item.type)}
                     </div>
 
@@ -1526,7 +1458,7 @@ export function ContentTable() {
                         {gscSummary ? (
                           <span
                             className={cn(
-                              "inline-flex rounded-full border px-2 py-0.5 font-mono text-[9px] font-bold uppercase tracking-widest",
+                              "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 font-mono text-[9px] font-bold uppercase tracking-[0.3em] shadow-sm",
                               gscSummary.tone,
                             )}
                           >
@@ -1558,7 +1490,7 @@ export function ContentTable() {
                             : "Never checked"}
                         </span>
                         {fresh ? (
-                          <span className="inline-flex items-center gap-1 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-1.5 py-0.5 font-mono text-[9px] font-bold uppercase tracking-widest text-emerald-700 dark:text-emerald-400">
+                          <span className="inline-flex items-center gap-1 rounded-full border border-emerald-500/40 bg-emerald-500/10 px-1.5 py-0.5 font-mono text-[9px] font-bold uppercase tracking-widest text-emerald-700 shadow-sm dark:text-emerald-400">
                             <ShieldCheck className="h-2.5 w-2.5" />
                             Fresh
                           </span>
@@ -1592,177 +1524,177 @@ export function ContentTable() {
                 <div className="flex items-start gap-2 md:contents">
                   {/* Status select column */}
                   <div className="flex-1 space-y-1.5 xl:space-y-1.5">
-                  <Select
-                    value={row.status}
-                    onValueChange={(v) => {
-                      const nextStatus = v as IndexStatusValue;
-                      if (
-                        isOptOut &&
-                        (nextStatus === "submitted" || nextStatus === "indexed")
-                      ) {
-                        toast({
-                          title: "Konten dikecualikan dari index monitoring",
-                          description:
-                            "Item ini tidak boleh dipindah ke status submitted atau indexed dari monitor.",
-                          variant: "destructive",
-                        });
-                        return;
-                      }
-                      if (
-                        item.type === "blog" &&
-                        item.hasLocalePair === false &&
-                        (nextStatus === "submitted" || nextStatus === "indexed")
-                      ) {
-                        toast({
-                          title: "Pasangan locale belum lengkap",
-                          description: `Artikel ini belum punya pasangan ${missingPairsLabel}, jadi status push tidak bisa dipilih.`,
-                          variant: "destructive",
-                        });
-                        return;
-                      }
-                      setRowField(item.id, { status: nextStatus });
-                    }}
-                  >
-                    <SelectTrigger
-                      className={cn(
-                        "h-8 border font-mono text-[10px] font-bold uppercase tracking-widest",
-                        opt.pill,
-                      )}
+                    <Select
+                      value={row.status}
+                      onValueChange={(v) => {
+                        const nextStatus = v as IndexStatusValue;
+                        if (
+                          isOptOut &&
+                          (nextStatus === "submitted" || nextStatus === "indexed")
+                        ) {
+                          toast({
+                            title: "Konten dikecualikan dari index monitoring",
+                            description:
+                              "Item ini tidak boleh dipindah ke status submitted atau indexed dari monitor.",
+                            variant: "destructive",
+                          });
+                          return;
+                        }
+                        if (
+                          item.type === "blog" &&
+                          item.hasLocalePair === false &&
+                          (nextStatus === "submitted" || nextStatus === "indexed")
+                        ) {
+                          toast({
+                            title: "Pasangan locale belum lengkap",
+                            description: `Artikel ini belum punya pasangan ${missingPairsLabel}, jadi status push tidak bisa dipilih.`,
+                            variant: "destructive",
+                          });
+                          return;
+                        }
+                        setRowField(item.id, { status: nextStatus });
+                      }}
                     >
-                      <span className="flex items-center gap-2">
-                        <span
-                          className={cn("h-1.5 w-1.5 rounded-full", opt.dot)}
-                        />
-                        <SelectValue />
-                      </span>
-                    </SelectTrigger>
-                    <SelectContent className={ADMIN_SELECT_CONTENT_CLASSNAME}>
-                      {STATUS_OPTIONS.map((s) => (
-                        <SelectItem
-                          className={ADMIN_SELECT_ITEM_CLASSNAME}
-                          key={s.value}
-                          value={s.value}
-                          disabled={
-                            ((item.type === "blog" &&
-                              item.hasLocalePair === false) ||
-                              isOptOut) &&
-                            (s.value === "submitted" || s.value === "indexed")
-                          }
-                        >
-                          <span className="flex items-center gap-2">
-                            <span
-                              className={cn("h-1.5 w-1.5 rounded-full", s.dot)}
-                            />
-                            {s.label}
-                          </span>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  {row.notes ? (
-                    <p className="truncate text-[11px] text-muted-foreground">
-                      {row.notes}
-                    </p>
-                  ) : null}
+                      <SelectTrigger
+                        className={cn(
+                          "h-9 rounded-full border px-3 font-mono text-[10px] font-bold uppercase tracking-widest shadow-sm",
+                          opt.pill,
+                        )}
+                      >
+                        <span className="flex items-center gap-2">
+                          <span
+                            className={cn("h-1.5 w-1.5 rounded-full", opt.dot)}
+                          />
+                          <SelectValue />
+                        </span>
+                      </SelectTrigger>
+                      <SelectContent className={ADMIN_SELECT_CONTENT_CLASSNAME}>
+                        {STATUS_OPTIONS.map((s) => (
+                          <SelectItem
+                            className={ADMIN_SELECT_ITEM_CLASSNAME}
+                            key={s.value}
+                            value={s.value}
+                            disabled={
+                              ((item.type === "blog" &&
+                                item.hasLocalePair === false) ||
+                                isOptOut) &&
+                              (s.value === "submitted" || s.value === "indexed")
+                            }
+                          >
+                            <span className="flex items-center gap-2">
+                              <span
+                                className={cn("h-1.5 w-1.5 rounded-full", s.dot)}
+                              />
+                              {s.label}
+                            </span>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    {row.notes ? (
+                      <p className="truncate text-[11px] text-muted-foreground">
+                        {row.notes}
+                      </p>
+                    ) : null}
                   </div>
 
                   {/* ── Actions column ─── */}
                   <div className="flex shrink-0 items-center gap-1.5 xl:justify-end">
-                  <Button
-                    size="sm"
-                    className="h-8 gap-2 font-mono text-[10px] font-bold uppercase tracking-widest"
-                    title="Buka GSC Inspect URL + copy URL ke clipboard"
-                    onClick={() => openGscAndCopy(item.url)}
-                  >
-                    <ExternalLink className="h-3.5 w-3.5" />
-                    GSC
-                  </Button>
-
-                  {row.dirty ? (
                     <Button
                       size="sm"
-                      variant="default"
-                      disabled={row.saving || row.refreshing || statusLocked}
-                      className="h-8 gap-1 font-mono text-[10px] font-bold uppercase tracking-widest"
-                      onClick={() => save(item)}
-                      title="Save"
+                      className="h-8 gap-2 rounded-full font-mono text-[10px] font-bold uppercase tracking-widest"
+                      title="Buka GSC Inspect URL + copy URL ke clipboard"
+                      onClick={() => openGscAndCopy(item.url)}
                     >
-                      {row.saving ? (
-                        <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                      ) : (
-                        <>
-                          <Save className="h-3.5 w-3.5" />
-                          Save
-                        </>
-                      )}
+                      <ExternalLink className="h-3.5 w-3.5" />
+                      GSC
                     </Button>
-                  ) : null}
 
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
+                    {row.dirty ? (
                       <Button
                         size="sm"
-                        variant="ghost"
-                        className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground"
-                        aria-label="More actions"
+                        className="h-8 gap-2 rounded-full font-mono text-[10px] font-bold uppercase tracking-widest"
+                        onClick={() => save(item)}
                       >
-                        <MoreHorizontal className="h-4 w-4" />
+                        {row.saving ? (
+                          <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                        ) : (
+                          <>
+                            <Save className="h-3.5 w-3.5" />
+                            Save
+                          </>
+                        )}
                       </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-48">
-                      <DropdownMenuItem
-                        onSelect={() => refreshGsc(item)}
-                        disabled={refreshDisabled}
-                        className="flex items-center gap-2"
-                      >
-                        {row.refreshing ? (
-                          <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                        ) : (
-                          <RefreshCw className="h-3.5 w-3.5" />
-                        )}
-                        Refresh from GSC
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onSelect={() => pushToIndexNow(item)}
-                        disabled={refreshDisabled}
-                        className="flex items-center gap-2"
-                      >
-                        {row.pushing ? (
-                          <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                        ) : (
-                          <Send className="h-3.5 w-3.5" />
-                        )}
-                        Push to IndexNow
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onSelect={() => copyUrl(item.url)}
-                        className="flex items-center gap-2"
-                      >
-                        <Copy className="h-3.5 w-3.5" />
-                        Copy URL
-                      </DropdownMenuItem>
-                      <DropdownMenuItem asChild>
-                        <a
-                          href={item.url}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="flex items-center gap-2"
+                    ) : null}
+
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-8 w-8 rounded-full p-0 text-muted-foreground hover:text-foreground"
+                          aria-label="More actions"
                         >
-                          <ExternalLink className="h-3.5 w-3.5" />
-                          Open public URL
-                        </a>
-                      </DropdownMenuItem>
-                      {!row.dirty ? (
+                          <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent
+                        align="end"
+                        className="w-48 rounded-2xl border border-border/50 bg-popover/95 p-2 shadow-xl backdrop-blur supports-[backdrop-filter]:backdrop-blur"
+                      >
                         <DropdownMenuItem
-                          disabled
-                          className="flex items-center gap-2"
+                          onSelect={() => refreshGsc(item)}
+                          disabled={refreshDisabled}
+                          className="flex items-center gap-2 rounded-lg"
                         >
-                          <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />
-                          Saved
+                          {row.refreshing ? (
+                            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                          ) : (
+                            <RefreshCw className="h-3.5 w-3.5" />
+                          )}
+                          Refresh from GSC
                         </DropdownMenuItem>
-                      ) : null}
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                        <DropdownMenuItem
+                          onSelect={() => pushToIndexNow(item)}
+                          disabled={refreshDisabled}
+                          className="flex items-center gap-2 rounded-lg"
+                        >
+                          {row.pushing ? (
+                            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                          ) : (
+                            <Send className="h-3.5 w-3.5" />
+                          )}
+                          Push to IndexNow
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onSelect={() => copyUrl(item.url)}
+                          className="flex items-center gap-2 rounded-lg"
+                        >
+                          <Copy className="h-3.5 w-3.5" />
+                          Copy URL
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                          <a
+                            href={item.url}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="flex items-center gap-2 rounded-lg"
+                          >
+                            <ExternalLink className="h-3.5 w-3.5" />
+                            Open public URL
+                          </a>
+                        </DropdownMenuItem>
+                        {!row.dirty ? (
+                          <DropdownMenuItem
+                            disabled
+                            className="flex items-center gap-2 rounded-lg"
+                          >
+                            <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />
+                            Saved
+                          </DropdownMenuItem>
+                        ) : null}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </div>
                 </div>
               </div>

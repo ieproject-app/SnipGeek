@@ -43,7 +43,12 @@ export function StageFunnel({
   /* ── compact variant ─────────────────────────────────────────── */
   if (variant === "compact") {
     return (
-      <div className={cn("pointer-events-auto flex flex-wrap items-center gap-1.5", className)}>
+      <div
+        className={cn(
+          "pointer-events-auto flex flex-wrap items-center gap-1.5 rounded-full bg-card/40 p-1 backdrop-blur supports-[backdrop-filter]:backdrop-blur",
+          className,
+        )}
+      >
         {STAGE_ORDER.map((key) => {
           const entry = byKey.get(key);
           if (!entry) return null;
@@ -65,9 +70,12 @@ export function StageFunnel({
           );
 
           const baseClass = cn(
-            "inline-flex cursor-pointer items-center gap-1.5 border px-2 py-0.5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40",
+            "inline-flex cursor-pointer items-center gap-1.5 rounded-full border px-3 py-1.5 text-[10px] font-mono font-bold uppercase tracking-widest transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40",
             palette.surface,
-            isActive ? "border-accent bg-accent/10" : palette.surfaceActive,
+            palette.surfaceActive,
+            isActive
+              ? "border-accent bg-accent/20 text-foreground shadow-sm"
+              : "border-border/60 text-muted-foreground",
           );
 
           if (entry.href) {
@@ -118,7 +126,7 @@ export function StageFunnel({
             <>
               <span
                 className={cn(
-                  "flex h-7 w-7 shrink-0 items-center justify-center ",
+                  "flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-border/50",
                   palette.iconWrap,
                 )}
               >
@@ -144,7 +152,7 @@ export function StageFunnel({
           );
 
           const baseClass = cn(
-            "flex items-center gap-2.5 border px-2.5 py-1.5 transition-colors",
+            "flex items-center gap-2.5 rounded-xl border px-3 py-2 shadow-sm transition-colors backdrop-blur supports-[backdrop-filter]:backdrop-blur",
             palette.surface,
             palette.surfaceActive,
           );
@@ -199,7 +207,7 @@ export function StageFunnel({
         <div className="flex items-start gap-3">
           <div
             className={cn(
-              "flex h-9 w-9 shrink-0 items-center justify-center ",
+              "flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-border/50",
               palette.iconWrap,
             )}
           >
@@ -230,13 +238,13 @@ export function StageFunnel({
 
     const baseClass = cn(
       // base
-      "relative border p-4 transition-all duration-200 ease-out will-change-transform hover:-translate-y-0.5 hover:",
+      "relative rounded-2xl border p-4 shadow-sm transition-all duration-200 ease-out will-change-transform hover:-translate-y-0.5 hover:shadow-md backdrop-blur supports-[backdrop-filter]:backdrop-blur",
       // mobile: 2-per-row (gap-2 = 8px, so each takes half minus half the gap)
       "basis-[calc(50%-4px)] xl:basis-auto xl:flex-1 xl:min-w-0",
       palette.surface,
       entry.href ? palette.surfaceActive : "",
       // mobile: each card is its own pill; XL: they join into one strip
-      " xl:rounded-none",
+      "xl:rounded-none",
       isFirst && "xl:rounded-l-2xl",
       isLast && "xl:rounded-r-2xl",
       // on XL: remove left border so cards share edges (joined strip effect)

@@ -66,71 +66,80 @@ export function AdminShell({ children }: { children: ReactNode }) {
 
   return (
     <AdminGuard>
-      {/* ── Mobile top bar ─────────────────────────────────── */}
-      <div className="sticky top-0 z-40 flex h-12 items-center border-b border-border bg-background px-3 md:hidden">
-        <button
-          onClick={() => setDrawerOpen(true)}
-          className="flex h-8 w-8 items-center justify-center border border-border bg-card text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-          aria-label="Open navigation"
-        >
-          <Menu className="h-4 w-4" />
-        </button>
-        <div className="ml-3 min-w-0 leading-none">
-          <p className="font-mono text-[9px] font-bold uppercase tracking-[0.26em] text-muted-foreground">
-            {resolvePageTitle(pathname).eyebrow}
-          </p>
-          <span className="mt-1 block truncate font-display text-sm font-bold tracking-tight">
-            {resolvePageTitle(pathname).title}
-          </span>
-        </div>
-      </div>
-
-      {/* ── Mobile drawer backdrop ──────────────────── */}
-      {drawerOpen && (
+      <div className="relative min-h-screen overflow-hidden">
         <div
-          className="fixed inset-0 z-40 bg-background md:hidden"
-          onClick={() => setDrawerOpen(false)}
           aria-hidden
+          className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(79,70,229,0.08),_transparent_65%)] dark:bg-[radial-gradient(circle_at_top,_rgba(59,130,246,0.18),_transparent_55%)]"
         />
-      )}
 
-      {/* ── Mobile drawer ───────────────────────────────── */}
-      <div
-        className={cn(
-          "fixed inset-y-0 left-0 z-50 transition-transform duration-300 ease-in-out md:hidden",
-          drawerOpen ? "translate-x-0" : "-translate-x-full",
-        )}
-      >
-        {/* Close button inside drawer */}
-        <div className="absolute right-0 top-0 translate-y-0 translate-x-full p-2">
-          <button
-            onClick={handleCloseDrawer}
-            className="flex h-8 w-8 items-center justify-center border border-border bg-background text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-            aria-label="Close navigation"
+        <div className="relative flex min-h-screen flex-col bg-gradient-to-br from-background via-background to-muted/40">
+          {/* ── Mobile top bar ─────────────────────────────────── */}
+          <div className="sticky top-0 z-40 flex h-12 items-center border-b border-border/60 bg-background/90 px-3 shadow-sm backdrop-blur supports-[backdrop-filter]:backdrop-blur md:hidden">
+            <button
+              onClick={() => setDrawerOpen(true)}
+              className="flex h-9 w-9 items-center justify-center rounded-full border border-border/60 bg-card/90 text-muted-foreground shadow-sm transition-colors hover:bg-muted/80 hover:text-foreground"
+              aria-label="Open navigation"
+            >
+              <Menu className="h-4 w-4" />
+            </button>
+            <div className="ml-3 min-w-0 leading-none">
+              <p className="font-mono text-[9px] font-bold uppercase tracking-[0.26em] text-muted-foreground">
+                {resolvePageTitle(pathname).eyebrow}
+              </p>
+              <span className="mt-1 block truncate font-display text-sm font-bold tracking-tight">
+                {resolvePageTitle(pathname).title}
+              </span>
+            </div>
+          </div>
+
+          {/* ── Mobile drawer backdrop ──────────────────── */}
+          {drawerOpen && (
+            <div
+              className="fixed inset-0 z-40 bg-background/70 backdrop-blur supports-[backdrop-filter]:backdrop-blur md:hidden"
+              onClick={() => setDrawerOpen(false)}
+              aria-hidden
+            />
+          )}
+
+          {/* ── Mobile drawer ───────────────────────────────── */}
+          <div
+            className={cn(
+              "fixed inset-y-0 left-0 z-50 bg-background/95 shadow-xl transition-transform duration-300 ease-in-out supports-[backdrop-filter]:backdrop-blur md:hidden",
+              drawerOpen ? "translate-x-0" : "-translate-x-full",
+            )}
           >
-            <X className="h-4 w-4" />
-          </button>
-        </div>
-        <AdminSidebar
-          mobile
-          currentPath={pathname}
-          onNavigateAction={handleNavigate}
-          onCloseAction={handleCloseDrawer}
-        />
-      </div>
+            {/* Close button inside drawer */}
+            <div className="absolute right-0 top-0 translate-y-0 translate-x-full p-2">
+              <button
+                onClick={handleCloseDrawer}
+                className="flex h-9 w-9 items-center justify-center rounded-full border border-border/60 bg-background/90 text-muted-foreground shadow-sm transition-colors hover:bg-muted/80 hover:text-foreground"
+                aria-label="Close navigation"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+            <AdminSidebar
+              mobile
+              currentPath={pathname}
+              onNavigateAction={handleNavigate}
+              onCloseAction={handleCloseDrawer}
+            />
+          </div>
 
-      {/* ── Desktop layout ───────────────────────────────── */}
-      <div className="min-h-screen bg-background md:grid md:grid-cols-[240px_minmax(0,1fr)]">
-        {/* Sidebar: hidden on mobile, visible on md+ */}
-        <div className="hidden md:block">
-          <AdminSidebar />
-        </div>
-        <main className="min-w-0 overflow-x-hidden bg-background">
-          {children}
-        </main>
-      </div>
+          {/* ── Desktop layout ───────────────────────────────── */}
+          <div className="relative flex-1 md:grid md:grid-cols-[260px_minmax(0,1fr)]">
+            {/* Sidebar: hidden on mobile, visible on md+ */}
+            <div className="hidden md:block">
+              <AdminSidebar />
+            </div>
+            <main className="min-w-0 overflow-x-hidden pb-12">
+              {children}
+            </main>
+          </div>
 
-      <Toaster />
+          <Toaster />
+        </div>
+      </div>
     </AdminGuard>
   );
 }

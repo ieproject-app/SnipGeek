@@ -1,7 +1,7 @@
 "use client";
 
 import Image, { type ImageLoaderProps, type ImageProps } from "next/image";
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { cn } from "@/lib/utils";
 
 /**
@@ -44,41 +44,23 @@ export function RevealImage({
   ...props
 }: RevealImageProps) {
   const srcKey = typeof src === "string" ? src : "";
-  const [isLoaded, setIsLoaded] = useState(() => loadedSources.has(srcKey));
-  const [hasMounted, setHasMounted] = useState(false);
-  const [shouldHold, setShouldHold] = useState(holdUntilLoaded);
+  const [loadedSrc, setLoadedSrc] = useState(() => (loadedSources.has(srcKey) ? srcKey : ""));
   const wrapperRef = useRef<HTMLDivElement>(null);
+  const hasMounted = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false,
+  );
+  const hasCachedLoad = srcKey ? loadedSources.has(srcKey) : false;
+  const isLoaded = hasCachedLoad || loadedSrc === srcKey;
 
-  useEffect(() => {
-    setHasMounted(true);
-  }, []);
-
-  useEffect(() => {
-    // When src changes, check the global cache first before resetting.
-    if (loadedSources.has(srcKey)) {
-      setIsLoaded(true);
-    } else {
-      setIsLoaded(false);
-    }
-  }, [srcKey]);
-
-  useEffect(() => {
-    if (!initialVisitOnly) {
-      setShouldHold(holdUntilLoaded);
-      return;
-    }
-
-    if (typeof window === "undefined") {
-      setShouldHold(holdUntilLoaded);
-      return;
-    }
+  const shouldHold = useMemo(() => {
+    if (!initialVisitOnly) return holdUntilLoaded;
+    if (typeof window === "undefined") return holdUntilLoaded;
 
     const visitKey = "snipgeek-initial-visit-complete";
     const hasVisited = window.sessionStorage.getItem(visitKey) === "1";
-    setShouldHold(holdUntilLoaded && !hasVisited);
-    if (!hasVisited) {
-      window.sessionStorage.setItem(visitKey, "1");
-    }
+    return holdUntilLoaded && !hasVisited;
   }, [holdUntilLoaded, initialVisitOnly]);
 
   // Synchronously detect images already in browser cache (before paint).
@@ -86,10 +68,10 @@ export function RevealImage({
     if (isLoaded) return;
     const img = wrapperRef.current?.querySelector("img");
     if (img?.complete && img.naturalWidth > 0) {
-      setIsLoaded(true);
+      setLoadedSrc(srcKey);
       if (srcKey) loadedSources.add(srcKey);
     }
-  }, [srcKey]);
+  }, [isLoaded, srcKey]);
 
   const shouldHideImage = shouldHold && !isLoaded;
   const shouldShowPlaceholder = !isLoaded && (!hasMounted || shouldHold || showSkeleton);
@@ -191,8 +173,11 @@ export function RevealImage({
         sizes={sizes}
         width={width}
         onLoad={() => {
-          setIsLoaded(true);
+          setLoadedSrc(srcKey);
           if (srcKey) loadedSources.add(srcKey);
+          if (initialVisitOnly && typeof window !== "undefined") {
+            window.sessionStorage.setItem("snipgeek-initial-visit-complete", "1");
+          }
         }}
         {...props}
         style={{

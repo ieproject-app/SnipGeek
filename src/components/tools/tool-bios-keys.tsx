@@ -1,9 +1,8 @@
 "use client";
 
 import React, { useState, useEffect, useCallback, useMemo } from "react";
-import { useAuth, useFirestore, useUser } from "@/firebase";
+import { useFirestore, useUser } from "@/firebase";
 import { collection, doc, getDoc, getDocs, setDoc, deleteDoc, writeBatch } from "firebase/firestore";
-import { initiateGoogleSignIn } from "@/firebase/non-blocking-login";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -367,7 +366,6 @@ function DetailView({ item, related, onBack, onSelectRelated, onEdit, lang, loca
 
 export function ToolBiosKeys({ dictionary }: { dictionary?: Dictionary }) {
   const { notify } = useNotification();
-  const auth = useAuth();
   const firestore = useFirestore();
   const { user } = useUser();
 

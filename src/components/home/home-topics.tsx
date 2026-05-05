@@ -40,7 +40,6 @@ export function HomeTopics({
   title,
   viewAllText,
   dictionary,
-  locale,
   linkPrefix,
   tag,
   viewAllHref,
@@ -100,11 +99,6 @@ export function HomeTopics({
       </ScrollReveal>
     );
   };
-
-  const breadcrumbSegments = [
-    { label: linkPrefix || "/" },
-    { label: tag },
-  ];
 
   return (
     <section className="container max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pb-12 sm:pb-16 overflow-hidden">

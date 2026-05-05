@@ -41,6 +41,10 @@ function resolveIcon(name?: string): IconComponent {
   return iconMap[name] ?? Mail;
 }
 
+function IconRenderer({ icon, className }: { icon?: string; className?: string }) {
+  return React.createElement(resolveIcon(icon), { className });
+}
+
 /* -------------------------------------------------------------------------- */
 /* ContactEmailCta                                                            */
 /* -------------------------------------------------------------------------- */
@@ -131,12 +135,10 @@ export function ContactCategory({
   title,
   children,
 }: ContactCategoryProps) {
-  const Icon = resolveIcon(icon);
-
   return (
     <div className="h-full rounded-2xl border border-primary/10 bg-card/40 p-5 transition-all duration-300 hover:border-primary/25 hover:shadow-md hover:shadow-primary/5">
       <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-xl border border-primary/15 bg-primary/10">
-        <Icon className="h-4 w-4 text-primary" />
+        <IconRenderer icon={icon} className="h-4 w-4 text-primary" />
       </div>
       <h3 className="font-display text-sm font-bold tracking-tight text-primary">
         {title}
@@ -192,11 +194,9 @@ type ResponseItemProps = {
 };
 
 export function ResponseItem({ icon, children }: ResponseItemProps) {
-  const Icon = resolveIcon(icon);
-
   return (
     <div className="flex items-start gap-3 rounded-xl border border-primary/5 bg-background/50 px-4 py-3">
-      <Icon className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
+      <IconRenderer icon={icon} className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
       <div className="text-sm text-foreground/75 [&>span]:my-0 [&>span]:block">
         {children}
       </div>

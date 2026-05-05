@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useId, useState } from "react";
+import React, { useId, useSyncExternalStore } from "react";
 import { useTheme } from "next-themes";
 
 type SnipGeekLogoProps = React.SVGProps<SVGSVGElement> & {
@@ -42,8 +42,11 @@ export const SnipGeekLogo = ({
   const gradId = `sg-grad-${id}`;
 
   const { resolvedTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
+  const mounted = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false,
+  );
   const isDark = mounted && resolvedTheme === "dark";
 
   const strokeColor = isDark ? "#ffffff" : `url(#${gradId})`;

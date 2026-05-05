@@ -139,7 +139,9 @@ export function AddressBookDialog({ isOpen, onClose, addressBook, onUpdateBook, 
     ];
     
     // Add data
-    addressBook.forEach(({ id, ...rest }) => {
+    addressBook.forEach((entry) => {
+      const { id, ...rest } = entry;
+      void id;
       worksheet.addRow(rest);
     });
     

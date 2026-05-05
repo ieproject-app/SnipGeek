@@ -523,10 +523,10 @@ export function DashboardOverview() {
       : `${Math.max(WEEKLY_TARGET - weekStats.current, 0)} more needed`;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-transparent">
       {/* ── Header: editorial title + live dot ─── */}
-      <header className="border-b border-border bg-background px-4 py-5 md:px-6 lg:px-8">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+      <header className="border-b border-border/50 bg-background/80 px-4 py-6 shadow-sm backdrop-blur supports-[backdrop-filter]:backdrop-blur md:px-6 lg:px-8">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <p className="font-mono text-[10px] font-bold uppercase tracking-[0.28em] text-muted-foreground">
               SnipGeek Control · W
@@ -539,8 +539,8 @@ export function DashboardOverview() {
               Pipeline status, cadence, dan priority queue untuk minggu ini.
             </p>
           </div>
-          <div className="flex items-center gap-1.5 border border-emerald-500/40 bg-emerald-500/10 px-2 py-1">
-            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />
+          <div className="flex items-center gap-2 rounded-full border border-emerald-500/40 bg-emerald-500/10 px-3 py-1.5 shadow-sm">
+            <span className="h-2 w-2 animate-pulse rounded-full bg-emerald-500" />
             <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-emerald-700 dark:text-emerald-400">
               Live
             </span>
@@ -549,15 +549,15 @@ export function DashboardOverview() {
       </header>
 
       {/* ── Funnel: the workflow spine ─── */}
-      <section className="border-b border-border bg-background px-4 py-4 md:px-6 lg:px-8">
-        <p className="mb-3 font-mono text-[10px] font-bold uppercase tracking-[0.28em] text-muted-foreground">
+      <section className="border-b border-border/50 bg-background/75 px-4 py-5 shadow-sm backdrop-blur supports-[backdrop-filter]:backdrop-blur md:px-6 lg:px-8">
+        <p className="mb-4 font-mono text-[10px] font-bold uppercase tracking-[0.28em] text-muted-foreground">
           Pipeline
         </p>
         <StageFunnel stages={funnelStages} variant="full" />
       </section>
 
       {/* ── Body: queue (left) + cadence (right) ─── */}
-      <div className="flex flex-col gap-5 px-4 py-5 md:px-6 lg:px-8 xl:flex-row">
+      <div className="flex flex-col gap-6 px-4 py-6 md:px-6 lg:px-8 xl:flex-row">
         {/* ── Priority queue ─── */}
         <section className="min-w-0 flex-1">
           <SectionHeader
@@ -599,10 +599,10 @@ export function DashboardOverview() {
             }
           />
 
-          <div className="mt-4">
+          <div className="mt-5">
             {priorityItems.length === 0 ? (
-              <div className="flex flex-col items-center justify-center border border-emerald-500/20 bg-emerald-500/5 py-16 text-center">
-                <div className="mb-3 flex h-12 w-12 items-center justify-center border border-emerald-500/30 bg-emerald-500/10">
+              <div className="flex flex-col items-center justify-center rounded-2xl border border-emerald-500/20 bg-emerald-500/5 py-16 text-center">
+                <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-xl border border-emerald-500/30 bg-emerald-500/10">
                   <ArrowUpRight className="h-5 w-5 text-emerald-500" />
                 </div>
                 <p className="text-sm font-semibold text-foreground">
@@ -613,14 +613,14 @@ export function DashboardOverview() {
                 </p>
               </div>
             ) : (
-              <div className="space-y-2">
+              <div className="space-y-3">
                 {priorityItems.map((item, idx) => (
                   <div
                     key={item.id}
                     style={{ animationDelay: `${idx * 35}ms` }}
-                    className="flex animate-[fadeSlideIn_0.25s_ease_both] items-start gap-3 border border-border bg-card px-3.5 py-3 transition-colors hover:border-border"
+                    className="flex animate-[fadeSlideIn_0.25s_ease_both] items-start gap-3 rounded-2xl border border-border/50 bg-card/80 px-4 py-3.5 shadow-sm transition-colors hover:border-accent/30"
                   >
-                    <div className="flex h-7 w-7 shrink-0 items-center justify-center border border-border bg-background font-display text-sm font-bold text-muted-foreground">
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-border/40 bg-background font-display text-sm font-bold text-muted-foreground">
                       {idx + 1}
                     </div>
 
@@ -645,7 +645,7 @@ export function DashboardOverview() {
                     <div className="flex shrink-0 items-center gap-1.5">
                       <Button
                         size="sm"
-                        className="h-8 gap-2 font-mono text-[10px] font-bold uppercase tracking-widest"
+                        className="h-8 gap-2 rounded-full font-mono text-[10px] font-bold uppercase tracking-widest"
                         onClick={() => copyAndOpenGsc(item.url)}
                       >
                         <span className="hidden sm:inline">Open GSC</span>
@@ -656,7 +656,7 @@ export function DashboardOverview() {
                           <Button
                             variant="ghost"
                             size="sm"
-                            className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground"
+                            className="h-8 w-8 rounded-full p-0 text-muted-foreground hover:text-foreground"
                             aria-label="More actions"
                           >
                             <MoreHorizontal className="h-4 w-4" />
@@ -708,7 +708,7 @@ export function DashboardOverview() {
         {/* ── Cadence panels ─── */}
         <aside className="flex flex-col gap-4 xl:w-96 xl:shrink-0">
           {/* Weekly target */}
-          <div className="overflow-hidden border border-border bg-card p-4">
+          <div className="overflow-hidden rounded-2xl border border-border/50 bg-card/80 p-4 shadow-sm">
             <SectionHeader
               eyebrow="Cadence"
               title="Weekly target"
@@ -727,13 +727,13 @@ export function DashboardOverview() {
                 heightClassName="h-44"
               />
             </div>
-            <p className="mt-2 border-t border-dashed pt-2 text-[11px] text-muted-foreground">
+            <div className="mt-2 border-t border-dashed border-border/60 pt-2 text-[11px] text-muted-foreground">
               {weekProgressHint} · minggu lalu {weekStats.previous} artikel.
-            </p>
+            </div>
           </div>
 
           {/* Posting heatmap */}
-          <div className="flex flex-col overflow-hidden border border-border bg-card p-4">
+          <div className="flex flex-col overflow-hidden rounded-2xl border border-border/50 bg-card/80 p-4 shadow-sm">
             <SectionHeader
               eyebrow="Rhythm"
               title="Posting heatmap"
@@ -747,7 +747,7 @@ export function DashboardOverview() {
             <div className="mt-3 overflow-x-auto">
               <PostingHeatmap publishDates={articleDates} />
             </div>
-            <div className="mt-2 flex items-center justify-between gap-2 border-t border-dashed pt-2 font-mono text-[9px] font-bold uppercase tracking-widest text-muted-foreground">
+            <div className="mt-2 flex items-center justify-between gap-2 border-t border-dashed border-border/60 pt-2 font-mono text-[9px] font-bold uppercase tracking-widest text-muted-foreground">
               <div className="flex items-center gap-1.5">
                 <span>Less</span>
                 <span className="flex gap-0.5">
@@ -764,7 +764,7 @@ export function DashboardOverview() {
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="h-6 gap-1 px-1.5 font-mono text-[9px] font-bold uppercase tracking-widest text-muted-foreground hover:text-foreground"
+                    className="h-7 gap-1 rounded-full px-2 font-mono text-[9px] font-bold uppercase tracking-widest text-muted-foreground hover:text-foreground"
                   >
                     Filter
                     <MoreHorizontal className="h-3 w-3" />

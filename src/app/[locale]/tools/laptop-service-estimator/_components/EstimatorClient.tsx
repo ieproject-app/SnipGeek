@@ -463,6 +463,7 @@ export function EstimatorClient({ dictionary }: EstimatorClientProps) {
               ) : (
                  <div className="relative rounded-xl border border-border bg-muted/30 overflow-hidden p-2 flex items-center gap-3">
                    <div className="w-12 h-12 rounded-lg overflow-hidden bg-background shrink-0 border border-border">
+                     {/* eslint-disable-next-line @next/next/no-img-element */}
                      <img src={scannedImage} alt="Label scan" className="w-full h-full object-cover" />
                    </div>
                    <div className="min-w-0 flex-1">
