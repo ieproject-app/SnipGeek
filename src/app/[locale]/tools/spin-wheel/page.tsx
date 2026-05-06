@@ -2,6 +2,7 @@ import { getDictionary } from "@/lib/get-dictionary";
 import { i18n, type Locale } from "@/i18n-config";
 import type { Metadata } from "next";
 import { SpinWheelClient } from "./spin-wheel-client";
+import { SeoContent } from "./seo-content";
 
 const DOMAIN = "https://snipgeek.com";
 
@@ -249,41 +250,17 @@ export default async function SpinWheelPage({
       />
       <SpinWheelClient locale={locale} dictionary={dictionary} />
 
-      {/* ── Server-rendered SEO content — crawlable by Google/Bing ── */}
-      <section
-        aria-label={isId ? "Informasi tentang spin wheel" : "About this wheel spinner"}
-        className="max-w-3xl mx-auto px-4 sm:px-6 pb-20 space-y-10 text-sm text-muted-foreground"
-      >
-        {/* Use cases */}
-        <div className="space-y-3">
-          <h2 className="text-base font-semibold text-foreground">
-            {isId ? "Cocok digunakan untuk apa saja?" : "What can you use this wheel spinner for?"}
-          </h2>
-          <ul className="grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-2 list-none p-0 m-0">
-            {seo.useCases.map((item) => (
-              <li key={item} className="flex items-start gap-1.5">
-                <span className="text-primary mt-0.5 shrink-0">✓</span>
-                <span>{item}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        {/* FAQ */}
-        <div className="space-y-5">
-          <h2 className="text-base font-semibold text-foreground">
-            {isId ? "Pertanyaan yang Sering Ditanyakan" : "Frequently Asked Questions"}
-          </h2>
-          <dl className="space-y-4">
-            {seo.faq.map(({ q, a }) => (
-              <div key={q}>
-                <dt className="font-medium text-foreground">{q}</dt>
-                <dd className="mt-1 leading-relaxed">{a}</dd>
-              </div>
-            ))}
-          </dl>
-        </div>
-      </section>
+      {/* ── SEO content with show/hide toggle — still crawlable by Google/Bing ── */}
+      <SeoContent
+        useCases={seo.useCases}
+        faq={seo.faq}
+        labels={{
+          useCasesTitle: isId ? "Cocok digunakan untuk apa saja?" : "What can you use this wheel spinner for?",
+          faqTitle: isId ? "Pertanyaan yang Sering Ditanyakan" : "Frequently Asked Questions",
+          showMore: isId ? "Lihat Informasi & FAQ" : "Show Info & FAQ",
+          showLess: isId ? "Sembunyikan" : "Hide",
+        }}
+      />
     </>
   );
 }
