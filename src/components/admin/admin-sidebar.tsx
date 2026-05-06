@@ -10,6 +10,7 @@ import {
   ListChecks,
   Sparkles,
   Search as SearchIcon,
+  Users,
 } from "lucide-react";
 import { SnipGeekLogo } from "@/components/icons/snipgeek-logo";
 import { Button } from "@/components/ui/button";
@@ -34,6 +35,12 @@ const NAV_ITEMS = [
     href: "/admin/prompt-generator",
     icon: Sparkles,
     description: "Editorial brief builder · create atau revise prompt kerja",
+  },
+  {
+    name: "Employee History",
+    href: "/admin/employee-history",
+    icon: Users,
+    description: "Search employee · signer generator · data injection",
   },
 ];
 

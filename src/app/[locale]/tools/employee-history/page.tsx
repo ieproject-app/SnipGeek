@@ -1,6 +1,6 @@
 import { getDictionary } from '@/lib/get-dictionary'
 import { Locale } from '@/i18n-config'
-import { ToolHistory } from '@/components/tools/tool-history'
+import { EmployeeHistoryTabs } from '@/components/tools/employee-history-tabs'
 import type { Metadata } from 'next'
 
 export async function generateMetadata({
@@ -22,9 +22,6 @@ export async function generateMetadata({
   };
 }
 
-/**
- * The main server component for the Employee History page.
- */
 export default async function EmployeeHistoryPage({
   params,
 }: {
@@ -36,7 +33,7 @@ export default async function EmployeeHistoryPage({
   return (
     <div className="w-full">
       <main className="mx-auto max-w-6xl px-4 pt-10 pb-16 md:px-6">
-        <ToolHistory dictionary={dictionary} employeeData="" locale={locale} />
+        <EmployeeHistoryTabs dictionary={dictionary} locale={locale} />
       </main>
     </div>
   );
