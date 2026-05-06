@@ -33,7 +33,6 @@ export function EmployeeHistoryTabs({ dictionary, locale }: EmployeeHistoryTabsP
 
   const hook = useEmployeeHistory('', locale);
   const {
-    user,
     isDatasetLoading, isAdminUser, isAdminLoading,
     injectText, setInjectText, isInjecting,
     searchText, setSearchText, searchGrup, setSearchGrup,
