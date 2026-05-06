@@ -78,8 +78,8 @@ export function ToolHistory({
                       <Database className="h-5 w-5 text-primary" />
                     </div>
                     <div>
-                      <CardTitle className="font-display text-xl">Admin Data Injection</CardTitle>
-                      <CardDescription>Paste data tab-separated: Grup, Tgl Mulai, Tgl Selesai, Nama, Jabatan, NIK</CardDescription>
+                      <CardTitle className="font-display text-xl">{toolMeta.adminTitle}</CardTitle>
+                      <CardDescription>{toolMeta.adminDesc}</CardDescription>
                     </div>
                   </div>
                 </CardHeader>
@@ -87,7 +87,7 @@ export function ToolHistory({
                   {isAdminLoading ? (
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
                       <Loader2 className="h-4 w-4 animate-spin" />
-                      Memeriksa hak akses admin...
+                      {toolMeta.checkingAccess}
                     </div>
                   ) : (
                     <>
@@ -110,12 +110,12 @@ export function ToolHistory({
                         {isInjecting ? (
                           <>
                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                            Injecting...
+                            {toolMeta.injecting}
                           </>
                         ) : (
                           <>
                             <Database className="mr-2 h-4 w-4" />
-                            Inject ke Firestore
+                            {toolMeta.injectToFirestore}
                           </>
                         )}
                       </Button>
@@ -295,7 +295,7 @@ export function ToolHistory({
                       <div className="p-4 bg-muted/20 rounded-full">
                         <Search className="h-8 w-8 text-muted-foreground/30" />
                       </div>
-                      <p className="italic text-sm">No matching records found.</p>
+                      <p className="italic text-sm">{toolMeta.emptyResults}</p>
                     </div>
                   )}
                 </div>

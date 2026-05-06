@@ -29,3 +29,16 @@ For homepage and UX changes, prioritize Lighthouse outcomes using evidence from 
 
 ### Practical expectation
 For content-heavy, client-interactive sites, mobile Performance in the 70-80 range can be realistic. Keep pushing meaningful gains, but communicate diminishing returns clearly.
+
+## Proxy CDN Safety (CRITICAL)
+
+**NEVER add cookie-based or header-based redirects in `src/proxy.ts`** without also setting `Cache-Control: private` or adding a `Vary` header.
+
+In April 2026, a cookie-based locale redirect was cached by the CDN without `Vary: Cookie`, poisoning all visitors (including Googlebot) with a 307 redirect to `/id/`. Google indexing dropped to zero.
+
+### Rules for proxy.ts
+- Locale-less URLs always rewrite to `/en/...` — no cookie reads, no conditional redirects.
+- Locale switching is client-side only (`LanguageSwitcher`, `LocaleSuggestionBanner` use `router.push()`).
+- If you must vary by cookie/header: set `Cache-Control: private, no-store` on the response.
+- After any proxy.ts edit: run `npx vitest run src/proxy.test.ts` and `node scripts/pre-deploy-check.mjs`.
+- Full rule details: `.windsurf/rules/proxy-cdn-safety.md`

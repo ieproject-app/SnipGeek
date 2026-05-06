@@ -29,9 +29,9 @@ export function ToolNumbers({ dictionary }: { dictionary: Dictionary }) {
                     <div className="relative flex justify-between">
                         <div className="absolute top-4 left-0 right-0 h-0.5 border-t-2 border-dashed border-primary/20 -z-10" />
                         {[
-                            { step: 1, label: "Pilih Dokumen", active: !hasResults, done: hasResults },
-                            { step: 2, label: "Buat Nomor", active: !hasResults, done: hasResults },
-                            { step: 3, label: "Salin Hasil", active: hasResults, done: false }
+                            { step: 1, label: toolMeta.stepper.step1, active: !hasResults, done: hasResults },
+                            { step: 2, label: toolMeta.stepper.step2, active: !hasResults, done: hasResults },
+                            { step: 3, label: toolMeta.stepper.step3, active: hasResults, done: false }
                         ].map((s) => (
                             <div key={s.step} className="flex flex-col items-center gap-3 bg-background px-4">
                                 <div className={cn(

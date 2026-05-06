@@ -71,6 +71,8 @@ const t = {
     cancel: "Cancel",
     save: "Save",
     delete: "Delete",
+    copied: "Copied",
+    copy: "Copy",
     bulkTitle: "Bulk Update / Mass Inject (via JSON)",
     bulkDesc: "Powerful feature to overwrite or inject dozens of new entries at once from Gemini/ChatGPT prompts. Please follow the JSON schema structure.",
     bulkJsonLabel: "JSON Array Script",
@@ -129,6 +131,8 @@ const t = {
     cancel: "Batal",
     save: "Simpan",
     delete: "Hapus",
+    copied: "Tersalin",
+    copy: "Salin",
     bulkTitle: "Bulk Update / Mass Inject (via JSON)",
     bulkDesc: "Fitur mutakhir untuk menimpa massal atau menyuntikkan puluhan data baru sekaligus hasil dari prompt Gemini/ChatGPT. Harap patuhi struktur skema JSON murni.",
     bulkJsonLabel: "Teks Script Array JSON",
@@ -188,6 +192,7 @@ function KeyCap({
   copied,
   onCopy,
   icon,
+  lang,
 }: {
   label: string;
   value: string;
@@ -195,6 +200,7 @@ function KeyCap({
   copied: boolean;
   onCopy: () => void;
   icon: React.ReactNode;
+  lang: { copied: string; copy: string };
 }) {
   const accentCls = accent === "primary"
     ? "text-foreground border-border/70"
@@ -220,7 +226,7 @@ function KeyCap({
           hoverCls
         )}
       >
-        {copied ? <><Check className="h-3.5 w-3.5 text-emerald-500" /> Copied</> : <><Copy className="h-3 w-3" /> Copy</>}
+        {copied ? <><Check className="h-3.5 w-3.5 text-emerald-500" /> {lang.copied}</> : <><Copy className="h-3 w-3" /> {lang.copy}</>}
       </button>
     </div>
   );
@@ -293,6 +299,7 @@ function DetailView({ item, related, onBack, onSelectRelated, onEdit, lang, loca
               copied={copiedId === `${item.id}-bios`}
               onCopy={() => onCopy(item.biosKey, `${item.id}-bios`)}
               icon={<KeyRound className="h-3 w-3" />}
+              lang={lang}
             />
             <KeyCap
               label={lang.bootLabel}
@@ -301,6 +308,7 @@ function DetailView({ item, related, onBack, onSelectRelated, onEdit, lang, loca
               copied={copiedId === `${item.id}-boot`}
               onCopy={() => onCopy(item.bootKey, `${item.id}-boot`)}
               icon={<Keyboard className="h-3 w-3" />}
+              lang={lang}
             />
           </div>
 

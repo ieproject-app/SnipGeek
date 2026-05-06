@@ -44,7 +44,7 @@ export function RevealImage({
   ...props
 }: RevealImageProps) {
   const srcKey = typeof src === "string" ? src : "";
-  const [loadedSrc, setLoadedSrc] = useState(() => (loadedSources.has(srcKey) ? srcKey : ""));
+  const [loadedSrc, setLoadedSrc] = useState("");
   const wrapperRef = useRef<HTMLDivElement>(null);
   const hasMounted = useSyncExternalStore(
     () => () => {},
@@ -52,7 +52,7 @@ export function RevealImage({
     () => false,
   );
   const hasCachedLoad = srcKey ? loadedSources.has(srcKey) : false;
-  const isLoaded = hasCachedLoad || loadedSrc === srcKey;
+  const isLoaded = hasMounted && (hasCachedLoad || loadedSrc === srcKey);
 
   const shouldHold = useMemo(() => {
     if (!initialVisitOnly) return holdUntilLoaded;

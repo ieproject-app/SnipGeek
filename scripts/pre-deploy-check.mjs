@@ -5,7 +5,8 @@
  * Checks performed:
  *  1. Image file size — all images under public/images must be <= MAX_IMAGE_KB
  *  2. MDX frontmatter — required fields must be present in every published post/note
- *  3. TypeScript — runs tsc --noEmit to catch type errors
+ *  3. SEO proxy guard — static analysis to prevent cookie-based CDN cache poisoning
+ *  4. TypeScript — runs tsc --noEmit to catch type errors
  *
  * Exit code 0 = all checks passed, exit code 1 = one or more checks failed.
  */
@@ -146,7 +147,34 @@ function checkMdxFiles(dir, requiredFields, label) {
 checkMdxFiles(POSTS_DIR, REQUIRED_POST_FIELDS, "post");
 checkMdxFiles(NOTES_DIR, REQUIRED_NOTE_FIELDS, "note");
 
-// ─── CHECK 3: TypeScript ──────────────────────────────────────────────────────
+// ─── CHECK 3: SEO proxy guard (static analysis) ──────────────────────────────
+section("SEO proxy guard — no cookie-based redirect in proxy.ts");
+
+const proxyPath = join(ROOT, "src", "proxy.ts");
+try {
+  const proxySource = readFileSync(proxyPath, "utf8");
+  // Strip comments to check only actual code
+  const codeOnly = proxySource.replace(/\/\/.*$/gm, "").replace(/\/\*[\s\S]*?\*\//g, "");
+
+  const hasCookieRead = codeOnly.includes('cookies.get("NEXT_LOCALE")')
+    || codeOnly.includes("cookies.get('NEXT_LOCALE')");
+  const hasCookieRedirect = /preferredLocale.*redirect/s.test(codeOnly)
+    || /cookie.*redirect/si.test(codeOnly);
+
+  if (hasCookieRead) {
+    error("proxy.ts reads NEXT_LOCALE cookie — this causes CDN cache poisoning (see: fix-cdn-cached-redirect-killing-google-indexing)");
+  }
+  if (hasCookieRedirect) {
+    error("proxy.ts contains cookie-based redirect pattern — this causes CDN cache poisoning");
+  }
+  if (!hasCookieRead && !hasCookieRedirect) {
+    ok("proxy.ts does not contain cookie-based redirect patterns");
+  }
+} catch (e) {
+  warn(`Could not read proxy.ts: ${e.message}`);
+}
+
+// ─── CHECK 4: TypeScript ──────────────────────────────────────────────────────
 section("TypeScript check (tsc --noEmit)");
 
 try {

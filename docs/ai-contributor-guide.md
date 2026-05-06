@@ -554,7 +554,39 @@ If unsure where something belongs, follow these defaults:
 
 ---
 
-## 20. Summary
+## 20. Proxy CDN Safety (CRITICAL)
+
+**This rule exists because of a production incident that killed Google indexing for the entire site.**
+
+### The Incident
+In April 2026, `src/proxy.ts` had a cookie-based locale redirect: if `NEXT_LOCALE=id` cookie was present, the proxy returned a `307 redirect → /id/`. Firebase App Hosting CDN cached this redirect with `Cache-Control: public, s-maxage=3600` and no `Vary: Cookie` header. Every subsequent visitor — including Googlebot — got the cached redirect. Google impressions dropped to zero.
+
+### The Rule
+**NEVER add cookie-based or header-based redirects in `src/proxy.ts`** unless you also:
+1. Set `Cache-Control: private, no-store` on the response, OR
+2. Add a `Vary` header matching the input (e.g., `Vary: Cookie`)
+
+### Current Architecture
+- Locale-less URLs (e.g., `/`, `/blog`) always **rewrite** to `/en/...` — deterministic, cacheable.
+- Locale switching is handled **client-side only** by `LanguageSwitcher` and `LocaleSuggestionBanner` via `router.push()`.
+- The `NEXT_LOCALE` cookie exists for the banner's "don't show again" UX — the proxy must never read it.
+
+### Automated Guards
+| Guard | File | Purpose |
+|---|---|---|
+| Unit tests | `src/proxy.test.ts` | 22 tests; 5 specifically block cookie-based redirect regression |
+| Pre-deploy check | `scripts/pre-deploy-check.mjs` | Static analysis blocks deploy if cookie redirect pattern detected |
+| Comment block | `src/proxy.ts` (top of file) | Architectural decision record visible on file open |
+| Windsurf rule | `.windsurf/rules/proxy-cdn-safety.md` | Full rule for Windsurf/Cascade AI |
+
+### Before Editing proxy.ts
+1. Read the comment block at the top of the file.
+2. After changes, run: `npx vitest run src/proxy.test.ts`
+3. Before deploy, run: `node scripts/pre-deploy-check.mjs`
+
+---
+
+## 21. Summary
 
 If you remember only a few rules, remember these:
 

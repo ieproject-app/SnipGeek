@@ -85,11 +85,22 @@
       },
       "employee_history": {
         "title": "Employee History",
-        "description": "A private log for tracking employee work history and performance."
+        "description": "A private log for tracking employee work history and performance.",
+        "adminTitle": "Admin Data Injection",
+        "adminDesc": "Paste data tab-separated: Grup, Tgl Mulai, Tgl Selesai, Nama, Jabatan, NIK",
+        "checkingAccess": "Checking admin access...",
+        "injecting": "Injecting...",
+        "injectToFirestore": "Inject to Firestore",
+        "emptyResults": "No matching records found."
       },
       "number_generator": {
         "title": "Number Generator",
-        "description": "Generate unique sequential numbers for internal tracking purposes."
+        "description": "Generate unique sequential numbers for internal tracking purposes.",
+        "stepper": {
+          "step1": "Select Document",
+          "step2": "Generate Number",
+          "step3": "Copy Results"
+        }
       },
       "spin_wheel": {
         "title": "Spin Wheel",

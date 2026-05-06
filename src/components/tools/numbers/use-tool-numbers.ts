@@ -70,9 +70,19 @@ export function useToolNumbers() {
     const isLoggedIn = Boolean(user);
     const remainingLimit = Math.max(0, DAILY_LIMIT - userLimit.count);
     const hasResults = generatedNumbers.length > 0;
-    const successCount = generatedNumbers.filter(r => !r.isError).length;
-    const failedCount = generatedNumbers.filter(r => r.isError).length;
-    const totalQuantity = requests.reduce((sum, r) => sum + r.quantity, 0);
+
+    const successCount = useMemo(
+        () => generatedNumbers.filter(r => !r.isError).length,
+        [generatedNumbers]
+    );
+    const failedCount = useMemo(
+        () => generatedNumbers.filter(r => r.isError).length,
+        [generatedNumbers]
+    );
+    const totalQuantity = useMemo(
+        () => requests.reduce((sum, r) => sum + r.quantity, 0),
+        [requests]
+    );
 
     const mergedCategories = useMemo(() => {
         const dynamic: Record<string, { name: string; types: string[] }> = {};
