@@ -28,7 +28,7 @@ export async function generateMetadata({
     fallbackTitle: "Privacy Policy",
     fallbackDescription:
       "SnipGeek privacy policy — covering cookies, analytics, and how we handle your data.",
-    robots: { index: false, follow: false },
+    robots: { index: true, follow: true },
   });
 }
 

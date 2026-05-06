@@ -202,20 +202,28 @@ export function LocaleSuggestionBanner({
             </p>
           </div>
 
-          <div className="flex items-center gap-4 pt-0.5">
+          <div className="flex items-center gap-2 pt-0.5">
             <button
               ref={primaryButtonRef}
               type="button"
               onClick={handleSwitch}
-              className="text-xs font-semibold text-accent transition-colors hover:text-accent/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+              className="group/btn relative -mx-1.5 inline-flex items-center gap-1 rounded-md px-1.5 py-1 text-xs font-semibold text-accent outline-none transition-all hover:text-accent/80 focus-visible:bg-accent/10 focus-visible:text-accent"
             >
-              {localeSuggestion.switch}
-              <span aria-hidden> →</span>
+              <span className="relative">
+                {localeSuggestion.switch}
+                <span className="absolute -bottom-0.5 left-0 h-px w-full origin-left scale-x-0 bg-accent transition-transform duration-300 group-hover/btn:scale-x-100 group-focus-visible/btn:scale-x-100" />
+              </span>
+              <span
+                aria-hidden
+                className="transition-transform duration-200 group-hover/btn:translate-x-0.5 group-focus-visible/btn:translate-x-0.5"
+              >
+                →
+              </span>
             </button>
             <button
               type="button"
               onClick={handleStay}
-              className="text-xs font-medium text-muted-foreground transition-colors hover:text-foreground focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+              className="rounded-md px-1.5 py-1 text-xs font-medium text-muted-foreground outline-none transition-colors hover:text-foreground focus-visible:bg-muted/60 focus-visible:text-foreground"
             >
               {localeSuggestion.stay}
             </button>
