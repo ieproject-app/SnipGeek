@@ -1,7 +1,7 @@
 "use client";
 
 import Image, { type ImageLoaderProps, type ImageProps } from "next/image";
-import { useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 
 /**
@@ -45,33 +45,33 @@ export function RevealImage({
 }: RevealImageProps) {
   const srcKey = typeof src === "string" ? src : "";
   const [loadedSrc, setLoadedSrc] = useState("");
+  const [hasMounted, setHasMounted] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
-  const hasMounted = useSyncExternalStore(
-    () => () => {},
-    () => true,
-    () => false,
-  );
-  const hasCachedLoad = srcKey ? loadedSources.has(srcKey) : false;
-  const isLoaded = hasMounted && (hasCachedLoad || loadedSrc === srcKey);
+  const isLoaded = hasMounted && loadedSrc === srcKey;
 
-  const shouldHold = useMemo(() => {
-    if (!initialVisitOnly) return holdUntilLoaded;
-    if (typeof window === "undefined") return holdUntilLoaded;
+  // shouldHold must be deterministic on server & first client render to avoid
+  // hydration mismatches. We read sessionStorage only after mount.
+  const [hasVisited, setHasVisited] = useState(false);
+  const shouldHold = initialVisitOnly ? holdUntilLoaded && !hasVisited : holdUntilLoaded;
 
-    const visitKey = "snipgeek-initial-visit-complete";
-    const hasVisited = window.sessionStorage.getItem(visitKey) === "1";
-    return holdUntilLoaded && !hasVisited;
-  }, [holdUntilLoaded, initialVisitOnly]);
-
-  // Synchronously detect images already in browser cache (before paint).
+  // Post-mount: check cache (module-level + sessionStorage) and current <img>.
   useIsomorphicLayoutEffect(() => {
-    if (isLoaded) return;
+    setHasMounted(true);
+    if (initialVisitOnly && typeof window !== "undefined") {
+      if (window.sessionStorage.getItem("snipgeek-initial-visit-complete") === "1") {
+        setHasVisited(true);
+      }
+    }
+    if (srcKey && loadedSources.has(srcKey)) {
+      setLoadedSrc(srcKey);
+      return;
+    }
     const img = wrapperRef.current?.querySelector("img");
     if (img?.complete && img.naturalWidth > 0) {
       setLoadedSrc(srcKey);
       if (srcKey) loadedSources.add(srcKey);
     }
-  }, [isLoaded, srcKey]);
+  }, [srcKey, initialVisitOnly]);
 
   const shouldHideImage = shouldHold && !isLoaded;
   const shouldShowPlaceholder = !isLoaded && (!hasMounted || shouldHold || showSkeleton);
