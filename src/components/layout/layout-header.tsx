@@ -940,20 +940,9 @@ export function LayoutHeader({
                             )}
                           </div>
 
-                          <div className="flex-1 min-w-0 flex flex-col gap-1">
-                            {/* Type badge */}
-                            <span className={cn(
-                              "inline-flex self-start items-center px-1.5 py-0.5 rounded text-[8px] font-black uppercase tracking-widest leading-none border",
-                              isNote
-                                ? "bg-accent/8 text-accent/70 border-accent/20"
-                                : "bg-primary/5 text-muted-foreground/60 border-primary/10",
-                            )}>
-                              {isNote ? "Note" : "Blog"}
-                            </span>
-                            <h4 className="font-sans text-sm font-bold text-foreground line-clamp-2 group-hover:text-accent transition-colors leading-tight">
-                              {item.title}
-                            </h4>
-                          </div>
+                          <h4 className="flex-1 min-w-0 font-sans text-sm font-bold text-foreground line-clamp-2 group-hover:text-accent transition-colors leading-tight">
+                            {item.title}
+                          </h4>
                         </NextLink>
                         <Button
                           variant="ghost"
