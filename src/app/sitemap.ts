@@ -64,14 +64,23 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       const posts = await getSortedPostsData(locale);
       const localePrefix = locale === i18n.defaultLocale ? "" : `/${locale}`;
 
-      return posts.map((post) => ({
-        url: `${DOMAIN}${localePrefix}/blog/${post.slug}`,
-        lastModified: new Date(
-          post.frontmatter.updated || post.frontmatter.date,
-        ),
-        changeFrequency: "monthly" as const,
-        priority: post.frontmatter.featured ? 0.8 : 0.6,
-      }));
+      return posts
+        .map((post) => {
+          const lastModified = safeDate(
+            post.frontmatter.updated || post.frontmatter.date,
+          );
+          // Skip entries where the date is unresolvable — avoids Invalid Date
+          // producing malformed <lastmod> output in the sitemap XML.
+          if (!lastModified) return null;
+
+          return {
+            url: `${DOMAIN}${localePrefix}/blog/${post.slug}`.trim(),
+            lastModified,
+            changeFrequency: "monthly" as const,
+            priority: post.frontmatter.featured ? 0.8 : 0.6,
+          };
+        })
+        .filter((entry): entry is NonNullable<typeof entry> => entry !== null);
     }),
   );
 
@@ -81,14 +90,21 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       const notes = await getSortedNotesData(locale);
       const localePrefix = locale === i18n.defaultLocale ? "" : `/${locale}`;
 
-      return notes.map((note) => ({
-        url: `${DOMAIN}${localePrefix}/notes/${note.slug}`,
-        lastModified: new Date(
-          note.frontmatter.updated || note.frontmatter.date,
-        ),
-        changeFrequency: "monthly" as const,
-        priority: 0.5,
-      }));
+      return notes
+        .map((note) => {
+          const lastModified = safeDate(
+            note.frontmatter.updated || note.frontmatter.date,
+          );
+          if (!lastModified) return null;
+
+          return {
+            url: `${DOMAIN}${localePrefix}/notes/${note.slug}`.trim(),
+            lastModified,
+            changeFrequency: "monthly" as const,
+            priority: 0.5,
+          };
+        })
+        .filter((entry): entry is NonNullable<typeof entry> => entry !== null);
     }),
   );
 
@@ -101,4 +117,26 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...blogEntries.flat(),
     ...noteEntries.flat(),
   ];
+}
+
+/**
+ * Safely parse a date string from MDX frontmatter.
+ *
+ * gray-matter parses YAML dates as Date objects or strings; either way,
+ * trim whitespace before passing to the Date constructor to prevent
+ * trailing newlines (e.g. "2026-04-28\n") from producing Invalid Date,
+ * which would cause the Next.js sitemap serializer to emit empty <lastmod>
+ * tags or malformed XML structure.
+ *
+ * Returns null if the value is falsy or unparseable.
+ */
+function safeDate(value: string | Date | undefined | null): Date | null {
+  if (!value) return null;
+  if (value instanceof Date) {
+    return isNaN(value.getTime()) ? null : value;
+  }
+  const trimmed = String(value).trim();
+  if (!trimmed) return null;
+  const d = new Date(trimmed);
+  return isNaN(d.getTime()) ? null : d;
 }
