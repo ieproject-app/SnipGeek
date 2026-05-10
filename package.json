@@ -2,6 +2,10 @@
   "name": "snipgeek",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": ">=22.0.0",
+    "npm": ">=10.0.0"
+  },
   "scripts": {
     "dev": "NODE_OPTIONS=--max-old-space-size=4096 next dev -p 9003",
     "build": "npm run validate:tags && next build",

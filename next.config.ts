@@ -48,13 +48,21 @@ const cspDirectives = [
   // Fonts
   `font-src 'self' data: https://fonts.gstatic.com https://*.gstatic.com https://*.youtube.com https://*.youtube-nocookie.com`,
 
-  // Images: self + data URIs + all HTTPS
+  // Images: self + data URIs + blob (canvas/image-crop) + whitelisted CDN hostnames.
+  // Explicit whitelist instead of broad 'https:' to prevent arbitrary image injection.
   [
     `img-src`,
     `'self'`,
-    `data:`,
-    `blob:`,
-    `https:`,                                            // allows all HTTPS image sources
+    `data:`,                                             // inline images, SVG data URIs, favicons
+    `blob:`,                                             // canvas exports, image-crop tool output
+    `https://firebasestorage.googleapis.com`,            // Firebase Storage (heroImages, uploads)
+    `https://res.cloudinary.com`,                        // Cloudinary CDN (snipgeek namespace)
+    `https://placehold.co`,                              // placeholder images (dev/fallback)
+    `https://picsum.photos`,                             // picsum placeholder images (dev)
+    `https://*.ytimg.com`,                               // YouTube video thumbnails
+    `https://*.googleusercontent.com`,                   // Google user avatars (Firebase Auth)
+    `https://www.google-analytics.com`,                  // GA4 measurement pixel
+    `https://www.googletagmanager.com`,                  // GTM preview mode sprites
   ].join(" "),
 
   // iframes: YouTube embeds
