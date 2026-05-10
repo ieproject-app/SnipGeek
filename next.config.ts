@@ -244,6 +244,59 @@ const nextConfig: NextConfig = {
         destination: "/id/blog/remove-duplicate-onedrive-windows-11",
         permanent: true,
       },
+      // ── Orphaned Indonesian slugs (pre-i18n migration) ─────────────
+      // These URLs exist in GSC / external links without the /id/ prefix.
+      // Content lives at /id/blog/[slug]. 301 → correct locale URL.
+      {
+        source: "/blog/instalasi-sap-gui-java-manjaro-linux",
+        destination: "/id/blog/instalasi-sap-gui-java-manjaro-linux",
+        permanent: true,
+      },
+      {
+        source: "/blog/ubuntu-26-04-lts-aplikasi-default-baru",
+        destination: "/id/blog/ubuntu-26-04-lts-aplikasi-default-baru",
+        permanent: true,
+      },
+      {
+        source: "/blog/ram-16gb-sudah-pas-pasan-kenapa-32gb-jadi-standar-baru",
+        destination: "/id/blog/ram-16gb-sudah-pas-pasan-kenapa-32gb-jadi-standar-baru",
+        permanent: true,
+      },
+      {
+        source: "/blog/waspada-bug-windows-11-kb5063878-ssd-phison",
+        destination: "/id/blog/waspada-bug-windows-11-kb5063878-ssd-phison",
+        permanent: true,
+      },
+      {
+        source: "/blog/perbedaan-workbook-dan-worksheet-google-sheets",
+        destination: "/id/blog/perbedaan-workbook-dan-worksheet-google-sheets",
+        permanent: true,
+      },
+      {
+        source: "/blog/blog-baru-sulit-ranking-google-sandbox",
+        destination: "/id/blog/blog-baru-sulit-ranking-google-sandbox",
+        permanent: true,
+      },
+      {
+        source: "/blog/langkah-penting-setelah-instal-windows-11",
+        destination: "/id/blog/langkah-penting-setelah-instal-windows-11",
+        permanent: true,
+      },
+      {
+        source: "/blog/satu-bulan-bersama-ai-di-next-js",
+        destination: "/id/blog/satu-bulan-bersama-ai-di-next-js",
+        permanent: true,
+      },
+      {
+        source: "/blog/instalasi-windows-11-panduan-lengkap",
+        destination: "/id/blog/instalasi-windows-11-panduan-lengkap",
+        permanent: true,
+      },
+      {
+        source: "/blog/cara-aman-melihat-draf-artikel-nextjs",
+        destination: "/id/blog/cara-aman-melihat-draf-artikel-nextjs",
+        permanent: true,
+      },
     ];
   },
   images: {
