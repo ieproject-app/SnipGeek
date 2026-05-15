@@ -9,25 +9,25 @@
     {
       "id": "footer-about",
       "description": "Portrait of a person in a creative setting",
-      "imageUrl": "/images/footer/about.webp",
+      "imageUrl": "/images/blank/blank.webp",
       "imageHint": "person portrait"
     },
     {
       "id": "footer-privacy",
       "description": "Privacy and security shield illustration",
-      "imageUrl": "/images/footer/notebook.webp",
+      "imageUrl": "/images/blank/blank.webp",
       "imageHint": "privacy security"
     },
     {
       "id": "footer-disclaimer",
       "description": "Legal disclaimer and information icon",
-      "imageUrl": "/images/footer/tools.webp",
+      "imageUrl": "/images/blank/blank.webp",
       "imageHint": "legal disclaimer"
     },
     {
       "id": "footer-contact",
       "description": "A person typing on a laptop, representing contact via email.",
-      "imageUrl": "/images/footer/email.webp",
+      "imageUrl": "/images/blank/blank.webp",
       "imageHint": "laptop contact"
     }
   ]
