@@ -24,6 +24,7 @@ import { RevealImage } from "@/components/ui/reveal-image";
 import { extractHeadings, stripMdxSyntax } from "@/lib/mdx-utils";
 import { LayoutBreadcrumbs } from "@/components/layout/layout-breadcrumbs";
 import { resolveHeroImage, getLinkPrefix } from "@/lib/utils";
+import { slugify } from "@/lib/slugify";
 import remarkGfm from "remark-gfm";
 import rehypeShiki from "@shikijs/rehype";
 
@@ -181,7 +182,12 @@ export default async function Page({
   const breadcrumbSegments = [
     { label: dictionary.home.breadcrumbHome, href: linkPrefix || "/" },
     { label: dictionary.navigation.blog, href: `${linkPrefix}/blog` },
-    { label: initialPost.frontmatter.category || "Blog", href: initialPost.frontmatter.category ? `${linkPrefix}/blog?category=${encodeURIComponent(initialPost.frontmatter.category)}` : `${linkPrefix}/blog` },
+    {
+      label: initialPost.frontmatter.category || "Blog",
+      href: initialPost.frontmatter.category
+        ? `${linkPrefix}/category/${encodeURIComponent(slugify(initialPost.frontmatter.category))}`
+        : `${linkPrefix}/blog`,
+    },
     { label: initialPost.frontmatter.title },
   ];
 
@@ -265,6 +271,8 @@ export default async function Page({
                   revealDurationMs={420}
                   sizes="(max-width: 1200px) 100vw, 1200px"
                   priority
+                  fetchPriority="high"
+                  loading="eager"
                   data-ai-hint={heroSource.hint}
                 />
               </div>

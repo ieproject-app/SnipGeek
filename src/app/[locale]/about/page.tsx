@@ -65,6 +65,13 @@ export async function generateMetadata({
       siteName: "SnipGeek",
       title: dictionary.about.title,
       description: dictionary.about.description,
+      url: `https://snipgeek.com${canonicalPath}`,
+      images: [
+        {
+          url: "https://snipgeek.com/images/profile/profile.webp",
+          alt: "Iwan Efendi",
+        },
+      ],
     },
   };
 }

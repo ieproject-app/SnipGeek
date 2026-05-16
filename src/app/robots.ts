@@ -9,7 +9,9 @@ export default function robots(): MetadataRoute.Robots {
     "/icons/",
     "/manifest.json",
     "/en/opengraph-image",
+    "/id/opengraph-image",
     "/opengraph-image",
+    "/api/admin/",
     "/api/dev/",
     "/api/tools/",
     "/api/numbers/",
@@ -19,7 +21,18 @@ export default function robots(): MetadataRoute.Robots {
   return {
     rules: [
       {
-        userAgent: ['GPTBot', 'ClaudeBot', 'PerplexityBot', 'Applebot', 'Bytespider'],
+        userAgent: [
+          "Googlebot",
+          "Bingbot",
+          "GPTBot",
+          "ClaudeBot",
+          "anthropic-ai",
+          "PerplexityBot",
+          "Applebot",
+          "Applebot-Extended",
+          "Amazonbot",
+          "Bytespider",
+        ],
         allow: ['/', '/api/posts/', '/api/notes/'],
         disallow: disallowRules,
       },

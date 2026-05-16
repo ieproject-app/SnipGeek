@@ -8,15 +8,17 @@
   },
   "scripts": {
     "dev": "NODE_OPTIONS=--max-old-space-size=4096 next dev -p 9003",
-    "build": "npm run validate:tags && next build",
+    "build": "npm run validate:tags && npm run validate:category-archives && next build",
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "check": "node scripts/pre-deploy-check.mjs",
     "predeploy": "node scripts/pre-deploy-check.mjs",
     "validate:tags": "tsx scripts/validate-tags.ts",
+    "validate:category-archives": "tsx scripts/validate-category-archives.ts",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "analyze": "ANALYZE=true npm run build"
   },
   "dependencies": {
     "@giscus/react": "^3.1.0",
@@ -83,6 +85,7 @@
     "not dead"
   ],
   "devDependencies": {
+    "@next/bundle-analyzer": "^16.2.6",
     "@tailwindcss/postcss": "^4.2.1",
     "@testing-library/jest-dom": "^6.9.1",
     "@types/fast-levenshtein": "^0.0.4",

@@ -1,6 +1,7 @@
 import { MetadataRoute } from "next";
 import { getSortedPostsData } from "@/lib/posts";
 import { getSortedNotesData } from "@/lib/notes";
+import { getAllCategories, normalizeCategorySlug } from "@/lib/categories";
 import { i18n } from "@/i18n-config";
 
 // Cache sitemap for 1 hour to avoid recomputing on every crawler request
@@ -14,7 +15,7 @@ const STATIC_LAST_MODIFIED = new Date("2026-04-01");
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Content/discovery pages — change whenever new posts or notes are added
   // Note: /tags is excluded because tag pages have noindex meta (sitemap/noindex conflict)
-  const contentRoutes = ["", "/blog", "/notes"];
+  const contentRoutes = ["", "/blog", "/notes", "/category", "/tools"];
 
   // Info pages — rarely change; no need to signal weekly crawl
   const infoRoutes = ["/about", "/contact", "/privacy", "/terms", "/disclaimer"];
@@ -36,7 +37,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       const contentPages = contentRoutes.map((route) => ({
         url: `${DOMAIN}${localePrefix}${route}`,
         lastModified: STATIC_LAST_MODIFIED,
-        changeFrequency: "weekly" as const,
+        changeFrequency: route === "" ? "daily" as const : "weekly" as const,
         priority: route === "" ? 1 : 0.8,
       }));
 
@@ -76,8 +77,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
           return {
             url: `${DOMAIN}${localePrefix}/blog/${post.slug}`.trim(),
             lastModified,
-            changeFrequency: "monthly" as const,
-            priority: post.frontmatter.featured ? 0.8 : 0.6,
+            changeFrequency: "weekly" as const,
+            priority: 0.8,
           };
         })
         .filter((entry): entry is NonNullable<typeof entry> => entry !== null);
@@ -108,6 +109,56 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }),
   );
 
+  // 4. Category archives (indexable) — weekly crawl with medium priority
+  const categoryEntries = await Promise.all(
+    i18n.locales.map(async (locale) => {
+      const [categories, posts, notes] = await Promise.all([
+        getAllCategories(locale),
+        getSortedPostsData(locale),
+        getSortedNotesData(locale),
+      ]);
+      const localePrefix = locale === i18n.defaultLocale ? "" : `/${locale}`;
+      const latestByCategory = new Map<string, Date>();
+
+      const recordCategoryDate = (
+        rawCategory: string | undefined,
+        dateValue: string | Date | undefined,
+      ) => {
+        if (!rawCategory) return;
+        const categorySlug = normalizeCategorySlug(rawCategory);
+        if (!categorySlug) return;
+        const resolvedDate = safeDate(dateValue);
+        if (!resolvedDate) return;
+
+        const previous = latestByCategory.get(categorySlug);
+        if (!previous || resolvedDate > previous) {
+          latestByCategory.set(categorySlug, resolvedDate);
+        }
+      };
+
+      posts.forEach((post) => {
+        recordCategoryDate(
+          post.frontmatter.category,
+          post.frontmatter.updated || post.frontmatter.date,
+        );
+      });
+
+      notes.forEach((note) => {
+        recordCategoryDate(
+          note.frontmatter.category,
+          note.frontmatter.updated || note.frontmatter.date,
+        );
+      });
+
+      return categories.map((category) => ({
+        url: `${DOMAIN}${localePrefix}/category/${encodeURIComponent(category.slug)}`,
+        lastModified: latestByCategory.get(category.slug) ?? STATIC_LAST_MODIFIED,
+        changeFrequency: "weekly" as const,
+        priority: 0.7,
+      }));
+    }),
+  );
+
   // Tags are intentionally excluded from sitemap because tag pages have noindex meta.
   // Including them would create a sitemap/noindex conflict that wastes crawl budget.
   // Tags are still accessible via navigation and internal links for users.
@@ -116,6 +167,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...staticEntries,
     ...blogEntries.flat(),
     ...noteEntries.flat(),
+    ...categoryEntries.flat(),
   ];
 }
 

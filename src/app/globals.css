@@ -12,6 +12,10 @@
 
     /* ── Typography Tokens (Fluid) ───────────────── */
     --text-h1: clamp(1.875rem, 1.2rem + 2.5vw, 3.25rem);
+    --text-h2: clamp(1.5rem, 1rem + 1.6vw, 2.5rem);
+    --text-h3: clamp(1.25rem, 0.95rem + 1vw, 2rem);
+    --text-h4: clamp(1.125rem, 0.95rem + 0.6vw, 1.5rem);
+    --text-h5: clamp(1rem, 0.9rem + 0.4vw, 1.25rem);
 
     /* ── Colors ───────────────────────────────────── */
     --color-background: hsl(var(--background));

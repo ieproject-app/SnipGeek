@@ -1,6 +1,10 @@
 import type { NextConfig } from "next";
+import bundleAnalyzer from "@next/bundle-analyzer";
 
 const isProduction = process.env.NODE_ENV === "production";
+const withBundleAnalyzer = bundleAnalyzer({
+  enabled: process.env.ANALYZE === "true",
+});
 
 /**
  * Content Security Policy directives.
@@ -20,6 +24,8 @@ const scriptSrcDirectives = [
   `https://www.googletagmanager.com`, // GTM
   `https://www.google-analytics.com`, // GA4
   `https://ssl.google-analytics.com`, // GA4 (legacy)
+  `https://pagead2.googlesyndication.com`, // Google AdSense
+  `https://*.googlesyndication.com`, // Google AdSense
   `https://static.monetag.com`, // Monetag
   `https://cdn.monetag.com`, // Monetag CDN
   `https://apis.google.com`, // Firebase Auth popup
@@ -63,6 +69,8 @@ const cspDirectives = [
     `https://*.googleusercontent.com`,                   // Google user avatars (Firebase Auth)
     `https://www.google-analytics.com`,                  // GA4 measurement pixel
     `https://www.googletagmanager.com`,                  // GTM preview mode sprites
+    `https://pagead2.googlesyndication.com`,             // Google AdSense
+    `https://*.googlesyndication.com`,                   // Google AdSense
   ].join(" "),
 
   // iframes: YouTube embeds
@@ -75,6 +83,9 @@ const cspDirectives = [
     `https://accounts.google.com`,                     // Firebase Auth
     `https://*.firebaseapp.com`,                       // Firebase Auth handler
     `https://giscus.app`,                               // Giscus comments
+    `https://googleads.g.doubleclick.net`,              // Google AdSense
+    `https://tpc.googlesyndication.com`,                // Google AdSense
+    `https://*.googlesyndication.com`,                  // Google AdSense
   ].join(" "),
 
   // Connections: Firebase, Analytics, Monetag, YouTube
@@ -88,6 +99,9 @@ const cspDirectives = [
     `https://firebasestorage.googleapis.com`,          // Firebase Storage
     `https://www.google-analytics.com`,                // GA4
     `https://region1.google-analytics.com`,            // GA4 regional
+    `https://pagead2.googlesyndication.com`,           // Google AdSense
+    `https://*.googlesyndication.com`,                 // Google AdSense
+    `https://googleads.g.doubleclick.net`,             // Google AdSense
     `wss://*.firebaseio.com`,                          // Firebase realtime (websocket)
     `https://static.monetag.com`,                      // Monetag
     `https://giscus.app`,                               // Giscus comments
@@ -161,33 +175,12 @@ const nextConfig: NextConfig = {
         headers: securityHeaders,
       },
       {
-        // Long-cache immutable Next.js build assets (hashed filenames).
-        // These are content-hashed so they can be cached forever.
-        source: "/_next/static/:path*",
-        headers: [
-          {
-            key: "Cache-Control",
-            value: "public, max-age=31536000, immutable",
-          },
-        ],
-      },
-      {
-        // Next.js image optimizer output — safe to cache long at the CDN.
-        source: "/_next/image",
-        headers: [
-          {
-            key: "Cache-Control",
-            value: "public, max-age=31536000, immutable",
-          },
-        ],
-      },
-      {
         // Cache pre-rendered HTML pages at CDN level for 1 hour.
         // Exclude:
         //  - /api/*            (routes set their own Cache-Control)
-        //  - /_next/*          (build assets use the long-cache rule above)
+        //  - /_next/*          (managed by Next.js)
         //  - any file with an extension (fonts, images, manifests, etc.)
-        // This prevents accidentally shortening Cache-Control on immutable assets.
+        // This prevents accidentally overriding immutable asset caching.
         source: "/((?!api/|_next/|.*\\..*).*)",
         headers: [
           {
@@ -326,6 +319,12 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: "https",
+        hostname: "i.ytimg.com",
+        port: "",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
         hostname: "firebasestorage.googleapis.com",
         port: "",
         pathname: "/**",
@@ -340,4 +339,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+export default withBundleAnalyzer(nextConfig);

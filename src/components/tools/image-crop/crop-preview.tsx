@@ -7,6 +7,7 @@ import {
   type MouseEvent as ReactMouseEvent,
   type TouchEvent as ReactTouchEvent,
 } from "react";
+import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { X, GripHorizontal } from "lucide-react";
@@ -274,12 +275,14 @@ export function CropPreview({
           onMouseDown={handleMouseDown}
           onTouchStart={handleTouchStart}
         >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
+          <Image
             src={imageSrc}
             alt={imageAlt}
+            fill
+            unoptimized={imageSrc.startsWith("data:") || imageSrc.startsWith("blob:")}
             className="w-full h-full object-fill block pointer-events-none"
             draggable={false}
+            sizes="(max-width: 768px) 100vw, 55vw"
           />
 
           {/* Overlays */}

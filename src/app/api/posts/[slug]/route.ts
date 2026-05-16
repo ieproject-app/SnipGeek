@@ -90,6 +90,7 @@ export async function GET(
       translationAvailable,
       translationUrls,
       title: post.frontmatter.title,
+      excerpt: post.frontmatter.description ?? "",
       description: post.frontmatter.description ?? null,
       date: post.frontmatter.date ?? null,
       updated: post.frontmatter.updated ?? null,

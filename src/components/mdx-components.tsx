@@ -165,6 +165,14 @@ const CustomImage = ({
     console.warn(`[SEO] Image missing alt text: ${normalizedSrc}`);
   }
 
+  const imageProps = props as {
+    width?: number | string;
+    height?: number | string;
+    loading?: "lazy" | "eager";
+    fetchPriority?: "auto" | "high" | "low";
+    sizes?: string;
+  };
+
   return (
     <span className="block relative my-8 w-full">
       <ZoomableImage
@@ -172,7 +180,11 @@ const CustomImage = ({
         alt={alt ?? ""}
         className={cn(_class, className)}
         priority={priority}
-        {...props}
+        width={imageProps.width}
+        height={imageProps.height}
+        loading={imageProps.loading}
+        fetchPriority={imageProps.fetchPriority}
+        sizes={imageProps.sizes}
       />
     </span>
   );

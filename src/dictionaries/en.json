@@ -4,6 +4,7 @@
     "about": "About",
     "contact": "Contact",
     "notes": "Notes",
+    "categories": "Categories",
     "tools": "Tools",
     "privacy": "Privacy Policy",
     "disclaimer": "Disclaimer",
@@ -291,6 +292,13 @@
     "noItems": "No articles found for this tag.",
     "allTagsTitle": "All Topics",
     "allTagsDescription": "Explore our collection of articles and technical notes categorized by topic."
+  },
+  "categories": {
+    "title": "Category: {category}",
+    "description": "All articles and notes in {category}.",
+    "noItems": "No content found in this category.",
+    "allCategoriesTitle": "All Categories",
+    "allCategoriesDescription": "Browse articles and notes grouped by editorial category."
   },
   "search": {
     "placeholder": "Search posts and notes...",

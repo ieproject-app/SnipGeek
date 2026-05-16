@@ -28,6 +28,7 @@ import {
 import { cn } from "@/lib/utils";
 import { FirebaseProviderWrapper } from "@/components/layout/firebase-provider-wrapper";
 import { FirebaseAnalyticsTracker } from "@/components/analytics/firebase-analytics-tracker";
+import { GoogleAnalyticsTag } from "@/components/analytics/google-analytics-tag";
 import { LayoutDeferredUi } from "@/components/layout/layout-deferred-ui";
 import { DevIndexTracker } from "@/components/dev/dev-index-tracker";
 
@@ -128,12 +129,21 @@ export async function generateMetadata({
       siteName: "SnipGeek",
       title: homepageTitle,
       description: homepageDescription,
+      images: [
+        {
+          url: "https://snipgeek.com/opengraph-image",
+          width: 1200,
+          height: 630,
+          alt: "SnipGeek",
+        },
+      ],
     },
     twitter: {
       card: "summary_large_image",
       title: homepageTitle,
       description: homepageDescription,
       creator: "@iwnefnd",
+      images: ["https://snipgeek.com/opengraph-image"],
     },
     robots: {
       index: true,
@@ -178,6 +188,7 @@ export default async function LocaleLayout({
     description: post.frontmatter.description,
     type: "blog" as const,
     href: `${linkPrefix}/blog/${post.slug}`,
+    category: post.frontmatter.category,
     tags: post.frontmatter.tags,
   }));
 
@@ -187,6 +198,7 @@ export default async function LocaleLayout({
     description: note.frontmatter.description,
     type: "note" as const,
     href: `${linkPrefix}/notes/${note.slug}`,
+    category: note.frontmatter.category,
     tags: note.frontmatter.tags,
   }));
 
@@ -206,6 +218,7 @@ export default async function LocaleLayout({
       suppressHydrationWarning
     >
       <body className="font-sans antialiased fade-in-on-load">
+        <GoogleAnalyticsTag />
         <a href="#main-content" className="skip-link">
           {locale === "id" ? "Lanjut ke konten utama" : "Skip to main content"}
         </a>

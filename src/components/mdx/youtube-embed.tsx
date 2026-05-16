@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 
 interface YouTubeEmbedProps {
   videoid: string;
@@ -58,13 +59,13 @@ export function YouTubeEmbed({ videoid, title }: YouTubeEmbedProps) {
           ) : (
           /* Thumbnail placeholder — zero iframe cost */
           <span className="absolute inset-0 flex items-center justify-center">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
+            <Image
               src={thumbnailUrl}
               alt={resolvedTitle}
-              className="w-full h-full object-cover opacity-90"
+              fill
+              sizes="(max-width: 768px) 100vw, 768px"
+              className="object-cover opacity-90"
               loading="lazy"
-              decoding="async"
             />
             {/* YouTube-style play button */}
             <span

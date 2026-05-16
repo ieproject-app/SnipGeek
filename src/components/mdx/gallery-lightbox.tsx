@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -123,13 +124,14 @@ export function GalleryLightbox({
             onClick={() => openAt(index)}
             className="group relative overflow-hidden rounded-xl ring-1 ring-border/45 transition-[box-shadow,transform] duration-300 hover:shadow-md hover:ring-border/70"
           >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
+            <Image
               src={image.src}
               alt={image.alt || `Gallery image ${index + 1}`}
+              width={1200}
+              height={675}
               loading="lazy"
-              decoding="async"
-              className="block h-full w-full rounded-xl object-cover transition-transform duration-300 group-hover:scale-[1.015]"
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+              className="block h-auto w-full rounded-xl object-cover transition-transform duration-300 group-hover:scale-[1.015]"
             />
           </button>
         ))}
@@ -186,16 +188,16 @@ export function GalleryLightbox({
               onTouchEnd={handleTouchEnd}
             >
               {activeImage && (
-                <>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={activeImage.src}
-                    alt={activeImage.alt || "Gallery image"}
-                    loading="eager"
-                    decoding="async"
-                    className="max-h-[86vh] max-w-[92vw] rounded-2xl border border-white/10 object-contain shadow-[0_0_100px_-20px_rgba(0,0,0,0.55)]"
-                  />
-                </>
+                <Image
+                  src={activeImage.src}
+                  alt={activeImage.alt || "Gallery image"}
+                  width={1600}
+                  height={900}
+                  loading="eager"
+                  fetchPriority="high"
+                  sizes="92vw"
+                  className="max-h-[86vh] max-w-[92vw] rounded-2xl border border-white/10 object-contain shadow-[0_0_100px_-20px_rgba(0,0,0,0.55)]"
+                />
               )}
             </div>
 

@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef, useMemo } from "react";
 import dynamic from "next/dynamic";
 import { cn, getLinkPrefix } from "@/lib/utils";
+import { slugify } from "@/lib/slugify";
 import {
   Search,
   X,
@@ -22,6 +23,7 @@ import {
   Smartphone,
   Cpu,
   GraduationCap,
+  FolderClosed,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -84,6 +86,19 @@ const getTagKeyFromHref = (href: string) => {
   if (!tagPath) return null;
 
   const firstSegment = tagPath.split("/")[0];
+  if (!firstSegment) return null;
+
+  return decodeURIComponent(firstSegment).toLowerCase();
+};
+
+const getCategoryKeyFromHref = (href: string) => {
+  const normalizedHref = normalizeNavHref(href);
+  if (!normalizedHref.startsWith("/category/")) return null;
+
+  const categoryPath = normalizedHref.slice("/category/".length);
+  if (!categoryPath) return null;
+
+  const firstSegment = categoryPath.split("/")[0];
   if (!firstSegment) return null;
 
   return decodeURIComponent(firstSegment).toLowerCase();
@@ -400,8 +415,8 @@ export function LayoutHeader({
         if (currentItem.category) {
           pool.push({
             name: currentItem.category,
-            href: `/tags/${encodeURIComponent(currentItem.category.toLowerCase())}`,
-            icon: Hash,
+            href: `/category/${encodeURIComponent(slugify(currentItem.category))}`,
+            icon: FolderClosed,
           });
         }
       }
@@ -426,12 +441,24 @@ export function LayoutHeader({
       if (seenHrefs.has(normalizedHref)) return false;
       if (reservedNavHrefs.has(normalizedHref)) return false;
       const tagKey = getTagKeyFromHref(item.href);
+      const categoryKey = getCategoryKeyFromHref(item.href);
       if (tagKey && reservedTagFamilies.has(getTagFamilyKey(tagKey))) return false;
 
-      const lowerTag = (tagKey || item.name).toLowerCase();
-      const hasContent = (searchableData || []).some((article) =>
-        (article.tags || []).some((t) => t.trim().toLowerCase() === lowerTag),
+      const hasTagContent = (searchableData || []).some((article) =>
+        (article.tags || []).some(
+          (t) => t.trim().toLowerCase() === (tagKey || item.name).toLowerCase(),
+        ),
       );
+
+      const hasCategoryContent = categoryKey
+        ? (searchableData || []).some(
+            (article) =>
+              typeof article.category === "string" &&
+              slugify(article.category) === categoryKey,
+          )
+        : false;
+
+      const hasContent = hasTagContent || hasCategoryContent;
 
       if (hasContent) {
         seenHrefs.add(normalizedHref);
@@ -447,9 +474,19 @@ export function LayoutHeader({
     const baseLinks = [
       { name: dictionary.navigation.blog, href: "/blog", icon: BookOpen },
       { name: dictionary.navigation.notes, href: "/notes", icon: StickyNote },
+      {
+        name: dictionary.navigation.categories,
+        href: "/category",
+        icon: FolderClosed,
+      },
     ];
     return [...baseLinks, ...dynamicTagLinks];
-  }, [dictionary.navigation.blog, dictionary.navigation.notes, dynamicTagLinks]);
+  }, [
+    dictionary.navigation.blog,
+    dictionary.navigation.notes,
+    dictionary.navigation.categories,
+    dynamicTagLinks,
+  ]);
 
   const getIsActivePath = (href: string) => {
     const localizedHref = `${linkPrefix}${href}` || "/";

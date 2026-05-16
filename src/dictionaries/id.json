@@ -4,6 +4,7 @@
     "about": "Tentang",
     "contact": "Kontak",
     "notes": "Catatan",
+    "categories": "Kategori",
     "tools": "Alat",
     "privacy": "Kebijakan Privasi",
     "disclaimer": "Disclaimer",
@@ -291,6 +292,13 @@
     "noItems": "Tidak ada artikel yang ditemukan untuk tag ini.",
     "allTagsTitle": "Semua Topik",
     "allTagsDescription": "Telusuri koleksi artikel dan catatan teknis kami yang dikategorikan berdasarkan topik."
+  },
+  "categories": {
+    "title": "Kategori: {category}",
+    "description": "Semua artikel dan catatan dalam kategori {category}.",
+    "noItems": "Tidak ada konten pada kategori ini.",
+    "allCategoriesTitle": "Semua Kategori",
+    "allCategoriesDescription": "Jelajahi artikel dan catatan berdasarkan kategori editorial."
   },
   "search": {
     "placeholder": "Cari postingan dan catatan...",
