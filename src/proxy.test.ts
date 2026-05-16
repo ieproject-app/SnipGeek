@@ -161,8 +161,8 @@ describe("proxy", () => {
       expect(codeOnly).not.toContain("cookies.get('NEXT_LOCALE')");
 
       // Must not have a redirect that depends on preferredLocale or cookie
-      expect(codeOnly).not.toMatch(/preferredLocale.*redirect/s);
-      expect(codeOnly).not.toMatch(/cookie.*redirect/si);
+      expect(codeOnly).not.toMatch(/preferredLocale[\s\S]*redirect/);
+      expect(codeOnly.toLowerCase()).not.toMatch(/cookie[\s\S]*redirect/);
     });
   });
 });

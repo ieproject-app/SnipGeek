@@ -6,8 +6,6 @@ import { MetadataRoute } from 'next';
  */
 export default function robots(): MetadataRoute.Robots {
   const disallowRules = [
-    "/_next/",
-    "/_next/static/media/",
     "/icons/",
     "/manifest.json",
     "/en/opengraph-image",

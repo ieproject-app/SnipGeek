@@ -95,7 +95,7 @@ Audit yang saya lakukan cukup sistematis. Saya cek tiap layer yang bisa mempenga
 
   ### Cek robots.txt dan sitemap.xml
 
-  Keduanya bersih. `robots.txt` mengizinkan `/` untuk semua user agent, dan `sitemap.xml` berisi semua 216 URL yang published termasuk setiap blog post.
+  Inti aturan crawl-nya memang baik: `robots.txt` mengizinkan `/` untuk semua user agent, dan `sitemap.xml` berisi semua 216 URL yang published termasuk setiap blog post. Tapi setelah audit, saya sadar ada satu celah hardening SEO: `robots.txt` juga memblokir `/_next/`, padahal untuk Next.js itu terlalu ketat karena Google bisa butuh aset tersebut agar halaman dirender dengan benar. Itu sudah saya perbaiki setelahnya.
 
   ```bash
   curl -sS https://snipgeek.com/robots.txt | head -20
@@ -169,6 +169,7 @@ Preferensi bahasa berbasis cookie tetap berfungsi — tapi sepenuhnya di sisi cl
 Sambil sudah bongkar-bongkar, saya sekalian menambah beberapa perkuatan defensif:
 
 - **Hapus redirect `/en` duplikat** dari `next.config.ts` — proxy sudah meng-handle kanonisasi `/en/*` → `/*` dengan redirect 308. Punya keduanya itu redundan.
+- **Longgarkan `robots.txt` untuk aset Next.js** — saya berhenti men-disallow `/_next/` supaya crawler bisa mengambil CSS/JS yang dibutuhkan untuk render halaman dengan benar.
 - **Tambah meta `robots` eksplisit** ke `generateMetadata` blog dan notes — sebelumnya mengandalkan inheritance dari layout, yang rapuh kalau metadata layout berubah.
 - **Tambah schema JSON-LD HowTo** untuk artikel bertag tutorial — ini mengaktifkan [rich results di Google Search](/blog/to-do-after-install-windows11) untuk konten step-by-step.
 

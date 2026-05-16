@@ -95,7 +95,7 @@ The audit was systematic. I checked each layer that could affect indexing:
 
   ### Check robots.txt and sitemap.xml
 
-  Both were clean. `robots.txt` allowed `/` for all user agents, and `sitemap.xml` contained all 216 published URLs including every blog post.
+  The core crawl rules were fine: `robots.txt` allowed `/` for all user agents, and `sitemap.xml` contained all 216 published URLs including every blog post. I later noticed one SEO hardening gap, though: `robots.txt` was also blocking `/_next/`, which is too aggressive for a Next.js site because Google may need those assets to render pages properly. I fixed that afterward.
 
   ```bash
   curl -sS https://snipgeek.com/robots.txt | head -20
@@ -169,6 +169,7 @@ The cookie-based language preference still works — but entirely client-side. T
 While I had the hood open, I made a few more defensive changes:
 
 - **Removed duplicate `/en` redirect** from `next.config.ts` — the proxy already canonicalizes `/en/*` → `/*` with a 308 redirect. Having both was redundant.
+- **Relaxed `robots.txt` for Next.js assets** — I stopped disallowing `/_next/` so crawlers can fetch the CSS/JS needed to render pages correctly.
 - **Added explicit `robots` meta** to blog and note `generateMetadata` — previously relied on layout inheritance, which is fragile if the layout metadata changes.
 - **Added HowTo JSON-LD schema** for tutorial-tagged articles — this enables [rich results in Google Search](/blog/to-do-after-install-windows11) for step-by-step content.
 
