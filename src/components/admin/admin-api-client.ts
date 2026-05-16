@@ -28,8 +28,10 @@ async function adminFetch<T>(path: string, init: RequestInit = {}): Promise<T> {
 
 import type { InventoryItem } from "@/lib/content-inventory";
 import type { IndexStatusDoc, IndexStatusValue } from "@/app/api/admin/index-status/route";
+import type { ArticleCandidate, ArticleGroupCandidate, ImageCandidate } from "@/lib/admin-image-migration";
 
 export type { InventoryItem, IndexStatusDoc, IndexStatusValue };
+export type { ArticleCandidate, ArticleGroupCandidate, ImageCandidate };
 
 export type IndexStatusRecord = IndexStatusDoc & { id: string };
 
@@ -108,4 +110,19 @@ export async function submitToIndexNow(payload: { urlList: string[] }): Promise<
     method: "POST",
     body: JSON.stringify(payload),
   });
+}
+
+export async function fetchImageMigrationInventory(): Promise<{
+  candidates: ImageCandidate[];
+  articles: ArticleCandidate[];
+  articleGroups: ArticleGroupCandidate[];
+  summary: {
+    totalUnmigratedImages: number;
+    totalUnmigratedArticles: number;
+    totalUnmigratedArticleGroups: number;
+    totalProjectLevelImages: number;
+  };
+  generatedAt: string;
+}> {
+  return adminFetch("/api/admin/image-migration-inventory");
 }

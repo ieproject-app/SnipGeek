@@ -13,6 +13,7 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "check": "node scripts/pre-deploy-check.mjs",
+    "check:admin-local": "node scripts/check-local-admin-setup.mjs",
     "predeploy": "node scripts/pre-deploy-check.mjs",
     "validate:tags": "tsx scripts/validate-tags.ts",
     "validate:category-archives": "tsx scripts/validate-category-archives.ts",

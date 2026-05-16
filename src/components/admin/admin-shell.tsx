@@ -21,6 +21,9 @@ function resolvePageTitle(pathname: string): { eyebrow: string; title: string } 
   if (pathname.startsWith("/admin/employee-history")) {
     return { eyebrow: "Data", title: "Employee History" };
   }
+  if (pathname.startsWith("/admin/image-migration")) {
+    return { eyebrow: "Media", title: "Image Migration" };
+  }
   if (pathname.startsWith("/admin/login")) {
     return { eyebrow: "Auth", title: "Sign in" };
   }

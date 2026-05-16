@@ -11,6 +11,7 @@ import {
   Sparkles,
   Search as SearchIcon,
   Users,
+  Images,
 } from "lucide-react";
 import { SnipGeekLogo } from "@/components/icons/snipgeek-logo";
 import { Button } from "@/components/ui/button";
@@ -41,6 +42,12 @@ const NAV_ITEMS = [
     href: "/admin/employee-history",
     icon: Users,
     description: "Search employee · signer generator · data injection",
+  },
+  {
+    name: "Image Migration",
+    href: "/admin/image-migration",
+    icon: Images,
+    description: "Scanner referensi gambar · mapping 1:1 · prompt migrasi",
   },
 ];
 
