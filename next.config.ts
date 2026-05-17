@@ -6,6 +6,9 @@ const withBundleAnalyzer = bundleAnalyzer({
   enabled: process.env.ANALYZE === "true",
 });
 
+const alternateHostPattern =
+  "(?:www\\.snipgeek\\.com|irweb\\.info|.*\\.hosted\\.app)";
+
 /**
  * Content Security Policy directives.
  *
@@ -193,6 +196,26 @@ const nextConfig: NextConfig = {
   },
   async redirects() {
     return [
+      // Canonical host redirects. Keep these before content redirects so
+      // alternate/default hosting domains consolidate to snipgeek.com.
+      {
+        source: "/en",
+        has: [{ type: "host", value: alternateHostPattern }],
+        destination: "https://snipgeek.com/",
+        permanent: true,
+      },
+      {
+        source: "/en/:path*",
+        has: [{ type: "host", value: alternateHostPattern }],
+        destination: "https://snipgeek.com/:path*",
+        permanent: true,
+      },
+      {
+        source: "/:path*",
+        has: [{ type: "host", value: alternateHostPattern }],
+        destination: "https://snipgeek.com/:path*",
+        permanent: true,
+      },
       // /en canonicalization is handled by proxy.ts (308 redirect).
       // Only content-specific redirects below.
       {
