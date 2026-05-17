@@ -115,8 +115,8 @@ const cspDirectives = [
     `https://*.google.com`,
   ].join(" "),
 
-  // Media (audio/video): self + blob + YouTube CDN (needed for Firefox)
-  `media-src 'self' blob: https://*.googlevideo.com https://*.ytimg.com https://*.youtube.com https://*.youtube-nocookie.com`,
+  // Media (audio/video): self + blob + Cloudinary + YouTube CDN (needed for Firefox)
+  `media-src 'self' blob: https://res.cloudinary.com https://*.googlevideo.com https://*.ytimg.com https://*.youtube.com https://*.youtube-nocookie.com`,
 
   // Workers (Next.js service worker, if any) + YouTube workers for Firefox
   `worker-src 'self' blob: https://*.youtube.com https://*.youtube-nocookie.com`,

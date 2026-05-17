@@ -32,6 +32,7 @@ import { Expandable } from "./mdx/expandable";
 import { GalleryLightbox, type GalleryImageItem } from "./mdx/gallery-lightbox";
 import { CopyablePre } from "./mdx/copyable-pre";
 import { YouTubeEmbed } from "./mdx/youtube-embed";
+import { CloudinaryVideoEmbed } from "./mdx/cloudinary-video-embed";
 import {
   ContactEmailCta,
   ContactCategoryGrid,
@@ -797,6 +798,7 @@ export const mdxComponents = {
   Steps,
   Step,
   YouTubeEmbed,
+  CloudinaryVideoEmbed,
   ContactEmailCta,
   ContactCategoryGrid,
   ContactCategory,
