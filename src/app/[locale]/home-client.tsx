@@ -11,12 +11,14 @@ import type { Note, NoteFrontmatter } from "@/lib/notes";
 import type { Dictionary } from "@/lib/get-dictionary";
 
 // Below-fold sections: code-split so their JS is not in the initial bundle
-function SectionPlaceholder({ minHeight, children }: { minHeight: string; children?: React.ReactNode }) {
-  return (
-    <div style={{ minHeight }}>
-      {children}
-    </div>
-  );
+function SectionPlaceholder({
+  minHeight,
+  children,
+}: {
+  minHeight: string;
+  children?: React.ReactNode;
+}) {
+  return <div style={{ minHeight }}>{children}</div>;
 }
 
 const createSectionLoader = (minHeight: string) => {
@@ -32,35 +34,35 @@ const HomeTransitionNote = dynamic(
     import("@/components/home/home-transition-note").then((m) => ({
       default: m.HomeTransitionNote,
     })),
-  { loading: createSectionLoader("120px") }
+  { loading: createSectionLoader("120px") },
 );
 const HomeTutorials = dynamic(
   () =>
     import("@/components/home/home-tutorials").then((m) => ({
       default: m.HomeTutorials,
     })),
-  { loading: createSectionLoader("400px") }
+  { loading: createSectionLoader("400px") },
 );
 const HomeTopics = dynamic(
   () =>
     import("@/components/home/home-topics").then((m) => ({
       default: m.HomeTopics,
     })),
-  { loading: createSectionLoader("400px") }
+  { loading: createSectionLoader("400px") },
 );
 const HomeUpdates = dynamic(
   () =>
     import("@/components/home/home-updates").then((m) => ({
       default: m.HomeUpdates,
     })),
-  { loading: createSectionLoader("400px") }
+  { loading: createSectionLoader("400px") },
 );
 const HomeNotes = dynamic(
   () =>
     import("@/components/home/home-notes").then((m) => ({
       default: m.HomeNotes,
     })),
-  { loading: createSectionLoader("400px") }
+  { loading: createSectionLoader("400px") },
 );
 
 /**
@@ -84,7 +86,10 @@ function SectionPreview({
   minHeight: string;
 }) {
   return (
-    <section className="container max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pb-12 sm:pb-14" style={{ minHeight }}>
+    <section
+      className="container max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pb-12 sm:pb-14"
+      style={{ minHeight }}
+    >
       <div className="rounded-2xl border border-primary/10 bg-card/40 px-5 py-6 shadow-sm">
         <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
           <div>
@@ -149,7 +154,10 @@ function TransitionPreview({
   minHeight: string;
 }) {
   return (
-    <section className="container max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pb-12 sm:pb-14" style={{ minHeight }}>
+    <section
+      className="container max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pb-12 sm:pb-14"
+      style={{ minHeight }}
+    >
       <div className="rounded-2xl border border-dashed border-primary/20 bg-card/50 px-5 py-6 shadow-sm">
         <p className="text-[10px] font-black uppercase tracking-[0.16em] text-sky-800 dark:text-sky-200">
           {eyebrow}
@@ -157,9 +165,7 @@ function TransitionPreview({
         <h2 className="mt-2 font-display text-2xl font-extrabold tracking-tight text-primary">
           {title}
         </h2>
-        <p className="mt-1 text-sm text-muted-foreground">
-          {subtitle}
-        </p>
+        <p className="mt-1 text-sm text-muted-foreground">{subtitle}</p>
         <p className="mt-4 text-sm leading-relaxed text-foreground/85">
           {description}
         </p>
@@ -197,7 +203,7 @@ function LazySection({
           observer.disconnect();
         }
       },
-      { rootMargin: "300px" }
+      { rootMargin: "80px" },
     );
     observer.observe(ref.current);
     return () => observer.disconnect();
@@ -205,7 +211,13 @@ function LazySection({
 
   return (
     <div ref={ref}>
-      {visible ? children : <SectionPlaceholder minHeight={minHeight ?? "200px"}>{fallback}</SectionPlaceholder>}
+      {visible ? (
+        children
+      ) : (
+        <SectionPlaceholder minHeight={minHeight ?? "200px"}>
+          {fallback}
+        </SectionPlaceholder>
+      )}
     </div>
   );
 }
@@ -222,16 +234,21 @@ export function HomeClient({
   locale: string;
 }) {
   const linkPrefix = locale === "en" ? "" : `/${locale}`;
-  const windowsUbuntuTags = new Set(["windows", "ubuntu", "linux", "dual-boot"]);
+  const windowsUbuntuTags = new Set([
+    "windows",
+    "ubuntu",
+    "linux",
+    "dual-boot",
+  ]);
 
   const allPosts = useMemo(() => {
     return [...initialPosts]
       .filter((post) => !post.frontmatter.hideFromHome)
       .sort(
-      (a, b) =>
-        new Date(b.frontmatter.date).getTime() -
-        new Date(a.frontmatter.date).getTime(),
-    );
+        (a, b) =>
+          new Date(b.frontmatter.date).getTime() -
+          new Date(a.frontmatter.date).getTime(),
+      );
   }, [initialPosts]);
 
   const latestNotes = useMemo(() => {
@@ -250,42 +267,47 @@ export function HomeClient({
   // --- Featured Posts: 2 Linux + 2 Windows 11 ---
   const linuxTags = new Set(["linux", "ubuntu"]);
   const windowsTags = new Set(["windows", "windows-11"]);
-  
+
   const featuredLinuxPosts = allPosts
-    .filter((post) => 
-      post.frontmatter.published && 
-      post.frontmatter.featured &&
-      post.frontmatter.tags?.some((tag: string) => linuxTags.has(tag.toLowerCase()))
+    .filter(
+      (post) =>
+        post.frontmatter.published &&
+        post.frontmatter.featured &&
+        post.frontmatter.tags?.some((tag: string) =>
+          linuxTags.has(tag.toLowerCase()),
+        ),
     )
     .slice(0, 2);
-  
+
   const featuredWindowsPosts = allPosts
-    .filter((post) => 
-      post.frontmatter.published && 
-      post.frontmatter.featured &&
-      post.frontmatter.tags?.some((tag: string) => windowsTags.has(tag.toLowerCase()))
+    .filter(
+      (post) =>
+        post.frontmatter.published &&
+        post.frontmatter.featured &&
+        post.frontmatter.tags?.some((tag: string) =>
+          windowsTags.has(tag.toLowerCase()),
+        ),
     )
     .slice(0, 2);
-  
+
   const featuredPosts = [...featuredLinuxPosts, ...featuredWindowsPosts];
   featuredPosts.forEach((p) => seenSlugs.add(p.slug));
 
   const latestPosts = allPosts
-    .filter(
-      (post) => post.frontmatter.published && !seenSlugs.has(post.slug),
-    )
+    .filter((post) => post.frontmatter.published && !seenSlugs.has(post.slug))
     .slice(0, 6);
   latestPosts.forEach((p) => seenSlugs.add(p.slug));
 
   // --- Manual Tutorial Posts for Modular Learning ---
   const manualTutorialSlugs = [
     "how-to-create-windows-11-bootable-usb-rufus",
-    "clean-install-windows-11-step-by-step-guide", 
-    "to-do-after-install-windows11"
+    "clean-install-windows-11-step-by-step-guide",
+    "to-do-after-install-windows11",
   ];
-  
+
   const manualTutorialPosts = allPosts.filter(
-    (post) => post.frontmatter.published && manualTutorialSlugs.includes(post.slug)
+    (post) =>
+      post.frontmatter.published && manualTutorialSlugs.includes(post.slug),
   );
   manualTutorialPosts.forEach((p) => seenSlugs.add(p.slug));
 
@@ -295,8 +317,8 @@ export function HomeClient({
       (post) =>
         post.frontmatter.published &&
         !seenSlugs.has(post.slug) &&
-        post.frontmatter.tags?.some(
-          (tag: string) => windowsUbuntuTags.has(tag.toLowerCase()),
+        post.frontmatter.tags?.some((tag: string) =>
+          windowsUbuntuTags.has(tag.toLowerCase()),
         ),
     )
     .slice(0, 8);
@@ -305,14 +327,18 @@ export function HomeClient({
   // Software & App Updates: posts with "apps" tag + "update" or "news" tag
   const appTags = new Set(["apps", "software"]);
   const updateNewsTags = new Set(["update", "news"]);
-  
+
   const primaryUpdatePosts = allPosts
     .filter(
       (post) =>
         post.frontmatter.published &&
         !seenSlugs.has(post.slug) &&
-        post.frontmatter.tags?.some((tag: string) => appTags.has(tag.toLowerCase())) &&
-        post.frontmatter.tags?.some((tag: string) => updateNewsTags.has(tag.toLowerCase())),
+        post.frontmatter.tags?.some((tag: string) =>
+          appTags.has(tag.toLowerCase()),
+        ) &&
+        post.frontmatter.tags?.some((tag: string) =>
+          updateNewsTags.has(tag.toLowerCase()),
+        ),
     )
     .slice(0, 6);
 
@@ -321,7 +347,9 @@ export function HomeClient({
     (post) =>
       post.frontmatter.published &&
       !seenSlugs.has(post.slug) &&
-      post.frontmatter.tags?.some((tag: string) => appTags.has(tag.toLowerCase())),
+      post.frontmatter.tags?.some((tag: string) =>
+        appTags.has(tag.toLowerCase()),
+      ),
   );
 
   const updatePosts = [
@@ -331,22 +359,38 @@ export function HomeClient({
     ),
   ].slice(0, 6);
 
-  const focusTopicsTitle = locale === "id" ? "Sorotan Windows & Ubuntu" : "Windows & Ubuntu Highlights";
-  const updatesTitle = locale === "id" ? "Software & App Updates" : "Software & App Updates";
+  const focusTopicsTitle =
+    locale === "id"
+      ? "Sorotan Windows & Ubuntu"
+      : "Windows & Ubuntu Highlights";
+  const updatesTitle =
+    locale === "id" ? "Software & App Updates" : "Software & App Updates";
   const updatesViewMore = locale === "id" ? "lihat update" : "view updates";
-  const notesTitle = locale === "id" ? "Catatan Teknis Terbaru" : "Latest Technical Notes";
+  const notesTitle =
+    locale === "id" ? "Catatan Teknis Terbaru" : "Latest Technical Notes";
   const notesViewMore = locale === "id" ? "Selengkapnya" : "View Notes";
-  const transitionEyebrow = locale === "id" ? "Catatan Redaksi" : "Editorial Note";
-  const transitionTitle = locale === "id" ? "Masuk Ke Alur Yang Lebih Fokus" : "Entering A More Focused Flow";
-  const transitionSubtitle = locale === "id"
-    ? "Ringkasan singkat sebelum berlanjut ke section berikutnya"
-    : "A short context before continuing to the next sections";
-  const transitionDescription = locale === "id"
-    ? "Bagian selanjutnya disusun dari praktik ke konteks: tutorial, sorotan topik, update penting, lalu catatan teknis ringkas. Tujuannya agar urutan baca lebih natural, bukan sekadar feed acak."
-    : "The next sections are arranged from practice to context: tutorials, topic highlights, key updates, and concise technical notes. This keeps the reading order intentional instead of feeling like a random feed.";
-  const tutorialTitle = locale === "id" ? "Panduan Instalasi Windows 11" : "Windows 11 Installation Guide";
-  const tutorialViewMore = locale === "id" ? "lihat panduan lengkap" : "view complete guide";
-  const transitionCta = locale === "id" ? "Lanjut ke Tutorial" : "Continue to Tutorials";
+  const transitionEyebrow =
+    locale === "id" ? "Catatan Redaksi" : "Editorial Note";
+  const transitionTitle =
+    locale === "id"
+      ? "Masuk Ke Alur Yang Lebih Fokus"
+      : "Entering A More Focused Flow";
+  const transitionSubtitle =
+    locale === "id"
+      ? "Ringkasan singkat sebelum berlanjut ke section berikutnya"
+      : "A short context before continuing to the next sections";
+  const transitionDescription =
+    locale === "id"
+      ? "Bagian selanjutnya disusun dari praktik ke konteks: tutorial, sorotan topik, update penting, lalu catatan teknis ringkas. Tujuannya agar urutan baca lebih natural, bukan sekadar feed acak."
+      : "The next sections are arranged from practice to context: tutorials, topic highlights, key updates, and concise technical notes. This keeps the reading order intentional instead of feeling like a random feed.";
+  const tutorialTitle =
+    locale === "id"
+      ? "Panduan Instalasi Windows 11"
+      : "Windows 11 Installation Guide";
+  const tutorialViewMore =
+    locale === "id" ? "lihat panduan lengkap" : "view complete guide";
+  const transitionCta =
+    locale === "id" ? "Lanjut ke Tutorial" : "Continue to Tutorials";
   const previewPosts = (posts: Post<PostFrontmatter>[], limit = 3) =>
     posts.slice(0, limit).map((post) => ({
       title: post.frontmatter.title,
@@ -408,7 +452,11 @@ export function HomeClient({
           fallback={
             <SectionPreview
               title={tutorialTitle}
-              description={locale === "id" ? "Pratinjau cepat artikel tutorial yang sudah tersedia tanpa menunggu interaksi JavaScript." : "Quick server-rendered preview of tutorial articles before the interactive section loads."}
+              description={
+                locale === "id"
+                  ? "Pratinjau cepat artikel tutorial yang sudah tersedia tanpa menunggu interaksi JavaScript."
+                  : "Quick server-rendered preview of tutorial articles before the interactive section loads."
+              }
               href={`${linkPrefix}/blog`}
               hrefLabel={tutorialViewMore}
               items={previewPosts(manualTutorialPosts)}
@@ -433,7 +481,11 @@ export function HomeClient({
           fallback={
             <SectionPreview
               title={focusTopicsTitle}
-              description={locale === "id" ? "Sorotan artikel bertopik Windows dan Ubuntu yang tetap muncul di HTML server-rendered." : "Highlighted Windows and Ubuntu articles that remain visible in the server-rendered HTML."}
+              description={
+                locale === "id"
+                  ? "Sorotan artikel bertopik Windows dan Ubuntu yang tetap muncul di HTML server-rendered."
+                  : "Highlighted Windows and Ubuntu articles that remain visible in the server-rendered HTML."
+              }
               href={`${linkPrefix}/blog`}
               hrefLabel={dictionary.home.viewAllPosts}
               items={previewPosts(topicPosts)}
@@ -460,7 +512,11 @@ export function HomeClient({
           fallback={
             <SectionPreview
               title={updatesTitle}
-              description={locale === "id" ? "Artikel pembaruan sistem yang dipublikasikan sebagai preview SSR untuk crawler dan pembaca cepat." : "System update articles exposed as SSR previews for crawlers and fast readers."}
+              description={
+                locale === "id"
+                  ? "Artikel pembaruan sistem yang dipublikasikan sebagai preview SSR untuk crawler dan pembaca cepat."
+                  : "System update articles exposed as SSR previews for crawlers and fast readers."
+              }
               href={`${linkPrefix}/blog`}
               hrefLabel={updatesViewMore}
               items={previewPosts(updatePosts)}
@@ -486,7 +542,11 @@ export function HomeClient({
           fallback={
             <SectionPreview
               title={notesTitle}
-              description={locale === "id" ? "Catatan teknis terbaru tetap terlihat di HTML awal meski section interaktif ditunda." : "Latest technical notes stay visible in the initial HTML even while the interactive section is deferred."}
+              description={
+                locale === "id"
+                  ? "Catatan teknis terbaru tetap terlihat di HTML awal meski section interaktif ditunda."
+                  : "Latest technical notes stay visible in the initial HTML even while the interactive section is deferred."
+              }
               href={`${linkPrefix}/notes`}
               hrefLabel={notesViewMore}
               items={previewNotes(latestNotes)}

@@ -118,7 +118,7 @@ export function HomeHero({
                         fill
                         className="transition-transform duration-700"
                         wrapperClassName="absolute inset-0"
-                        sizes="(max-width: 640px) calc(100vw - 2rem), 640px"
+                        sizes="(min-width: 640px) 0px, calc(100vw - 2rem)"
                         priority={index === 0}
                         loading={index === 0 ? "eager" : "lazy"}
                         quality={64}
@@ -247,7 +247,7 @@ export function HomeHero({
                             fill
                             className="transition-transform duration-1000 ease-out"
                             wrapperClassName="absolute inset-0"
-                            sizes="(max-width: 640px) calc(100vw - 2rem), (max-width: 1024px) calc(50vw - 2.5rem), 22vw"
+                            sizes="(max-width: 639px) 0px, (max-width: 1024px) calc(50vw - 2.5rem), 22vw"
                             priority={index === 0}
                             loading={index === 0 ? "eager" : "lazy"}
                             quality={64}
