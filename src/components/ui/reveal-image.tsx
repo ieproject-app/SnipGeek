@@ -118,35 +118,6 @@ export function RevealImage({
     };
   }, [providedLoader, src]);
 
-  const directLocalOptimizedSrc = useMemo(() => {
-    if (providedLoader) return undefined;
-    if (typeof src !== "string") return undefined;
-
-    const normalizedSrc = (() => {
-      if (src.startsWith("/images/")) return src;
-      if (/^https?:\/\//i.test(src)) {
-        try {
-          const parsed = new URL(src);
-          if (parsed.pathname.startsWith("/images/")) {
-            return `${parsed.pathname}${parsed.search}`;
-          }
-        } catch {
-          return undefined;
-        }
-      }
-      return undefined;
-    })();
-
-    if (!normalizedSrc) return undefined;
-
-    const params = new URLSearchParams({
-      src: normalizedSrc,
-      w: width ? String(Math.min(Number(width), 1200)) : "640",
-      q: "68",
-    });
-    return `/api/img?${params.toString()}`;
-  }, [providedLoader, src, width]);
-
   return (
     <div ref={wrapperRef} className={cn("relative h-full w-full overflow-hidden", wrapperClassName)}>
       {shouldShowPlaceholder && (
@@ -163,10 +134,10 @@ export function RevealImage({
 
       <Image
         alt={alt}
-        src={directLocalOptimizedSrc ?? src}
+        src={src}
         className={mergedImageClassName}
         loader={localImageLoader}
-        unoptimized={Boolean(directLocalOptimizedSrc) || unoptimized}
+        unoptimized={unoptimized}
         priority={priority}
         fetchPriority={priority ? "high" : undefined}
         loading={loading}

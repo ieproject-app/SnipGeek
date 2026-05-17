@@ -91,8 +91,8 @@ export function HomeHero({ posts, dictionary, locale, linkPrefix }: HomeHeroProp
                                             className="transition-transform duration-700"
                                             wrapperClassName="absolute inset-0"
                                             sizes="(max-width: 640px) 100vw, 100vw"
-                                            priority={index === 0}
                                             loading={index === 0 ? "eager" : "lazy"}
+                                            fetchPriority={index === 0 ? "high" : undefined}
                                             quality={68}
                                             holdUntilLoaded={index === 0}
                                             initialVisitOnly={index === 0}
@@ -183,8 +183,8 @@ export function HomeHero({ posts, dictionary, locale, linkPrefix }: HomeHeroProp
                                                     className="transition-transform duration-1000 ease-out"
                                                     wrapperClassName="absolute inset-0"
                                                     sizes="(max-width: 640px) calc(100vw - 32px), (max-width: 1024px) 50vw, 25vw"
-                                                    priority={index === 0}
-                                                    loading={index === 0 ? "eager" : "lazy"}
+                                                    loading={index < 4 ? "eager" : "lazy"}
+                                                    fetchPriority={index < 4 ? "high" : undefined}
                                                     quality={68}
                                                     holdUntilLoaded={index === 0}
                                                     initialVisitOnly={index === 0}
