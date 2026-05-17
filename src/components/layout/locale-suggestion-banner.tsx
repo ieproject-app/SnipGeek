@@ -207,11 +207,11 @@ export function LocaleSuggestionBanner({
               ref={primaryButtonRef}
               type="button"
               onClick={handleSwitch}
-              className="group/btn relative -mx-1.5 inline-flex items-center gap-1 rounded-md px-1.5 py-1 text-xs font-semibold text-accent outline-none transition-all hover:text-accent/80 focus-visible:bg-accent/10 focus-visible:text-accent"
+              className="group/btn relative -mx-1.5 inline-flex items-center gap-1 rounded-md px-1.5 py-1 text-xs font-semibold text-sky-800 outline-none transition-all hover:text-sky-900 focus-visible:bg-accent/10 focus-visible:text-sky-900 dark:text-sky-200 dark:hover:text-sky-100 dark:focus-visible:text-sky-100"
             >
               <span className="relative">
                 {localeSuggestion.switch}
-                <span className="absolute -bottom-0.5 left-0 h-px w-full origin-left scale-x-0 bg-accent transition-transform duration-300 group-hover/btn:scale-x-100 group-focus-visible/btn:scale-x-100" />
+                <span className="absolute -bottom-0.5 left-0 h-px w-full origin-left scale-x-0 bg-sky-800 transition-transform duration-300 group-hover/btn:scale-x-100 group-focus-visible/btn:scale-x-100 dark:bg-sky-200" />
               </span>
               <span
                 aria-hidden

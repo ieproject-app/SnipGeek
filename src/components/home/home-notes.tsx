@@ -151,7 +151,7 @@ export function HomeNotes({
                           <RelativeTime
                             date={note.frontmatter.date}
                             locale={locale}
-                            className="text-[10px] text-muted-foreground/80 block"
+                            className="text-[10px] font-semibold text-foreground/70 block"
                           />
                         </div>
                       </Link>
@@ -207,7 +207,7 @@ export function HomeNotes({
 
               <Link
                 href={viewMoreHref}
-                className="group inline-flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-accent transition-colors"
+                className="group inline-flex items-center gap-1 text-sm font-medium text-foreground/70 transition-colors hover:text-sky-800 dark:hover:text-sky-200"
               >
                 <span>{viewMoreText}</span>
                 <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />

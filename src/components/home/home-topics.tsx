@@ -125,7 +125,7 @@ export function HomeTopics({
               <div className="h-1 w-5 bg-accent rounded-full" />
               <div className="h-0.75 w-0.75 bg-accent rounded-full" />
             </div>
-            <span className="text-[10px] font-bold uppercase tracking-wide text-accent/90 group-hover:text-accent transition-all flex items-center gap-1">
+            <span className="text-[10px] font-bold uppercase tracking-wide text-sky-800 transition-all flex items-center gap-1 group-hover:text-sky-900 dark:text-sky-200 dark:group-hover:text-sky-100">
               {viewAllText}
               <ChevronRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5" />
             </span>

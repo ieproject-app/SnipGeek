@@ -99,9 +99,9 @@ export function LanguageSwitcher(props: {
                 aria-label={`${locale.toUpperCase()} – ${locale === "en" ? "Switch to English" : "Switch to Indonesian"}`}
                 className={cn(
                   "text-[10px] font-black uppercase tracking-[0.2em] transition-all duration-300",
-                  isActive
-                    ? "text-accent"
-                    : "text-primary/60 hover:text-primary/80",
+	                  isActive
+	                    ? "text-sky-800 dark:text-sky-200"
+	                    : "text-foreground/70 hover:text-foreground",
                 )}
               >
                 {locale}

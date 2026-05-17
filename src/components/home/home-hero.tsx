@@ -127,7 +127,7 @@ export function HomeHero({ posts, dictionary, locale, linkPrefix }: HomeHeroProp
                                         <RelativeTime
                                             date={post.frontmatter.date}
                                             locale={locale}
-                                            className="text-[10px] font-bold uppercase tracking-tighter text-muted-foreground/80"
+                                            className="text-[10px] font-bold uppercase tracking-tighter text-foreground/70"
                                         />
                                         <div
                                             className={cn(
@@ -212,7 +212,7 @@ export function HomeHero({ posts, dictionary, locale, linkPrefix }: HomeHeroProp
                                                 <RelativeTime
                                                     date={post.frontmatter.date}
                                                     locale={locale}
-                                                    className="text-[10px] font-bold uppercase tracking-tighter text-muted-foreground/80"
+                                                    className="text-[10px] font-bold uppercase tracking-tighter text-foreground/70"
                                                 />
 
                                                 <div className="flex items-center gap-2">

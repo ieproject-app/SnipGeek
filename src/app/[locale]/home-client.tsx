@@ -100,7 +100,7 @@ function SectionPreview({
           {href && hrefLabel && (
             <Link
               href={href}
-              className="text-sm font-medium text-accent transition-colors hover:text-primary"
+              className="text-sm font-medium text-sky-800 transition-colors hover:text-sky-900 dark:text-sky-200 dark:hover:text-sky-100"
             >
               {hrefLabel}
             </Link>
@@ -151,7 +151,7 @@ function TransitionPreview({
   return (
     <section className="container max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pb-12 sm:pb-14" style={{ minHeight }}>
       <div className="rounded-2xl border border-dashed border-primary/20 bg-card/50 px-5 py-6 shadow-sm">
-        <p className="text-[10px] font-black uppercase tracking-[0.16em] text-accent/85">
+        <p className="text-[10px] font-black uppercase tracking-[0.16em] text-sky-800 dark:text-sky-200">
           {eyebrow}
         </p>
         <h2 className="mt-2 font-display text-2xl font-extrabold tracking-tight text-primary">
@@ -166,7 +166,7 @@ function TransitionPreview({
         {ctaText && ctaHref && (
           <Link
             href={ctaHref}
-            className="mt-4 inline-flex text-sm font-medium text-accent transition-colors hover:text-primary"
+            className="mt-4 inline-flex text-sm font-medium text-sky-800 transition-colors hover:text-sky-900 dark:text-sky-200 dark:hover:text-sky-100"
           >
             {ctaText}
           </Link>

@@ -167,7 +167,7 @@ export function HomeTutorials({ posts, title, viewMoreText, dictionary, locale, 
                           <RelativeTime
                             date={post.frontmatter.date}
                             locale={locale}
-                            className="text-[10px] text-muted-foreground block font-medium opacity-60"
+                            className="text-[10px] text-foreground/70 block font-semibold"
                           />
                         </div>
                       </Link>
@@ -223,7 +223,7 @@ export function HomeTutorials({ posts, title, viewMoreText, dictionary, locale, 
 
               <Link
                 href={viewMoreHref}
-                className="group inline-flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-accent transition-colors"
+                className="group inline-flex items-center gap-1 text-sm font-medium text-foreground/70 transition-colors hover:text-sky-800 dark:hover:text-sky-200"
               >
                 <span>{viewMoreText}</span>
                 <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />

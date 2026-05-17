@@ -124,9 +124,9 @@ export function LayoutFooter({
 
         <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <ScrollReveal direction="up" className="text-center mb-12">
-            <h4 className="font-display text-2xl font-bold text-foreground tracking-tight">
+            <p className="font-display text-2xl font-bold text-foreground tracking-tight">
               {authorName}
-            </h4>
+            </p>
             <p className="mt-2 text-muted-foreground max-w-sm mx-auto text-sm leading-relaxed font-medium animate-in fade-in duration-700">
               {dictionary.footer.authorBio}
             </p>
@@ -199,7 +199,7 @@ export function LayoutFooter({
               <nav className="flex flex-wrap items-center justify-center gap-x-6 gap-y-3">
                 <Link
                   href={`${linkPrefix}/tools`}
-                  className="group flex items-center gap-2 text-[11px] font-black uppercase tracking-widest text-primary/60 hover:text-accent transition-all duration-300"
+                  className="group flex items-center gap-2 text-[11px] font-black uppercase tracking-widest text-foreground/70 transition-all duration-300 hover:text-sky-800 dark:hover:text-sky-200"
                 >
                   <Terminal className="h-3.5 w-3.5 transition-transform group-hover:scale-120 group-hover:rotate-12" />
                   <span>{dictionary.navigation.tools || "Tools"}</span>
@@ -208,7 +208,7 @@ export function LayoutFooter({
                 {!user ? (
                   <Link
                     href="/admin/login"
-                    className="group flex items-center gap-2 text-[11px] font-black uppercase tracking-widest text-primary/60 hover:text-accent transition-all duration-300"
+                    className="group flex items-center gap-2 text-[11px] font-black uppercase tracking-widest text-foreground/70 transition-all duration-300 hover:text-sky-800 dark:hover:text-sky-200"
                   >
                     <GoogleLogo className="h-3.5 w-3.5 transition-transform group-hover:scale-120" />
                     <span>Admin Portal</span>
@@ -229,14 +229,14 @@ export function LayoutFooter({
                   <Link
                     key={item.id}
                     href={item.href}
-                    className="text-[10px] font-black uppercase tracking-widest text-primary/60 hover:text-accent transition-all duration-300"
+                    className="text-[10px] font-black uppercase tracking-widest text-foreground/70 transition-all duration-300 hover:text-sky-800 dark:hover:text-sky-200"
                   >
                     {item.title}
                   </Link>
                 ))}
               </nav>
               
-              <small className="font-extrabold tracking-widest text-[10px] uppercase text-primary/50 hover:text-primary transition-colors duration-300">
+              <small className="font-extrabold tracking-widest text-[10px] uppercase text-foreground/70 transition-colors duration-300 hover:text-foreground">
                 &copy; {new Date().getFullYear()} SnipGeek. All Rights Reserved.
               </small>
             </div>

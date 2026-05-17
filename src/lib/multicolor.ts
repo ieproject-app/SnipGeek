@@ -16,7 +16,7 @@ const MULTICOLOR_THEMES: MulticolorTheme[] = [
     hoverShadow: "hover:shadow-[0_16px_36px_-20px_rgba(14,116,211,0.72)]",
     hoverTitle: "group-hover:text-sky-700 dark:group-hover:text-sky-300",
     overlayGradient: "from-sky-700/20 via-sky-600/10 to-transparent dark:from-sky-950/45 dark:via-sky-900/20 dark:to-transparent",
-    readingButtonTone: "text-sky-600 dark:text-sky-300",
+    readingButtonTone: "text-sky-800 dark:text-sky-200",
   },
   {
     gradient: "from-[#0d8570] via-[#14967d] to-[#28b696]",
@@ -25,7 +25,7 @@ const MULTICOLOR_THEMES: MulticolorTheme[] = [
     hoverShadow: "hover:shadow-[0_16px_36px_-20px_rgba(5,150,105,0.72)]",
     hoverTitle: "group-hover:text-emerald-700 dark:group-hover:text-emerald-300",
     overlayGradient: "from-emerald-700/20 via-emerald-600/10 to-transparent dark:from-emerald-950/45 dark:via-emerald-900/20 dark:to-transparent",
-    readingButtonTone: "text-emerald-600 dark:text-emerald-300",
+    readingButtonTone: "text-emerald-800 dark:text-emerald-200",
   },
   {
     gradient: "from-[#b75a13] via-[#cf6b18] to-[#e58a2c]",
@@ -34,7 +34,7 @@ const MULTICOLOR_THEMES: MulticolorTheme[] = [
     hoverShadow: "hover:shadow-[0_16px_36px_-20px_rgba(234,88,12,0.7)]",
     hoverTitle: "group-hover:text-orange-700 dark:group-hover:text-orange-300",
     overlayGradient: "from-orange-700/20 via-orange-600/10 to-transparent dark:from-orange-950/45 dark:via-orange-900/20 dark:to-transparent",
-    readingButtonTone: "text-orange-600 dark:text-orange-300",
+    readingButtonTone: "text-orange-800 dark:text-orange-200",
   },
   {
     gradient: "from-[#7f325a] via-[#96406b] to-[#b05b83]",
@@ -43,7 +43,7 @@ const MULTICOLOR_THEMES: MulticolorTheme[] = [
     hoverShadow: "hover:shadow-[0_16px_36px_-20px_rgba(225,29,72,0.72)]",
     hoverTitle: "group-hover:text-rose-700 dark:group-hover:text-rose-300",
     overlayGradient: "from-rose-700/20 via-rose-600/10 to-transparent dark:from-rose-950/45 dark:via-rose-900/20 dark:to-transparent",
-    readingButtonTone: "text-rose-600 dark:text-rose-300",
+    readingButtonTone: "text-rose-800 dark:text-rose-200",
   },
   {
     gradient: "from-[#4251b7] via-[#5064d2] to-[#6d80ec]",
@@ -52,7 +52,7 @@ const MULTICOLOR_THEMES: MulticolorTheme[] = [
     hoverShadow: "hover:shadow-[0_16px_36px_-20px_rgba(79,70,229,0.72)]",
     hoverTitle: "group-hover:text-indigo-700 dark:group-hover:text-indigo-300",
     overlayGradient: "from-indigo-700/20 via-indigo-600/10 to-transparent dark:from-indigo-950/45 dark:via-indigo-900/20 dark:to-transparent",
-    readingButtonTone: "text-indigo-600 dark:text-indigo-300",
+    readingButtonTone: "text-indigo-800 dark:text-indigo-200",
   },
   {
     gradient: "from-[#1a6d7a] via-[#247f8f] to-[#39a0b4]",
@@ -61,7 +61,7 @@ const MULTICOLOR_THEMES: MulticolorTheme[] = [
     hoverShadow: "hover:shadow-[0_16px_36px_-20px_rgba(6,182,212,0.72)]",
     hoverTitle: "group-hover:text-cyan-700 dark:group-hover:text-cyan-300",
     overlayGradient: "from-cyan-700/20 via-cyan-600/10 to-transparent dark:from-cyan-950/45 dark:via-cyan-900/20 dark:to-transparent",
-    readingButtonTone: "text-cyan-600 dark:text-cyan-300",
+    readingButtonTone: "text-cyan-800 dark:text-cyan-200",
   },
   {
     gradient: "from-[#4e6f17] via-[#618a1d] to-[#7aaa2a]",
@@ -70,7 +70,7 @@ const MULTICOLOR_THEMES: MulticolorTheme[] = [
     hoverShadow: "hover:shadow-[0_16px_36px_-20px_rgba(132,204,22,0.72)]",
     hoverTitle: "group-hover:text-lime-700 dark:group-hover:text-lime-300",
     overlayGradient: "from-lime-700/20 via-lime-600/10 to-transparent dark:from-lime-950/45 dark:via-lime-900/20 dark:to-transparent",
-    readingButtonTone: "text-lime-600 dark:text-lime-300",
+    readingButtonTone: "text-lime-800 dark:text-lime-200",
   },
   {
     gradient: "from-[#6e3a8c] via-[#8350a3] to-[#9a6bba]",
@@ -79,7 +79,7 @@ const MULTICOLOR_THEMES: MulticolorTheme[] = [
     hoverShadow: "hover:shadow-[0_16px_36px_-20px_rgba(217,70,239,0.72)]",
     hoverTitle: "group-hover:text-fuchsia-700 dark:group-hover:text-fuchsia-300",
     overlayGradient: "from-fuchsia-700/20 via-fuchsia-600/10 to-transparent dark:from-fuchsia-950/45 dark:via-fuchsia-900/20 dark:to-transparent",
-    readingButtonTone: "text-fuchsia-600 dark:text-fuchsia-300",
+    readingButtonTone: "text-fuchsia-800 dark:text-fuchsia-200",
   },
 ];
 

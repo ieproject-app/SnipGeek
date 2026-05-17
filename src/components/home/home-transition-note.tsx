@@ -25,7 +25,7 @@ export function HomeTransitionNote({
     <section className="container max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pb-12 sm:pb-14 overflow-hidden">
       <ScrollReveal direction="up">
         <div className="mb-4 text-left">
-          <p className="font-sans text-[10px] font-black uppercase tracking-[0.16em] text-accent/85 mb-2">
+          <p className="font-sans text-[10px] font-black uppercase tracking-[0.16em] text-sky-800 dark:text-sky-200 mb-2">
             {eyebrow}
           </p>
           <h3 className="font-display text-2xl sm:text-3xl font-extrabold tracking-tight text-primary mb-1.5">
@@ -46,7 +46,7 @@ export function HomeTransitionNote({
             <div className="mt-3">
               <Link
                 href={ctaHref}
-                className="group inline-flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-accent transition-colors"
+                className="group inline-flex items-center gap-1 text-sm font-medium text-foreground/70 transition-colors hover:text-sky-800 dark:hover:text-sky-200"
               >
                 <span>{ctaText}</span>
                 <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
