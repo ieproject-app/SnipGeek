@@ -6,10 +6,22 @@ import { proxy } from "./proxy";
 
 function makeRequest(
   path: string,
-  options?: { cookies?: Record<string, string>; origin?: string },
+  options?: {
+    cookies?: Record<string, string>;
+    forwardedHost?: string;
+    host?: string;
+    origin?: string;
+  },
 ) {
   const url = new URL(path, options?.origin ?? "https://snipgeek.com");
-  const req = new NextRequest(url);
+  const headers = new Headers({
+    host: options?.host ?? url.host,
+  });
+  if (options?.forwardedHost) {
+    headers.set("x-forwarded-host", options.forwardedHost);
+  }
+
+  const req = new NextRequest(url, { headers });
   if (options?.cookies) {
     for (const [name, value] of Object.entries(options.cookies)) {
       req.cookies.set(name, value);
@@ -59,6 +71,21 @@ describe("proxy", () => {
       expect(res.status).toBe(308);
       expect(getLocation(res)).toBe(
         "https://snipgeek.com/blog/some-slug?utm_source=test",
+      );
+    });
+
+    it("uses forwarded host headers before falling back to nextUrl hostname", () => {
+      const res = proxy(
+        makeRequest("/contact?ref=hosting", {
+          forwardedHost:
+            "studio--studio-8697076532-14512.us-central1.hosted.app",
+          origin: "https://snipgeek.com",
+        }),
+      );
+
+      expect(res.status).toBe(308);
+      expect(getLocation(res)).toBe(
+        "https://snipgeek.com/contact?ref=hosting",
       );
     });
 

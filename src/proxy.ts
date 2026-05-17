@@ -32,6 +32,15 @@ function shouldRedirectToCanonicalHost(hostname: string) {
   );
 }
 
+function getRequestHostname(request: NextRequest) {
+  const host =
+    request.headers.get("x-forwarded-host") ??
+    request.headers.get("host") ??
+    request.nextUrl.host;
+
+  return host.split(",")[0]?.trim().toLowerCase().split(":")[0] ?? "";
+}
+
 function toCanonicalUrl(request: NextRequest, pathname?: string) {
   const url = request.nextUrl.clone();
   url.protocol = "https:";
@@ -57,7 +66,7 @@ function removeDefaultLocalePrefix(pathname: string) {
 
 export function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
-  const hostname = request.nextUrl.hostname;
+  const hostname = getRequestHostname(request);
 
   if (shouldRedirectToCanonicalHost(hostname)) {
     return NextResponse.redirect(
