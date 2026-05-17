@@ -48,7 +48,7 @@ const LayoutHeaderSearchPanel = dynamic(
     import("@/components/layout/layout-header-search-panel").then((mod) => ({
       default: mod.LayoutHeaderSearchPanel,
     })),
-  { loading: () => null }
+  { loading: () => null },
 );
 
 type SearchableItem = {
@@ -134,8 +134,7 @@ export function LayoutHeader({
     items: readingListItems,
     removeItem: removeReadingListItem,
     clearItems: clearReadingListItems,
-  } =
-    useReadingList();
+  } = useReadingList();
   const { message, icon, progress, clear } = useNotification();
   const {
     currentMode,
@@ -323,8 +322,18 @@ export function LayoutHeader({
 
   const directLinks = useMemo(
     () => [
-      { name: "Windows 11", href: "/tags/windows-11", icon: Monitor, badge: "25H2" },
-      { name: "Ubuntu 26.04", href: "/tags/ubuntu-26-04", icon: Terminal, badge: "LTS" },
+      {
+        name: "Windows 11",
+        href: "/tags/windows-11",
+        icon: Monitor,
+        badge: "25H2",
+      },
+      {
+        name: "Ubuntu 26.04",
+        href: "/tags/ubuntu-26-04",
+        icon: Terminal,
+        badge: "LTS",
+      },
     ],
     [],
   );
@@ -387,7 +396,11 @@ export function LayoutHeader({
     });
 
     // 2. Determine base tags based on current context
-    let pool: { name: string; href: string; icon: React.ComponentType<{ className?: string }> }[] = [];
+    let pool: {
+      name: string;
+      href: string;
+      icon: React.ComponentType<{ className?: string }>;
+    }[] = [];
 
     const blogDetailPrefix = `${linkPrefix}/blog/`;
     const noteDetailPrefix = `${linkPrefix}/notes/`;
@@ -442,7 +455,8 @@ export function LayoutHeader({
       if (reservedNavHrefs.has(normalizedHref)) return false;
       const tagKey = getTagKeyFromHref(item.href);
       const categoryKey = getCategoryKeyFromHref(item.href);
-      if (tagKey && reservedTagFamilies.has(getTagFamilyKey(tagKey))) return false;
+      if (tagKey && reservedTagFamilies.has(getTagFamilyKey(tagKey)))
+        return false;
 
       const hasTagContent = (searchableData || []).some((article) =>
         (article.tags || []).some(
@@ -468,7 +482,13 @@ export function LayoutHeader({
     });
 
     return filteredPool.slice(0, 3);
-  }, [linkPrefix, normalizedPath, reservedNavHrefs, reservedTagFamilies, searchableData]);
+  }, [
+    linkPrefix,
+    normalizedPath,
+    reservedNavHrefs,
+    reservedTagFamilies,
+    searchableData,
+  ]);
 
   const finalSecondaryLinks = useMemo(() => {
     const baseLinks = [
@@ -491,10 +511,15 @@ export function LayoutHeader({
   const getIsActivePath = (href: string) => {
     const localizedHref = `${linkPrefix}${href}` || "/";
     if (href === "/tags") return pathname === localizedHref;
-    return pathname === localizedHref || pathname.startsWith(`${localizedHref}/`);
+    return (
+      pathname === localizedHref || pathname.startsWith(`${localizedHref}/`)
+    );
   };
 
-  const trackSecondaryNavClick = (item: { name: string; href: string }, position: number) => {
+  const trackSecondaryNavClick = (
+    item: { name: string; href: string },
+    position: number,
+  ) => {
     if (typeof window === "undefined") return;
     const detail = {
       name: item.name,
@@ -503,9 +528,13 @@ export function LayoutHeader({
       locale: currentLocale,
       sourcePath: normalizedPath,
     };
-    window.dispatchEvent(new CustomEvent("snipgeek:secondary-nav-click", { detail }));
-    const gtag = (window as Window & { gtag?: (...args: unknown[]) => void }).gtag;
-    if (typeof gtag === "function") gtag("event", "secondary_nav_click", detail);
+    window.dispatchEvent(
+      new CustomEvent("snipgeek:secondary-nav-click", { detail }),
+    );
+    const gtag = (window as Window & { gtag?: (...args: unknown[]) => void })
+      .gtag;
+    if (typeof gtag === "function")
+      gtag("event", "secondary_nav_click", detail);
   };
 
   const navItemClass =
@@ -573,9 +602,7 @@ export function LayoutHeader({
                 <SnipGeekLogo className="h-7 w-7 sm:h-8 sm:w-8 transition-transform duration-500 ease-in-out group-hover:scale-[1.15] group-hover:rotate-3" />
                 <div className="font-display text-lg sm:text-xl font-black tracking-[-0.03em] flex items-baseline leading-none">
                   <span className="text-foreground">Snip</span>
-                  <span className="text-accent ml-px">
-                    Geek
-                  </span>
+                  <span className="text-accent ml-px">Geek</span>
                 </div>
               </NextLink>
             )}
@@ -616,7 +643,10 @@ export function LayoutHeader({
                     "px-3.5 py-2 font-sans text-[10px] font-black uppercase tracking-[0.12em] transition-all rounded-full border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50 inline-flex items-center gap-1.5",
                     isActive
                       ? activeToneClass
-                      : cn("border-transparent text-foreground/65", hoverToneClass),
+                      : cn(
+                          "border-transparent text-foreground/65",
+                          hoverToneClass,
+                        ),
                   )}
                 >
                   {item.name}
@@ -626,7 +656,7 @@ export function LayoutHeader({
                     </span>
                   )}
                   {item.name === "Windows 11" && (
-                    <span className="text-[8px] font-black uppercase tracking-wide px-1 py-0.5 rounded bg-[#0078D4]/15 text-[#005A9E] dark:text-[#0078D4] border border-[#0078D4]/30 leading-none">
+                    <span className="text-[9px] font-black uppercase tracking-wide px-1 py-0.5 rounded bg-[#0078D4]/22 text-[#003A70] dark:text-[#B9DEFF] border border-[#0078D4]/40 leading-none">
                       25H2
                     </span>
                   )}
@@ -652,7 +682,8 @@ export function LayoutHeader({
               <div className="relative z-[110]">
                 <SnipTooltip
                   label={
-                    dictionary?.promptGenerator?.tooltips?.moreMenu ?? "More Menu"
+                    dictionary?.promptGenerator?.tooltips?.moreMenu ??
+                    "More Menu"
                   }
                   side="bottom"
                 >
@@ -714,7 +745,7 @@ export function LayoutHeader({
                           </span>
                         )}
                         {item.name === "Windows 11" && (
-                          <span className="text-[8px] font-black uppercase tracking-wide px-1 py-0.5 rounded bg-[#0078D4]/15 text-[#005A9E] dark:text-[#0078D4] border border-[#0078D4]/30 leading-none">
+                          <span className="text-[9px] font-black uppercase tracking-wide px-1 py-0.5 rounded bg-[#0078D4]/22 text-[#003A70] dark:text-[#B9DEFF] border border-[#0078D4]/40 leading-none">
                             25H2
                           </span>
                         )}
@@ -781,7 +812,10 @@ export function LayoutHeader({
             </SnipTooltip>
 
             {/* 3. Theme Toggle (light → dark → system) */}
-            <SnipTooltip label={mounted ? themeTooltipLabel : "Ganti Tema"} side="bottom">
+            <SnipTooltip
+              label={mounted ? themeTooltipLabel : "Ganti Tema"}
+              side="bottom"
+            >
               <button
                 type="button"
                 className={cn(navItemClass, "group/theme relative inline-flex")}
@@ -1118,16 +1152,14 @@ export function LayoutHeader({
           <span
             className={cn(
               "text-accent transition-all duration-300 delay-100",
-              message
-                ? "opacity-100 scale-100"
-                : "opacity-0 scale-50",
+              message ? "opacity-100 scale-100" : "opacity-0 scale-50",
             )}
           >
             {icon &&
               React.cloneElement(
                 icon as React.ReactElement<{ className?: string }>,
                 {
-                className: "h-3.5 w-3.5",
+                  className: "h-3.5 w-3.5",
                 },
               )}
           </span>
