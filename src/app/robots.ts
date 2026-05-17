@@ -15,7 +15,6 @@ export default function robots(): MetadataRoute.Robots {
     "/api/dev/",
     "/api/tools/",
     "/api/numbers/",
-    "/api/img",
   ];
 
   return {
