@@ -4,8 +4,11 @@ import { proxy } from "./proxy";
 
 // ── Helpers ────────────────────────────────────────────────────────────────────
 
-function makeRequest(path: string, options?: { cookies?: Record<string, string> }) {
-  const url = new URL(path, "https://snipgeek.com");
+function makeRequest(
+  path: string,
+  options?: { cookies?: Record<string, string>; origin?: string },
+) {
+  const url = new URL(path, options?.origin ?? "https://snipgeek.com");
   const req = new NextRequest(url);
   if (options?.cookies) {
     for (const [name, value] of Object.entries(options.cookies)) {
@@ -34,6 +37,61 @@ function getRewriteUrl(res: NextResponse) {
 // ── Tests ──────────────────────────────────────────────────────────────────────
 
 describe("proxy", () => {
+  describe("canonical host redirects — 308 redirect to snipgeek.com", () => {
+    it("redirects Firebase App Hosting default domain to the canonical host", () => {
+      const res = proxy(
+        makeRequest("/", {
+          origin: "https://studio--studio-8697076532-14512.us-central1.hosted.app",
+        }),
+      );
+
+      expect(res.status).toBe(308);
+      expect(getLocation(res)).toBe("https://snipgeek.com/");
+    });
+
+    it("preserves path and query string when redirecting non-canonical hosts", () => {
+      const res = proxy(
+        makeRequest("/blog/some-slug?utm_source=test", {
+          origin: "https://studio--studio-8697076532-14512.us-central1.hosted.app",
+        }),
+      );
+
+      expect(res.status).toBe(308);
+      expect(getLocation(res)).toBe(
+        "https://snipgeek.com/blog/some-slug?utm_source=test",
+      );
+    });
+
+    it("removes the default locale prefix in the same host redirect", () => {
+      const res = proxy(
+        makeRequest("/en/blog/some-slug?ref=preview", {
+          origin: "https://studio--studio-8697076532-14512.us-central1.hosted.app",
+        }),
+      );
+
+      expect(res.status).toBe(308);
+      expect(getLocation(res)).toBe(
+        "https://snipgeek.com/blog/some-slug?ref=preview",
+      );
+    });
+
+    it("redirects www and legacy domains to the canonical host", () => {
+      const wwwRes = proxy(
+        makeRequest("/contact", { origin: "https://www.snipgeek.com" }),
+      );
+      const legacyRes = proxy(
+        makeRequest("/id/blog/some-slug", { origin: "https://irweb.info" }),
+      );
+
+      expect(wwwRes.status).toBe(308);
+      expect(getLocation(wwwRes)).toBe("https://snipgeek.com/contact");
+      expect(legacyRes.status).toBe(308);
+      expect(getLocation(legacyRes)).toBe(
+        "https://snipgeek.com/id/blog/some-slug",
+      );
+    });
+  });
+
   describe("skip rules — should pass through without modification", () => {
     it.each([
       "/api/posts",

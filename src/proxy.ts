@@ -22,8 +22,49 @@ import { i18n } from "./i18n-config";
 // ║ Incident post: /blog/fix-cdn-cached-redirect-killing-google-indexing        ║
 // ╚══════════════════════════════════════════════════════════════════════════════╝
 
+const canonicalHost = "snipgeek.com";
+const canonicalRedirectHosts = new Set(["www.snipgeek.com", "irweb.info"]);
+
+function shouldRedirectToCanonicalHost(hostname: string) {
+  return (
+    canonicalRedirectHosts.has(hostname) ||
+    hostname.endsWith(".hosted.app")
+  );
+}
+
+function toCanonicalUrl(request: NextRequest, pathname?: string) {
+  const url = request.nextUrl.clone();
+  url.protocol = "https:";
+  url.hostname = canonicalHost;
+  url.port = "";
+  if (pathname) {
+    url.pathname = pathname;
+  }
+  return url;
+}
+
+function removeDefaultLocalePrefix(pathname: string) {
+  if (pathname === `/${i18n.defaultLocale}`) {
+    return "/";
+  }
+
+  if (pathname.startsWith(`/${i18n.defaultLocale}/`)) {
+    return pathname.replace(`/${i18n.defaultLocale}`, "") || "/";
+  }
+
+  return pathname;
+}
+
 export function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
+  const hostname = request.nextUrl.hostname;
+
+  if (shouldRedirectToCanonicalHost(hostname)) {
+    return NextResponse.redirect(
+      toCanonicalUrl(request, removeDefaultLocalePrefix(pathname)),
+      308,
+    );
+  }
 
   // Skip middleware for API routes, Next.js internal files, static files,
   // and the internal /admin dashboard (which is intentionally not localized).
@@ -38,12 +79,14 @@ export function proxy(request: NextRequest) {
 
   // Canonicalize default-locale paths: /en/* -> /*
   if (pathname === `/${i18n.defaultLocale}`) {
-    return NextResponse.redirect(new URL("/", request.url), 308);
+    return NextResponse.redirect(toCanonicalUrl(request, "/"), 308);
   }
 
   if (pathname.startsWith(`/${i18n.defaultLocale}/`)) {
-    const normalizedPath = pathname.replace(`/${i18n.defaultLocale}`, "") || "/";
-    return NextResponse.redirect(new URL(normalizedPath, request.url), 308);
+    return NextResponse.redirect(
+      toCanonicalUrl(request, removeDefaultLocalePrefix(pathname)),
+      308,
+    );
   }
 
   const pathnameIsMissingLocale = i18n.locales.every(
