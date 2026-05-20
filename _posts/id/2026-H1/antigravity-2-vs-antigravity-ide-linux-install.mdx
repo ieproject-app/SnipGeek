@@ -1,0 +1,262 @@
+---
+title: "Antigravity 2.0 vs Antigravity IDE: Cara Install di Linux"
+slug: "antigravity-2-vs-antigravity-ide-linux-install"
+translationKey: "antigravity-2-vs-antigravity-ide-linux-install"
+date: "2026-05-22"
+description: "Pahami perbedaan Google Antigravity 2.0 dan versi IDE, serta cara install manual keduanya menggunakan tarball di CachyOS dan distro Linux lainnya."
+category: "AI"
+tags: ["linux", "tutorial", "apps", "ai", "troubleshooting"]
+published: true
+featured: false
+heroImage: "https://res.cloudinary.com/snipgeek/image/upload/q_auto/f_auto/v1779270232/gemini-35-1920x1440_o5e9id.webp"
+imageAlt: "Google Antigravity 2.0 and Gemini 3.5 Flash launch banner"
+---
+
+Setelah ganti OS harian saya ke CachyOS bulan lalu, saya merasa ini waktu yang tepat buat pasang tool agentic milik Google. Saya langsung menyalakan sistem dan siap mengunduh paketnya, tapi tiba-tiba langsung terhambat oleh masalah yang tidak saya duga sama sekali. Ternyata, Antigravity 2.0 dan Antigravity IDE itu bukan sekadar pembaruan dari aplikasi yang sama, melainkan dua aplikasi yang berbeda fungsi.
+
+Saya sempat bingung sekitar setengah jam di depan terminal, mengira saya salah mengetik perintah instalasi. Dokumentasi resminya tidak menjelaskan pemisahan ini secara gamblang pada pandangan pertama, membuat saya sempat garuk-garuk kepala. Ditambah lagi, CachyOS tidak menyediakan kedua aplikasi ini di repositori resmi mereka, dan paket AUR buatan komunitas juga belum diperbarui.
+
+Karena tidak bisa mengandalkan package manager bawaan, saya memutuskan untuk menempuh jalur manual memakai file tarball resmi. Saya akhirnya berhasil menjalankan keduanya di CachyOS dengan desktop KDE Plasma, walaupun prosesnya punya beberapa keunikan tersendiri. Kalau kamu berniat memasangnya di sistem Linux serupa, begini langkah-langkahnya agar tidak pusing sendiri.
+
+<Callout variant="info" title="Tested On">
+  CachyOS dengan KDE Plasma, x86_64, glibc 2.43. Antigravity 2.0.1 + Antigravity IDE 2.0.1.
+</Callout>
+
+## Antigravity 2.0 vs Antigravity IDE: Apa Bedanya?
+
+Google mengumumkan Antigravity 2.0 di ajang I/O 2026, dan penamaannya langsung memicu kebingungan bagi banyak orang. Kalau kamu sudah membaca tulisan saya saat [mencoba editor kode AI Antigravity](/blog/trying-antigravity-ai-code-editor), kamu mungkin mengira ini versi barunya saja. Padahal kenyataannya tidak seperti itu; kedua aplikasi ini melayani alur kerja developer yang sangat berbeda.
+
+<CloudinaryVideoEmbed
+  src="https://res.cloudinary.com/snipgeek/video/upload/q_auto/f_auto/v1779270254/AGY2-hype_xwdpla.mp4"
+  title="Demo Antigravity 2.0 Agent Orchestration"
+/>
+
+Antigravity 2.0 merupakan aplikasi desktop mandiri yang dirancang khusus untuk mengelola orkestrasi banyak *agent* secara paralel. Di dalamnya tidak ada editor kode sama sekali; fungsinya murni sebagai dashboard untuk memantau *autonomous agents* bekerja di latar belakang. Aplikasi ini sangat pas untuk mendelegasikan tugas secara otomatis, membiarkan *agent* membuat *subagent* dan menyelesaikan proyek besar sendiri.
+
+Sementara itu, Antigravity IDE adalah aplikasi hasil fork VS Code yang biasa kamu pakai untuk coding aktif sehari-hari. Di sinilah kamu menulis dan menyunting kode secara langsung, dibantu oleh satu *agent* pendamping selama sesi coding berlangsung. Sederhananya, versi IDE adalah ruang kerja coding kamu, sedangkan Antigravity 2.0 bertindak sebagai manajer *agent* otomatis.
+
+<Expandable title="Perbandingan Lengkap: Antigravity 2.0 vs Antigravity IDE" icon="info">
+
+| Fitur | Antigravity 2.0 | Antigravity IDE |
+| :--- | :--- | :--- |
+| **Deskripsi** | Aplikasi desktop mandiri untuk orkestrasi *agent* | Editor kode berbasis VS Code dengan fitur AI |
+| **Fungsi Utama** | Menjalankan dan memantau beberapa *agent* otonom secara paralel | Menulis dan mengedit kode dengan bantuan AI |
+| **Antarmuka** | Dashboard Manager Agent + browser bawaan | Layout editor familiar (seperti VS Code) |
+| **Edit Kode** | Minimal — *agent* yang menangani kode secara otomatis | Editor lengkap dengan syntax highlighting dan IntelliSense |
+| **Dukungan Agent** | Multi-agent, eksekusi paralel, tugas terjadwal | Satu *agent* asisten per sesi coding |
+| **Nama Binary** | `antigravity` | `antigravity-ide` |
+
+</Expandable>
+
+## Peningkatan ke Gemini 3.5 Flash
+
+Bersamaan dengan peluncuran versi 2.0 di Google I/O 2026, Google juga merilis model baru bernama Gemini 3.5 Flash. Model ini dirancang khusus agar proses pengerjaan tugas coding dan tugas otonom berjalan cepat dan hemat biaya. Saya cukup terkejut melihat performanya yang empat kali lebih cepat dibanding Gemini 3.1 Pro, bahkan unggul di sebagian besar benchmark coding.
+
+Model ini dibekali context window input sebesar 1 juta token dan batas output hingga 65.536 token. Kapasitas besar inilah yang membuat Antigravity 2.0 sanggup mengoordinasikan tugas-tugas rumit tanpa kehabisan memori. Hal ini membuat pekerjaan latar belakang berdurasi lama dan pembentukan *subagent* dinamis menjadi sangat praktis untuk digunakan.
+
+## Mengapa Memilih Instalasi Manual Menggunakan Tarball?
+
+Jika kamu memakai sistem berbasis Arch seperti CachyOS, kamu mungkin mengira paket AUR akan langsung berfungsi dengan lancar. Sayangnya, waktu saya coba pasang, instalasinya gagal karena paket tersebut belum diperbarui ke versi 2.0.1. File tarball resmi adalah satu-satunya cara untuk menikmati fitur baru saat ini, dan untungnya Google menyediakan build Linux yang stabil.
+
+Kamu bisa mencari tautan unduhan terbaru di [halaman rilis resmi](https://antigravity.google/releases). Kadang-kadang tautan dari CDN di sana memicu error 404, jadi saya terpaksa menyalin URL unduhan langsung dari notifikasi pembaruan di dalam aplikasi. Begitu URL yang benar disalin, proses instalasinya sebenarnya cukup mudah.
+
+## Cara Menginstall Antigravity 2.0
+
+<CloudinaryVideoEmbed
+  src="https://res.cloudinary.com/snipgeek/video/upload/q_auto/f_auto/v1779270254/AGY_Logo_loop_i7zkpj.mp4"
+  title="Loop Logo Antigravity 2.0"
+/>
+
+<Steps>
+  <Step>
+    ### Unduh file tarball
+
+    Pertama, unduh tarball resmi dari penyimpanan publik Google. Jalankan perintah berikut di terminal untuk menyimpannya di folder unduhan:
+
+    ```bash
+    cd ~/Downloads && \
+    curl -L "https://storage.googleapis.com/antigravity-public/antigravity-hub/2.0.1-6566078776737792/linux-x64/Antigravity.tar.gz" \
+      -o Antigravity-2.0.1.tar.gz
+    ```
+
+    Pastikan proses unduh selesai dengan benar. Ukuran filenya seharusnya sedikit di atas 200MB:
+
+    ```bash
+    ls -lh ~/Downloads/Antigravity-2.0.1.tar.gz
+    ```
+  </Step>
+
+  <Step>
+    ### Ekstrak ke folder /opt
+
+    Ekstrak seluruh isi file tarball ke dalam direktori `/opt`. Proses ini memerlukan akses superuser:
+
+    ```bash
+    sudo tar -xzf ~/Downloads/Antigravity-2.0.1.tar.gz -C /opt/
+    ```
+  </Step>
+
+  <Step>
+    ### Sesuaikan nama folder dan wrapper
+
+    Folder hasil ekstrak akan bernama `Antigravity-x64`. Jika kamu punya instalasi lama, script wrapper di `/usr/bin/antigravity` mungkin masih mengarah ke `/opt/Antigravity/bin/`. Kamu harus menyesuaikannya:
+
+    ```bash
+    sudo sed -i 's|/opt/Antigravity/bin/antigravity|/opt/Antigravity-x64/antigravity|' /usr/bin/antigravity
+    ```
+
+    Untuk instalasi baru, buat symlink dan file desktop entry secara manual agar aplikasi bisa dibuka dari menu desktop:
+
+    ```bash
+    sudo ln -sf /opt/Antigravity-x64/antigravity /usr/local/bin/antigravity
+
+    sudo bash -c 'cat > /usr/share/applications/antigravity.desktop << EOF
+    [Desktop Entry]
+    Name=Antigravity
+    Exec=/opt/Antigravity-x64/antigravity %F
+    Icon=/opt/Antigravity-x64/resources/app/resources/linux/code.png
+    Type=Application
+    Categories=Development;IDE;
+    StartupNotify=true
+    EOF'
+    ```
+  </Step>
+
+  <Step>
+    ### Lakukan verifikasi
+
+    Jalankan perintah berikut untuk memastikan wrapper terminal berfungsi dan menampilkan versi yang benar:
+
+    ```bash
+    antigravity --version
+    ```
+  </Step>
+
+  <Step>
+    ### Bersihkan file unduhan
+
+    Setelah semuanya dipastikan berjalan normal, hapus file tarball tadi untuk menghemat penyimpanan disk:
+
+    ```bash
+    rm ~/Downloads/Antigravity-2.0.1.tar.gz
+    ```
+  </Step>
+</Steps>
+
+## Cara Menginstall Antigravity IDE
+
+Instalasi versi IDE sebenarnya sangat mirip dengan langkah di atas, tapi ada satu hal penting terkait nama foldernya. Folder hasil ekstrak bernama `Antigravity IDE` (menggunakan spasi). Adanya spasi ini akan membuat launcher aplikasi gagal membuka editor kecuali kamu membungkus path eksekusinya dengan tanda kutip.
+
+<Steps>
+  <Step>
+    ### Unduh tarball IDE
+
+    Dapatkan tautan tarball khusus IDE dari CDN rilis resmi Google. Jalankan perintah ini di terminal:
+
+    ```bash
+    cd ~/Downloads && \
+    curl -L "https://edgedl.me.gvt1.com/edgedl/release2/j0qc3/antigravity/stable/2.0.1-4861014005645312/linux-x64/Antigravity%20IDE.tar.gz" \
+      -o AntigravityIDE-2.0.1.tar.gz
+    ```
+  </Step>
+
+  <Step>
+    ### Ekstrak arsip file
+
+    Ekstrak seluruh berkas ke dalam direktori `/opt`, sama seperti folder agent hub tadi:
+
+    ```bash
+    sudo tar -xzf ~/Downloads/AntigravityIDE-2.0.1.tar.gz -C /opt/
+    ```
+
+    Pastikan folder baru bernama `Antigravity IDE` sudah terbuat dengan memeriksa daftar direktori:
+
+    ```bash
+    ls /opt/
+    ```
+  </Step>
+
+  <Step>
+    ### Buat symlink dan shortcut desktop
+
+    Karena nama foldernya mengandung spasi, kamu wajib membungkus perintah eksekusi dengan tanda kutip di file `.desktop`. Masukkan perintah berikut:
+
+    ```bash
+    sudo ln -sf "/opt/Antigravity IDE/antigravity-ide" /usr/local/bin/antigravity-ide
+
+    sudo bash -c 'cat > /usr/share/applications/antigravity-ide.desktop << EOF
+    [Desktop Entry]
+    Name=Antigravity IDE
+    Exec="/opt/Antigravity IDE/antigravity-ide" %F
+    Icon=/opt/Antigravity IDE/resources/app/resources/linux/code.png
+    Type=Application
+    Categories=Development;IDE;
+    StartupNotify=true
+    EOF'
+    ```
+
+    Perbarui database aplikasi desktop agar sistem langsung mengenali jalan pintas baru tersebut:
+
+    ```bash
+    sudo update-desktop-database /usr/share/applications
+    ```
+  </Step>
+
+  <Step>
+    ### Verifikasi hasil instalasi IDE
+
+    Pastikan binary IDE bisa dijalankan lewat terminal dan memunculkan info versi:
+
+    ```bash
+    antigravity-ide --version
+    ```
+  </Step>
+
+  <Step>
+    ### Hapus file arsip unduhan
+
+    Bersihkan folder unduhan dari file arsip tarball yang sudah tidak terpakai:
+
+    ```bash
+    rm ~/Downloads/AntigravityIDE-2.0.1.tar.gz
+    ```
+  </Step>
+</Steps>
+
+![Antigravity IDE menampilkan opsi pilihan model untuk Gemini 3.5 Flash.](https://res.cloudinary.com/snipgeek/image/upload/q_auto/f_auto/v1779270231/antigravity-ide-gemini-new_jf0yax.webp)
+<div className="-mt-3 mb-6 text-center text-sm italic text-muted-foreground">Antigravity IDE 2.0.1 berjalan di CachyOS, menampilkan integrasi model Gemini 3.5 Flash terbaru.</div>
+
+<Callout variant="warning" title="Aplikasi Gagal Terbuka dari Launcher?">
+  Jika Antigravity IDE tidak mau terbuka, coba cek kembali tanda kutip pada baris `Exec=` di file `.desktop`. Karena path `/opt/Antigravity IDE/` memiliki spasi, desktop environment seperti KDE tidak akan bisa membacanya tanpa tanda kutip. Script di atas sudah mengaturnya, tapi edit manual kadang bisa menghilangkannya secara tidak sengaja.
+</Callout>
+
+## Perbaikan untuk Wayland (Opsional)
+
+Jika kamu menjalankan KDE Plasma dengan protokol Wayland dan mendapati salah satu aplikasi hanya memunculkan layar kosong saat dibuka, kemungkinan besar itu adalah bug rendering Electron. Saya terpaksa menambahkan parameter Wayland di file desktop agar aplikasi menampilkan dekorasi jendela dengan benar. Patch ini bisa dipasang lewat perintah `sed`.
+
+```bash
+# Patch Antigravity 2.0
+sudo sed -i 's|Exec=/opt/Antigravity-x64/antigravity %F|Exec=/opt/Antigravity-x64/antigravity --enable-features=WaylandWindowDecorations --ozone-platform=wayland %F|' /usr/share/applications/antigravity.desktop
+
+# Patch Antigravity IDE
+sudo sed -i 's|Exec="/opt/Antigravity IDE/antigravity-ide" %F|Exec="/opt/Antigravity IDE/antigravity-ide" --enable-features=WaylandWindowDecorations --ozone-platform=wayland %F|' /usr/share/applications/antigravity-ide.desktop
+```
+
+## Pembaruan di Masa Mendatang
+
+Karena kita memasang aplikasi ini lewat tarball manual, kamu harus mengurus pembaruan versi baru secara mandiri. Ketika versi baru dirilis, unduh arsip tarball yang baru, hapus folder lama di `/opt`, lalu ekstrak berkas barunya di sana. Kedua aplikasi ini juga akan memberi tahu lewat notifikasi internal saat ada update baru.
+
+## Sudut Pandang SnipGeek (SnipGeek's Take)
+
+Menurut saya, keputusan Google membagi Antigravity menjadi dua aplikasi terpisah sangat masuk akal. Mencoba menjejalkan seluruh proses orkestrasi *agent* ke dalam satu antarmuka editor kode hanya akan membuatnya terasa penuh dan lambat. Dengan pemisahan ini, kamu tetap mendapat lingkungan VS Code yang bersih untuk coding aktif, dan dashboard khusus untuk memantau pekerjaan *agent*.
+
+Meski begitu, proses instalasi manual ini memperlihatkan bahwa Linux masih dianaktirikan oleh tim pengembang mereka. Adanya spasi pada nama folder IDE serta ketiadaan paket AUR yang terawat membuat konfigurasi awal terasa lebih merepotkan dari yang seharusnya. Namun, demi mencoba kebolehan Gemini 3.5 Flash yang baru, langkah manual ini tetap layak dicoba.
+
+Jika kamu juga sedang mengeksplorasi sesi Wayland, membaca tulisan tentang bagaimana [desktop virtual per layar di KDE Plasma](/blog/kde-plasma-per-screen-virtual-desktops) bekerja bisa membantu meningkatkan efisiensi kerjamu. Fitur tersebut sangat menunjang konsep multi-agent milik Antigravity 2.0 ketika kamu menjalankan *agent* di satu monitor dan membuka editor kode di monitor lainnya.
+
+Apakah kamu tertarik mencoba dashboard agent otonom di Antigravity 2.0, atau memilih bertahan di versi IDE saja? Tulis pendapatmu di kolom komentar di bawah ya.
+
+### References
+1. [Google Antigravity Releases](https://antigravity.google/releases)
+2. [Google I/O 2026 Blog: Introducing Gemini 3.5 Flash](https://blog.google)
+3. [Google Antigravity Changelog](https://antigravity.google/changelog)

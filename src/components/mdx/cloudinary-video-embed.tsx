@@ -86,7 +86,9 @@ const getVideoSources = (src: string): VideoSource[] => {
 
 export function CloudinaryVideoEmbed({ src, title }: CloudinaryVideoEmbedProps) {
   const [shouldLoad, setShouldLoad] = useState(false);
+  const [isIntersecting, setIsIntersecting] = useState(false);
   const containerRef = useRef<HTMLSpanElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
   const resolvedTitle = title ?? "Video player";
   const sources = getVideoSources(src);
 
@@ -96,17 +98,29 @@ export function CloudinaryVideoEmbed({ src, title }: CloudinaryVideoEmbedProps) 
 
     const observer = new IntersectionObserver(
       ([entry]) => {
+        setIsIntersecting(entry.isIntersecting);
         if (entry.isIntersecting) {
           setShouldLoad(true);
-          observer.disconnect();
         }
       },
-      { rootMargin: "200px 0px" },
+      { rootMargin: "100px 0px", threshold: 0.1 },
     );
 
     observer.observe(el);
     return () => observer.disconnect();
   }, []);
+
+  useEffect(() => {
+    if (!shouldLoad || !videoRef.current) return;
+
+    if (isIntersecting) {
+      videoRef.current.play().catch((err) => {
+        console.warn("Autoplay blocked or interrupted:", err);
+      });
+    } else {
+      videoRef.current.pause();
+    }
+  }, [shouldLoad, isIntersecting]);
 
   return (
     <span ref={containerRef} className="block my-8 w-full">
@@ -116,7 +130,10 @@ export function CloudinaryVideoEmbed({ src, title }: CloudinaryVideoEmbedProps) 
       >
         {shouldLoad ? (
           <video
+            ref={videoRef}
             controls
+            muted
+            loop
             playsInline
             preload="metadata"
             className="absolute inset-0 w-full h-full"
