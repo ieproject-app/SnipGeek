@@ -67,6 +67,10 @@ const openGraphLocaleMap: Record<Locale, string> = {
   id: "id_ID",
 };
 
+// Restrict dynamic [locale] segment to generated locales only.
+// Prevents arbitrary paths like "/foo.txt" from being treated as a valid locale page.
+export const dynamicParams = false;
+
 export async function generateMetadata({
   params,
 }: {
@@ -103,17 +107,14 @@ export async function generateMetadata({
     publisher: "SnipGeek",
     icons: {
       icon: [
-        {
-          url: "/images/logo/favicon-96x96.png",
-          sizes: "96x96",
-          type: "image/png",
-        },
+        { url: "/favicon.ico", type: "image/x-icon" },
+        { url: "/images/logo/favicon-96x96.png", sizes: "96x96", type: "image/png" },
         { url: "/images/logo/favicon.svg", type: "image/svg+xml" },
       ],
-      shortcut: "/images/logo/favicon.ico",
-      apple: "/images/logo/apple-touch-icon.png",
+      shortcut: "/favicon.ico",
+      apple: "/apple-touch-icon.png",
     },
-    manifest: "/images/logo/site.webmanifest",
+    manifest: "/manifest.json",
     alternates: {
       canonical: canonicalPath,
       languages: {

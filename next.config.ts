@@ -268,57 +268,66 @@ const nextConfig: NextConfig = {
         destination: "/id/blog/remove-duplicate-onedrive-windows-11",
         permanent: true,
       },
-      // ── Orphaned Indonesian slugs (pre-i18n migration) ─────────────
-      // These URLs exist in GSC / external links without the /id/ prefix.
-      // Content lives at /id/blog/[slug]. 301 → correct locale URL.
+      // Legacy Indonesian slugs that still receive crawls/external links.
+      // Keep only one-to-one mappings to live destinations.
       {
         source: "/blog/instalasi-sap-gui-java-manjaro-linux",
-        destination: "/id/blog/instalasi-sap-gui-java-manjaro-linux",
+        destination: "/id/blog/install-sap-gui-java-manjaro-linux",
         permanent: true,
       },
       {
-        source: "/blog/ubuntu-26-04-lts-aplikasi-default-baru",
-        destination: "/id/blog/ubuntu-26-04-lts-aplikasi-default-baru",
+        source: "/id/blog/instalasi-sap-gui-java-manjaro-linux",
+        destination: "/id/blog/install-sap-gui-java-manjaro-linux",
         permanent: true,
       },
       {
         source: "/blog/ram-16gb-sudah-pas-pasan-kenapa-32gb-jadi-standar-baru",
-        destination: "/id/blog/ram-16gb-sudah-pas-pasan-kenapa-32gb-jadi-standar-baru",
+        destination: "/id/blog/is-16gb-ram-obsolete",
         permanent: true,
       },
       {
-        source: "/blog/waspada-bug-windows-11-kb5063878-ssd-phison",
-        destination: "/id/blog/waspada-bug-windows-11-kb5063878-ssd-phison",
-        permanent: true,
-      },
-      {
-        source: "/blog/perbedaan-workbook-dan-worksheet-google-sheets",
-        destination: "/id/blog/perbedaan-workbook-dan-worksheet-google-sheets",
-        permanent: true,
-      },
-      {
-        source: "/blog/blog-baru-sulit-ranking-google-sandbox",
-        destination: "/id/blog/blog-baru-sulit-ranking-google-sandbox",
+        source: "/id/blog/ram-16gb-sudah-pas-pasan-kenapa-32gb-jadi-standar-baru",
+        destination: "/id/blog/is-16gb-ram-obsolete",
         permanent: true,
       },
       {
         source: "/blog/langkah-penting-setelah-instal-windows-11",
-        destination: "/id/blog/langkah-penting-setelah-instal-windows-11",
+        destination: "/id/blog/to-do-after-install-windows11",
         permanent: true,
       },
       {
-        source: "/blog/satu-bulan-bersama-ai-di-next-js",
-        destination: "/id/blog/satu-bulan-bersama-ai-di-next-js",
+        source: "/id/blog/langkah-penting-setelah-instal-windows-11",
+        destination: "/id/blog/to-do-after-install-windows11",
         permanent: true,
       },
       {
         source: "/blog/instalasi-windows-11-panduan-lengkap",
-        destination: "/id/blog/instalasi-windows-11-panduan-lengkap",
+        destination: "/id/blog/clean-install-windows-11-step-by-step-guide",
         permanent: true,
       },
       {
-        source: "/blog/cara-aman-melihat-draf-artikel-nextjs",
-        destination: "/id/blog/cara-aman-melihat-draf-artikel-nextjs",
+        source: "/id/blog/instalasi-windows-11-panduan-lengkap",
+        destination: "/id/blog/clean-install-windows-11-step-by-step-guide",
+        permanent: true,
+      },
+      {
+        source: "/blog/instalasi-driver-fuji-xerox-docucentre-v-2060",
+        destination: "/id/blog/install-fuji-xerox-docucentre-v2060-driver",
+        permanent: true,
+      },
+      {
+        source: "/id/blog/instalasi-driver-fuji-xerox-docucentre-v-2060",
+        destination: "/id/blog/install-fuji-xerox-docucentre-v2060-driver",
+        permanent: true,
+      },
+      {
+        source: "/icons/favicon.ico",
+        destination: "/favicon.ico",
+        permanent: true,
+      },
+      {
+        source: "/kit/gdrive-link-tool",
+        destination: "/tools",
         permanent: true,
       },
     ];
@@ -327,6 +336,7 @@ const nextConfig: NextConfig = {
     formats: ["image/avif", "image/webp"],
     deviceSizes: [640, 768, 1024, 1280, 1600],
     imageSizes: [64, 128, 256, 384, 512],
+    qualities: [64, 75],
     remotePatterns: [
       {
         protocol: "https",
