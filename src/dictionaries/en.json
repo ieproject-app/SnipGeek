@@ -111,6 +111,10 @@
         "title": "Image Crop",
         "description": "Crop to 16:9 and export as WebP for hero banners."
       },
+      "laptop_service_estimator": {
+        "title": "Laptop Service Estimator",
+        "description": "Describe a laptop issue and get a quick service action and cost estimate."
+      },
       "compress_pdf": {
         "title": "Compress PDF",
         "description": "Reduce the file size of your PDF documents without significant quality loss."

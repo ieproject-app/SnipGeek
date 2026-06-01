@@ -63,3 +63,7 @@ eslint-result.json
 
 # Cloudinary draft images (local drafts before upload)
 claudinary/
+
+# Local audit/analysis scratch files
+docs/gsc-indexing-health-audit-2026-05-26.md
+scripts/analyze-build.mjs

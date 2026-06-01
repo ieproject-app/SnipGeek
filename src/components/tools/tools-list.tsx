@@ -16,6 +16,7 @@ import {
   FileDown,
   FileSignature,
   ScrollText,
+  Wrench,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
@@ -77,6 +78,14 @@ export function ToolsList({ dictionary, locale, isDevelopment }: ToolsListProps)
       icon: <Shuffle className="h-8 w-8" />,
       isLink: true,
       href: `${linkPrefix}/tools/random-name-picker`,
+      badge: pageContent.open_tool,
+      badgeVariant: 'secondary' as const,
+    },
+    {
+      id: 'laptop_service_estimator',
+      icon: <Wrench className="h-8 w-8" />,
+      isLink: true,
+      href: `${linkPrefix}/tools/laptop-service-estimator`,
       badge: pageContent.open_tool,
       badgeVariant: 'secondary' as const,
     },

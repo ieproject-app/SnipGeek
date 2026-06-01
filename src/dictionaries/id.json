@@ -111,6 +111,10 @@
         "title": "Potong Gambar",
         "description": "Potong ke rasio 16:9 dan ekspor WebP untuk banner hero."
       },
+      "laptop_service_estimator": {
+        "title": "Estimasi Servis Laptop",
+        "description": "Jelaskan keluhan laptop dan dapatkan estimasi tindakan servis serta biayanya."
+      },
       "compress_pdf": {
         "title": "Kompres PDF",
         "description": "Perkecil ukuran file PDF Anda tanpa mengurangi kualitas secara signifikan."

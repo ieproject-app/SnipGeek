@@ -103,7 +103,7 @@ SnipGeek is a bilingual (EN/ID) content platform for publishing technical articl
 ## 🚀 Getting Started
 
 ### Prerequisites
-- Node.js 20+
+- Node.js 22+
 - npm
 
 ### Install & Run
