@@ -5,6 +5,7 @@
 functions/node_modules
 functions/package-lock.json
 functions/lib/
+/.npm-cache/
 /.pnp
 .pnp.js
 
@@ -21,6 +22,7 @@ functions/lib/
 # Other
 .DS_Store
 *.pem
+.agent/*.log
 
 # Environment variables
 .env*.local
@@ -50,6 +52,8 @@ src/github/downloaded-logs-*.json
 # IDE settings
 .idea/
 *.code-workspace
+.vscode/
+.windsurf/
 
 # ESLint result dump
 eslint-result.json
