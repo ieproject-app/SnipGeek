@@ -19,6 +19,7 @@ import { GithubLogo } from "@/components/icons/github-logo";
 import { WindowsStoreLogo } from "@/components/icons/windows-store-logo";
 import type { Dictionary } from "@/lib/get-dictionary";
 import { cn } from "@/lib/utils";
+import { AdSenseUnit } from "@/components/analytics/adsense-unit";
 
 
 const COUNTDOWN_SECONDS = 10;
@@ -145,22 +146,6 @@ const PLATFORM_THEME: Record<
   },
 };
 
-function AdPlaceholder({ label, className }: { label: string; className?: string }) {
-  return (
-    <div className={cn(
-      "relative flex items-center justify-center rounded-2xl border border-dashed border-primary/10 bg-muted/5 group transition-colors hover:bg-muted/10 overflow-hidden",
-      className
-    )}>
-      <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/30 group-hover:text-muted-foreground/50 transition-colors z-10 px-4 text-center">
-        {label}
-      </span>
-      <div className="absolute inset-0 z-0 opacity-10 pointer-events-none">
-        <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_1px_1px,rgba(0,0,0,0.05)_1px,transparent_0)] bg-size-[24px_24px]" />
-      </div>
-    </div>
-  );
-}
-
 const containerVariants: Variants = {
   hidden: { opacity: 0 },
   visible: {
@@ -225,21 +210,21 @@ export function DownloadClient({
       </div>
 
       <main className="w-full max-w-7xl flex flex-col items-center gap-4 sm:gap-6">
-        {/* Slot A: Top Horizontal Banner - COMPACT */}
+        {/* AdSense — Download Top: banner atas sebelum countdown */}
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="w-full max-w-3xl h-20"
+          className="w-full max-w-3xl"
         >
-          <AdPlaceholder label="AD BANNER (Top)" className="h-full rounded-xl" />
+          <AdSenseUnit slot="1148790086" />
         </motion.div>
 
         {/* Balanced Dashboard Layout */}
         <div className="w-full grid grid-cols-1 lg:grid-cols-[250px_1fr_250px] gap-6 items-center">
 
-          {/* Left Sidebar */}
+          {/* Left Sidebar — reserved for future ad expansion */}
           <aside className="hidden lg:block self-stretch">
-            <AdPlaceholder label="SIDEBAR (Left)" className="h-full min-h-100 rounded-2xl" />
+            <div className="h-full min-h-100 rounded-2xl" />
           </aside>
 
           {/* Main Card - ULTRA COMPACT */}
@@ -372,7 +357,8 @@ export function DownloadClient({
 
           {/* Right Sidebar */}
           <aside className="hidden lg:flex flex-col gap-4 self-stretch">
-            <AdPlaceholder label="AD (Side)" className="flex-1 min-h-75 rounded-2xl" />
+            {/* AdSense — Download Sidebar: sidebar desktop kanan */}
+            <AdSenseUnit slot="5399901994" className="flex-1 min-h-75" />
             <div className="p-4 rounded-2xl border border-primary/5 bg-card/60 backdrop-blur-md">
               <div className="flex items-center gap-2 mb-2">
                 <Lock className="h-3 w-3 text-muted-foreground/50" />
@@ -386,15 +372,14 @@ export function DownloadClient({
 
         </div>
 
-        {/* Bottom Ad Grid */}
+        {/* AdSense — Download Below: setelah aksi download selesai */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="w-full max-w-4xl grid grid-cols-2 gap-4"
+          className="w-full max-w-4xl"
         >
-          <AdPlaceholder label="RECOMENDED (1)" className="h-17.5 rounded-xl" />
-          <AdPlaceholder label="RECOMENDED (2)" className="h-17.5 rounded-xl" />
+          <AdSenseUnit slot="1716642007" />
         </motion.div>
 
       </main>
