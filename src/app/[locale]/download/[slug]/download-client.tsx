@@ -211,7 +211,7 @@ export function DownloadClient({
 
       <main className="w-full max-w-7xl flex flex-col items-center gap-4 sm:gap-6">
         {/* Balanced Dashboard Layout */}
-        <div className="w-full grid grid-cols-1 lg:grid-cols-[250px_1fr_250px] gap-6 items-center">
+        <div className="w-full grid grid-cols-1 lg:grid-cols-[250px_1fr_250px] gap-6 items-start">
 
           {/* Left Sidebar */}
           <aside className="hidden lg:flex flex-col gap-4 self-stretch">
@@ -371,7 +371,7 @@ export function DownloadClient({
 
         </div>
 
-        {/* AdSense — Download Below: setelah aksi download selesai */}
+        {/* AdSense — Download Below 1: setelah aksi download selesai */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -379,6 +379,16 @@ export function DownloadClient({
           className="w-full max-w-3xl mx-auto my-8 md:my-12"
         >
           <AdSenseUnit slot="1716642007" className="my-0" />
+        </motion.div>
+
+        {/* AdSense — Download Below 2 (Wide & Desktop Only): agar di mobile tidak double */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          className="hidden md:block w-full max-w-5xl mx-auto mb-8"
+        >
+          <AdSenseUnit slot="8443199432" className="my-0" format="horizontal" />
         </motion.div>
 
       </main>
