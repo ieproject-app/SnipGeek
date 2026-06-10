@@ -210,21 +210,20 @@ export function DownloadClient({
       </div>
 
       <main className="w-full max-w-7xl flex flex-col items-center gap-4 sm:gap-6">
-        {/* AdSense — Download Top: banner atas sebelum countdown */}
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="w-full max-w-3xl"
-        >
-          <AdSenseUnit slot="1148790086" />
-        </motion.div>
-
         {/* Balanced Dashboard Layout */}
         <div className="w-full grid grid-cols-1 lg:grid-cols-[250px_1fr_250px] gap-6 items-center">
 
-          {/* Left Sidebar — reserved for future ad expansion */}
-          <aside className="hidden lg:block self-stretch">
-            <div className="h-full min-h-100 rounded-2xl" />
+          {/* Left Sidebar */}
+          <aside className="hidden lg:flex flex-col gap-4 self-stretch">
+            {/* AdSense — Download Sidebar: sidebar desktop kiri */}
+            <AdSenseUnit slot="1148790086" className="flex-1 min-h-75" />
+            {/* Spacer to align symmetrically with the right sidebar's support box */}
+            <div className="p-4 rounded-2xl border border-transparent bg-transparent opacity-0 pointer-events-none hidden lg:block select-none">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-[8px] font-black uppercase tracking-widest">&nbsp;</span>
+              </div>
+              <p className="text-[10px] leading-relaxed">&nbsp;</p>
+            </div>
           </aside>
 
           {/* Main Card - ULTRA COMPACT */}
@@ -377,9 +376,9 @@ export function DownloadClient({
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="w-full max-w-4xl"
+          className="w-full max-w-3xl mx-auto my-8 md:my-12"
         >
-          <AdSenseUnit slot="1716642007" />
+          <AdSenseUnit slot="1716642007" className="my-0" />
         </motion.div>
 
       </main>

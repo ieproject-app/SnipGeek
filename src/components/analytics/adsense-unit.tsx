@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import { cn } from '@/lib/utils';
 
 const PUBLISHER_ID = 'ca-pub-6235611333449307';
 
@@ -39,13 +40,9 @@ export function AdSenseUnit({ slot, format = 'auto', className = '' }: AdSenseUn
 
   return (
     <div
-      className={`my-6 overflow-hidden text-center ${className}`}
+      className={cn("my-8 w-full overflow-hidden text-center", className)}
       aria-label="Advertisement"
     >
-      {/* Faint label — required by AdSense policy, minimal visual impact */}
-      <span className="mb-1.5 block select-none text-[10px] font-medium uppercase tracking-widest text-muted-foreground/30">
-        Iklan
-      </span>
       <ins
         className="adsbygoogle"
         style={{ display: 'block' }}

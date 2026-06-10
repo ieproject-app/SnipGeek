@@ -158,7 +158,7 @@ export default async function BiosKeysPage({
       <main className="mx-auto max-w-7xl px-4 pt-10 pb-16 sm:px-6 lg:px-8 w-full">
         <ToolBiosKeys dictionary={dictionaryWithLocale} />
         {/* AdSense — Below Content: setelah tabel BIOS, di bawah semua konten */}
-        <AdSenseUnit slot="8443199432" className="mt-8 max-w-3xl mx-auto" />
+        <AdSenseUnit slot="8443199432" className="my-8 max-w-3xl mx-auto" />
       </main>
     </div>
   );

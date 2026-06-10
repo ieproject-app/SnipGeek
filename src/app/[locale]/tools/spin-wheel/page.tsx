@@ -263,9 +263,7 @@ export default async function SpinWheelPage({
         }}
       />
       {/* AdSense — Below Content: di bawah FAQ, aman dari mis-klik pada roda */}
-      <div className="max-w-3xl mx-auto px-4 pb-8">
-        <AdSenseUnit slot="8443199432" />
-      </div>
+      <AdSenseUnit slot="8443199432" className="max-w-3xl mx-auto px-4 my-8 md:my-10" />
     </>
   );
 }

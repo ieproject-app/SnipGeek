@@ -25,7 +25,7 @@ export function ToolNumbers({ dictionary }: { dictionary: Dictionary }) {
             isPublic={true}
         >
             {/* AdSense — In Article: sebelum konten tool, non-intrusif */}
-            <AdSenseUnit slot="2069362770" className="mb-2" />
+            <AdSenseUnit slot="2069362770" className="my-6 md:my-8" />
             <div className="space-y-10">
                 {/* Stepper Visual */}
                 <div className="max-w-2xl mx-auto mb-12">
