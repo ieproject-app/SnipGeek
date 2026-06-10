@@ -75,22 +75,31 @@ export default async function Image({ params }: { params: Promise<{ locale: Loca
 
         {/* Logo + Brand */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 22, marginBottom: 28 }}>
-          {/* 4-quadrant logo matching favicon */}
-          <div
+          {/* Logo mark - new compass/star design matching logo.svg */}
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 100 100"
+            width="80"
+            height="80"
             style={{
-              width: 80,
-              height: 80,
-              display: 'flex',
-              flexWrap: 'wrap',
-              gap: '4px',
-              filter: 'drop-shadow(0 8px 40px rgba(4, 136, 199, 0.5))',
+              filter: "drop-shadow(0 8px 40px rgba(14, 165, 233, 0.5))",
             }}
           >
-            <div style={{ width: 38, height: 38, borderRadius: '4px 4px 10px 4px', background: 'linear-gradient(135deg, #bae6fd, #0ea5e9)' }} />
-            <div style={{ width: 38, height: 38, borderRadius: '4px 4px 4px 4px', background: 'linear-gradient(135deg, #3b82f6, #1d4ed8)' }} />
-            <div style={{ width: 38, height: 38, borderRadius: '4px 4px 4px 4px', background: 'linear-gradient(135deg, #3b82f6, #1d4ed8)' }} />
-            <div style={{ width: 38, height: 38, borderRadius: '4px 10px 4px 4px', background: 'linear-gradient(135deg, #bae6fd, #0ea5e9)' }} />
-          </div>
+            <defs>
+              <linearGradient id="sg-grad-og" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#0ea5e9" />
+                <stop offset="100%" stopColor="#1d4ed8" />
+              </linearGradient>
+            </defs>
+            <path
+              d="M 60.87 9.43 A 42 42 0 0 1 90.57 60.87 L 53.46 52 L 79.7 79.7 A 42 42 0 0 1 20.3 79.7 L 46.54 52 L 9.43 60.87 A 42 42 0 0 1 39.13 9.43 L 50 46 Z"
+              fill="none"
+              stroke="url(#sg-grad-og)"
+              strokeWidth="6"
+              strokeLinejoin="round"
+              strokeLinecap="round"
+            />
+          </svg>
           <span
             style={{
               fontSize: 68,

@@ -58,31 +58,32 @@ export default function TwitterImage() {
           }}
         />
 
-        {/* Logo mark */}
-        <div
+        {/* Logo mark - new compass/star design matching logo.svg */}
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 100 100"
+          width="72"
+          height="72"
           style={{
-            width: "72px",
-            height: "72px",
-            borderRadius: "16px",
-            background: "linear-gradient(135deg, #0797de, #38bdf8)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
             marginBottom: "28px",
-            boxShadow: "0 0 40px #0797de55",
+            filter: "drop-shadow(0 0 40px rgba(14, 165, 233, 0.5))",
           }}
         >
-          <span
-            style={{
-              color: "#ffffff",
-              fontSize: "36px",
-              fontWeight: "900",
-              letterSpacing: "-2px",
-            }}
-          >
-            S
-          </span>
-        </div>
+          <defs>
+            <linearGradient id="sg-grad-og" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#0ea5e9" />
+              <stop offset="100%" stopColor="#1d4ed8" />
+            </linearGradient>
+          </defs>
+          <path
+            d="M 60.87 9.43 A 42 42 0 0 1 90.57 60.87 L 53.46 52 L 79.7 79.7 A 42 42 0 0 1 20.3 79.7 L 46.54 52 L 9.43 60.87 A 42 42 0 0 1 39.13 9.43 L 50 46 Z"
+            fill="none"
+            stroke="url(#sg-grad-og)"
+            strokeWidth="6"
+            strokeLinejoin="round"
+            strokeLinecap="round"
+          />
+        </svg>
 
         {/* Site name */}
         <div
