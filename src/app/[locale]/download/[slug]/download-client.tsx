@@ -211,19 +211,12 @@ export function DownloadClient({
 
       <main className="w-full max-w-7xl flex flex-col items-center gap-4 sm:gap-6">
         {/* Balanced Dashboard Layout */}
-        <div className="w-full grid grid-cols-1 lg:grid-cols-[250px_1fr_250px] gap-6 items-start">
+        <div className="w-full grid grid-cols-1 lg:grid-cols-[250px_1fr_250px] gap-6 items-center">
 
           {/* Left Sidebar */}
-          <aside className="hidden lg:flex flex-col gap-4 self-stretch">
+          <aside className="hidden lg:block w-full">
             {/* AdSense — Download Sidebar: sidebar desktop kiri */}
-            <AdSenseUnit slot="1148790086" className="flex-1 min-h-75" />
-            {/* Spacer to align symmetrically with the right sidebar's support box */}
-            <div className="p-4 rounded-2xl border border-transparent bg-transparent opacity-0 pointer-events-none hidden lg:block select-none">
-              <div className="flex items-center gap-2 mb-2">
-                <span className="text-[8px] font-black uppercase tracking-widest">&nbsp;</span>
-              </div>
-              <p className="text-[10px] leading-relaxed">&nbsp;</p>
-            </div>
+            <AdSenseUnit slot="1148790086" className="min-h-75" />
           </aside>
 
           {/* Main Card - ULTRA COMPACT */}
@@ -231,7 +224,7 @@ export function DownloadClient({
             variants={containerVariants}
             initial="hidden"
             animate="visible"
-            className="w-full flex flex-col items-center"
+            className="w-full flex flex-col items-center gap-4"
           >
             <section className={cn(
               "relative overflow-hidden rounded-4xl border bg-background/60 backdrop-blur-2xl saturate-150 p-px shadow-2xl w-full max-w-xl mx-auto",
@@ -352,21 +345,35 @@ export function DownloadClient({
 
               </div>
             </section>
+
+            {/* Community Support Box */}
+            <motion.div
+              variants={itemVariants}
+              className="w-full max-w-xl p-4 rounded-2xl border border-primary/5 bg-card/60 backdrop-blur-md flex items-center justify-between gap-4"
+            >
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-primary/10 rounded-lg shrink-0">
+                  <Lock className="h-4 w-4 text-muted-foreground/60" />
+                </div>
+                <div className="text-left">
+                  <span className="block text-[8px] font-black uppercase tracking-widest text-muted-foreground/50 mb-0.5">
+                    Community Support
+                  </span>
+                  <p className="text-[10px] font-medium text-muted-foreground/80 leading-snug">
+                    Need help with the download?
+                  </p>
+                </div>
+              </div>
+              <span className="text-primary hover:underline cursor-pointer font-bold text-[10px] uppercase tracking-wider shrink-0 bg-primary/10 hover:bg-primary/20 px-3 py-1.5 rounded-lg border border-primary/10 transition-colors">
+                Visit Discussion
+              </span>
+            </motion.div>
           </motion.div>
 
           {/* Right Sidebar */}
-          <aside className="hidden lg:flex flex-col gap-4 self-stretch">
+          <aside className="hidden lg:block w-full">
             {/* AdSense — Download Sidebar: sidebar desktop kanan */}
-            <AdSenseUnit slot="5399901994" className="flex-1 min-h-75" />
-            <div className="p-4 rounded-2xl border border-primary/5 bg-card/60 backdrop-blur-md">
-              <div className="flex items-center gap-2 mb-2">
-                <Lock className="h-3 w-3 text-muted-foreground/50" />
-                <span className="text-[8px] font-black uppercase tracking-widest text-muted-foreground/50">Community Support</span>
-              </div>
-              <p className="text-[10px] font-medium text-muted-foreground/80 leading-relaxed">
-                Need help? <span className="text-primary hover:underline cursor-pointer font-bold">Visit Support & Discussion</span>
-              </p>
-            </div>
+            <AdSenseUnit slot="5399901994" className="min-h-75" />
           </aside>
 
         </div>
