@@ -29,6 +29,7 @@ import { cn } from "@/lib/utils";
 import { FirebaseProviderWrapper } from "@/components/layout/firebase-provider-wrapper";
 import { FirebaseAnalyticsTracker } from "@/components/analytics/firebase-analytics-tracker";
 import { GoogleAnalyticsTag } from "@/components/analytics/google-analytics-tag";
+import { AdSenseScript } from "@/components/analytics/adsense-script";
 import { LayoutDeferredUi } from "@/components/layout/layout-deferred-ui";
 import { DevIndexTracker } from "@/components/dev/dev-index-tracker";
 
@@ -220,6 +221,7 @@ export default async function LocaleLayout({
     >
       <body className="font-sans antialiased fade-in-on-load">
         <GoogleAnalyticsTag />
+        <AdSenseScript />
         <a href="#main-content" className="skip-link">
           {locale === "id" ? "Lanjut ke konten utama" : "Skip to main content"}
         </a>

@@ -10,6 +10,7 @@ import { useToolNumbers } from './numbers/use-tool-numbers';
 import { NumberGeneratorTab } from './numbers/number-generator-tab';
 import { NumberHistoryTab } from './numbers/number-history-tab';
 import { NumberInjectorTab } from './numbers/number-injector-tab';
+import { AdSenseUnit } from '@/components/analytics/adsense-unit';
 
 export function ToolNumbers({ dictionary }: { dictionary: Dictionary }) {
     const hook = useToolNumbers();
@@ -23,6 +24,8 @@ export function ToolNumbers({ dictionary }: { dictionary: Dictionary }) {
             dictionary={dictionary}
             isPublic={true}
         >
+            {/* AdSense — In Article: sebelum konten tool, non-intrusif */}
+            <AdSenseUnit slot="2069362770" className="mb-2" />
             <div className="space-y-10">
                 {/* Stepper Visual */}
                 <div className="max-w-2xl mx-auto mb-12">

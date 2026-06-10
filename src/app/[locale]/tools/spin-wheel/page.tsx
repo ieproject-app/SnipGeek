@@ -3,6 +3,7 @@ import { i18n, type Locale } from "@/i18n-config";
 import type { Metadata } from "next";
 import { SpinWheelClient } from "./spin-wheel-client";
 import { SeoContent } from "./seo-content";
+import { AdSenseUnit } from "@/components/analytics/adsense-unit";
 
 const DOMAIN = "https://snipgeek.com";
 
@@ -261,6 +262,10 @@ export default async function SpinWheelPage({
           showLess: isId ? "Sembunyikan" : "Hide",
         }}
       />
+      {/* AdSense — Below Content: di bawah FAQ, aman dari mis-klik pada roda */}
+      <div className="max-w-3xl mx-auto px-4 pb-8">
+        <AdSenseUnit slot="8443199432" />
+      </div>
     </>
   );
 }

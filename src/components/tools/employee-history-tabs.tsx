@@ -21,6 +21,7 @@ import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { useEmployeeHistory } from './employee-history/use-employee-history';
 import { ToolWrapper } from './tool-wrapper';
+import { AdSenseUnit } from '@/components/analytics/adsense-unit';
 
 interface EmployeeHistoryTabsProps {
   dictionary: Dictionary;
@@ -57,6 +58,8 @@ export function EmployeeHistoryTabs({ dictionary, locale }: EmployeeHistoryTabsP
         isPublic={true}
         requiresCloud={false}
       >
+        {/* AdSense — In Article: sebelum tabs, non-intrusif untuk pengguna internal */}
+        <AdSenseUnit slot="2069362770" className="mb-2" />
         <div className="space-y-10">
           <Tabs defaultValue="search" className="w-full">
             <div className="flex items-center justify-between flex-wrap gap-4">

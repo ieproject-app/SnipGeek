@@ -27,6 +27,7 @@ import { resolveHeroImage, getLinkPrefix } from "@/lib/utils";
 import { slugify } from "@/lib/slugify";
 import remarkGfm from "remark-gfm";
 import rehypeShiki from "@shikijs/rehype";
+import { AdSenseUnit } from "@/components/analytics/adsense-unit";
 
 // Only pre-render known published slugs; unknown/removed slugs should return 404.
 export const dynamicParams = false;
@@ -294,6 +295,9 @@ export default async function Page({
             />
           )}
 
+          {/* AdSense — In Article: setelah lead, sebelum TOC & konten */}
+          <AdSenseUnit slot="2069362770" className="max-w-3xl mx-auto" />
+
           <div className="max-w-3xl mx-auto">
             <ArticleTOC
               headings={headings}
@@ -329,6 +333,9 @@ export default async function Page({
               }
               className="mt-14 bg-muted/20"
             />
+
+            {/* AdSense — Below Content: setelah artikel selesai dibaca, sebelum share */}
+            <AdSenseUnit slot="8443199432" className="mt-4" />
 
             <div className="mt-16 flex flex-col gap-4 text-center border-t pt-12">
               <h3 className="text-lg font-semibold tracking-tight text-primary">
