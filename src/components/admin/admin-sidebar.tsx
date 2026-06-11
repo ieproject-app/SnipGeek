@@ -25,12 +25,7 @@ const NAV_ITEMS = [
     icon: LayoutDashboard,
     description: "Backlog, cadence, dan priority queue",
   },
-  {
-    name: "Index Monitor",
-    href: "/admin/index-monitor",
-    icon: ListChecks,
-    description: "Workspace eksekusi · review status · aksi GSC",
-  },
+
   {
     name: "Prompt Generator",
     href: "/admin/prompt-generator",
