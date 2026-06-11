@@ -1,7 +1,6 @@
 ---
 translationKey: "epson-l310-driver-linux-ubuntu"
 title: "Cara Install Driver Epson L310 di Ubuntu 25.10 — Panduan Lengkap"
-slug: "epson-l310-driver-linux-ubuntu"
 date: "2026-03-31"
 published: true
 featured: false
@@ -68,11 +67,10 @@ Setelah file ada, ada dua cara install: lewat App Center (GUI, lebih mudah) atau
 
 ```bash
 cd ~/Downloads
-sudo dpkg -i epson-inkjet-printer-*.deb
-sudo apt install -f
+sudo apt install ./epson-inkjet-printer-*.deb
 ```
 
-Perintah `apt install -f` di baris terakhir berguna untuk menyelesaikan dependency yang mungkin tertinggal secara otomatis.
+Menggunakan `apt` (bukan `dpkg` biasa) membuat Ubuntu otomatis mengunduh dependensi tambahan yang diperlukan.
 
 <Callout variant="warning" title="Ubuntu 25.10 — Error Dependency lsb">
   Kalau kamu pakai Ubuntu 25.10 ke atas, kemungkinan besar akan muncul error seperti ini:
@@ -161,8 +159,4 @@ Error dependency `lsb` itu sempat bikin saya mikir ada yang salah. Ternyata cuma
 
 Kalau kamu ketemu error lain yang tidak ada di sini, tulis di kolom komentar ya. Saya akan coba bantu.
 
----
 
-### Lihat Juga
-- [Download & Install Driver Epson L310 (Windows)](/id/blog/epson-l310-driver-download-installer)
-- [Resetter Epson L4150 / L4160 — Reset Ink Pad Counter](/id/blog/resetter-epson-l4150-l4160)

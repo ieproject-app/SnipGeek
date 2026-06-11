@@ -1,7 +1,6 @@
 ---
 translationKey: "epson-l310-driver-linux-ubuntu"
 title: "Install Epson L310 Driver on Ubuntu 25.10 — Full Guide"
-slug: "epson-l310-driver-linux-ubuntu"
 date: "2026-03-31"
 published: true
 featured: false
@@ -13,7 +12,7 @@ tags: ["linux", "ubuntu-25-10", "printer", "epson", "driver", "tutorial"]
 hideFromHome: true
 ---
 
-I've written before about [installing the Epson L310 driver on Windows](/en/blog/epson-l310-driver-download-installer) — and honestly, that process is almost embarrassingly simple. A `.exe` installer, a few clicks, done. So when I booted into Ubuntu 25.10 for the first time and tried to print something, I was quietly hoping it would be just as smooth.
+I've written before about [installing the Epson L310 driver on Windows](/blog/epson-l310-driver-download-installer) — and honestly, that process is almost embarrassingly simple. A `.exe` installer, a few clicks, done. So when I booted into Ubuntu 25.10 for the first time and tried to print something, I was quietly hoping it would be just as smooth.
 
 It wasn't. But it wasn't a nightmare either.
 
@@ -70,11 +69,10 @@ If you prefer the terminal, `cd` into Downloads and run `dpkg`:
 
 ```bash
 cd ~/Downloads
-sudo dpkg -i epson-inkjet-printer-*.deb
-sudo apt install -f
+sudo apt install ./epson-inkjet-printer-*.deb
 ```
 
-The `apt install -f` at the end resolves any dangling dependencies automatically.
+Using `apt` instead of raw `dpkg` allows Ubuntu to automatically resolve and install any required dependencies in one go.
 
 <Callout variant="warning" title="Ubuntu 25.10 — Missing lsb Dependency">
   On Ubuntu 25.10 and later, you might hit this error during install:
@@ -163,8 +161,4 @@ If you have a different Ubuntu version or the driver file name differs slightly 
 
 Got a different error or a step that didn't work? Drop it in the comments and I'll take a look.
 
----
 
-### See Also
-- [Epson L310 Driver & Installation Guide (Windows)](/en/blog/epson-l310-driver-download-installer)
-- [Resetter Epson L4150 / L4160 — Fix Ink Pad Counter](/en/blog/resetter-epson-l4150-l4160)

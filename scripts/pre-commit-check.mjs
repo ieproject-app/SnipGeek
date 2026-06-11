@@ -121,6 +121,7 @@ if (stagedMdx.length === 0) {
 }
 
 let warnings = 0;
+let localImageErrors = 0;
 
 console.log("\n🔍 Pre-commit: checking images for staged MDX files...\n");
 
@@ -130,12 +131,27 @@ for (const mdxFile of stagedMdx) {
 
   if (imagePaths.size === 0) continue;
 
+  // Forbid local images inside content directories (_posts, _notes, _pages)
+  const forbiddenLocalImages = [];
+  for (const imgPath of imagePaths) {
+    if (
+      imgPath.startsWith("public/images/_posts/") ||
+      imgPath.startsWith("public/images/_notes/") ||
+      imgPath.startsWith("public/images/_pages/")
+    ) {
+      forbiddenLocalImages.push(imgPath);
+    }
+  }
+
   // Check each referenced image.
   // An image is only a problem if it exists on disk but is NEITHER:
   //   a) staged in this commit, NOR
   //   b) already tracked in git (committed in a previous commit)
   const missingFromStage = [];
   for (const imgPath of imagePaths) {
+    // If it's a forbidden local image, it will be reported separately, skip missing check
+    if (forbiddenLocalImages.includes(imgPath)) continue;
+
     const onDisk = existsSync(join(ROOT, imgPath));
     const isStaged = staged.has(imgPath);
     const isTracked = tracked.has(imgPath);
@@ -149,6 +165,14 @@ for (const mdxFile of stagedMdx) {
   const imgDirs = guessImageDirs(imagePaths);
   const untrackedInDirs = [];
   for (const dir of imgDirs) {
+    // If the directory belongs to a forbidden content path, skip untracked check here
+    if (
+      dir.startsWith("public/images/_posts") ||
+      dir.startsWith("public/images/_notes") ||
+      dir.startsWith("public/images/_pages")
+    ) {
+      continue;
+    }
     const fullDir = join(ROOT, dir);
     if (!existsSync(fullDir)) continue;
     const allFiles = walkDir(fullDir);
@@ -159,8 +183,14 @@ for (const mdxFile of stagedMdx) {
     }
   }
 
-  if (missingFromStage.length > 0 || untrackedInDirs.length > 0) {
+  if (forbiddenLocalImages.length > 0 || missingFromStage.length > 0 || untrackedInDirs.length > 0) {
     console.log(`  📄 ${mdxFile}`);
+
+    for (const img of forbiddenLocalImages) {
+      console.log(`     ✗ Local image not allowed: ${img.replace("public/", "/")}`);
+      console.log(`       Fix: Upload to Cloudinary and use a res.cloudinary.com URL instead.`);
+      localImageErrors++;
+    }
 
     for (const img of missingFromStage) {
       console.log(`     ✗ Referenced but NOT staged: ${img}`);
@@ -176,13 +206,19 @@ for (const mdxFile of stagedMdx) {
   }
 }
 
-if (warnings > 0) {
-  console.log(`❌ Found ${warnings} image(s) that should probably be staged.`);
-  console.log(`   Run: git add public/images/... to include them.`);
+if (warnings > 0 || localImageErrors > 0) {
+  if (localImageErrors > 0) {
+    console.log(`❌ Found ${localImageErrors} forbidden local image reference(s).`);
+    console.log(`   Post/note/page images must be hosted on Cloudinary.`);
+  }
+  if (warnings > 0) {
+    console.log(`❌ Found ${warnings} image(s) that should probably be staged.`);
+    console.log(`   Run: git add public/images/... to include them.`);
+  }
   console.log(`   Or skip this check with: git commit --no-verify\n`);
   process.exit(1);
 } else {
-  console.log("✅ All referenced images are staged. Good to go!\n");
+  console.log("✅ All referenced images are staged or hosted on Cloudinary. Good to go!\n");
 }
 
 // ── Bilingual filename sync check ─────────────────────────────────────────────
