@@ -415,7 +415,7 @@ The following HTTP headers are applied to all routes via `next.config.ts`:
 | `Referrer-Policy` | `strict-origin-when-cross-origin` |
 | `Permissions-Policy` | camera, mic, geolocation, interest-cohort blocked |
 | `Strict-Transport-Security` | 1 year, includeSubDomains |
-| `Content-Security-Policy` | Comprehensive CSP covering Firebase, GA4, Giscus, YouTube, Monetag |
+| `Content-Security-Policy` | Comprehensive CSP covering Firebase, GA4, Giscus, YouTube, and AdSense |
 | `Cross-Origin-Opener-Policy` | `same-origin-allow-popups` (required for Firebase/Google Auth popups) |
 
 ---

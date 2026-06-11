@@ -296,7 +296,7 @@ export default async function Page({
           )}
 
           {/* AdSense — In Article: setelah lead, sebelum TOC & konten */}
-          <AdSenseUnit slot="2069362770" className="max-w-3xl mx-auto my-8 md:my-12" />
+          <AdSenseUnit slot="2069362770" size="inArticle" className="max-w-3xl mx-auto my-8 md:my-12" />
 
           <div className="max-w-3xl mx-auto">
             <ArticleTOC
@@ -335,7 +335,7 @@ export default async function Page({
             />
 
             {/* AdSense — Below Content: setelah artikel selesai dibaca, sebelum share */}
-            <AdSenseUnit slot="8443199432" className="my-8 md:my-12" />
+            <AdSenseUnit slot="8443199432" size="belowContent" className="my-8 md:my-12" />
 
             <div className="mt-8 md:mt-12 flex flex-col gap-4 text-center border-t pt-10">
               <h3 className="text-lg font-semibold tracking-tight text-primary">

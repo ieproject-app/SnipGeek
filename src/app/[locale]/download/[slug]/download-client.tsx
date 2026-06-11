@@ -216,7 +216,7 @@ export function DownloadClient({
           {/* Left Sidebar */}
           <aside className="hidden lg:block w-full">
             {/* AdSense — Download Sidebar: sidebar desktop kiri */}
-            <AdSenseUnit slot="1148790086" className="min-h-75" />
+            <AdSenseUnit slot="1148790086" size="sidebar" className="my-0" />
           </aside>
 
           {/* Main Card - ULTRA COMPACT */}
@@ -373,7 +373,7 @@ export function DownloadClient({
           {/* Right Sidebar */}
           <aside className="hidden lg:block w-full">
             {/* AdSense — Download Sidebar: sidebar desktop kanan */}
-            <AdSenseUnit slot="5399901994" className="min-h-75" />
+            <AdSenseUnit slot="5399901994" size="sidebar" className="my-0" />
           </aside>
 
         </div>
@@ -385,7 +385,7 @@ export function DownloadClient({
           transition={{ delay: 0.3 }}
           className="w-full max-w-3xl mx-auto my-8 md:my-12"
         >
-          <AdSenseUnit slot="1716642007" className="my-0" />
+          <AdSenseUnit slot="1716642007" size="belowContent" className="my-0" />
         </motion.div>
 
         {/* AdSense — Download Below 2 (Wide & Desktop Only): agar di mobile tidak double */}
@@ -395,7 +395,7 @@ export function DownloadClient({
           transition={{ delay: 0.4 }}
           className="hidden md:block w-full max-w-5xl mx-auto mb-8"
         >
-          <AdSenseUnit slot="8443199432" className="my-0" format="horizontal" />
+          <AdSenseUnit slot="8443199432" size="horizontal" className="my-0" format="horizontal" />
         </motion.div>
 
       </main>

@@ -29,8 +29,6 @@ const scriptSrcDirectives = [
   `https://ssl.google-analytics.com`, // GA4 (legacy)
   `https://pagead2.googlesyndication.com`, // Google AdSense
   `https://*.googlesyndication.com`, // Google AdSense
-  `https://static.monetag.com`, // Monetag
-  `https://cdn.monetag.com`, // Monetag CDN
   `https://apis.google.com`, // Firebase Auth popup
   `https://*.firebaseapp.com`, // Firebase Auth handler
   `https://giscus.app`, // Giscus comments
@@ -48,7 +46,7 @@ const cspDirectives = [
   `default-src 'self'`,
 
   // Scripts: self + inline (Next.js needs 'unsafe-inline' for hydration)
-  // Tag Manager, Analytics, Monetag
+  // Tag Manager, Analytics, and AdSense
   [`script-src`, scriptSrcDirectives].join(" "),
 
   // Styles: self + inline (Tailwind/CSS-in-JS needs unsafe-inline)
@@ -91,7 +89,7 @@ const cspDirectives = [
     `https://*.googlesyndication.com`,                  // Google AdSense
   ].join(" "),
 
-  // Connections: Firebase, Analytics, Monetag, YouTube
+  // Connections: Firebase, Analytics, AdSense, and YouTube
   [
     `connect-src`,
     `'self'`,
@@ -106,7 +104,6 @@ const cspDirectives = [
     `https://*.googlesyndication.com`,                 // Google AdSense
     `https://googleads.g.doubleclick.net`,             // Google AdSense
     `wss://*.firebaseio.com`,                          // Firebase realtime (websocket)
-    `https://static.monetag.com`,                      // Monetag
     `https://giscus.app`,                               // Giscus comments
     `https://*.googlevideo.com`,                       // YouTube video segment CDN
     `https://*.ytimg.com`,                             // YouTube thumbnails & static assets

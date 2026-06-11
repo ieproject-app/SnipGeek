@@ -6,11 +6,26 @@ import { cn } from '@/lib/utils';
 
 const PUBLISHER_ID = 'ca-pub-6235611333449307';
 
+type AdSenseSize = 'inArticle' | 'belowContent' | 'horizontal' | 'sidebar';
+
+const sizeClassName: Record<AdSenseSize, string> = {
+  // Reserve a common mobile/display ad box to reduce CLS before Google fills it.
+  inArticle: 'min-h-[280px] md:min-h-[320px]',
+  // Below-content units can use a slightly taller box without pushing primary content.
+  belowContent: 'min-h-[280px] md:min-h-[336px]',
+  // Horizontal leaderboard-style units should stay compact.
+  horizontal: 'min-h-[90px] md:min-h-[120px]',
+  // Desktop sidebars commonly fill with tall skyscraper creatives.
+  sidebar: 'min-h-[600px]',
+};
+
 interface AdSenseUnitProps {
   /** AdSense data-ad-slot ID for this specific unit */
   slot: string;
   /** Ad format — 'auto' (default) lets Google pick the optimal size */
   format?: string;
+  /** Reserved layout box size to reduce cumulative layout shift */
+  size?: AdSenseSize;
   /** Extra Tailwind classes on the outer wrapper */
   className?: string;
 }
@@ -21,11 +36,16 @@ interface AdSenseUnitProps {
  * Design notes:
  * - Calls adsbygoogle.push() once per pathname/mount.
  * - Uses Next.js pathname dependency to re-initialize during client-side routing.
- * - Force-remounts the element using a pathname-scoped key.
+ * - Reserves a predictable min-height so late ad fill does not cause major CLS.
  * - overflow-hidden prevents layout shift from unexpectedly large creatives.
  * - Never blocks render — the parent AdSenseScript loads the SDK lazily.
  */
-export function AdSenseUnit({ slot, format = 'auto', className = '' }: AdSenseUnitProps) {
+export function AdSenseUnit({
+  slot,
+  format = 'auto',
+  size = 'inArticle',
+  className = '',
+}: AdSenseUnitProps) {
   const pathname = usePathname();
   // Store the pathname for which we pushed to prevent duplicate pushes in StrictMode
   const pushedPath = useRef<string | null>(null);
@@ -38,14 +58,17 @@ export function AdSenseUnit({ slot, format = 'auto', className = '' }: AdSenseUn
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       ((window as any).adsbygoogle = (window as any).adsbygoogle || []).push({});
     } catch {
-      // SDK not yet ready — Google will fill the slot once the script loads
+      // AdSense may throw when a slot is not fillable yet; keep the page usable.
     }
   }, [pathname]);
 
   return (
     <div
-      key={`${pathname}-${slot}`}
-      className={cn("my-8 w-full overflow-hidden text-center", className)}
+      className={cn(
+        'my-8 flex w-full items-center justify-center overflow-hidden text-center',
+        sizeClassName[size],
+        className,
+      )}
       aria-label="Advertisement"
     >
       <ins

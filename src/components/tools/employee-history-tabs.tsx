@@ -59,7 +59,7 @@ export function EmployeeHistoryTabs({ dictionary, locale }: EmployeeHistoryTabsP
         requiresCloud={false}
       >
         {/* AdSense — In Article: sebelum tabs, non-intrusif untuk pengguna internal */}
-        <AdSenseUnit slot="2069362770" className="my-6 md:my-8" />
+        <AdSenseUnit slot="2069362770" size="inArticle" className="my-6 md:my-8" />
         <div className="space-y-10">
           <Tabs defaultValue="search" className="w-full">
             <div className="flex items-center justify-between flex-wrap gap-4">
