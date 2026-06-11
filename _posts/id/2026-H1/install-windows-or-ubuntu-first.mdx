@@ -8,7 +8,7 @@ category: "Linux"
 tags: ["windows-11", "ubuntu-25-10", "dual-boot", "linux", "tutorial", "setup"]
 published: true
 featured: false
-heroImage: "/images/_posts/dual-boot/install-windows-or-linux-before/banner-windows-linux.webp"
+heroImage: "https://res.cloudinary.com/snipgeek/image/upload/q_auto/f_auto/v1781144583/snipgeek/images/_posts/dual-boot/install-windows-or-linux-before/banner-windows-linux.webp"
 imageAlt: "Representasi visual dual-boot Windows dan Ubuntu Linux."
 ---
 
@@ -39,7 +39,7 @@ Berikut adalah tabel partisi yang saya terapkan:
 | `/dev/nvme0n1p5` | 93.13 GiB | ext4 | `/` | Root (Sistem Linux) |
 | `/dev/nvme0n1p6` | 128.49 GiB | ext4 | `/home` | Home (Data Pribadi) |
 
-![Tampilan partisi di GParted setelah instalasi selesai](/images/_posts/dual-boot/install-windows-or-linux-before/gparted.webp)
+![Tampilan partisi di GParted setelah instalasi selesai](https://res.cloudinary.com/snipgeek/image/upload/q_auto/f_auto/v1781144587/snipgeek/images/_posts/dual-boot/install-windows-or-linux-before/gparted.webp)
 <div className="-mt-3 mb-6 text-center text-sm italic text-muted-foreground">Ini adalah tampilan GParted di laptop saya setelah membagi ruang untuk Windows 11 dan Ubuntu secara proporsional.</div>
 
 Saya sengaja memperbesar partisi EFI jadi 200 MiB. Windows biasanya cuma kasih 100 MiB, yang menurut saya agak sempit kalau kita mau taruh GRUB dan *entry* EFI lainnya. Selain itu, saya memisahkan `/` (Root) dan `/home`. Ini *best practice* klasik di Linux; kalau suatu hari saya mau *install* ulang Ubuntu-nya saja, data pribadi dan proyek-proyek saya di `/home` tetap aman tak tersentuh.
@@ -56,7 +56,7 @@ Pertama, **matikan Fast Startup**. Fitur ini sebenernya bikin Windows masuk ke m
 
 Kamu bisa cari ini di **Control Panel → Power Options → Choose what the power buttons do**.
 
-![Mematikan Fast Startup di Power Options Windows 11](/images/_posts/dual-boot/install-windows-or-linux-before/off-startup.webp)
+![Mematikan Fast Startup di Power Options Windows 11](https://res.cloudinary.com/snipgeek/image/upload/q_auto/f_auto/v1781144585/snipgeek/images/_posts/dual-boot/install-windows-or-linux-before/off-startup.webp)
 <div className="-mt-3 mb-6 text-center text-sm italic text-muted-foreground">Pastikan centang "Turn on fast startup" dihilangkan supaya partisi Windows kamu nggak terkunci.</div>
 
 Kedua, saya sarankan matikan sekalian fitur hibernasi lewat Command Prompt (Administrator) dengan perintah:

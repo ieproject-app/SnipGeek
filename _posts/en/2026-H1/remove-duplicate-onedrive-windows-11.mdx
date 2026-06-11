@@ -9,7 +9,7 @@ category: "Windows"
 tags: ["windows", "windows-11", "tutorial", "onedrive", "troubleshooting"]
 published: true
 featured: false
-heroImage: "/images/_posts/windows11/onedrive-duplicate/onedrive-1.webp"
+heroImage: "https://res.cloudinary.com/snipgeek/image/upload/q_auto/f_auto/v1781144596/snipgeekhttps://res.cloudinary.com/snipgeek/image/upload/q_auto/f_auto/v1781144596/snipgeek/images/_posts/windows11/onedrive-duplicate/onedrive-1.webp"
 imageAlt: "Duplicate OneDrive folders in Windows 11 File Explorer navigation pane."
 ---
 
@@ -64,7 +64,7 @@ The first step is to clean up the 'keys' that tell File Explorer to display thes
     
     `Computer\HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Desktop\NameSpace`
 
-    ![Navigate to the NameSpace path in the Registry Editor](/images/_posts/windows11/onedrive-duplicate/onedrive-2.webp)
+    ![Navigate to the NameSpace path in the Registry Editor](https://res.cloudinary.com/snipgeek/image/upload/q_auto/f_auto/v1781144603/snipgeekhttps://res.cloudinary.com/snipgeek/image/upload/q_auto/f_auto/v1781144603/snipgeek/images/_posts/windows11/onedrive-duplicate/onedrive-2.webp)
     *Double-check you are in the HKEY_CURRENT_USER hive.*
   </Step>
 
@@ -74,7 +74,7 @@ The first step is to clean up the 'keys' that tell File Explorer to display thes
     
     Look for entries that mention **"OneDrive"**. Once found, **right-click** that folder in the left pane and select **Delete**. Repeat this for any duplicate OneDrive entries you find.
 
-    ![Delete the registry key folder related to OneDrive](/images/_posts/windows11/onedrive-duplicate/onedrive-3.webp)
+    ![Delete the registry key folder related to OneDrive](https://res.cloudinary.com/snipgeek/image/upload/q_auto/f_auto/v1781144601/snipgeekhttps://res.cloudinary.com/snipgeek/image/upload/q_auto/f_auto/v1781144601/snipgeek/images/_posts/windows11/onedrive-duplicate/onedrive-3.webp)
     *Removing the CLSID folder associated with OneDrive.*
   </Step>
 </Steps>
@@ -99,7 +99,7 @@ This second step works because `System.IsPinnedToNameSpaceTree` controls whether
     ### Change Pinning Status
     In the right-hand pane, find the entry named `System.IsPinnedToNameSpaceTree`. **Double-click** it and change the **Value data** from `1` to `0`. Click **OK**.
 
-    ![Changing the pinning value to 0](/images/_posts/windows11/onedrive-duplicate/onedrive-5.webp)
+    ![Changing the pinning value to 0](https://res.cloudinary.com/snipgeek/image/upload/q_auto/f_auto/v1781144598/snipgeekhttps://res.cloudinary.com/snipgeek/image/upload/q_auto/f_auto/v1781144598/snipgeek/images/_posts/windows11/onedrive-duplicate/onedrive-5.webp)
     *Setting this to 0 prevents it from being pinned to the sidebar.*
   </Step>
 </Steps>
@@ -116,7 +116,7 @@ If Explorer behaves unexpectedly after edits:
 
 For this specific tweak, restoring `System.IsPinnedToNameSpaceTree` back to `1` usually returns the default behavior.
 
-![Clean File Explorer view](/images/_posts/windows11/onedrive-duplicate/onedrive-4.webp)
+![Clean File Explorer view](https://res.cloudinary.com/snipgeek/image/upload/q_auto/f_auto/v1781144600/snipgeekhttps://res.cloudinary.com/snipgeek/image/upload/q_auto/f_auto/v1781144600/snipgeek/images/_posts/windows11/onedrive-duplicate/onedrive-4.webp)
 *My final File Explorer view, much better without those phantom folders.*
 
 If you ever want to bring it back, just head back to Part 2 and change the value back to `1`. Hopefully, this helps you reclaim some visual peace in Windows 11!

@@ -9,7 +9,7 @@ category: "Windows"
 tags: ["windows", "windows-11", "tutorial", "onedrive", "troubleshooting"]
 published: true
 featured: false
-heroImage: "/images/_posts/windows11/onedrive-duplicate/onedrive-1.webp"
+heroImage: "https://res.cloudinary.com/snipgeek/image/upload/q_auto/f_auto/v1781144596/snipgeek/images/_posts/windows11/onedrive-duplicate/onedrive-1.webp"
 imageAlt: "Tampilan duplikat folder OneDrive di panel navigasi File Explorer Windows 11."
 ---
 
@@ -64,7 +64,7 @@ Langkah pertama adalah membersihkan 'kunci' yang memerintahkan File Explorer unt
     
     `Computer\HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Desktop\NameSpace`
 
-    ![Navigasi ke jalur NameSpace di Registry Editor](/images/_posts/windows11/onedrive-duplicate/onedrive-2.webp)
+    ![Navigasi ke jalur NameSpace di Registry Editor](https://res.cloudinary.com/snipgeek/image/upload/q_auto/f_auto/v1781144603/snipgeek/images/_posts/windows11/onedrive-duplicate/onedrive-2.webp)
     *Pastikan kamu berada di bagian HKEY_CURRENT_USER.*
   </Step>
 
@@ -74,7 +74,7 @@ Langkah pertama adalah membersihkan 'kunci' yang memerintahkan File Explorer unt
     
     Cari entri yang mengandung kata **"OneDrive"**. Jika sudah ketemu, **klik kanan** folder tersebut di panel kiri, lalu pilih **Delete**. Ulangi untuk semua entri OneDrive duplikat yang kamu temukan.
 
-    ![Menghapus folder kunci registry terkait OneDrive](/images/_posts/windows11/onedrive-duplicate/onedrive-3.webp)
+    ![Menghapus folder kunci registry terkait OneDrive](https://res.cloudinary.com/snipgeek/image/upload/q_auto/f_auto/v1781144601/snipgeek/images/_posts/windows11/onedrive-duplicate/onedrive-3.webp)
     *Hapus folder CLSID yang diasosiasikan dengan OneDrive.*
   </Step>
 </Steps>
@@ -99,7 +99,7 @@ Bagian ini efektif karena nilai `System.IsPinnedToNameSpaceTree` menentukan apak
     ### Ubah Status Pinning
     Di panel kanan, cari entri bernama `System.IsPinnedToNameSpaceTree`. **Klik dua kali** pada entri tersebut dan ubah **Value data** dari `1` menjadi `0`. Klik **OK**.
 
-    ![Mengubah nilai pinning menjadi 0](/images/_posts/windows11/onedrive-duplicate/onedrive-5.webp)
+    ![Mengubah nilai pinning menjadi 0](https://res.cloudinary.com/snipgeek/image/upload/q_auto/f_auto/v1781144598/snipgeek/images/_posts/windows11/onedrive-duplicate/onedrive-5.webp)
     *Mengubah nilai ke 0 akan menyembunyikan folder dari panel navigasi.*
   </Step>
 </Steps>
@@ -116,7 +116,7 @@ Kalau setelah edit registry Explorer jadi aneh:
 
 Untuk kasus ini, mengembalikan nilai `System.IsPinnedToNameSpaceTree` ke `1` biasanya sudah cukup untuk mengembalikan kondisi default.
 
-![Tampilan File Explorer yang sudah bersih](/images/_posts/windows11/onedrive-duplicate/onedrive-4.webp)
+![Tampilan File Explorer yang sudah bersih](https://res.cloudinary.com/snipgeek/image/upload/q_auto/f_auto/v1781144600/snipgeek/images/_posts/windows11/onedrive-duplicate/onedrive-4.webp)
 *Tampilan akhir File Explorer saya, jauh lebih lega tanpa folder hantu.*
 
 Kalau suatu saat kamu ingin menampilkannya lagi, cukup ikuti langkah di Bagian 2 dan ubah nilainya kembali ke `1`. Semoga panduan ini membantu kamu yang juga terganggu dengan detail-detail kecil seperti ini di Windows 11!
