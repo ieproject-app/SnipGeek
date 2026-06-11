@@ -8,7 +8,7 @@ category: "Linux"
 tags: ["windows-11", "ubuntu-25-10", "dual-boot", "linux", "tutorial", "setup"]
 published: true
 featured: false
-heroImage: "https://res.cloudinary.com/snipgeek/image/upload/q_auto/f_auto/v1781144583/snipgeekhttps://res.cloudinary.com/snipgeek/image/upload/q_auto/f_auto/v1781144583/snipgeek/images/_posts/dual-boot/install-windows-or-linux-before/banner-windows-linux.webp"
+heroImage: "https://res.cloudinary.com/snipgeek/image/upload/q_auto/f_auto/v1781144583/snipgeek/images/_posts/dual-boot/install-windows-or-linux-before/banner-windows-linux.webp"
 imageAlt: "A visual representation of dual-booting Windows and Ubuntu Linux."
 ---
 
@@ -39,7 +39,7 @@ Here is the final partition layout I used for this fresh build:
 | `/dev/nvme0n1p5` | 93.13 GiB | ext4 | `/` | Root (Linux OS) |
 | `/dev/nvme0n1p6` | 128.49 GiB | ext4 | `/home` | Home (Personal Files) |
 
-![The partition layout seen in GParted after the installation](https://res.cloudinary.com/snipgeek/image/upload/q_auto/f_auto/v1781144587/snipgeekhttps://res.cloudinary.com/snipgeek/image/upload/q_auto/f_auto/v1781144587/snipgeek/images/_posts/dual-boot/install-windows-or-linux-before/gparted.webp)
+![The partition layout seen in GParted after the installation](https://res.cloudinary.com/snipgeek/image/upload/q_auto/f_auto/v1781144587/snipgeek/images/_posts/dual-boot/install-windows-or-linux-before/gparted.webp)
 <div className="-mt-3 mb-6 text-center text-sm italic text-muted-foreground">This is how my storage looks in GParted after managing the space for both Windows 11 and Ubuntu.</div>
 
 I decided to bump the EFI partition to 200 MiB. Windows usually defaults to 100 MiB, which can feel a bit cramped once you add GRUB and potentially other EFI entries into the mix. Also, I strictly separate `/` (Root) and `/home` in Linux. This is a classic best practice; if I ever need to reinstall Ubuntu, my personal files, projects, and even my large VirtualBox VMs stored in `/home` remain untouched.
@@ -56,7 +56,7 @@ First, you need to **disable Fast Startup**. While it sounds like a good thing, 
 
 You can find this in **Control Panel → Power Options → Choose what the power buttons do**.
 
-![Disabling Fast Startup in Windows 11 Power Options](https://res.cloudinary.com/snipgeek/image/upload/q_auto/f_auto/v1781144585/snipgeekhttps://res.cloudinary.com/snipgeek/image/upload/q_auto/f_auto/v1781144585/snipgeek/images/_posts/dual-boot/install-windows-or-linux-before/off-startup.webp)
+![Disabling Fast Startup in Windows 11 Power Options](https://res.cloudinary.com/snipgeek/image/upload/q_auto/f_auto/v1781144585/snipgeek/images/_posts/dual-boot/install-windows-or-linux-before/off-startup.webp)
 <div className="-mt-3 mb-6 text-center text-sm italic text-muted-foreground">Make sure to uncheck the "Turn on fast startup" option to prevent partition locking.</div>
 
 Second, I highly recommend disabling Hibernation entirely to save space and avoid similar locking issues. Open a Command Prompt as Administrator and run:
