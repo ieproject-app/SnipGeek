@@ -1,10 +1,18 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 
 const PUBLISHER_ID = 'ca-pub-6235611333449307';
+
+function canRenderAdsense() {
+  if (process.env.NODE_ENV !== 'production') return false;
+  if (typeof window === 'undefined') return false;
+
+  const hostname = window.location.hostname;
+  return !['localhost', '127.0.0.1', '::1'].includes(hostname);
+}
 
 type AdSenseSize = 'inArticle' | 'belowContent' | 'horizontal' | 'sidebar';
 
@@ -47,23 +55,52 @@ export function AdSenseUnit({
   className = '',
 }: AdSenseUnitProps) {
   const pathname = usePathname();
+  const wrapperRef = useRef<HTMLDivElement | null>(null);
   // Store the pathname for which we pushed to prevent duplicate pushes in StrictMode
   const pushedPath = useRef<string | null>(null);
+  const [enabled, setEnabled] = useState(false);
 
   useEffect(() => {
+    const timer = window.setTimeout(() => {
+      setEnabled(canRenderAdsense());
+    }, 0);
+
+    return () => window.clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    if (!enabled) return;
     // Guard prevents double-push on same pathname (StrictMode dev double-invoke)
     if (pushedPath.current === pathname) return;
-    pushedPath.current = pathname;
-    try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      ((window as any).adsbygoogle = (window as any).adsbygoogle || []).push({});
-    } catch {
-      // AdSense may throw when a slot is not fillable yet; keep the page usable.
-    }
-  }, [pathname]);
+
+    const pushAd = () => {
+      const width = wrapperRef.current?.getBoundingClientRect().width ?? 0;
+      if (width <= 0 || pushedPath.current === pathname) return;
+
+      pushedPath.current = pathname;
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        ((window as any).adsbygoogle = (window as any).adsbygoogle || []).push({});
+      } catch {
+        // AdSense may throw when a slot is not fillable yet; keep the page usable.
+      }
+    };
+
+    pushAd();
+
+    if (pushedPath.current === pathname || !wrapperRef.current) return;
+
+    const observer = new ResizeObserver(pushAd);
+    observer.observe(wrapperRef.current);
+
+    return () => observer.disconnect();
+  }, [enabled, pathname]);
+
+  if (!enabled) return null;
 
   return (
     <div
+      ref={wrapperRef}
       className={cn(
         'my-8 flex w-full items-center justify-center overflow-hidden text-center',
         sizeClassName[size],
