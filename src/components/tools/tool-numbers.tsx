@@ -98,9 +98,9 @@ export function ToolNumbers({
             isPublic={true}
         >
             {enableManualAdLayout ? (
-                <div className="mx-auto grid w-full max-w-7xl gap-8 xl:grid-cols-[minmax(0,56rem)_300px] xl:items-start xl:justify-center">
+                <div className="relative mx-auto w-full">
                     {toolContent}
-                    <aside className="hidden xl:block" aria-label="Advertisement rail">
+                    <aside className="absolute left-1/2 top-0 hidden w-[300px] translate-x-[calc(28rem+1rem)] 2xl:block" aria-label="Advertisement rail">
                         <AdSenseUnit slot="5399901994" size="sidebar" className="my-0" />
                     </aside>
                 </div>
