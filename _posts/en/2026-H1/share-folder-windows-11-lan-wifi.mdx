@@ -3,7 +3,8 @@ title: "How to Share a Folder in Windows 11 via LAN and WiFi"
 slug: "share-folder-windows-11-lan-wifi"
 translationKey: "share-folder-windows-11-lan-wifi"
 date: "2026-03-17"
-description: "Step-by-step guide to sharing folders in Windows 11 over LAN or WiFi, from enabling network discovery to opening shared folders by IP address."
+updated: "2026-06-12"
+description: "Share folders in Windows 11 over LAN or WiFi with network discovery, permissions, IP access, password sharing, firewall, and SMB troubleshooting."
 heroImage: "https://res.cloudinary.com/snipgeek/image/upload/q_auto/f_auto/v1781144641/snipgeek/images/_posts/windows11/share-folder/banner-share.webp"
 imageAlt: "Windows 11 folder sharing banner for LAN and WiFi collaboration"
 published: true
@@ -16,7 +17,7 @@ Folder sharing is still one of the most practical features in Windows 11, especi
 
 I still use this setup in small office environments because it is simple, fast, and saves time. Instead of repeatedly moving files with a flash drive, everyone can open the same folder directly from their own PC.
 
-In this guide, I will walk you through the full setup flow: enabling required network settings, sharing a folder with proper permissions, and opening it from another computer using the target IP address.
+In this guide, I will walk you through the full setup flow: enabling required network settings, sharing a folder with proper permissions, opening it from another computer using the target IP address, and fixing common problems such as permission errors or a PC that does not appear in Network.
 
 ## Step 1: Enable Network Discovery First
 
@@ -49,6 +50,10 @@ In the **All Networks** section, turn off **Password protected sharing** only wh
 </Callout>
 
 Apply this setting on devices that will share folders and devices that will access them.
+
+<Callout variant="info" title="Private network works best">
+Folder sharing is easiest when both PCs are connected to a **Private** network profile. If Windows marks the connection as Public, discovery and file sharing can be more restricted.
+</Callout>
 
 ## Step 2: Share a Specific Folder
 
@@ -139,4 +144,53 @@ To open the shared folder from another computer, you need the IP address of the 
 
 If everything is configured correctly, File Explorer will show shared folders (and sometimes shared printers) from the target machine.
 
-At this point, your local file transfer workflow becomes much easier: faster collaboration, fewer duplicate copies, and no more dependency on flash drives for every update.
+## Step 4: If the Shared Folder Does Not Open
+
+If the folder still does not appear, check these points before rebuilding the whole setup:
+
+1. **Confirm both PCs are on the same network.** A LAN cable and WiFi can still be on different subnets depending on the router. Compare the first parts of the IPv4 address, for example `192.168.1.x`.
+2. **Use direct IP access first.** Network discovery can be slow, but `\\192.168.1.5` often works even when the PC name does not show up.
+3. **Check Windows Defender Firewall.** File and Printer Sharing must be allowed on the active network profile.
+4. **Review folder permission and NTFS permission.** Sharing permission may allow access, but the folder's Security tab can still block a user.
+5. **Restart File Explorer or both PCs.** Windows network discovery sometimes needs a refresh after changing sharing settings.
+
+<Callout variant="warning" title="Avoid open sharing on public WiFi">
+Do not disable password protected sharing on public networks such as cafes, hotels, campuses, or coworking guest WiFi. Use it only on a trusted home or office network.
+</Callout>
+
+## Step 5: Safer Permission Setup
+
+For a home or small office setup, this permission pattern is usually safer:
+
+| Scenario | Recommended permission | Why |
+| --- | --- | --- |
+| Share documents for reference | Read | Others can open files but not overwrite them. |
+| Team folder for active work | Read/Write | Use only for trusted collaborators. |
+| Temporary file transfer | Read/Write, then turn off sharing later | Keeps the network tidy after the transfer is done. |
+| Guest/public WiFi | Do not share | Use cloud transfer or a private network instead. |
+
+At this point, your local file transfer workflow becomes much easier: faster collaboration, fewer duplicate copies, and no more dependency on flash drives for every update. If you are preparing several Windows PCs, you may also want to [rename each PC first](/blog/rename-pc-windows-11) so the device list is easier to recognize.
+
+---
+
+## FAQ
+
+### Why is my Windows 11 PC not visible under Network?
+
+Usually Network Discovery is off, the network profile is Public, or File and Printer Sharing is blocked by firewall. Try direct IP access with `\\ip-address` while checking those settings.
+
+### Do I need to turn off password protected sharing?
+
+No. Turning it off is convenient for trusted private networks, but it is not required. For better security, keep it on and use a Windows account that has permission to access the shared folder.
+
+### What is the difference between Read and Read/Write?
+
+Read lets others open and copy files. Read/Write lets them add, edit, rename, or delete files, so use it only for folders where collaboration is intended.
+
+### Can I share folders between LAN cable and WiFi?
+
+Yes, as long as both devices are on the same local network and the router allows devices to communicate with each other. Some guest WiFi networks isolate devices by design.
+
+### Why do I get “permission denied” even after sharing the folder?
+
+Check both layers: the Sharing tab permission and the Security tab permission. Windows can allow network sharing but still block access through NTFS folder permissions.

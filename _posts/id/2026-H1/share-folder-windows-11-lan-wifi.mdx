@@ -3,7 +3,8 @@ title: "Cara Share Folder di Windows 11 via LAN dan WiFi"
 slug: "share-folder-windows-11-lan-wifi"
 translationKey: "share-folder-windows-11-lan-wifi"
 date: "2026-03-17"
-description: "Panduan lengkap share folder di Windows 11 lewat LAN atau WiFi, mulai dari aktivasi network discovery sampai akses folder dengan alamat IP."
+updated: "2026-06-12"
+description: "Panduan share folder Windows 11 lewat LAN atau WiFi dengan network discovery, permission, akses IP, password sharing, firewall, dan solusi SMB."
 heroImage: "https://res.cloudinary.com/snipgeek/image/upload/q_auto/f_auto/v1781144641/snipgeek/images/_posts/windows11/share-folder/banner-share.webp"
 imageAlt: "Banner panduan share folder Windows 11 untuk kolaborasi LAN dan WiFi"
 published: true
@@ -16,7 +17,7 @@ Fitur share folder masih jadi salah satu senjata produktivitas paling praktis di
 
 Saya sendiri masih rutin pakai setup ini di lingkungan kantor kecil karena simpel dan hemat waktu. Daripada bolak-balik pindah file lewat flash drive, semua orang bisa akses folder yang sama langsung dari PC masing-masing.
 
-Di panduan ini, kita bahas alur lengkapnya: aktifkan pengaturan jaringan yang wajib, bagikan folder dengan permission yang tepat, lalu akses dari komputer lain lewat alamat IP.
+Di panduan ini, kita bahas alur lengkapnya: aktifkan pengaturan jaringan yang wajib, bagikan folder dengan permission yang tepat, akses dari komputer lain lewat alamat IP, lalu atasi masalah umum seperti permission denied atau PC tidak muncul di Network.
 
 ## Langkah 1: Aktifkan Network Discovery Dulu
 
@@ -49,6 +50,10 @@ Di bagian **All Networks**, nonaktifkan **Password protected sharing** hanya jik
 </Callout>
 
 Pastikan pengaturan ini diterapkan di perangkat yang akan share folder dan perangkat yang akan mengaksesnya.
+
+<Callout variant="info" title="Network Private lebih mudah">
+Share folder paling lancar saat kedua PC memakai profil jaringan **Private**. Kalau Windows menandai koneksi sebagai Public, discovery dan file sharing biasanya lebih dibatasi.
+</Callout>
 
 ## Langkah 2: Bagikan Folder yang Diinginkan
 
@@ -139,4 +144,53 @@ Untuk membuka folder yang sudah dishare dari PC lain, kamu butuh alamat IP kompu
 
 Kalau semua konfigurasi benar, File Explorer akan menampilkan daftar folder (dan kadang printer) yang dishare dari komputer target.
 
-Setelah ini, proses kolaborasi file di jaringan lokal jadi jauh lebih praktis: transfer lebih cepat, duplikasi file berkurang, dan kamu tidak perlu lagi bergantung pada flash drive untuk tiap revisi.
+## Langkah 4: Kalau Folder Share Tidak Bisa Dibuka
+
+Kalau folder masih tidak muncul atau tidak bisa dibuka, cek poin berikut sebelum mengulang semua setting dari awal:
+
+1. **Pastikan kedua PC berada di jaringan yang sama.** Kabel LAN dan WiFi bisa saja masuk subnet berbeda tergantung router. Bandingkan bagian awal IPv4, misalnya `192.168.1.x`.
+2. **Coba akses langsung lewat IP dulu.** Network discovery kadang lambat, tetapi `\\192.168.1.5` sering tetap bisa dibuka walau nama PC belum muncul.
+3. **Cek Windows Defender Firewall.** File and Printer Sharing harus diizinkan pada profil jaringan yang aktif.
+4. **Cek permission folder dan NTFS.** Permission di tab Sharing bisa benar, tetapi tab Security masih bisa memblokir user.
+5. **Restart File Explorer atau kedua PC.** Setelah setting sharing diubah, discovery Windows kadang butuh refresh.
+
+<Callout variant="warning" title="Jangan buka sharing di WiFi publik">
+Jangan menonaktifkan password protected sharing di jaringan publik seperti kafe, hotel, kampus, atau guest WiFi coworking. Pakai opsi ini hanya di jaringan rumah/kantor yang kamu percaya.
+</Callout>
+
+## Langkah 5: Pola Permission yang Lebih Aman
+
+Untuk rumah atau kantor kecil, pola permission berikut biasanya lebih aman:
+
+| Skenario | Permission yang disarankan | Alasan |
+| --- | --- | --- |
+| Dokumen hanya untuk referensi | Read | Pengguna lain bisa membuka file tetapi tidak bisa menimpa. |
+| Folder kerja tim | Read/Write | Pakai hanya untuk kolaborator tepercaya. |
+| Transfer file sementara | Read/Write, lalu matikan sharing setelah selesai | Jaringan tetap rapi setelah transfer selesai. |
+| WiFi tamu/publik | Jangan share | Gunakan cloud transfer atau jaringan private. |
+
+Setelah ini, proses kolaborasi file di jaringan lokal jadi jauh lebih praktis: transfer lebih cepat, duplikasi file berkurang, dan kamu tidak perlu lagi bergantung pada flash drive untuk tiap revisi. Kalau kamu menyiapkan banyak PC Windows, kamu juga bisa [rename PC Windows 11](/blog/rename-pc-windows-11) dulu supaya daftar perangkat lebih mudah dikenali.
+
+---
+
+## FAQ
+
+### Kenapa PC Windows 11 tidak muncul di Network?
+
+Biasanya Network Discovery masih mati, profil jaringan masih Public, atau File and Printer Sharing diblokir firewall. Coba akses langsung dengan `\\alamat-ip` sambil cek pengaturan tersebut.
+
+### Apakah password protected sharing harus dimatikan?
+
+Tidak wajib. Mematikannya memang praktis di jaringan private tepercaya, tetapi untuk keamanan lebih baik tetap aktif dan gunakan akun Windows yang punya izin akses ke folder.
+
+### Apa bedanya Read dan Read/Write?
+
+Read hanya mengizinkan pengguna lain membuka dan menyalin file. Read/Write mengizinkan mereka menambah, mengedit, rename, atau menghapus file, jadi gunakan hanya untuk folder kolaborasi.
+
+### Bisa share folder antara PC kabel LAN dan laptop WiFi?
+
+Bisa, selama keduanya berada di jaringan lokal yang sama dan router mengizinkan perangkat saling berkomunikasi. Beberapa guest WiFi memang mengisolasi perangkat secara sengaja.
+
+### Kenapa muncul “permission denied” padahal folder sudah dishare?
+
+Cek dua lapisan izin: permission di tab Sharing dan permission di tab Security. Windows bisa mengizinkan sharing jaringan, tetapi akses tetap ditolak oleh permission NTFS folder.

@@ -1,8 +1,8 @@
 ---
 title: "How to Create a Windows 11 Bootable USB with Rufus (2026)"
 date: "2026-03-08"
-updated: "2026-03-19"
-description: "Master the step-by-step process of creating a Windows 11 bootable USB using Rufus, including practical compatibility options during setup."
+updated: "2026-06-12"
+description: "Create a Windows 11 bootable USB with Rufus using the right GPT, UEFI, TPM, Secure Boot, and troubleshooting settings for a clean install."
 heroImage: "https://res.cloudinary.com/snipgeek/image/upload/q_auto/f_auto/v1781144527/snipgeek/images/_posts/rufus/pasang-rufus-terbaru.webp"
 imageAlt: "Rufus 4.9 interface showing the configuration for creating a Windows 11 bootable USB drive"
 translationKey: "windows-11-bootable-usb-rufus"
@@ -14,7 +14,9 @@ category: "OS Installation"
 
 So, you're ready to perform a clean installation of Windows 11? Great choice! Using a USB installation media is the best way to get a fresh system free from manufacturer bloatware. And for this task, there's no better, lighter, or more user-friendly tool than **Rufus**.
 
-This guide will walk you through the process step-by-step, from preparation to a ready-to-use USB, including useful compatibility options provided by Rufus during setup. Let's get started!
+This guide will walk you through the process step-by-step, from preparation to a ready-to-use USB, including the Rufus settings that matter most: **GPT vs MBR**, **UEFI vs Legacy**, Secure Boot, TPM checks, and what to do if the USB does not appear in the boot menu.
+
+If your goal is a normal clean install on a modern laptop or PC, keep the default Windows 11 path: GPT, UEFI, and official installation media. The compatibility options are useful, but they should be used intentionally instead of being clicked blindly.
 
 ---
 
@@ -93,7 +95,24 @@ After it's finished, you can close the Rufus app. Your Windows 11 bootable flash
 
 ---
 
-## #3 Common Mistakes (and Fast Fixes)
+## #3 Recommended Rufus Settings for Windows 11
+
+Use this table if you are unsure which option to choose in Rufus:
+
+| Rufus option | Recommended setting | When to change it |
+| --- | --- | --- |
+| Device | Your target USB drive | Change only if more than one USB is plugged in. |
+| Boot selection | Windows 11 ISO | Redownload the ISO if Rufus reports it as invalid. |
+| Image option | Standard Windows installation | Use other modes only if you know the target scenario. |
+| Partition scheme | GPT | Use MBR only for older Legacy/CSM-only systems. |
+| Target system | UEFI | Legacy BIOS is not the normal Windows 11 path. |
+| File system | NTFS or Rufus default | Let Rufus decide unless your firmware has a specific limitation. |
+
+For most Windows 11 installs in 2026, **GPT + UEFI** is the safest baseline. It matches modern hardware and avoids many boot-menu problems.
+
+---
+
+## #4 Common Mistakes (and Fast Fixes)
 
 Before you assume the USB failed, check these common issues:
 
@@ -109,9 +128,15 @@ Before you assume the USB failed, check these common issues:
 4.  **USB creation stops at a certain percentage**
   Try another USB port (preferably USB 2.0 for stability) and avoid running heavy background disk tasks.
 
+5.  **The PC boots back to the old Windows installation**
+  Open the one-time boot menu again and choose the USB entry that starts with `UEFI:`. Also check whether the USB drive is lower than the internal SSD in boot priority.
+
+6.  **Rufus shows multiple USB devices**
+  Unplug external drives you do not want to format. Rufus will erase the selected device, so do not continue until the target USB is obvious.
+
 ---
 
-## #4 BIOS/UEFI Checklist Before Install
+## #5 BIOS/UEFI Checklist Before Install
 
 Use this quick checklist so installation starts on the first try:
 
@@ -124,7 +149,21 @@ These 4 checks prevent most "USB works on one PC but not another" cases.
 
 ---
 
-## #5 Dual-Boot Safety Note (Windows + Linux)
+## #6 What to Do After the USB Is Ready
+
+Once Rufus shows **READY**, do not immediately wipe the target PC. Do these quick checks first:
+
+1. Keep the USB plugged in and restart the target PC.
+2. Open the boot menu key for your device, commonly <kbd>F12</kbd>, <kbd>F9</kbd>, <kbd>Esc</kbd>, or <kbd>F8</kbd> depending on the brand.
+3. Choose the USB entry with the `UEFI:` label.
+4. Stop at the Windows Setup screen and confirm the installer loads normally.
+5. If you are doing a clean install, make sure your important files and license/account information are backed up first.
+
+If you need a complete installation walkthrough after creating the USB, continue with the [clean install Windows 11 guide](/blog/clean-install-windows-11-step-by-step-guide). If this is part of a dual-boot setup, also read [whether to install Windows or Ubuntu first](/blog/install-windows-or-ubuntu-first).
+
+---
+
+## #7 Dual-Boot Safety Note (Windows + Linux)
 
 If your target machine is dual-boot (for example Windows 11 + Ubuntu), avoid deleting partitions blindly during setup.
 
@@ -135,3 +174,28 @@ Safe approach:
 3.  Expect the bootloader to change after installation; plan to repair GRUB from Linux live USB if needed.
 
 This keeps your dual-boot migration cleaner and reduces post-install recovery work.
+
+
+---
+
+## FAQ
+
+### Is Rufus safe for creating a Windows 11 bootable USB?
+
+Yes, Rufus is a widely used bootable USB tool. Use the official Rufus app and a Windows ISO you trust, then double-check the selected USB device before clicking **START**.
+
+### Should I choose GPT or MBR for Windows 11?
+
+Choose **GPT** for modern Windows 11 installations. MBR is mainly for older Legacy BIOS systems, while Windows 11 is designed around UEFI-era hardware.
+
+### Why does my USB not appear in the boot menu?
+
+The most common causes are wrong partition mode, Legacy/UEFI mismatch, a bad USB port, or the boot menu showing a non-UEFI USB entry. Recreate the USB with GPT + UEFI and try another port.
+
+### Can Rufus bypass TPM or Secure Boot checks?
+
+Rufus can show compatibility options during USB creation. Use them only when you understand the trade-offs, especially on unsupported hardware or test environments.
+
+### Do I need internet during Windows 11 installation?
+
+It depends on the Windows 11 edition and setup path. Having internet available is helpful for activation, account setup, and drivers, but prepare essential drivers separately if the target PC has unusual Wi-Fi or storage hardware.
