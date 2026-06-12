@@ -9,6 +9,7 @@ import { HomeLatest } from "@/components/home/home-latest";
 import type { Post, PostFrontmatter } from "@/lib/posts";
 import type { Note, NoteFrontmatter } from "@/lib/notes";
 import type { Dictionary } from "@/lib/get-dictionary";
+import { AdSenseUnit } from "@/components/analytics/adsense-unit";
 
 // Below-fold sections: code-split so their JS is not in the initial bundle
 function SectionPlaceholder({
@@ -413,6 +414,16 @@ export function HomeClient({
         locale={locale}
         linkPrefix={linkPrefix}
       />
+
+      {/* AD BLOCK: Horizontal ad between Hero and Latest posts matching Hero's width */}
+      <section className="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 sm:pt-10 pb-4">
+        <AdSenseUnit
+          slot="8443199432"
+          size="horizontal"
+          format="horizontal"
+          className="my-0"
+        />
+      </section>
 
       <HomeLatest
         posts={latestPosts}

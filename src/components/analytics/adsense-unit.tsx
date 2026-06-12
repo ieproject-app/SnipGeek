@@ -3,16 +3,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
+import { isAdSenseEnabled } from '@/lib/adsense';
 
 const PUBLISHER_ID = 'ca-pub-6235611333449307';
-
-function canRenderAdsense() {
-  if (process.env.NODE_ENV !== 'production') return false;
-  if (typeof window === 'undefined') return false;
-
-  const hostname = window.location.hostname;
-  return !['localhost', '127.0.0.1', '::1'].includes(hostname);
-}
 
 type AdSenseSize = 'inArticle' | 'belowContent' | 'horizontal' | 'sidebar';
 
@@ -62,7 +55,7 @@ export function AdSenseUnit({
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
-      setEnabled(canRenderAdsense());
+      setEnabled(isAdSenseEnabled());
     }, 0);
 
     return () => window.clearTimeout(timer);
@@ -79,8 +72,7 @@ export function AdSenseUnit({
 
       pushedPath.current = pathname;
       try {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        ((window as any).adsbygoogle = (window as any).adsbygoogle || []).push({});
+        (window.adsbygoogle = window.adsbygoogle || []).push({});
       } catch {
         // AdSense may throw when a slot is not fillable yet; keep the page usable.
       }

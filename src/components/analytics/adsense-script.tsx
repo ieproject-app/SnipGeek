@@ -2,16 +2,9 @@
 
 import Script from 'next/script';
 import { useEffect, useState } from 'react';
+import { isAdSenseEnabled } from '@/lib/adsense';
 
 const PUBLISHER_ID = 'ca-pub-6235611333449307';
-
-function canLoadAdsense() {
-  if (process.env.NODE_ENV !== 'production') return false;
-  if (typeof window === 'undefined') return false;
-
-  const hostname = window.location.hostname;
-  return !['localhost', '127.0.0.1', '::1'].includes(hostname);
-}
 
 /**
  * Loads the Google AdSense script once per page via next/script.
@@ -25,7 +18,7 @@ export function AdSenseScript() {
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
-      setEnabled(canLoadAdsense());
+      setEnabled(isAdSenseEnabled());
     }, 0);
 
     return () => window.clearTimeout(timer);

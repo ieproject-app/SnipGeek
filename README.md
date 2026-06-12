@@ -445,7 +445,7 @@ The following HTTP headers are applied to all routes via `next.config.ts`:
 | Testing | Vitest + `@testing-library/react` + happy-dom |
 | i18n | Custom proxy + `@formatjs/intl-localematcher` |
 | Analytics | Firebase Analytics (client-side page_view) |
-| Ads | Google AdSense (`lazyOnload` strategy) |
+| Ads | Google AdSense (`afterInteractive` strategy) |
 | Comments | Giscus (GitHub Discussions) |
 | Deployment | Firebase App Hosting (Google Cloud) |
 
