@@ -327,6 +327,47 @@ const nextConfig: NextConfig = {
         destination: "/tools",
         permanent: true,
       },
+      // GSC recovery batch 2026-06: high-confidence legacy/garbled URLs.
+      {
+        source: "/projects",
+        destination: "/",
+        permanent: true,
+      },
+      {
+        source: "/tentang",
+        destination: "/about",
+        permanent: true,
+      },
+      {
+        source: "/kit/terbilang-generator",
+        destination: "/tools",
+        permanent: true,
+      },
+      {
+        source: "/articles",
+        destination: "/blog",
+        permanent: true,
+      },
+      {
+        source: "/google-sheets",
+        destination: "/category/productivity",
+        permanent: true,
+      },
+      {
+        source: "/blog/membuat-dark-mode-otomatis-windows-11",
+        destination: "/id/blog/auto-dark-mode-windows-11",
+        permanent: true,
+      },
+      {
+        source: "/favicon.ico/notes/fix-firebase-auth-domain-error-localhost-ip",
+        destination: "/notes/fix-firebase-auth-domain-error-localhost-ip",
+        permanent: true,
+      },
+      {
+        source: "/favicon.ico/blog/how-to-create-windows-11-bootable-usb-rufus",
+        destination: "/id/blog/how-to-create-windows-11-bootable-usb-rufus",
+        permanent: true,
+      },
     ];
   },
   images: {
