@@ -418,7 +418,7 @@ export function HomeClient({
       {/* AD BLOCK: Horizontal ad between Hero and Latest posts matching Hero's width */}
       <section className="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 sm:pt-10 pb-4">
         <AdSenseUnit
-          slot="8443199432"
+          slot="6487154355"
           size="horizontal"
           format="horizontal"
           className="my-0"
