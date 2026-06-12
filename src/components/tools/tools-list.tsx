@@ -45,7 +45,7 @@ export function ToolsList({ dictionary, locale, isDevelopment }: ToolsListProps)
   const { user, isUserLoading } = useUser();
   const pageContent = dictionary.tools;
   const linkPrefix = locale === "en" ? "" : `/${locale}`;
-  const devOnlyToolIds = new Set(["signatories_index", "compress_pdf", "address_label"]);
+  const devOnlyToolIds = new Set<string>([]);
   const devOnlyBadgeText = locale === "id" ? "Hanya Internal (Belum Rilis)" : "Internal Only (Unreleased)";
 
   const publicTools: ToolCardConfig[] = [
@@ -112,33 +112,6 @@ export function ToolsList({ dictionary, locale, isDevelopment }: ToolsListProps)
       icon: <Briefcase className="h-8 w-8" />,
       isLink: true,
       href: `${linkPrefix}/tools/employee-history`,
-      badge: pageContent.open_tool,
-      badgeVariant: "secondary" as const,
-      requiresAuth: true,
-    },
-    {
-      id: "signatories_index",
-      icon: <FileSignature className="h-8 w-8" />,
-      isLink: true,
-      href: `${linkPrefix}/tools/signatories-index`,
-      badge: pageContent.open_tool,
-      badgeVariant: "secondary" as const,
-      requiresAuth: true,
-    },
-    {
-      id: "compress_pdf",
-      icon: <FileDown className="h-8 w-8" />,
-      isLink: true,
-      href: `${linkPrefix}/tools/compress-pdf`,
-      badge: pageContent.open_tool,
-      badgeVariant: "secondary" as const,
-      requiresAuth: true,
-    },
-    {
-      id: "address_label",
-      icon: <ScrollText className="h-8 w-8" />,
-      isLink: true,
-      href: `${linkPrefix}/tools/address-label-generator`,
       badge: pageContent.open_tool,
       badgeVariant: "secondary" as const,
       requiresAuth: true,

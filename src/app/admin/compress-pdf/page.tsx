@@ -1,13 +1,12 @@
 import type { Metadata } from "next";
 import { AdminShell } from "@/components/admin/admin-shell";
-import { EmployeeHistoryTabs } from "@/components/admin/employee-history-tabs";
-import { getDictionary } from "@/lib/get-dictionary";
+import ToolCompressPdf from "@/components/tools/compress-pdf/tool-compress-pdf";
 import { i18n, type Locale } from "@/i18n-config";
 
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Employee History — Admin — SnipGeek",
+  title: "Compress PDF — Admin — SnipGeek",
   robots: { index: false, follow: false, nocache: true },
 };
 
@@ -18,18 +17,17 @@ function resolveLocale(localeParam?: string): Locale {
   return i18n.defaultLocale;
 }
 
-export default async function AdminEmployeeHistoryPage({
+export default async function AdminCompressPdfPage({
   searchParams,
 }: {
   searchParams: Promise<{ locale?: string }>;
 }) {
   const { locale: localeParam } = await searchParams;
   const locale = resolveLocale(localeParam);
-  const dictionary = await getDictionary(locale);
 
   return (
     <AdminShell>
-      <EmployeeHistoryTabs dictionary={dictionary} locale={locale} />
+      <ToolCompressPdf locale={locale} />
     </AdminShell>
   );
 }

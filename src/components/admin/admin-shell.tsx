@@ -12,22 +12,22 @@ const emptySubscribe = () => () => {};
 
 /** Map pathname → human-readable page title for the mobile top bar. */
 function resolvePageTitle(pathname: string): { eyebrow: string; title: string } {
-  if (pathname.startsWith("/admin/index-monitor")) {
-    return { eyebrow: "Workspace", title: "Index Monitor" };
-  }
   if (pathname.startsWith("/admin/prompt-generator")) {
     return { eyebrow: "Editorial", title: "Prompt Generator" };
   }
-  if (pathname.startsWith("/admin/employee-history")) {
-    return { eyebrow: "Data", title: "Employee History" };
+  if (pathname.startsWith("/admin/signatories-index")) {
+    return { eyebrow: "Utility", title: "Signatories Index" };
   }
-  if (pathname.startsWith("/admin/image-migration")) {
-    return { eyebrow: "Media", title: "Image Migration" };
+  if (pathname.startsWith("/admin/compress-pdf")) {
+    return { eyebrow: "Utility", title: "Compress PDF" };
+  }
+  if (pathname.startsWith("/admin/address-label-generator")) {
+    return { eyebrow: "Utility", title: "Address Label" };
   }
   if (pathname.startsWith("/admin/login")) {
     return { eyebrow: "Auth", title: "Sign in" };
   }
-  return { eyebrow: "Overview", title: "Dashboard" };
+  return { eyebrow: "Overview", title: "Admin Overview" };
 }
 
 /**

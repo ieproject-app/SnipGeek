@@ -1,12 +1,7 @@
-import { AdminShell } from "@/components/admin/admin-shell";
-import { DashboardOverview } from "@/components/admin/dashboard-overview";
+import { redirect } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 
 export default function AdminOverviewPage() {
-  return (
-    <AdminShell>
-      <DashboardOverview />
-    </AdminShell>
-  );
+  redirect("/admin/prompt-generator");
 }

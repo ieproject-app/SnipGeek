@@ -6,12 +6,10 @@ import { cn } from "@/lib/utils";
 import {
   LogOut,
   ExternalLink,
-  LayoutDashboard,
-  ListChecks,
   Sparkles,
-  Search as SearchIcon,
-  Users,
-  Images,
+  FileSignature,
+  FileDown,
+  ScrollText,
 } from "lucide-react";
 import { SnipGeekLogo } from "@/components/icons/snipgeek-logo";
 import { Button } from "@/components/ui/button";
@@ -19,35 +17,30 @@ import { getAuth, signOut } from "firebase/auth";
 
 const NAV_ITEMS = [
   {
-    name: "Dashboard",
-    href: "/admin",
-    exact: true,
-    icon: LayoutDashboard,
-    description: "Backlog, cadence, dan priority queue",
-  },
-
-  {
     name: "Prompt Generator",
     href: "/admin/prompt-generator",
     icon: Sparkles,
     description: "Editorial brief builder · create atau revise prompt kerja",
   },
   {
-    name: "Employee History",
-    href: "/admin/employee-history",
-    icon: Users,
-    description: "Search employee · signer generator · data injection",
+    name: "Signatories Index",
+    href: "/admin/signatories-index",
+    icon: FileSignature,
+    description: "Scanner referensi nama penandatangan PDF massal",
   },
   {
-    name: "Image Migration",
-    href: "/admin/image-migration",
-    icon: Images,
-    description: "Scanner referensi gambar · mapping 1:1 · prompt migrasi",
+    name: "Compress PDF",
+    href: "/admin/compress-pdf",
+    icon: FileDown,
+    description: "Unggah dan kompres file PDF",
+  },
+  {
+    name: "Address Label",
+    href: "/admin/address-label-generator",
+    icon: ScrollText,
+    description: "Isi alamat, pratinjau label, dan unduh PDF",
   },
 ];
-
-const GSC_PROPERTY_URL =
-  "https://search.google.com/u/0/search-console?resource_id=sc-domain:snipgeek.com";
 
 export function AdminSidebar({
   mobile = false,
@@ -80,7 +73,7 @@ export function AdminSidebar({
       {/* ── Brand ────────────────────────────── */}
       <div className="border-b border-border/40 px-5 py-5">
         <Link
-          href="/admin"
+          href="/admin/prompt-generator"
           className="group flex items-center gap-3 rounded-2xl bg-gradient-to-r from-primary/10 via-accent/10 to-transparent px-3 py-2 transition-shadow hover:shadow-lg"
         >
           <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/15 text-primary transition-transform group-hover:scale-105">
@@ -104,7 +97,7 @@ export function AdminSidebar({
         </p>
         <div className="space-y-1">
           {NAV_ITEMS.map((item) => {
-            const isActive = item.exact
+            const isActive = item.href === "/admin"
               ? pathname === item.href
               : pathname.startsWith(item.href);
 
@@ -146,25 +139,6 @@ export function AdminSidebar({
             );
           })}
         </div>
-
-        {/* ── Quick actions ────────────────────── */}
-        <p className="px-2 font-mono text-[9px] font-bold uppercase tracking-[0.3em] text-muted-foreground">
-          Quick actions
-        </p>
-        <a
-          href={GSC_PROPERTY_URL}
-          target="_blank"
-          rel="noreferrer"
-          className="group flex items-center gap-3 rounded-xl border border-border/50 bg-card/80 px-3 py-2 text-muted-foreground transition-colors hover:border-accent/40 hover:bg-card/90 hover:text-foreground"
-        >
-          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-accent/15 text-accent group-hover:bg-accent/20">
-            <SearchIcon className="h-4 w-4 shrink-0" />
-          </span>
-          <span className="min-w-0 flex-1 text-sm font-semibold tracking-tight">
-            Open GSC
-          </span>
-          <ExternalLink className="h-3.5 w-3.5 text-muted-foreground/70 group-hover:text-foreground/70" />
-        </a>
       </nav>
 
       {/* ── Footer actions ────────────────────── */}
