@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import { ToolNumbers } from '@/components/tools/tool-numbers';
 import { getDictionary } from '@/lib/get-dictionary';
 import { i18n, Locale } from '@/i18n-config';
+import { getDateKeyInTimeZone } from '@/lib/number-generator';
 
 export async function generateMetadata({
   params,
@@ -36,11 +37,12 @@ export default async function NomorGeneratorPage({
 }) {
   const { locale } = await params;
   const dictionary = await getDictionary(locale);
+  const initialDateKey = getDateKeyInTimeZone();
 
   return (
     <div className="w-full">
-      <main className="mx-auto max-w-4xl px-4 pt-10 pb-16 sm:px-6">
-        <ToolNumbers dictionary={dictionary} />
+      <main className="mx-auto max-w-7xl px-4 pt-10 pb-16 sm:px-6 lg:px-8">
+        <ToolNumbers dictionary={dictionary} initialDateKey={initialDateKey} />
       </main>
     </div>
   );

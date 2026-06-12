@@ -20,11 +20,19 @@ import {
     type UserLimit,
     getErrorMessage,
     normalizeCategory,
+    createDateFromDateKey,
     createNewRequest,
+    formatDateKey,
+    getMonthStart,
 } from './types';
 
-export function useToolNumbers() {
-    const [requests, setRequests] = useState<GenerationRequest[]>([createNewRequest()]);
+export function useToolNumbers(initialDateKey: string) {
+    const [requests, setRequests] = useState<GenerationRequest[]>(() => [
+        createNewRequest({
+            id: 'req_initial',
+            docDate: createDateFromDateKey(initialDateKey),
+        }),
+    ]);
     const [valueCategory, setValueCategory] = useState<ValueCategory>('below_500m');
     const [isGenerating, setIsGenerating] = useState(false);
     const [generatedNumbers, setGeneratedNumbers] = useState<GeneratedResult[]>([]);
@@ -42,6 +50,7 @@ export function useToolNumbers() {
     const [stockCategories, setStockCategories] = useState<string[]>([]);
     const [stockCategoryDetails, setStockCategoryDetails] = useState<StockCategoryDetail[]>([]);
     const [isStockLoading, setIsStockLoading] = useState(false);
+    const [stockErrorMessage, setStockErrorMessage] = useState<string | null>(null);
     const [openDatePickerId, setOpenDatePickerId] = useState<string | null>(null);
     const [calendarViewMonths, setCalendarViewMonths] = useState<Record<string, Date>>({});
 
@@ -245,7 +254,7 @@ export function useToolNumbers() {
                     category?: string;
                     assignedDate?: string;
                 };
-                const rawNum = (data.fullNumber as string).replace('{DOCTYPE} ', '');
+                const rawNum = (data.fullNumber ?? '').replace('{DOCTYPE} ', '');
                 return {
                     text: rawNum,
                     rawNumber: rawNum,
@@ -278,6 +287,7 @@ export function useToolNumbers() {
 
     const fetchStockSummary = useCallback(async () => {
         setIsStockLoading(true);
+        setStockErrorMessage(null);
         try {
             const params = new URLSearchParams({ valueCategory });
             const res = await fetch(`/api/numbers/stock?${params.toString()}`);
@@ -294,11 +304,15 @@ export function useToolNumbers() {
             setStockRawMatrix((data?.rawMatrix ?? {}) as StockMatrix);
             setStockMatrix((data?.matrix ?? {}) as StockMatrix);
         } catch (error) {
-            console.error("Error fetching stock summary:", error);
+            const message = getErrorMessage(error, "Tidak dapat memuat ringkasan stok.");
+            setStockErrorMessage(message);
+            if (process.env.NODE_ENV === 'production') {
+                console.error("Error fetching stock summary:", error);
+            }
             toast({
                 variant: "destructive",
                 title: "Gagal Mengambil Stok",
-                description: getErrorMessage(error, "Tidak dapat memuat ringkasan stok."),
+                description: message,
             });
         } finally {
             setIsStockLoading(false);
@@ -360,8 +374,33 @@ export function useToolNumbers() {
         setRequests(prev => prev.map(req => req.id === id ? { ...req, [field]: value } : req));
     };
 
-    const addRequest = () => setRequests(prev => [...prev, createNewRequest()]);
-    const removeRequest = (id: string) => setRequests(prev => prev.filter(req => req.id !== id));
+    const handleRequestDateChange = (id: string, date: Date) => {
+        setRequests(prev => prev.map(req => req.id === id ? { ...req, docDate: date } : req));
+        setCalendarViewMonths(prev => ({ ...prev, [id]: getMonthStart(date) }));
+    };
+
+    const addRequest = () => {
+        const sourceDate = requests.at(-1)?.docDate ?? new Date();
+        const nextDate = new Date(sourceDate);
+        const nextRequest = {
+            ...createNewRequest(),
+            docDate: nextDate,
+        };
+        setRequests(prev => [...prev, nextRequest]);
+        setCalendarViewMonths(prev => ({
+            ...prev,
+            [nextRequest.id]: getMonthStart(nextDate),
+        }));
+    };
+
+    const removeRequest = (id: string) => {
+        setRequests(prev => prev.filter(req => req.id !== id));
+        setCalendarViewMonths(prev => {
+            const next = { ...prev };
+            delete next[id];
+            return next;
+        });
+    };
 
     const handleGenerate = async () => {
         for (const req of requests) {
@@ -388,7 +427,7 @@ export function useToolNumbers() {
                 requests: requests.map(r => ({
                     category: r.category,
                     docType: r.docType,
-                    docDate: r.docDate!.toISOString(),
+                    docDate: formatDateKey(r.docDate!),
                     quantity: r.quantity,
                 })),
                 valueCategory,
@@ -417,7 +456,7 @@ export function useToolNumbers() {
 
             const generated: GeneratedResult[] = (data.results as Array<{
                 text: string; rawNumber: string; date: string; docType: string; isError?: boolean;
-            }>).map(r => ({ ...r, date: new Date(r.date) }));
+            }>).map(r => ({ ...r, date: createDateFromDateKey(r.date) }));
 
             if (data.dailyLimit !== null) {
                 setUserLimit({ count: data.dailyCount, isLimited: data.dailyCount >= data.dailyLimit });
@@ -520,7 +559,9 @@ export function useToolNumbers() {
     };
 
     const handleReset = () => {
-        setRequests([createNewRequest()]);
+        const nextRequest = createNewRequest();
+        setRequests([nextRequest]);
+        setCalendarViewMonths({ [nextRequest.id]: getMonthStart(nextRequest.docDate ?? new Date()) });
         setGeneratedNumbers([]);
     };
 
@@ -562,7 +603,7 @@ export function useToolNumbers() {
     };
 
     const handleCalendarMonthChange = (id: string, month: Date) => {
-        setCalendarViewMonths(prev => ({ ...prev, [id]: month }));
+        setCalendarViewMonths(prev => ({ ...prev, [id]: getMonthStart(month) }));
     };
 
     return {
@@ -571,7 +612,7 @@ export function useToolNumbers() {
         isCopied, copiedIndex, myHistory, isHistoryLoading,
         isStockDialogOpen, setIsStockDialogOpen, stockMatrix, stockRawMatrix,
         stockPeriodsByYear, stockYears, stockCategories, stockCategoryDetails,
-        isStockLoading, openDatePickerId, setOpenDatePickerId,
+        isStockLoading, stockErrorMessage, openDatePickerId, setOpenDatePickerId,
         calendarViewMonths,
         injectText, setInjectText, injectValueCategory, setInjectValueCategory,
         isInjecting, injectProgress,
@@ -586,7 +627,7 @@ export function useToolNumbers() {
         // Actions
         fetchDynamicCategories, handleSaveDynamicCategory, handleDeleteDynamicCategory,
         fetchStockSummary, fetchMyHistory,
-        handleCategoryChange, handleDocTypeChange, handleRequestChange,
+        handleCategoryChange, handleDocTypeChange, handleRequestChange, handleRequestDateChange,
         handleCalendarMonthChange,
         addRequest, removeRequest,
         handleGenerate, handleBulkInject, handleReset,

@@ -1,15 +1,15 @@
 
-export const DAILY_LIMIT = 15;
-
-export const STATIC_DOCUMENT_CATEGORIES: Record<string, { name: string; types: string[] }> = {
-    'UM.000': { name: 'Umum', types: ['ND UT'] },
-    'HK.800': { name: 'Hukum', types: ['BAUT', 'LAUT', 'BA ABD', 'BA REKON'] },
-    'HK.820': { name: 'Amandemen', types: ['AMD PERTAMA', 'AMD KEDUA', 'AMD KETIGA', 'AMD KEEMPAT', 'AMD PENUTUP'] },
-    'LG.270': { name: 'Penetapan', types: ['PENETAPAN'] },
-    'LG.000': { name: 'Justifikasi', types: ['JUSTIFIKASI'] },
-};
-
-export type ValueCategory = 'below_500m' | 'above_500m';
+export {
+    DAILY_LIMIT,
+    MAX_REQUEST_QUANTITY,
+    MAX_TOTAL_QUANTITY,
+    STATIC_DOCUMENT_CATEGORIES,
+    createDateFromDateKey,
+    formatDateKey,
+    getMonthStart,
+    normalizeCategory,
+} from '@/lib/number-generator';
+export type { ValueCategory } from '@/lib/number-generator';
 
 export interface GenerationRequest {
     id: string;
@@ -54,16 +54,13 @@ export interface UserLimit {
 export const getErrorMessage = (error: unknown, fallback: string) =>
     error instanceof Error ? error.message : fallback;
 
-export function normalizeCategory(category: string): string {
-    return category.trim().toUpperCase();
-}
-
-export function createNewRequest(): GenerationRequest {
+export function createNewRequest(overrides: Partial<GenerationRequest> = {}): GenerationRequest {
     return {
-        id: `req_${Date.now()}_${Math.random()}`,
+        id: overrides.id ?? `req_${Date.now()}_${Math.random()}`,
         category: '',
         docType: '',
-        docDate: new Date(),
+        docDate: overrides.docDate ?? new Date(),
         quantity: 1,
+        ...overrides,
     };
 }

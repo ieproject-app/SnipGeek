@@ -24,7 +24,7 @@ import { cn } from '@/lib/utils';
 import { format, addMonths, addWeeks, addYears } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { motion, AnimatePresence } from 'framer-motion';
-import { DAILY_LIMIT, type ValueCategory, type StockMatrix, type StockCategoryDetail } from './types';
+import { DAILY_LIMIT, getMonthStart, type ValueCategory, type StockMatrix, type StockCategoryDetail } from './types';
 import type { useToolNumbers } from './use-tool-numbers';
 
 type NumbersHook = ReturnType<typeof useToolNumbers>;
@@ -131,22 +131,30 @@ export function NumberGeneratorTab({ hook }: NumberGeneratorTabProps) {
         requests, valueCategory, setValueCategory, isGenerating, generatedNumbers,
         isCopied, copiedIndex, isStockDialogOpen, setIsStockDialogOpen,
         stockMatrix, stockRawMatrix, stockPeriodsByYear, stockYears,
-        stockCategories, isStockLoading, openDatePickerId, setOpenDatePickerId,
+        stockCategories, isStockLoading, stockErrorMessage, openDatePickerId, setOpenDatePickerId,
         calendarViewMonths,
         userLimit, isLimitLoading, isAdminUser,
         remainingLimit, hasResults, successCount, failedCount, totalQuantity,
         mergedCategories, categoryOptions, stockCategoryDetailMap,
         fetchStockSummary,
-        handleCategoryChange, handleDocTypeChange, handleRequestChange,
+        handleCategoryChange, handleDocTypeChange, handleRequestChange, handleRequestDateChange,
         handleCalendarMonthChange,
         addRequest, removeRequest,
         handleGenerate, handleReset,
         copyFullResults, copyNumbersOnly, copyItem,
     } = hook;
 
+    const isStockLoaded = stockYears.length > 0;
+    const clampQuantity = (value: number) => Math.min(20, Math.max(1, Math.trunc(value)));
+    const getRequestStock = (category: string, docDate: Date | undefined) => {
+        if (!category || !docDate || !isStockLoaded) return null;
+        const period = format(docDate, 'yyyy-MM');
+        return stockMatrix[category]?.[period] ?? 0;
+    };
+
     return (
         <div className="space-y-10">
-            <Card className="border-primary/10 bg-card/50 shadow-sm overflow-hidden transition-shadow duration-300 hover:shadow-md">
+            <Card className="border-primary/10 bg-card/50 shadow-sm overflow-hidden">
                 <CardHeader className="bg-muted/20 border-b flex flex-col md:flex-row md:items-center justify-between gap-6 p-6">
                     <div className="space-y-1">
                         <CardTitle className="font-display text-xl uppercase tracking-tight">Isi kebutuhan nomor</CardTitle>
@@ -179,20 +187,17 @@ export function NumberGeneratorTab({ hook }: NumberGeneratorTabProps) {
                         </div>
                     )}
                 </CardHeader>
-                <CardContent className="space-y-8 p-6">
-                    <div className="grid gap-3 md:grid-cols-3">
-                        <div className="rounded-2xl border border-primary/10 bg-primary/[0.03] px-4 py-3">
-                            <p className="text-[10px] font-black uppercase tracking-widest text-primary">Tanpa login</p>
-                            <p className="mt-1 text-sm text-muted-foreground">Generator bisa langsung dipakai oleh siapa pun yang memiliki link.</p>
+                <CardContent className="space-y-6 p-6">
+                    <div className="flex flex-col gap-3 rounded-xl border border-primary/10 bg-muted/15 px-4 py-3 text-xs text-muted-foreground md:flex-row md:items-center md:justify-between">
+                        <div className="flex flex-wrap items-center gap-2">
+                            <Badge variant="outline" className="rounded-full bg-background/80 px-2.5 py-1 text-[9px] font-black uppercase tracking-widest text-primary">
+                                Tanpa login
+                            </Badge>
+                            <span className="font-medium">Isi baris permintaan, cek stok bila perlu, lalu generate.</span>
                         </div>
-                        <div className="rounded-2xl border border-primary/10 bg-primary/[0.03] px-4 py-3">
-                            <p className="text-[10px] font-black uppercase tracking-widest text-primary">Kuota publik</p>
-                            <p className="mt-1 text-sm text-muted-foreground">Pengguna umum dapat membuat hingga {DAILY_LIMIT} nomor per hari.</p>
-                        </div>
-                        <div className="rounded-2xl border border-primary/10 bg-primary/[0.03] px-4 py-3">
-                            <p className="text-[10px] font-black uppercase tracking-widest text-primary">Admin opsional</p>
-                            <p className="mt-1 text-sm text-muted-foreground">Login hanya diperlukan untuk injector dan pengaturan internal.</p>
-                        </div>
+                        <span className="font-mono text-[11px] font-bold text-primary/70">
+                            {totalQuantity} nomor diminta
+                        </span>
                     </div>
                     <div className="space-y-3">
                         <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Kelompok Nilai Proyek</Label>
@@ -215,22 +220,27 @@ export function NumberGeneratorTab({ hook }: NumberGeneratorTabProps) {
                             <p className="text-sm text-muted-foreground">Pilih kategori terlebih dahulu agar daftar jenis dokumen lebih ringkas, lalu lengkapi tanggal dan jumlahnya.</p>
                         </div>
                         <AnimatePresence>
-                            {requests.map((req, index) => (
-                                <motion.div
-                                    key={req.id}
-                                    className="grid grid-cols-1 md:grid-cols-[auto_1.35fr_1.45fr_1.35fr_1fr_auto] gap-4 items-end p-4 md:p-5 border-2 border-primary/5 hover:border-primary/15 transition-colors rounded-2xl bg-linear-to-br from-background to-muted/20 shadow-inner"
-                                    initial={{ opacity: 0, y: -8, scale: 0.98 }}
-                                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                                    exit={{ opacity: 0, y: -4, scale: 0.97, transition: { duration: 0.15 } }}
-                                    transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-                                >
-                                    <div className="hidden md:flex items-center justify-center h-11 w-8 rounded-lg bg-primary/10 text-primary font-black text-sm">
+                            {requests.map((req, index) => {
+                                const calendarMonth = calendarViewMonths[req.id] ?? getMonthStart(req.docDate ?? new Date());
+                                const stockCount = getRequestStock(req.category, req.docDate);
+                                const isDocTypeDisabled = !req.category;
+
+                                return (
+                                    <motion.div
+                                        key={req.id}
+                                        className="grid grid-cols-1 gap-3 rounded-xl border border-primary/10 bg-background/70 p-3 shadow-sm transition-colors hover:border-primary/25 md:grid-cols-[2rem_minmax(0,1.15fr)_minmax(0,1.25fr)_minmax(0,1.1fr)_10rem_2.5rem] md:items-start"
+                                        initial={{ opacity: 0, y: -8, scale: 0.98 }}
+                                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                                        exit={{ opacity: 0, y: -4, scale: 0.97, transition: { duration: 0.15 } }}
+                                        transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+                                    >
+                                    <div className="hidden h-10 w-8 items-center justify-center rounded-lg bg-primary/10 text-sm font-black text-primary md:mt-5 md:flex">
                                         {index + 1}
                                     </div>
                                     <div className="space-y-2">
                                         <Label className="text-[10px] font-black uppercase text-muted-foreground ml-1">Kategori Dokumen</Label>
                                         <Select onValueChange={(value) => handleCategoryChange(req.id, value)} value={req.category}>
-                                            <SelectTrigger className="h-11 rounded-lg border-primary/10 focus:ring-accent focus:ring-offset-0"><SelectValue placeholder="Pilih kategori" /></SelectTrigger>
+                                            <SelectTrigger className="h-10 rounded-lg border-primary/10 focus:ring-accent focus:ring-offset-0"><SelectValue placeholder="Pilih kategori" /></SelectTrigger>
                                             <SelectContent className="border-primary/10">
                                                 {categoryOptions.map(category => (
                                                     <SelectItem
@@ -246,8 +256,17 @@ export function NumberGeneratorTab({ hook }: NumberGeneratorTabProps) {
                                     </div>
                                     <div className="space-y-2">
                                         <Label className="text-[10px] font-black uppercase text-muted-foreground ml-1">Jenis Dokumen</Label>
-                                        <Select onValueChange={(value) => handleDocTypeChange(req.id, value)} value={req.docType} disabled={!req.category}>
-                                            <SelectTrigger className="h-11 rounded-lg border-primary/10 focus:ring-accent focus:ring-offset-0"><SelectValue placeholder={req.category ? "Pilih jenis dokumen" : "Pilih kategori dulu"} /></SelectTrigger>
+                                        <Select onValueChange={(value) => handleDocTypeChange(req.id, value)} value={req.docType}>
+                                            <SelectTrigger
+                                                aria-disabled={isDocTypeDisabled}
+                                                tabIndex={isDocTypeDisabled ? -1 : undefined}
+                                                className={cn(
+                                                    "h-10 rounded-lg border-primary/10 focus:ring-accent focus:ring-offset-0",
+                                                    isDocTypeDisabled && "pointer-events-none opacity-50"
+                                                )}
+                                            >
+                                                <SelectValue placeholder={req.category ? "Pilih jenis dokumen" : "Pilih kategori dulu"} />
+                                            </SelectTrigger>
                                             <SelectContent className="border-primary/10">
                                                 {(mergedCategories[req.category]?.types ?? []).map(type => (
                                                     <SelectItem
@@ -265,10 +284,15 @@ export function NumberGeneratorTab({ hook }: NumberGeneratorTabProps) {
                                         <Label className="text-[10px] font-black uppercase text-muted-foreground ml-1">Tanggal Dokumen</Label>
                                         <Popover
                                             open={openDatePickerId === req.id}
-                                            onOpenChange={(isOpen) => setOpenDatePickerId(isOpen ? req.id : null)}
+                                            onOpenChange={(isOpen) => {
+                                                if (isOpen) {
+                                                    handleCalendarMonthChange(req.id, calendarMonth);
+                                                }
+                                                setOpenDatePickerId(isOpen ? req.id : null);
+                                            }}
                                         >
                                             <PopoverTrigger asChild>
-                                                <Button variant={'outline'} className={cn('w-full h-11 justify-start text-left font-normal rounded-lg border-primary/10 hover:border-primary/30 focus-visible:ring-accent', !req.docDate && 'text-muted-foreground')}>
+                                                <Button variant={'outline'} className={cn('w-full h-10 justify-start text-left font-normal rounded-lg border-primary/10 hover:border-primary/30 focus-visible:ring-accent', !req.docDate && 'text-muted-foreground')}>
                                                     <CalendarIcon className="mr-2 h-4 w-4 text-accent" />
                                                     {req.docDate ? format(req.docDate, 'd MMM yyyy', { locale: id }) : <span>Pilih tanggal dokumen</span>}
                                                 </Button>
@@ -276,22 +300,16 @@ export function NumberGeneratorTab({ hook }: NumberGeneratorTabProps) {
                                             <PopoverContent className="w-auto p-0 border-primary/15 shadow-2xl rounded-xl overflow-hidden backdrop-blur-sm">
                                                 <div className="flex items-center justify-between px-3 py-2 bg-muted/30 border-b border-primary/5">
                                                     <button
-                                                        onClick={() => {
-                                                            const base = calendarViewMonths[req.id] || req.docDate || new Date();
-                                                            handleCalendarMonthChange(req.id, addMonths(base, -1));
-                                                        }}
+                                                        onClick={() => handleCalendarMonthChange(req.id, addMonths(calendarMonth, -1))}
                                                         className="p-1.5 rounded-md hover:bg-accent/10 text-muted-foreground hover:text-accent transition-colors"
                                                     >
                                                         <ChevronLeft className="h-4 w-4" />
                                                     </button>
                                                     <span className="text-xs font-semibold text-foreground">
-                                                        {format(calendarViewMonths[req.id] || req.docDate || new Date(), 'MMMM yyyy', { locale: id })}
+                                                        {format(calendarMonth, 'MMMM yyyy', { locale: id })}
                                                     </span>
                                                     <button
-                                                        onClick={() => {
-                                                            const base = calendarViewMonths[req.id] || req.docDate || new Date();
-                                                            handleCalendarMonthChange(req.id, addMonths(base, 1));
-                                                        }}
+                                                        onClick={() => handleCalendarMonthChange(req.id, addMonths(calendarMonth, 1))}
                                                         className="p-1.5 rounded-md hover:bg-accent/10 text-muted-foreground hover:text-accent transition-colors"
                                                     >
                                                         <ChevronRight className="h-4 w-4" />
@@ -300,11 +318,11 @@ export function NumberGeneratorTab({ hook }: NumberGeneratorTabProps) {
                                                 <Calendar
                                                     mode="single"
                                                     selected={req.docDate}
-                                                    month={calendarViewMonths[req.id] || req.docDate || new Date()}
+                                                    month={calendarMonth}
                                                     onMonthChange={(month) => handleCalendarMonthChange(req.id, month)}
                                                     onSelect={(d) => {
                                                         if (!d) return;
-                                                        handleRequestChange(req.id, 'docDate', d);
+                                                        handleRequestDateChange(req.id, d);
                                                         setOpenDatePickerId(null);
                                                     }}
                                                     className="p-2"
@@ -317,12 +335,12 @@ export function NumberGeneratorTab({ hook }: NumberGeneratorTabProps) {
                                                     components={{
                                                         Nav: () => <></>,
                                                     }}
-                                                    fixedWeeks={false}
+                                                    fixedWeeks
                                                 />
                                                 <div className="border-t border-primary/5 px-2 pt-2 pb-2 grid grid-cols-4 gap-1">
                                                     <button
                                                         onClick={() => {
-                                                            handleRequestChange(req.id, 'docDate', new Date());
+                                                            handleRequestDateChange(req.id, new Date());
                                                             setOpenDatePickerId(null);
                                                         }}
                                                         className="text-[9px] font-black uppercase tracking-widest text-muted-foreground hover:text-accent hover:bg-accent/5 rounded-md py-1.5 transition-colors text-center"
@@ -331,7 +349,7 @@ export function NumberGeneratorTab({ hook }: NumberGeneratorTabProps) {
                                                     </button>
                                                     <button
                                                         onClick={() => {
-                                                            handleRequestChange(req.id, 'docDate', addWeeks(new Date(), 1));
+                                                            handleRequestDateChange(req.id, addWeeks(new Date(), 1));
                                                             setOpenDatePickerId(null);
                                                         }}
                                                         className="text-[9px] font-black uppercase tracking-widest text-muted-foreground hover:text-accent hover:bg-accent/5 rounded-md py-1.5 transition-colors text-center"
@@ -340,7 +358,7 @@ export function NumberGeneratorTab({ hook }: NumberGeneratorTabProps) {
                                                     </button>
                                                     <button
                                                         onClick={() => {
-                                                            handleRequestChange(req.id, 'docDate', addMonths(new Date(), 1));
+                                                            handleRequestDateChange(req.id, addMonths(new Date(), 1));
                                                             setOpenDatePickerId(null);
                                                         }}
                                                         className="text-[9px] font-black uppercase tracking-widest text-muted-foreground hover:text-accent hover:bg-accent/5 rounded-md py-1.5 transition-colors text-center"
@@ -349,7 +367,7 @@ export function NumberGeneratorTab({ hook }: NumberGeneratorTabProps) {
                                                     </button>
                                                     <button
                                                         onClick={() => {
-                                                            handleRequestChange(req.id, 'docDate', addYears(new Date(), 1));
+                                                            handleRequestDateChange(req.id, addYears(new Date(), 1));
                                                             setOpenDatePickerId(null);
                                                         }}
                                                         className="text-[9px] font-black uppercase tracking-widest text-muted-foreground hover:text-accent hover:bg-accent/5 rounded-md py-1.5 transition-colors text-center"
@@ -359,42 +377,55 @@ export function NumberGeneratorTab({ hook }: NumberGeneratorTabProps) {
                                                 </div>
                                             </PopoverContent>
                                         </Popover>
+                                        {stockCount !== null && (
+                                            <p className={cn(
+                                                "text-[10px] font-bold uppercase tracking-widest",
+                                                stockCount === 0
+                                                    ? "text-destructive/70"
+                                                    : stockCount <= 5
+                                                        ? "text-amber-600"
+                                                        : "text-accent"
+                                            )}>
+                                                Stok periode ini: {stockCount}
+                                            </p>
+                                        )}
                                     </div>
                                     <div className="space-y-2">
                                         <Label className="text-[10px] font-black uppercase text-muted-foreground ml-1">Jumlah</Label>
-                                        <div className="flex items-center gap-1">
+                                        <div className="grid grid-cols-[2.5rem_minmax(3rem,1fr)_2.5rem] items-center gap-1">
                                             <Button
-                                                variant="outline" size="icon" className="h-11 w-11 rounded-lg border-primary/10 focus-visible:ring-accent"
-                                                onClick={() => handleRequestChange(req.id, 'quantity', Math.max(1, req.quantity - 1))}
+                                                variant="outline" size="icon" className="h-10 w-10 rounded-lg border-primary/10 focus-visible:ring-accent"
+                                                onClick={() => handleRequestChange(req.id, 'quantity', clampQuantity(req.quantity - 1))}
                                             >
                                                 <Minus className="h-3 w-3" />
                                             </Button>
                                             <Input
                                                 type="number" min="1" max="20" value={req.quantity}
-                                                onChange={(e) => handleRequestChange(req.id, 'quantity', Number(e.target.value))}
-                                                className="h-11 flex-1 min-w-12.5 text-center rounded-lg border-primary/10 font-bold [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none focus-visible:ring-accent"
+                                                onChange={(e) => handleRequestChange(req.id, 'quantity', clampQuantity(Number(e.target.value) || 1))}
+                                                className="h-10 min-w-0 text-center rounded-lg border-primary/10 font-bold [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none focus-visible:ring-accent"
                                             />
                                             <Button
-                                                variant="outline" size="icon" className="h-11 w-11 rounded-lg border-primary/10 focus-visible:ring-accent"
-                                                onClick={() => handleRequestChange(req.id, 'quantity', Math.min(20, req.quantity + 1))}
+                                                variant="outline" size="icon" className="h-10 w-10 rounded-lg border-primary/10 focus-visible:ring-accent"
+                                                onClick={() => handleRequestChange(req.id, 'quantity', clampQuantity(req.quantity + 1))}
                                             >
                                                 <Plus className="h-3 w-3" />
                                             </Button>
                                         </div>
                                     </div>
-                                    <div className="flex items-center h-11">
+                                    <div className="flex h-10 items-center md:mt-5">
                                         {requests.length > 1 && (
-                                            <Button variant="ghost" size="icon" onClick={() => removeRequest(req.id)} className="rounded-full hover:bg-destructive/10 text-destructive/40 hover:text-destructive transition-all">
+                                            <Button variant="ghost" size="icon" onClick={() => removeRequest(req.id)} className="h-9 w-9 rounded-lg text-destructive/40 transition-all hover:bg-destructive/10 hover:text-destructive">
                                                 <Trash2 className="h-4 w-4" />
                                             </Button>
                                         )}
                                     </div>
                                 </motion.div>
-                            ))}
+                                );
+                            })}
                         </AnimatePresence>
                     </div>
 
-                    <div className="flex flex-col md:flex-row items-center gap-4 pt-6 border-t border-dashed">
+                    <div className="flex flex-col items-stretch gap-3 border-t border-dashed pt-6 md:flex-row md:items-center">
                         <Button
                             variant="ghost"
                             onClick={addRequest}
@@ -435,6 +466,30 @@ export function NumberGeneratorTab({ hook }: NumberGeneratorTabProps) {
                                         <Loader2 className="h-8 w-8 animate-spin text-accent" />
                                         <Skeleton className="h-52 w-full rounded-xl" />
                                     </div>
+                                ) : stockErrorMessage ? (
+                                    <div className="bg-background p-12 text-center">
+                                        <AlertTriangle className="mx-auto mb-4 h-10 w-10 text-destructive/70" />
+                                        <p className="text-sm font-black uppercase tracking-widest text-destructive">Stok belum bisa dimuat</p>
+                                        <p className="mx-auto mt-2 max-w-xl text-sm text-muted-foreground">
+                                            {stockErrorMessage}
+                                        </p>
+                                        <Button
+                                            variant="outline"
+                                            onClick={fetchStockSummary}
+                                            className="mt-5 h-10 rounded-full border-destructive/20 px-5 text-xs font-black uppercase tracking-widest text-destructive hover:bg-destructive/5"
+                                        >
+                                            <RotateCcw className="mr-2 h-3.5 w-3.5" />
+                                            Coba Lagi
+                                        </Button>
+                                    </div>
+                                ) : stockYears.length === 0 ? (
+                                    <div className="bg-background p-12 text-center">
+                                        <Database className="mx-auto mb-4 h-10 w-10 text-muted-foreground/25" />
+                                        <p className="text-sm font-black uppercase tracking-widest text-primary">Stok belum tersedia</p>
+                                        <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
+                                            Belum ada nomor bebas untuk kelompok nilai proyek ini.
+                                        </p>
+                                    </div>
                                 ) : (
                                     <>
                                         <div className="bg-background">
@@ -471,7 +526,7 @@ export function NumberGeneratorTab({ hook }: NumberGeneratorTabProps) {
                             </DialogContent>
                         </Dialog>
 
-                        <div className="flex-1 min-w-0">
+                        <div className="min-w-0 md:ml-auto md:flex-1">
                             <Button
                                 onClick={handleGenerate}
                                 disabled={isGenerating || userLimit.isLimited}

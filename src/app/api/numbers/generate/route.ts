@@ -1,16 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAdminServices, verifyAdminFromRequest, normalizeDocType, getCategorySearchOrder } from '@/lib/api-helpers';
-import { format } from 'date-fns';
+import {
+    DAILY_LIMIT,
+    MAX_REQUEST_QUANTITY,
+    MAX_TOTAL_QUANTITY,
+    type ValueCategory,
+    getDateKeyInTimeZone,
+    parseDateKey,
+} from '@/lib/number-generator';
 import crypto from 'crypto';
-
-const DAILY_LIMIT = 15;
-const MAX_REQUEST_QUANTITY = 20;
-const MAX_TOTAL_QUANTITY = 100;
 
 interface GenerationRequestItem {
     category: string;
     docType: string;
-    docDate: string; // ISO string
+    docDate: string; // yyyy-MM-dd
     quantity: number;
 }
 
@@ -36,12 +39,16 @@ function hashIp(ip: string): string {
     return crypto.createHash('sha256').update(ip + salt).digest('hex');
 }
 
+function isValueCategory(value: string): value is ValueCategory {
+    return value === 'below_500m' || value === 'above_500m';
+}
+
 export async function GET(req: NextRequest) {
     try {
         const { adminDb } = getAdminServices();
         const ip = getClientIp(req);
         const ipHash = hashIp(ip);
-        const todayStr = format(new Date(), 'yyyy-MM-dd');
+        const todayStr = getDateKeyInTimeZone();
 
         const adminCheck = await verifyAdminFromRequest(req);
 
@@ -74,12 +81,12 @@ export async function POST(req: NextRequest) {
             idToken?: string;
         };
 
-        if (!requests?.length || !valueCategory) {
+        if (!Array.isArray(requests) || requests.length === 0 || !isValueCategory(valueCategory)) {
             return NextResponse.json({ error: 'Body permintaan tidak valid.' }, { status: 400 });
         }
 
         for (const r of requests) {
-            if (!r.category || !r.docType || !r.docDate || r.quantity < 1 || !Number.isInteger(r.quantity)) {
+            if (!r.category || !r.docType || !parseDateKey(r.docDate) || r.quantity < 1 || !Number.isInteger(r.quantity)) {
                 return NextResponse.json({ error: 'Input tidak lengkap.' }, { status: 400 });
             }
 
@@ -116,7 +123,7 @@ export async function POST(req: NextRequest) {
             assignedTo = `ip:${ipHash.slice(0, 12)}`;
         }
 
-        const todayStr = format(new Date(), 'yyyy-MM-dd');
+        const todayStr = getDateKeyInTimeZone();
 
         // ─── IP-based daily limit check (skip for admin) ─────────────────────────
         const limitRef = adminDb.collection('ipGenerationLimits').doc(ipHash);
@@ -159,9 +166,12 @@ export async function POST(req: NextRequest) {
             const docsToAssign: Array<{ docRef: FirebaseFirestore.DocumentReference; normalizedDocType: string }> = [];
 
             for (const req of requests) {
-                const docDate = new Date(req.docDate);
-                const year = docDate.getFullYear();
-                const month = docDate.getMonth() + 1;
+                const parsedDate = parseDateKey(req.docDate);
+                if (!parsedDate) {
+                    throw new Error('Tanggal dokumen tidak valid.');
+                }
+
+                const { year, month, dateKey } = parsedDate;
                 const normalizedDocType = normalizeDocType(req.docType);
                 const categorySearchOrder = getCategorySearchOrder(req.category);
 
@@ -170,7 +180,7 @@ export async function POST(req: NextRequest) {
 
                 if (processQty <= 0 && !isAdmin) {
                     for (let i = 0; i < req.quantity; i++) {
-                        txResults.push({ text: 'KUOTA HABIS', rawNumber: '', date: req.docDate, docType: req.docType, isError: true });
+                        txResults.push({ text: 'KUOTA HABIS', rawNumber: '', date: dateKey, docType: req.docType, isError: true });
                     }
                     continue;
                 }
@@ -212,7 +222,7 @@ export async function POST(req: NextRequest) {
                     txResults.push({
                         text: fullNum.replace('{DOCTYPE}', normalizedDocType),
                         rawNumber: fullNum.replace('{DOCTYPE} ', ''),
-                        date: req.docDate,
+                        date: dateKey,
                         docType: normalizedDocType,
                     });
                     docsToAssign.push({
@@ -224,7 +234,7 @@ export async function POST(req: NextRequest) {
 
                 const missing = req.quantity - matchedDocs.length;
                 for (let i = 0; i < missing; i++) {
-                    txResults.push({ text: 'STOK HABIS', rawNumber: '', date: req.docDate, docType: normalizedDocType, isError: true });
+                    txResults.push({ text: 'STOK HABIS', rawNumber: '', date: dateKey, docType: normalizedDocType, isError: true });
                 }
             }
 
