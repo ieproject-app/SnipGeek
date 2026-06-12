@@ -89,6 +89,14 @@ export function ToolsList({ dictionary, locale, isDevelopment }: ToolsListProps)
       badge: pageContent.open_tool,
       badgeVariant: 'secondary' as const,
     },
+    {
+      id: "number_generator",
+      icon: <Hash className="h-8 w-8" />,
+      isLink: true,
+      href: `${linkPrefix}/tools/number-generator`,
+      badge: pageContent.open_tool,
+      badgeVariant: "secondary" as const,
+    },
   ];
 
   const devPreviewTools: ToolCardConfig[] = [
@@ -131,15 +139,6 @@ export function ToolsList({ dictionary, locale, isDevelopment }: ToolsListProps)
       icon: <ScrollText className="h-8 w-8" />,
       isLink: true,
       href: `${linkPrefix}/tools/address-label-generator`,
-      badge: pageContent.open_tool,
-      badgeVariant: "secondary" as const,
-      requiresAuth: true,
-    },
-    {
-      id: "number_generator",
-      icon: <Hash className="h-8 w-8" />,
-      isLink: true,
-      href: `${linkPrefix}/tools/number-generator`,
       badge: pageContent.open_tool,
       badgeVariant: "secondary" as const,
       requiresAuth: true,
