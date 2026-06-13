@@ -1355,10 +1355,6 @@ export function usePromptLogic({
       prompt += `- Ensure output is MDX-parse-safe (no invalid JS expressions such as raw moustache tokens).\n`;
     }
 
-    if (hasHeroImage) {
-      prompt += `- Hero image rule: Hero Image is reserved for frontmatter heroImage/banner only and must not be repeated inside article body unless explicitly requested.\n`;
-    }
-
     prompt += `\n**9. SEO & HELPFUL CONTENT REQUIREMENTS**\n`;
     prompt += `- Match the primary search intent directly; do not open with generic filler.\n`;
     prompt += `- In the first 120 words, include a concise direct answer/outcome before deep explanation.\n`;
