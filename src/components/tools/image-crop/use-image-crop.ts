@@ -285,11 +285,11 @@ export function useImageCrop(t: ImageCropTranslations, aspectRatio: AspectRatioM
       objectUrlRef.current = url;
       const a = document.createElement("a");
       a.href = url;
-      a.download = `${fileName}-${exportW}x${exportH}.${outputExt}`;
+      const downloadedName = `hero.${outputExt}`;
+      a.download = downloadedName;
       a.click();
 
       // Notify with size info
-      const downloadedName = `${fileName}-${exportW}x${exportH}.${outputExt}`;
       const sizeStr = formatBytes(outputBlob.size);
       const message = t.downloaded
         .replace("{filename}", downloadedName)
