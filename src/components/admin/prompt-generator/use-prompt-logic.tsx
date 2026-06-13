@@ -1557,12 +1557,8 @@ export function usePromptLogic({
     setOriginalContent("");
     setModInstructions("");
     setPublishDate("");
-    setHeroImage("");
-    setImages("");
     setNewsAngle("");
     setNewsSourceUrls([""]);
-    setImageGridMappings("");
-    setGalleryMappings("");
     setSpecsMappings("");
     setSelectedSlug("");
     setDownloadItems([]);
