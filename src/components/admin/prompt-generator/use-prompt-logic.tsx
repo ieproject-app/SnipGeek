@@ -1026,8 +1026,6 @@ export function usePromptLogic({
         if (["series", "news", "tips", "notes", "apps"].includes(d.contentType)) setContentType(d.contentType);
         if (typeof d.draft === "string") setDraft(d.draft);
         if (typeof d.publishDate === "string" && d.publishDate.trim() !== "") setPublishDate(d.publishDate);
-        if (typeof d.heroImage === "string") setHeroImage(d.heroImage);
-        if (typeof d.images === "string") setImages(d.images);
         if (typeof d.newsAngle === "string") setNewsAngle(d.newsAngle);
         if (Array.isArray(d.newsSourceUrls) && d.newsSourceUrls.length > 0) setNewsSourceUrls(d.newsSourceUrls);
         if (typeof d.modInstructions === "string") setModInstructions(d.modInstructions);
