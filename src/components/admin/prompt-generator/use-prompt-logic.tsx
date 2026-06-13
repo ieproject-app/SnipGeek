@@ -1273,13 +1273,14 @@ export function usePromptLogic({
       prompt += `Upload via POST /api/admin/cloudinary/upload\n`;
       prompt += `  FormData fields:\n`;
       prompt += `    file     : <binary image>\n`;
+      prompt += `    folder   : ${cloudinaryTarget}\n`;
       prompt += `    slug     : ${slug || "[article-slug]"}\n`;
       prompt += `    type     : ${contentSegment}\n`;
       if (category) prompt += `    category : ${category}\n`;
       prompt += `\n`;
       prompt += `After upload, each URL will be:\n`;
       prompt += `  https://res.cloudinary.com/snipgeek/image/upload/q_auto/f_auto/v{timestamp}/${cloudinaryTarget}/{filename}\n\n`;
-      prompt += `Use ONLY Cloudinary URLs in final MDX. Never use local file paths.\n\n`;
+      prompt += `Use ONLY Cloudinary URLs in final MDX. Never use local file paths. Do NOT suggest, request, or perform renaming of the local staging folder path or the Cloudinary target path to match the article slug; keep the directory structure exactly as specified in the brief.\n\n`;
 
       prompt += `**AUTOMATED PLACEMENT RULESET:**\n`;
       prompt += `- \`hero.webp\`: Use exclusively for the frontmatter \`heroImage\` banner.\n`;
@@ -1358,8 +1359,9 @@ export function usePromptLogic({
     prompt += `\n**9. SEO & HELPFUL CONTENT REQUIREMENTS**\n`;
     prompt += `- Match the primary search intent directly; do not open with generic filler.\n`;
     prompt += `- In the first 120 words, include a concise direct answer/outcome before deep explanation.\n`;
-    prompt += `- Generate a strong SEO title (target ~55-65 chars) and meta description (STRICT: 50–165 chars, no exceptions — the deploy check blocks anything outside this range).\n`;
-    prompt += `- Meta description must be a single sentence or two short clauses. No filler opener like "A guide to..." or "This article covers...". Start with the core value or outcome directly.\n`;
+    prompt += `- Generate a strong SEO title (target ~55-65 chars) based on the actual article content. The title must be descriptive and keyword-focused (do not use generic or short titles).\n`;
+    prompt += `- Generate a descriptive, SEO-friendly English slug (lowercase kebab-case, e.g. "testing-mimocode-terminal-ai-coding-assistant") based on the English title. The slug and translationKey for both language versions of a bilingual post MUST ALWAYS be in English. Do NOT copy a short staging folder name (e.g. "mimo-code") for the slug.\n`;
+    prompt += `- Generate a strong meta description (STRICT: 50–165 chars, no exceptions — the deploy check blocks anything outside this range).\n`;
     prompt += `- Description checklist: (1) under 165 chars including spaces, (2) contains the primary keyword naturally, (3) reads as a complete thought, not a truncated sentence.\n`;
     prompt += `- Keep one clear H1 and build scannable H2/H3 sections with practical progression.\n`;
     prompt += `- For tutorial/procedural posts, include: prerequisites, step-by-step actions, verification/check results, and common error fixes.\n`;
@@ -1401,6 +1403,8 @@ export function usePromptLogic({
     prompt += `- First person voice is consistent in both English and Indonesian versions.\n`;
     prompt += `- Indonesian version reads naturally as native Indonesian — not translated from English.\n`;
     prompt += `- At least one moment of personal reaction (doubt, surprise, realisation) is present in narrative sections.\n`;
+    prompt += `- Title is custom, descriptive, and matches SEO target lengths (55-65 chars).\n`;
+    prompt += `- Slug and translationKey are in English for both versions and are descriptive, NOT just copying the staging folder name.\n`;
 
     prompt += `\n---\n\n`;
     if (isModify) {
@@ -1449,7 +1453,7 @@ export function usePromptLogic({
     }
     prompt += `For procedural or tutorial sections, use custom MDX components \`<Steps>\` and \`<Step>\` instead of plain numbered markdown lists. `;
     prompt += `Set the hero.webp image as frontmatter heroImage/banner and do not render it again in article body unless explicitly requested. `;
-    prompt += `Ensure all metadata (slugs, translation keys, alt texts) are generated automatically. Tags must never contain spaces and must never produce %20 in URLs. Any tag that would produce %20 is invalid and must be rewritten into lowercase kebab-case (e.g., windows-11, clean-install, ui-design, ubuntu-25-10). Always include 1 platform tag (windows/ubuntu/linux/android/hardware) and 1 versioned tag if the article targets a specific OS version (e.g., windows-11, ubuntu-25-10). Minimum 3 tags, maximum 6 tags per article. `;
+    prompt += `Ensure all metadata (slugs, translation keys, alt texts) are generated automatically. Both the English and Indonesian versions of a bilingual post MUST use the exact same English-language slug (lowercase kebab-case) for both their \`slug\` and \`translationKey\` fields. Do NOT just copy the staging folder name (e.g., if staging folder is "mimo-code", do NOT use "mimo-code" as the slug). Instead, generate a descriptive, SEO-friendly English slug derived from the SEO English title (e.g., "testing-mimocode-terminal-ai-coding-assistant"). The title must be specifically crafted to match SEO standards (~55-65 chars) and represent the actual content of the article. Tags must never contain spaces and must never produce %20 in URLs. Any tag that would produce %20 is invalid and must be rewritten into lowercase kebab-case (e.g., windows-11, clean-install, ui-design, ubuntu-25-10). Always include 1 platform tag (windows/ubuntu/linux/android/hardware) and 1 versioned tag if the article targets a specific OS version (e.g., windows-11, ubuntu-25-10). Minimum 3 tags, maximum 6 tags per article. `;
     prompt += `Run a final self-check against the readability rhythm rules and the QA checklist before returning final MDX. `;
     prompt += `Ensure the output is genuinely helpful, intent-focused, and clearly better than a generic rewrite.`;
 

@@ -38,6 +38,7 @@ export async function POST(req: NextRequest) {
   }
 
   const fileField = formData.get("file");
+  const customFolder = (formData.get("folder") as string | null)?.trim();
   const slug = (formData.get("slug") as string | null)?.trim();
   const type = (formData.get("type") as string | null)?.trim();
   const category = (formData.get("category") as string | null)?.trim();
@@ -46,19 +47,25 @@ export async function POST(req: NextRequest) {
   if (!fileField || !(fileField instanceof Blob)) {
     return NextResponse.json({ error: "Missing required field: file (must be a Blob/File)." }, { status: 400 });
   }
-  if (!slug) {
-    return NextResponse.json({ error: "Missing required field: slug." }, { status: 400 });
-  }
-  if (!type || !["_posts", "_notes"].includes(type)) {
-    return NextResponse.json({ error: "Field 'type' must be '_posts' or '_notes'." }, { status: 400 });
+  if (!customFolder) {
+    if (!slug) {
+      return NextResponse.json({ error: "Missing required field: slug." }, { status: 400 });
+    }
+    if (!type || !["_posts", "_notes"].includes(type)) {
+      return NextResponse.json({ error: "Field 'type' must be '_posts' or '_notes'." }, { status: 400 });
+    }
   }
 
   // ── Build the Cloudinary folder path ──
-  // Pattern: snipgeek/images/{type}/{category?}/{slug}
-  const segments = ["snipgeek", "images", type];
-  if (category) segments.push(category);
-  segments.push(slug);
-  const folder = segments.join("/");
+  let folder = "";
+  if (customFolder) {
+    folder = customFolder;
+  } else {
+    const segments = ["snipgeek", "images", type || "_posts"];
+    if (category) segments.push(category);
+    if (slug) segments.push(slug);
+    folder = segments.join("/");
+  }
 
   // ── Derive public_id from original filename (strip extension) ──
   const file = fileField as File;
@@ -88,7 +95,9 @@ export async function POST(req: NextRequest) {
     }>((resolve, reject) => {
       const uploadStream = cloudinary.uploader.upload_stream(
         {
-          public_id: publicId,
+          folder: folder,
+          asset_folder: folder,
+          public_id: safePublicId,
           overwrite: true,
           resource_type: "image",
           // Preserve uploaded WebP as-is; let Cloudinary handle format via f_auto at delivery
