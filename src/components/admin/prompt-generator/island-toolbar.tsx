@@ -19,8 +19,6 @@ export function IslandToolbar() {
     categoryHint, setCategoryHint,
     showImages, setShowImages,
     showDownloads, setShowDownloads,
-    showGrids, setShowGrids,
-    showGallery, setShowGallery,
     showSpecs, setShowSpecs,
     isIdOnly, setIsIdOnly,
     dictionary
@@ -215,8 +213,6 @@ export function IslandToolbar() {
       >
         <FeaturePill active={showImages} onClick={() => setShowImages(!showImages)} icon={ImageIcon} label="Images" activeClass="bg-emerald-500 text-white border-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.3)]" />
         <FeaturePill active={showDownloads} onClick={() => setShowDownloads(!showDownloads)} icon={Download} label="Downloads" activeClass="bg-blue-500 text-white border-blue-400 shadow-[0_0_15px_rgba(59,130,246,0.3)]" />
-        <FeaturePill active={showGrids} onClick={() => setShowGrids(!showGrids)} icon={Grid3X3} label="Grids" activeClass="bg-violet-500 text-white border-violet-400 shadow-[0_0_15px_rgba(139,92,246,0.3)]" />
-        <FeaturePill active={showGallery} onClick={() => setShowGallery(!showGallery)} icon={GalleryHorizontal} label="Gallery" activeClass="bg-fuchsia-500 text-white border-fuchsia-400 shadow-[0_0_15px_rgba(217,70,239,0.3)]" />
         <FeaturePill active={showSpecs} onClick={() => setShowSpecs(!showSpecs)} icon={Settings2} label="Specs" activeClass="bg-orange-500 text-white border-orange-400 shadow-[0_0_15px_rgba(249,115,22,0.3)]" />
         <FeaturePill active={isIdOnly} onClick={() => setIsIdOnly(!isIdOnly)} icon={Hash} label="ID-Only" activeClass="bg-rose-500 text-white border-rose-400 shadow-[0_0_15px_rgba(244,63,94,0.3)]" />
       </motion.div>

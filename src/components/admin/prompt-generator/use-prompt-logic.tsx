@@ -195,17 +195,7 @@ export const parseNaturalDate = (input: string): string => {
   return `${yyyy}-${mm}-${dd}`;
 };
 
-// ──────────────────────────────────────────────────────────────────────────────
-// Utility: Normalize Image Paths (flip \ to /, strip 'public/', ensure leading /)
-// ──────────────────────────────────────────────────────────────────────────────
-const normalizeImagePath = (path: string): string => {
-  if (!path) return "";
-  return path
-    .trim()
-    .replace(/\\/g, "/") // Flip \ to /
-    .replace(/^public\//, "/") // Remove 'public/' prefix
-    .replace(/^\/+/, "/"); // Ensure single leading /
-};
+
 
 // Safe UUID v4 generator — works in HTTP, HTTPS, and all browsers
 const generateUUID = (): string => {
@@ -541,8 +531,6 @@ export function usePromptLogic({
   // ── Feature flags (persisted) ──
   const [showImages, setShowImages] = useState(true);
   const [showDownloads, setShowDownloads] = useState(false);
-  const [showGrids, setShowGrids] = useState(false);
-  const [showGallery, setShowGallery] = useState(false);
   const [showSpecs, setShowSpecs] = useState(false);
   const [isIdOnly, setIsIdOnly] = useState(false);
   const [captionMode, setCaptionMode] = useState<"off" | "auto" | "manual">("auto");
@@ -562,11 +550,7 @@ export function usePromptLogic({
   // ── Media / technical ──
   const [isTechnicalExpanded, setIsTechnicalExpanded] = useState(true);
   const [downloadItems, setDownloadItems] = useState<DownloadItem[]>([]);
-  const [imageGridMappings, setImageGridMappings] = useState("");
-  const [galleryMappings, setGalleryMappings] = useState("");
   const [specsMappings, setSpecsMappings] = useState("");
-  const [heroImage, setHeroImage] = useState("");
-  const [images, setImages] = useState("");
   // ── Staging folder (for Cloudinary upload instruction) ──
   const [stagingFolderPath, setStagingFolderPath] = useState("");
 
@@ -576,10 +560,6 @@ export function usePromptLogic({
   const debouncedModInstructions = useDebounce(modInstructions, 500);
   const debouncedNewsAngle = useDebounce(newsAngle, 500);
   const debouncedNewsSourceUrls = useDebounce(newsSourceUrls, 500);
-  const debouncedHeroImage = useDebounce(heroImage, 300);
-  const debouncedImages = useDebounce(images, 300);
-  const debouncedImageGridMappings = useDebounce(imageGridMappings, 300);
-  const debouncedGalleryMappings = useDebounce(galleryMappings, 300);
   const debouncedStagingFolderPath = useDebounce(stagingFolderPath, 400);
   const debouncedSpecsMappings = useDebounce(specsMappings, 300);
   // Debounce free-text fields that feed directly into the prompt to reduce
@@ -851,8 +831,8 @@ export function usePromptLogic({
 
   const sourceContent = mode === "modify" ? debouncedOriginalContent : debouncedDraft;
   const imageLines = useMemo(
-    () => debouncedImages.split("\n").filter((line) => line.trim() !== ""),
-    [debouncedImages],
+    () => [],
+    [],
   );
 
   const parsedCaptionMaxCount = useMemo(() => {
@@ -880,16 +860,6 @@ export function usePromptLogic({
         label: "Link",
         enabled: showDownloads,
         count: downloadItems.filter((item) => item.value.trim() !== "").length,
-      },
-      {
-        label: "Grid",
-        enabled: showGrids,
-        count: debouncedImageGridMappings.split("\n").filter((line) => line.trim() !== "").length,
-      },
-      {
-        label: "Gallery",
-        enabled: showGallery,
-        count: debouncedGalleryMappings.split("\n").filter((line) => line.trim() !== "").length,
       },
       {
         label: "Specs",
@@ -960,15 +930,6 @@ export function usePromptLogic({
       }
     }
 
-    if (showGallery && debouncedGalleryMappings.trim() !== "" && !/\{\{\s*Gallery\s+\d+\s*\}\}/i.test(sourceContent)) {
-      issues.push({
-        id: "gallery-unused",
-        severity: "warning",
-        title: "Gallery entries are configured but not referenced",
-        description: "Gallery mappings exist, but the source content does not reference any {{Gallery n}} marker.",
-      });
-    }
-
     if (showDownloads && downloadItems.some((item) => item.value.trim() !== "") && !/\{\{\s*Link\s+\d+\s*\}\}/i.test(sourceContent)) {
       issues.push({
         id: "downloads-unused",
@@ -978,42 +939,13 @@ export function usePromptLogic({
       });
     }
 
-    if (showImages && debouncedHeroImage.trim() !== "") {
-      const heroPath = normalizeImagePath((debouncedHeroImage.split("|")[0] ?? "").trim());
-      if (heroPath && sourceContent.includes(heroPath)) {
-        issues.push({
-          id: "hero-image-duplicated",
-          severity: "warning",
-          title: "Hero image path appears in body content",
-          description: "Hero image is reserved for frontmatter. Remove it from article body unless you intentionally want duplicate rendering.",
-        });
-      }
-      // Warn if hero path looks like a local path instead of a Cloudinary URL
-      const rawHeroPath = (debouncedHeroImage.split("|")[0] ?? "").trim();
-      if (rawHeroPath && !rawHeroPath.startsWith("http") && rawHeroPath.includes("/images/")) {
-        issues.push({
-          id: "hero-local-path",
-          severity: "warning",
-          title: "Hero image is a local path",
-          description: "Hero image looks like a local file path. Upload to Cloudinary first and replace with the Cloudinary URL.",
-        });
-      }
-    }
-
-    // Warn if any body image is a local path
-    if (showImages) {
-      const localBodyImages = debouncedImages
-        .split("\n")
-        .map((l) => (l.split("|")[0] ?? "").trim())
-        .filter((p) => p && !p.startsWith("http") && p.includes("/images/"));
-      if (localBodyImages.length > 0) {
-        issues.push({
-          id: "body-local-paths",
-          severity: "warning",
-          title: `${localBodyImages.length} body image(s) are local paths`,
-          description: "These images have not been uploaded to Cloudinary yet. Use the staging folder path and upload instructions in the prompt.",
-        });
-      }
+    if (showImages && debouncedStagingFolderPath.trim() === "") {
+      issues.push({
+        id: "staging-path-missing",
+        severity: "error",
+        title: "Staging Folder Path is missing",
+        description: "Images feature is enabled but no staging path is provided. Provide the local folder path or disable the Images feature.",
+      });
     }
 
     if (mode === "create" && (contentType === "news" || contentType === "apps")) {
@@ -1041,16 +973,11 @@ export function usePromptLogic({
   }, [
     contentType,
     downloadItems,
-    debouncedGalleryMappings,
-    debouncedHeroImage,
-    debouncedImageGridMappings,
-    debouncedImages,
+    debouncedStagingFolderPath,
     mode,
     debouncedNewsAngle,
     debouncedNewsSourceUrls,
     showDownloads,
-    showGallery,
-    showGrids,
     showImages,
     showSpecs,
     sourceContent,
@@ -1074,8 +1001,6 @@ export function usePromptLogic({
         const p = JSON.parse(saved);
         setShowImages(p.showImages !== undefined ? !!p.showImages : true);
         setShowDownloads(!!p.showDownloads);
-        setShowGrids(!!p.showGrids);
-        setShowGallery(!!p.showGallery);
         setShowSpecs(!!p.showSpecs);
         setIsIdOnly(!!p.isIdOnly);
         setCaptionMode(p.captionMode === "off" || p.captionMode === "manual" ? p.captionMode : "auto");
@@ -1113,8 +1038,6 @@ export function usePromptLogic({
         if (typeof d.isPublished === "boolean") setIsPublished(d.isPublished);
         if (typeof d.isFeatured === "boolean") setIsFeatured(d.isFeatured);
         if (typeof d.isHideFromHome === "boolean") setIsHideFromHome(d.isHideFromHome);
-        if (typeof d.imageGridMappings === "string") setImageGridMappings(d.imageGridMappings);
-        if (typeof d.galleryMappings === "string") setGalleryMappings(d.galleryMappings);
         if (typeof d.specsMappings === "string") setSpecsMappings(d.specsMappings);
         if (typeof d.selectedSlug === "string") setSelectedSlug(d.selectedSlug);
         if (typeof d.stagingFolderPath === "string") setStagingFolderPath(d.stagingFolderPath);
@@ -1129,8 +1052,6 @@ export function usePromptLogic({
       JSON.stringify({
         showImages,
         showDownloads,
-        showGrids,
-        showGallery,
         showSpecs,
         isIdOnly,
         captionMode,
@@ -1143,8 +1064,6 @@ export function usePromptLogic({
   }, [
     showImages,
     showDownloads,
-    showGrids,
-    showGallery,
     showSpecs,
     isIdOnly,
     captionMode,
@@ -1165,8 +1084,6 @@ export function usePromptLogic({
         contentType,
         draft,
         publishDate,
-        heroImage,
-        images,
         newsAngle,
         newsSourceUrls,
         modInstructions,
@@ -1177,8 +1094,6 @@ export function usePromptLogic({
         isPublished,
         isFeatured,
         isHideFromHome,
-        imageGridMappings,
-        galleryMappings,
         specsMappings,
         selectedSlug,
         stagingFolderPath,
@@ -1189,8 +1104,6 @@ export function usePromptLogic({
     contentType,
     draft,
     publishDate,
-    heroImage,
-    images,
     newsAngle,
     newsSourceUrls,
     modInstructions,
@@ -1201,8 +1114,6 @@ export function usePromptLogic({
     isPublished,
     isFeatured,
     isHideFromHome,
-    imageGridMappings,
-    galleryMappings,
     specsMappings,
     selectedSlug,
     stagingFolderPath,
@@ -1338,108 +1249,51 @@ export function usePromptLogic({
       }
     }
 
-    const hasHeroImage = showImages && debouncedHeroImage.trim() !== "";
-    const hasBodyImages = showImages && imageLines.length > 0;
-    const hasGridImages = showGrids && debouncedImageGridMappings.trim() !== "";
-    const hasGalleryImages = showGallery && debouncedGalleryMappings.trim() !== "";
     const stagingPath = debouncedStagingFolderPath.trim();
-    const hasAnyImages = hasHeroImage || hasBodyImages || hasGridImages || hasGalleryImages;
+    const hasAnyImages = showImages && stagingPath !== "";
 
     if (hasAnyImages) {
-      prompt += `**3. ASSETS & MEDIA**\n`;
+      // Derive Cloudinary target from staging path:
+      const normalised = stagingPath
+        .replace(/\\/g, "/")
+        .replace(/^\/?public\//, "")
+        .replace(/\/+$/, "");
+      const cloudinaryTarget = `snipgeek/${normalised}`;
 
-      // ── Upload instruction block (only when staging folder is set) ──
-      if (stagingPath) {
-        // Derive Cloudinary target from staging path:
-        // Strip leading slash/public, normalise separators
-        const normalised = stagingPath
-          .replace(/\\/g, "/")
-          .replace(/^\/?public\//, "")
-          .replace(/\/+$/, "");
-        const cloudinaryTarget = `snipgeek/${normalised}`;
+      // Parse category and slug from the path for upload API fields
+      const pathParts = normalised.replace(/^images\//, "").split("/");
+      const contentSegment = pathParts[0] ?? "_posts"; // e.g. _posts or _notes
+      const isNotes = contentSegment === "_notes";
+      const category = !isNotes && pathParts.length >= 3 ? pathParts[1] : "";
+      const slug = pathParts[pathParts.length - 1] ?? "";
 
-        // Parse category and slug from the path for upload API fields
-        const pathParts = normalised.replace(/^images\//, "").split("/");
-        const contentSegment = pathParts[0] ?? "_posts"; // e.g. _posts or _notes
-        const isNotes = contentSegment === "_notes";
-        const category = !isNotes && pathParts.length >= 3 ? pathParts[1] : "";
-        const slug = pathParts[pathParts.length - 1] ?? "";
+      prompt += `**3. ASSETS & MEDIA (AUTOMATED STAGING)**\n`;
+      prompt += `\n⚠️  PRE-WRITING TASK — READ FOLDER & UPLOAD IMAGES:\n`;
+      prompt += `You must read the staging folder, upload every WebP image to Cloudinary, and use them to construct the article.\n\n`;
+      prompt += `Staging path (local) : ${stagingPath}\n`;
+      prompt += `Cloudinary target     : ${cloudinaryTarget}\n\n`;
+      prompt += `Upload via POST /api/admin/cloudinary/upload\n`;
+      prompt += `  FormData fields:\n`;
+      prompt += `    file     : <binary image>\n`;
+      prompt += `    slug     : ${slug || "[article-slug]"}\n`;
+      prompt += `    type     : ${contentSegment}\n`;
+      if (category) prompt += `    category : ${category}\n`;
+      prompt += `\n`;
+      prompt += `After upload, each URL will be:\n`;
+      prompt += `  https://res.cloudinary.com/snipgeek/image/upload/q_auto/f_auto/v{timestamp}/${cloudinaryTarget}/{filename}\n\n`;
+      prompt += `Use ONLY Cloudinary URLs in final MDX. Never use local file paths.\n\n`;
 
-        prompt += `\n⚠️  PRE-WRITING TASK — UPLOAD ALL IMAGES BEFORE WRITING:\n`;
-        prompt += `You must upload every image listed below to Cloudinary before inserting any URLs into content.\n\n`;
-        prompt += `Staging path (local) : ${stagingPath}\n`;
-        prompt += `Cloudinary target     : ${cloudinaryTarget}\n\n`;
-        prompt += `Upload via POST /api/admin/cloudinary/upload\n`;
-        prompt += `  FormData fields:\n`;
-        prompt += `    file     : <binary image>\n`;
-        prompt += `    slug     : ${slug || "[article-slug]"}\n`;
-        prompt += `    type     : ${contentSegment}\n`;
-        if (category) prompt += `    category : ${category}\n`;
-        prompt += `\n`;
-        prompt += `After upload, each URL will be:\n`;
-        prompt += `  https://res.cloudinary.com/snipgeek/image/upload/q_auto/f_auto/v{timestamp}/${cloudinaryTarget}/{filename}\n\n`;
-        prompt += `Use ONLY Cloudinary URLs in final MDX. Never use local file paths.\n\n`;
+      prompt += `**AUTOMATED PLACEMENT RULESET:**\n`;
+      prompt += `- \`hero.webp\`: Use exclusively for the frontmatter \`heroImage\` banner.\n`;
+      prompt += `- \`01-*.webp\`, \`02-*.webp\`: Distribute these chronologically into the article body. Use the filename suffix (e.g., 'camera' from '02-camera.webp') to place the image under the most relevant contextual paragraph. Do not clump them; keep 2-3 paragraphs of breathing space between images.\n`;
+      prompt += `- \`gallery-*.webp\`: Group all gallery images into a single \`<Gallery>\` MDX component and place it near the end of the article (before the conclusion).\n`;
+      prompt += `- \`grid-*.webp\`: Group all grid images into a single \`<ImageGrid columns={2}>\` MDX component and place it near the end of the article.\n`;
+      prompt += `- **Alt Text & Captions**: Generate highly accurate, SEO-friendly Alt Text for every image based on the filename and surrounding paragraph context. Follow the Caption Policy below.\n\n`;
 
-        // Build file list
-        prompt += `Files to upload (in this order):\n`;
-        let fileIndex = 1;
-        if (hasHeroImage) {
-          const heroRaw = (debouncedHeroImage.split("|")[0] ?? "").trim();
-          prompt += `  ${fileIndex++}. [HERO]    hero.webp\n`;
-          // If it's already a Cloudinary URL, note it
-          if (heroRaw.startsWith("http")) {
-            prompt += `     (Already uploaded: ${heroRaw})\n`;
-          }
-        }
-        if (hasBodyImages) {
-          imageLines.forEach((line, i) => {
-            const rawPath = (line.split("|")[0] ?? "").trim();
-            const filename = (rawPath.split("/").pop() ?? rawPath) || `image-${String(i + 1).padStart(2, "0")}.webp`;
-            prompt += `  ${fileIndex++}. [IMAGE ${i + 1}] ${filename}\n`;
-          });
-        }
-        if (hasGridImages) {
-          debouncedImageGridMappings.split("\n").filter(l => l.trim()).forEach((line, i) => {
-            const pathPart = line.split("|")[1] ?? line;
-            pathPart.split(",").map(p => p.trim()).filter(Boolean).forEach((p) => {
-              const fn = p.split("/").pop() ?? p;
-              prompt += `  ${fileIndex++}. [GRID ${i + 1}]  ${fn}\n`;
-            });
-          });
-        }
-        if (hasGalleryImages) {
-          debouncedGalleryMappings.split("\n").filter(l => l.trim()).forEach((line, i) => {
-            const pathPart = line.split("|")[1] ?? line;
-            pathPart.split(",").map(p => p.trim()).filter(Boolean).forEach((p) => {
-              const fn = p.split("/").pop() ?? p;
-              prompt += `  ${fileIndex++}. [GALLERY ${i + 1}] ${fn}\n`;
-            });
-          });
-        }
-
-        prompt += `\n🗑️  CLEANUP RULE (run after article is published for 2+ days):\n`;
-        prompt += `Delete the CONTENTS of the staging folder (not the folder itself):\n`;
-        prompt += `  ${stagingPath}\n`;
-        prompt += `The Cloudinary copy is permanent and serves all production traffic.\n\n`;
-      }
-
-      // ── Image list for AI content placement ──
-      if (hasHeroImage) {
-        const heroParts = debouncedHeroImage.split("|").map((s) => s?.trim() || "");
-        const heroPath = normalizeImagePath(heroParts[0] ?? "");
-        const heroAlt = heroParts[1] ?? "";
-        prompt += `- Hero Image (HERO ONLY): "${heroPath}"${heroAlt ? ` | Label: "${heroAlt}"` : ""} | Use only as frontmatter heroImage/banner. Do not insert into article body unless explicitly requested.\n`;
-      }
-      if (hasBodyImages) {
-        imageLines.forEach((line, i) => {
-          const parts = line.split("|").map((s) => s?.trim() || "");
-          const imgPath = parts[0] ?? "";
-          const imgAlt = parts[1] ?? "";
-          const imgCaptionHint = parts[2] ?? "";
-          const normalizedPath = normalizeImagePath(imgPath);
-          prompt += `- Image ${i + 1}: "${normalizedPath}"${imgAlt ? ` | Label: "${imgAlt}"` : ""}${imgCaptionHint ? ` | Caption Hint: "${imgCaptionHint}"` : ""}\n`;
-        });
-      }
+      prompt += `\n🗑️  CLEANUP RULE (run after article is published for 2+ days):\n`;
+      prompt += `Delete the CONTENTS of the staging folder (not the folder itself):\n`;
+      prompt += `  ${stagingPath}\n`;
+      prompt += `The Cloudinary copy is permanent and serves all production traffic.\n\n`;
     }
 
     prompt += `\n**3A. YOUTUBE EMBED POLICY**\n`;
@@ -1447,13 +1301,13 @@ export function usePromptLogic({
     prompt += `- NEVER use raw <iframe> tags or markdown links for YouTube videos.\n`;
     prompt += `- Example: \`<YouTubeEmbed videoid="ogfYd705cRs" />\`\n`;
 
-    if (!isModify && hasBodyImages && captionMode !== "off") {
+    if (!isModify && hasAnyImages && captionMode !== "off") {
       prompt += `\n**3B. IMAGE CAPTION POLICY**\n`;
       prompt += `- Caption Mode: ${captionMode.toUpperCase()}\n`;
       prompt += `- Alignment: ${captionAlignment.toUpperCase()} (${captionAlignmentClass})\n`;
       prompt += `- Coverage: ${captionCoverage.toUpperCase()}\n`;
       prompt += `- Maximum Captions: ${parsedCaptionMaxCount}\n`;
-      prompt += `- Hero rule: Never render caption for Image 1 in article body.\n`;
+      prompt += `- Hero rule: Never render caption for \`hero.webp\` in the article body.\n`;
 
       if (captionMode === "auto") {
         prompt += `- Auto logic: prioritize captions for evidence-heavy screenshots (settings panels, verification outputs, before/after state, error/fix proof).\n`;
@@ -1486,48 +1340,18 @@ export function usePromptLogic({
       prompt += `- Place the \`<DownloadButton />\` component exactly where the {{Link n}} marker appears in the source content.\n`;
     }
 
-    if (showGrids && debouncedImageGridMappings) {
-      prompt += `\n**5. IMAGE GRIDS**\n`;
-      debouncedImageGridMappings.split("\n").filter(l => l.trim()).forEach((line, i) => {
-        const [config, pathPart] = line.split("|").map(s => s.trim());
-        if (config && pathPart) {
-          const normalizedPaths = pathPart.split(",").map(p => normalizeImagePath(p.trim())).join(", ");
-          prompt += `- Group ${i + 1}: ${config} | ${normalizedPaths} (source marker: {{Grid ${i + 1}}})\n`;
-        } else {
-          prompt += `- Group ${i + 1}: ${line} (source marker: {{Grid ${i + 1}}})\n`;
-        }
-      });
-    }
-
-    if (showGallery && debouncedGalleryMappings) {
-      prompt += `\n**6. HERO GALLERIES**\n`;
-      debouncedGalleryMappings.split("\n").filter(l => l.trim()).forEach((line, i) => {
-        const [caption, pathPart] = line.split("|").map(s => s.trim());
-        if (caption && pathPart) {
-          const normalizedPaths = pathPart.split(",").map(p => normalizeImagePath(p.trim())).join(", ");
-          prompt += `- Gallery ${i + 1}: ${caption} | ${normalizedPaths} (source marker: {{Gallery ${i + 1}}})\n`;
-        } else {
-          // If no | separator, assume it's just paths
-          const normalizedPaths = line.split(",").map(p => normalizeImagePath(p.trim())).join(", ");
-          prompt += `- Gallery ${i + 1}: ${normalizedPaths} (source marker: {{Gallery ${i + 1}}})\n`;
-        }
-      });
-    }
-
     if (showSpecs && debouncedSpecsMappings.trim()) {
-      prompt += `\n**7. SYSTEM REQUIREMENTS (RAW DATA)**\n`;
+      prompt += `\n**5. SYSTEM REQUIREMENTS (RAW DATA)**\n`;
       prompt += `Parse the following raw text into <SpecList> and <SpecItem> blocks. Each line or block represents a spec group.\n`;
       prompt += `${debouncedSpecsMappings}\n`;
       prompt += `(Source markers: {{Specs 1}}, {{Specs 2}}, etc.)\n`;
     }
 
-    if (showDownloads || showGrids || showGallery || showSpecs) {
-      prompt += `\n**8. PLACEHOLDER RESOLUTION RULES**\n`;
-      prompt += `- Treat {{Link n}}, {{Grid n}}, {{Gallery n}}, and {{Specs n}} as source markers only.\n`;
+    if (showDownloads || showSpecs) {
+      prompt += `\n**6. PLACEHOLDER RESOLUTION RULES**\n`;
+      prompt += `- Treat {{Link n}} and {{Specs n}} as source markers only.\n`;
       prompt += `- In FINAL MDX output, resolve every marker into actual content/components at the correct position.\n`;
       prompt += `- **{{Link n}} → ALWAYS resolves to \`<DownloadButton id="..." />\`** — never a markdown link, never a raw <a> tag. See Section 4 for full rules.\n`;
-      prompt += `- **{{Grid n}} → resolves to \`<ImageGrid columns={N}>\` block** with the mapped images.\n`;
-      prompt += `- **{{Gallery n}} → resolves to \`<Gallery caption="...">\` block** with the mapped images.\n`;
       prompt += `- **{{Specs n}} → resolves to \`<SpecList>\` / \`<SpecItem>\` blocks** parsed from the raw spec data.\n`;
       prompt += `- Never leave raw {{...}} markers in final output.\n`;
       prompt += `- Ensure output is MDX-parse-safe (no invalid JS expressions such as raw moustache tokens).\n`;
@@ -1625,14 +1449,12 @@ export function usePromptLogic({
       prompt += `For readability-only passes in modify mode, prioritize paragraph splits over sentence rewrites: keep claims, facts, and wording intact as much as possible, and only break dense paragraphs into shorter blocks that follow the paragraph rhythm rules. `;
       prompt += `When splitting paragraphs, do not remove factual details, do not soften key caveats, and do not change technical meaning. `;
     }
-    prompt += `If source markers ({{Link n}}, {{Grid n}}, {{Gallery n}}, {{Specs n}}) are present, replace them with concrete MDX output and do not keep marker text in the final file. `;
-    if (!isModify && hasBodyImages && captionMode !== "off") {
+    prompt += `If source markers ({{Link n}}, {{Specs n}}) are present, replace them with concrete MDX output and do not keep marker text in the final file. `;
+    if (!isModify && hasAnyImages && captionMode !== "off") {
       prompt += `Apply the Image Caption Policy section deterministically. Avoid captioning decorative/redundant images in selective mode, keep each caption to one sentence, and place it directly under the image using the required class alignment. `;
     }
     prompt += `For procedural or tutorial sections, use custom MDX components \`<Steps>\` and \`<Step>\` instead of plain numbered markdown lists. `;
-    if (hasHeroImage) {
-      prompt += `Set the hero image as frontmatter heroImage/banner and do not render it again in article body unless explicitly requested. `;
-    }
+    prompt += `Set the hero.webp image as frontmatter heroImage/banner and do not render it again in article body unless explicitly requested. `;
     prompt += `Ensure all metadata (slugs, translation keys, alt texts) are generated automatically. Tags must never contain spaces and must never produce %20 in URLs. Any tag that would produce %20 is invalid and must be rewritten into lowercase kebab-case (e.g., windows-11, clean-install, ui-design, ubuntu-25-10). Always include 1 platform tag (windows/ubuntu/linux/android/hardware) and 1 versioned tag if the article targets a specific OS version (e.g., windows-11, ubuntu-25-10). Minimum 3 tags, maximum 6 tags per article. `;
     prompt += `Run a final self-check against the readability rhythm rules and the QA checklist before returning final MDX. `;
     prompt += `Ensure the output is genuinely helpful, intent-focused, and clearly better than a generic rewrite.`;
@@ -1650,14 +1472,9 @@ export function usePromptLogic({
     isFeatured,
     isHideFromHome,
     isIdOnly,
-    debouncedHeroImage,
     contentType,
     downloadItems,
-    debouncedImageGridMappings,
-    debouncedGalleryMappings,
     showDownloads,
-    showGrids,
-    showGallery,
     showImages,
     showSpecs,
     debouncedSpecsMappings,
@@ -1676,7 +1493,6 @@ export function usePromptLogic({
     captionAlignment,
     captionCoverage,
     parsedCaptionMaxCount,
-    imageLines,
     availableTags,
     debouncedStagingFolderPath,
   ]);
@@ -1872,10 +1688,10 @@ export function usePromptLogic({
     selectedSlug, setSelectedSlug, articleSearch, setArticleSearch,
     statusFilter, setStatusFilter, draft, setDraft,
     originalContent, setOriginalContent, modInstructions, setModInstructions,
-    showImages, setShowImages, showDownloads, setShowDownloads, showGrids, setShowGrids, showGallery, setShowGallery, showSpecs, setShowSpecs, isIdOnly, setIsIdOnly,
+    showImages, setShowImages, showDownloads, setShowDownloads, showSpecs, setShowSpecs, isIdOnly, setIsIdOnly,
     captionMode, setCaptionMode, captionAlignment, setCaptionAlignment, captionCoverage, setCaptionCoverage, captionMaxCount, setCaptionMaxCount,
     publishDate, setPublishDate, isPublished, setIsPublished, isFeatured, setIsFeatured, isHideFromHome, setIsHideFromHome, categoryHint, setCategoryHint, isTechnicalExpanded, setIsTechnicalExpanded,
-    downloadItems, setDownloadItems, imageGridMappings, setImageGridMappings, galleryMappings, setGalleryMappings, specsMappings, setSpecsMappings, heroImage, setHeroImage, images, setImages,
+    downloadItems, setDownloadItems, specsMappings, setSpecsMappings,
     stagingFolderPath, setStagingFolderPath,
     generatedPrompt, setGeneratedPrompt, isCopied, setIsCopied, resetPopoverOpen, setResetPopoverOpen, isOriginalLoading, setIsOriginalLoading,
     selectedBlock, setSelectedBlock, selectedBlockLine, setSelectedBlockLine, selectedBlockComment, setSelectedBlockComment,
