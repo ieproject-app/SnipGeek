@@ -28,6 +28,18 @@ export const STORAGE_KEYS = {
    * Values: "en" | "id"
    */
   LOCALE: "NEXT_LOCALE",
+
+  /**
+   * Active tab in the Image Crop tool.
+   * Values: "crop" | "rename"
+   */
+  IMAGE_CROP_TAB: "snipgeek-image-crop-tab",
+
+  /**
+   * Active article image type in the Batch Rename tab.
+   * Values: "body" | "gallery" | "grid"
+   */
+  IMAGE_RENAME_TYPE: "snipgeek-image-rename-type",
 } as const;
 
 export type StorageKey = (typeof STORAGE_KEYS)[keyof typeof STORAGE_KEYS];

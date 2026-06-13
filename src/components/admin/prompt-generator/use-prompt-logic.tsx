@@ -567,6 +567,8 @@ export function usePromptLogic({
   const [specsMappings, setSpecsMappings] = useState("");
   const [heroImage, setHeroImage] = useState("");
   const [images, setImages] = useState("");
+  // ── Staging folder (for Cloudinary upload instruction) ──
+  const [stagingFolderPath, setStagingFolderPath] = useState("");
 
   // Debounce frequently changing values to reduce prompt recompute frequency
   const debouncedDraft = useDebounce(draft, 500);
@@ -578,6 +580,7 @@ export function usePromptLogic({
   const debouncedImages = useDebounce(images, 300);
   const debouncedImageGridMappings = useDebounce(imageGridMappings, 300);
   const debouncedGalleryMappings = useDebounce(galleryMappings, 300);
+  const debouncedStagingFolderPath = useDebounce(stagingFolderPath, 400);
   const debouncedSpecsMappings = useDebounce(specsMappings, 300);
   // Debounce free-text fields that feed directly into the prompt to reduce
   // unnecessary recomputes while the user is still typing.
@@ -985,6 +988,32 @@ export function usePromptLogic({
           description: "Hero image is reserved for frontmatter. Remove it from article body unless you intentionally want duplicate rendering.",
         });
       }
+      // Warn if hero path looks like a local path instead of a Cloudinary URL
+      const rawHeroPath = (debouncedHeroImage.split("|")[0] ?? "").trim();
+      if (rawHeroPath && !rawHeroPath.startsWith("http") && rawHeroPath.includes("/images/")) {
+        issues.push({
+          id: "hero-local-path",
+          severity: "warning",
+          title: "Hero image is a local path",
+          description: "Hero image looks like a local file path. Upload to Cloudinary first and replace with the Cloudinary URL.",
+        });
+      }
+    }
+
+    // Warn if any body image is a local path
+    if (showImages) {
+      const localBodyImages = debouncedImages
+        .split("\n")
+        .map((l) => (l.split("|")[0] ?? "").trim())
+        .filter((p) => p && !p.startsWith("http") && p.includes("/images/"));
+      if (localBodyImages.length > 0) {
+        issues.push({
+          id: "body-local-paths",
+          severity: "warning",
+          title: `${localBodyImages.length} body image(s) are local paths`,
+          description: "These images have not been uploaded to Cloudinary yet. Use the staging folder path and upload instructions in the prompt.",
+        });
+      }
     }
 
     if (mode === "create" && (contentType === "news" || contentType === "apps")) {
@@ -1015,6 +1044,7 @@ export function usePromptLogic({
     debouncedGalleryMappings,
     debouncedHeroImage,
     debouncedImageGridMappings,
+    debouncedImages,
     mode,
     debouncedNewsAngle,
     debouncedNewsSourceUrls,
@@ -1087,6 +1117,7 @@ export function usePromptLogic({
         if (typeof d.galleryMappings === "string") setGalleryMappings(d.galleryMappings);
         if (typeof d.specsMappings === "string") setSpecsMappings(d.specsMappings);
         if (typeof d.selectedSlug === "string") setSelectedSlug(d.selectedSlug);
+        if (typeof d.stagingFolderPath === "string") setStagingFolderPath(d.stagingFolderPath);
       } catch { }
     }
   }, []);
@@ -1150,6 +1181,7 @@ export function usePromptLogic({
         galleryMappings,
         specsMappings,
         selectedSlug,
+        stagingFolderPath,
       }),
     );
   }, [
@@ -1173,6 +1205,7 @@ export function usePromptLogic({
     galleryMappings,
     specsMappings,
     selectedSlug,
+    stagingFolderPath,
     mounted,
   ]);
 
@@ -1307,9 +1340,90 @@ export function usePromptLogic({
 
     const hasHeroImage = showImages && debouncedHeroImage.trim() !== "";
     const hasBodyImages = showImages && imageLines.length > 0;
+    const hasGridImages = showGrids && debouncedImageGridMappings.trim() !== "";
+    const hasGalleryImages = showGallery && debouncedGalleryMappings.trim() !== "";
+    const stagingPath = debouncedStagingFolderPath.trim();
+    const hasAnyImages = hasHeroImage || hasBodyImages || hasGridImages || hasGalleryImages;
 
-    if (hasHeroImage || hasBodyImages) {
+    if (hasAnyImages) {
       prompt += `**3. ASSETS & MEDIA**\n`;
+
+      // ── Upload instruction block (only when staging folder is set) ──
+      if (stagingPath) {
+        // Derive Cloudinary target from staging path:
+        // Strip leading slash/public, normalise separators
+        const normalised = stagingPath
+          .replace(/\\/g, "/")
+          .replace(/^\/?public\//, "")
+          .replace(/\/+$/, "");
+        const cloudinaryTarget = `snipgeek/${normalised}`;
+
+        // Parse category and slug from the path for upload API fields
+        const pathParts = normalised.replace(/^images\//, "").split("/");
+        const contentSegment = pathParts[0] ?? "_posts"; // e.g. _posts or _notes
+        const isNotes = contentSegment === "_notes";
+        const category = !isNotes && pathParts.length >= 3 ? pathParts[1] : "";
+        const slug = pathParts[pathParts.length - 1] ?? "";
+
+        prompt += `\n⚠️  PRE-WRITING TASK — UPLOAD ALL IMAGES BEFORE WRITING:\n`;
+        prompt += `You must upload every image listed below to Cloudinary before inserting any URLs into content.\n\n`;
+        prompt += `Staging path (local) : ${stagingPath}\n`;
+        prompt += `Cloudinary target     : ${cloudinaryTarget}\n\n`;
+        prompt += `Upload via POST /api/admin/cloudinary/upload\n`;
+        prompt += `  FormData fields:\n`;
+        prompt += `    file     : <binary image>\n`;
+        prompt += `    slug     : ${slug || "[article-slug]"}\n`;
+        prompt += `    type     : ${contentSegment}\n`;
+        if (category) prompt += `    category : ${category}\n`;
+        prompt += `\n`;
+        prompt += `After upload, each URL will be:\n`;
+        prompt += `  https://res.cloudinary.com/snipgeek/image/upload/q_auto/f_auto/v{timestamp}/${cloudinaryTarget}/{filename}\n\n`;
+        prompt += `Use ONLY Cloudinary URLs in final MDX. Never use local file paths.\n\n`;
+
+        // Build file list
+        prompt += `Files to upload (in this order):\n`;
+        let fileIndex = 1;
+        if (hasHeroImage) {
+          const heroRaw = (debouncedHeroImage.split("|")[0] ?? "").trim();
+          prompt += `  ${fileIndex++}. [HERO]    hero.webp\n`;
+          // If it's already a Cloudinary URL, note it
+          if (heroRaw.startsWith("http")) {
+            prompt += `     (Already uploaded: ${heroRaw})\n`;
+          }
+        }
+        if (hasBodyImages) {
+          imageLines.forEach((line, i) => {
+            const rawPath = (line.split("|")[0] ?? "").trim();
+            const filename = (rawPath.split("/").pop() ?? rawPath) || `image-${String(i + 1).padStart(2, "0")}.webp`;
+            prompt += `  ${fileIndex++}. [IMAGE ${i + 1}] ${filename}\n`;
+          });
+        }
+        if (hasGridImages) {
+          debouncedImageGridMappings.split("\n").filter(l => l.trim()).forEach((line, i) => {
+            const pathPart = line.split("|")[1] ?? line;
+            pathPart.split(",").map(p => p.trim()).filter(Boolean).forEach((p) => {
+              const fn = p.split("/").pop() ?? p;
+              prompt += `  ${fileIndex++}. [GRID ${i + 1}]  ${fn}\n`;
+            });
+          });
+        }
+        if (hasGalleryImages) {
+          debouncedGalleryMappings.split("\n").filter(l => l.trim()).forEach((line, i) => {
+            const pathPart = line.split("|")[1] ?? line;
+            pathPart.split(",").map(p => p.trim()).filter(Boolean).forEach((p) => {
+              const fn = p.split("/").pop() ?? p;
+              prompt += `  ${fileIndex++}. [GALLERY ${i + 1}] ${fn}\n`;
+            });
+          });
+        }
+
+        prompt += `\n🗑️  CLEANUP RULE (run after article is published for 2+ days):\n`;
+        prompt += `Delete the CONTENTS of the staging folder (not the folder itself):\n`;
+        prompt += `  ${stagingPath}\n`;
+        prompt += `The Cloudinary copy is permanent and serves all production traffic.\n\n`;
+      }
+
+      // ── Image list for AI content placement ──
       if (hasHeroImage) {
         const heroParts = debouncedHeroImage.split("|").map((s) => s?.trim() || "");
         const heroPath = normalizeImagePath(heroParts[0] ?? "");
@@ -1564,6 +1678,7 @@ export function usePromptLogic({
     parsedCaptionMaxCount,
     imageLines,
     availableTags,
+    debouncedStagingFolderPath,
   ]);
 
   // Update generatedPrompt when the memoized prompt changes
@@ -1761,6 +1876,7 @@ export function usePromptLogic({
     captionMode, setCaptionMode, captionAlignment, setCaptionAlignment, captionCoverage, setCaptionCoverage, captionMaxCount, setCaptionMaxCount,
     publishDate, setPublishDate, isPublished, setIsPublished, isFeatured, setIsFeatured, isHideFromHome, setIsHideFromHome, categoryHint, setCategoryHint, isTechnicalExpanded, setIsTechnicalExpanded,
     downloadItems, setDownloadItems, imageGridMappings, setImageGridMappings, galleryMappings, setGalleryMappings, specsMappings, setSpecsMappings, heroImage, setHeroImage, images, setImages,
+    stagingFolderPath, setStagingFolderPath,
     generatedPrompt, setGeneratedPrompt, isCopied, setIsCopied, resetPopoverOpen, setResetPopoverOpen, isOriginalLoading, setIsOriginalLoading,
     selectedBlock, setSelectedBlock, selectedBlockLine, setSelectedBlockLine, selectedBlockComment, setSelectedBlockComment,
     originalContentRef, modInstructionsRef, blockComposerRef,

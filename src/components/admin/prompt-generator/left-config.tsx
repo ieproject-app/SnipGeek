@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
 import { DownloadIdPicker, getDraftAgeDays, parseNaturalDate, type ArticleSummary } from "./use-prompt-logic";
-import { Search, FileText, Sparkles, Plus, Trash2, Copy, Settings2, ImageIcon, Download, Grid3X3, GalleryHorizontal, Import } from "lucide-react";
+import { Search, FileText, Sparkles, Plus, Trash2, Copy, Settings2, ImageIcon, Download, Grid3X3, GalleryHorizontal, Import, FolderOpen, Info } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export function LeftConfig() {
@@ -364,6 +364,7 @@ function TechnicalTabsCard() {
   const {
     showImages, showDownloads, showGrids, showGallery, showSpecs,
     heroImage, setHeroImage, images, setImages,
+    stagingFolderPath, setStagingFolderPath,
     downloadItems, updateDownloadItem, removeDownloadItem, addDownloadItem, downloadIds, copyLinkCaller,
     imageGridMappings, setImageGridMappings, copyGridCaller,
     galleryMappings, setGalleryMappings, copyGalleryCaller,
@@ -428,6 +429,45 @@ function TechnicalTabsCard() {
           <div className="p-4">
             {showImages && (
               <TabsContent value="images" className="space-y-4 m-0 border-none outline-none">
+
+                {/* Staging Folder Path */}
+                <div className="space-y-1.5">
+                  <div className="flex items-center gap-2">
+                    <FolderOpen className="h-3 w-3 text-emerald-600 dark:text-emerald-400" />
+                    <p className="text-[9px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">Staging Folder Path</p>
+                    <span className="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-[8px] font-bold uppercase tracking-wide text-emerald-600 dark:text-emerald-400">OPTIONAL</span>
+                  </div>
+                  <Input
+                    placeholder="public/images/_posts/windows11/cara-install-wsl/"
+                    value={stagingFolderPath}
+                    onChange={(e) => setStagingFolderPath(e.target.value)}
+                    className={cn("bg-background/50 font-mono text-[11px] focus-visible:border-emerald-500/50", focusRing)}
+                  />
+                  {stagingFolderPath.trim() && (() => {
+                    const norm = stagingFolderPath.trim().replace(/\\/g, "/").replace(/^\/?public\//, "").replace(/\/+$/, "");
+                    return (
+                      <p className="font-mono text-[10px] text-muted-foreground/60">
+                        Cloudinary: <span className="text-emerald-600 dark:text-emerald-400">snipgeek/{norm}</span>
+                      </p>
+                    );
+                  })()}
+                </div>
+
+                {/* Naming convention info */}
+                <div className="flex gap-2 rounded-lg border border-emerald-500/15 bg-emerald-500/5 px-3 py-2.5">
+                  <Info className="h-3.5 w-3.5 shrink-0 mt-0.5 text-emerald-600/60" />
+                  <div className="space-y-1">
+                    <p className="text-[9px] font-bold uppercase tracking-wider text-emerald-600/80">File naming convention</p>
+                    <div className="grid grid-cols-2 gap-x-3 gap-y-0.5 font-mono text-[9px] text-muted-foreground/70">
+                      <span><span className="text-emerald-500">hero.webp</span> &rarr; Hero/Banner</span>
+                      <span><span className="text-emerald-500">01-name.webp</span> &rarr; Body img</span>
+                      <span><span className="text-emerald-500">gallery-01.webp</span> &rarr; Gallery</span>
+                      <span><span className="text-emerald-500">grid-01.webp</span> &rarr; Grid</span>
+                    </div>
+                    <p className="text-[9px] text-muted-foreground/50">Use the Batch Rename tab in Image Crop tool to auto-rename files.</p>
+                  </div>
+                </div>
+
                 <div className="space-y-1.5">
                   <div className="flex items-center gap-2">
                     <p className="text-[9px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">Hero / Banner</p>
