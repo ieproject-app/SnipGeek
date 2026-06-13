@@ -1,0 +1,49 @@
+---
+title: "Mencoba MiMoCode: AI Coding Assistant Terminal Dengan Memori"
+slug: "testing-mimocode-terminal-ai-coding-assistant"
+translationKey: "testing-mimocode-terminal-ai-coding-assistant"
+date: "2026-06-13"
+description: "MiMoCode menawarkan sistem memori lintas sesi, akses MiMo Auto gratis, dan mode Plan serta Compose untuk mengeksekusi task coding panjang."
+category: "mimo"
+tags: ["windows", "ubuntu", "ai", "news", "code-editor"]
+published: true
+featured: false
+heroImage: "https://res.cloudinary.com/snipgeek/image/upload/q_auto/f_auto/v1781363980/snipgeek/images/_posts/mimo/hero.webp"
+imageAlt: "Antarmuka terminal MiMoCode menampilkan fitur agen AI dan sistem memori"
+---
+
+Malam kemarin, saat saya iseng *scrolling* Threads, saya melihat salah satu postingan yang ngebahas soal AI model yang perkembangannya sering saya amati. Menariknya, ternyata sekarang ada *terminal coding assistant*-nya yang bernama **MiMoCode**! Usut punya usut, ini adalah *fork* dari OpenCode. Karena saya memang selalu mencari alat bantu AI alternatif yang berjalan langsung di terminal, saya langsung penasaran untuk mencobanya.
+
+Kalau kamu sedang butuh *coding assistant* yang bisa mengingat struktur proyekmu antar sesi dan sanggup mengeksekusi *task* panjang, MiMoCode ini sangat layak dicoba. Alat *open-source* ini punya sistem memori berbasis SQLite, beberapa mode agen pintar (seperti Plan, Compose, dan Build), dan yang paling penting: saat ini mereka menyediakan *channel* "MiMo Auto" yang bisa diakses gratis tanpa perlu login rumit!
+
+### Memori Persisten yang Benar-Benar Ingat
+
+Daya tarik utama yang bikin saya kaget adalah sistem memori persistennya. Tidak seperti *chat interface* biasa di mana kita harus terus-terusan menjelaskan ulang struktur proyek setiap kali mulai sesi baru, MiMoCode secara cerdas mempertahankan file `MEMORY.md` bersama dengan *checkpoint* sesi otomatis. Jadi, saat saya buka lagi proyek yang sama keesokan harinya, agennya langsung ingat arsitektur kode saya tanpa perlu disuruh *relearn*.
+
+![Antarmuka baris perintah MiMoCode menunjukkan mode agen Plan, Build, dan Compose](https://res.cloudinary.com/snipgeek/image/upload/q_auto/f_auto/v1781363977/snipgeek/images/_posts/mimo/01-mimo-code.webp)
+<div className="-mt-3 mb-6 text-center text-sm italic text-muted-foreground">Screenshot: Mencoba mode Plan dan Compose di dalam terminal MiMoCode</div>
+
+Saya benar-benar tidak menyangka struktur memorinya sekuat ini. Mereka menggunakan SQLite FTS5 untuk pencarian *full-text* yang mencakup pengetahuan proyek, catatan sementara (*scratch notes*), sampai log progres berjalannya sebuah *task*.
+
+### Eksplorasi Mode Plan dan Compose
+
+Saat mencobanya beberapa kali, fitur mode bawaannya langsung terasa manfaatnya. Kamu cukup menekan `Tab` untuk berpindah mode.
+- **Build Mode**: Ini mode bawaannya. Agen punya izin penuh untuk menulis kode dan menjalankan perintah terminal.
+- **Plan Mode**: Mode analisis *read-only* yang super aman. Ini sangat membantu saat saya cuma butuh AI untuk mengeksplorasi kode dan merancang solusi tanpa takut ada file yang tidak sengaja terubah.
+- **Compose Mode**: Ini mode orkestrasi untuk pengembangan berbasis spesifikasi (*specs-driven*). Dari mulai merencanakan, eksekusi, *testing*, sampai *debugging*, semuanya diatur dalam satu alur.
+
+Khusus untuk mode Compose, saya merasa ini sangat ngebantu banget pas lagi mau merencanakan atau langsung gas bikin proyek dengan *task* panjang. Walaupun dari segi detail *raw generation*-nya mungkin belum sekuat Codex, tapi mengingat alat ini gratis dan punya kemampuan orkestrasi sebaik ini, jelas ini jadi alternatif yang sangat bagus buat kita.
+
+<Gallery caption="Fitur dan antarmuka komponen MiMoCode">
+  ![Antarmuka Terminal MiMoCode 1](https://res.cloudinary.com/snipgeek/image/upload/q_auto/f_auto/v1781363978/snipgeek/images/_posts/mimo/gallery-01.png)
+  ![Antarmuka Terminal MiMoCode 2](https://res.cloudinary.com/snipgeek/image/upload/q_auto/f_auto/v1781363979/snipgeek/images/_posts/mimo/gallery-02.png)
+</Gallery>
+
+### SnipGeek's Take
+
+Ini adalah salah satu alat yang wajib kamu tes kalau kamu sering kerja di terminal. Setup-nya *zero-configuration* kalau kamu pakai opsi MiMo Auto, dan sistem injeksi memorinya menangani masalah *context management* dengan sangat mulus.
+
+### Referensi
+1. [Repositori GitHub MiMoCode](https://github.com/XiaomiMiMo/MiMo-Code)
+
+Kalau kamu ikutan nyoba, kasih tau saya ya gimana pengalamannya ngadepin *workflow* harianmu! Jujur saya juga penasaran mau lihat seberapa pintar fitur `/dream` dan `/distill`-nya setelah dipakai intens selama beberapa minggu ke depan.
